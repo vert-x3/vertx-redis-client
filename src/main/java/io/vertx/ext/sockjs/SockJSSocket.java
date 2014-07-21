@@ -14,8 +14,9 @@
  * You may elect to redistribute this code under either of these licenses.
  */
 
-package io.vertx.ext.sockjs.impl;
+package io.vertx.ext.sockjs;
 
+import io.vertx.codegen.annotations.VertxGen;
 import io.vertx.core.MultiMap;
 import io.vertx.core.net.SocketAddress;
 import io.vertx.core.streams.ReadStream;
@@ -31,6 +32,7 @@ import io.vertx.core.streams.WriteStream;
  *
  * @author <a href="http://tfox.org">Tim Fox</a>
  */
+@VertxGen
 public interface SockJSSocket extends ReadStream<SockJSSocket>, WriteStream<SockJSSocket> {
 
   /**

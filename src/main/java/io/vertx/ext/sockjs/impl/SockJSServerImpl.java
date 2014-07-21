@@ -25,12 +25,15 @@ import io.vertx.core.http.HttpServerRequest;
 import io.vertx.core.http.HttpServerResponse;
 import io.vertx.core.http.ServerWebSocket;
 import io.vertx.core.http.impl.WebSocketMatcher;
-import io.vertx.core.json.JsonArray;
-import io.vertx.core.json.JsonObject;
 import io.vertx.core.logging.Logger;
 import io.vertx.core.logging.impl.LoggerFactory;
 import io.vertx.ext.routematcher.RouteMatcher;
+import io.vertx.ext.sockjs.BridgeOptions;
+import io.vertx.ext.sockjs.EventBusBridgeHook;
 import io.vertx.ext.sockjs.SockJSServer;
+import io.vertx.ext.sockjs.SockJSServerOptions;
+import io.vertx.ext.sockjs.SockJSSocket;
+import io.vertx.ext.sockjs.Transport;
 
 import java.security.MessageDigest;
 import java.text.SimpleDateFormat;
@@ -95,51 +98,22 @@ public class SockJSServerImpl implements SockJSServer, Handler<HttpServerRequest
     if (log.isTraceEnabled()) {
       log.trace("Got request in sockjs server: " + req.uri());
     }
-    rm.requestHandler().handle(req);
+    rm.accept(req);
   }
 
   public void close() {
     vertx.cancelTimer(timerID);
   }
 
-  private static JsonObject setDefaults(JsonObject config) {
-    config = config.copy();
-    //Set the defaults
-    if (config.getNumber("session_timeout") == null) {
-      config.putNumber("session_timeout", 5l * 1000); // 5 seconds default
-    }
-    if (config.getBoolean("insert_JSESSIONID") == null) {
-      config.putBoolean("insert_JSESSIONID", true);
-    }
-    if (config.getNumber("heartbeat_period") == null) {
-      config.putNumber("heartbeat_period", 25l * 1000);
-    }
-    if (config.getNumber("max_bytes_streaming") == null) {
-      config.putNumber("max_bytes_streaming", 128 * 1024);
-    }
-    if (config.getString("prefix") == null) {
-      config.putString("prefix", "/");
-    }
-    if (config.getString("library_url") == null) {
-      config.putString("library_url", "http://cdn.sockjs.org/sockjs-0.3.4.min.js");
-    }
-    if (config.getArray("disabled_transports") == null) {
-      config.putArray("disabled_transports", new JsonArray());
-    }
-    return config;
-  }
-  
   public SockJSServerImpl setHook(EventBusBridgeHook hook) {
 	  this.hook = hook;
     return this;
   }
 
-  public SockJSServerImpl installApp(JsonObject config,
-                                 Handler<SockJSSocket> sockHandler) {
+  public SockJSServerImpl installApp(SockJSServerOptions options,
+                                     Handler<SockJSSocket> sockHandler) {
 
-    config = setDefaults(config);
-
-    String prefix = config.getString("prefix");
+    String prefix = options.getPrefix();
 
     if (prefix == null || prefix.equals("") || prefix.endsWith("/")) {
       throw new IllegalArgumentException("Invalid prefix: " + prefix);
@@ -156,7 +130,7 @@ public class SockJSServerImpl implements SockJSServer, Handler<HttpServerRequest
     });
 
     // Iframe handlers
-    String iframeHTML = IFRAME_TEMPLATE.replace("{{ sockjs_url }}", config.getString("library_url"));
+    String iframeHTML = IFRAME_TEMPLATE.replace("{{ sockjs_url }}", options.getLibraryURL());
     Handler<HttpServerRequest> iframeHandler = createIFrameHandler(iframeHTML);
 
     // Request exactly for iframe.html
@@ -167,11 +141,11 @@ public class SockJSServerImpl implements SockJSServer, Handler<HttpServerRequest
 
     // Chunking test
     rm.postWithRegEx(prefix + "\\/chunking_test", createChunkingTestHandler());
-    rm.optionsWithRegEx(prefix + "\\/chunking_test", BaseTransport.createCORSOptionsHandler(config, "OPTIONS, POST"));
+    rm.optionsWithRegEx(prefix + "\\/chunking_test", BaseTransport.createCORSOptionsHandler(options, "OPTIONS, POST"));
 
     // Info
-    rm.getWithRegEx(prefix + "\\/info", BaseTransport.createInfoHandler(config));
-    rm.optionsWithRegEx(prefix + "\\/info", BaseTransport.createCORSOptionsHandler(config, "OPTIONS, GET"));
+    rm.getWithRegEx(prefix + "\\/info", BaseTransport.createInfoHandler(options));
+    rm.optionsWithRegEx(prefix + "\\/info", BaseTransport.createCORSOptionsHandler(options, "OPTIONS, GET"));
 
     // Transports
 
@@ -181,24 +155,26 @@ public class SockJSServerImpl implements SockJSServer, Handler<HttpServerRequest
     enabledTransports.add(Transport.JSON_P.toString());
     enabledTransports.add(Transport.WEBSOCKET.toString());
     enabledTransports.add(Transport.XHR.toString());
-    for (Object tr : config.getArray("disabled_transports", new JsonArray())) {
-      enabledTransports.remove(tr);
+    Set<String> disabledTransports = options.getDisabledTransports();
+    if (disabledTransports == null) {
+      disabledTransports = new HashSet<>();
     }
+    enabledTransports.removeAll(disabledTransports);
 
     if (enabledTransports.contains(Transport.XHR.toString())) {
-      new XhrTransport(vertx, rm, prefix, sessions, config, sockHandler);
+      new XhrTransport(vertx, rm, prefix, sessions, options, sockHandler);
     }
     if (enabledTransports.contains(Transport.EVENT_SOURCE.toString())) {
-      new EventSourceTransport(vertx, rm, prefix, sessions, config, sockHandler);
+      new EventSourceTransport(vertx, rm, prefix, sessions, options, sockHandler);
     }
     if (enabledTransports.contains(Transport.HTML_FILE.toString())) {
-      new HtmlFileTransport(vertx, rm, prefix, sessions, config, sockHandler);
+      new HtmlFileTransport(vertx, rm, prefix, sessions, options, sockHandler);
     }
     if (enabledTransports.contains(Transport.JSON_P.toString())) {
-      new JsonPTransport(vertx, rm, prefix, sessions, config, sockHandler);
+      new JsonPTransport(vertx, rm, prefix, sessions, options, sockHandler);
     }
     if (enabledTransports.contains(Transport.WEBSOCKET.toString())) {
-      new WebSocketTransport(vertx, wsMatcher, rm, prefix, sessions, config, sockHandler);
+      new WebSocketTransport(vertx, wsMatcher, rm, prefix, sessions, options, sockHandler);
       new RawWebSocketTransport(vertx, wsMatcher, rm, prefix, sockHandler);
     }
     // Catch all for any other requests on this app
@@ -213,44 +189,15 @@ public class SockJSServerImpl implements SockJSServer, Handler<HttpServerRequest
     return this;
   }
 
-  public SockJSServerImpl bridge(JsonObject sjsConfig, JsonArray inboundPermitted, JsonArray outboundPermitted) {
-	  EventBusBridge busBridge = new EventBusBridge(vertx, inboundPermitted, outboundPermitted);
+  public SockJSServerImpl bridge(SockJSServerOptions serverOptions, BridgeOptions bridgeOptions) {
+	  EventBusBridge busBridge = new EventBusBridge(vertx, bridgeOptions);
     if (hook != null) {
       busBridge.setHook(hook);
     }
-    installApp(sjsConfig, busBridge);
+    installApp(serverOptions, busBridge);
     return this;
   }
 
-  public SockJSServerImpl bridge(JsonObject sjsConfig, JsonArray inboundPermitted, JsonArray outboundPermitted,
-                     long authTimeout) {
-	  EventBusBridge busBridge = new EventBusBridge(vertx, inboundPermitted, outboundPermitted, authTimeout);
-	  if (hook != null) {
-		  busBridge.setHook(hook);
-	  }
-    installApp(sjsConfig, busBridge);
-    return this;
-  }
-
-  public SockJSServerImpl bridge(JsonObject sjsConfig, JsonArray inboundPermitted, JsonArray outboundPermitted,
-                     long authTimeout, String authAddress) {
-	  EventBusBridge busBridge = new EventBusBridge(vertx, inboundPermitted, outboundPermitted, authTimeout, authAddress);
-	  if (hook != null) {
-		  busBridge.setHook(hook);
-	  }
-    installApp(sjsConfig, busBridge);
-    return this;
-  }
-
-  public SockJSServerImpl bridge(JsonObject sjsConfig, JsonArray inboundPermitted, JsonArray outboundPermitted,
-                             JsonObject bridgeConfig) {
-    EventBusBridge busBridge = new EventBusBridge(vertx, inboundPermitted, outboundPermitted, bridgeConfig);
-    if (hook != null) {
-      busBridge.setHook(hook);
-    }
-    installApp(sjsConfig, busBridge);
-    return this;
-  }
 
   private Handler<HttpServerRequest> createChunkingTestHandler() {
     return new Handler<HttpServerRequest>() {
@@ -393,108 +340,55 @@ public class SockJSServerImpl implements SockJSServer, Handler<HttpServerRequest
   These applications are required by the SockJS protocol and QUnit tests
    */
   public void installTestApplications() {
-    installApp(new JsonObject().putString("prefix", "/echo")
-                               .putNumber("max_bytes_streaming", 4096),
-               new Handler<SockJSSocket>() {
-      public void handle(SockJSSocket sock) {
-        sock.dataHandler(new Handler<Buffer>() {
-          public void handle(Buffer buff) {
-            sock.writeBuffer(buff);
+    installApp(new SockJSServerOptions().setPrefix("/echo").setMaxBytesStreaming(4096),
+               sock -> sock.dataHandler(sock::writeBuffer));
+    installApp(new SockJSServerOptions().setPrefix("/close").setMaxBytesStreaming(4096),
+               sock -> sock.close());
+    installApp(new SockJSServerOptions().setPrefix("/disabled_websocket_echo").setMaxBytesStreaming(4096).addDisabledTransport("WEBSOCKET"),
+      sock -> sock.dataHandler(sock::writeBuffer));
+    installApp(new SockJSServerOptions().setPrefix("/ticker").setMaxBytesStreaming(4096),
+      sock -> {
+        long timerID = vertx.setPeriodic(1000, tid -> sock.writeBuffer(Buffer.newBuffer("tick!")));
+        sock.endHandler(v -> vertx.cancelTimer(timerID));
+      });
+    installApp(new SockJSServerOptions().setPrefix("/amplify").setMaxBytesStreaming(4096),
+      sock -> {
+        sock.dataHandler(data -> {
+          String str = data.toString();
+          int n = Integer.valueOf(str);
+          if (n < 0 || n > 19) {
+            n = 1;
           }
-        });
-      }
-    });
-    installApp(new JsonObject().putString("prefix", "/close")
-                               .putNumber("max_bytes_streaming", 4096),
-               new Handler<SockJSSocket>() {
-      public void handle(SockJSSocket sock) {
-        sock.close();
-      }
-    });
-    JsonArray disabled = new JsonArray();
-    disabled.add(Transport.WEBSOCKET.toString());
-    installApp(new JsonObject().putString("prefix", "/disabled_websocket_echo")
-                               .putNumber("max_bytes_streaming", 4096)
-                               .putArray("disabled_transports",disabled),
-        new Handler<SockJSSocket>() {
-          public void handle(SockJSSocket sock) {
-            sock.dataHandler(new Handler<Buffer>() {
-              public void handle(Buffer buff) {
-                sock.writeBuffer(buff);
-              }
-            });
+          int num = (int) Math.pow(2, n);
+          Buffer buff = Buffer.newBuffer(num);
+          for (int i = 0; i < num; i++) {
+            buff.appendByte((byte) 'x');
           }
+          sock.writeBuffer(buff);
         });
-    installApp(new JsonObject().putString("prefix", "/ticker")
-                               .putNumber("max_bytes_streaming", 4096),
-               new Handler<SockJSSocket>() {
-      public void handle(SockJSSocket sock) {
-        long timerID = vertx.setPeriodic(1000, new Handler<Long>() {
-          public void handle(Long id) {
-            sock.writeBuffer(Buffer.newBuffer("tick!"));
-          }
-        });
-        sock.endHandler(new VoidHandler() {
-          public void handle() {
-            vertx.cancelTimer(timerID);
-          }
-        });
-      }
-    });
-    installApp(new JsonObject().putString("prefix", "/amplify")
-                               .putNumber("max_bytes_streaming", 4096),
-               new Handler<SockJSSocket>() {
-      public void handle(SockJSSocket sock) {
-        sock.dataHandler(new Handler<Buffer>() {
-          public void handle(Buffer data) {
-            String str = data.toString();
-            int n = Integer.valueOf(str);
-            if (n < 0 || n > 19) {
-              n = 1;
-            }
-            int num = (int)Math.pow(2, n);
-            Buffer buff = Buffer.newBuffer(num);
-            for (int i = 0; i < num; i++) {
-              buff.appendByte((byte)'x');
-            }
-            sock.writeBuffer(buff);
-          }
-        });
-      }
-    });
-    installApp(new JsonObject().putString("prefix", "/broadcast")
-                               .putNumber("max_bytes_streaming", 4096),
-               new Handler<SockJSSocket>() {
-      Set<String> connections = vertx.sharedData().getSet("conns");
-      public void handle(SockJSSocket sock) {
-        connections.add(sock.writeHandlerID());
-        sock.dataHandler(new Handler<Buffer>() {
-          public void handle(Buffer buffer) {
-            for (String actorID : connections) {
-              vertx.eventBus().publish(actorID, buffer);
-            }
-          }
-        });
-        sock.endHandler(new VoidHandler() {
-          public void handle() {
-            connections.remove(sock.writeHandlerID());
-          }
-        });
-      }
-    });
-    installApp(new JsonObject().putString("prefix", "/cookie_needed_echo")
-      .putNumber("max_bytes_streaming", 4096).putBoolean("insert_JSESSIONID", true),
+      });
+    installApp(new SockJSServerOptions().setPrefix("/broadcast").setMaxBytesStreaming(4096),
       new Handler<SockJSSocket>() {
+        Set<String> connections = vertx.sharedData().getSet("conns");
         public void handle(SockJSSocket sock) {
+          connections.add(sock.writeHandlerID());
           sock.dataHandler(new Handler<Buffer>() {
-            public void handle(Buffer buff) {
-              sock.writeBuffer(buff);
+            public void handle(Buffer buffer) {
+              for (String actorID : connections) {
+                vertx.eventBus().publish(actorID, buffer);
+              }
+            }
+          });
+          sock.endHandler(new VoidHandler() {
+            public void handle() {
+              connections.remove(sock.writeHandlerID());
             }
           });
         }
       });
 
-
+    installApp(new SockJSServerOptions().setPrefix("/cookie_needed_echo").setMaxBytesStreaming(4096).setInsertJSESSIONID(true),
+      sock -> sock.dataHandler(sock::writeBuffer));
   }
 
 }

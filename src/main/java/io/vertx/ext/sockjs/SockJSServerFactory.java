@@ -16,7 +16,6 @@
 
 package io.vertx.ext.sockjs;
 
-import io.vertx.codegen.annotations.VertxGen;
 import io.vertx.core.Vertx;
 import io.vertx.core.http.HttpServer;
 import io.vertx.ext.sockjs.impl.SockJSServerImpl;
@@ -24,7 +23,6 @@ import io.vertx.ext.sockjs.impl.SockJSServerImpl;
 /**
  * @author <a href="http://tfox.org">Tim Fox</a>
  */
-@VertxGen
 public interface SockJSServerFactory {
 
   SockJSServerImpl newSockJSServer(Vertx vertx, HttpServer httpServer);

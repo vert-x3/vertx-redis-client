@@ -20,10 +20,11 @@ import io.vertx.core.Handler;
 import io.vertx.core.Vertx;
 import io.vertx.core.buffer.Buffer;
 import io.vertx.core.http.HttpServerRequest;
-import io.vertx.ext.routematcher.RouteMatcher;
-import io.vertx.core.json.JsonObject;
 import io.vertx.core.logging.Logger;
 import io.vertx.core.logging.impl.LoggerFactory;
+import io.vertx.ext.routematcher.RouteMatcher;
+import io.vertx.ext.sockjs.SockJSServerOptions;
+import io.vertx.ext.sockjs.SockJSSocket;
 
 import java.util.Map;
 
@@ -45,22 +46,22 @@ class XhrTransport extends BaseTransport {
     H_BLOCK = Buffer.newBuffer(bytes);
   }
 
-  XhrTransport(Vertx vertx, RouteMatcher rm, String basePath, final Map<String, Session> sessions, final JsonObject config,
+  XhrTransport(Vertx vertx, RouteMatcher rm, String basePath, final Map<String, Session> sessions, final SockJSServerOptions options,
             final Handler<SockJSSocket> sockHandler) {
 
-    super(vertx, sessions, config);
+    super(vertx, sessions, options);
 
     String xhrBase = basePath + COMMON_PATH_ELEMENT_RE;
     String xhrRE = xhrBase + "xhr";
     String xhrStreamRE = xhrBase + "xhr_streaming";
 
-    Handler<HttpServerRequest> xhrOptionsHandler = createCORSOptionsHandler(config, "OPTIONS, POST");
+    Handler<HttpServerRequest> xhrOptionsHandler = createCORSOptionsHandler(options, "OPTIONS, POST");
 
     rm.optionsWithRegEx(xhrRE, xhrOptionsHandler);
     rm.optionsWithRegEx(xhrStreamRE, xhrOptionsHandler);
 
-    registerHandler(rm, sockHandler, xhrRE, false, config);
-    registerHandler(rm, sockHandler, xhrStreamRE, true, config);
+    registerHandler(rm, sockHandler, xhrRE, false, options);
+    registerHandler(rm, sockHandler, xhrStreamRE, true, options);
 
     String xhrSendRE = basePath + COMMON_PATH_ELEMENT_RE + "xhr_send";
 
@@ -75,7 +76,7 @@ class XhrTransport extends BaseTransport {
           handleSend(req, session);
         } else {
           req.response().setStatusCode(404);
-          setJSESSIONID(config, req);
+          setJSESSIONID(options, req);
           req.response().end();
         }
       }
@@ -83,15 +84,15 @@ class XhrTransport extends BaseTransport {
   }
 
   private void registerHandler(RouteMatcher rm, final Handler<SockJSSocket> sockHandler, String re,
-                               final boolean streaming, final JsonObject config) {
+                               final boolean streaming, final SockJSServerOptions options) {
     rm.postWithRegEx(re, new Handler<HttpServerRequest>() {
       public void handle(final HttpServerRequest req) {
         if (log.isTraceEnabled()) log.trace("XHR, post, " + req.uri());
         setNoCacheHeaders(req);
         String sessionID = req.params().get("param0");
-        Session session = getSession(config.getLong("session_timeout"), config.getLong("heartbeat_period"), sessionID, sockHandler);
+        Session session = getSession(options.getSessionTimeout(), options.getHeartbeatPeriod(), sessionID, sockHandler);
         session.setInfo(req.localAddress(), req.remoteAddress(), req.uri(), req.headers());
-        session.register(streaming? new XhrStreamingListener(config.getInteger("max_bytes_streaming"), req, session) : new XhrPollingListener(req, session));
+        session.register(streaming? new XhrStreamingListener(options.getMaxBytesStreaming(), req, session) : new XhrPollingListener(req, session));
       }
     });
   }
@@ -111,7 +112,7 @@ class XhrTransport extends BaseTransport {
         } else {
           req.response().headers().set("Content-Type", "text/plain; charset=UTF-8");
           setNoCacheHeaders(req);
-          setJSESSIONID(config, req);
+          setJSESSIONID(options, req);
           setCORS(req);
           req.response().setStatusCode(204);
           req.response().end();
@@ -133,7 +134,7 @@ class XhrTransport extends BaseTransport {
       if (log.isTraceEnabled()) log.trace("XHR sending frame");
       if (!headersWritten) {
         req.response().headers().set("Content-Type", "application/javascript; charset=UTF-8");
-        setJSESSIONID(config, req);
+        setJSESSIONID(options, req);
         setCORS(req);
         req.response().setChunked(true);
         headersWritten = true;

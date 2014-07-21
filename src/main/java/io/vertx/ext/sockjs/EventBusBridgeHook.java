@@ -14,7 +14,7 @@
  * You may elect to redistribute this code under either of these licenses.
  */
 
-package io.vertx.ext.sockjs.impl;
+package io.vertx.ext.sockjs;
 
 import io.vertx.core.AsyncResult;
 import io.vertx.core.Handler;

@@ -24,6 +24,8 @@ import io.vertx.ext.routematcher.RouteMatcher;
 import io.vertx.core.json.JsonObject;
 import io.vertx.core.logging.Logger;
 import io.vertx.core.logging.impl.LoggerFactory;
+import io.vertx.ext.sockjs.SockJSServerOptions;
+import io.vertx.ext.sockjs.SockJSSocket;
 
 import java.util.Map;
 
@@ -34,9 +36,9 @@ class EventSourceTransport extends BaseTransport {
 
   private static final Logger log = LoggerFactory.getLogger(EventSourceTransport.class);
 
-  EventSourceTransport(Vertx vertx,RouteMatcher rm, String basePath, Map<String, Session> sessions, final JsonObject config,
+  EventSourceTransport(Vertx vertx,RouteMatcher rm, String basePath, Map<String, Session> sessions, final SockJSServerOptions options,
             final Handler<SockJSSocket> sockHandler) {
-    super(vertx, sessions, config);
+    super(vertx, sessions, options);
 
     String eventSourceRE = basePath + COMMON_PATH_ELEMENT_RE + "eventsource";
 
@@ -44,9 +46,9 @@ class EventSourceTransport extends BaseTransport {
       public void handle(final HttpServerRequest req) {
         if (log.isTraceEnabled()) log.trace("EventSource transport, get: " + req.uri());
         String sessionID = req.params().get("param0");
-        Session session = getSession(config.getLong("session_timeout"), config.getLong("heartbeat_period"), sessionID, sockHandler);
+        Session session = getSession(options.getSessionTimeout(), options.getHeartbeatPeriod(), sessionID, sockHandler);
         session.setInfo(req.localAddress(), req.remoteAddress(), req.uri(), req.headers());
-        session.register(new EventSourceListener(config.getInteger("max_bytes_streaming"), req, session));
+        session.register(new EventSourceListener(options.getMaxBytesStreaming(), req, session));
       }
     });
   }
@@ -70,7 +72,7 @@ class EventSourceTransport extends BaseTransport {
       if (!headersWritten) {
         req.response().headers().set("Content-Type", "text/event-stream; charset=UTF-8");
         setNoCacheHeaders(req);
-        setJSESSIONID(config, req);
+        setJSESSIONID(options, req);
         req.response().setChunked(true);
         req.response().writeString("\r\n");
         headersWritten = true;

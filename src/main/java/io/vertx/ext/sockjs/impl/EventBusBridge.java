@@ -29,6 +29,9 @@ import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;
 import io.vertx.core.logging.Logger;
 import io.vertx.core.logging.impl.LoggerFactory;
+import io.vertx.ext.sockjs.BridgeOptions;
+import io.vertx.ext.sockjs.EventBusBridgeHook;
+import io.vertx.ext.sockjs.SockJSSocket;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -90,41 +93,17 @@ public class EventBusBridge implements Handler<SockJSSocket> {
     return l;
   }
 
-  public EventBusBridge(Vertx vertx, JsonArray inboundPermitted, JsonArray outboundPermitted) {
-    this(vertx, inboundPermitted, outboundPermitted, DEFAULT_AUTH_TIMEOUT, null);
-  }
-
-  public EventBusBridge(Vertx vertx, JsonArray inboundPermitted, JsonArray outboundPermitted,
-                        long authTimeout) {
-    this(vertx, inboundPermitted, outboundPermitted, authTimeout, null);
-  }
-
-  /*
-  Old constructor -we keep this for backward compatibility
-   */
-  public EventBusBridge(Vertx vertx, JsonArray inboundPermitted, JsonArray outboundPermitted,
-                        long authTimeout,
-                        String authAddress) {
-    this(vertx, inboundPermitted, outboundPermitted,
-        new JsonObject().putNumber("auth_timeout", authTimeout).putString("auth_address", authAddress));
-  }
-
-  public EventBusBridge(Vertx vertx, JsonArray inboundPermitted, JsonArray outboundPermitted,
-                        JsonObject conf) {
+  public EventBusBridge(Vertx vertx, BridgeOptions options) {
     this.vertx = vertx;
     this.eb = vertx.eventBus();
-    this.inboundPermitted = convertArray(inboundPermitted);
-    this.outboundPermitted = convertArray(outboundPermitted);
-    long authTimeout = conf.getLong("auth_timeout", DEFAULT_AUTH_TIMEOUT);
-    if (authTimeout < 0) {
-      throw new IllegalArgumentException("authTimeout < 0");
-    }
-    this.authTimeout = authTimeout;
-    this.authAddress = conf.getString("auth_address", DEFAULT_AUTH_ADDRESS);
-    this.maxAddressLength = conf.getInteger("max_address_length", DEFAULT_MAX_ADDRESS_LENGTH);
-    this.maxHandlersPerSocket = conf.getInteger("max_handlers_per_socket", DEFAULT_MAX_HANDLERS_PER_SOCKET);
-    this.pingTimeout = conf.getLong("ping_interval", DEFAULT_PING_TIMEOUT);
-    this.replyTimeout = conf.getLong("reply_timeout", DEFAULT_REPLY_TIMEOUT);
+    this.inboundPermitted = options.getInboundPermitted() == null ? new ArrayList<>() : options.getInboundPermitted();
+    this.outboundPermitted = options.getOutboundPermitted() == null ? new ArrayList<>() : options.getOutboundPermitted();
+    this.authTimeout = options.getAuthTimeout();
+    this.authAddress = options.getAuthAddress();
+    this.maxAddressLength = options.getMaxAddressLength();
+    this.maxHandlersPerSocket = options.getMaxHandlersPerSocket();
+    this.pingTimeout = options.getPingTimeout();
+    this.replyTimeout = options.getReplyTimeout();
   }
 
   private void handleSocketClosed(SockJSSocket sock, Map<String, Registration> registrations) {

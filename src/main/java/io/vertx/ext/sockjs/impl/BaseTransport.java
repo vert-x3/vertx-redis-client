@@ -27,6 +27,9 @@ import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;
 import io.vertx.core.logging.Logger;
 import io.vertx.core.logging.impl.LoggerFactory;
+import io.vertx.ext.sockjs.SockJSServerOptions;
+import io.vertx.ext.sockjs.SockJSSocket;
+import io.vertx.ext.sockjs.Transport;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -42,16 +45,16 @@ class BaseTransport {
 
   protected final Vertx vertx;
   protected final Map<String, Session> sessions;
-  protected JsonObject config;
+  protected SockJSServerOptions options;
 
   protected static final String COMMON_PATH_ELEMENT_RE = "\\/[^\\/\\.]+\\/([^\\/\\.]+)\\/";
 
   private static final long RAND_OFFSET = 2L << 30;
 
-  public BaseTransport(Vertx vertx, Map<String, Session> sessions, JsonObject config) {
+  public BaseTransport(Vertx vertx, Map<String, Session> sessions, SockJSServerOptions options) {
     this.vertx = vertx;
     this.sessions = sessions;
-    this.config = config;
+    this.options = options;
   }
 
   protected Session getSession(final long timeout, final long heartbeatPeriod, final String sessionID,
@@ -108,9 +111,9 @@ class BaseTransport {
     }
   }
 
-  static void setJSESSIONID(JsonObject config, HttpServerRequest req) {
+  static void setJSESSIONID(SockJSServerOptions options, HttpServerRequest req) {
     String cookies = req.headers().get("cookie");
-    if (config.getBoolean("insert_JSESSIONID")) {
+    if (options.isInsertJSESSIONID()) {
       //Preserve existing JSESSIONID, if any
       if (cookies != null) {
         String[] parts;
@@ -146,16 +149,16 @@ class BaseTransport {
     }
   }
 
-  static Handler<HttpServerRequest> createInfoHandler(final JsonObject config) {
+  static Handler<HttpServerRequest> createInfoHandler(final SockJSServerOptions options) {
     return new Handler<HttpServerRequest>() {
-      boolean websocket = !config.getArray("disabled_transports").contains(Transport.WEBSOCKET.toString());
+      boolean websocket = !options.getDisabledTransports().contains(Transport.WEBSOCKET.toString());
       public void handle(HttpServerRequest req) {
         if (log.isTraceEnabled()) log.trace("In Info handler");
         req.response().headers().set("Content-Type", "application/json; charset=UTF-8");
         setNoCacheHeaders(req);
         JsonObject json = new JsonObject();
         json.putBoolean("websocket", websocket);
-        json.putBoolean("cookie_needed", config.getBoolean("insert_JSESSIONID"));
+        json.putBoolean("cookie_needed", options.isInsertJSESSIONID());
         json.putArray("origins", new JsonArray().add("*:*"));
         // Java ints are signed, so we need to use a long and add the offset so
         // the result is not negative
@@ -170,7 +173,7 @@ class BaseTransport {
     req.response().headers().set("Cache-Control", "no-store, no-cache, must-revalidate, max-age=0");
   }
 
-  static Handler<HttpServerRequest> createCORSOptionsHandler(final JsonObject config, final String methods) {
+  static Handler<HttpServerRequest> createCORSOptionsHandler(final SockJSServerOptions options, final String methods) {
     return new Handler<HttpServerRequest>() {
       public void handle(HttpServerRequest req) {
         if (log.isTraceEnabled()) log.trace("In CORS options handler");
@@ -182,7 +185,7 @@ class BaseTransport {
         req.response().headers().set("Access-Control-Allow-Methods", methods);
         req.response().headers().set("Access-Control-Max-Age", String.valueOf(oneYearSeconds));
         setCORS(req);
-        setJSESSIONID(config, req);
+        setJSESSIONID(options, req);
         req.response().setStatusCode(204);
         req.response().end();
       }

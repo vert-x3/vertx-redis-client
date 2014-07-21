@@ -20,10 +20,11 @@ import io.vertx.core.Handler;
 import io.vertx.core.Vertx;
 import io.vertx.core.buffer.Buffer;
 import io.vertx.core.http.HttpServerRequest;
-import io.vertx.ext.routematcher.RouteMatcher;
-import io.vertx.core.json.JsonObject;
 import io.vertx.core.logging.Logger;
 import io.vertx.core.logging.impl.LoggerFactory;
+import io.vertx.ext.routematcher.RouteMatcher;
+import io.vertx.ext.sockjs.SockJSServerOptions;
+import io.vertx.ext.sockjs.SockJSSocket;
 
 import java.util.Map;
 
@@ -61,9 +62,9 @@ class HtmlFileTransport extends BaseTransport {
     HTML_FILE_TEMPLATE = sb.toString();
   }
 
-  HtmlFileTransport(Vertx vertx, RouteMatcher rm, String basePath, Map<String, Session> sessions, final JsonObject config,
+  HtmlFileTransport(Vertx vertx, RouteMatcher rm, String basePath, Map<String, Session> sessions, final SockJSServerOptions options,
             final Handler<SockJSSocket> sockHandler) {
-    super(vertx, sessions, config);
+    super(vertx, sessions, options);
     String htmlFileRE = basePath + COMMON_PATH_ELEMENT_RE + "htmlfile";
 
     rm.getWithRegEx(htmlFileRE, new Handler<HttpServerRequest>() {
@@ -80,9 +81,9 @@ class HtmlFileTransport extends BaseTransport {
         }
 
         String sessionID = req.params().get("param0");
-        Session session = getSession(config.getLong("session_timeout"), config.getLong("heartbeat_period"), sessionID, sockHandler);
+        Session session = getSession(options.getSessionTimeout(), options.getHeartbeatPeriod(), sessionID, sockHandler);
         session.setInfo(req.localAddress(), req.remoteAddress(), req.uri(), req.headers());
-        session.register(new HtmlFileListener(config.getInteger("max_bytes_streaming"), req, callback, session));
+        session.register(new HtmlFileListener(options.getMaxBytesStreaming(), req, callback, session));
       }
     });
   }
@@ -109,7 +110,7 @@ class HtmlFileTransport extends BaseTransport {
         req.response().headers().set("Content-Type", "text/html; charset=UTF-8");
         setNoCacheHeaders(req);
         req.response().setChunked(true);
-        setJSESSIONID(config, req);
+        setJSESSIONID(options, req);
         req.response().writeString(htmlFile);
         headersWritten = true;
       }

@@ -58,7 +58,15 @@ public class RouteMatcherImpl implements RouteMatcher {
   private final List<PatternBinding> connectBindings = new ArrayList<>();
   private final List<PatternBinding> patchBindings = new ArrayList<>();
   private Handler<HttpServerRequest> noMatchHandler;
-  private Handler<HttpServerRequest> requestHandler = request -> {
+
+  /**
+   * Do not instantiate this directly - use RouteMatcher.newRouteMatcher() instead
+   */
+  public RouteMatcherImpl() {
+  }
+
+  @Override
+  public RouteMatcher accept(HttpServerRequest request) {
     switch (request.method()) {
       case "GET":
         route(request, getBindings);
@@ -88,17 +96,7 @@ public class RouteMatcherImpl implements RouteMatcher {
         route(request, connectBindings);
         break;
     }
-  };
-
-  /**
-   * Do not instantiate this directly - use RouteMatcher.newRouteMatcher() instead
-   */
-  public RouteMatcherImpl() {
-  }
-
-  @Override
-  public Handler<HttpServerRequest> requestHandler() {
-    return requestHandler;
+    return this;
   }
 
   /**

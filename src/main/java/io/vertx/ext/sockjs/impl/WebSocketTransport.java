@@ -21,12 +21,13 @@ import io.vertx.core.Vertx;
 import io.vertx.core.VoidHandler;
 import io.vertx.core.buffer.Buffer;
 import io.vertx.core.http.HttpServerRequest;
-import io.vertx.ext.routematcher.RouteMatcher;
 import io.vertx.core.http.ServerWebSocket;
 import io.vertx.core.http.impl.WebSocketMatcher;
-import io.vertx.core.json.JsonObject;
 import io.vertx.core.logging.Logger;
 import io.vertx.core.logging.impl.LoggerFactory;
+import io.vertx.ext.routematcher.RouteMatcher;
+import io.vertx.ext.sockjs.SockJSServerOptions;
+import io.vertx.ext.sockjs.SockJSSocket;
 
 import java.util.Map;
 
@@ -39,16 +40,16 @@ class WebSocketTransport extends BaseTransport {
 
   WebSocketTransport(final Vertx vertx, WebSocketMatcher wsMatcher,
                      RouteMatcher rm, String basePath, final Map<String, Session> sessions,
-                     final JsonObject config,
+                     final SockJSServerOptions options,
             final Handler<SockJSSocket> sockHandler) {
-    super(vertx, sessions, config);
+    super(vertx, sessions, options);
     String wsRE = basePath + COMMON_PATH_ELEMENT_RE + "websocket";
 
     wsMatcher.addRegEx(wsRE, new Handler<WebSocketMatcher.Match>() {
 
       public void handle(final WebSocketMatcher.Match match) {
         if (log.isTraceEnabled()) log.trace("WS, handler");
-        final Session session = new Session(vertx, sessions, config.getLong("heartbeat_period"), sockHandler);
+        final Session session = new Session(vertx, sessions, options.getHeartbeatPeriod(), sockHandler);
         session.setInfo(match.ws.localAddress(), match.ws.remoteAddress(), match.ws.uri(), match.ws.headers());
         session.register(new WebSocketListener(match.ws, session));
       }

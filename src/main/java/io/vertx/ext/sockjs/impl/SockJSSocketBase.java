@@ -21,6 +21,7 @@ import io.vertx.core.Vertx;
 import io.vertx.core.buffer.Buffer;
 import io.vertx.core.eventbus.Message;
 import io.vertx.core.eventbus.Registration;
+import io.vertx.ext.sockjs.SockJSSocket;
 
 import java.util.UUID;
 

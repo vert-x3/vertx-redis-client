@@ -20,10 +20,11 @@ import io.vertx.core.Handler;
 import io.vertx.core.Vertx;
 import io.vertx.core.buffer.Buffer;
 import io.vertx.core.http.HttpServerRequest;
-import io.vertx.ext.routematcher.RouteMatcher;
-import io.vertx.core.json.JsonObject;
 import io.vertx.core.logging.Logger;
 import io.vertx.core.logging.impl.LoggerFactory;
+import io.vertx.ext.routematcher.RouteMatcher;
+import io.vertx.ext.sockjs.SockJSServerOptions;
+import io.vertx.ext.sockjs.SockJSSocket;
 
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
@@ -36,9 +37,9 @@ class JsonPTransport extends BaseTransport {
 
   private static final Logger log = LoggerFactory.getLogger(JsonPTransport.class);
 
-  JsonPTransport(Vertx vertx, RouteMatcher rm, String basePath, final Map<String, Session> sessions, final JsonObject config,
+  JsonPTransport(Vertx vertx, RouteMatcher rm, String basePath, final Map<String, Session> sessions, final SockJSServerOptions options,
             final Handler<SockJSSocket> sockHandler) {
-    super(vertx, sessions, config);
+    super(vertx, sessions, options);
 
     String jsonpRE = basePath + COMMON_PATH_ELEMENT_RE + "jsonp";
 
@@ -56,7 +57,7 @@ class JsonPTransport extends BaseTransport {
         }
 
         String sessionID = req.params().get("param0");
-        Session session = getSession(config.getLong("session_timeout"), config.getLong("heartbeat_period"), sessionID, sockHandler);
+        Session session = getSession(options.getSessionTimeout(), options.getHeartbeatPeriod(), sessionID, sockHandler);
         session.setInfo(req.localAddress(), req.remoteAddress(), req.uri(), req.headers());
         session.register(new JsonPListener(req, session, callback));
       }
@@ -73,7 +74,7 @@ class JsonPTransport extends BaseTransport {
           handleSend(req, session);
         } else {
           req.response().setStatusCode(404);
-          setJSESSIONID(config, req);
+          setJSESSIONID(options, req);
           req.response().end();
         }
       }
@@ -116,7 +117,7 @@ class JsonPTransport extends BaseTransport {
         if (!session.handleMessages(body)) {
           sendInvalidJSON(req.response());
         } else {
-          setJSESSIONID(config, req);
+          setJSESSIONID(options, req);
           req.response().headers().set("Content-Type", "text/plain; charset=UTF-8");
           setNoCacheHeaders(req);
           req.response().writeStringAndEnd("ok");
@@ -147,7 +148,7 @@ class JsonPTransport extends BaseTransport {
         req.response().setChunked(true);
         req.response().headers().set("Content-Type", "application/javascript; charset=UTF-8");
         setNoCacheHeaders(req);
-        setJSESSIONID(config, req);
+        setJSESSIONID(options, req);
         headersWritten = true;
       }
 

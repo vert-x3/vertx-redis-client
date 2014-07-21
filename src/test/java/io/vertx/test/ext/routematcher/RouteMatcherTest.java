@@ -325,7 +325,7 @@ public class RouteMatcherTest extends HttpTestBase {
       matcher.noMatch(req -> req.response().writeStringAndEnd(noMatchResponseBody));
     }
 
-    server.requestHandler(matcher.requestHandler()).listen(onSuccess(s -> {
+    server.requestHandler(matcher::accept).listen(onSuccess(s -> {
       Handler<HttpClientResponse> respHandler = resp -> {
         if (shouldPass) {
           assertEquals(200, resp.statusCode());

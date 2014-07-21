@@ -21,9 +21,10 @@ import io.vertx.core.http.HttpClientOptions;
 import io.vertx.core.http.HttpServer;
 import io.vertx.core.http.HttpServerOptions;
 import io.vertx.core.http.WebSocketConnectOptions;
-import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;
+import io.vertx.ext.sockjs.BridgeOptions;
 import io.vertx.ext.sockjs.SockJSServer;
+import io.vertx.ext.sockjs.SockJSServerOptions;
 import io.vertx.test.core.HttpTestBase;
 import io.vertx.test.core.VertxTestBase;
 import org.junit.After;
@@ -42,13 +43,8 @@ public class EventBusBridgeTest extends VertxTestBase {
   @Before
   public void before() {
     server = vertx.createHttpServer(new HttpServerOptions().setPort(HttpTestBase.DEFAULT_HTTP_PORT));
-
-    JsonArray permitted = new JsonArray();
-    permitted.add(new JsonObject()); // Let everything through
-
     SockJSServer sockJSServer = SockJSServer.newSockJSServer(vertx, server);
-    sockJSServer.bridge(new JsonObject().putString("prefix", "/eventbus"), permitted, permitted);
-
+    sockJSServer.bridge(new SockJSServerOptions().setPrefix("/eventbus"), new BridgeOptions().addInboundPermitted(new JsonObject()).addOutboundPermitted(new JsonObject()));
   }
 
   @After
