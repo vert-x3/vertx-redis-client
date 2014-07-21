@@ -66,6 +66,7 @@
         <!-- Configure the execution of the compiler to execute the codegen processor -->
         <plugin>
           <artifactId>maven-compiler-plugin</artifactId>
+          <version>3.1</version>
           <executions>
             <execution>
               <id>default-compile</id>
