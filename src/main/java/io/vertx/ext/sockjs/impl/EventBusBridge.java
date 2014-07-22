@@ -334,16 +334,19 @@ public class EventBusBridge implements Handler<SockJSSocket> {
                 checkAndSend(send, address, body, sock, replyAddress);
               } else {
                 // invalid session id
+                replyStatus(sock, replyAddress, "access_denied");
                 if (debug) {
                   log.debug("Inbound message for address " + address + " rejected because sessionID is not authorised");
                 }
               }
             } else {
+              replyStatus(sock, replyAddress, "auth_error");
               log.error("Error in performing authorisation", res.cause());
             }
           });
         } else {
-          // session id null
+          // session id null, authentication is required
+          replyStatus(sock, replyAddress, "auth_required");
           if (debug) {
             log.debug("Inbound message for address " + address + " rejected because it requires auth and sessionID is missing");
           }
@@ -353,6 +356,7 @@ public class EventBusBridge implements Handler<SockJSSocket> {
       }
     } else {
       // inbound match failed
+      replyStatus(sock, replyAddress, "access_denied");
       if (debug) {
         log.debug("Inbound message for address " + address + " rejected because there is no match");
       }
@@ -471,6 +475,12 @@ public class EventBusBridge implements Handler<SockJSSocket> {
     }
     Matcher m = pattern.matcher(address);
     return m.matches();
+  }
+
+  private static void replyStatus(SockJSSocket sock, String replyAddress, String status) {
+    JsonObject body = new JsonObject().putString("status", status);
+    JsonObject envelope = new JsonObject().putString("address", replyAddress).putValue("body", body);
+    sock.writeBuffer(Buffer.newBuffer(envelope.encode()));
   }
 
   private static boolean structureMatches(JsonObject match, Object bodyObject) {
