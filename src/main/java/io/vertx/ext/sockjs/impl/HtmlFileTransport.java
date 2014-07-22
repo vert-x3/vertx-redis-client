@@ -28,6 +28,8 @@ import io.vertx.ext.sockjs.SockJSSocket;
 
 import java.util.Map;
 
+import static io.vertx.core.buffer.Buffer.*;
+
 /**
  * @author <a href="http://tfox.org">Tim Fox</a>
  */
@@ -119,7 +121,7 @@ class HtmlFileTransport extends BaseTransport {
       sb.append("<script>\np(\"");
       sb.append(body);
       sb.append("\");\n</script>\r\n");
-      Buffer buff = Buffer.newBuffer(sb.toString());
+      Buffer buff = buffer(sb.toString());
       req.response().writeBuffer(buff);
       bytesSent += buff.length();
       if (bytesSent >= maxBytesStreaming) {

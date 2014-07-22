@@ -45,6 +45,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import static io.vertx.core.buffer.Buffer.*;
+
 /**
  *
  * @author <a href="http://tfox.org">Tim Fox</a>
@@ -241,10 +243,10 @@ public class SockJSServerImpl implements SockJSServer, Handler<HttpServerRequest
         BaseTransport.setCORS(req);
         req.response().setChunked(true);
 
-        Buffer h = Buffer.newBuffer(2);
+        Buffer h = buffer(2);
         h.appendString("h\n");
 
-        Buffer hs = Buffer.newBuffer(2050);
+        Buffer hs = buffer(2050);
         for (int i = 0; i < 2048; i++) {
           hs.appendByte((byte) ' ');
         }
@@ -348,7 +350,7 @@ public class SockJSServerImpl implements SockJSServer, Handler<HttpServerRequest
       sock -> sock.dataHandler(sock::writeBuffer));
     installApp(new SockJSServerOptions().setPrefix("/ticker").setMaxBytesStreaming(4096),
       sock -> {
-        long timerID = vertx.setPeriodic(1000, tid -> sock.writeBuffer(Buffer.newBuffer("tick!")));
+        long timerID = vertx.setPeriodic(1000, tid -> sock.writeBuffer(buffer("tick!")));
         sock.endHandler(v -> vertx.cancelTimer(timerID));
       });
     installApp(new SockJSServerOptions().setPrefix("/amplify").setMaxBytesStreaming(4096),
@@ -360,7 +362,7 @@ public class SockJSServerImpl implements SockJSServer, Handler<HttpServerRequest
             n = 1;
           }
           int num = (int) Math.pow(2, n);
-          Buffer buff = Buffer.newBuffer(num);
+          Buffer buff = buffer(num);
           for (int i = 0; i < num; i++) {
             buff.appendByte((byte) 'x');
           }

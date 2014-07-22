@@ -20,14 +20,15 @@ import io.vertx.core.Handler;
 import io.vertx.core.Vertx;
 import io.vertx.core.buffer.Buffer;
 import io.vertx.core.http.HttpServerRequest;
-import io.vertx.ext.routematcher.RouteMatcher;
-import io.vertx.core.json.JsonObject;
 import io.vertx.core.logging.Logger;
 import io.vertx.core.logging.impl.LoggerFactory;
+import io.vertx.ext.routematcher.RouteMatcher;
 import io.vertx.ext.sockjs.SockJSServerOptions;
 import io.vertx.ext.sockjs.SockJSSocket;
 
 import java.util.Map;
+
+import static io.vertx.core.buffer.Buffer.*;
 
 /**
  * @author <a href="http://tfox.org">Tim Fox</a>
@@ -81,7 +82,7 @@ class EventSourceTransport extends BaseTransport {
       sb.append("data: ");
       sb.append(body);
       sb.append("\r\n\r\n");
-      Buffer buff = Buffer.newBuffer(sb.toString());
+      Buffer buff = buffer(sb.toString());
       req.response().writeBuffer(buff);
       bytesSent += buff.length();
       if (bytesSent >= maxBytesStreaming) {

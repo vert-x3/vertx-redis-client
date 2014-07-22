@@ -28,6 +28,8 @@ import io.vertx.ext.sockjs.SockJSSocket;
 
 import java.util.Map;
 
+import static io.vertx.core.buffer.Buffer.*;
+
 /**
  * @author <a href="http://tfox.org">Tim Fox</a>
  */
@@ -43,7 +45,7 @@ class XhrTransport extends BaseTransport {
       bytes[i] = (byte)'h';
     }
     bytes[bytes.length - 1] = (byte)'\n';
-    H_BLOCK = Buffer.newBuffer(bytes);
+    H_BLOCK = buffer(bytes);
   }
 
   XhrTransport(Vertx vertx, RouteMatcher rm, String basePath, final Map<String, Session> sessions, final SockJSServerOptions options,
@@ -191,7 +193,7 @@ class XhrTransport extends BaseTransport {
         req.response().writeBuffer(H_BLOCK);
       }
       String sbody = body + "\n";
-      Buffer buff = Buffer.newBuffer(sbody);
+      Buffer buff = buffer(sbody);
       req.response().writeBuffer(buff);
       bytesSent += buff.length();
       if (bytesSent >= maxBytesStreaming) {

@@ -31,6 +31,8 @@ import java.util.LinkedList;
 import java.util.Map;
 import java.util.Queue;
 
+import static io.vertx.core.buffer.Buffer.*;
+
 /**
  * The SockJS session implementation.
  *
@@ -119,7 +121,7 @@ class Session extends SockJSSocketBase implements Shareable {
     paused = false;
     if (dataHandler != null) {
       for (String msg: this.pendingReads) {
-        dataHandler.handle(Buffer.newBuffer(msg));
+        dataHandler.handle(buffer(msg));
       }
     }
     return this;
@@ -329,7 +331,7 @@ class Session extends SockJSSocketBase implements Shareable {
         for (String msg : msgArr) {
           if (!paused) {
             try {
-              dataHandler.handle(Buffer.newBuffer(msg));
+              dataHandler.handle(buffer(msg));
             } catch (Throwable t) {
               log.error("Unhandle exception", t);
             }
