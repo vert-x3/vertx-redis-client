@@ -95,6 +95,8 @@ public class RouteMatcherImpl implements RouteMatcher {
       case "CONNECT":
         route(request, connectBindings);
         break;
+      default:
+        notFound(request);
     }
     return this;
   }
@@ -390,6 +392,10 @@ public class RouteMatcherImpl implements RouteMatcher {
         return;
       }
     }
+    notFound(request);
+  }
+
+  private void notFound(HttpServerRequest request) {
     if (noMatchHandler != null) {
       noMatchHandler.handle(request);
     } else {
