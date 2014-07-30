@@ -25,11 +25,10 @@ import io.vertx.core.http.ServerWebSocket;
 import io.vertx.core.http.impl.WebSocketMatcher;
 import io.vertx.core.logging.Logger;
 import io.vertx.core.logging.impl.LoggerFactory;
+import io.vertx.core.shareddata.LocalMap;
 import io.vertx.ext.routematcher.RouteMatcher;
 import io.vertx.ext.sockjs.SockJSServerOptions;
 import io.vertx.ext.sockjs.SockJSSocket;
-
-import java.util.Map;
 
 /**
  * @author <a href="http://tfox.org">Tim Fox</a>
@@ -39,7 +38,7 @@ class WebSocketTransport extends BaseTransport {
   private static final Logger log = LoggerFactory.getLogger(WebSocketTransport.class);
 
   WebSocketTransport(final Vertx vertx, WebSocketMatcher wsMatcher,
-                     RouteMatcher rm, String basePath, final Map<String, Session> sessions,
+                     RouteMatcher rm, String basePath, final LocalMap<String, Session> sessions,
                      final SockJSServerOptions options,
             final Handler<SockJSSocket> sockHandler) {
     super(vertx, sessions, options);

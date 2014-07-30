@@ -22,13 +22,13 @@ import io.vertx.core.buffer.Buffer;
 import io.vertx.core.http.HttpServerRequest;
 import io.vertx.core.logging.Logger;
 import io.vertx.core.logging.impl.LoggerFactory;
+import io.vertx.core.shareddata.LocalMap;
 import io.vertx.ext.routematcher.RouteMatcher;
 import io.vertx.ext.sockjs.SockJSServerOptions;
 import io.vertx.ext.sockjs.SockJSSocket;
 
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
-import java.util.Map;
 
 /**
  * @author <a href="http://tfox.org">Tim Fox</a>
@@ -37,7 +37,7 @@ class JsonPTransport extends BaseTransport {
 
   private static final Logger log = LoggerFactory.getLogger(JsonPTransport.class);
 
-  JsonPTransport(Vertx vertx, RouteMatcher rm, String basePath, final Map<String, Session> sessions, final SockJSServerOptions options,
+  JsonPTransport(Vertx vertx, RouteMatcher rm, String basePath, final LocalMap<String, Session> sessions, final SockJSServerOptions options,
             final Handler<SockJSSocket> sockHandler) {
     super(vertx, sessions, options);
 

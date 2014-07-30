@@ -14,19 +14,16 @@
  * You may elect to redistribute this code under either of these licenses.
  */
 
-package io.vertx.ext.sockjs.impl;
+package io.vertx.ext.sockjs.spi;
 
 import io.vertx.core.Vertx;
 import io.vertx.core.http.HttpServer;
-import io.vertx.ext.sockjs.spi.SockJSServerFactory;
+import io.vertx.ext.sockjs.impl.SockJSServerImpl;
 
 /**
  * @author <a href="http://tfox.org">Tim Fox</a>
  */
-public class SockJSServerFactoryImpl implements SockJSServerFactory {
+public interface SockJSServerFactory {
 
-  @Override
-  public SockJSServerImpl sockJSServer(Vertx vertx, HttpServer httpServer) {
-    return new SockJSServerImpl(vertx, httpServer);
-  }
+  SockJSServerImpl sockJSServer(Vertx vertx, HttpServer httpServer);
 }

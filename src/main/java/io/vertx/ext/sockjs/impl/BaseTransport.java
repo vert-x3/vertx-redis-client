@@ -27,13 +27,13 @@ import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;
 import io.vertx.core.logging.Logger;
 import io.vertx.core.logging.impl.LoggerFactory;
+import io.vertx.core.shareddata.LocalMap;
 import io.vertx.ext.sockjs.SockJSServerOptions;
 import io.vertx.ext.sockjs.SockJSSocket;
 import io.vertx.ext.sockjs.Transport;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
-import java.util.Map;
 import java.util.Random;
 
 /**
@@ -44,14 +44,14 @@ class BaseTransport {
   private static final Logger log = LoggerFactory.getLogger(BaseTransport.class);
 
   protected final Vertx vertx;
-  protected final Map<String, Session> sessions;
+  protected final LocalMap<String, Session> sessions;
   protected SockJSServerOptions options;
 
   protected static final String COMMON_PATH_ELEMENT_RE = "\\/[^\\/\\.]+\\/([^\\/\\.]+)\\/";
 
   private static final long RAND_OFFSET = 2L << 30;
 
-  public BaseTransport(Vertx vertx, Map<String, Session> sessions, SockJSServerOptions options) {
+  public BaseTransport(Vertx vertx, LocalMap<String, Session> sessions, SockJSServerOptions options) {
     this.vertx = vertx;
     this.sessions = sessions;
     this.options = options;

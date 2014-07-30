@@ -14,16 +14,17 @@
  * You may elect to redistribute this code under either of these licenses.
  */
 
-package io.vertx.ext.sockjs;
+package io.vertx.ext.sockjs.spi;
 
-import io.vertx.core.Vertx;
-import io.vertx.core.http.HttpServer;
-import io.vertx.ext.sockjs.impl.SockJSServerImpl;
+import io.vertx.core.json.JsonObject;
+import io.vertx.ext.sockjs.BridgeOptions;
 
 /**
  * @author <a href="http://tfox.org">Tim Fox</a>
  */
-public interface SockJSServerFactory {
+public interface BridgeOptionsFactory {
 
-  SockJSServerImpl newSockJSServer(Vertx vertx, HttpServer httpServer);
+  BridgeOptions options();
+
+  BridgeOptions options(JsonObject json);
 }

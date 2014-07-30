@@ -27,6 +27,7 @@ import io.vertx.core.http.ServerWebSocket;
 import io.vertx.core.http.impl.WebSocketMatcher;
 import io.vertx.core.logging.Logger;
 import io.vertx.core.logging.impl.LoggerFactory;
+import io.vertx.core.shareddata.LocalMap;
 import io.vertx.ext.routematcher.RouteMatcher;
 import io.vertx.ext.sockjs.BridgeOptions;
 import io.vertx.ext.sockjs.EventBusBridgeHook;
@@ -42,7 +43,6 @@ import java.util.Date;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 
 import static io.vertx.core.buffer.Buffer.*;
@@ -58,13 +58,13 @@ public class SockJSServerImpl implements SockJSServer, Handler<HttpServerRequest
   private final Vertx vertx;
   private RouteMatcher rm = RouteMatcher.newRouteMatcher();
   private WebSocketMatcher wsMatcher = new WebSocketMatcher();
-  private final Map<String, Session> sessions;
+  private final LocalMap<String, Session> sessions;
   private EventBusBridgeHook hook;
   private long timerID;
 
   SockJSServerImpl(Vertx vertx, HttpServer httpServer) {
     this.vertx = vertx;
-    this.sessions = vertx.sharedData().getMap("_vertx.sockjssessions");
+    this.sessions = vertx.sharedData().getLocalMap("_vertx.sockjssessions");
     // Any previous request and websocket handlers will become default handlers
     // if nothing else matches
     rm.noMatch(httpServer.requestHandler());
@@ -342,18 +342,18 @@ public class SockJSServerImpl implements SockJSServer, Handler<HttpServerRequest
   These applications are required by the SockJS protocol and QUnit tests
    */
   public void installTestApplications() {
-    installApp(new SockJSServerOptions().setPrefix("/echo").setMaxBytesStreaming(4096),
+    installApp(SockJSServerOptions.options().setPrefix("/echo").setMaxBytesStreaming(4096),
                sock -> sock.dataHandler(sock::writeBuffer));
-    installApp(new SockJSServerOptions().setPrefix("/close").setMaxBytesStreaming(4096),
+    installApp(SockJSServerOptions.options().setPrefix("/close").setMaxBytesStreaming(4096),
                sock -> sock.close());
-    installApp(new SockJSServerOptions().setPrefix("/disabled_websocket_echo").setMaxBytesStreaming(4096).addDisabledTransport("WEBSOCKET"),
+    installApp(SockJSServerOptions.options().setPrefix("/disabled_websocket_echo").setMaxBytesStreaming(4096).addDisabledTransport("WEBSOCKET"),
       sock -> sock.dataHandler(sock::writeBuffer));
-    installApp(new SockJSServerOptions().setPrefix("/ticker").setMaxBytesStreaming(4096),
+    installApp(SockJSServerOptions.options().setPrefix("/ticker").setMaxBytesStreaming(4096),
       sock -> {
         long timerID = vertx.setPeriodic(1000, tid -> sock.writeBuffer(buffer("tick!")));
         sock.endHandler(v -> vertx.cancelTimer(timerID));
       });
-    installApp(new SockJSServerOptions().setPrefix("/amplify").setMaxBytesStreaming(4096),
+    installApp(SockJSServerOptions.options().setPrefix("/amplify").setMaxBytesStreaming(4096),
       sock -> {
         sock.dataHandler(data -> {
           String str = data.toString();
@@ -369,9 +369,9 @@ public class SockJSServerImpl implements SockJSServer, Handler<HttpServerRequest
           sock.writeBuffer(buff);
         });
       });
-    installApp(new SockJSServerOptions().setPrefix("/broadcast").setMaxBytesStreaming(4096),
+    installApp(SockJSServerOptions.options().setPrefix("/broadcast").setMaxBytesStreaming(4096),
       new Handler<SockJSSocket>() {
-        Set<String> connections = vertx.sharedData().getSet("conns");
+        Set<String> connections = new HashSet<>();
         public void handle(SockJSSocket sock) {
           connections.add(sock.writeHandlerID());
           sock.dataHandler(new Handler<Buffer>() {
@@ -389,7 +389,7 @@ public class SockJSServerImpl implements SockJSServer, Handler<HttpServerRequest
         }
       });
 
-    installApp(new SockJSServerOptions().setPrefix("/cookie_needed_echo").setMaxBytesStreaming(4096).setInsertJSESSIONID(true),
+    installApp(SockJSServerOptions.options().setPrefix("/cookie_needed_echo").setMaxBytesStreaming(4096).setInsertJSESSIONID(true),
       sock -> sock.dataHandler(sock::writeBuffer));
   }
 

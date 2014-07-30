@@ -240,8 +240,8 @@ public class RouteMatcherTest extends HttpTestBase {
 
   private void testRoute(final boolean regex, final String pattern, final Map<String, String> params,
                          final String method, final String uri, final boolean shouldPass, final boolean noMatchHandler) {
-    server = vertx.createHttpServer(new HttpServerOptions().setPort(DEFAULT_HTTP_PORT));
-    client = vertx.createHttpClient(new HttpClientOptions());
+    server = vertx.createHttpServer(HttpServerOptions.options().setPort(DEFAULT_HTTP_PORT));
+    client = vertx.createHttpClient(HttpClientOptions.options());
 
     RouteMatcher matcher = RouteMatcher.newRouteMatcher();
 
@@ -344,7 +344,7 @@ public class RouteMatcherTest extends HttpTestBase {
 
       final HttpClientRequest req;
 
-      RequestOptions options = new RequestOptions().setRequestURI(uri).setPort(DEFAULT_HTTP_PORT);
+      RequestOptions options = RequestOptions.options().setRequestURI(uri).setPort(DEFAULT_HTTP_PORT);
 
       switch (method) {
         case "GET":

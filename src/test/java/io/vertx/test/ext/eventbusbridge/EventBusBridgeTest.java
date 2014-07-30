@@ -42,9 +42,9 @@ public class EventBusBridgeTest extends VertxTestBase {
 
   @Before
   public void before() {
-    server = vertx.createHttpServer(new HttpServerOptions().setPort(HttpTestBase.DEFAULT_HTTP_PORT));
-    SockJSServer sockJSServer = SockJSServer.newSockJSServer(vertx, server);
-    sockJSServer.bridge(new SockJSServerOptions().setPrefix("/eventbus"), new BridgeOptions().addInboundPermitted(new JsonObject()).addOutboundPermitted(new JsonObject()));
+    server = vertx.createHttpServer(HttpServerOptions.options().setPort(HttpTestBase.DEFAULT_HTTP_PORT));
+    SockJSServer sockJSServer = SockJSServer.sockJSServer(vertx, server);
+    sockJSServer.bridge(SockJSServerOptions.options().setPrefix("/eventbus"), BridgeOptions.options().addInboundPermitted(new JsonObject()).addOutboundPermitted(new JsonObject()));
   }
 
   @After
@@ -59,12 +59,12 @@ public class EventBusBridgeTest extends VertxTestBase {
 
   @Test
   public void testSimple() {
-    HttpClient client = vertx.createHttpClient(new HttpClientOptions());
+    HttpClient client = vertx.createHttpClient(HttpClientOptions.options());
 
     server.listen(ar -> {
       assertTrue(ar.succeeded());
       // We use raw websocket transport
-      WebSocketConnectOptions options = new WebSocketConnectOptions().setPort(HttpTestBase.DEFAULT_HTTP_PORT).setRequestURI("/eventbus/websocket");
+      WebSocketConnectOptions options = WebSocketConnectOptions.options().setPort(HttpTestBase.DEFAULT_HTTP_PORT).setRequestURI("/eventbus/websocket");
       client.connectWebsocket(options, ws -> {
 
         // Register

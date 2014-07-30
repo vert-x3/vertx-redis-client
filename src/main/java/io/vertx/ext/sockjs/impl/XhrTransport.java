@@ -22,11 +22,10 @@ import io.vertx.core.buffer.Buffer;
 import io.vertx.core.http.HttpServerRequest;
 import io.vertx.core.logging.Logger;
 import io.vertx.core.logging.impl.LoggerFactory;
+import io.vertx.core.shareddata.LocalMap;
 import io.vertx.ext.routematcher.RouteMatcher;
 import io.vertx.ext.sockjs.SockJSServerOptions;
 import io.vertx.ext.sockjs.SockJSSocket;
-
-import java.util.Map;
 
 import static io.vertx.core.buffer.Buffer.*;
 
@@ -48,7 +47,7 @@ class XhrTransport extends BaseTransport {
     H_BLOCK = buffer(bytes);
   }
 
-  XhrTransport(Vertx vertx, RouteMatcher rm, String basePath, final Map<String, Session> sessions, final SockJSServerOptions options,
+  XhrTransport(Vertx vertx, RouteMatcher rm, String basePath, final LocalMap<String, Session> sessions, final SockJSServerOptions options,
             final Handler<SockJSSocket> sockHandler) {
 
     super(vertx, sessions, options);

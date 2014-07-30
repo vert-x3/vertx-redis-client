@@ -23,6 +23,7 @@ import io.vertx.core.Handler;
 import io.vertx.core.ServiceHelper;
 import io.vertx.core.Vertx;
 import io.vertx.core.http.HttpServer;
+import io.vertx.ext.sockjs.spi.SockJSServerFactory;
 
 /**
  * @author <a href="http://tfox.org">Tim Fox</a>
@@ -30,8 +31,8 @@ import io.vertx.core.http.HttpServer;
 @VertxGen
 public interface SockJSServer {
 
-  static SockJSServer newSockJSServer(Vertx vertx, HttpServer httpServer) {
-    return factory.newSockJSServer(vertx, httpServer);
+  static SockJSServer sockJSServer(Vertx vertx, HttpServer httpServer) {
+    return factory.sockJSServer(vertx, httpServer);
   }
 
   @GenIgnore

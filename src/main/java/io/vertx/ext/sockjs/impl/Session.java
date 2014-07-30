@@ -24,11 +24,11 @@ import io.vertx.core.json.DecodeException;
 import io.vertx.core.logging.Logger;
 import io.vertx.core.logging.impl.LoggerFactory;
 import io.vertx.core.net.SocketAddress;
+import io.vertx.core.shareddata.LocalMap;
 import io.vertx.core.shareddata.Shareable;
 import io.vertx.ext.sockjs.SockJSSocket;
 
 import java.util.LinkedList;
-import java.util.Map;
 import java.util.Queue;
 
 import static io.vertx.core.buffer.Buffer.*;
@@ -45,7 +45,7 @@ import static io.vertx.core.buffer.Buffer.*;
 class Session extends SockJSSocketBase implements Shareable {
 
   private static final Logger log = LoggerFactory.getLogger(Session.class);
-  private final Map<String, Session> sessions;
+  private final LocalMap<String, Session> sessions;
   private final Queue<String> pendingWrites = new LinkedList<>();
   private final Queue<String> pendingReads = new LinkedList<>();
   private TransportListener listener;
@@ -69,12 +69,12 @@ class Session extends SockJSSocketBase implements Shareable {
   private String uri;
   private MultiMap headers;
 
-  Session(Vertx vertx, Map<String, Session> sessions, long heartbeatPeriod,
+  Session(Vertx vertx, LocalMap<String, Session> sessions, long heartbeatPeriod,
           Handler<SockJSSocket> sockHandler) {
     this(vertx, sessions, null, -1, heartbeatPeriod, sockHandler);
   }
 
-  Session(Vertx vertx, Map<String, Session> sessions, String id, long timeout, long heartbeatPeriod,
+  Session(Vertx vertx, LocalMap<String, Session> sessions, String id, long timeout, long heartbeatPeriod,
           Handler<SockJSSocket> sockHandler) {
     super(vertx);
     this.sessions = sessions;

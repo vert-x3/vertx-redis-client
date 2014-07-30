@@ -22,11 +22,10 @@ import io.vertx.core.buffer.Buffer;
 import io.vertx.core.http.HttpServerRequest;
 import io.vertx.core.logging.Logger;
 import io.vertx.core.logging.impl.LoggerFactory;
+import io.vertx.core.shareddata.LocalMap;
 import io.vertx.ext.routematcher.RouteMatcher;
 import io.vertx.ext.sockjs.SockJSServerOptions;
 import io.vertx.ext.sockjs.SockJSSocket;
-
-import java.util.Map;
 
 import static io.vertx.core.buffer.Buffer.*;
 
@@ -64,7 +63,7 @@ class HtmlFileTransport extends BaseTransport {
     HTML_FILE_TEMPLATE = sb.toString();
   }
 
-  HtmlFileTransport(Vertx vertx, RouteMatcher rm, String basePath, Map<String, Session> sessions, final SockJSServerOptions options,
+  HtmlFileTransport(Vertx vertx, RouteMatcher rm, String basePath, LocalMap<String, Session> sessions, final SockJSServerOptions options,
             final Handler<SockJSSocket> sockHandler) {
     super(vertx, sessions, options);
     String htmlFileRE = basePath + COMMON_PATH_ELEMENT_RE + "htmlfile";
