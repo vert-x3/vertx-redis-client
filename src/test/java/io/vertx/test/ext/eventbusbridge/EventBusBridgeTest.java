@@ -69,11 +69,11 @@ public class EventBusBridgeTest extends VertxTestBase {
 
         // Register
         JsonObject msg = new JsonObject().putString("type", "register").putString("address", "someaddress");
-        ws.writeTextFrame(msg.encode());
+        ws.writeFrame(io.vertx.core.http.WebSocketFrame.textFrame(msg.encode(), true));
 
         // Send
         msg = new JsonObject().putString("type", "send").putString("address", "someaddress").putString("body", "hello world");
-        ws.writeTextFrame(msg.encode());
+        ws.writeFrame(io.vertx.core.http.WebSocketFrame.textFrame(msg.encode(), true));
 
         ws.dataHandler(buff -> {
           String str = buff.toString();

@@ -22,6 +22,7 @@ import io.vertx.core.VoidHandler;
 import io.vertx.core.buffer.Buffer;
 import io.vertx.core.http.HttpServerRequest;
 import io.vertx.core.http.ServerWebSocket;
+import io.vertx.core.http.WebSocketFrame;
 import io.vertx.core.http.impl.WebSocketMatcher;
 import io.vertx.core.logging.Logger;
 import io.vertx.core.logging.impl.LoggerFactory;
@@ -115,7 +116,7 @@ class WebSocketTransport extends BaseTransport {
     public void sendFrame(final String body) {
       if (log.isTraceEnabled()) log.trace("WS, sending frame");
       if (!closed) {
-        ws.writeTextFrame(body);
+        ws.writeFrame(WebSocketFrame.textFrame(body, true));
       }
     }
 
