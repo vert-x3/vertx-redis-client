@@ -17,7 +17,7 @@
 package io.vertx.ext.sockjs.impl;
 
 import io.vertx.core.Handler;
-import io.vertx.core.MultiMap;
+import io.vertx.core.Headers;
 import io.vertx.core.Vertx;
 import io.vertx.core.buffer.Buffer;
 import io.vertx.core.json.DecodeException;
@@ -67,7 +67,7 @@ class Session extends SockJSSocketBase implements Shareable {
   private SocketAddress localAddress;
   private SocketAddress remoteAddress;
   private String uri;
-  private MultiMap headers;
+  private Headers headers;
 
   Session(Vertx vertx, LocalMap<String, Session> sessions, long heartbeatPeriod,
           Handler<SockJSSocket> sockHandler) {
@@ -188,7 +188,7 @@ class Session extends SockJSSocketBase implements Shareable {
   }
 
   @Override
-  public MultiMap headers() {
+  public Headers headers() {
     return headers;
   }
 
@@ -370,7 +370,7 @@ class Session extends SockJSSocketBase implements Shareable {
   }
 
   void setInfo(SocketAddress localAddress, SocketAddress remoteAddress, String uri,
-               MultiMap headers) {
+               Headers headers) {
     this.localAddress = localAddress;
     this.remoteAddress = remoteAddress;
     this.uri = uri;

@@ -17,7 +17,7 @@
 package io.vertx.ext.sockjs.impl;
 
 import io.vertx.core.Handler;
-import io.vertx.core.MultiMap;
+import io.vertx.core.Headers;
 import io.vertx.core.Vertx;
 import io.vertx.core.VoidHandler;
 import io.vertx.core.http.HttpServerRequest;
@@ -194,7 +194,7 @@ class BaseTransport {
 
   // We remove cookie headers for security reasons. See https://github.com/sockjs/sockjs-node section on
   // Authorisation
-  static MultiMap removeCookieHeaders(MultiMap headers) {
+  static Headers removeCookieHeaders(Headers headers) {
     // We don't want to remove the JSESSION cookie.
     String jsessionid = null;
     for (String cookie : headers.getAll("cookie")) {

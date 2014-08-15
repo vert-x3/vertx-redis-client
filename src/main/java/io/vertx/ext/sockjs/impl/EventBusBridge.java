@@ -21,6 +21,7 @@ import io.vertx.core.Future;
 import io.vertx.core.Handler;
 import io.vertx.core.Vertx;
 import io.vertx.core.buffer.Buffer;
+import io.vertx.core.eventbus.DeliveryOptions;
 import io.vertx.core.eventbus.EventBus;
 import io.vertx.core.eventbus.Message;
 import io.vertx.core.eventbus.Registration;
@@ -54,13 +55,6 @@ import static io.vertx.core.buffer.Buffer.*;
 public class EventBusBridge implements Handler<SockJSSocket> {
 
   private static final Logger log = LoggerFactory.getLogger(EventBusBridge.class);
-
-  private static final String DEFAULT_AUTH_ADDRESS = "vertx.basicauthmanager.authorise";
-  private static final long DEFAULT_AUTH_TIMEOUT = 5 * 60 * 1000;
-  private static final long DEFAULT_REPLY_TIMEOUT = 30 * 1000;
-  private static final int DEFAULT_MAX_ADDRESS_LENGTH = 200;
-  private static final int DEFAULT_MAX_HANDLERS_PER_SOCKET = 1000;
-  private static final long DEFAULT_PING_TIMEOUT = 10 * 1000;
 
   private final Map<String, Auth> authCache = new HashMap<>();
   private final Map<SockJSSocket, SockInfo> sockInfos = new HashMap<>();
@@ -399,7 +393,7 @@ public class EventBusBridge implements Handler<SockJSSocket> {
       log.debug("Forwarding message to address " + address + " on event bus");
     }
     if (send) {
-      eb.sendWithTimeout(address, body, replyTimeout, replyHandler);
+      eb.sendWithOptions(address, body, DeliveryOptions.options().setSendTimeout(replyTimeout), replyHandler);
       if (replyAddress != null) {
         info.handlerCount++;
       }
@@ -416,9 +410,13 @@ public class EventBusBridge implements Handler<SockJSSocket> {
       if (authCache.containsKey(sessionID)) {
         res.setResult(true).setHandler(handler);
       } else {
-        eb.send(authAddress, message, (Message<JsonObject> reply) -> {
-          boolean authed = reply.body().getString("status").equals("ok");
-          res.setResult(authed).setHandler(handler);
+        eb.send(authAddress, message, (AsyncResult<Message<JsonObject>> reply) -> {
+          if (reply.succeeded()) {
+            boolean authed = reply.result().body().getString("status").equals("ok");
+            res.setResult(authed).setHandler(handler);
+          } else {
+            reply.cause().printStackTrace();
+          }
         });
       }
     }

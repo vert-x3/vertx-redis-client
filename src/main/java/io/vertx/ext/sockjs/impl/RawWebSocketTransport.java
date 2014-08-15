@@ -17,7 +17,7 @@
 package io.vertx.ext.sockjs.impl;
 
 import io.vertx.core.Handler;
-import io.vertx.core.MultiMap;
+import io.vertx.core.Headers;
 import io.vertx.core.Vertx;
 import io.vertx.core.buffer.Buffer;
 import io.vertx.core.http.HttpServerRequest;
@@ -39,7 +39,7 @@ class RawWebSocketTransport {
   private static class RawWSSockJSSocket extends SockJSSocketBase {
 
     private ServerWebSocket ws;
-    private MultiMap headers;
+    private Headers headers;
 
     RawWSSockJSSocket(Vertx vertx, ServerWebSocket ws) {
       super(vertx);
@@ -113,7 +113,7 @@ class RawWebSocketTransport {
     }
 
     @Override
-    public MultiMap headers() {
+    public Headers headers() {
       if (headers == null) {
         headers = BaseTransport.removeCookieHeaders(ws.headers());
       }
