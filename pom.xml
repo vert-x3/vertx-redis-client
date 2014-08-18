@@ -106,6 +106,7 @@
                 </annotationProcessors>
                 <compilerArgs>
                   <arg>-AoutputDirectory=${project.basedir}/src/main</arg>
+                  <arg>-Avertx.js.scriptDir=ext-js</arg>
                 </compilerArgs>
               </configuration>
             </execution>
