@@ -19,3 +19,6 @@ test-results
 test-tmp
 *.class
 ScratchPad.java
+src/main/resources/vertx-js/*.js
+src/main/java/io/vertx/java/**/*.java
+src/main/groovy/**/*.groovy
