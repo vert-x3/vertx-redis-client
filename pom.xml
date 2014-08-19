@@ -115,6 +115,18 @@
     </pluginManagement>
 
     <plugins>
+      <!-- Copy resources after compilation phase as we generate JS in src/main/resources -->
+      <plugin>
+        <artifactId>maven-resources-plugin</artifactId>
+        <version>2.6</version>
+        <executions>
+          <execution>
+            <id>default-resources</id>
+            <phase>process-classes</phase>
+          </execution>
+        </executions>
+      </plugin>
+      <!-- Compile Groovy -->
       <plugin>
         <groupId>org.codehaus.gmavenplus</groupId>
         <artifactId>gmavenplus-plugin</artifactId>
@@ -127,6 +139,7 @@
           </execution>
         </executions>
       </plugin>
+      <!-- Have .groovy files in sources-jar -->
       <plugin>
         <groupId>org.codehaus.mojo</groupId>
         <artifactId>build-helper-maven-plugin</artifactId>
