@@ -16,6 +16,7 @@
 
 package io.vertx.ext.routematcher;
 
+import io.vertx.codegen.annotations.Fluent;
 import io.vertx.codegen.annotations.VertxGen;
 import io.vertx.core.Handler;
 import io.vertx.core.ServiceHelper;
@@ -31,6 +32,7 @@ public interface RouteMatcher {
     return factory.newRouteMatcher();
   }
 
+  @Fluent
   RouteMatcher accept(HttpServerRequest request);
 
   /**
@@ -38,6 +40,7 @@ public interface RouteMatcher {
    * @param pattern The simple pattern
    * @param handler The handler to call
    */
+  @Fluent
   RouteMatcher get(String pattern, Handler<HttpServerRequest> handler);
 
   /**
@@ -45,6 +48,7 @@ public interface RouteMatcher {
    * @param pattern The simple pattern
    * @param handler The handler to call
    */
+  @Fluent
   RouteMatcher put(String pattern, Handler<HttpServerRequest> handler);
 
   /**
@@ -52,6 +56,7 @@ public interface RouteMatcher {
    * @param pattern The simple pattern
    * @param handler The handler to call
    */
+  @Fluent
   RouteMatcher post(String pattern, Handler<HttpServerRequest> handler);
 
   /**
@@ -59,6 +64,7 @@ public interface RouteMatcher {
    * @param pattern The simple pattern
    * @param handler The handler to call
    */
+  @Fluent
   RouteMatcher delete(String pattern, Handler<HttpServerRequest> handler);
 
   /**
@@ -66,6 +72,7 @@ public interface RouteMatcher {
    * @param pattern The simple pattern
    * @param handler The handler to call
    */
+  @Fluent
   RouteMatcher options(String pattern, Handler<HttpServerRequest> handler);
 
   /**
@@ -73,6 +80,7 @@ public interface RouteMatcher {
    * @param pattern The simple pattern
    * @param handler The handler to call
    */
+  @Fluent
   RouteMatcher head(String pattern, Handler<HttpServerRequest> handler);
 
   /**
@@ -80,6 +88,7 @@ public interface RouteMatcher {
    * @param pattern The simple pattern
    * @param handler The handler to call
    */
+  @Fluent
   RouteMatcher trace(String pattern, Handler<HttpServerRequest> handler);
 
   /**
@@ -87,6 +96,7 @@ public interface RouteMatcher {
    * @param pattern The simple pattern
    * @param handler The handler to call
    */
+  @Fluent
   RouteMatcher connect(String pattern, Handler<HttpServerRequest> handler);
 
   /**
@@ -94,6 +104,7 @@ public interface RouteMatcher {
    * @param pattern The simple pattern
    * @param handler The handler to call
    */
+  @Fluent
   RouteMatcher patch(String pattern, Handler<HttpServerRequest> handler);
 
   /**
@@ -101,6 +112,7 @@ public interface RouteMatcher {
    * @param pattern The simple pattern
    * @param handler The handler to call
    */
+  @Fluent
   RouteMatcher all(String pattern, Handler<HttpServerRequest> handler);
 
   /**
@@ -108,6 +120,7 @@ public interface RouteMatcher {
    * @param regex A regular expression
    * @param handler The handler to call
    */
+  @Fluent
   RouteMatcher getWithRegEx(String regex, Handler<HttpServerRequest> handler);
 
   /**
@@ -115,6 +128,7 @@ public interface RouteMatcher {
    * @param regex A regular expression
    * @param handler The handler to call
    */
+  @Fluent
   RouteMatcher putWithRegEx(String regex, Handler<HttpServerRequest> handler);
 
   /**
@@ -122,6 +136,7 @@ public interface RouteMatcher {
    * @param regex A regular expression
    * @param handler The handler to call
    */
+  @Fluent
   RouteMatcher postWithRegEx(String regex, Handler<HttpServerRequest> handler);
 
   /**
@@ -129,6 +144,7 @@ public interface RouteMatcher {
    * @param regex A regular expression
    * @param handler The handler to call
    */
+  @Fluent
   RouteMatcher deleteWithRegEx(String regex, Handler<HttpServerRequest> handler);
 
   /**
@@ -136,6 +152,7 @@ public interface RouteMatcher {
    * @param regex A regular expression
    * @param handler The handler to call
    */
+  @Fluent
   RouteMatcher optionsWithRegEx(String regex, Handler<HttpServerRequest> handler);
 
   /**
@@ -143,6 +160,7 @@ public interface RouteMatcher {
    * @param regex A regular expression
    * @param handler The handler to call
    */
+  @Fluent
   RouteMatcher headWithRegEx(String regex, Handler<HttpServerRequest> handler);
 
   /**
@@ -150,6 +168,7 @@ public interface RouteMatcher {
    * @param regex A regular expression
    * @param handler The handler to call
    */
+  @Fluent
   RouteMatcher traceWithRegEx(String regex, Handler<HttpServerRequest> handler);
 
   /**
@@ -157,6 +176,7 @@ public interface RouteMatcher {
    * @param regex A regular expression
    * @param handler The handler to call
    */
+  @Fluent
   RouteMatcher connectWithRegEx(String regex, Handler<HttpServerRequest> handler);
 
   /**
@@ -164,6 +184,7 @@ public interface RouteMatcher {
    * @param regex A regular expression
    * @param handler The handler to call
    */
+  @Fluent
   RouteMatcher patchWithRegEx(String regex, Handler<HttpServerRequest> handler);
 
   /**
@@ -171,12 +192,14 @@ public interface RouteMatcher {
    * @param regex A regular expression
    * @param handler The handler to call
    */
+  @Fluent
   RouteMatcher allWithRegEx(String regex, Handler<HttpServerRequest> handler);
 
   /**
    * Specify a handler that will be called when no other handlers match.
    * If this handler is not specified default behaviour is to return a 404
    */
+  @Fluent
   RouteMatcher noMatch(Handler<HttpServerRequest> handler);
 
   static final RouteMatcherFactory factory = ServiceHelper.loadFactory(RouteMatcherFactory.class);
