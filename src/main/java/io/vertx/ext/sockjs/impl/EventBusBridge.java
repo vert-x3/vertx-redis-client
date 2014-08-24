@@ -92,8 +92,8 @@ public class EventBusBridge implements Handler<SockJSSocket> {
   public EventBusBridge(Vertx vertx, BridgeOptions options) {
     this.vertx = vertx;
     this.eb = vertx.eventBus();
-    this.inboundPermitted = options.getInboundPermitted() == null ? new ArrayList<>() : options.getInboundPermitted();
-    this.outboundPermitted = options.getOutboundPermitted() == null ? new ArrayList<>() : options.getOutboundPermitted();
+    this.inboundPermitted = options.getInboundPermitteds() == null ? new ArrayList<>() : options.getInboundPermitteds();
+    this.outboundPermitted = options.getOutboundPermitteds() == null ? new ArrayList<>() : options.getOutboundPermitteds();
     this.authTimeout = options.getAuthTimeout();
     this.authAddress = options.getAuthAddress();
     this.maxAddressLength = options.getMaxAddressLength();

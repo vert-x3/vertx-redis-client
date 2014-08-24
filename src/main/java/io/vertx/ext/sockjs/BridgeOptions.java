@@ -62,11 +62,11 @@ public interface BridgeOptions {
 
   BridgeOptions addInboundPermitted(JsonObject json);
 
-  List<JsonObject> getInboundPermitted();
+  List<JsonObject> getInboundPermitteds();
 
   BridgeOptions addOutboundPermitted(JsonObject json);
 
-  List<JsonObject> getOutboundPermitted();
+  List<JsonObject> getOutboundPermitteds();
 
   static final BridgeOptionsFactory factory = ServiceHelper.loadFactory(BridgeOptionsFactory.class);
 

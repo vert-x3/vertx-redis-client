@@ -62,25 +62,25 @@ public class BridgeOptionsImpl implements BridgeOptions {
     this.pingTimeout = json.getLong("pingTimeout", DEFAULT_PINGTIMEOUT);
     this.replyTimeout = json.getLong("replyTimeout", DEFAULT_REPLYTIMEOUT);
     //TODO simplify common code
-    JsonArray arr = json.getArray("inboundPermitted");
+    JsonArray arr = json.getArray("inboundPermitteds");
     if (arr != null) {
       for (Object obj: arr) {
         if (obj instanceof JsonObject) {
           JsonObject jobj = (JsonObject)obj;
           inboundPermitted.add(jobj);
         } else {
-          throw new IllegalArgumentException("Invalid type " + obj.getClass() + " in inboundPermitted array");
+          throw new IllegalArgumentException("Invalid type " + obj.getClass() + " in inboundPermitteds array");
         }
       }
     }
-    arr = json.getArray("outboundPermitted");
+    arr = json.getArray("outboundPermitteds");
     if (arr != null) {
       for (Object obj: arr) {
         if (obj instanceof JsonObject) {
           JsonObject jobj = (JsonObject)obj;
           outboundPermitted.add(jobj);
         } else {
-          throw new IllegalArgumentException("Invalid type " + obj.getClass() + " in outboundPermitted array");
+          throw new IllegalArgumentException("Invalid type " + obj.getClass() + " in outboundPermitteds array");
         }
       }
     }
@@ -174,7 +174,7 @@ public class BridgeOptionsImpl implements BridgeOptions {
   }
 
   @Override
-  public List<JsonObject> getInboundPermitted() {
+  public List<JsonObject> getInboundPermitteds() {
     return inboundPermitted;
   }
 
@@ -185,7 +185,7 @@ public class BridgeOptionsImpl implements BridgeOptions {
   }
 
   @Override
-  public List<JsonObject> getOutboundPermitted() {
+  public List<JsonObject> getOutboundPermitteds() {
     return outboundPermitted;
   }
 }
