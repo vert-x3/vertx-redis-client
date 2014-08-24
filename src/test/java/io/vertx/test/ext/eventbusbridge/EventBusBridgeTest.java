@@ -27,8 +27,6 @@ import io.vertx.ext.sockjs.SockJSServer;
 import io.vertx.ext.sockjs.SockJSServerOptions;
 import io.vertx.test.core.HttpTestBase;
 import io.vertx.test.core.VertxTestBase;
-import org.junit.After;
-import org.junit.Before;
 import org.junit.Test;
 
 import java.util.concurrent.CountDownLatch;
@@ -40,21 +38,23 @@ public class EventBusBridgeTest extends VertxTestBase {
 
   private HttpServer server;
 
-  @Before
-  public void before() {
+  @Override
+  public void setUp() throws Exception {
+    super.setUp();
     server = vertx.createHttpServer(HttpServerOptions.options().setPort(HttpTestBase.DEFAULT_HTTP_PORT));
     SockJSServer sockJSServer = SockJSServer.sockJSServer(vertx, server);
     sockJSServer.bridge(SockJSServerOptions.options().setPrefix("/eventbus"), BridgeOptions.options().addInboundPermitted(new JsonObject()).addOutboundPermitted(new JsonObject()));
   }
 
-  @After
-  public void after() throws Exception {
+  @Override
+  protected void tearDown() throws Exception {
     CountDownLatch latch = new CountDownLatch(1);
     server.close(ar -> {
       assertTrue(ar.succeeded());
       latch.countDown();
     });
     awaitLatch(latch);
+    super.tearDown();
   }
 
   @Test
