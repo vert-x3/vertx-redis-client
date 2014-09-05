@@ -23,6 +23,7 @@
   <modules>
     <module>ext-sockjs</module>
     <module>ext-routematcher</module>
+    <module>ext-mongo</module>
   </modules>
 
   <parent>
