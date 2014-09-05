@@ -24,6 +24,7 @@
     <module>ext-sockjs</module>
     <module>ext-routematcher</module>
     <module>ext-mongo</module>
+    <module>ext-reactive-streams</module>
   </modules>
 
   <parent>
