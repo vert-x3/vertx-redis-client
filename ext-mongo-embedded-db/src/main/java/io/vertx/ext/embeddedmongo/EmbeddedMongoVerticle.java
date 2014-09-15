@@ -24,6 +24,7 @@ import de.flapdoodle.embed.mongo.config.Net;
 import de.flapdoodle.embed.mongo.distribution.Version;
 import de.flapdoodle.embed.process.runtime.Network;
 import io.vertx.core.AbstractVerticle;
+import io.vertx.core.json.JsonObject;
 
 /**
  * This verticle wraps an embedded MongoDB instance.
@@ -42,18 +43,20 @@ public class EmbeddedMongoVerticle extends AbstractVerticle {
   @Override
   public void start() throws Exception {
 
-    if (vertx != null && !vertx.currentContext().isWorker()) {
+    if (vertx != null && !vertx.context().isWorker()) {
       throw new IllegalStateException("Must be started as worker verticle!");
     }
 
+    JsonObject config = vertx.context().config();
+
     int port = config.getInteger("port", 27017);
 
-    IMongodConfig config = new MongodConfigBuilder().
+    IMongodConfig embeddedConfig = new MongodConfigBuilder().
       version(Version.Main.PRODUCTION).
       net(new Net(port, Network.localhostIsIPv6())).
       build();
 
-    exe = MongodStarter.getDefaultInstance().prepare(config);
+    exe = MongodStarter.getDefaultInstance().prepare(embeddedConfig);
     exe.start();
   }
 
