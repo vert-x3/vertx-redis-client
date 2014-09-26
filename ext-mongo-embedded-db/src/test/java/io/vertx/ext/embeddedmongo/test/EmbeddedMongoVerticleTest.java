@@ -30,13 +30,13 @@ public class EmbeddedMongoVerticleTest extends VertxTestBase {
   @Override
   public VertxOptions getOptions() {
     // It can take some time to download the first time!
-    return VertxOptions.options().setMaxWorkerExecuteTime(30 * 60 * 1000);
+    return new VertxOptions().setMaxWorkerExecuteTime(30 * 60 * 1000);
   }
 
   @Test
   public void testEmbeddedMongo() {
     // Not really sure what to test here apart from start and stop
-    vertx.deployVerticle("java:" + EmbeddedMongoVerticle.class.getName(), DeploymentOptions.options().setWorker(true), onSuccess(deploymentID -> {
+    vertx.deployVerticle("java:" + EmbeddedMongoVerticle.class.getName(), new DeploymentOptions().setWorker(true), onSuccess(deploymentID -> {
       assertNotNull(deploymentID);
       vertx.undeployVerticle(deploymentID, onSuccess(v -> {
         assertNull(v);
