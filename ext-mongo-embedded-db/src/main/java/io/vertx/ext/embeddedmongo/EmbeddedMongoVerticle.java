@@ -49,7 +49,7 @@ public class EmbeddedMongoVerticle extends AbstractVerticle {
 
     JsonObject config = vertx.context().config();
 
-    int port = config.getInteger("port", 27018);
+    int port = config.getInteger("port", 27017);
 
     IMongodConfig embeddedConfig = new MongodConfigBuilder().
       version(Version.Main.PRODUCTION).
