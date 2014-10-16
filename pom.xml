@@ -26,6 +26,7 @@
     <module>ext-mongo</module>
     <module>ext-reactive-streams</module>
     <module>ext-mongo-embedded-db</module>
+    <module>ext-rxjava</module>
   </modules>
 
   <parent>
