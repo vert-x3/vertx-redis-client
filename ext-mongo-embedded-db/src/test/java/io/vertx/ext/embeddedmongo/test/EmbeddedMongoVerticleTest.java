@@ -16,9 +16,7 @@
 
 package io.vertx.ext.embeddedmongo.test;
 
-import io.vertx.core.DeploymentOptions;
 import io.vertx.core.VertxOptions;
-import io.vertx.ext.embeddedmongo.EmbeddedMongoVerticle;
 import io.vertx.test.core.VertxTestBase;
 import org.junit.Test;
 
@@ -36,7 +34,7 @@ public class EmbeddedMongoVerticleTest extends VertxTestBase {
   @Test
   public void testEmbeddedMongo() {
     // Not really sure what to test here apart from start and stop
-    vertx.deployVerticle("java:" + EmbeddedMongoVerticle.class.getName(), new DeploymentOptions().setWorker(true), onSuccess(deploymentID -> {
+    vertx.deployVerticle("service:io.vertx:ext-mongo-embedded-db", onSuccess(deploymentID -> {
       assertNotNull(deploymentID);
       vertx.undeployVerticle(deploymentID, onSuccess(v -> {
         assertNull(v);
