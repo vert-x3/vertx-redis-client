@@ -120,6 +120,35 @@
             </execution>
           </executions>
         </plugin>
+
+        <!-- Define an assembly execution for packaging the vertx service that can be reused
+             by children modules -->
+        <plugin>
+          <artifactId>maven-assembly-plugin</artifactId>
+          <version>2.4.1</version>
+          <dependencies>
+            <dependency>
+              <groupId>io.vertx</groupId>
+              <artifactId>vertx-service-factory</artifactId>
+              <version>${version}</version>
+            </dependency>
+          </dependencies>
+          <executions>
+            <execution>
+              <id>package-vertx-service</id>
+              <goals>
+                <goal>single</goal>
+              </goals>
+              <configuration>
+                <appendAssemblyId>false</appendAssemblyId>
+                <descriptorRefs>
+                  <descriptorRef>vertx-service</descriptorRef>
+                </descriptorRefs>
+              </configuration>
+              <phase>package</phase>
+            </execution>
+          </executions>
+        </plugin>
       </plugins>
     </pluginManagement>
 
