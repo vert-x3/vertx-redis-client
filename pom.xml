@@ -28,6 +28,7 @@
     <module>ext-mongo-embedded-db</module>
     <module>ext-metrics</module>
     <module>ext-rxjava</module>
+    <module>ext-redis</module>
   </modules>
 
   <parent>
