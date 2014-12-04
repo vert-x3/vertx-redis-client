@@ -60,7 +60,7 @@ var RedisService = function(j_val) {
   this.append = function(args, handler) {
     var __args = arguments;
     if (__args.length === 2 && typeof __args[0] === 'object' && __args[0] instanceof Array && typeof __args[1] === 'function') {
-      j_redisService.append(utils.convJSArrayToJsonArray(args), function(ar) {
+      j_redisService.append(utils.convParamJsonArray(args), function(ar) {
       if (ar.succeeded()) {
         handler(ar.result(), null);
       } else {
@@ -76,7 +76,7 @@ var RedisService = function(j_val) {
   this.auth = function(args, handler) {
     var __args = arguments;
     if (__args.length === 2 && typeof __args[0] === 'object' && __args[0] instanceof Array && typeof __args[1] === 'function') {
-      j_redisService.auth(utils.convJSArrayToJsonArray(args), function(ar) {
+      j_redisService.auth(utils.convParamJsonArray(args), function(ar) {
       if (ar.succeeded()) {
         handler(ar.result(), null);
       } else {
@@ -124,7 +124,7 @@ var RedisService = function(j_val) {
   this.bitcount = function(args, handler) {
     var __args = arguments;
     if (__args.length === 2 && typeof __args[0] === 'object' && __args[0] instanceof Array && typeof __args[1] === 'function') {
-      j_redisService.bitcount(utils.convJSArrayToJsonArray(args), function(ar) {
+      j_redisService.bitcount(utils.convParamJsonArray(args), function(ar) {
       if (ar.succeeded()) {
         handler(ar.result(), null);
       } else {
@@ -140,7 +140,7 @@ var RedisService = function(j_val) {
   this.bitop = function(args, handler) {
     var __args = arguments;
     if (__args.length === 2 && typeof __args[0] === 'object' && __args[0] instanceof Array && typeof __args[1] === 'function') {
-      j_redisService.bitop(utils.convJSArrayToJsonArray(args), function(ar) {
+      j_redisService.bitop(utils.convParamJsonArray(args), function(ar) {
       if (ar.succeeded()) {
         handler(ar.result(), null);
       } else {
@@ -156,7 +156,7 @@ var RedisService = function(j_val) {
   this.bitpos = function(args, handler) {
     var __args = arguments;
     if (__args.length === 2 && typeof __args[0] === 'object' && __args[0] instanceof Array && typeof __args[1] === 'function') {
-      j_redisService.bitpos(utils.convJSArrayToJsonArray(args), function(ar) {
+      j_redisService.bitpos(utils.convParamJsonArray(args), function(ar) {
       if (ar.succeeded()) {
         handler(ar.result(), null);
       } else {
@@ -172,9 +172,9 @@ var RedisService = function(j_val) {
   this.blpop = function(args, handler) {
     var __args = arguments;
     if (__args.length === 2 && typeof __args[0] === 'object' && __args[0] instanceof Array && typeof __args[1] === 'function') {
-      j_redisService.blpop(utils.convJSArrayToJsonArray(args), function(ar) {
+      j_redisService.blpop(utils.convParamJsonArray(args), function(ar) {
       if (ar.succeeded()) {
-        handler(utils.convJsonToJS(ar.result()), null);
+        handler(utils.convReturnJson(ar.result()), null);
       } else {
         handler(null, ar.cause());
       }
@@ -188,9 +188,9 @@ var RedisService = function(j_val) {
   this.brpop = function(args, handler) {
     var __args = arguments;
     if (__args.length === 2 && typeof __args[0] === 'object' && __args[0] instanceof Array && typeof __args[1] === 'function') {
-      j_redisService.brpop(utils.convJSArrayToJsonArray(args), function(ar) {
+      j_redisService.brpop(utils.convParamJsonArray(args), function(ar) {
       if (ar.succeeded()) {
-        handler(utils.convJsonToJS(ar.result()), null);
+        handler(utils.convReturnJson(ar.result()), null);
       } else {
         handler(null, ar.cause());
       }
@@ -204,7 +204,7 @@ var RedisService = function(j_val) {
   this.brpoplpush = function(args, handler) {
     var __args = arguments;
     if (__args.length === 2 && typeof __args[0] === 'object' && __args[0] instanceof Array && typeof __args[1] === 'function') {
-      j_redisService.brpoplpush(utils.convJSArrayToJsonArray(args), function(ar) {
+      j_redisService.brpoplpush(utils.convParamJsonArray(args), function(ar) {
       if (ar.succeeded()) {
         handler(null, null);
       } else {
@@ -220,7 +220,7 @@ var RedisService = function(j_val) {
   this.clientKill = function(args, handler) {
     var __args = arguments;
     if (__args.length === 2 && typeof __args[0] === 'object' && __args[0] instanceof Array && typeof __args[1] === 'function') {
-      j_redisService.clientKill(utils.convJSArrayToJsonArray(args), function(ar) {
+      j_redisService.clientKill(utils.convParamJsonArray(args), function(ar) {
       if (ar.succeeded()) {
         handler(ar.result(), null);
       } else {
@@ -268,7 +268,7 @@ var RedisService = function(j_val) {
   this.clientPause = function(args, handler) {
     var __args = arguments;
     if (__args.length === 2 && typeof __args[0] === 'object' && __args[0] instanceof Array && typeof __args[1] === 'function') {
-      j_redisService.clientPause(utils.convJSArrayToJsonArray(args), function(ar) {
+      j_redisService.clientPause(utils.convParamJsonArray(args), function(ar) {
       if (ar.succeeded()) {
         handler(ar.result(), null);
       } else {
@@ -284,7 +284,7 @@ var RedisService = function(j_val) {
   this.clientSetname = function(args, handler) {
     var __args = arguments;
     if (__args.length === 2 && typeof __args[0] === 'object' && __args[0] instanceof Array && typeof __args[1] === 'function') {
-      j_redisService.clientSetname(utils.convJSArrayToJsonArray(args), function(ar) {
+      j_redisService.clientSetname(utils.convParamJsonArray(args), function(ar) {
       if (ar.succeeded()) {
         handler(ar.result(), null);
       } else {
@@ -302,7 +302,7 @@ var RedisService = function(j_val) {
     if (__args.length === 1 && typeof __args[0] === 'function') {
       j_redisService.clusterSlots(function(ar) {
       if (ar.succeeded()) {
-        handler(utils.convJsonToJS(ar.result()), null);
+        handler(utils.convReturnJson(ar.result()), null);
       } else {
         handler(null, ar.cause());
       }
@@ -318,7 +318,7 @@ var RedisService = function(j_val) {
     if (__args.length === 1 && typeof __args[0] === 'function') {
       j_redisService.command(function(ar) {
       if (ar.succeeded()) {
-        handler(utils.convJsonToJS(ar.result()), null);
+        handler(utils.convReturnJson(ar.result()), null);
       } else {
         handler(null, ar.cause());
       }
@@ -350,7 +350,7 @@ var RedisService = function(j_val) {
     if (__args.length === 1 && typeof __args[0] === 'function') {
       j_redisService.commandGetkeys(function(ar) {
       if (ar.succeeded()) {
-        handler(utils.convJsonToJS(ar.result()), null);
+        handler(utils.convReturnJson(ar.result()), null);
       } else {
         handler(null, ar.cause());
       }
@@ -364,9 +364,9 @@ var RedisService = function(j_val) {
   this.commandInfo = function(args, handler) {
     var __args = arguments;
     if (__args.length === 2 && typeof __args[0] === 'object' && __args[0] instanceof Array && typeof __args[1] === 'function') {
-      j_redisService.commandInfo(utils.convJSArrayToJsonArray(args), function(ar) {
+      j_redisService.commandInfo(utils.convParamJsonArray(args), function(ar) {
       if (ar.succeeded()) {
-        handler(utils.convJsonToJS(ar.result()), null);
+        handler(utils.convReturnJson(ar.result()), null);
       } else {
         handler(null, ar.cause());
       }
@@ -380,7 +380,7 @@ var RedisService = function(j_val) {
   this.configGet = function(args, handler) {
     var __args = arguments;
     if (__args.length === 2 && typeof __args[0] === 'object' && __args[0] instanceof Array && typeof __args[1] === 'function') {
-      j_redisService.configGet(utils.convJSArrayToJsonArray(args), function(ar) {
+      j_redisService.configGet(utils.convParamJsonArray(args), function(ar) {
       if (ar.succeeded()) {
         handler(ar.result(), null);
       } else {
@@ -412,7 +412,7 @@ var RedisService = function(j_val) {
   this.configSet = function(args, handler) {
     var __args = arguments;
     if (__args.length === 2 && typeof __args[0] === 'object' && __args[0] instanceof Array && typeof __args[1] === 'function') {
-      j_redisService.configSet(utils.convJSArrayToJsonArray(args), function(ar) {
+      j_redisService.configSet(utils.convParamJsonArray(args), function(ar) {
       if (ar.succeeded()) {
         handler(ar.result(), null);
       } else {
@@ -460,7 +460,7 @@ var RedisService = function(j_val) {
   this.debugObject = function(args, handler) {
     var __args = arguments;
     if (__args.length === 2 && typeof __args[0] === 'object' && __args[0] instanceof Array && typeof __args[1] === 'function') {
-      j_redisService.debugObject(utils.convJSArrayToJsonArray(args), function(ar) {
+      j_redisService.debugObject(utils.convParamJsonArray(args), function(ar) {
       if (ar.succeeded()) {
         handler(ar.result(), null);
       } else {
@@ -492,7 +492,7 @@ var RedisService = function(j_val) {
   this.decr = function(args, handler) {
     var __args = arguments;
     if (__args.length === 2 && typeof __args[0] === 'object' && __args[0] instanceof Array && typeof __args[1] === 'function') {
-      j_redisService.decr(utils.convJSArrayToJsonArray(args), function(ar) {
+      j_redisService.decr(utils.convParamJsonArray(args), function(ar) {
       if (ar.succeeded()) {
         handler(ar.result(), null);
       } else {
@@ -508,7 +508,7 @@ var RedisService = function(j_val) {
   this.decrby = function(args, handler) {
     var __args = arguments;
     if (__args.length === 2 && typeof __args[0] === 'object' && __args[0] instanceof Array && typeof __args[1] === 'function') {
-      j_redisService.decrby(utils.convJSArrayToJsonArray(args), function(ar) {
+      j_redisService.decrby(utils.convParamJsonArray(args), function(ar) {
       if (ar.succeeded()) {
         handler(ar.result(), null);
       } else {
@@ -524,7 +524,7 @@ var RedisService = function(j_val) {
   this.del = function(args, handler) {
     var __args = arguments;
     if (__args.length === 2 && typeof __args[0] === 'object' && __args[0] instanceof Array && typeof __args[1] === 'function') {
-      j_redisService.del(utils.convJSArrayToJsonArray(args), function(ar) {
+      j_redisService.del(utils.convParamJsonArray(args), function(ar) {
       if (ar.succeeded()) {
         handler(ar.result(), null);
       } else {
@@ -556,7 +556,7 @@ var RedisService = function(j_val) {
   this.dump = function(args, handler) {
     var __args = arguments;
     if (__args.length === 2 && typeof __args[0] === 'object' && __args[0] instanceof Array && typeof __args[1] === 'function') {
-      j_redisService.dump(utils.convJSArrayToJsonArray(args), function(ar) {
+      j_redisService.dump(utils.convParamJsonArray(args), function(ar) {
       if (ar.succeeded()) {
         handler(ar.result(), null);
       } else {
@@ -572,7 +572,7 @@ var RedisService = function(j_val) {
   this.echo = function(args, handler) {
     var __args = arguments;
     if (__args.length === 2 && typeof __args[0] === 'object' && __args[0] instanceof Array && typeof __args[1] === 'function') {
-      j_redisService.echo(utils.convJSArrayToJsonArray(args), function(ar) {
+      j_redisService.echo(utils.convParamJsonArray(args), function(ar) {
       if (ar.succeeded()) {
         handler(ar.result(), null);
       } else {
@@ -588,7 +588,7 @@ var RedisService = function(j_val) {
   this.eval = function(args, handler) {
     var __args = arguments;
     if (__args.length === 2 && typeof __args[0] === 'object' && __args[0] instanceof Array && typeof __args[1] === 'function') {
-      j_redisService.eval(utils.convJSArrayToJsonArray(args), function(ar) {
+      j_redisService.eval(utils.convParamJsonArray(args), function(ar) {
       if (ar.succeeded()) {
         handler(null, null);
       } else {
@@ -604,7 +604,7 @@ var RedisService = function(j_val) {
   this.evalsha = function(args, handler) {
     var __args = arguments;
     if (__args.length === 2 && typeof __args[0] === 'object' && __args[0] instanceof Array && typeof __args[1] === 'function') {
-      j_redisService.evalsha(utils.convJSArrayToJsonArray(args), function(ar) {
+      j_redisService.evalsha(utils.convParamJsonArray(args), function(ar) {
       if (ar.succeeded()) {
         handler(null, null);
       } else {
@@ -636,7 +636,7 @@ var RedisService = function(j_val) {
   this.exists = function(args, handler) {
     var __args = arguments;
     if (__args.length === 2 && typeof __args[0] === 'object' && __args[0] instanceof Array && typeof __args[1] === 'function') {
-      j_redisService.exists(utils.convJSArrayToJsonArray(args), function(ar) {
+      j_redisService.exists(utils.convParamJsonArray(args), function(ar) {
       if (ar.succeeded()) {
         handler(ar.result(), null);
       } else {
@@ -652,7 +652,7 @@ var RedisService = function(j_val) {
   this.expire = function(args, handler) {
     var __args = arguments;
     if (__args.length === 2 && typeof __args[0] === 'object' && __args[0] instanceof Array && typeof __args[1] === 'function') {
-      j_redisService.expire(utils.convJSArrayToJsonArray(args), function(ar) {
+      j_redisService.expire(utils.convParamJsonArray(args), function(ar) {
       if (ar.succeeded()) {
         handler(ar.result(), null);
       } else {
@@ -668,7 +668,7 @@ var RedisService = function(j_val) {
   this.expireat = function(args, handler) {
     var __args = arguments;
     if (__args.length === 2 && typeof __args[0] === 'object' && __args[0] instanceof Array && typeof __args[1] === 'function') {
-      j_redisService.expireat(utils.convJSArrayToJsonArray(args), function(ar) {
+      j_redisService.expireat(utils.convParamJsonArray(args), function(ar) {
       if (ar.succeeded()) {
         handler(ar.result(), null);
       } else {
@@ -716,7 +716,7 @@ var RedisService = function(j_val) {
   this.get = function(args, handler) {
     var __args = arguments;
     if (__args.length === 2 && typeof __args[0] === 'object' && __args[0] instanceof Array && typeof __args[1] === 'function') {
-      j_redisService.get(utils.convJSArrayToJsonArray(args), function(ar) {
+      j_redisService.get(utils.convParamJsonArray(args), function(ar) {
       if (ar.succeeded()) {
         handler(ar.result(), null);
       } else {
@@ -732,7 +732,7 @@ var RedisService = function(j_val) {
   this.getbit = function(args, handler) {
     var __args = arguments;
     if (__args.length === 2 && typeof __args[0] === 'object' && __args[0] instanceof Array && typeof __args[1] === 'function') {
-      j_redisService.getbit(utils.convJSArrayToJsonArray(args), function(ar) {
+      j_redisService.getbit(utils.convParamJsonArray(args), function(ar) {
       if (ar.succeeded()) {
         handler(ar.result(), null);
       } else {
@@ -748,7 +748,7 @@ var RedisService = function(j_val) {
   this.getrange = function(args, handler) {
     var __args = arguments;
     if (__args.length === 2 && typeof __args[0] === 'object' && __args[0] instanceof Array && typeof __args[1] === 'function') {
-      j_redisService.getrange(utils.convJSArrayToJsonArray(args), function(ar) {
+      j_redisService.getrange(utils.convParamJsonArray(args), function(ar) {
       if (ar.succeeded()) {
         handler(ar.result(), null);
       } else {
@@ -764,7 +764,7 @@ var RedisService = function(j_val) {
   this.getset = function(args, handler) {
     var __args = arguments;
     if (__args.length === 2 && typeof __args[0] === 'object' && __args[0] instanceof Array && typeof __args[1] === 'function') {
-      j_redisService.getset(utils.convJSArrayToJsonArray(args), function(ar) {
+      j_redisService.getset(utils.convParamJsonArray(args), function(ar) {
       if (ar.succeeded()) {
         handler(ar.result(), null);
       } else {
@@ -780,7 +780,7 @@ var RedisService = function(j_val) {
   this.hdel = function(args, handler) {
     var __args = arguments;
     if (__args.length === 2 && typeof __args[0] === 'object' && __args[0] instanceof Array && typeof __args[1] === 'function') {
-      j_redisService.hdel(utils.convJSArrayToJsonArray(args), function(ar) {
+      j_redisService.hdel(utils.convParamJsonArray(args), function(ar) {
       if (ar.succeeded()) {
         handler(ar.result(), null);
       } else {
@@ -796,7 +796,7 @@ var RedisService = function(j_val) {
   this.hexists = function(args, handler) {
     var __args = arguments;
     if (__args.length === 2 && typeof __args[0] === 'object' && __args[0] instanceof Array && typeof __args[1] === 'function') {
-      j_redisService.hexists(utils.convJSArrayToJsonArray(args), function(ar) {
+      j_redisService.hexists(utils.convParamJsonArray(args), function(ar) {
       if (ar.succeeded()) {
         handler(ar.result(), null);
       } else {
@@ -812,7 +812,7 @@ var RedisService = function(j_val) {
   this.hget = function(args, handler) {
     var __args = arguments;
     if (__args.length === 2 && typeof __args[0] === 'object' && __args[0] instanceof Array && typeof __args[1] === 'function') {
-      j_redisService.hget(utils.convJSArrayToJsonArray(args), function(ar) {
+      j_redisService.hget(utils.convParamJsonArray(args), function(ar) {
       if (ar.succeeded()) {
         handler(ar.result(), null);
       } else {
@@ -828,9 +828,9 @@ var RedisService = function(j_val) {
   this.hgetall = function(args, handler) {
     var __args = arguments;
     if (__args.length === 2 && typeof __args[0] === 'object' && __args[0] instanceof Array && typeof __args[1] === 'function') {
-      j_redisService.hgetall(utils.convJSArrayToJsonArray(args), function(ar) {
+      j_redisService.hgetall(utils.convParamJsonArray(args), function(ar) {
       if (ar.succeeded()) {
-        handler(utils.convJsonToJS(ar.result()), null);
+        handler(utils.convReturnJson(ar.result()), null);
       } else {
         handler(null, ar.cause());
       }
@@ -844,7 +844,7 @@ var RedisService = function(j_val) {
   this.hincrby = function(args, handler) {
     var __args = arguments;
     if (__args.length === 2 && typeof __args[0] === 'object' && __args[0] instanceof Array && typeof __args[1] === 'function') {
-      j_redisService.hincrby(utils.convJSArrayToJsonArray(args), function(ar) {
+      j_redisService.hincrby(utils.convParamJsonArray(args), function(ar) {
       if (ar.succeeded()) {
         handler(ar.result(), null);
       } else {
@@ -860,7 +860,7 @@ var RedisService = function(j_val) {
   this.hincrbyfloat = function(args, handler) {
     var __args = arguments;
     if (__args.length === 2 && typeof __args[0] === 'object' && __args[0] instanceof Array && typeof __args[1] === 'function') {
-      j_redisService.hincrbyfloat(utils.convJSArrayToJsonArray(args), function(ar) {
+      j_redisService.hincrbyfloat(utils.convParamJsonArray(args), function(ar) {
       if (ar.succeeded()) {
         handler(ar.result(), null);
       } else {
@@ -876,9 +876,9 @@ var RedisService = function(j_val) {
   this.hkeys = function(args, handler) {
     var __args = arguments;
     if (__args.length === 2 && typeof __args[0] === 'object' && __args[0] instanceof Array && typeof __args[1] === 'function') {
-      j_redisService.hkeys(utils.convJSArrayToJsonArray(args), function(ar) {
+      j_redisService.hkeys(utils.convParamJsonArray(args), function(ar) {
       if (ar.succeeded()) {
-        handler(utils.convJsonToJS(ar.result()), null);
+        handler(utils.convReturnJson(ar.result()), null);
       } else {
         handler(null, ar.cause());
       }
@@ -892,7 +892,7 @@ var RedisService = function(j_val) {
   this.hlen = function(args, handler) {
     var __args = arguments;
     if (__args.length === 2 && typeof __args[0] === 'object' && __args[0] instanceof Array && typeof __args[1] === 'function') {
-      j_redisService.hlen(utils.convJSArrayToJsonArray(args), function(ar) {
+      j_redisService.hlen(utils.convParamJsonArray(args), function(ar) {
       if (ar.succeeded()) {
         handler(ar.result(), null);
       } else {
@@ -908,9 +908,9 @@ var RedisService = function(j_val) {
   this.hmget = function(args, handler) {
     var __args = arguments;
     if (__args.length === 2 && typeof __args[0] === 'object' && __args[0] instanceof Array && typeof __args[1] === 'function') {
-      j_redisService.hmget(utils.convJSArrayToJsonArray(args), function(ar) {
+      j_redisService.hmget(utils.convParamJsonArray(args), function(ar) {
       if (ar.succeeded()) {
-        handler(utils.convJsonToJS(ar.result()), null);
+        handler(utils.convReturnJson(ar.result()), null);
       } else {
         handler(null, ar.cause());
       }
@@ -924,7 +924,7 @@ var RedisService = function(j_val) {
   this.hmset = function(args, handler) {
     var __args = arguments;
     if (__args.length === 2 && typeof __args[0] === 'object' && __args[0] instanceof Array && typeof __args[1] === 'function') {
-      j_redisService.hmset(utils.convJSArrayToJsonArray(args), function(ar) {
+      j_redisService.hmset(utils.convParamJsonArray(args), function(ar) {
       if (ar.succeeded()) {
         handler(ar.result(), null);
       } else {
@@ -940,7 +940,7 @@ var RedisService = function(j_val) {
   this.hset = function(args, handler) {
     var __args = arguments;
     if (__args.length === 2 && typeof __args[0] === 'object' && __args[0] instanceof Array && typeof __args[1] === 'function') {
-      j_redisService.hset(utils.convJSArrayToJsonArray(args), function(ar) {
+      j_redisService.hset(utils.convParamJsonArray(args), function(ar) {
       if (ar.succeeded()) {
         handler(ar.result(), null);
       } else {
@@ -956,7 +956,7 @@ var RedisService = function(j_val) {
   this.hsetnx = function(args, handler) {
     var __args = arguments;
     if (__args.length === 2 && typeof __args[0] === 'object' && __args[0] instanceof Array && typeof __args[1] === 'function') {
-      j_redisService.hsetnx(utils.convJSArrayToJsonArray(args), function(ar) {
+      j_redisService.hsetnx(utils.convParamJsonArray(args), function(ar) {
       if (ar.succeeded()) {
         handler(ar.result(), null);
       } else {
@@ -972,9 +972,9 @@ var RedisService = function(j_val) {
   this.hvals = function(args, handler) {
     var __args = arguments;
     if (__args.length === 2 && typeof __args[0] === 'object' && __args[0] instanceof Array && typeof __args[1] === 'function') {
-      j_redisService.hvals(utils.convJSArrayToJsonArray(args), function(ar) {
+      j_redisService.hvals(utils.convParamJsonArray(args), function(ar) {
       if (ar.succeeded()) {
-        handler(utils.convJsonToJS(ar.result()), null);
+        handler(utils.convReturnJson(ar.result()), null);
       } else {
         handler(null, ar.cause());
       }
@@ -988,7 +988,7 @@ var RedisService = function(j_val) {
   this.incr = function(args, handler) {
     var __args = arguments;
     if (__args.length === 2 && typeof __args[0] === 'object' && __args[0] instanceof Array && typeof __args[1] === 'function') {
-      j_redisService.incr(utils.convJSArrayToJsonArray(args), function(ar) {
+      j_redisService.incr(utils.convParamJsonArray(args), function(ar) {
       if (ar.succeeded()) {
         handler(ar.result(), null);
       } else {
@@ -1004,7 +1004,7 @@ var RedisService = function(j_val) {
   this.incrby = function(args, handler) {
     var __args = arguments;
     if (__args.length === 2 && typeof __args[0] === 'object' && __args[0] instanceof Array && typeof __args[1] === 'function') {
-      j_redisService.incrby(utils.convJSArrayToJsonArray(args), function(ar) {
+      j_redisService.incrby(utils.convParamJsonArray(args), function(ar) {
       if (ar.succeeded()) {
         handler(ar.result(), null);
       } else {
@@ -1020,7 +1020,7 @@ var RedisService = function(j_val) {
   this.incrbyfloat = function(args, handler) {
     var __args = arguments;
     if (__args.length === 2 && typeof __args[0] === 'object' && __args[0] instanceof Array && typeof __args[1] === 'function') {
-      j_redisService.incrbyfloat(utils.convJSArrayToJsonArray(args), function(ar) {
+      j_redisService.incrbyfloat(utils.convParamJsonArray(args), function(ar) {
       if (ar.succeeded()) {
         handler(ar.result(), null);
       } else {
@@ -1036,7 +1036,7 @@ var RedisService = function(j_val) {
   this.info = function(args, handler) {
     var __args = arguments;
     if (__args.length === 2 && typeof __args[0] === 'object' && __args[0] instanceof Array && typeof __args[1] === 'function') {
-      j_redisService.info(utils.convJSArrayToJsonArray(args), function(ar) {
+      j_redisService.info(utils.convParamJsonArray(args), function(ar) {
       if (ar.succeeded()) {
         handler(ar.result(), null);
       } else {
@@ -1052,9 +1052,9 @@ var RedisService = function(j_val) {
   this.keys = function(args, handler) {
     var __args = arguments;
     if (__args.length === 2 && typeof __args[0] === 'object' && __args[0] instanceof Array && typeof __args[1] === 'function') {
-      j_redisService.keys(utils.convJSArrayToJsonArray(args), function(ar) {
+      j_redisService.keys(utils.convParamJsonArray(args), function(ar) {
       if (ar.succeeded()) {
-        handler(utils.convJsonToJS(ar.result()), null);
+        handler(utils.convReturnJson(ar.result()), null);
       } else {
         handler(null, ar.cause());
       }
@@ -1084,7 +1084,7 @@ var RedisService = function(j_val) {
   this.lindex = function(args, handler) {
     var __args = arguments;
     if (__args.length === 2 && typeof __args[0] === 'object' && __args[0] instanceof Array && typeof __args[1] === 'function') {
-      j_redisService.lindex(utils.convJSArrayToJsonArray(args), function(ar) {
+      j_redisService.lindex(utils.convParamJsonArray(args), function(ar) {
       if (ar.succeeded()) {
         handler(ar.result(), null);
       } else {
@@ -1100,7 +1100,7 @@ var RedisService = function(j_val) {
   this.linsert = function(args, handler) {
     var __args = arguments;
     if (__args.length === 2 && typeof __args[0] === 'object' && __args[0] instanceof Array && typeof __args[1] === 'function') {
-      j_redisService.linsert(utils.convJSArrayToJsonArray(args), function(ar) {
+      j_redisService.linsert(utils.convParamJsonArray(args), function(ar) {
       if (ar.succeeded()) {
         handler(ar.result(), null);
       } else {
@@ -1116,7 +1116,7 @@ var RedisService = function(j_val) {
   this.llen = function(args, handler) {
     var __args = arguments;
     if (__args.length === 2 && typeof __args[0] === 'object' && __args[0] instanceof Array && typeof __args[1] === 'function') {
-      j_redisService.llen(utils.convJSArrayToJsonArray(args), function(ar) {
+      j_redisService.llen(utils.convParamJsonArray(args), function(ar) {
       if (ar.succeeded()) {
         handler(ar.result(), null);
       } else {
@@ -1132,7 +1132,7 @@ var RedisService = function(j_val) {
   this.lpop = function(args, handler) {
     var __args = arguments;
     if (__args.length === 2 && typeof __args[0] === 'object' && __args[0] instanceof Array && typeof __args[1] === 'function') {
-      j_redisService.lpop(utils.convJSArrayToJsonArray(args), function(ar) {
+      j_redisService.lpop(utils.convParamJsonArray(args), function(ar) {
       if (ar.succeeded()) {
         handler(ar.result(), null);
       } else {
@@ -1148,7 +1148,7 @@ var RedisService = function(j_val) {
   this.lpush = function(args, handler) {
     var __args = arguments;
     if (__args.length === 2 && typeof __args[0] === 'object' && __args[0] instanceof Array && typeof __args[1] === 'function') {
-      j_redisService.lpush(utils.convJSArrayToJsonArray(args), function(ar) {
+      j_redisService.lpush(utils.convParamJsonArray(args), function(ar) {
       if (ar.succeeded()) {
         handler(ar.result(), null);
       } else {
@@ -1164,7 +1164,7 @@ var RedisService = function(j_val) {
   this.lpushx = function(args, handler) {
     var __args = arguments;
     if (__args.length === 2 && typeof __args[0] === 'object' && __args[0] instanceof Array && typeof __args[1] === 'function') {
-      j_redisService.lpushx(utils.convJSArrayToJsonArray(args), function(ar) {
+      j_redisService.lpushx(utils.convParamJsonArray(args), function(ar) {
       if (ar.succeeded()) {
         handler(ar.result(), null);
       } else {
@@ -1180,9 +1180,9 @@ var RedisService = function(j_val) {
   this.lrange = function(args, handler) {
     var __args = arguments;
     if (__args.length === 2 && typeof __args[0] === 'object' && __args[0] instanceof Array && typeof __args[1] === 'function') {
-      j_redisService.lrange(utils.convJSArrayToJsonArray(args), function(ar) {
+      j_redisService.lrange(utils.convParamJsonArray(args), function(ar) {
       if (ar.succeeded()) {
-        handler(utils.convJsonToJS(ar.result()), null);
+        handler(utils.convReturnJson(ar.result()), null);
       } else {
         handler(null, ar.cause());
       }
@@ -1196,7 +1196,7 @@ var RedisService = function(j_val) {
   this.lrem = function(args, handler) {
     var __args = arguments;
     if (__args.length === 2 && typeof __args[0] === 'object' && __args[0] instanceof Array && typeof __args[1] === 'function') {
-      j_redisService.lrem(utils.convJSArrayToJsonArray(args), function(ar) {
+      j_redisService.lrem(utils.convParamJsonArray(args), function(ar) {
       if (ar.succeeded()) {
         handler(ar.result(), null);
       } else {
@@ -1212,7 +1212,7 @@ var RedisService = function(j_val) {
   this.lset = function(args, handler) {
     var __args = arguments;
     if (__args.length === 2 && typeof __args[0] === 'object' && __args[0] instanceof Array && typeof __args[1] === 'function') {
-      j_redisService.lset(utils.convJSArrayToJsonArray(args), function(ar) {
+      j_redisService.lset(utils.convParamJsonArray(args), function(ar) {
       if (ar.succeeded()) {
         handler(ar.result(), null);
       } else {
@@ -1228,7 +1228,7 @@ var RedisService = function(j_val) {
   this.ltrim = function(args, handler) {
     var __args = arguments;
     if (__args.length === 2 && typeof __args[0] === 'object' && __args[0] instanceof Array && typeof __args[1] === 'function') {
-      j_redisService.ltrim(utils.convJSArrayToJsonArray(args), function(ar) {
+      j_redisService.ltrim(utils.convParamJsonArray(args), function(ar) {
       if (ar.succeeded()) {
         handler(ar.result(), null);
       } else {
@@ -1244,9 +1244,9 @@ var RedisService = function(j_val) {
   this.mget = function(args, handler) {
     var __args = arguments;
     if (__args.length === 2 && typeof __args[0] === 'object' && __args[0] instanceof Array && typeof __args[1] === 'function') {
-      j_redisService.mget(utils.convJSArrayToJsonArray(args), function(ar) {
+      j_redisService.mget(utils.convParamJsonArray(args), function(ar) {
       if (ar.succeeded()) {
-        handler(utils.convJsonToJS(ar.result()), null);
+        handler(utils.convReturnJson(ar.result()), null);
       } else {
         handler(null, ar.cause());
       }
@@ -1260,7 +1260,7 @@ var RedisService = function(j_val) {
   this.migrate = function(args, handler) {
     var __args = arguments;
     if (__args.length === 2 && typeof __args[0] === 'object' && __args[0] instanceof Array && typeof __args[1] === 'function') {
-      j_redisService.migrate(utils.convJSArrayToJsonArray(args), function(ar) {
+      j_redisService.migrate(utils.convParamJsonArray(args), function(ar) {
       if (ar.succeeded()) {
         handler(ar.result(), null);
       } else {
@@ -1292,7 +1292,7 @@ var RedisService = function(j_val) {
   this.move = function(args, handler) {
     var __args = arguments;
     if (__args.length === 2 && typeof __args[0] === 'object' && __args[0] instanceof Array && typeof __args[1] === 'function') {
-      j_redisService.move(utils.convJSArrayToJsonArray(args), function(ar) {
+      j_redisService.move(utils.convParamJsonArray(args), function(ar) {
       if (ar.succeeded()) {
         handler(ar.result(), null);
       } else {
@@ -1308,7 +1308,7 @@ var RedisService = function(j_val) {
   this.mset = function(args, handler) {
     var __args = arguments;
     if (__args.length === 2 && typeof __args[0] === 'object' && __args[0] instanceof Array && typeof __args[1] === 'function') {
-      j_redisService.mset(utils.convJSArrayToJsonArray(args), function(ar) {
+      j_redisService.mset(utils.convParamJsonArray(args), function(ar) {
       if (ar.succeeded()) {
         handler(ar.result(), null);
       } else {
@@ -1324,7 +1324,7 @@ var RedisService = function(j_val) {
   this.msetnx = function(args, handler) {
     var __args = arguments;
     if (__args.length === 2 && typeof __args[0] === 'object' && __args[0] instanceof Array && typeof __args[1] === 'function') {
-      j_redisService.msetnx(utils.convJSArrayToJsonArray(args), function(ar) {
+      j_redisService.msetnx(utils.convParamJsonArray(args), function(ar) {
       if (ar.succeeded()) {
         handler(ar.result(), null);
       } else {
@@ -1356,7 +1356,7 @@ var RedisService = function(j_val) {
   this.object = function(args, handler) {
     var __args = arguments;
     if (__args.length === 2 && typeof __args[0] === 'object' && __args[0] instanceof Array && typeof __args[1] === 'function') {
-      j_redisService.object(utils.convJSArrayToJsonArray(args), function(ar) {
+      j_redisService.object(utils.convParamJsonArray(args), function(ar) {
       if (ar.succeeded()) {
         handler(null, null);
       } else {
@@ -1372,7 +1372,7 @@ var RedisService = function(j_val) {
   this.persist = function(args, handler) {
     var __args = arguments;
     if (__args.length === 2 && typeof __args[0] === 'object' && __args[0] instanceof Array && typeof __args[1] === 'function') {
-      j_redisService.persist(utils.convJSArrayToJsonArray(args), function(ar) {
+      j_redisService.persist(utils.convParamJsonArray(args), function(ar) {
       if (ar.succeeded()) {
         handler(ar.result(), null);
       } else {
@@ -1388,7 +1388,7 @@ var RedisService = function(j_val) {
   this.pexpire = function(args, handler) {
     var __args = arguments;
     if (__args.length === 2 && typeof __args[0] === 'object' && __args[0] instanceof Array && typeof __args[1] === 'function') {
-      j_redisService.pexpire(utils.convJSArrayToJsonArray(args), function(ar) {
+      j_redisService.pexpire(utils.convParamJsonArray(args), function(ar) {
       if (ar.succeeded()) {
         handler(ar.result(), null);
       } else {
@@ -1404,7 +1404,7 @@ var RedisService = function(j_val) {
   this.pexpireat = function(args, handler) {
     var __args = arguments;
     if (__args.length === 2 && typeof __args[0] === 'object' && __args[0] instanceof Array && typeof __args[1] === 'function') {
-      j_redisService.pexpireat(utils.convJSArrayToJsonArray(args), function(ar) {
+      j_redisService.pexpireat(utils.convParamJsonArray(args), function(ar) {
       if (ar.succeeded()) {
         handler(ar.result(), null);
       } else {
@@ -1420,7 +1420,7 @@ var RedisService = function(j_val) {
   this.pfadd = function(args, handler) {
     var __args = arguments;
     if (__args.length === 2 && typeof __args[0] === 'object' && __args[0] instanceof Array && typeof __args[1] === 'function') {
-      j_redisService.pfadd(utils.convJSArrayToJsonArray(args), function(ar) {
+      j_redisService.pfadd(utils.convParamJsonArray(args), function(ar) {
       if (ar.succeeded()) {
         handler(ar.result(), null);
       } else {
@@ -1436,7 +1436,7 @@ var RedisService = function(j_val) {
   this.pfcount = function(args, handler) {
     var __args = arguments;
     if (__args.length === 2 && typeof __args[0] === 'object' && __args[0] instanceof Array && typeof __args[1] === 'function') {
-      j_redisService.pfcount(utils.convJSArrayToJsonArray(args), function(ar) {
+      j_redisService.pfcount(utils.convParamJsonArray(args), function(ar) {
       if (ar.succeeded()) {
         handler(ar.result(), null);
       } else {
@@ -1452,7 +1452,7 @@ var RedisService = function(j_val) {
   this.pfmerge = function(args, handler) {
     var __args = arguments;
     if (__args.length === 2 && typeof __args[0] === 'object' && __args[0] instanceof Array && typeof __args[1] === 'function') {
-      j_redisService.pfmerge(utils.convJSArrayToJsonArray(args), function(ar) {
+      j_redisService.pfmerge(utils.convParamJsonArray(args), function(ar) {
       if (ar.succeeded()) {
         handler(ar.result(), null);
       } else {
@@ -1484,7 +1484,7 @@ var RedisService = function(j_val) {
   this.psetex = function(args, handler) {
     var __args = arguments;
     if (__args.length === 2 && typeof __args[0] === 'object' && __args[0] instanceof Array && typeof __args[1] === 'function') {
-      j_redisService.psetex(utils.convJSArrayToJsonArray(args), function(ar) {
+      j_redisService.psetex(utils.convParamJsonArray(args), function(ar) {
       if (ar.succeeded()) {
         handler(null, null);
       } else {
@@ -1500,7 +1500,7 @@ var RedisService = function(j_val) {
   this.psubscribe = function(args, handler) {
     var __args = arguments;
     if (__args.length === 2 && typeof __args[0] === 'object' && __args[0] instanceof Array && typeof __args[1] === 'function') {
-      j_redisService.psubscribe(utils.convJSArrayToJsonArray(args), function(ar) {
+      j_redisService.psubscribe(utils.convParamJsonArray(args), function(ar) {
       if (ar.succeeded()) {
         handler(null, null);
       } else {
@@ -1516,7 +1516,7 @@ var RedisService = function(j_val) {
   this.pubsub = function(args, handler) {
     var __args = arguments;
     if (__args.length === 2 && typeof __args[0] === 'object' && __args[0] instanceof Array && typeof __args[1] === 'function') {
-      j_redisService.pubsub(utils.convJSArrayToJsonArray(args), function(ar) {
+      j_redisService.pubsub(utils.convParamJsonArray(args), function(ar) {
       if (ar.succeeded()) {
         handler(ar.result(), null);
       } else {
@@ -1532,7 +1532,7 @@ var RedisService = function(j_val) {
   this.pttl = function(args, handler) {
     var __args = arguments;
     if (__args.length === 2 && typeof __args[0] === 'object' && __args[0] instanceof Array && typeof __args[1] === 'function') {
-      j_redisService.pttl(utils.convJSArrayToJsonArray(args), function(ar) {
+      j_redisService.pttl(utils.convParamJsonArray(args), function(ar) {
       if (ar.succeeded()) {
         handler(ar.result(), null);
       } else {
@@ -1548,7 +1548,7 @@ var RedisService = function(j_val) {
   this.publish = function(args, handler) {
     var __args = arguments;
     if (__args.length === 2 && typeof __args[0] === 'object' && __args[0] instanceof Array && typeof __args[1] === 'function') {
-      j_redisService.publish(utils.convJSArrayToJsonArray(args), function(ar) {
+      j_redisService.publish(utils.convParamJsonArray(args), function(ar) {
       if (ar.succeeded()) {
         handler(ar.result(), null);
       } else {
@@ -1564,7 +1564,7 @@ var RedisService = function(j_val) {
   this.punsubscribe = function(args, handler) {
     var __args = arguments;
     if (__args.length === 2 && typeof __args[0] === 'object' && __args[0] instanceof Array && typeof __args[1] === 'function') {
-      j_redisService.punsubscribe(utils.convJSArrayToJsonArray(args), function(ar) {
+      j_redisService.punsubscribe(utils.convParamJsonArray(args), function(ar) {
       if (ar.succeeded()) {
         handler(null, null);
       } else {
@@ -1612,7 +1612,7 @@ var RedisService = function(j_val) {
   this.rename = function(args, handler) {
     var __args = arguments;
     if (__args.length === 2 && typeof __args[0] === 'object' && __args[0] instanceof Array && typeof __args[1] === 'function') {
-      j_redisService.rename(utils.convJSArrayToJsonArray(args), function(ar) {
+      j_redisService.rename(utils.convParamJsonArray(args), function(ar) {
       if (ar.succeeded()) {
         handler(ar.result(), null);
       } else {
@@ -1628,7 +1628,7 @@ var RedisService = function(j_val) {
   this.renamenx = function(args, handler) {
     var __args = arguments;
     if (__args.length === 2 && typeof __args[0] === 'object' && __args[0] instanceof Array && typeof __args[1] === 'function') {
-      j_redisService.renamenx(utils.convJSArrayToJsonArray(args), function(ar) {
+      j_redisService.renamenx(utils.convParamJsonArray(args), function(ar) {
       if (ar.succeeded()) {
         handler(ar.result(), null);
       } else {
@@ -1644,7 +1644,7 @@ var RedisService = function(j_val) {
   this.restore = function(args, handler) {
     var __args = arguments;
     if (__args.length === 2 && typeof __args[0] === 'object' && __args[0] instanceof Array && typeof __args[1] === 'function') {
-      j_redisService.restore(utils.convJSArrayToJsonArray(args), function(ar) {
+      j_redisService.restore(utils.convParamJsonArray(args), function(ar) {
       if (ar.succeeded()) {
         handler(ar.result(), null);
       } else {
@@ -1662,7 +1662,7 @@ var RedisService = function(j_val) {
     if (__args.length === 1 && typeof __args[0] === 'function') {
       j_redisService.role(function(ar) {
       if (ar.succeeded()) {
-        handler(utils.convJsonToJS(ar.result()), null);
+        handler(utils.convReturnJson(ar.result()), null);
       } else {
         handler(null, ar.cause());
       }
@@ -1676,7 +1676,7 @@ var RedisService = function(j_val) {
   this.rpop = function(args, handler) {
     var __args = arguments;
     if (__args.length === 2 && typeof __args[0] === 'object' && __args[0] instanceof Array && typeof __args[1] === 'function') {
-      j_redisService.rpop(utils.convJSArrayToJsonArray(args), function(ar) {
+      j_redisService.rpop(utils.convParamJsonArray(args), function(ar) {
       if (ar.succeeded()) {
         handler(ar.result(), null);
       } else {
@@ -1692,7 +1692,7 @@ var RedisService = function(j_val) {
   this.rpoplpush = function(args, handler) {
     var __args = arguments;
     if (__args.length === 2 && typeof __args[0] === 'object' && __args[0] instanceof Array && typeof __args[1] === 'function') {
-      j_redisService.rpoplpush(utils.convJSArrayToJsonArray(args), function(ar) {
+      j_redisService.rpoplpush(utils.convParamJsonArray(args), function(ar) {
       if (ar.succeeded()) {
         handler(ar.result(), null);
       } else {
@@ -1708,7 +1708,7 @@ var RedisService = function(j_val) {
   this.rpush = function(args, handler) {
     var __args = arguments;
     if (__args.length === 2 && typeof __args[0] === 'object' && __args[0] instanceof Array && typeof __args[1] === 'function') {
-      j_redisService.rpush(utils.convJSArrayToJsonArray(args), function(ar) {
+      j_redisService.rpush(utils.convParamJsonArray(args), function(ar) {
       if (ar.succeeded()) {
         handler(ar.result(), null);
       } else {
@@ -1724,7 +1724,7 @@ var RedisService = function(j_val) {
   this.rpushx = function(args, handler) {
     var __args = arguments;
     if (__args.length === 2 && typeof __args[0] === 'object' && __args[0] instanceof Array && typeof __args[1] === 'function') {
-      j_redisService.rpushx(utils.convJSArrayToJsonArray(args), function(ar) {
+      j_redisService.rpushx(utils.convParamJsonArray(args), function(ar) {
       if (ar.succeeded()) {
         handler(ar.result(), null);
       } else {
@@ -1740,7 +1740,7 @@ var RedisService = function(j_val) {
   this.sadd = function(args, handler) {
     var __args = arguments;
     if (__args.length === 2 && typeof __args[0] === 'object' && __args[0] instanceof Array && typeof __args[1] === 'function') {
-      j_redisService.sadd(utils.convJSArrayToJsonArray(args), function(ar) {
+      j_redisService.sadd(utils.convParamJsonArray(args), function(ar) {
       if (ar.succeeded()) {
         handler(ar.result(), null);
       } else {
@@ -1772,7 +1772,7 @@ var RedisService = function(j_val) {
   this.scard = function(args, handler) {
     var __args = arguments;
     if (__args.length === 2 && typeof __args[0] === 'object' && __args[0] instanceof Array && typeof __args[1] === 'function') {
-      j_redisService.scard(utils.convJSArrayToJsonArray(args), function(ar) {
+      j_redisService.scard(utils.convParamJsonArray(args), function(ar) {
       if (ar.succeeded()) {
         handler(ar.result(), null);
       } else {
@@ -1788,9 +1788,9 @@ var RedisService = function(j_val) {
   this.scriptExists = function(args, handler) {
     var __args = arguments;
     if (__args.length === 2 && typeof __args[0] === 'object' && __args[0] instanceof Array && typeof __args[1] === 'function') {
-      j_redisService.scriptExists(utils.convJSArrayToJsonArray(args), function(ar) {
+      j_redisService.scriptExists(utils.convParamJsonArray(args), function(ar) {
       if (ar.succeeded()) {
-        handler(utils.convJsonToJS(ar.result()), null);
+        handler(utils.convReturnJson(ar.result()), null);
       } else {
         handler(null, ar.cause());
       }
@@ -1836,7 +1836,7 @@ var RedisService = function(j_val) {
   this.scriptLoad = function(args, handler) {
     var __args = arguments;
     if (__args.length === 2 && typeof __args[0] === 'object' && __args[0] instanceof Array && typeof __args[1] === 'function') {
-      j_redisService.scriptLoad(utils.convJSArrayToJsonArray(args), function(ar) {
+      j_redisService.scriptLoad(utils.convParamJsonArray(args), function(ar) {
       if (ar.succeeded()) {
         handler(ar.result(), null);
       } else {
@@ -1852,9 +1852,9 @@ var RedisService = function(j_val) {
   this.sdiff = function(args, handler) {
     var __args = arguments;
     if (__args.length === 2 && typeof __args[0] === 'object' && __args[0] instanceof Array && typeof __args[1] === 'function') {
-      j_redisService.sdiff(utils.convJSArrayToJsonArray(args), function(ar) {
+      j_redisService.sdiff(utils.convParamJsonArray(args), function(ar) {
       if (ar.succeeded()) {
-        handler(utils.convJsonToJS(ar.result()), null);
+        handler(utils.convReturnJson(ar.result()), null);
       } else {
         handler(null, ar.cause());
       }
@@ -1868,7 +1868,7 @@ var RedisService = function(j_val) {
   this.sdiffstore = function(args, handler) {
     var __args = arguments;
     if (__args.length === 2 && typeof __args[0] === 'object' && __args[0] instanceof Array && typeof __args[1] === 'function') {
-      j_redisService.sdiffstore(utils.convJSArrayToJsonArray(args), function(ar) {
+      j_redisService.sdiffstore(utils.convParamJsonArray(args), function(ar) {
       if (ar.succeeded()) {
         handler(ar.result(), null);
       } else {
@@ -1884,7 +1884,7 @@ var RedisService = function(j_val) {
   this.select = function(args, handler) {
     var __args = arguments;
     if (__args.length === 2 && typeof __args[0] === 'object' && __args[0] instanceof Array && typeof __args[1] === 'function') {
-      j_redisService.select(utils.convJSArrayToJsonArray(args), function(ar) {
+      j_redisService.select(utils.convParamJsonArray(args), function(ar) {
       if (ar.succeeded()) {
         handler(ar.result(), null);
       } else {
@@ -1900,7 +1900,7 @@ var RedisService = function(j_val) {
   this.set = function(args, handler) {
     var __args = arguments;
     if (__args.length === 2 && typeof __args[0] === 'object' && __args[0] instanceof Array && typeof __args[1] === 'function') {
-      j_redisService.set(utils.convJSArrayToJsonArray(args), function(ar) {
+      j_redisService.set(utils.convParamJsonArray(args), function(ar) {
       if (ar.succeeded()) {
         handler(null, null);
       } else {
@@ -1916,7 +1916,7 @@ var RedisService = function(j_val) {
   this.setbit = function(args, handler) {
     var __args = arguments;
     if (__args.length === 2 && typeof __args[0] === 'object' && __args[0] instanceof Array && typeof __args[1] === 'function') {
-      j_redisService.setbit(utils.convJSArrayToJsonArray(args), function(ar) {
+      j_redisService.setbit(utils.convParamJsonArray(args), function(ar) {
       if (ar.succeeded()) {
         handler(ar.result(), null);
       } else {
@@ -1932,7 +1932,7 @@ var RedisService = function(j_val) {
   this.setex = function(args, handler) {
     var __args = arguments;
     if (__args.length === 2 && typeof __args[0] === 'object' && __args[0] instanceof Array && typeof __args[1] === 'function') {
-      j_redisService.setex(utils.convJSArrayToJsonArray(args), function(ar) {
+      j_redisService.setex(utils.convParamJsonArray(args), function(ar) {
       if (ar.succeeded()) {
         handler(ar.result(), null);
       } else {
@@ -1948,7 +1948,7 @@ var RedisService = function(j_val) {
   this.setnx = function(args, handler) {
     var __args = arguments;
     if (__args.length === 2 && typeof __args[0] === 'object' && __args[0] instanceof Array && typeof __args[1] === 'function') {
-      j_redisService.setnx(utils.convJSArrayToJsonArray(args), function(ar) {
+      j_redisService.setnx(utils.convParamJsonArray(args), function(ar) {
       if (ar.succeeded()) {
         handler(ar.result(), null);
       } else {
@@ -1964,7 +1964,7 @@ var RedisService = function(j_val) {
   this.setrange = function(args, handler) {
     var __args = arguments;
     if (__args.length === 2 && typeof __args[0] === 'object' && __args[0] instanceof Array && typeof __args[1] === 'function') {
-      j_redisService.setrange(utils.convJSArrayToJsonArray(args), function(ar) {
+      j_redisService.setrange(utils.convParamJsonArray(args), function(ar) {
       if (ar.succeeded()) {
         handler(ar.result(), null);
       } else {
@@ -1980,7 +1980,7 @@ var RedisService = function(j_val) {
   this.shutdown = function(args, handler) {
     var __args = arguments;
     if (__args.length === 2 && typeof __args[0] === 'object' && __args[0] instanceof Array && typeof __args[1] === 'function') {
-      j_redisService.shutdown(utils.convJSArrayToJsonArray(args), function(ar) {
+      j_redisService.shutdown(utils.convParamJsonArray(args), function(ar) {
       if (ar.succeeded()) {
         handler(ar.result(), null);
       } else {
@@ -1996,9 +1996,9 @@ var RedisService = function(j_val) {
   this.sinter = function(args, handler) {
     var __args = arguments;
     if (__args.length === 2 && typeof __args[0] === 'object' && __args[0] instanceof Array && typeof __args[1] === 'function') {
-      j_redisService.sinter(utils.convJSArrayToJsonArray(args), function(ar) {
+      j_redisService.sinter(utils.convParamJsonArray(args), function(ar) {
       if (ar.succeeded()) {
-        handler(utils.convJsonToJS(ar.result()), null);
+        handler(utils.convReturnJson(ar.result()), null);
       } else {
         handler(null, ar.cause());
       }
@@ -2012,7 +2012,7 @@ var RedisService = function(j_val) {
   this.sinterstore = function(args, handler) {
     var __args = arguments;
     if (__args.length === 2 && typeof __args[0] === 'object' && __args[0] instanceof Array && typeof __args[1] === 'function') {
-      j_redisService.sinterstore(utils.convJSArrayToJsonArray(args), function(ar) {
+      j_redisService.sinterstore(utils.convParamJsonArray(args), function(ar) {
       if (ar.succeeded()) {
         handler(ar.result(), null);
       } else {
@@ -2028,7 +2028,7 @@ var RedisService = function(j_val) {
   this.sismember = function(args, handler) {
     var __args = arguments;
     if (__args.length === 2 && typeof __args[0] === 'object' && __args[0] instanceof Array && typeof __args[1] === 'function') {
-      j_redisService.sismember(utils.convJSArrayToJsonArray(args), function(ar) {
+      j_redisService.sismember(utils.convParamJsonArray(args), function(ar) {
       if (ar.succeeded()) {
         handler(ar.result(), null);
       } else {
@@ -2044,7 +2044,7 @@ var RedisService = function(j_val) {
   this.slaveof = function(args, handler) {
     var __args = arguments;
     if (__args.length === 2 && typeof __args[0] === 'object' && __args[0] instanceof Array && typeof __args[1] === 'function') {
-      j_redisService.slaveof(utils.convJSArrayToJsonArray(args), function(ar) {
+      j_redisService.slaveof(utils.convParamJsonArray(args), function(ar) {
       if (ar.succeeded()) {
         handler(ar.result(), null);
       } else {
@@ -2060,7 +2060,7 @@ var RedisService = function(j_val) {
   this.slowlog = function(args, handler) {
     var __args = arguments;
     if (__args.length === 2 && typeof __args[0] === 'object' && __args[0] instanceof Array && typeof __args[1] === 'function') {
-      j_redisService.slowlog(utils.convJSArrayToJsonArray(args), function(ar) {
+      j_redisService.slowlog(utils.convParamJsonArray(args), function(ar) {
       if (ar.succeeded()) {
         handler(null, null);
       } else {
@@ -2076,9 +2076,9 @@ var RedisService = function(j_val) {
   this.smembers = function(args, handler) {
     var __args = arguments;
     if (__args.length === 2 && typeof __args[0] === 'object' && __args[0] instanceof Array && typeof __args[1] === 'function') {
-      j_redisService.smembers(utils.convJSArrayToJsonArray(args), function(ar) {
+      j_redisService.smembers(utils.convParamJsonArray(args), function(ar) {
       if (ar.succeeded()) {
-        handler(utils.convJsonToJS(ar.result()), null);
+        handler(utils.convReturnJson(ar.result()), null);
       } else {
         handler(null, ar.cause());
       }
@@ -2092,7 +2092,7 @@ var RedisService = function(j_val) {
   this.smove = function(args, handler) {
     var __args = arguments;
     if (__args.length === 2 && typeof __args[0] === 'object' && __args[0] instanceof Array && typeof __args[1] === 'function') {
-      j_redisService.smove(utils.convJSArrayToJsonArray(args), function(ar) {
+      j_redisService.smove(utils.convParamJsonArray(args), function(ar) {
       if (ar.succeeded()) {
         handler(ar.result(), null);
       } else {
@@ -2108,9 +2108,9 @@ var RedisService = function(j_val) {
   this.sort = function(args, handler) {
     var __args = arguments;
     if (__args.length === 2 && typeof __args[0] === 'object' && __args[0] instanceof Array && typeof __args[1] === 'function') {
-      j_redisService.sort(utils.convJSArrayToJsonArray(args), function(ar) {
+      j_redisService.sort(utils.convParamJsonArray(args), function(ar) {
       if (ar.succeeded()) {
-        handler(utils.convJsonToJS(ar.result()), null);
+        handler(utils.convReturnJson(ar.result()), null);
       } else {
         handler(null, ar.cause());
       }
@@ -2124,7 +2124,7 @@ var RedisService = function(j_val) {
   this.spop = function(args, handler) {
     var __args = arguments;
     if (__args.length === 2 && typeof __args[0] === 'object' && __args[0] instanceof Array && typeof __args[1] === 'function') {
-      j_redisService.spop(utils.convJSArrayToJsonArray(args), function(ar) {
+      j_redisService.spop(utils.convParamJsonArray(args), function(ar) {
       if (ar.succeeded()) {
         handler(ar.result(), null);
       } else {
@@ -2140,9 +2140,9 @@ var RedisService = function(j_val) {
   this.srandmember = function(args, handler) {
     var __args = arguments;
     if (__args.length === 2 && typeof __args[0] === 'object' && __args[0] instanceof Array && typeof __args[1] === 'function') {
-      j_redisService.srandmember(utils.convJSArrayToJsonArray(args), function(ar) {
+      j_redisService.srandmember(utils.convParamJsonArray(args), function(ar) {
       if (ar.succeeded()) {
-        handler(utils.convJsonToJS(ar.result()), null);
+        handler(utils.convReturnJson(ar.result()), null);
       } else {
         handler(null, ar.cause());
       }
@@ -2156,7 +2156,7 @@ var RedisService = function(j_val) {
   this.srem = function(args, handler) {
     var __args = arguments;
     if (__args.length === 2 && typeof __args[0] === 'object' && __args[0] instanceof Array && typeof __args[1] === 'function') {
-      j_redisService.srem(utils.convJSArrayToJsonArray(args), function(ar) {
+      j_redisService.srem(utils.convParamJsonArray(args), function(ar) {
       if (ar.succeeded()) {
         handler(ar.result(), null);
       } else {
@@ -2172,7 +2172,7 @@ var RedisService = function(j_val) {
   this.strlen = function(args, handler) {
     var __args = arguments;
     if (__args.length === 2 && typeof __args[0] === 'object' && __args[0] instanceof Array && typeof __args[1] === 'function') {
-      j_redisService.strlen(utils.convJSArrayToJsonArray(args), function(ar) {
+      j_redisService.strlen(utils.convParamJsonArray(args), function(ar) {
       if (ar.succeeded()) {
         handler(ar.result(), null);
       } else {
@@ -2188,7 +2188,7 @@ var RedisService = function(j_val) {
   this.subscribe = function(args, handler) {
     var __args = arguments;
     if (__args.length === 2 && typeof __args[0] === 'object' && __args[0] instanceof Array && typeof __args[1] === 'function') {
-      j_redisService.subscribe(utils.convJSArrayToJsonArray(args), function(ar) {
+      j_redisService.subscribe(utils.convParamJsonArray(args), function(ar) {
       if (ar.succeeded()) {
         handler(null, null);
       } else {
@@ -2204,9 +2204,9 @@ var RedisService = function(j_val) {
   this.sunion = function(args, handler) {
     var __args = arguments;
     if (__args.length === 2 && typeof __args[0] === 'object' && __args[0] instanceof Array && typeof __args[1] === 'function') {
-      j_redisService.sunion(utils.convJSArrayToJsonArray(args), function(ar) {
+      j_redisService.sunion(utils.convParamJsonArray(args), function(ar) {
       if (ar.succeeded()) {
-        handler(utils.convJsonToJS(ar.result()), null);
+        handler(utils.convReturnJson(ar.result()), null);
       } else {
         handler(null, ar.cause());
       }
@@ -2220,7 +2220,7 @@ var RedisService = function(j_val) {
   this.sunionstore = function(args, handler) {
     var __args = arguments;
     if (__args.length === 2 && typeof __args[0] === 'object' && __args[0] instanceof Array && typeof __args[1] === 'function') {
-      j_redisService.sunionstore(utils.convJSArrayToJsonArray(args), function(ar) {
+      j_redisService.sunionstore(utils.convParamJsonArray(args), function(ar) {
       if (ar.succeeded()) {
         handler(ar.result(), null);
       } else {
@@ -2254,7 +2254,7 @@ var RedisService = function(j_val) {
     if (__args.length === 1 && typeof __args[0] === 'function') {
       j_redisService.time(function(ar) {
       if (ar.succeeded()) {
-        handler(utils.convJsonToJS(ar.result()), null);
+        handler(utils.convReturnJson(ar.result()), null);
       } else {
         handler(null, ar.cause());
       }
@@ -2268,7 +2268,7 @@ var RedisService = function(j_val) {
   this.ttl = function(args, handler) {
     var __args = arguments;
     if (__args.length === 2 && typeof __args[0] === 'object' && __args[0] instanceof Array && typeof __args[1] === 'function') {
-      j_redisService.ttl(utils.convJSArrayToJsonArray(args), function(ar) {
+      j_redisService.ttl(utils.convParamJsonArray(args), function(ar) {
       if (ar.succeeded()) {
         handler(ar.result(), null);
       } else {
@@ -2284,7 +2284,7 @@ var RedisService = function(j_val) {
   this.type = function(args, handler) {
     var __args = arguments;
     if (__args.length === 2 && typeof __args[0] === 'object' && __args[0] instanceof Array && typeof __args[1] === 'function') {
-      j_redisService.type(utils.convJSArrayToJsonArray(args), function(ar) {
+      j_redisService.type(utils.convParamJsonArray(args), function(ar) {
       if (ar.succeeded()) {
         handler(ar.result(), null);
       } else {
@@ -2300,7 +2300,7 @@ var RedisService = function(j_val) {
   this.unsubscribe = function(args, handler) {
     var __args = arguments;
     if (__args.length === 2 && typeof __args[0] === 'object' && __args[0] instanceof Array && typeof __args[1] === 'function') {
-      j_redisService.unsubscribe(utils.convJSArrayToJsonArray(args), function(ar) {
+      j_redisService.unsubscribe(utils.convParamJsonArray(args), function(ar) {
       if (ar.succeeded()) {
         handler(null, null);
       } else {
@@ -2332,7 +2332,7 @@ var RedisService = function(j_val) {
   this.watch = function(args, handler) {
     var __args = arguments;
     if (__args.length === 2 && typeof __args[0] === 'object' && __args[0] instanceof Array && typeof __args[1] === 'function') {
-      j_redisService.watch(utils.convJSArrayToJsonArray(args), function(ar) {
+      j_redisService.watch(utils.convParamJsonArray(args), function(ar) {
       if (ar.succeeded()) {
         handler(ar.result(), null);
       } else {
@@ -2348,7 +2348,7 @@ var RedisService = function(j_val) {
   this.zadd = function(args, handler) {
     var __args = arguments;
     if (__args.length === 2 && typeof __args[0] === 'object' && __args[0] instanceof Array && typeof __args[1] === 'function') {
-      j_redisService.zadd(utils.convJSArrayToJsonArray(args), function(ar) {
+      j_redisService.zadd(utils.convParamJsonArray(args), function(ar) {
       if (ar.succeeded()) {
         handler(ar.result(), null);
       } else {
@@ -2364,7 +2364,7 @@ var RedisService = function(j_val) {
   this.zcard = function(args, handler) {
     var __args = arguments;
     if (__args.length === 2 && typeof __args[0] === 'object' && __args[0] instanceof Array && typeof __args[1] === 'function') {
-      j_redisService.zcard(utils.convJSArrayToJsonArray(args), function(ar) {
+      j_redisService.zcard(utils.convParamJsonArray(args), function(ar) {
       if (ar.succeeded()) {
         handler(ar.result(), null);
       } else {
@@ -2380,7 +2380,7 @@ var RedisService = function(j_val) {
   this.zcount = function(args, handler) {
     var __args = arguments;
     if (__args.length === 2 && typeof __args[0] === 'object' && __args[0] instanceof Array && typeof __args[1] === 'function') {
-      j_redisService.zcount(utils.convJSArrayToJsonArray(args), function(ar) {
+      j_redisService.zcount(utils.convParamJsonArray(args), function(ar) {
       if (ar.succeeded()) {
         handler(ar.result(), null);
       } else {
@@ -2396,7 +2396,7 @@ var RedisService = function(j_val) {
   this.zincrby = function(args, handler) {
     var __args = arguments;
     if (__args.length === 2 && typeof __args[0] === 'object' && __args[0] instanceof Array && typeof __args[1] === 'function') {
-      j_redisService.zincrby(utils.convJSArrayToJsonArray(args), function(ar) {
+      j_redisService.zincrby(utils.convParamJsonArray(args), function(ar) {
       if (ar.succeeded()) {
         handler(ar.result(), null);
       } else {
@@ -2412,7 +2412,7 @@ var RedisService = function(j_val) {
   this.zinterstore = function(args, handler) {
     var __args = arguments;
     if (__args.length === 2 && typeof __args[0] === 'object' && __args[0] instanceof Array && typeof __args[1] === 'function') {
-      j_redisService.zinterstore(utils.convJSArrayToJsonArray(args), function(ar) {
+      j_redisService.zinterstore(utils.convParamJsonArray(args), function(ar) {
       if (ar.succeeded()) {
         handler(ar.result(), null);
       } else {
@@ -2428,7 +2428,7 @@ var RedisService = function(j_val) {
   this.zlexcount = function(args, handler) {
     var __args = arguments;
     if (__args.length === 2 && typeof __args[0] === 'object' && __args[0] instanceof Array && typeof __args[1] === 'function') {
-      j_redisService.zlexcount(utils.convJSArrayToJsonArray(args), function(ar) {
+      j_redisService.zlexcount(utils.convParamJsonArray(args), function(ar) {
       if (ar.succeeded()) {
         handler(ar.result(), null);
       } else {
@@ -2444,9 +2444,9 @@ var RedisService = function(j_val) {
   this.zrange = function(args, handler) {
     var __args = arguments;
     if (__args.length === 2 && typeof __args[0] === 'object' && __args[0] instanceof Array && typeof __args[1] === 'function') {
-      j_redisService.zrange(utils.convJSArrayToJsonArray(args), function(ar) {
+      j_redisService.zrange(utils.convParamJsonArray(args), function(ar) {
       if (ar.succeeded()) {
-        handler(utils.convJsonToJS(ar.result()), null);
+        handler(utils.convReturnJson(ar.result()), null);
       } else {
         handler(null, ar.cause());
       }
@@ -2460,9 +2460,9 @@ var RedisService = function(j_val) {
   this.zrangebylex = function(args, handler) {
     var __args = arguments;
     if (__args.length === 2 && typeof __args[0] === 'object' && __args[0] instanceof Array && typeof __args[1] === 'function') {
-      j_redisService.zrangebylex(utils.convJSArrayToJsonArray(args), function(ar) {
+      j_redisService.zrangebylex(utils.convParamJsonArray(args), function(ar) {
       if (ar.succeeded()) {
-        handler(utils.convJsonToJS(ar.result()), null);
+        handler(utils.convReturnJson(ar.result()), null);
       } else {
         handler(null, ar.cause());
       }
@@ -2476,9 +2476,9 @@ var RedisService = function(j_val) {
   this.zrangebyscore = function(args, handler) {
     var __args = arguments;
     if (__args.length === 2 && typeof __args[0] === 'object' && __args[0] instanceof Array && typeof __args[1] === 'function') {
-      j_redisService.zrangebyscore(utils.convJSArrayToJsonArray(args), function(ar) {
+      j_redisService.zrangebyscore(utils.convParamJsonArray(args), function(ar) {
       if (ar.succeeded()) {
-        handler(utils.convJsonToJS(ar.result()), null);
+        handler(utils.convReturnJson(ar.result()), null);
       } else {
         handler(null, ar.cause());
       }
@@ -2492,7 +2492,7 @@ var RedisService = function(j_val) {
   this.zrank = function(args, handler) {
     var __args = arguments;
     if (__args.length === 2 && typeof __args[0] === 'object' && __args[0] instanceof Array && typeof __args[1] === 'function') {
-      j_redisService.zrank(utils.convJSArrayToJsonArray(args), function(ar) {
+      j_redisService.zrank(utils.convParamJsonArray(args), function(ar) {
       if (ar.succeeded()) {
         handler(ar.result(), null);
       } else {
@@ -2508,7 +2508,7 @@ var RedisService = function(j_val) {
   this.zrem = function(args, handler) {
     var __args = arguments;
     if (__args.length === 2 && typeof __args[0] === 'object' && __args[0] instanceof Array && typeof __args[1] === 'function') {
-      j_redisService.zrem(utils.convJSArrayToJsonArray(args), function(ar) {
+      j_redisService.zrem(utils.convParamJsonArray(args), function(ar) {
       if (ar.succeeded()) {
         handler(ar.result(), null);
       } else {
@@ -2524,7 +2524,7 @@ var RedisService = function(j_val) {
   this.zremrangebylex = function(args, handler) {
     var __args = arguments;
     if (__args.length === 2 && typeof __args[0] === 'object' && __args[0] instanceof Array && typeof __args[1] === 'function') {
-      j_redisService.zremrangebylex(utils.convJSArrayToJsonArray(args), function(ar) {
+      j_redisService.zremrangebylex(utils.convParamJsonArray(args), function(ar) {
       if (ar.succeeded()) {
         handler(ar.result(), null);
       } else {
@@ -2540,7 +2540,7 @@ var RedisService = function(j_val) {
   this.zremrangebyrank = function(args, handler) {
     var __args = arguments;
     if (__args.length === 2 && typeof __args[0] === 'object' && __args[0] instanceof Array && typeof __args[1] === 'function') {
-      j_redisService.zremrangebyrank(utils.convJSArrayToJsonArray(args), function(ar) {
+      j_redisService.zremrangebyrank(utils.convParamJsonArray(args), function(ar) {
       if (ar.succeeded()) {
         handler(ar.result(), null);
       } else {
@@ -2556,7 +2556,7 @@ var RedisService = function(j_val) {
   this.zremrangebyscore = function(args, handler) {
     var __args = arguments;
     if (__args.length === 2 && typeof __args[0] === 'object' && __args[0] instanceof Array && typeof __args[1] === 'function') {
-      j_redisService.zremrangebyscore(utils.convJSArrayToJsonArray(args), function(ar) {
+      j_redisService.zremrangebyscore(utils.convParamJsonArray(args), function(ar) {
       if (ar.succeeded()) {
         handler(ar.result(), null);
       } else {
@@ -2572,9 +2572,9 @@ var RedisService = function(j_val) {
   this.zrevrange = function(args, handler) {
     var __args = arguments;
     if (__args.length === 2 && typeof __args[0] === 'object' && __args[0] instanceof Array && typeof __args[1] === 'function') {
-      j_redisService.zrevrange(utils.convJSArrayToJsonArray(args), function(ar) {
+      j_redisService.zrevrange(utils.convParamJsonArray(args), function(ar) {
       if (ar.succeeded()) {
-        handler(utils.convJsonToJS(ar.result()), null);
+        handler(utils.convReturnJson(ar.result()), null);
       } else {
         handler(null, ar.cause());
       }
@@ -2588,9 +2588,9 @@ var RedisService = function(j_val) {
   this.zrevrangebyscore = function(args, handler) {
     var __args = arguments;
     if (__args.length === 2 && typeof __args[0] === 'object' && __args[0] instanceof Array && typeof __args[1] === 'function') {
-      j_redisService.zrevrangebyscore(utils.convJSArrayToJsonArray(args), function(ar) {
+      j_redisService.zrevrangebyscore(utils.convParamJsonArray(args), function(ar) {
       if (ar.succeeded()) {
-        handler(utils.convJsonToJS(ar.result()), null);
+        handler(utils.convReturnJson(ar.result()), null);
       } else {
         handler(null, ar.cause());
       }
@@ -2604,7 +2604,7 @@ var RedisService = function(j_val) {
   this.zrevrank = function(args, handler) {
     var __args = arguments;
     if (__args.length === 2 && typeof __args[0] === 'object' && __args[0] instanceof Array && typeof __args[1] === 'function') {
-      j_redisService.zrevrank(utils.convJSArrayToJsonArray(args), function(ar) {
+      j_redisService.zrevrank(utils.convParamJsonArray(args), function(ar) {
       if (ar.succeeded()) {
         handler(ar.result(), null);
       } else {
@@ -2620,7 +2620,7 @@ var RedisService = function(j_val) {
   this.zscore = function(args, handler) {
     var __args = arguments;
     if (__args.length === 2 && typeof __args[0] === 'object' && __args[0] instanceof Array && typeof __args[1] === 'function') {
-      j_redisService.zscore(utils.convJSArrayToJsonArray(args), function(ar) {
+      j_redisService.zscore(utils.convParamJsonArray(args), function(ar) {
       if (ar.succeeded()) {
         handler(ar.result(), null);
       } else {
@@ -2636,7 +2636,7 @@ var RedisService = function(j_val) {
   this.zunionstore = function(args, handler) {
     var __args = arguments;
     if (__args.length === 2 && typeof __args[0] === 'object' && __args[0] instanceof Array && typeof __args[1] === 'function') {
-      j_redisService.zunionstore(utils.convJSArrayToJsonArray(args), function(ar) {
+      j_redisService.zunionstore(utils.convParamJsonArray(args), function(ar) {
       if (ar.succeeded()) {
         handler(ar.result(), null);
       } else {
@@ -2652,7 +2652,7 @@ var RedisService = function(j_val) {
   this.scan = function(args, handler) {
     var __args = arguments;
     if (__args.length === 2 && typeof __args[0] === 'object' && __args[0] instanceof Array && typeof __args[1] === 'function') {
-      j_redisService.scan(utils.convJSArrayToJsonArray(args), function(ar) {
+      j_redisService.scan(utils.convParamJsonArray(args), function(ar) {
       if (ar.succeeded()) {
         handler(null, null);
       } else {
@@ -2668,7 +2668,7 @@ var RedisService = function(j_val) {
   this.sscan = function(args, handler) {
     var __args = arguments;
     if (__args.length === 2 && typeof __args[0] === 'object' && __args[0] instanceof Array && typeof __args[1] === 'function') {
-      j_redisService.sscan(utils.convJSArrayToJsonArray(args), function(ar) {
+      j_redisService.sscan(utils.convParamJsonArray(args), function(ar) {
       if (ar.succeeded()) {
         handler(null, null);
       } else {
@@ -2684,7 +2684,7 @@ var RedisService = function(j_val) {
   this.hscan = function(args, handler) {
     var __args = arguments;
     if (__args.length === 2 && typeof __args[0] === 'object' && __args[0] instanceof Array && typeof __args[1] === 'function') {
-      j_redisService.hscan(utils.convJSArrayToJsonArray(args), function(ar) {
+      j_redisService.hscan(utils.convParamJsonArray(args), function(ar) {
       if (ar.succeeded()) {
         handler(null, null);
       } else {
@@ -2700,7 +2700,7 @@ var RedisService = function(j_val) {
   this.zscan = function(args, handler) {
     var __args = arguments;
     if (__args.length === 2 && typeof __args[0] === 'object' && __args[0] instanceof Array && typeof __args[1] === 'function') {
-      j_redisService.zscan(utils.convJSArrayToJsonArray(args), function(ar) {
+      j_redisService.zscan(utils.convParamJsonArray(args), function(ar) {
       if (ar.succeeded()) {
         handler(null, null);
       } else {
@@ -2710,26 +2710,23 @@ var RedisService = function(j_val) {
     } else utils.invalidArgs();
   };
 
-  this._vertxgen = true;
-
-  // Get a reference to the underlying Java delegate
-  this._jdel = function() {
-    return j_redisService;
-  }
-
+  // A reference to the underlying Java delegate
+  // NOTE! This is an internal API and must not be used in user code.
+  // If you rely on this property your code is likely to break if we change it / remove it without warning.
+  this._jdel = j_redisService;
 };
 
 RedisService.create = function(vertx, config) {
   var __args = arguments;
-  if (__args.length === 2 && typeof __args[0] === 'object' && __args[0]._vertxgen && typeof __args[1] === 'object') {
-    return new RedisService(JRedisService.create(vertx._jdel(), utils.convJSObjectToJsonObject(config)));
+  if (__args.length === 2 && typeof __args[0] === 'object' && __args[0]._jdel && typeof __args[1] === 'object') {
+    return new RedisService(JRedisService.create(vertx._jdel, utils.convParamJsonObject(config)));
   } else utils.invalidArgs();
 };
 
 RedisService.createEventBusProxy = function(vertx, address) {
   var __args = arguments;
-  if (__args.length === 2 && typeof __args[0] === 'object' && __args[0]._vertxgen && typeof __args[1] === 'string') {
-    return new RedisService(JRedisService.createEventBusProxy(vertx._jdel(), address));
+  if (__args.length === 2 && typeof __args[0] === 'object' && __args[0]._jdel && typeof __args[1] === 'string') {
+    return new RedisService(JRedisService.createEventBusProxy(vertx._jdel, address));
   } else utils.invalidArgs();
 };
 
