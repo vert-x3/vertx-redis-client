@@ -131,7 +131,7 @@ public class Command {
 
         // serialize arguments
         for (int i = 0; i < totalArgs; i++) {
-            appendToBuffer(args.get(i), encoding, buffer);
+            appendToBuffer(args.getValue(i), encoding, buffer);
         }
     }
 

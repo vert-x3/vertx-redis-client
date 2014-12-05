@@ -4,22 +4,23 @@ import io.vertx.codegen.annotations.VertxGen;
 import io.vertx.core.*;
 
 import io.vertx.core.json.*;
-import io.vertx.redis.spi.RedisServiceFactory;
+import io.vertx.redis.impl.RedisServiceImpl;
+import io.vertx.serviceproxy.ProxyHelper;
 
 @VertxGen
 public interface RedisService {
   static RedisService create(Vertx vertx, JsonObject config) {
-    return factory.create(vertx, config);
+    return new RedisServiceImpl(vertx, config);
   }
 
   static RedisService createEventBusProxy(Vertx vertx, String address) {
-    return factory.createEventBusProxy(vertx, address);
+    return ProxyHelper.createProxy(RedisService.class, vertx, address);
   }
 
   void start(Handler<AsyncResult<Void>> handler);
   void stop(Handler<AsyncResult<Void>> handler);
 
-  static final RedisServiceFactory factory = ServiceHelper.loadFactory(RedisServiceFactory.class);
+//  static final RedisServiceFactory factory = ServiceHelper.loadFactory(RedisServiceFactory.class);
 
   /**
    * Append a value to a key

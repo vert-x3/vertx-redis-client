@@ -67,10 +67,10 @@ public class RedisServiceTest extends VertxTestBase {
         String host = getHost();
         String port = getPort();
         if (host != null) {
-            config.putString("host", host);
+            config.put("host", host);
         }
         if (port != null) {
-            config.putNumber("port", Integer.parseInt(port));
+            config.put("port", Integer.parseInt(port));
         }
         redis = RedisService.create(vertx, config);
         CountDownLatch latch = new CountDownLatch(1);
@@ -224,7 +224,7 @@ public class RedisServiceTest extends VertxTestBase {
 
                 redis.blpop(j(list1, list2, 0), reply2 -> {
                     assertTrue(reply2.succeeded());
-                    assertArrayEquals(a(list1, "a"), reply2.result().toArray());
+                    assertArrayEquals(a(list1, "a"), reply2.result().getList().toArray());
                     testComplete();
                 });
             });
@@ -246,7 +246,7 @@ public class RedisServiceTest extends VertxTestBase {
 
                 redis.brpop(j(list1, list2, 0), reply2 -> {
                     assertTrue(reply2.succeeded());
-                    assertArrayEquals(a(list1, "c"), reply2.result().toArray());
+                    assertArrayEquals(a(list1, "c"), reply2.result().getList().toArray());
                     testComplete();
                 });
             });
@@ -703,8 +703,8 @@ public class RedisServiceTest extends VertxTestBase {
                 redis.hgetall(j(myhash), reply2 -> {
                     assertTrue(reply2.succeeded());
                     JsonObject obj = reply2.result();
-                    assertEquals("Hello", obj.getField("field1"));
-                    assertEquals("World", obj.getField("field2"));
+                    assertEquals("Hello", obj.getString("field1"));
+                    assertEquals("World", obj.getString("field2"));
                     testComplete();
                 });
             });
@@ -780,7 +780,7 @@ public class RedisServiceTest extends VertxTestBase {
 
                 redis.hkeys(j(myhash), reply2 -> {
                     assertTrue(reply2.succeeded());
-                    assertArrayEquals(a("field1", "field2"), reply2.result().toArray());
+                    assertArrayEquals(a("field1", "field2"), reply2.result().getList().toArray());
                     testComplete();
                 });
             });
@@ -824,7 +824,7 @@ public class RedisServiceTest extends VertxTestBase {
 
                 redis.hmget(j(myhash, "field1", "field2", "nofield"), reply2 -> {
                     assertTrue(reply2.succeeded());
-                    assertArrayEquals(a("Hello", "World", null), reply2.result().toArray());
+                    assertArrayEquals(a("Hello", "World", null), reply2.result().getList().toArray());
                     testComplete();
                 });
             });
@@ -904,7 +904,7 @@ public class RedisServiceTest extends VertxTestBase {
 
                 redis.hvals(j(myhash), reply2 -> {
                     assertTrue(reply2.succeeded());
-                    assertArrayEquals(a("Hello", "World"), reply2.result().toArray());
+                    assertArrayEquals(a("Hello", "World"), reply2.result().getList().toArray());
                     testComplete();
                 });
             });
@@ -1118,7 +1118,7 @@ public class RedisServiceTest extends VertxTestBase {
                 assertEquals(2, reply1.result().longValue());
                 redis.lrange(j(mykey, 0, -1), reply2 -> {
                     assertTrue(reply2.succeeded());
-                    assertArrayEquals(a("hello", "world"), reply2.result().toArray());
+                    assertArrayEquals(a("hello", "world"), reply2.result().getList().toArray());
                     testComplete();
                 });
             });
@@ -1145,8 +1145,8 @@ public class RedisServiceTest extends VertxTestBase {
                         JsonArray array3 = reply3.result();
                         assertTrue(2 == array3.size());
 
-                        assertTrue("Hello".equals(array3.get(0)));
-                        assertTrue("World".equals(array3.get(1)));
+                        assertTrue("Hello".equals(array3.getString(0)));
+                        assertTrue("World".equals(array3.getString(1)));
                         redis.lrange(j(myotherkey, 0, -1), reply4 -> {
                             JsonArray array4 = reply4.result();
                             assertTrue(0 == array4.size());
@@ -1173,7 +1173,7 @@ public class RedisServiceTest extends VertxTestBase {
                     assertEquals(3, reply2.result().longValue());
                     redis.lrange(j(mykey, 0, 0), reply3 -> {
                         assertTrue(reply3.succeeded());
-                        assertEquals("one", reply3.result().get(0));
+                        assertEquals("one", reply3.result().getString(0));
                         testComplete();
                     });
                 });
@@ -1202,7 +1202,7 @@ public class RedisServiceTest extends VertxTestBase {
                             assertEquals(2, reply4.result().longValue());
                             redis.lrange(j(mykey, 0, -1), reply5 -> {
                                 assertTrue(reply5.succeeded());
-                                assertArrayEquals(a("hello", "foo"), reply5.result().toArray());
+                                assertArrayEquals(a("hello", "foo"), reply5.result().getList().toArray());
                                 testComplete();
                             });
                         });
@@ -1231,7 +1231,7 @@ public class RedisServiceTest extends VertxTestBase {
                             assertTrue(reply4.succeeded());
                             redis.lrange(j(mykey, 0, -1), reply5 -> {
                                 assertTrue(reply5.succeeded());
-                                assertArrayEquals(a("four", "five", "three"), reply5.result().toArray());
+                                assertArrayEquals(a("four", "five", "three"), reply5.result().getList().toArray());
                                 testComplete();
                             });
                         });
@@ -1258,7 +1258,7 @@ public class RedisServiceTest extends VertxTestBase {
                         assertTrue(reply3.succeeded());
                         redis.lrange(j(mykey, 0, -1), reply5 -> {
                             assertTrue(reply5.succeeded());
-                            assertArrayEquals(a("two", "three"), reply5.result().toArray());
+                            assertArrayEquals(a("two", "three"), reply5.result().getList().toArray());
                             testComplete();
                         });
                     });
@@ -1278,7 +1278,7 @@ public class RedisServiceTest extends VertxTestBase {
                 assertTrue(reply1.succeeded());
                 redis.mget(j(mykey1, mykey2, "nonexisting"), reply2 -> {
                     assertTrue(reply2.succeeded());
-                    assertArrayEquals(a("Hello", "World", null), reply2.result().toArray());
+                    assertArrayEquals(a("Hello", "World", null), reply2.result().getList().toArray());
                     testComplete();
                 });
             });
@@ -1334,7 +1334,7 @@ public class RedisServiceTest extends VertxTestBase {
                 assertEquals(0, reply1.result().longValue());
                 redis.mget(j(mykey1, mykey2, mykey3), reply2 -> {
                     assertTrue(reply2.succeeded());
-                    assertArrayEquals(a("Hello", "there", null), reply2.result().toArray());
+                    assertArrayEquals(a("Hello", "there", null), reply2.result().getList().toArray());
                     testComplete();
                 });
             });
@@ -1557,7 +1557,7 @@ public class RedisServiceTest extends VertxTestBase {
                         assertEquals("three", reply3.result());
                         redis.lrange(j(mykey, 0, -1), reply5 -> {
                             assertTrue(reply5.succeeded());
-                            assertArrayEquals(a("one", "two"), reply5.result().toArray());
+                            assertArrayEquals(a("one", "two"), reply5.result().getList().toArray());
                             testComplete();
                         });
                     });
@@ -1585,9 +1585,9 @@ public class RedisServiceTest extends VertxTestBase {
                                 assertEquals("three", reply3.result());
                                 redis.lrange(j(mykey, 0, -1), reply5 -> {
                                     assertTrue(reply5.succeeded());
-                                    assertArrayEquals(a("one", "two"), reply5.result().toArray());
+                                    assertArrayEquals(a("one", "two"), reply5.result().getList().toArray());
                                     redis.lrange(j(myotherkey, 0, -1), reply6 -> {
-                                        assertArrayEquals(a("three"), reply6.result().toArray());
+                                        assertArrayEquals(a("three"), reply6.result().getList().toArray());
                                         testComplete();
                                     });
                                 });
@@ -1613,7 +1613,7 @@ public class RedisServiceTest extends VertxTestBase {
                 assertEquals(2, reply1.result().longValue());
                 redis.lrange(j(mykey, 0, -1), reply2 -> {
                     assertTrue(reply2.succeeded());
-                    assertArrayEquals(a("hello", "world"), reply2.result().toArray());
+                    assertArrayEquals(a("hello", "world"), reply2.result().getList().toArray());
                     testComplete();
                 });
             });
@@ -1636,9 +1636,9 @@ public class RedisServiceTest extends VertxTestBase {
                     assertEquals(0, reply2.result().longValue());
                     redis.lrange(j(mykey, 0, -1), reply3 -> {
                         assertTrue(reply3.succeeded());
-                        assertArrayEquals(a("Hello", "World"), reply3.result().toArray());
+                        assertArrayEquals(a("Hello", "World"), reply3.result().getList().toArray());
                         redis.lrange(j(myotherkey, 0, -1), reply4 -> {
-                            assertArrayEquals(new Object[0], reply4.result().toArray());
+                            assertArrayEquals(new Object[0], reply4.result().getList().toArray());
                             testComplete();
                         });
                     });
@@ -1663,7 +1663,7 @@ public class RedisServiceTest extends VertxTestBase {
                     redis.smembers(j(mykey), reply3 -> {
                         assertTrue(reply3.succeeded());
                         Object[] expected = new Object[]{"Hello", "World"};
-                        Object[] result = reply3.result().toArray();
+                        Object[] result = reply3.result().getList().toArray();
                         Arrays.sort(result);
                         assertArrayEquals(expected, result);
                         testComplete();
@@ -1744,7 +1744,7 @@ public class RedisServiceTest extends VertxTestBase {
                                 redis.sdiff(j(mykey1, mykey2), reply6 -> {
                                     assertTrue(reply6.succeeded());
                                     Object[] expected = new Object[]{"a", "b"};
-                                    Object[] result = reply6.result().toArray();
+                                    Object[] result = reply6.result().getList().toArray();
                                     Arrays.sort(result);
                                     assertArrayEquals(expected, result);
                                     testComplete();
@@ -1886,7 +1886,7 @@ public class RedisServiceTest extends VertxTestBase {
                                 assertEquals(1, reply5.result().longValue());
                                 redis.sinter(j(mykey1, mykey2), reply6 -> {
                                     assertTrue(reply6.succeeded());
-                                    assertArrayEquals(new Object[]{"c"}, reply6.result().toArray());
+                                    assertArrayEquals(new Object[]{"c"}, reply6.result().getList().toArray());
                                     testComplete();
                                 });
                             });
@@ -1943,7 +1943,7 @@ public class RedisServiceTest extends VertxTestBase {
                 redis.smembers(j(mykey), reply2 -> {
                     assertTrue(reply2.succeeded());
                     Object[] expected = new Object[]{"Hello", "World"};
-                    Object[] result = reply2.result().toArray();
+                    Object[] result = reply2.result().getList().toArray();
                     Arrays.sort(result);
                     assertArrayEquals(expected, result);
                     testComplete();
@@ -1972,13 +1972,13 @@ public class RedisServiceTest extends VertxTestBase {
                         redis.smembers(j(mykey), reply4 -> {
                             assertTrue(reply4.succeeded());
                             Object[] expected = new Object[]{"one"};
-                            Object[] result = reply4.result().toArray();
+                            Object[] result = reply4.result().getList().toArray();
                             Arrays.sort(result);
                             assertArrayEquals(expected, result);
                             redis.smembers(j(myotherkey), reply5 -> {
                                 assertTrue(reply5.succeeded());
                                 Object[] expected1 = new Object[]{"three", "two"};
-                                Object[] result1 = reply5.result().toArray();
+                                Object[] result1 = reply5.result().getList().toArray();
                                 Arrays.sort(result1);
                                 assertArrayEquals(expected1, result1);
                                 testComplete();
@@ -2011,7 +2011,7 @@ public class RedisServiceTest extends VertxTestBase {
                         assertTrue(reply3.succeeded());
                         redis.sort(j(mykey, "desc", "get", kx), reply4 -> {
                             assertTrue(reply4.succeeded());
-                            assertArrayEquals(a("three", "two", "one"), reply4.result().toArray());
+                            assertArrayEquals(a("three", "two", "one"), reply4.result().getList().toArray());
                             testComplete();
                         });
                     });
@@ -2044,9 +2044,9 @@ public class RedisServiceTest extends VertxTestBase {
                             expected.add("three");
                         }
                         redis.smembers(j(mykey), reply4 -> { assertTrue(reply4.succeeded());
-                            Object[] expectedA = expected.toArray();
+                            Object[] expectedA = expected.getList().toArray();
                             Arrays.sort(expectedA);
-                            Object[] res = reply4.result().toArray();
+                            Object[] res = reply4.result().getList().toArray();
                             Arrays.sort(res);
                             assertArrayEquals(expectedA, res);
                             testComplete();
@@ -2154,7 +2154,7 @@ public class RedisServiceTest extends VertxTestBase {
                 redis.sunion(j(mykey1, mykey2), reply6 -> {
                     assertTrue(reply6.succeeded());
                     JsonArray arr = reply6.result();
-                    Object[] array = arr.toArray();
+                    Object[] array = arr.getList().toArray();
                     Arrays.sort(array);
                     assertTrue(array.length == 5);
                     assertArrayEquals(new Object[]{"a", "b", "c", "d", "e"}, array);
@@ -2268,7 +2268,7 @@ public class RedisServiceTest extends VertxTestBase {
                         assertEquals(0, reply3.result().longValue());
                         redis.zrange(j(key, 0, -1, "withscores"), reply4 -> {
                             assertTrue(reply4.succeeded());
-                            assertArrayEquals(a("one", "1", "uno", "1", "two", "3"), reply4.result().toArray());
+                            assertArrayEquals(a("one", "1", "uno", "1", "two", "3"), reply4.result().getList().toArray());
                             testComplete();
                         });
                     });
@@ -2387,7 +2387,7 @@ public class RedisServiceTest extends VertxTestBase {
                     assertEquals(1, reply2.result().longValue());
                     redis.zrange(j(key, 0, -1), reply3 -> {
                         assertTrue(reply3.succeeded());
-                        assertArrayEquals(a("one", "two", "three"), reply3.result().toArray());
+                        assertArrayEquals(a("one", "two", "three"), reply3.result().getList().toArray());
                         testComplete();
                     });
                 });
@@ -2410,7 +2410,7 @@ public class RedisServiceTest extends VertxTestBase {
                     assertEquals(1, reply2.result().longValue());
                     redis.zrangebyscore(j(key, "-inf", "+inf"), reply3 -> {
                         assertTrue(reply3.succeeded());
-                        assertArrayEquals(a("one", "two", "three"), reply3.result().toArray());
+                        assertArrayEquals(a("one", "two", "three"), reply3.result().getList().toArray());
                         testComplete();
                     });
                 });
@@ -2525,7 +2525,7 @@ public class RedisServiceTest extends VertxTestBase {
                     assertEquals(1, reply2.result().longValue());
                     redis.zrevrange(j(key, 0, -1), reply3 -> {
                         assertTrue(reply3.succeeded());
-                        assertArrayEquals(a("three", "two", "one"), reply3.result().toArray());
+                        assertArrayEquals(a("three", "two", "one"), reply3.result().getList().toArray());
                         testComplete();
                     });
                 });
@@ -2548,7 +2548,7 @@ public class RedisServiceTest extends VertxTestBase {
                     assertEquals(1, reply2.result().longValue());
                     redis.zrevrangebyscore(j(key, "+inf", "-inf"), reply3 -> {
                         assertTrue(reply3.succeeded());
-                        assertArrayEquals(a("three", "two", "one"), reply3.result().toArray());
+                        assertArrayEquals(a("three", "two", "one"), reply3.result().getList().toArray());
                         testComplete();
                     });
                 });

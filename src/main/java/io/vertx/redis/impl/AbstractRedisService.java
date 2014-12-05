@@ -5,8 +5,8 @@ import io.vertx.core.Handler;
 import io.vertx.core.Vertx;
 import io.vertx.core.eventbus.EventBus;
 import io.vertx.core.json.JsonArray;
-import io.vertx.core.json.JsonElement;
 import io.vertx.core.json.JsonObject;
+import io.vertx.core.json.impl.Json;
 import io.vertx.core.logging.Logger;
 import io.vertx.core.logging.impl.LoggerFactory;
 import io.vertx.redis.RedisService;
@@ -44,17 +44,11 @@ public abstract class AbstractRedisService implements RedisService {
     public void start(final Handler<AsyncResult<Void>> handler) {
         final String host = config.getString("host", "localhost");
         final int port = config.getInteger("port", 6379);
-        final String encoding = config.getString("encoding");
+        final String encoding = config.getString("encoding", "UTF-8");
         final boolean binary = config.getBoolean("binary", false);
 
         if (binary) {
             log.warn("Binary mode is not implemented yet!!!");
-        }
-
-        if (encoding != null) {
-            this.encoding = encoding;
-        } else {
-            this.encoding = "UTF-8";
         }
 
         charset = Charset.forName(this.encoding);
@@ -100,23 +94,23 @@ public abstract class AbstractRedisService implements RedisService {
         send(command, args, JsonObject.class, resultHandler);
     }
 
-    final <T> void send(final String command, final JsonElement args, final Class<T> type, final Handler<AsyncResult<T>> resultHandler) {
+    final <T> void send(final String command, final Object args, final Class<T> type, final Handler<AsyncResult<T>> resultHandler) {
 
         final ResponseTransform transform = getResponseTransformFor(command);
         JsonArray redisArgs = null;
 
         if (args != null) {
-            if (args.isObject()) {
+            if (type.equals(JsonObject.class)) {
                 redisArgs = new JsonArray();
 
-                JsonObject hash = args.asObject();
+                JsonObject hash = (JsonObject)args;
 
-                for (String key : hash.getFieldNames()) {
+                for (String key : hash.fieldNames()) {
                     serializeArg(redisArgs, key);
-                    serializeArg(redisArgs, hash.getField(key));
+                    serializeArg(redisArgs, hash.getValue(key));
                 }
             } else {
-                redisArgs = args.asArray();
+                redisArgs = (JsonArray)args;
             }
         }
 
@@ -138,12 +132,12 @@ public abstract class AbstractRedisService implements RedisService {
                     final String vertxChannel = baseAddress + "." + pattern;
                     subscriptions.registerPatternSubscribeHandler(pattern, (pattern1, replyData) -> {
                         JsonObject replyMessage = new JsonObject();
-                        replyMessage.putString("status", "ok");
+                        replyMessage.put("status", "ok");
                         JsonObject message = new JsonObject();
-                        message.putString("pattern", pattern1);
-                        message.putString("channel", replyData[2].asType(String.class, encoding));
-                        message.putString("message", replyData[3].asType(String.class, encoding));
-                        replyMessage.putObject("value", message);
+                        message.put("pattern", pattern1);
+                        message.put("channel", replyData[2].asType(String.class, encoding));
+                        message.put("message", replyData[3].asType(String.class, encoding));
+                        replyMessage.put("value", message);
                         eb.send(vertxChannel, replyMessage);
                     });
                 }
@@ -162,11 +156,11 @@ public abstract class AbstractRedisService implements RedisService {
                     final String vertxChannel = baseAddress + "." + channel;
                     subscriptions.registerChannelSubscribeHandler(channel, (channel1, replyData) -> {
                         JsonObject replyMessage = new JsonObject();
-                        replyMessage.putString("status", "ok");
+                        replyMessage.put("status", "ok");
                         JsonObject message = new JsonObject();
-                        message.putString("channel", channel1);
-                        message.putString("message", replyData[2].asType(String.class, encoding));
-                        replyMessage.putObject("value", message);
+                        message.put("channel", channel1);
+                        message.put("message", replyData[2].asType(String.class, encoding));
+                        replyMessage.put("value", message);
                         eb.send(vertxChannel, replyMessage);
                     });
                 }
@@ -228,14 +222,14 @@ public abstract class AbstractRedisService implements RedisService {
                                 // begin section
                                 section = new JsonObject();
                                 // create a sub key with the section name
-                                value.putObject(line.substring(2).toLowerCase(), section);
+                                value.put(line.substring(2).toLowerCase(), section);
                             } else {
                                 // entry in section
                                 int split = line.indexOf(':');
                                 if (section == null) {
-                                    value.putString(line.substring(0, split), line.substring(split + 1));
+                                    value.put(line.substring(0, split), line.substring(split + 1));
                                 } else {
-                                    section.putString(line.substring(0, split), line.substring(split + 1));
+                                    section.put(line.substring(0, split), line.substring(split + 1));
                                 }
                             }
                         }
@@ -262,24 +256,24 @@ public abstract class AbstractRedisService implements RedisService {
 
     private static void serializeArg(JsonArray redisArgs, Object arg) {
         if (arg == null) {
-            redisArgs.add(null);
+            redisArgs.addNull();
         } else {
             if (arg instanceof String) {
-                redisArgs.addString((String) arg);
+                redisArgs.add((String) arg);
             } else if (arg instanceof Object[]) {
                 for (Object o : (Object[]) arg) {
                     redisArgs.add(o);
                 }
             } else if (arg instanceof JsonObject) {
-                redisArgs.addObject((JsonObject) arg);
+                redisArgs.add((JsonObject) arg);
             } else if (arg instanceof JsonArray) {
-                redisArgs.addArray((JsonArray) arg);
+                redisArgs.add((JsonArray) arg);
             } else if (arg instanceof Number) {
-                redisArgs.addNumber((Number) arg);
+                redisArgs.add((Number) arg);
             } else if (arg instanceof Boolean) {
-                redisArgs.addBoolean((Boolean) arg);
+                redisArgs.add((Boolean) arg);
             } else if (arg instanceof byte[]) {
-                redisArgs.addBinary((byte[]) arg);
+                redisArgs.add((byte[]) arg);
             } else {
                 throw new RuntimeException("Unsupported type: " + arg.getClass().getName());
             }

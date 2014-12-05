@@ -5,7 +5,7 @@ import io.vertx.core.json.*;
 
 public final class RedisServiceImpl extends AbstractRedisService {
 
-  RedisServiceImpl(Vertx vertx, JsonObject config) { super(vertx, config); }
+  public RedisServiceImpl(Vertx vertx, JsonObject config) { super(vertx, config); }
 
   public void append(JsonArray args, Handler<AsyncResult<Long>> handler) { sendLong("APPEND", args, handler); }
 

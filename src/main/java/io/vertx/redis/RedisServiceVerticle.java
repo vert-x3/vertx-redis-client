@@ -1,35 +1,21 @@
 package io.vertx.redis;
 
+import io.vertx.core.AbstractVerticle;
 import io.vertx.core.Future;
-import io.vertx.core.Verticle;
-import io.vertx.core.Vertx;
-import io.vertx.core.json.JsonObject;
+import io.vertx.serviceproxy.ProxyHelper;
 
-public class RedisServiceVerticle implements Verticle {
+public class RedisServiceVerticle extends AbstractVerticle {
 
     private RedisService service;
 
-    protected Vertx vertx;
-
-    @Override
-    public Vertx getVertx() {
-        return vertx;
-    }
-
-    @Override
-    public void setVertx(Vertx vertx) {
-        this.vertx = vertx;
-    }
-
     @Override
     public void start(Future<Void> startFuture) throws Exception {
-        JsonObject config = vertx.context().config();
         // Create the service
-        service = RedisService.create(vertx, config);
+        service = RedisService.create(vertx, config());
         service.start(asyncResult -> {
             if (asyncResult.succeeded()) {
-                String address = config.getString("address", "vertx.redis");
-                vertx.eventBus().registerService(service, address);
+                String address = config().getString("address", "vertx.redis");
+                ProxyHelper.registerService(RedisService.class, vertx, service, address);
                 startFuture.complete();
             } else {
                 startFuture.fail(asyncResult.cause());

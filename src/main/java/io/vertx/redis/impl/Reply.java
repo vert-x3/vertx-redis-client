@@ -80,13 +80,13 @@ public final class Reply {
             for (Reply r : (Reply[]) data) {
                 switch (r.type()) {
                     case '$':   // Bulk
-                        multi.addString(r.asType(String.class, encoding));
+                        multi.add(r.asType(String.class, encoding));
                         break;
                     case ':':   // Integer
-                        multi.addNumber(r.asType(Long.class, encoding));
+                        multi.add(r.asType(Long.class, encoding));
                         break;
                     case '*':   // Multi
-                        multi.addArray(r.asType(JsonArray.class, encoding));
+                        multi.add(r.asType(JsonArray.class, encoding));
                         break;
                     default:
                         throw new RuntimeException("Unknown sub message type in multi: " + r.type());
@@ -109,13 +109,13 @@ public final class Reply {
 
                 switch (brValue.type()) {
                     case '$':   // Bulk
-                        multi.putString(brKey.asType(String.class, encoding), brValue.asType(String.class, encoding));
+                        multi.put(brKey.asType(String.class, encoding), brValue.asType(String.class, encoding));
                         break;
                     case ':':   // Integer
-                        multi.putNumber(brKey.asType(String.class, encoding), brValue.asType(Long.class, encoding));
+                        multi.put(brKey.asType(String.class, encoding), brValue.asType(Long.class, encoding));
                         break;
                     case '*':   // Multi
-                        multi.putArray(brKey.asType(String.class, encoding), brValue.asType(JsonArray.class, encoding));
+                        multi.put(brKey.asType(String.class, encoding), brValue.asType(JsonArray.class, encoding));
                         break;
                     default:
                         throw new RuntimeException("Unknown sub message type in multi: " + ((Reply[]) data)[i+1].type());
