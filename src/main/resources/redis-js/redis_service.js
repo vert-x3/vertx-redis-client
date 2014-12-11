@@ -67,6 +67,7 @@ var RedisService = function(j_val) {
 
   /**
    Append a value to a key
+
    @public
    @param args {todo} 
    @param handler {function} 
@@ -86,6 +87,7 @@ var RedisService = function(j_val) {
 
   /**
    Authenticate to the server
+
    @public
    @param args {todo} 
    @param handler {function} 
@@ -105,6 +107,7 @@ var RedisService = function(j_val) {
 
   /**
    Asynchronously rewrite the append-only file
+
    @public
    @param handler {function} 
    */
@@ -123,6 +126,7 @@ var RedisService = function(j_val) {
 
   /**
    Asynchronously save the dataset to disk
+
    @public
    @param handler {function} 
    */
@@ -141,6 +145,7 @@ var RedisService = function(j_val) {
 
   /**
    Count set bits in a string
+
    @public
    @param args {todo} 
    @param handler {function} 
@@ -160,6 +165,7 @@ var RedisService = function(j_val) {
 
   /**
    Perform bitwise operations between strings
+
    @public
    @param args {todo} 
    @param handler {function} 
@@ -179,6 +185,7 @@ var RedisService = function(j_val) {
 
   /**
    Find first bit set or clear in a string
+
    @public
    @param args {todo} 
    @param handler {function} 
@@ -198,6 +205,7 @@ var RedisService = function(j_val) {
 
   /**
    Remove and get the first element in a list, or block until one is available
+
    @public
    @param args {todo} 
    @param handler {function} 
@@ -217,6 +225,7 @@ var RedisService = function(j_val) {
 
   /**
    Remove and get the last element in a list, or block until one is available
+
    @public
    @param args {todo} 
    @param handler {function} 
@@ -236,6 +245,7 @@ var RedisService = function(j_val) {
 
   /**
    Pop a value from a list, push it to another list and return it; or block until one is available
+
    @public
    @param args {todo} 
    @param handler {function} 
@@ -255,6 +265,7 @@ var RedisService = function(j_val) {
 
   /**
    Kill the connection of a client
+
    @public
    @param args {todo} 
    @param handler {function} 
@@ -274,6 +285,7 @@ var RedisService = function(j_val) {
 
   /**
    Get the list of client connections
+
    @public
    @param handler {function} 
    */
@@ -292,6 +304,7 @@ var RedisService = function(j_val) {
 
   /**
    Get the current connection name
+
    @public
    @param handler {function} 
    */
@@ -310,6 +323,7 @@ var RedisService = function(j_val) {
 
   /**
    Stop processing commands from clients for some time
+
    @public
    @param args {todo} 
    @param handler {function} 
@@ -329,6 +343,7 @@ var RedisService = function(j_val) {
 
   /**
    Set the current connection name
+
    @public
    @param args {todo} 
    @param handler {function} 
@@ -348,6 +363,7 @@ var RedisService = function(j_val) {
 
   /**
    Get array of Cluster slot to node mappings
+
    @public
    @param handler {function} 
    */
@@ -366,6 +382,7 @@ var RedisService = function(j_val) {
 
   /**
    Get array of Redis command details
+
    @public
    @param handler {function} 
    */
@@ -384,6 +401,7 @@ var RedisService = function(j_val) {
 
   /**
    Get total number of Redis commands
+
    @public
    @param handler {function} 
    */
@@ -402,6 +420,7 @@ var RedisService = function(j_val) {
 
   /**
    Extract keys given a full Redis command
+
    @public
    @param handler {function} 
    */
@@ -420,6 +439,7 @@ var RedisService = function(j_val) {
 
   /**
    Get array of specific Redis command details
+
    @public
    @param args {todo} 
    @param handler {function} 
@@ -439,6 +459,7 @@ var RedisService = function(j_val) {
 
   /**
    Get the value of a configuration parameter
+
    @public
    @param args {todo} 
    @param handler {function} 
@@ -458,6 +479,7 @@ var RedisService = function(j_val) {
 
   /**
    Rewrite the configuration file with the in memory configuration
+
    @public
    @param handler {function} 
    */
@@ -476,6 +498,7 @@ var RedisService = function(j_val) {
 
   /**
    Set a configuration parameter to the given value
+
    @public
    @param args {todo} 
    @param handler {function} 
@@ -495,6 +518,7 @@ var RedisService = function(j_val) {
 
   /**
    Reset the stats returned by INFO
+
    @public
    @param handler {function} 
    */
@@ -513,6 +537,7 @@ var RedisService = function(j_val) {
 
   /**
    Return the number of keys in the selected database
+
    @public
    @param handler {function} 
    */
@@ -531,6 +556,7 @@ var RedisService = function(j_val) {
 
   /**
    Get debugging information about a key
+
    @public
    @param args {todo} 
    @param handler {function} 
@@ -550,6 +576,7 @@ var RedisService = function(j_val) {
 
   /**
    Make the server crash
+
    @public
    @param handler {function} 
    */
@@ -568,6 +595,7 @@ var RedisService = function(j_val) {
 
   /**
    Decrement the integer value of a key by one
+
    @public
    @param args {todo} 
    @param handler {function} 
@@ -587,6 +615,7 @@ var RedisService = function(j_val) {
 
   /**
    Decrement the integer value of a key by the given number
+
    @public
    @param args {todo} 
    @param handler {function} 
@@ -606,6 +635,7 @@ var RedisService = function(j_val) {
 
   /**
    Delete a key
+
    @public
    @param args {todo} 
    @param handler {function} 
@@ -625,6 +655,7 @@ var RedisService = function(j_val) {
 
   /**
    Discard all commands issued after MULTI
+
    @public
    @param handler {function} 
    */
@@ -643,6 +674,7 @@ var RedisService = function(j_val) {
 
   /**
    Return a serialized version of the value stored at the specified key.
+
    @public
    @param args {todo} 
    @param handler {function} 
@@ -662,6 +694,7 @@ var RedisService = function(j_val) {
 
   /**
    Echo the given string
+
    @public
    @param args {todo} 
    @param handler {function} 
@@ -681,6 +714,7 @@ var RedisService = function(j_val) {
 
   /**
    Execute a Lua script server side
+
    @public
    @param args {todo} 
    @param handler {function} 
@@ -700,6 +734,7 @@ var RedisService = function(j_val) {
 
   /**
    Execute a Lua script server side
+
    @public
    @param args {todo} 
    @param handler {function} 
@@ -719,6 +754,7 @@ var RedisService = function(j_val) {
 
   /**
    Execute all commands issued after MULTI
+
    @public
    @param handler {function} 
    */
@@ -737,6 +773,7 @@ var RedisService = function(j_val) {
 
   /**
    Determine if a key exists
+
    @public
    @param args {todo} 
    @param handler {function} 
@@ -756,6 +793,7 @@ var RedisService = function(j_val) {
 
   /**
    Set a key's time to live in seconds
+
    @public
    @param args {todo} 
    @param handler {function} 
@@ -775,6 +813,7 @@ var RedisService = function(j_val) {
 
   /**
    Set the expiration for a key as a UNIX timestamp
+
    @public
    @param args {todo} 
    @param handler {function} 
@@ -794,6 +833,7 @@ var RedisService = function(j_val) {
 
   /**
    Remove all keys from all databases
+
    @public
    @param handler {function} 
    */
@@ -812,6 +852,7 @@ var RedisService = function(j_val) {
 
   /**
    Remove all keys from the current database
+
    @public
    @param handler {function} 
    */
@@ -830,6 +871,7 @@ var RedisService = function(j_val) {
 
   /**
    Get the value of a key
+
    @public
    @param args {todo} 
    @param handler {function} 
@@ -849,6 +891,7 @@ var RedisService = function(j_val) {
 
   /**
    Returns the bit value at offset in the string value stored at key
+
    @public
    @param args {todo} 
    @param handler {function} 
@@ -868,6 +911,7 @@ var RedisService = function(j_val) {
 
   /**
    Get a substring of the string stored at a key
+
    @public
    @param args {todo} 
    @param handler {function} 
@@ -887,6 +931,7 @@ var RedisService = function(j_val) {
 
   /**
    Set the string value of a key and return its old value
+
    @public
    @param args {todo} 
    @param handler {function} 
@@ -906,6 +951,7 @@ var RedisService = function(j_val) {
 
   /**
    Delete one or more hash fields
+
    @public
    @param args {todo} 
    @param handler {function} 
@@ -925,6 +971,7 @@ var RedisService = function(j_val) {
 
   /**
    Determine if a hash field exists
+
    @public
    @param args {todo} 
    @param handler {function} 
@@ -944,6 +991,7 @@ var RedisService = function(j_val) {
 
   /**
    Get the value of a hash field
+
    @public
    @param args {todo} 
    @param handler {function} 
@@ -963,6 +1011,7 @@ var RedisService = function(j_val) {
 
   /**
    Get all the fields and values in a hash
+
    @public
    @param args {todo} 
    @param handler {function} 
@@ -982,6 +1031,7 @@ var RedisService = function(j_val) {
 
   /**
    Increment the integer value of a hash field by the given number
+
    @public
    @param args {todo} 
    @param handler {function} 
@@ -1001,6 +1051,7 @@ var RedisService = function(j_val) {
 
   /**
    Increment the float value of a hash field by the given amount
+
    @public
    @param args {todo} 
    @param handler {function} 
@@ -1020,6 +1071,7 @@ var RedisService = function(j_val) {
 
   /**
    Get all the fields in a hash
+
    @public
    @param args {todo} 
    @param handler {function} 
@@ -1039,6 +1091,7 @@ var RedisService = function(j_val) {
 
   /**
    Get the number of fields in a hash
+
    @public
    @param args {todo} 
    @param handler {function} 
@@ -1058,6 +1111,7 @@ var RedisService = function(j_val) {
 
   /**
    Get the values of all the given hash fields
+
    @public
    @param args {todo} 
    @param handler {function} 
@@ -1077,6 +1131,7 @@ var RedisService = function(j_val) {
 
   /**
    Set multiple hash fields to multiple values
+
    @public
    @param args {todo} 
    @param handler {function} 
@@ -1096,6 +1151,7 @@ var RedisService = function(j_val) {
 
   /**
    Set the string value of a hash field
+
    @public
    @param args {todo} 
    @param handler {function} 
@@ -1115,6 +1171,7 @@ var RedisService = function(j_val) {
 
   /**
    Set the value of a hash field, only if the field does not exist
+
    @public
    @param args {todo} 
    @param handler {function} 
@@ -1134,6 +1191,7 @@ var RedisService = function(j_val) {
 
   /**
    Get all the values in a hash
+
    @public
    @param args {todo} 
    @param handler {function} 
@@ -1153,6 +1211,7 @@ var RedisService = function(j_val) {
 
   /**
    Increment the integer value of a key by one
+
    @public
    @param args {todo} 
    @param handler {function} 
@@ -1172,6 +1231,7 @@ var RedisService = function(j_val) {
 
   /**
    Increment the integer value of a key by the given amount
+
    @public
    @param args {todo} 
    @param handler {function} 
@@ -1191,6 +1251,7 @@ var RedisService = function(j_val) {
 
   /**
    Increment the float value of a key by the given amount
+
    @public
    @param args {todo} 
    @param handler {function} 
@@ -1210,6 +1271,7 @@ var RedisService = function(j_val) {
 
   /**
    Get information and statistics about the server
+
    @public
    @param args {todo} 
    @param handler {function} 
@@ -1229,6 +1291,7 @@ var RedisService = function(j_val) {
 
   /**
    Find all keys matching the given pattern
+
    @public
    @param args {todo} 
    @param handler {function} 
@@ -1248,6 +1311,7 @@ var RedisService = function(j_val) {
 
   /**
    Get the UNIX time stamp of the last successful save to disk
+
    @public
    @param handler {function} 
    */
@@ -1266,6 +1330,7 @@ var RedisService = function(j_val) {
 
   /**
    Get an element from a list by its index
+
    @public
    @param args {todo} 
    @param handler {function} 
@@ -1285,6 +1350,7 @@ var RedisService = function(j_val) {
 
   /**
    Insert an element before or after another element in a list
+
    @public
    @param args {todo} 
    @param handler {function} 
@@ -1304,6 +1370,7 @@ var RedisService = function(j_val) {
 
   /**
    Get the length of a list
+
    @public
    @param args {todo} 
    @param handler {function} 
@@ -1323,6 +1390,7 @@ var RedisService = function(j_val) {
 
   /**
    Remove and get the first element in a list
+
    @public
    @param args {todo} 
    @param handler {function} 
@@ -1342,6 +1410,7 @@ var RedisService = function(j_val) {
 
   /**
    Prepend one or multiple values to a list
+
    @public
    @param args {todo} 
    @param handler {function} 
@@ -1361,6 +1430,7 @@ var RedisService = function(j_val) {
 
   /**
    Prepend a value to a list, only if the list exists
+
    @public
    @param args {todo} 
    @param handler {function} 
@@ -1380,6 +1450,7 @@ var RedisService = function(j_val) {
 
   /**
    Get a range of elements from a list
+
    @public
    @param args {todo} 
    @param handler {function} 
@@ -1399,6 +1470,7 @@ var RedisService = function(j_val) {
 
   /**
    Remove elements from a list
+
    @public
    @param args {todo} 
    @param handler {function} 
@@ -1418,6 +1490,7 @@ var RedisService = function(j_val) {
 
   /**
    Set the value of an element in a list by its index
+
    @public
    @param args {todo} 
    @param handler {function} 
@@ -1437,6 +1510,7 @@ var RedisService = function(j_val) {
 
   /**
    Trim a list to the specified range
+
    @public
    @param args {todo} 
    @param handler {function} 
@@ -1456,6 +1530,7 @@ var RedisService = function(j_val) {
 
   /**
    Get the values of all the given keys
+
    @public
    @param args {todo} 
    @param handler {function} 
@@ -1475,6 +1550,7 @@ var RedisService = function(j_val) {
 
   /**
    Atomically transfer a key from a Redis instance to another one.
+
    @public
    @param args {todo} 
    @param handler {function} 
@@ -1494,6 +1570,7 @@ var RedisService = function(j_val) {
 
   /**
    Listen for all requests received by the server in real time
+
    @public
    @param handler {function} 
    */
@@ -1512,6 +1589,7 @@ var RedisService = function(j_val) {
 
   /**
    Move a key to another database
+
    @public
    @param args {todo} 
    @param handler {function} 
@@ -1531,6 +1609,7 @@ var RedisService = function(j_val) {
 
   /**
    Set multiple keys to multiple values
+
    @public
    @param args {todo} 
    @param handler {function} 
@@ -1550,6 +1629,7 @@ var RedisService = function(j_val) {
 
   /**
    Set multiple keys to multiple values, only if none of the keys exist
+
    @public
    @param args {todo} 
    @param handler {function} 
@@ -1569,6 +1649,7 @@ var RedisService = function(j_val) {
 
   /**
    Mark the start of a transaction block
+
    @public
    @param handler {function} 
    */
@@ -1587,6 +1668,7 @@ var RedisService = function(j_val) {
 
   /**
    Inspect the internals of Redis objects
+
    @public
    @param args {todo} 
    @param handler {function} 
@@ -1606,6 +1688,7 @@ var RedisService = function(j_val) {
 
   /**
    Remove the expiration from a key
+
    @public
    @param args {todo} 
    @param handler {function} 
@@ -1625,6 +1708,7 @@ var RedisService = function(j_val) {
 
   /**
    Set a key's time to live in milliseconds
+
    @public
    @param args {todo} 
    @param handler {function} 
@@ -1644,6 +1728,7 @@ var RedisService = function(j_val) {
 
   /**
    Set the expiration for a key as a UNIX timestamp specified in milliseconds
+
    @public
    @param args {todo} 
    @param handler {function} 
@@ -1663,6 +1748,7 @@ var RedisService = function(j_val) {
 
   /**
    Adds the specified elements to the specified HyperLogLog.
+
    @public
    @param args {todo} 
    @param handler {function} 
@@ -1682,6 +1768,7 @@ var RedisService = function(j_val) {
 
   /**
    Return the approximated cardinality of the set(s) observed by the HyperLogLog at key(s).
+
    @public
    @param args {todo} 
    @param handler {function} 
@@ -1701,6 +1788,7 @@ var RedisService = function(j_val) {
 
   /**
    Merge N different HyperLogLogs into a single one.
+
    @public
    @param args {todo} 
    @param handler {function} 
@@ -1720,6 +1808,7 @@ var RedisService = function(j_val) {
 
   /**
    Ping the server
+
    @public
    @param handler {function} 
    */
@@ -1738,6 +1827,7 @@ var RedisService = function(j_val) {
 
   /**
    Set the value and expiration in milliseconds of a key
+
    @public
    @param args {todo} 
    @param handler {function} 
@@ -1757,6 +1847,7 @@ var RedisService = function(j_val) {
 
   /**
    Listen for messages published to channels matching the given patterns
+
    @public
    @param args {todo} 
    @param handler {function} 
@@ -1776,6 +1867,7 @@ var RedisService = function(j_val) {
 
   /**
    Inspect the state of the Pub/Sub subsystem
+
    @public
    @param args {todo} 
    @param handler {function} 
@@ -1795,6 +1887,7 @@ var RedisService = function(j_val) {
 
   /**
    Get the time to live for a key in milliseconds
+
    @public
    @param args {todo} 
    @param handler {function} 
@@ -1814,6 +1907,7 @@ var RedisService = function(j_val) {
 
   /**
    Post a message to a channel
+
    @public
    @param args {todo} 
    @param handler {function} 
@@ -1833,6 +1927,7 @@ var RedisService = function(j_val) {
 
   /**
    Stop listening for messages posted to channels matching the given patterns
+
    @public
    @param args {todo} 
    @param handler {function} 
@@ -1852,6 +1947,7 @@ var RedisService = function(j_val) {
 
   /**
    Close the connection
+
    @public
    @param handler {function} 
    */
@@ -1870,6 +1966,7 @@ var RedisService = function(j_val) {
 
   /**
    Return a random key from the keyspace
+
    @public
    @param handler {function} 
    */
@@ -1888,6 +1985,7 @@ var RedisService = function(j_val) {
 
   /**
    Rename a key
+
    @public
    @param args {todo} 
    @param handler {function} 
@@ -1907,6 +2005,7 @@ var RedisService = function(j_val) {
 
   /**
    Rename a key, only if the new key does not exist
+
    @public
    @param args {todo} 
    @param handler {function} 
@@ -1926,6 +2025,7 @@ var RedisService = function(j_val) {
 
   /**
    Create a key using the provided serialized value, previously obtained using DUMP.
+
    @public
    @param args {todo} 
    @param handler {function} 
@@ -1945,6 +2045,7 @@ var RedisService = function(j_val) {
 
   /**
    Return the role of the instance in the context of replication
+
    @public
    @param handler {function} 
    */
@@ -1963,6 +2064,7 @@ var RedisService = function(j_val) {
 
   /**
    Remove and get the last element in a list
+
    @public
    @param args {todo} 
    @param handler {function} 
@@ -1982,6 +2084,7 @@ var RedisService = function(j_val) {
 
   /**
    Remove the last element in a list, append it to another list and return it
+
    @public
    @param args {todo} 
    @param handler {function} 
@@ -2001,6 +2104,7 @@ var RedisService = function(j_val) {
 
   /**
    Append one or multiple values to a list
+
    @public
    @param args {todo} 
    @param handler {function} 
@@ -2020,6 +2124,7 @@ var RedisService = function(j_val) {
 
   /**
    Append a value to a list, only if the list exists
+
    @public
    @param args {todo} 
    @param handler {function} 
@@ -2039,6 +2144,7 @@ var RedisService = function(j_val) {
 
   /**
    Add one or more members to a set
+
    @public
    @param args {todo} 
    @param handler {function} 
@@ -2058,6 +2164,7 @@ var RedisService = function(j_val) {
 
   /**
    Synchronously save the dataset to disk
+
    @public
    @param handler {function} 
    */
@@ -2076,6 +2183,7 @@ var RedisService = function(j_val) {
 
   /**
    Get the number of members in a set
+
    @public
    @param args {todo} 
    @param handler {function} 
@@ -2095,6 +2203,7 @@ var RedisService = function(j_val) {
 
   /**
    Check existence of scripts in the script cache.
+
    @public
    @param args {todo} 
    @param handler {function} 
@@ -2114,6 +2223,7 @@ var RedisService = function(j_val) {
 
   /**
    Remove all the scripts from the script cache.
+
    @public
    @param handler {function} 
    */
@@ -2132,6 +2242,7 @@ var RedisService = function(j_val) {
 
   /**
    Kill the script currently in execution.
+
    @public
    @param handler {function} 
    */
@@ -2150,6 +2261,7 @@ var RedisService = function(j_val) {
 
   /**
    Load the specified Lua script into the script cache.
+
    @public
    @param args {todo} 
    @param handler {function} 
@@ -2169,6 +2281,7 @@ var RedisService = function(j_val) {
 
   /**
    Subtract multiple sets
+
    @public
    @param args {todo} 
    @param handler {function} 
@@ -2188,6 +2301,7 @@ var RedisService = function(j_val) {
 
   /**
    Subtract multiple sets and store the resulting set in a key
+
    @public
    @param args {todo} 
    @param handler {function} 
@@ -2207,6 +2321,7 @@ var RedisService = function(j_val) {
 
   /**
    Change the selected database for the current connection
+
    @public
    @param args {todo} 
    @param handler {function} 
@@ -2226,6 +2341,7 @@ var RedisService = function(j_val) {
 
   /**
    Set the string value of a key
+
    @public
    @param args {todo} 
    @param handler {function} 
@@ -2245,6 +2361,7 @@ var RedisService = function(j_val) {
 
   /**
    Sets or clears the bit at offset in the string value stored at key
+
    @public
    @param args {todo} 
    @param handler {function} 
@@ -2264,6 +2381,7 @@ var RedisService = function(j_val) {
 
   /**
    Set the value and expiration of a key
+
    @public
    @param args {todo} 
    @param handler {function} 
@@ -2283,6 +2401,7 @@ var RedisService = function(j_val) {
 
   /**
    Set the value of a key, only if the key does not exist
+
    @public
    @param args {todo} 
    @param handler {function} 
@@ -2302,6 +2421,7 @@ var RedisService = function(j_val) {
 
   /**
    Overwrite part of a string at key starting at the specified offset
+
    @public
    @param args {todo} 
    @param handler {function} 
@@ -2321,6 +2441,7 @@ var RedisService = function(j_val) {
 
   /**
    Synchronously save the dataset to disk and then shut down the server
+
    @public
    @param args {todo} 
    @param handler {function} 
@@ -2340,6 +2461,7 @@ var RedisService = function(j_val) {
 
   /**
    Intersect multiple sets
+
    @public
    @param args {todo} 
    @param handler {function} 
@@ -2359,6 +2481,7 @@ var RedisService = function(j_val) {
 
   /**
    Intersect multiple sets and store the resulting set in a key
+
    @public
    @param args {todo} 
    @param handler {function} 
@@ -2378,6 +2501,7 @@ var RedisService = function(j_val) {
 
   /**
    Determine if a given value is a member of a set
+
    @public
    @param args {todo} 
    @param handler {function} 
@@ -2397,6 +2521,7 @@ var RedisService = function(j_val) {
 
   /**
    Make the server a slave of another instance, or promote it as master
+
    @public
    @param args {todo} 
    @param handler {function} 
@@ -2416,6 +2541,7 @@ var RedisService = function(j_val) {
 
   /**
    Manages the Redis slow queries log
+
    @public
    @param args {todo} 
    @param handler {function} 
@@ -2435,6 +2561,7 @@ var RedisService = function(j_val) {
 
   /**
    Get all the members in a set
+
    @public
    @param args {todo} 
    @param handler {function} 
@@ -2454,6 +2581,7 @@ var RedisService = function(j_val) {
 
   /**
    Move a member from one set to another
+
    @public
    @param args {todo} 
    @param handler {function} 
@@ -2473,6 +2601,7 @@ var RedisService = function(j_val) {
 
   /**
    Sort the elements in a list, set or sorted set
+
    @public
    @param args {todo} 
    @param handler {function} 
@@ -2492,6 +2621,7 @@ var RedisService = function(j_val) {
 
   /**
    Remove and return a random member from a set
+
    @public
    @param args {todo} 
    @param handler {function} 
@@ -2511,6 +2641,7 @@ var RedisService = function(j_val) {
 
   /**
    Get one or multiple random members from a set
+
    @public
    @param args {todo} 
    @param handler {function} 
@@ -2530,6 +2661,7 @@ var RedisService = function(j_val) {
 
   /**
    Remove one or more members from a set
+
    @public
    @param args {todo} 
    @param handler {function} 
@@ -2549,6 +2681,7 @@ var RedisService = function(j_val) {
 
   /**
    Get the length of the value stored in a key
+
    @public
    @param args {todo} 
    @param handler {function} 
@@ -2568,6 +2701,7 @@ var RedisService = function(j_val) {
 
   /**
    Listen for messages published to the given channels
+
    @public
    @param args {todo} 
    @param handler {function} 
@@ -2587,6 +2721,7 @@ var RedisService = function(j_val) {
 
   /**
    Add multiple sets
+
    @public
    @param args {todo} 
    @param handler {function} 
@@ -2606,6 +2741,7 @@ var RedisService = function(j_val) {
 
   /**
    Add multiple sets and store the resulting set in a key
+
    @public
    @param args {todo} 
    @param handler {function} 
@@ -2625,6 +2761,7 @@ var RedisService = function(j_val) {
 
   /**
    Internal command used for replication
+
    @public
    @param handler {function} 
    */
@@ -2643,6 +2780,7 @@ var RedisService = function(j_val) {
 
   /**
    Return the current server time
+
    @public
    @param handler {function} 
    */
@@ -2661,6 +2799,7 @@ var RedisService = function(j_val) {
 
   /**
    Get the time to live for a key
+
    @public
    @param args {todo} 
    @param handler {function} 
@@ -2680,6 +2819,7 @@ var RedisService = function(j_val) {
 
   /**
    Determine the type stored at key
+
    @public
    @param args {todo} 
    @param handler {function} 
@@ -2699,6 +2839,7 @@ var RedisService = function(j_val) {
 
   /**
    Stop listening for messages posted to the given channels
+
    @public
    @param args {todo} 
    @param handler {function} 
@@ -2718,6 +2859,7 @@ var RedisService = function(j_val) {
 
   /**
    Forget about all watched keys
+
    @public
    @param handler {function} 
    */
@@ -2736,6 +2878,7 @@ var RedisService = function(j_val) {
 
   /**
    Watch the given keys to determine execution of the MULTI/EXEC block
+
    @public
    @param args {todo} 
    @param handler {function} 
@@ -2755,6 +2898,7 @@ var RedisService = function(j_val) {
 
   /**
    Add one or more members to a sorted set, or update its score if it already exists
+
    @public
    @param args {todo} 
    @param handler {function} 
@@ -2774,6 +2918,7 @@ var RedisService = function(j_val) {
 
   /**
    Get the number of members in a sorted set
+
    @public
    @param args {todo} 
    @param handler {function} 
@@ -2793,6 +2938,7 @@ var RedisService = function(j_val) {
 
   /**
    Count the members in a sorted set with scores within the given values
+
    @public
    @param args {todo} 
    @param handler {function} 
@@ -2812,6 +2958,7 @@ var RedisService = function(j_val) {
 
   /**
    Increment the score of a member in a sorted set
+
    @public
    @param args {todo} 
    @param handler {function} 
@@ -2831,6 +2978,7 @@ var RedisService = function(j_val) {
 
   /**
    Intersect multiple sorted sets and store the resulting sorted set in a new key
+
    @public
    @param args {todo} 
    @param handler {function} 
@@ -2850,6 +2998,7 @@ var RedisService = function(j_val) {
 
   /**
    Count the number of members in a sorted set between a given lexicographical range
+
    @public
    @param args {todo} 
    @param handler {function} 
@@ -2869,6 +3018,7 @@ var RedisService = function(j_val) {
 
   /**
    Return a range of members in a sorted set, by index
+
    @public
    @param args {todo} 
    @param handler {function} 
@@ -2888,6 +3038,7 @@ var RedisService = function(j_val) {
 
   /**
    Return a range of members in a sorted set, by lexicographical range
+
    @public
    @param args {todo} 
    @param handler {function} 
@@ -2907,6 +3058,7 @@ var RedisService = function(j_val) {
 
   /**
    Return a range of members in a sorted set, by score
+
    @public
    @param args {todo} 
    @param handler {function} 
@@ -2926,6 +3078,7 @@ var RedisService = function(j_val) {
 
   /**
    Determine the index of a member in a sorted set
+
    @public
    @param args {todo} 
    @param handler {function} 
@@ -2945,6 +3098,7 @@ var RedisService = function(j_val) {
 
   /**
    Remove one or more members from a sorted set
+
    @public
    @param args {todo} 
    @param handler {function} 
@@ -2964,6 +3118,7 @@ var RedisService = function(j_val) {
 
   /**
    Remove all members in a sorted set between the given lexicographical range
+
    @public
    @param args {todo} 
    @param handler {function} 
@@ -2983,6 +3138,7 @@ var RedisService = function(j_val) {
 
   /**
    Remove all members in a sorted set within the given indexes
+
    @public
    @param args {todo} 
    @param handler {function} 
@@ -3002,6 +3158,7 @@ var RedisService = function(j_val) {
 
   /**
    Remove all members in a sorted set within the given scores
+
    @public
    @param args {todo} 
    @param handler {function} 
@@ -3021,6 +3178,7 @@ var RedisService = function(j_val) {
 
   /**
    Return a range of members in a sorted set, by index, with scores ordered from high to low
+
    @public
    @param args {todo} 
    @param handler {function} 
@@ -3040,6 +3198,7 @@ var RedisService = function(j_val) {
 
   /**
    Return a range of members in a sorted set, by score, with scores ordered from high to low
+
    @public
    @param args {todo} 
    @param handler {function} 
@@ -3059,6 +3218,7 @@ var RedisService = function(j_val) {
 
   /**
    Determine the index of a member in a sorted set, with scores ordered from high to low
+
    @public
    @param args {todo} 
    @param handler {function} 
@@ -3078,6 +3238,7 @@ var RedisService = function(j_val) {
 
   /**
    Get the score associated with the given member in a sorted set
+
    @public
    @param args {todo} 
    @param handler {function} 
@@ -3097,6 +3258,7 @@ var RedisService = function(j_val) {
 
   /**
    Add multiple sorted sets and store the resulting sorted set in a new key
+
    @public
    @param args {todo} 
    @param handler {function} 
@@ -3116,6 +3278,7 @@ var RedisService = function(j_val) {
 
   /**
    Incrementally iterate the keys space
+
    @public
    @param args {todo} 
    @param handler {function} 
@@ -3135,6 +3298,7 @@ var RedisService = function(j_val) {
 
   /**
    Incrementally iterate Set elements
+
    @public
    @param args {todo} 
    @param handler {function} 
@@ -3154,6 +3318,7 @@ var RedisService = function(j_val) {
 
   /**
    Incrementally iterate hash fields and associated values
+
    @public
    @param args {todo} 
    @param handler {function} 
@@ -3173,6 +3338,7 @@ var RedisService = function(j_val) {
 
   /**
    Incrementally iterate sorted sets elements and associated scores
+
    @public
    @param args {todo} 
    @param handler {function} 
