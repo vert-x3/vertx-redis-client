@@ -77,20 +77,25 @@ public final class Reply {
     }
     if (type == JsonArray.class) {
       final JsonArray multi = new JsonArray();
-
       for (Reply r : (Reply[]) data) {
+        Object elem;
         switch (r.type()) {
           case '$':   // Bulk
-            multi.add(r.asType(String.class, encoding));
+            elem = r.asType(String.class, encoding);
             break;
           case ':':   // Integer
-            multi.add(r.asType(Long.class, encoding));
+            elem = r.asType(Long.class, encoding);
             break;
           case '*':   // Multi
-            multi.add(r.asType(JsonArray.class, encoding));
+            elem = r.asType(JsonArray.class, encoding);
             break;
           default:
             throw new RuntimeException("Unknown sub message type in multi: " + r.type());
+        }
+        if (elem == null) {
+          multi.addNull();
+        } else {
+          multi.add(elem);
         }
       }
 

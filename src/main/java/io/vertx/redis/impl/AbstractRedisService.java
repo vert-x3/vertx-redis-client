@@ -43,14 +43,15 @@ public abstract class AbstractRedisService implements RedisService {
   public void start(final Handler<AsyncResult<Void>> handler) {
     final String host = config.getString("host", "localhost");
     final int port = config.getInteger("port", 6379);
-    final String encoding = config.getString("encoding", "UTF-8");
+    final String enc = config.getString("encoding", "UTF-8");
     final boolean binary = config.getBoolean("binary", false);
 
     if (binary) {
       log.warn("Binary mode is not implemented yet!!!");
     }
 
-    charset = Charset.forName(this.encoding);
+    encoding = enc;
+    charset = Charset.forName(enc);
     baseAddress = config.getString("address", "io.vertx.mod-redis");
 
     redisClient = new RedisConnection(vertx, host, port, subscriptions);
@@ -93,25 +94,11 @@ public abstract class AbstractRedisService implements RedisService {
     send(command, args, JsonObject.class, resultHandler);
   }
 
-  final <T> void send(final String command, final Object args, final Class<T> type, final Handler<AsyncResult<T>> resultHandler) {
+  final <T> void send(final String command, final JsonArray redisArgs,
+                      final Class<T> returnType,
+                      final Handler<AsyncResult<T>> resultHandler) {
 
     final ResponseTransform transform = getResponseTransformFor(command);
-    JsonArray redisArgs = null;
-
-    if (args != null) {
-      if (type.equals(JsonObject.class)) {
-        redisArgs = new JsonArray();
-
-        JsonObject hash = (JsonObject) args;
-
-        for (String key : hash.fieldNames()) {
-          serializeArg(redisArgs, key);
-          serializeArg(redisArgs, hash.getValue(key));
-        }
-      } else {
-        redisArgs = (JsonArray) args;
-      }
-    }
 
     // subscribe/psubscribe and unsubscribe/punsubscribe commands can have multiple (including zero) replies
     int expectedReplies = 1;
@@ -202,7 +189,7 @@ public abstract class AbstractRedisService implements RedisService {
           resultHandler.handle(new RedisAsyncResult<>(reply.asType(String.class)));
           return;
         case '+':   // Status
-          resultHandler.handle(new RedisAsyncResult<>(null, reply.asType(type)));
+          resultHandler.handle(new RedisAsyncResult<>(null, reply.asType(returnType)));
           return;
         case '$':  // Bulk
           if (transform == ResponseTransform.INFO) {
@@ -234,7 +221,7 @@ public abstract class AbstractRedisService implements RedisService {
             }
             resultHandler.handle(new RedisAsyncResult<>(null, (T) value));
           } else {
-            resultHandler.handle(new RedisAsyncResult<>(null, reply.asType(type, encoding)));
+            resultHandler.handle(new RedisAsyncResult<>(null, reply.asType(returnType, encoding)));
           }
           return;
         case '*': // Multi
@@ -245,7 +232,7 @@ public abstract class AbstractRedisService implements RedisService {
           }
           return;
         case ':':   // Integer
-          resultHandler.handle(new RedisAsyncResult<>(null, reply.asType(type)));
+          resultHandler.handle(new RedisAsyncResult<>(null, reply.asType(returnType)));
           return;
         default:
           resultHandler.handle(new RedisAsyncResult<>("Unknown message type"));

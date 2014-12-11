@@ -4,9 +4,7 @@ import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;
 import io.vertx.redis.RedisService;
 import io.vertx.test.core.VertxTestBase;
-import org.junit.After;
 import org.junit.AfterClass;
-import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Ignore;
 import org.junit.Test;
@@ -60,8 +58,8 @@ public class RedisServiceTest extends VertxTestBase {
     }
   }
 
-  @Before
-  public void before() throws Exception {
+  @Override
+  public void setUp() throws Exception {
     super.setUp();
     JsonObject config = new JsonObject();
     String host = getHost();
@@ -84,8 +82,8 @@ public class RedisServiceTest extends VertxTestBase {
     awaitLatch(latch);
   }
 
-  @After
-  public void after() throws Exception {
+  @Override
+  public void tearDown() throws Exception {
     CountDownLatch latch = new CountDownLatch(1);
     redis.stop(asyncResult -> {
       if (asyncResult.succeeded()) {
