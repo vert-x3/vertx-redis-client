@@ -1,5 +1,7 @@
 package io.vertx.redis;
 
+import io.vertx.codegen.annotations.ProxyGen;
+import io.vertx.codegen.annotations.ProxyIgnore;
 import io.vertx.codegen.annotations.VertxGen;
 import io.vertx.core.AsyncResult;
 import io.vertx.core.Handler;
@@ -10,7 +12,9 @@ import io.vertx.redis.impl.RedisServiceImpl;
 import io.vertx.serviceproxy.ProxyHelper;
 
 @VertxGen
+@ProxyGen
 public interface RedisService {
+
   static RedisService create(Vertx vertx, JsonObject config) {
     return new RedisServiceImpl(vertx, config);
   }
@@ -19,11 +23,11 @@ public interface RedisService {
     return ProxyHelper.createProxy(RedisService.class, vertx, address);
   }
 
+  @ProxyIgnore
   void start(Handler<AsyncResult<Void>> handler);
 
+  @ProxyIgnore
   void stop(Handler<AsyncResult<Void>> handler);
-
-//  static final RedisServiceFactory factory = ServiceHelper.loadFactory(RedisServiceFactory.class);
 
   /**
    * Append a value to a key

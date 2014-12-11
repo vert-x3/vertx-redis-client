@@ -16,6 +16,7 @@
 
 package io.vertx.test.redis;
 
+import io.vertx.core.DeploymentOptions;
 import io.vertx.redis.RedisService;
 
 import java.util.concurrent.CountDownLatch;
@@ -23,34 +24,17 @@ import java.util.concurrent.CountDownLatch;
 /**
  * @author <a href="http://tfox.org">Tim Fox</a>
  */
-public class RedisServiceTest extends RedisServiceTestBase {
+public class RedisServiceVerticleTest extends RedisServiceTestBase {
 
   @Override
   public void setUp() throws Exception {
     super.setUp();
-    redis = RedisService.create(vertx, getConfig());
     CountDownLatch latch = new CountDownLatch(1);
-    redis.start(asyncResult -> {
-      if (asyncResult.succeeded()) {
-        latch.countDown();
-      } else {
-        throw new RuntimeException("failed to setup", asyncResult.cause());
-      }
-    });
+    vertx.deployVerticle("service:io.vertx:redis-service", new DeploymentOptions().setConfig(getConfig()), onSuccess(res -> {
+      latch.countDown();
+    }));
     awaitLatch(latch);
+    redis = RedisService.createEventBusProxy(vertx, "vertx.redis");
   }
 
-  @Override
-  public void tearDown() throws Exception {
-    CountDownLatch latch = new CountDownLatch(1);
-    redis.stop(asyncResult -> {
-      if (asyncResult.succeeded()) {
-        latch.countDown();
-      } else {
-        throw new RuntimeException("failed to setup", asyncResult.cause());
-      }
-    });
-    awaitLatch(latch);
-    super.tearDown();
-  }
 }
