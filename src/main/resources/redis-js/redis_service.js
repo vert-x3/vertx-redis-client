@@ -469,7 +469,7 @@ var RedisService = function(j_val) {
     if (__args.length === 2 && typeof __args[0] === 'object' && __args[0] instanceof Array && typeof __args[1] === 'function') {
       j_redisService.configGet(utils.convParamJsonArray(args), function(ar) {
       if (ar.succeeded()) {
-        handler(ar.result(), null);
+        handler(utils.convReturnJson(ar.result()), null);
       } else {
         handler(null, ar.cause());
       }

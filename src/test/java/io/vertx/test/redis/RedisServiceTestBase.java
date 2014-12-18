@@ -4,14 +4,17 @@ import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;
 import io.vertx.redis.RedisService;
 import io.vertx.test.core.VertxTestBase;
+
+import java.util.Arrays;
+import java.util.UUID;
+import java.util.concurrent.CountDownLatch;
+
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Ignore;
 import org.junit.Test;
-import redis.embedded.RedisServer;
 
-import java.util.Arrays;
-import java.util.UUID;
+import redis.embedded.RedisServer;
 
 /**
  * This test relies on a Redis server, by default it will start and stop a Redis server unless
@@ -46,7 +49,7 @@ public class RedisServiceTestBase extends VertxTestBase {
   @BeforeClass
   static public void startRedis() throws Exception {
     if (getHost() == null && getPort() == null) {
-      redisServer = new RedisServer("2.8.9", 6379);
+      redisServer = new RedisServer(6379);
       redisServer.start();
     }
   }
@@ -121,13 +124,43 @@ public class RedisServiceTestBase extends VertxTestBase {
   }
 
   @Test
-  @Ignore
-  public void testAuth() {
+  public void testAuth() throws Exception{
+    RedisServer server 
+      = RedisServer.builder().port(6381).setting("requirepass foobar").build();    
+    server.start();    
+    JsonObject job = new JsonObject().put("host", "localhost").put("port", 6381);    
+    RedisService rdx = RedisService.create(vertx, job);
+    
+    CountDownLatch latch = new CountDownLatch(1);
+    rdx.start(asyncResult -> {
+      if (asyncResult.succeeded()) {
+        latch.countDown();
+      } else {
+        throw new RuntimeException("failed to setup", asyncResult.cause());
+      }
+    });
+    
+    awaitLatch(latch);
+    
+    rdx.auth(new JsonArray().add("barfoo"), reply->{
+      if(!reply.succeeded()){          
+          rdx.auth(new JsonArray().add("foobar"), reply2->{                            
+            if(reply2.succeeded()){
+              testComplete();
+            }
+         });
+      
+      }else {
+        fail("Blah");
+      }
+    });    
+    await();
   }
 
   @Test
   @Ignore
   public void testBgrewriteaof() {
+    
   }
 
   @Test
@@ -227,31 +260,95 @@ public class RedisServiceTestBase extends VertxTestBase {
     await();
   }
 
-  @Test
-  @Ignore
-  public void testBrpoplpush() {
-  }
+  @Test  
+  public void testBrpoplpush() throws Exception{
+    
+    JsonArray args = new JsonArray().add("list1").add("list2").add(100);
+    redis.brpoplpush(args, result ->{
+      
+      if(result.succeeded()){
+        redis.lpop(new JsonArray().add("list2"), result2 ->{          
+          if(result2.succeeded()){
+            System.out.println(result2.result());
+            assertTrue("hello".equals(result2.result()));        
+          }
+          testComplete();
+        });        
+      }          
+    });
+    
+    RedisService redis2 = RedisService.create(vertx, getConfig());
+    CountDownLatch latch = new CountDownLatch(1);
+    redis2.start(asyncResult -> {
+      if (asyncResult.succeeded()) {
+        latch.countDown();
+      } else {
+        throw new RuntimeException("failed to setup", asyncResult.cause());
+      }
+    });
+    
+    awaitLatch(latch);
+        
+    JsonArray args2 = new JsonArray().add("list1").add("hello");    
+    redis2.lpush(args2, result -> {            
+    });
 
+    await();
+    
+  }
+  
   @Test
   @Ignore
   public void testClientKill() {
   }
 
-  @Test
-  @Ignore
+  @Test  
   public void testClientList() {
+     
+    redis.clientList(result -> {       
+       assertTrue(result.succeeded());
+       assertNotNull(result.result());
+       testComplete();
+     });
+     
+     await();
   }
-
-  @Test
-  @Ignore
-  public void testClientGetname() {
+  
+  @Test  
+  public void testClientSetAndGetName() throws Exception{    
+    
+    CountDownLatch clientLatch = new CountDownLatch(1);
+    
+    redis.clientGetname(result -> {       
+      
+      if(result.succeeded()) {
+        assertNull(result.result());              
+      }      
+      clientLatch.countDown();
+    });    
+        
+    awaitLatch(clientLatch);
+    
+    CountDownLatch setLatch = new CountDownLatch(1);
+    JsonArray args = new JsonArray();
+    args.add("test-connection");
+    redis.clientSetname(args, result -> {      
+      assertTrue(result.succeeded());      
+      setLatch.countDown();
+    });
+    
+    awaitLatch(setLatch);
+    
+    redis.clientGetname(result -> {      
+      assertTrue(result.succeeded());      
+      assertEquals("test-connection", result.result());
+      testComplete();
+    });
+    
+    await();
   }
-
-  @Test
-  @Ignore
-  public void testClientSetname() {
-  }
-
+    
+  
   @Test
   public void testConfigGet() {
     redis.configGet(j("*max-*-entries*"), reply0 -> {
@@ -267,8 +364,21 @@ public class RedisServiceTestBase extends VertxTestBase {
   }
 
   @Test
-  @Ignore
-  public void testConfigSet() {
+  public void testConfigSetAndGet() {
+    
+    redis.configSet(new JsonArray().add("dbfilename").add("redis.dump"), reply ->{
+      if(reply.succeeded()){
+        redis.configGet(new JsonArray().add("dbfilename"), reply2 -> {
+          if(reply2.succeeded()){            
+            assertNotNull(reply2.result().getString(0));
+            assertTrue(reply2.result().getString(1).equals("redis.dump"));
+            testComplete();
+          }
+        });
+      }
+    });
+    
+    await();
   }
 
   @Test
@@ -1457,13 +1567,36 @@ public class RedisServiceTestBase extends VertxTestBase {
   }
 
   @Test
-  @Ignore
+  
   public void testQuit() {
+    
+    redis.quit(reply -> {
+      if(reply.succeeded()){                
+        redis.ping(reply2 ->{
+          if(reply2.succeeded()){
+            fail("Connection is closed.");
+          }
+          testComplete();
+        });
+      }
+    });
+    await();
   }
 
   @Test
-  @Ignore
   public void testRandomkey() {
+    
+    redis.set(new JsonArray().add("foo").add("bar"), reply->{
+      if(reply.succeeded()){
+        redis.randomkey(reply2->{
+          if(reply2.succeeded()){
+            assertNotNull(reply2.result());
+            testComplete();
+          }
+        });
+      }
+    });
+    await();
   }
 
   @Test
@@ -1737,8 +1870,31 @@ public class RedisServiceTestBase extends VertxTestBase {
   }
 
   @Test
-  @Ignore
   public void testSelect() {
+    //Gee, think redis should have a get current DB command?
+    redis.select(new JsonArray().add(1), reply -> {
+      if(reply.succeeded()){
+        redis.set(new JsonArray().add("first").add("value"), reply2->{
+          if(reply2.succeeded()){
+            redis.select(new JsonArray().add(0), reply3 ->{
+              if(reply3.succeeded()){
+                redis.select(new JsonArray().add(1), reply4 -> {
+                    if(reply4.succeeded()){                      
+                      redis.get(new JsonArray().add("first"),reply5->{
+                        if(reply5.succeeded()){
+                          assertTrue("value".equals(reply5.result()));
+                          testComplete();
+                        }
+                      });
+                    }
+                });
+              }
+            });
+          }
+        });        
+      }
+    });
+    await();
   }
 
   @Test
@@ -1829,9 +1985,35 @@ public class RedisServiceTestBase extends VertxTestBase {
     await();
   }
 
-  @Test
-  @Ignore
-  public void testShutdown() {
+  @Test  
+  public void testShutdown() throws Exception {        
+    
+    RedisServer testServer = new RedisServer(6380);
+    testServer.start();
+    
+    JsonObject job = new JsonObject().put("host", "localhost").put("port", 6380);    
+    RedisService rdx = RedisService.create(vertx, job);
+    
+    CountDownLatch latch = new CountDownLatch(1);
+    rdx.start(asyncResult -> {
+      if (asyncResult.succeeded()) {
+        latch.countDown();
+      } else {
+        throw new RuntimeException("failed to setup", asyncResult.cause());
+      }
+    });
+    
+    awaitLatch(latch);
+        
+    rdx.shutdown(new JsonArray().add("NOSAVE"), reply ->{      
+      fail("server has been terminated. No reply expected");
+    });        
+    
+    rdx.ping(reply ->{
+      assertFalse(reply.succeeded());
+      testComplete();
+    });
+    
   }
 
   @Test

@@ -92,8 +92,8 @@ public final class RedisServiceImpl extends AbstractRedisService {
     sendJsonArray("COMMAND INFO", args, handler);
   }
 
-  public void configGet(JsonArray args, Handler<AsyncResult<String>> handler) {
-    sendString("CONFIG GET", args, handler);
+  public void configGet(JsonArray args, Handler<AsyncResult<JsonArray>> handler) {
+    sendJsonArray("CONFIG GET", args, handler);
   }
 
   public void configRewrite(Handler<AsyncResult<String>> handler) {

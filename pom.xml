@@ -39,9 +39,9 @@
 
   <dependencies>
     <dependency>
-      <groupId>com.orange.redis-embedded</groupId>
+      <groupId>redis.embedded</groupId>
       <artifactId>embedded-redis</artifactId>
-      <version>0.6</version>
+      <version>0.3</version>
       <scope>test</scope>
     </dependency>
     <dependency>
@@ -222,4 +222,10 @@
       </plugin>
     </plugins>
   </build>
+  <repositories>
+    <repository>
+     <id>clojars.org</id>
+     <url>http://clojars.org/repo</url>
+    </repository>
+  </repositories>
 </project>

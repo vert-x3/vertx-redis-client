@@ -221,7 +221,7 @@ public interface RedisService {
    * @since 2.0.0
    * group: server
    */
-  void configGet(JsonArray args, Handler<AsyncResult<String>> handler);
+  void configGet(JsonArray args, Handler<AsyncResult<JsonArray>> handler);
 
   /**
    * Rewrite the configuration file with the in memory configuration
