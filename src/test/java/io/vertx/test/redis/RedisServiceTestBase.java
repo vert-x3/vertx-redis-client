@@ -499,21 +499,34 @@ public class RedisServiceTestBase extends VertxTestBase {
     await();
   }
 
-//    @Test
-//    public void testEval() {
-//        final String key1 = makeKey();
-//        final String key2 = makeKey();
-//
-//        redis.eval(j("return {KEYS[1],KEYS[2],ARGV[1],ARGV[2]}", 2, key1, key2, "first", "second"), reply0 -> { assertTrue(reply0.succeeded());
-//            assertArrayEquals(a(key1, key2, "first", "second"), reply0.result().toArray());
-//            testComplete();
-//        });
-//        await();
-//    }
+  @Test
+  public void testEval() {
+    final String key1 = makeKey();
+    final String key2 = makeKey();
+
+    redis.eval(j("return {KEYS[1],KEYS[2],ARGV[1],ARGV[2]}", 2, key1, key2, "first","second"),
+        reply -> {
+          assertTrue(reply.succeeded());
+          Object r = reply.result();
+          assertNotNull(r);          
+          testComplete();
+        });
+    await();
+  }
 
   @Test
-  @Ignore
   public void testEvalsha() {
+    String inline = "return 1";
+    redis.scriptLoad(new JsonArray().add(inline), reply->{
+      assertTrue(reply.succeeded());            
+      assertNotNull(reply.result());
+      redis.evalsha(new JsonArray().add(reply.result()).add(0) , reply2 ->{
+        assertTrue(reply2.succeeded());
+        testComplete();
+      });
+    });
+    await();
+
   }
 
   @Test
@@ -1426,6 +1439,11 @@ public class RedisServiceTestBase extends VertxTestBase {
   }
 
   @Test
+  public void testTransaction() throws Exception {
+           
+  }
+  
+  @Test
   @Ignore
   public void testMulti() {
   }
@@ -1533,6 +1551,13 @@ public class RedisServiceTestBase extends VertxTestBase {
     await();
   }
 
+  @Test
+  public void testPubSub() {
+    
+    redis.subscribe(new JsonArray().add("rustic"), sub->{      
+      
+    });
+  }
   @Test
   @Ignore
   public void testPsubscribe() {
@@ -1819,9 +1844,16 @@ public class RedisServiceTestBase extends VertxTestBase {
   public void testScriptkill() {
   }
 
-  @Test
-  @Ignore
+  @Test  
   public void testScriptload() {
+    
+    String inline = "return 1";
+    redis.scriptLoad(new JsonArray().add(inline), reply->{
+      assertTrue(reply.succeeded());            
+      assertNotNull(reply.result());
+      testComplete();
+    });
+    await();
   }
 
   @Test
