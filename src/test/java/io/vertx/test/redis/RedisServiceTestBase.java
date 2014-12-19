@@ -421,8 +421,7 @@ public class RedisServiceTestBase extends VertxTestBase {
     await();
   }
 
-  @Test
-  @Ignore
+  @Test  
   //Per the redis doc, this should not be used by clients, perhaps remove it from the API?
   public void testDebugObject() {
   }
@@ -1427,9 +1426,9 @@ public class RedisServiceTestBase extends VertxTestBase {
   public void testMove() {
     
     String key = makeKey();
-    redis.set(toJsonArray(key).add("moved_key"), reply ->{
+    redis.set(new JsonArray().add(key).add("moved_key"), reply ->{
       assertTrue(reply.succeeded());
-      redis.move(toJsonArray(key).add(1), reply2 ->{
+      redis.move(new JsonArray().add(key).add(1), reply2 ->{
         assertTrue(reply2.succeeded());
         assertTrue(new Long(1).equals(reply2.result()));
         testComplete();
@@ -1480,13 +1479,26 @@ public class RedisServiceTestBase extends VertxTestBase {
   }
 
   @Test
-  public void testTransaction() throws Exception {
-           
-  }
-  
-  @Test
-  @Ignore
   public void testMulti() {
+    
+    redis.multi(reply -> {
+      assertTrue(reply.succeeded());
+      redis.set(new JsonArray().add("multi-key").add("first"), reply2 -> {        
+        assertTrue(reply2.succeeded());        
+        redis.set(new JsonArray().add("multi-key2").add("second"), reply3 ->{
+          assertTrue(reply3.succeeded());
+        });
+          redis.get(new JsonArray().add("multi-key"), reply4 ->{
+            assertTrue(reply4.succeeded());
+            assertTrue("QUEUED".equalsIgnoreCase(reply4.result()));
+          });
+            redis.exec(reply5 ->{
+              assertTrue(reply5.succeeded());
+              testComplete();
+            });
+      }); 
+    });
+    await();
   }
 
   @Test
@@ -1913,8 +1925,12 @@ public class RedisServiceTestBase extends VertxTestBase {
   }
 
   @Test
-  @Ignore
   public void testScriptkill() {
+    
+    String inline = "while true do end";
+    redis.scriptLoad(new JsonArray().add(inline), reply ->{
+      
+    });
   }
 
   @Test  
