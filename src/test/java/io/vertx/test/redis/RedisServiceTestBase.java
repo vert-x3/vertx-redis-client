@@ -1846,9 +1846,14 @@ public class RedisServiceTestBase extends VertxTestBase {
     await();
   }
 
-  @Test
-  @Ignore
+  @Test  
   public void testSave() {
+    redis.save(reply ->{
+      assertTrue(reply.succeeded());
+      //Note, there's really not much else to do
+      testComplete();
+    });
+    await();
   }
 
   @Test
@@ -1870,14 +1875,41 @@ public class RedisServiceTestBase extends VertxTestBase {
     await();
   }
 
-  @Test
-  @Ignore
+  @Test  
   public void testScriptexists() {
+    String inline = "return 1";
+    redis.scriptLoad(new JsonArray().add(inline), reply ->{
+      assertTrue(reply.succeeded());
+      String hash = reply.result();
+      redis.scriptExists(new JsonArray().add(hash), reply2 ->{
+        assertTrue(reply2.succeeded());
+        assertTrue(reply2.result().getInteger(0) > 0);
+        testComplete();
+      });
+    });
+    await();
   }
 
-  @Test
-  @Ignore
+  @Test  
   public void testScriptflush() {
+    String inline = "return 1";
+    redis.scriptLoad(new JsonArray().add(inline), reply ->{
+      assertTrue(reply.succeeded());
+      String hash = reply.result();
+      redis.scriptExists(new JsonArray().add(hash), reply2 ->{
+        assertTrue(reply2.succeeded());
+        assertTrue(reply2.result().getInteger(0) > 0);
+          redis.scriptFlush(reply3 ->{
+            assertTrue(reply3.succeeded());            
+              redis.scriptExists(new JsonArray().add(hash), reply4 ->{
+                assertTrue(reply4.succeeded());
+                assertTrue(reply4.result().getInteger(0) == 0);
+                testComplete();
+              });                        
+          });                        
+      });
+    });
+    await();
   }
 
   @Test
@@ -1886,8 +1918,7 @@ public class RedisServiceTestBase extends VertxTestBase {
   }
 
   @Test  
-  public void testScriptload() {
-    
+  public void testScriptload() {    
     String inline = "return 1";
     redis.scriptLoad(new JsonArray().add(inline), reply->{
       assertTrue(reply.succeeded());            
