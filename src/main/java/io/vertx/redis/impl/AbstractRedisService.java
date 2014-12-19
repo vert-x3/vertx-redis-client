@@ -93,7 +93,8 @@ public abstract class AbstractRedisService implements RedisService {
   final void sendJsonObject(final String command, final JsonArray args, final Handler<AsyncResult<JsonObject>> resultHandler) {
     send(command, args, JsonObject.class, resultHandler);
   }
-
+  
+  @SuppressWarnings("unchecked")
   final <T> void send(final String command, final JsonArray redisArgs,
                       final Class<T> returnType,
                       final Handler<AsyncResult<T>> resultHandler) {
@@ -240,30 +241,5 @@ public abstract class AbstractRedisService implements RedisService {
     }));
   }
 
-  private static void serializeArg(JsonArray redisArgs, Object arg) {
-    if (arg == null) {
-      redisArgs.addNull();
-    } else {
-      if (arg instanceof String) {
-        redisArgs.add((String) arg);
-      } else if (arg instanceof Object[]) {
-        for (Object o : (Object[]) arg) {
-          redisArgs.add(o);
-        }
-      } else if (arg instanceof JsonObject) {
-        redisArgs.add((JsonObject) arg);
-      } else if (arg instanceof JsonArray) {
-        redisArgs.add((JsonArray) arg);
-      } else if (arg instanceof Number) {
-        redisArgs.add((Number) arg);
-      } else if (arg instanceof Boolean) {
-        redisArgs.add((Boolean) arg);
-      } else if (arg instanceof byte[]) {
-        redisArgs.add((byte[]) arg);
-      } else {
-        throw new RuntimeException("Unsupported type: " + arg.getClass().getName());
-      }
-    }
-  }
 }
 
