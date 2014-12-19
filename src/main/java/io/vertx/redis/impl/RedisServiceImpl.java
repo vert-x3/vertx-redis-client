@@ -256,8 +256,8 @@ public final class RedisServiceImpl extends AbstractRedisService {
     sendString("INCRBYFLOAT", args, handler);
   }
 
-  public void info(JsonArray args, Handler<AsyncResult<String>> handler) {
-    sendString("INFO", args, handler);
+  public void info(JsonArray args, Handler<AsyncResult<JsonObject>> handler) {
+    sendJsonObject("INFO", args, handler);
   }
 
   public void keys(JsonArray args, Handler<AsyncResult<JsonArray>> handler) {

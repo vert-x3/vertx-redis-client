@@ -615,7 +615,7 @@ public interface RedisService {
    * @since 1.0.0
    * group: server
    */
-  void info(JsonArray args, Handler<AsyncResult<String>> handler);
+  void info(JsonArray args, Handler<AsyncResult<JsonObject>> handler);
 
   /**
    * Find all keys matching the given pattern
