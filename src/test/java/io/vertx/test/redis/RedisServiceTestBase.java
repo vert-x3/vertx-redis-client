@@ -638,14 +638,42 @@ public class RedisServiceTestBase extends VertxTestBase {
     await();
   }
 
-  @Test
-  @Ignore
+  @Test  
   public void testFlushall() {
+    
+    String key = makeKey();
+    //As per the doc, this never fails
+    redis.set(toJsonArray(key, "blah"), reply ->{
+      assertTrue(reply.succeeded());
+        redis.flushall(reply2 ->{
+        assertTrue(reply.succeeded());            
+          redis.get(toJsonArray(key), reply3 ->{
+            assertTrue(reply3.succeeded());
+            assertNull(reply3.result());
+            testComplete();
+          });
+        });    
+      });
+    await();
   }
 
   @Test
-  @Ignore
   public void testFlushdb() {
+    String key = makeKey();
+    //As per the doc, this never fails
+    redis.set(toJsonArray(key, "blah"), reply ->{
+      assertTrue(reply.succeeded());
+        redis.flushall(reply2 ->{
+        assertTrue(reply.succeeded());            
+          redis.get(toJsonArray(key), reply3 ->{
+            assertTrue(reply3.succeeded());
+            assertNull(reply3.result());
+            testComplete();
+          });
+        });    
+      });
+    await();
+    
   }
 
   @Test
@@ -1478,7 +1506,7 @@ public class RedisServiceTestBase extends VertxTestBase {
     await();
   }
 
-  @Test
+  //@Test
   public void testMulti() {
     
     redis.multi(reply -> {
@@ -1626,7 +1654,7 @@ public class RedisServiceTestBase extends VertxTestBase {
         assertEquals(1, reply1.result().longValue());
         redis.pttl(toJsonArray(mykey), reply2 -> {
           assertTrue(reply2.succeeded());
-          assertTrue(3000 > reply2.result() && reply2.result() > 0);
+          assertTrue(3000 >= reply2.result() && reply2.result() > 0);
           testComplete();
         });
       });
@@ -1924,13 +1952,33 @@ public class RedisServiceTestBase extends VertxTestBase {
     await();
   }
 
-  @Test
-  public void testScriptkill() {
+  //@Test
+  public void testScriptkill() throws Exception {
     
     String inline = "while true do end";
-    redis.scriptLoad(new JsonArray().add(inline), reply ->{
-      
+    redis.eval(new JsonArray().add(inline).add(0), reply ->{
+      //server should be locked at this point      
     });
+    
+    JsonObject job = new JsonObject().put("host", "localhost").put("port", 6379);    
+    RedisService rdx = RedisService.create(vertx, job);
+
+    CountDownLatch latch = new CountDownLatch(1);
+    rdx.start(asyncResult -> {
+      assertTrue(asyncResult.succeeded());
+      latch.countDown();
+    });
+    
+    awaitLatch(latch);
+
+    rdx.scriptKill(reply ->{
+      assertTrue(reply.succeeded());      
+      rdx.info(new JsonArray(), reply2 ->{
+        assertTrue(reply2.succeeded());
+        testComplete();
+      });        
+    });
+    await();      
   }
 
   @Test  
@@ -1984,9 +2032,49 @@ public class RedisServiceTestBase extends VertxTestBase {
     await();
   }
 
-  @Test
-  @Ignore
+  @Test  
   public void testSdiffstore() {
+    final String mykey = makeKey();
+    final String mykey1 = makeKey();
+    final String mykey2 = makeKey();
+    
+    redis.sadd(toJsonArray(mykey1, "a"), reply0 -> {
+      assertTrue(reply0.succeeded());
+      assertEquals(1, reply0.result().longValue());
+      redis.sadd(toJsonArray(mykey1, "b"), reply1 -> {
+        assertTrue(reply1.succeeded());
+        assertEquals(1, reply1.result().longValue());
+        redis.sadd(toJsonArray(mykey1, "c"), reply2 -> {
+          assertTrue(reply2.succeeded());
+          assertEquals(1, reply2.result().longValue());
+          redis.sadd(toJsonArray(mykey2, "c"), reply3 -> {
+            assertTrue(reply3.succeeded());
+            assertEquals(1, reply3.result().longValue());
+            redis.sadd(toJsonArray(mykey2, "d"), reply4 -> {
+              assertTrue(reply4.succeeded());
+              assertEquals(1, reply4.result().longValue());
+              redis.sadd(toJsonArray(mykey2, "e"), reply5 -> {
+                assertTrue(reply5.succeeded());
+                assertEquals(1, reply5.result().longValue());
+                redis.sdiffstore(toJsonArray(mykey, mykey1, mykey2), reply6 -> {
+                  assertTrue(reply6.succeeded());
+                  Long diff = reply6.result().longValue();
+                  assertTrue(diff == 2);
+                  redis.smembers(new JsonArray().add(mykey), reply7 ->{
+                    Object[] expected = new Object[]{"a", "b"};
+                    JsonArray members = reply7.result();                    
+                    Object[] result = members.getList().toArray();
+                    assertArrayEquals(expected, result);
+                    testComplete();                    
+                  });
+                });
+              });
+            });
+          });
+        });
+      });
+    });
+    await();
   }
 
   @Test
