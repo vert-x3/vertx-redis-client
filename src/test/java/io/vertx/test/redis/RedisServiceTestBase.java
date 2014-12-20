@@ -303,8 +303,18 @@ public class RedisServiceTestBase extends VertxTestBase {
   }
   
   @Test
-  @Ignore
-  public void testClientKill() {
+  public void testClientKill() {    
+    
+    redis.clientList(reply -> {
+      assertTrue(reply.succeeded());
+      String clients = reply.result();
+      String add = clients.split("\\s")[0].split("=")[1];
+        redis.clientKill(toJsonArray(add), reply2 ->{
+          assertTrue(reply2.succeeded());
+          testComplete();
+        });
+    });
+    await();
   }
 
   @Test  
@@ -426,9 +436,29 @@ public class RedisServiceTestBase extends VertxTestBase {
   public void testDebugObject() {
   }
 
-  @Test
-  @Ignore
-  public void testDebugSegfault() {
+  @Test  
+  public void testDebugSegfault() throws Exception {
+
+    RedisServer server = RedisServer.builder().port(6381).setting("requirepass foobar").build();
+    server.start();
+    JsonObject job = new JsonObject().put("host", "localhost").put("port", 6381);
+    RedisService rdx = RedisService.create(vertx, job);
+
+    CountDownLatch latch = new CountDownLatch(1);
+    rdx.start(asyncResult -> {
+      assertTrue(asyncResult.succeeded());
+      latch.countDown();
+    });
+
+    awaitLatch(latch);
+    
+    rdx.debugSegfault(reply ->{
+      assertTrue(reply.succeeded());
+        rdx.info(new JsonArray(), reply2 ->{
+          assertFalse(reply2.succeeded());
+        });
+    });
+            
   }
 
   @Test
@@ -1529,9 +1559,24 @@ public class RedisServiceTestBase extends VertxTestBase {
     await();
   }
 
-  @Test
-  @Ignore
+  @Test  
   public void testObject() {
+    
+    String mykey = makeKey();    
+    redis.set(toJsonArray(mykey, "test"), reply ->{
+      assertTrue(reply.succeeded());
+      redis.object(toJsonArray("REFCOUNT", mykey), reply2 ->{
+        assertTrue(reply2.succeeded());
+          redis.object(toJsonArray("ENCODING", mykey), reply3 ->{
+            assertTrue(reply3.succeeded());            
+              redis.object(toJsonArray("IDLETIME", mykey), reply4 ->{
+                assertTrue(reply4.succeeded());
+                testComplete();                
+              });
+          });
+      });
+    });
+    await();
   }
 
   @Test
