@@ -1531,9 +1531,9 @@ public class RedisServiceTestBase extends VertxTestBase {
 
   @Test
   public void testMigrate() throws Exception {
-    RedisServer server = RedisServer.builder().port(6381).build();
+    RedisServer server = RedisServer.builder().port(6382).build();
     server.start();
-    JsonObject job = new JsonObject().put("host", "localhost").put("port", 6381);
+    JsonObject job = new JsonObject().put("host", "localhost").put("port", 6382);
     RedisService rdx = RedisService.create(vertx, job);
 
     CountDownLatch latch = new CountDownLatch(1);
@@ -1546,7 +1546,7 @@ public class RedisServiceTestBase extends VertxTestBase {
     String key = makeKey();
     redis.set(toJsonArray(key, "migrate"), reply ->{
       assertTrue(reply.succeeded());
-      redis.migrate(toJsonArray("localhost", 6381, key, 0, 20000), reply2 ->{
+      redis.migrate(toJsonArray("localhost", 6382, key, 0, 20000), reply2 ->{
         assertTrue(reply2.succeeded());
         rdx.get(toJsonArray(key), reply3 ->{
           assertTrue(reply3.succeeded());
@@ -1812,8 +1812,17 @@ public class RedisServiceTestBase extends VertxTestBase {
   }
 
   @Test
-  @Ignore
   public void testPublish() {
+    String key = makeKey();
+    redis.set(toJsonArray(key, 0), reply ->{
+      assertTrue(reply.succeeded());
+      redis.publish(toJsonArray(key, 1), reply2 ->{
+        assertTrue(reply2.succeeded());
+        assertTrue(reply2.result() == 0);
+        testComplete();
+      });
+    });  
+    await();
   }
 
   @Test
