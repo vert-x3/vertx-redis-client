@@ -80,6 +80,7 @@ public final class Reply {
       for (Reply r : (Reply[]) data) {
         Object elem;
         switch (r.type()) {
+          case '+':  
           case '$':   // Bulk
             elem = r.asType(String.class, encoding);
             break;

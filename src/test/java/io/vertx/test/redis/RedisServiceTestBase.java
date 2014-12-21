@@ -27,6 +27,10 @@ public class RedisServiceTestBase extends VertxTestBase {
 
   private static final Integer DEFAULT_PORT = 6379;
 
+  static RedisServer redisServer;
+
+  private static final Map<Integer, RedisServer> instances = new ConcurrentHashMap<>();
+
   private static String getHost() {
     return getProperty("host");
   }
@@ -39,11 +43,8 @@ public class RedisServiceTestBase extends VertxTestBase {
     String s = System.getProperty(name);
     return (s != null && s.trim().length() > 0) ?  s : null;
   }
-  private static final Map<Integer, RedisServer> instances = new ConcurrentHashMap<>();
 
   protected RedisService redis;
-
-  static RedisServer redisServer;
 
   @BeforeClass
   static public void startRedis() throws Exception {
@@ -137,29 +138,41 @@ public class RedisServiceTestBase extends VertxTestBase {
   }
 
   @Test
-  public void testAuth() throws Exception{
-    RedisServer server
-      = RedisServer.builder().port(6381).setting("requirepass foobar").build();
-    server.start();
-    JsonObject job = new JsonObject().put("host", "localhost").put("port", 6381);
-    RedisService rdx = RedisService.create(vertx, job);
+  //Note the try/finally is to ensure that the server is shutdown so other tests do not have to
+  //provide auth information
+  public void testAuth() throws Exception {
+    RedisServer server = null;
 
-    CountDownLatch latch = new CountDownLatch(1);
-    rdx.start(asyncResult -> {
-      assertTrue(asyncResult.succeeded());
-      latch.countDown();
-    });
+    try {
 
-    awaitLatch(latch);
+      server = RedisServer.builder().port(6381).setting("requirepass foobar").build();
+      server.start();
+      JsonObject job = new JsonObject().put("host", "localhost").put("port", 6381);
+      RedisService rdx = RedisService.create(vertx, job);
 
-    rdx.auth(new JsonArray().add("barfoo"), reply->{
-      assertFalse(reply.succeeded());
-      rdx.auth(new JsonArray().add("foobar"), reply2->{
-        assertTrue(reply2.succeeded());
-        testComplete();
-     });
-    });
-    await();
+      CountDownLatch latch = new CountDownLatch(1);
+      rdx.start(asyncResult -> {
+        assertTrue(asyncResult.succeeded());
+        latch.countDown();
+      });
+
+      awaitLatch(latch);
+
+      rdx.auth(new JsonArray().add("barfoo"), reply -> {
+        assertFalse(reply.succeeded());
+        rdx.auth(new JsonArray().add("foobar"), reply2 -> {
+          assertTrue(reply2.succeeded());
+          testComplete();
+        });
+      });
+      await();
+
+    } finally {
+
+      if (server != null) {
+        server.stop();
+      }
+    }
   }
 
   @Test
@@ -318,10 +331,10 @@ public class RedisServiceTestBase extends VertxTestBase {
       assertTrue(reply.succeeded());
       String clients = reply.result();
       String add = clients.split("\\s")[0].split("=")[1];
-        redis.clientKill(toJsonArray(add), reply2 ->{
-          assertTrue(reply2.succeeded());
-          testComplete();
-        });
+      redis.clientKill(toJsonArray(add), reply2 ->{
+        assertTrue(reply2.succeeded());
+        testComplete();
+      });
     });
     await();
   }
@@ -330,11 +343,11 @@ public class RedisServiceTestBase extends VertxTestBase {
   public void testClientList() {
 
     redis.clientList(result -> {
-       assertTrue(result.succeeded());
-       assertNotNull(result.result());
-       testComplete();
-     });
-     await();
+      assertTrue(result.succeeded());
+      assertNotNull(result.result());
+      testComplete();
+    });
+    await();
   }
 
   @Test
@@ -430,11 +443,11 @@ public class RedisServiceTestBase extends VertxTestBase {
       Long size = reply.result();
       redis.set(new JsonArray().add("new").add("value"), reply2 ->{
         assertTrue(reply2.succeeded());
-          redis.dbsize(reply3 ->{
-            assertTrue(reply3.succeeded());
-            assert(reply3.result() == size + 1);
-            testComplete();
-          });
+        redis.dbsize(reply3 ->{
+          assertTrue(reply3.succeeded());
+          assert(reply3.result() == size + 1);
+          testComplete();
+        });
       });
     });
     await();
@@ -448,7 +461,7 @@ public class RedisServiceTestBase extends VertxTestBase {
   @Test
   public void testDebugSegfault() throws Exception {
 
-    RedisServer server = RedisServer.builder().port(6381).setting("requirepass foobar").build();
+    RedisServer server = RedisServer.builder().port(6381).build();
     server.start();
     JsonObject job = new JsonObject().put("host", "localhost").put("port", 6381);
     RedisService rdx = RedisService.create(vertx, job);
@@ -463,9 +476,9 @@ public class RedisServiceTestBase extends VertxTestBase {
 
     rdx.debugSegfault(reply ->{
       assertTrue(reply.succeeded());
-        rdx.info(new JsonArray(), reply2 ->{
-          assertFalse(reply2.succeeded());
-        });
+      rdx.info(new JsonArray(), reply2 ->{
+        assertFalse(reply2.succeeded());
+      });
     });
 
   }
@@ -521,42 +534,61 @@ public class RedisServiceTestBase extends VertxTestBase {
   }
 
   @Test
-  @Ignore
   public void testDiscard() {
+    
+    String key = makeKey();    
+    redis.set(toJsonArray(key, 0), reply ->{
+      assertTrue(reply.succeeded());
+      redis.multi(reply2 ->{
+        assertTrue(reply2.succeeded());
+        redis.incr(toJsonArray(key), reply3 ->{
+          assertTrue(reply3.succeeded());
+          redis.discard(reply4 ->{
+            assertTrue(reply4.succeeded());
+            redis.get(toJsonArray(key), reply5 ->{
+              assertTrue(reply5.succeeded());
+              assertTrue(Integer.valueOf(reply5.result()) == 0);
+              testComplete();
+            });
+          });
+        });
+      });
+    });
+    await();
   }
 
-//    @Test
-//    public void testDump() {
-//        final String mykey = makeKey();
-//
-//        redis.set(j(mykey, 10), reply0 -> {
-//            assertTrue(reply0.succeeded());
-//            redis.dump(j(mykey), reply1 -> {
-//                assertTrue(reply1.succeeded());
-//                try {
-//                    byte[] data = reply1.result().getBytes("ISO-8859-1");
-//
-//                    assertEquals(data[0], (byte) 0);
-//                    assertEquals(data[1], (byte) 0xc0);
-//                    assertEquals(data[2], (byte) '\n');
-//                    assertEquals(data[3], (byte) 6);
-//                    assertEquals(data[4], (byte) 0);
-//                    assertEquals(data[5], (byte) 0xf8);
-//                    assertEquals(data[6], (byte) 'r');
-//                    assertEquals(data[7], (byte) '?');
-//                    assertEquals(data[8], (byte) 0xc5);
-//                    assertEquals(data[9], (byte) 0xfb);
-//                    assertEquals(data[10], (byte) 0xfb);
-//                    assertEquals(data[11], (byte) '_');
-//                    assertEquals(data[12], (byte) '(');
-//                    testComplete();
-//                } catch (UnsupportedEncodingException e) {
-//                    fail(e.getMessage());
-//                }
-//            });
-//        });
-//        await();
-//    }
+  //    @Test
+  //    public void testDump() {
+  //        final String mykey = makeKey();
+  //
+  //        redis.set(j(mykey, 10), reply0 -> {
+  //            assertTrue(reply0.succeeded());
+  //            redis.dump(j(mykey), reply1 -> {
+  //                assertTrue(reply1.succeeded());
+  //                try {
+  //                    byte[] data = reply1.result().getBytes("ISO-8859-1");
+  //
+  //                    assertEquals(data[0], (byte) 0);
+  //                    assertEquals(data[1], (byte) 0xc0);
+  //                    assertEquals(data[2], (byte) '\n');
+  //                    assertEquals(data[3], (byte) 6);
+  //                    assertEquals(data[4], (byte) 0);
+  //                    assertEquals(data[5], (byte) 0xf8);
+  //                    assertEquals(data[6], (byte) 'r');
+  //                    assertEquals(data[7], (byte) '?');
+  //                    assertEquals(data[8], (byte) 0xc5);
+  //                    assertEquals(data[9], (byte) 0xfb);
+  //                    assertEquals(data[10], (byte) 0xfb);
+  //                    assertEquals(data[11], (byte) '_');
+  //                    assertEquals(data[12], (byte) '(');
+  //                    testComplete();
+  //                } catch (UnsupportedEncodingException e) {
+  //                    fail(e.getMessage());
+  //                }
+  //            });
+  //        });
+  //        await();
+  //    }
 
   @Test
   public void testEcho() {
@@ -599,8 +631,26 @@ public class RedisServiceTestBase extends VertxTestBase {
   }
 
   @Test
-  @Ignore
+  //Note same test as testMulti, kept for consistency
   public void testExec() {
+    redis.multi(reply -> {
+      assertTrue(reply.succeeded());
+      redis.set(new JsonArray().add("multi-key").add("first"), reply2 -> {
+        assertTrue(reply2.succeeded());
+        redis.set(new JsonArray().add("multi-key2").add("second"), reply3 ->{
+          assertTrue(reply3.succeeded());
+        });
+        redis.get(new JsonArray().add("multi-key"), reply4 ->{
+          assertTrue(reply4.succeeded());
+          assertTrue("QUEUED".equalsIgnoreCase(reply4.result()));
+        });
+        redis.exec(reply5 ->{
+          assertTrue(reply5.succeeded());
+          testComplete();
+        });
+      });
+    });
+    await();
   }
 
   @Test
@@ -684,15 +734,15 @@ public class RedisServiceTestBase extends VertxTestBase {
     //As per the doc, this never fails
     redis.set(toJsonArray(key, "blah"), reply ->{
       assertTrue(reply.succeeded());
-        redis.flushall(reply2 ->{
+      redis.flushall(reply2 ->{
         assertTrue(reply.succeeded());
-          redis.get(toJsonArray(key), reply3 ->{
-            assertTrue(reply3.succeeded());
-            assertNull(reply3.result());
-            testComplete();
-          });
+        redis.get(toJsonArray(key), reply3 ->{
+          assertTrue(reply3.succeeded());
+          assertNull(reply3.result());
+          testComplete();
         });
       });
+    });
     await();
   }
 
@@ -702,15 +752,15 @@ public class RedisServiceTestBase extends VertxTestBase {
     //As per the doc, this never fails
     redis.set(toJsonArray(key, "blah"), reply ->{
       assertTrue(reply.succeeded());
-        redis.flushall(reply2 ->{
+      redis.flushall(reply2 ->{
         assertTrue(reply.succeeded());
-          redis.get(toJsonArray(key), reply3 ->{
-            assertTrue(reply3.succeeded());
-            assertNull(reply3.result());
-            testComplete();
-          });
+        redis.get(toJsonArray(key), reply3 ->{
+          assertTrue(reply3.succeeded());
+          assertNull(reply3.result());
+          testComplete();
         });
       });
+    });
     await();
 
   }
@@ -1579,24 +1629,35 @@ public class RedisServiceTestBase extends VertxTestBase {
     await();
   }
 
-  //@Test
-  public void testMulti() {
+  @Test
+  public void testMulti() throws Exception {
 
+    String key = makeKey();
+    RedisService rdx = RedisService.create(vertx, getConfig());
+    CountDownLatch latch = new CountDownLatch(1);
+    rdx.start(asyncResult -> {
+      assertTrue(asyncResult.succeeded());
+      latch.countDown();
+    });
+
+    awaitLatch(latch);
+    
+    redis.set(toJsonArray(key, 0), reply ->{
+      assertTrue(reply.succeeded());
+      
+    });
+    
     redis.multi(reply -> {
       assertTrue(reply.succeeded());
-      redis.set(new JsonArray().add("multi-key").add("first"), reply2 -> {
+      redis.set(new JsonArray().add(makeKey()).add(0), reply2 -> {
         assertTrue(reply2.succeeded());
-        redis.set(new JsonArray().add("multi-key2").add("second"), reply3 ->{
+        redis.set(new JsonArray().add(makeKey()).add(0), reply3 ->{
           assertTrue(reply3.succeeded());
         });
-          redis.get(new JsonArray().add("multi-key"), reply4 ->{
-            assertTrue(reply4.succeeded());
-            assertTrue("QUEUED".equalsIgnoreCase(reply4.result()));
-          });
-            redis.exec(reply5 ->{
-              assertTrue(reply5.succeeded());
-              testComplete();
-            });
+        redis.exec(reply4 ->{
+          assertTrue(reply4.succeeded());
+          testComplete();
+        });
       });
     });
     await();
@@ -1610,13 +1671,13 @@ public class RedisServiceTestBase extends VertxTestBase {
       assertTrue(reply.succeeded());
       redis.object(toJsonArray("REFCOUNT", mykey), reply2 ->{
         assertTrue(reply2.succeeded());
-          redis.object(toJsonArray("ENCODING", mykey), reply3 ->{
-            assertTrue(reply3.succeeded());
-              redis.object(toJsonArray("IDLETIME", mykey), reply4 ->{
-                assertTrue(reply4.succeeded());
-                testComplete();
-              });
+        redis.object(toJsonArray("ENCODING", mykey), reply3 ->{
+          assertTrue(reply3.succeeded());
+          redis.object(toJsonArray("IDLETIME", mykey), reply4 ->{
+            assertTrue(reply4.succeeded());
+            testComplete();
           });
+        });
       });
     });
     await();
@@ -1872,29 +1933,29 @@ public class RedisServiceTestBase extends VertxTestBase {
     final String mykey = makeKey();
     final String myotherkey = makeKey();
     redis.rpush(toJsonArray(mykey, "one"), reply0 -> {
-        assertTrue(reply0.succeeded());
-        assertEquals(1, reply0.result().longValue());
-        redis.rpush(toJsonArray(mykey, "two"), reply1 -> {
-          assertTrue(reply1.succeeded());
-          assertEquals(2, reply1.result().longValue());
-          redis.rpush(toJsonArray(mykey, "three"), reply2 -> {
-            assertTrue(reply2.succeeded());
-            assertEquals(3, reply2.result().longValue());
-            redis.rpoplpush(toJsonArray(mykey, myotherkey), reply3 -> {
-              assertTrue(reply3.succeeded());
-              assertEquals("three", reply3.result());
-              redis.lrange(toJsonArray(mykey, 0, -1), reply5 -> {
-                assertTrue(reply5.succeeded());
-                assertArrayEquals(toArray("one", "two"), reply5.result().getList().toArray());
-                redis.lrange(toJsonArray(myotherkey, 0, -1), reply6 -> {
-                  assertArrayEquals(toArray("three"), reply6.result().getList().toArray());
-                  testComplete();
-                });
+      assertTrue(reply0.succeeded());
+      assertEquals(1, reply0.result().longValue());
+      redis.rpush(toJsonArray(mykey, "two"), reply1 -> {
+        assertTrue(reply1.succeeded());
+        assertEquals(2, reply1.result().longValue());
+        redis.rpush(toJsonArray(mykey, "three"), reply2 -> {
+          assertTrue(reply2.succeeded());
+          assertEquals(3, reply2.result().longValue());
+          redis.rpoplpush(toJsonArray(mykey, myotherkey), reply3 -> {
+            assertTrue(reply3.succeeded());
+            assertEquals("three", reply3.result());
+            redis.lrange(toJsonArray(mykey, 0, -1), reply5 -> {
+              assertTrue(reply5.succeeded());
+              assertArrayEquals(toArray("one", "two"), reply5.result().getList().toArray());
+              redis.lrange(toJsonArray(myotherkey, 0, -1), reply6 -> {
+                assertArrayEquals(toArray("three"), reply6.result().getList().toArray());
+                testComplete();
               });
             });
           });
         });
-      }
+      });
+    }
 
     );
 
@@ -2027,14 +2088,14 @@ public class RedisServiceTestBase extends VertxTestBase {
       redis.scriptExists(new JsonArray().add(hash), reply2 ->{
         assertTrue(reply2.succeeded());
         assertTrue(reply2.result().getInteger(0) > 0);
-          redis.scriptFlush(reply3 ->{
-            assertTrue(reply3.succeeded());
-              redis.scriptExists(new JsonArray().add(hash), reply4 ->{
-                assertTrue(reply4.succeeded());
-                assertTrue(reply4.result().getInteger(0) == 0);
-                testComplete();
-              });
+        redis.scriptFlush(reply3 ->{
+          assertTrue(reply3.succeeded());
+          redis.scriptExists(new JsonArray().add(hash), reply4 ->{
+            assertTrue(reply4.succeeded());
+            assertTrue(reply4.result().getInteger(0) == 0);
+            testComplete();
           });
+        });
       });
     });
     await();
@@ -2175,14 +2236,14 @@ public class RedisServiceTestBase extends VertxTestBase {
             redis.select(new JsonArray().add(0), reply3 ->{
               if(reply3.succeeded()){
                 redis.select(new JsonArray().add(1), reply4 -> {
-                    if(reply4.succeeded()){
-                      redis.get(new JsonArray().add("first"),reply5->{
-                        if(reply5.succeeded()){
-                          assertTrue("value".equals(reply5.result()));
-                          testComplete();
-                        }
-                      });
-                    }
+                  if(reply4.succeeded()){
+                    redis.get(new JsonArray().add("first"),reply5->{
+                      if(reply5.succeeded()){
+                        assertTrue("value".equals(reply5.result()));
+                        testComplete();
+                      }
+                    });
+                  }
                 });
               }
             });
@@ -2548,21 +2609,21 @@ public class RedisServiceTestBase extends VertxTestBase {
     await();
   }
 
-    @Test
-    public void testSrandmember() {
-//        final String mykey = makeKey();
-//        redis.sadd(toJsonArray(mykey, "one", "two", "three"), reply0 -> {
-//            assertTrue(reply0.succeeded());
-//            assertEquals(3, reply0.result().longValue());
-//            redis.srandmember(toJsonArray(mykey), reply1 -> {
-//                assertTrue(reply1.succeeded());
-//                String randmember = reply1.result().getString(1);
-//                assertTrue(randmember.equals("one") || randmember.equals("two") || randmember.equals("three"));
-//                testComplete();
-//            });
-//        });
-//        await();
-    }
+  @Test
+  public void testSrandmember() {
+    //        final String mykey = makeKey();
+    //        redis.sadd(toJsonArray(mykey, "one", "two", "three"), reply0 -> {
+    //            assertTrue(reply0.succeeded());
+    //            assertEquals(3, reply0.result().longValue());
+    //            redis.srandmember(toJsonArray(mykey), reply1 -> {
+    //                assertTrue(reply1.succeeded());
+    //                String randmember = reply1.result().getString(1);
+    //                assertTrue(randmember.equals("one") || randmember.equals("two") || randmember.equals("three"));
+    //                testComplete();
+    //            });
+    //        });
+    //        await();
+  }
 
   @Test
   public void testSrem() {
@@ -2609,9 +2670,18 @@ public class RedisServiceTestBase extends VertxTestBase {
     await();
   }
 
-  @Test
-  @Ignore
+  @Test  
   public void testSubscribe() {
+    
+    String key = makeKey();
+    redis.subscribe(toJsonArray(key), reply ->{
+      assertTrue(reply.succeeded());
+      redis.unsubscribe(toJsonArray(key), reply2 ->{
+        assertTrue(reply2.succeeded());
+        testComplete();
+      });
+    });
+    await();
   }
 
   @Test
@@ -2687,10 +2757,10 @@ public class RedisServiceTestBase extends VertxTestBase {
           assertTrue(reply6.succeeded());
           assertTrue(reply6.result() == 5);
           //          JsonArray arr = reply6.result();
-//          Object[] array = arr.getList().toArray();
-//          Arrays.sort(array);
-//          assertTrue(array.length == 5);
-//          assertArrayEquals(new Object[]{"a", "b", "c", "d", "e"}, array);
+          //          Object[] array = arr.getList().toArray();
+          //          Arrays.sort(array);
+          //          assertTrue(array.length == 5);
+          //          assertArrayEquals(new Object[]{"a", "b", "c", "d", "e"}, array);
           testComplete();
         });
       });
@@ -2765,8 +2835,16 @@ public class RedisServiceTestBase extends VertxTestBase {
   }
 
   @Test
-  @Ignore
   public void testUnsubscribe() {
+    String key = makeKey();
+    redis.subscribe(toJsonArray(key), reply ->{
+      assertTrue(reply.succeeded());
+      redis.unsubscribe(toJsonArray(key), reply2 ->{
+        assertTrue(reply2.succeeded());
+        testComplete();
+      });
+    });
+    await();
   }
 
   @Test
@@ -2775,8 +2853,62 @@ public class RedisServiceTestBase extends VertxTestBase {
   }
 
   @Test
-  @Ignore
-  public void testWatch() {
+  public void testWatch() throws Exception {
+
+    String key = makeKey();
+    
+    RedisService rdx = RedisService.create(vertx, getConfig());
+    CountDownLatch latch = new CountDownLatch(1);
+    rdx.start(asyncResult -> {
+      assertTrue(asyncResult.succeeded());
+      latch.countDown();
+    });
+
+    awaitLatch(latch);
+    
+    CountDownLatch clientLatch = new CountDownLatch(1);
+    
+    redis.set(toJsonArray(key, 0), reply ->{
+      assertTrue(reply.succeeded());
+      redis.watch(toJsonArray(key), reply2 ->{
+        assertTrue(reply2.succeeded());
+        redis.multi(reply3 ->{
+          assertTrue(reply3.succeeded());
+          redis.incr(toJsonArray(key), reply4 ->{
+            assertTrue(reply4.succeeded());
+              try {
+                clientLatch.wait();                
+              }catch(Exception e){}
+              redis.incr(toJsonArray(key), reply5 ->{
+                assertTrue(reply5.succeeded());
+              });  
+              redis.incrby(toJsonArray(key, 10), reply6 ->{
+                assertTrue(reply6.succeeded());
+              });
+              redis.exec(reply7 ->{
+                /**
+                 * Note, this should really fail as we have watched a key and modified
+                 * it outside of the multi protocol. However, it does not appear to be 
+                 * showing this
+                 */
+                assertFalse(reply7.succeeded());
+                redis.get(toJsonArray(key), reply8 ->{
+                  assertTrue(reply8.succeeded());
+                  assertTrue(Integer.valueOf(reply8.result()) == 1);
+                  testComplete();
+                });
+              });
+            });
+          });
+        });
+      });
+    
+    rdx.incr(toJsonArray(key), reply ->{
+      assertTrue(reply.succeeded());
+      clientLatch.countDown();
+    });
+        
+    await();
   }
 
   @Test
