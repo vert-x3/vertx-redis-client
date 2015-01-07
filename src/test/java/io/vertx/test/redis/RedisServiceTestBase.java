@@ -2265,15 +2265,15 @@ public class RedisServiceTestBase extends VertxTestBase {
 
   @Test
   public void testSet() {
-    final String mykey = makeKey();
+    final String mykey = makeKey();        
     redis.set(toJsonArray(mykey, "Hello"), reply0 -> {
       assertTrue(reply0.succeeded());
       redis.get(toJsonArray(mykey), reply1 -> {
         assertTrue(reply1.succeeded());
-        assertEquals("Hello", reply1.result());
-        testComplete();
-      });
-    });
+        assertEquals("Hello", reply1.result());        
+            testComplete();
+          });
+        });
     await();
   }
 
