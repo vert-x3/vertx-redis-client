@@ -23,7 +23,7 @@
   <parent>
     <groupId>io.vertx</groupId>
     <artifactId>vertx-parent</artifactId>
-    <version>3.0.0-SNAPSHOT</version>
+    <version>1</version>
   </parent>
 
   <artifactId>vertx-redis-service</artifactId>
@@ -32,7 +32,7 @@
   <name>Vert.x Redis Service</name>
 
   <!--
-  Tests uses Redis, by default it uses it to manage a server for the tests, however it is possible to use
+  Tests uses embedded Redis by default in the test framework, however it is possible to use
   an existing Redis server by specifying the host and/or port system properties, for instance:
   % mvn test -host=.... -port=....
   -->
@@ -59,18 +59,6 @@
       <groupId>io.vertx</groupId>
       <artifactId>vertx-service-proxy</artifactId>
       <version>3.0.0-SNAPSHOT</version>
-    </dependency>
-    <dependency>
-      <groupId>io.vertx</groupId>
-      <artifactId>vertx-lang-groovy</artifactId>
-      <version>3.0.0-SNAPSHOT</version>
-      <optional>true</optional>
-    </dependency>
-    <dependency>
-      <groupId>org.codehaus.groovy</groupId>
-      <artifactId>groovy-all</artifactId>
-      <version>2.3.6</version>
-      <optional>true</optional>
     </dependency>
     <dependency>
       <groupId>io.vertx</groupId>

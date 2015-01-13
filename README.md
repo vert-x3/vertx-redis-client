@@ -6,7 +6,7 @@ The Vert.x Redis service is developed for use with Vert.x V3 and as such, is not
 
 Keep in mind that while the Vert.x service provides support for the complete [Redis command set](http://redis.io/commands), a working knowledge of the Redis runtime is strongly encouraged. Where there appears to be a discrepancy between this documentation and the [Redis documentation set](http://redis.io/documentation), the Redis literature takes precedence. 
 
-This project is based on original work from Paulo Lopes. The original repository for the module can be found at [https://github.com/vert-x/mod-redis](http://). 
+This project is based on original work from Paulo Lopes. The original repository for the module can be found at [https://github.com/vert-x/mod-redis](https://github.com/vert-x/mod-redis). 
 
 ##Redis Service
 While it is assumed you are familar with Redis, using the Redis service is straightforward
@@ -15,31 +15,31 @@ While it is assumed you are familar with Redis, using the Redis service is strai
 
 <pre>
 	RedisService service = RedisService.create(vertx, config());
+
     service.start(asyncResult -> {
       if (asyncResult.succeeded()) {
         String address = config().getString("address", "vertx.redis");
         ProxyHelper.registerService(RedisService.class, vertx, service, address);
         startFuture.complete();
+
       } else {
         startFuture.fail(asyncResult.cause());
       }
     });	
-	
 </pre>
 
-###Usage
 
+###Usage
 <pre>
-    service.set(toJsonArray(mykey, "Hello"), reply0 -> {
-      assertTrue(reply0.succeeded());
-      redis.get(toJsonArray(mykey), reply1 -> {
+    service.set(toJsonArray(mykey, "Hello"), reply -> {
+	  if(reply.succeeded()) {
+        redis.get(toJsonArray(mykey), reply1 -> {
         assertTrue(reply1.succeeded());
         assertEquals("Hello", reply1.result());
         testComplete();
-      });
+      });	  
+	 }
     });
-    await();
-
 </pre>
 
 If you are familar with Vert.x and Redis, the above code snippets will not be unfamiliar to you. As previously mentioned, the Redis Service supports the entire Redis Command Set allowing you full control of the Redis runtime as with any other API. 

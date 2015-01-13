@@ -10,6 +10,7 @@ import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.TimeUnit;
 
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
@@ -103,11 +104,6 @@ public class RedisServiceTestBase extends VertxTestBase {
     return UUID.randomUUID().toString();
   }
 
-  @Test
-  public void testRedisInstances() throws Exception {
-    createRedisCount(4);
-    assertTrue(instances.size() == 4);
-  }
 
   @Test
   public void testAppend() {
@@ -141,11 +137,8 @@ public class RedisServiceTestBase extends VertxTestBase {
   //Note the try/finally is to ensure that the server is shutdown so other tests do not have to
   //provide auth information
   public void testAuth() throws Exception {
-    RedisServer server = null;
 
-    try {
-
-      server = RedisServer.builder().port(6381).setting("requirepass foobar").build();
+    RedisServer server = RedisServer.builder().port(6381).setting("requirepass foobar").build();
       server.start();
       JsonObject job = new JsonObject().put("host", "localhost").put("port", 6381);
       RedisService rdx = RedisService.create(vertx, job);
@@ -162,17 +155,13 @@ public class RedisServiceTestBase extends VertxTestBase {
         assertFalse(reply.succeeded());
         rdx.auth(new JsonArray().add("foobar"), reply2 -> {
           assertTrue(reply2.succeeded());
+          try{
+            server.stop();            
+          }catch(Exception ignore){}
           testComplete();
         });
       });
-      await();
-
-    } finally {
-
-      if (server != null) {
-        server.stop();
-      }
-    }
+      await();    
   }
 
   @Test
@@ -478,6 +467,10 @@ public class RedisServiceTestBase extends VertxTestBase {
       assertTrue(reply.succeeded());
       rdx.info(new JsonArray(), reply2 ->{
         assertFalse(reply2.succeeded());
+        try{
+          server.stop();          
+        }catch(Exception ignore){}
+        testComplete();
       });
     });
 
@@ -1551,6 +1544,9 @@ public class RedisServiceTestBase extends VertxTestBase {
         rdx.get(toJsonArray(key), reply3 ->{
           assertTrue(reply3.succeeded());
           assertTrue("migrate".equals(reply3.result()));
+          try{
+            server.stop();            
+          }catch(Exception ignore){}          
           testComplete();
         });
       });
@@ -1559,8 +1555,6 @@ public class RedisServiceTestBase extends VertxTestBase {
     rdx.stop(reply ->{
       assertTrue(reply.succeeded());
     });
-    server.stop();
-
   }
 
   @Test
@@ -1710,25 +1704,19 @@ public class RedisServiceTestBase extends VertxTestBase {
   }
 
   @Test
-  public void testPexpire() {
+  public void testPexpire() {    
     final String mykey = makeKey();
     redis.set(toJsonArray(mykey, "Hello"), reply0 -> {
       assertTrue(reply0.succeeded());
-      redis.pexpire(toJsonArray(mykey, 1500), reply1 -> {
+      redis.pexpire(toJsonArray(mykey, 1000), reply1 -> {
         assertTrue(reply1.succeeded());
-        assertEquals(1, reply1.result().longValue());
-        redis.ttl(toJsonArray(mykey), reply2 -> {
-          assertTrue(reply2.succeeded());
-          assertEquals(1, reply2.result().longValue());
-          redis.pttl(toJsonArray(mykey), reply3 -> {
-            assertTrue(reply3.succeeded());
-            long val = reply3.result();
-            assertTrue(1500 > val && val > 0);
+        assertEquals(1, reply1.result().longValue());                
+        redis.get(toJsonArray(mykey), reply2 -> {
+            assertTrue(reply2.succeeded());
             testComplete();
           });
         });
       });
-    });
     await();
   }
 
