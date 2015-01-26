@@ -9,8 +9,10 @@ import io.vertx.core.net.NetClient;
 import io.vertx.core.net.NetClientOptions;
 import io.vertx.core.net.NetSocket;
 
+import java.util.ArrayDeque;
 import java.util.LinkedList;
 import java.util.Queue;
+import java.util.concurrent.ConcurrentLinkedDeque;
 
 /**
  * Base class for Redis Vertx client. Generated client would use the facilties
@@ -20,8 +22,8 @@ public class RedisConnection implements ReplyHandler {
 
   private static final Logger log = LoggerFactory.getLogger(RedisConnection.class);
 
-  private final Queue<Handler<Reply>> repliesQueue = new LinkedList<>();
-  private final Queue<Command> connectingQueue = new LinkedList<>();
+  private final Queue<Handler<Reply>> repliesQueue = new ConcurrentLinkedDeque<>();
+  private final Queue<Command> connectingQueue = new ConcurrentLinkedDeque<>();
 
   // instantiate a parser for the connection
   private final ReplyParser replyParser = new ReplyParser(this);
@@ -130,19 +132,19 @@ public class RedisConnection implements ReplyHandler {
     handler.handle(new RedisAsyncResult<>(null, null));
   }
 
-  // Redis 'subscribe', 'unsubscribe', 'psubscribe' and 'punsubscribe' commands can have multiple (including zero) repliesQueue
+  // Redis 'subscribe', 'unsubscribe', 'psubscribe' and 'punsubscribe' commands can have multiple (including zero) replies
   // See http://redis.io/topics/pubsub
   // In all cases we want to have a handler to report errors
-  void send(final Command command) {
+  synchronized void send(final Command command) {
     switch (state) {
       case CONNECTED:
         // The order read must match the order written, vertx guarantees
         // that this is only called from a single thread.
         try {
-          command.writeTo(netSocket);
           for (int i = 0; i < command.getExpectedReplies(); ++i) {
             repliesQueue.offer(command.getHandler());
           }
+          command.writeTo(netSocket);
         } catch (RuntimeException e) {
           // usually this means that the underlying socket is broken
           state = State.DISCONNECTED;

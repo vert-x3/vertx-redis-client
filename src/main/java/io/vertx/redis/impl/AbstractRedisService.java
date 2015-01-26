@@ -93,7 +93,7 @@ public abstract class AbstractRedisService implements RedisService {
   final void sendJsonObject(final String command, final JsonArray args, final Handler<AsyncResult<JsonObject>> resultHandler) {
     send(command, args, JsonObject.class, resultHandler);
   }
-  
+
   @SuppressWarnings("unchecked")
   final <T> void send(final String command, final JsonArray redisArgs,
                       final Class<T> returnType,

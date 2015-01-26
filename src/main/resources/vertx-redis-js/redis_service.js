@@ -71,6 +71,7 @@ var RedisService = function(j_val) {
    @public
    @param args {todo} 
    @param handler {function} 
+   @return {RedisService}
    */
   this.append = function(args, handler) {
     var __args = arguments;
@@ -82,6 +83,7 @@ var RedisService = function(j_val) {
         handler(null, ar.cause());
       }
     });
+      return that;
     } else utils.invalidArgs();
   };
 
@@ -91,6 +93,7 @@ var RedisService = function(j_val) {
    @public
    @param args {todo} 
    @param handler {function} 
+   @return {RedisService}
    */
   this.auth = function(args, handler) {
     var __args = arguments;
@@ -102,6 +105,7 @@ var RedisService = function(j_val) {
         handler(null, ar.cause());
       }
     });
+      return that;
     } else utils.invalidArgs();
   };
 
@@ -110,6 +114,7 @@ var RedisService = function(j_val) {
 
    @public
    @param handler {function} 
+   @return {RedisService}
    */
   this.bgrewriteaof = function(handler) {
     var __args = arguments;
@@ -121,6 +126,7 @@ var RedisService = function(j_val) {
         handler(null, ar.cause());
       }
     });
+      return that;
     } else utils.invalidArgs();
   };
 
@@ -129,6 +135,7 @@ var RedisService = function(j_val) {
 
    @public
    @param handler {function} 
+   @return {RedisService}
    */
   this.bgsave = function(handler) {
     var __args = arguments;
@@ -140,6 +147,7 @@ var RedisService = function(j_val) {
         handler(null, ar.cause());
       }
     });
+      return that;
     } else utils.invalidArgs();
   };
 
@@ -149,6 +157,7 @@ var RedisService = function(j_val) {
    @public
    @param args {todo} 
    @param handler {function} 
+   @return {RedisService}
    */
   this.bitcount = function(args, handler) {
     var __args = arguments;
@@ -160,6 +169,7 @@ var RedisService = function(j_val) {
         handler(null, ar.cause());
       }
     });
+      return that;
     } else utils.invalidArgs();
   };
 
@@ -169,6 +179,7 @@ var RedisService = function(j_val) {
    @public
    @param args {todo} 
    @param handler {function} 
+   @return {RedisService}
    */
   this.bitop = function(args, handler) {
     var __args = arguments;
@@ -180,6 +191,7 @@ var RedisService = function(j_val) {
         handler(null, ar.cause());
       }
     });
+      return that;
     } else utils.invalidArgs();
   };
 
@@ -189,6 +201,7 @@ var RedisService = function(j_val) {
    @public
    @param args {todo} 
    @param handler {function} 
+   @return {RedisService}
    */
   this.bitpos = function(args, handler) {
     var __args = arguments;
@@ -200,6 +213,7 @@ var RedisService = function(j_val) {
         handler(null, ar.cause());
       }
     });
+      return that;
     } else utils.invalidArgs();
   };
 
@@ -209,6 +223,7 @@ var RedisService = function(j_val) {
    @public
    @param args {todo} 
    @param handler {function} 
+   @return {RedisService}
    */
   this.blpop = function(args, handler) {
     var __args = arguments;
@@ -220,6 +235,7 @@ var RedisService = function(j_val) {
         handler(null, ar.cause());
       }
     });
+      return that;
     } else utils.invalidArgs();
   };
 
@@ -229,6 +245,7 @@ var RedisService = function(j_val) {
    @public
    @param args {todo} 
    @param handler {function} 
+   @return {RedisService}
    */
   this.brpop = function(args, handler) {
     var __args = arguments;
@@ -240,6 +257,7 @@ var RedisService = function(j_val) {
         handler(null, ar.cause());
       }
     });
+      return that;
     } else utils.invalidArgs();
   };
 
@@ -249,6 +267,7 @@ var RedisService = function(j_val) {
    @public
    @param args {todo} 
    @param handler {function} 
+   @return {RedisService}
    */
   this.brpoplpush = function(args, handler) {
     var __args = arguments;
@@ -260,6 +279,7 @@ var RedisService = function(j_val) {
         handler(null, ar.cause());
       }
     });
+      return that;
     } else utils.invalidArgs();
   };
 
@@ -269,6 +289,7 @@ var RedisService = function(j_val) {
    @public
    @param args {todo} 
    @param handler {function} 
+   @return {RedisService}
    */
   this.clientKill = function(args, handler) {
     var __args = arguments;
@@ -280,6 +301,7 @@ var RedisService = function(j_val) {
         handler(null, ar.cause());
       }
     });
+      return that;
     } else utils.invalidArgs();
   };
 
@@ -288,6 +310,7 @@ var RedisService = function(j_val) {
 
    @public
    @param handler {function} 
+   @return {RedisService}
    */
   this.clientList = function(handler) {
     var __args = arguments;
@@ -299,6 +322,7 @@ var RedisService = function(j_val) {
         handler(null, ar.cause());
       }
     });
+      return that;
     } else utils.invalidArgs();
   };
 
@@ -307,6 +331,7 @@ var RedisService = function(j_val) {
 
    @public
    @param handler {function} 
+   @return {RedisService}
    */
   this.clientGetname = function(handler) {
     var __args = arguments;
@@ -318,6 +343,7 @@ var RedisService = function(j_val) {
         handler(null, ar.cause());
       }
     });
+      return that;
     } else utils.invalidArgs();
   };
 
@@ -327,6 +353,7 @@ var RedisService = function(j_val) {
    @public
    @param args {todo} 
    @param handler {function} 
+   @return {RedisService}
    */
   this.clientPause = function(args, handler) {
     var __args = arguments;
@@ -338,6 +365,7 @@ var RedisService = function(j_val) {
         handler(null, ar.cause());
       }
     });
+      return that;
     } else utils.invalidArgs();
   };
 
@@ -347,6 +375,7 @@ var RedisService = function(j_val) {
    @public
    @param args {todo} 
    @param handler {function} 
+   @return {RedisService}
    */
   this.clientSetname = function(args, handler) {
     var __args = arguments;
@@ -358,6 +387,7 @@ var RedisService = function(j_val) {
         handler(null, ar.cause());
       }
     });
+      return that;
     } else utils.invalidArgs();
   };
 
@@ -366,6 +396,7 @@ var RedisService = function(j_val) {
 
    @public
    @param handler {function} 
+   @return {RedisService}
    */
   this.clusterSlots = function(handler) {
     var __args = arguments;
@@ -377,6 +408,7 @@ var RedisService = function(j_val) {
         handler(null, ar.cause());
       }
     });
+      return that;
     } else utils.invalidArgs();
   };
 
@@ -385,6 +417,7 @@ var RedisService = function(j_val) {
 
    @public
    @param handler {function} 
+   @return {RedisService}
    */
   this.command = function(handler) {
     var __args = arguments;
@@ -396,6 +429,7 @@ var RedisService = function(j_val) {
         handler(null, ar.cause());
       }
     });
+      return that;
     } else utils.invalidArgs();
   };
 
@@ -404,6 +438,7 @@ var RedisService = function(j_val) {
 
    @public
    @param handler {function} 
+   @return {RedisService}
    */
   this.commandCount = function(handler) {
     var __args = arguments;
@@ -415,6 +450,7 @@ var RedisService = function(j_val) {
         handler(null, ar.cause());
       }
     });
+      return that;
     } else utils.invalidArgs();
   };
 
@@ -423,6 +459,7 @@ var RedisService = function(j_val) {
 
    @public
    @param handler {function} 
+   @return {RedisService}
    */
   this.commandGetkeys = function(handler) {
     var __args = arguments;
@@ -434,6 +471,7 @@ var RedisService = function(j_val) {
         handler(null, ar.cause());
       }
     });
+      return that;
     } else utils.invalidArgs();
   };
 
@@ -443,6 +481,7 @@ var RedisService = function(j_val) {
    @public
    @param args {todo} 
    @param handler {function} 
+   @return {RedisService}
    */
   this.commandInfo = function(args, handler) {
     var __args = arguments;
@@ -454,6 +493,7 @@ var RedisService = function(j_val) {
         handler(null, ar.cause());
       }
     });
+      return that;
     } else utils.invalidArgs();
   };
 
@@ -463,6 +503,7 @@ var RedisService = function(j_val) {
    @public
    @param args {todo} 
    @param handler {function} 
+   @return {RedisService}
    */
   this.configGet = function(args, handler) {
     var __args = arguments;
@@ -474,6 +515,7 @@ var RedisService = function(j_val) {
         handler(null, ar.cause());
       }
     });
+      return that;
     } else utils.invalidArgs();
   };
 
@@ -482,6 +524,7 @@ var RedisService = function(j_val) {
 
    @public
    @param handler {function} 
+   @return {RedisService}
    */
   this.configRewrite = function(handler) {
     var __args = arguments;
@@ -493,6 +536,7 @@ var RedisService = function(j_val) {
         handler(null, ar.cause());
       }
     });
+      return that;
     } else utils.invalidArgs();
   };
 
@@ -502,6 +546,7 @@ var RedisService = function(j_val) {
    @public
    @param args {todo} 
    @param handler {function} 
+   @return {RedisService}
    */
   this.configSet = function(args, handler) {
     var __args = arguments;
@@ -513,6 +558,7 @@ var RedisService = function(j_val) {
         handler(null, ar.cause());
       }
     });
+      return that;
     } else utils.invalidArgs();
   };
 
@@ -521,6 +567,7 @@ var RedisService = function(j_val) {
 
    @public
    @param handler {function} 
+   @return {RedisService}
    */
   this.configResetstat = function(handler) {
     var __args = arguments;
@@ -532,6 +579,7 @@ var RedisService = function(j_val) {
         handler(null, ar.cause());
       }
     });
+      return that;
     } else utils.invalidArgs();
   };
 
@@ -540,6 +588,7 @@ var RedisService = function(j_val) {
 
    @public
    @param handler {function} 
+   @return {RedisService}
    */
   this.dbsize = function(handler) {
     var __args = arguments;
@@ -551,6 +600,7 @@ var RedisService = function(j_val) {
         handler(null, ar.cause());
       }
     });
+      return that;
     } else utils.invalidArgs();
   };
 
@@ -560,6 +610,7 @@ var RedisService = function(j_val) {
    @public
    @param args {todo} 
    @param handler {function} 
+   @return {RedisService}
    */
   this.debugObject = function(args, handler) {
     var __args = arguments;
@@ -571,6 +622,7 @@ var RedisService = function(j_val) {
         handler(null, ar.cause());
       }
     });
+      return that;
     } else utils.invalidArgs();
   };
 
@@ -579,6 +631,7 @@ var RedisService = function(j_val) {
 
    @public
    @param handler {function} 
+   @return {RedisService}
    */
   this.debugSegfault = function(handler) {
     var __args = arguments;
@@ -590,6 +643,7 @@ var RedisService = function(j_val) {
         handler(null, ar.cause());
       }
     });
+      return that;
     } else utils.invalidArgs();
   };
 
@@ -599,6 +653,7 @@ var RedisService = function(j_val) {
    @public
    @param args {todo} 
    @param handler {function} 
+   @return {RedisService}
    */
   this.decr = function(args, handler) {
     var __args = arguments;
@@ -610,6 +665,7 @@ var RedisService = function(j_val) {
         handler(null, ar.cause());
       }
     });
+      return that;
     } else utils.invalidArgs();
   };
 
@@ -619,6 +675,7 @@ var RedisService = function(j_val) {
    @public
    @param args {todo} 
    @param handler {function} 
+   @return {RedisService}
    */
   this.decrby = function(args, handler) {
     var __args = arguments;
@@ -630,6 +687,7 @@ var RedisService = function(j_val) {
         handler(null, ar.cause());
       }
     });
+      return that;
     } else utils.invalidArgs();
   };
 
@@ -639,6 +697,7 @@ var RedisService = function(j_val) {
    @public
    @param args {todo} 
    @param handler {function} 
+   @return {RedisService}
    */
   this.del = function(args, handler) {
     var __args = arguments;
@@ -650,6 +709,7 @@ var RedisService = function(j_val) {
         handler(null, ar.cause());
       }
     });
+      return that;
     } else utils.invalidArgs();
   };
 
@@ -658,6 +718,7 @@ var RedisService = function(j_val) {
 
    @public
    @param handler {function} 
+   @return {RedisService}
    */
   this.discard = function(handler) {
     var __args = arguments;
@@ -669,6 +730,7 @@ var RedisService = function(j_val) {
         handler(null, ar.cause());
       }
     });
+      return that;
     } else utils.invalidArgs();
   };
 
@@ -678,6 +740,7 @@ var RedisService = function(j_val) {
    @public
    @param args {todo} 
    @param handler {function} 
+   @return {RedisService}
    */
   this.dump = function(args, handler) {
     var __args = arguments;
@@ -689,6 +752,7 @@ var RedisService = function(j_val) {
         handler(null, ar.cause());
       }
     });
+      return that;
     } else utils.invalidArgs();
   };
 
@@ -698,6 +762,7 @@ var RedisService = function(j_val) {
    @public
    @param args {todo} 
    @param handler {function} 
+   @return {RedisService}
    */
   this.echo = function(args, handler) {
     var __args = arguments;
@@ -709,6 +774,7 @@ var RedisService = function(j_val) {
         handler(null, ar.cause());
       }
     });
+      return that;
     } else utils.invalidArgs();
   };
 
@@ -718,6 +784,7 @@ var RedisService = function(j_val) {
    @public
    @param args {todo} 
    @param handler {function} 
+   @return {RedisService}
    */
   this.eval = function(args, handler) {
     var __args = arguments;
@@ -729,6 +796,7 @@ var RedisService = function(j_val) {
         handler(null, ar.cause());
       }
     });
+      return that;
     } else utils.invalidArgs();
   };
 
@@ -738,6 +806,7 @@ var RedisService = function(j_val) {
    @public
    @param args {todo} 
    @param handler {function} 
+   @return {RedisService}
    */
   this.evalsha = function(args, handler) {
     var __args = arguments;
@@ -749,6 +818,7 @@ var RedisService = function(j_val) {
         handler(null, ar.cause());
       }
     });
+      return that;
     } else utils.invalidArgs();
   };
 
@@ -757,6 +827,7 @@ var RedisService = function(j_val) {
 
    @public
    @param handler {function} 
+   @return {RedisService}
    */
   this.exec = function(handler) {
     var __args = arguments;
@@ -768,6 +839,7 @@ var RedisService = function(j_val) {
         handler(null, ar.cause());
       }
     });
+      return that;
     } else utils.invalidArgs();
   };
 
@@ -777,6 +849,7 @@ var RedisService = function(j_val) {
    @public
    @param args {todo} 
    @param handler {function} 
+   @return {RedisService}
    */
   this.exists = function(args, handler) {
     var __args = arguments;
@@ -788,6 +861,7 @@ var RedisService = function(j_val) {
         handler(null, ar.cause());
       }
     });
+      return that;
     } else utils.invalidArgs();
   };
 
@@ -797,6 +871,7 @@ var RedisService = function(j_val) {
    @public
    @param args {todo} 
    @param handler {function} 
+   @return {RedisService}
    */
   this.expire = function(args, handler) {
     var __args = arguments;
@@ -808,6 +883,7 @@ var RedisService = function(j_val) {
         handler(null, ar.cause());
       }
     });
+      return that;
     } else utils.invalidArgs();
   };
 
@@ -817,6 +893,7 @@ var RedisService = function(j_val) {
    @public
    @param args {todo} 
    @param handler {function} 
+   @return {RedisService}
    */
   this.expireat = function(args, handler) {
     var __args = arguments;
@@ -828,6 +905,7 @@ var RedisService = function(j_val) {
         handler(null, ar.cause());
       }
     });
+      return that;
     } else utils.invalidArgs();
   };
 
@@ -836,6 +914,7 @@ var RedisService = function(j_val) {
 
    @public
    @param handler {function} 
+   @return {RedisService}
    */
   this.flushall = function(handler) {
     var __args = arguments;
@@ -847,6 +926,7 @@ var RedisService = function(j_val) {
         handler(null, ar.cause());
       }
     });
+      return that;
     } else utils.invalidArgs();
   };
 
@@ -855,6 +935,7 @@ var RedisService = function(j_val) {
 
    @public
    @param handler {function} 
+   @return {RedisService}
    */
   this.flushdb = function(handler) {
     var __args = arguments;
@@ -866,6 +947,7 @@ var RedisService = function(j_val) {
         handler(null, ar.cause());
       }
     });
+      return that;
     } else utils.invalidArgs();
   };
 
@@ -875,6 +957,7 @@ var RedisService = function(j_val) {
    @public
    @param args {todo} 
    @param handler {function} 
+   @return {RedisService}
    */
   this.get = function(args, handler) {
     var __args = arguments;
@@ -886,6 +969,7 @@ var RedisService = function(j_val) {
         handler(null, ar.cause());
       }
     });
+      return that;
     } else utils.invalidArgs();
   };
 
@@ -895,6 +979,7 @@ var RedisService = function(j_val) {
    @public
    @param args {todo} 
    @param handler {function} 
+   @return {RedisService}
    */
   this.getbit = function(args, handler) {
     var __args = arguments;
@@ -906,6 +991,7 @@ var RedisService = function(j_val) {
         handler(null, ar.cause());
       }
     });
+      return that;
     } else utils.invalidArgs();
   };
 
@@ -915,6 +1001,7 @@ var RedisService = function(j_val) {
    @public
    @param args {todo} 
    @param handler {function} 
+   @return {RedisService}
    */
   this.getrange = function(args, handler) {
     var __args = arguments;
@@ -926,6 +1013,7 @@ var RedisService = function(j_val) {
         handler(null, ar.cause());
       }
     });
+      return that;
     } else utils.invalidArgs();
   };
 
@@ -935,6 +1023,7 @@ var RedisService = function(j_val) {
    @public
    @param args {todo} 
    @param handler {function} 
+   @return {RedisService}
    */
   this.getset = function(args, handler) {
     var __args = arguments;
@@ -946,6 +1035,7 @@ var RedisService = function(j_val) {
         handler(null, ar.cause());
       }
     });
+      return that;
     } else utils.invalidArgs();
   };
 
@@ -955,6 +1045,7 @@ var RedisService = function(j_val) {
    @public
    @param args {todo} 
    @param handler {function} 
+   @return {RedisService}
    */
   this.hdel = function(args, handler) {
     var __args = arguments;
@@ -966,6 +1057,7 @@ var RedisService = function(j_val) {
         handler(null, ar.cause());
       }
     });
+      return that;
     } else utils.invalidArgs();
   };
 
@@ -975,6 +1067,7 @@ var RedisService = function(j_val) {
    @public
    @param args {todo} 
    @param handler {function} 
+   @return {RedisService}
    */
   this.hexists = function(args, handler) {
     var __args = arguments;
@@ -986,6 +1079,7 @@ var RedisService = function(j_val) {
         handler(null, ar.cause());
       }
     });
+      return that;
     } else utils.invalidArgs();
   };
 
@@ -995,6 +1089,7 @@ var RedisService = function(j_val) {
    @public
    @param args {todo} 
    @param handler {function} 
+   @return {RedisService}
    */
   this.hget = function(args, handler) {
     var __args = arguments;
@@ -1006,6 +1101,7 @@ var RedisService = function(j_val) {
         handler(null, ar.cause());
       }
     });
+      return that;
     } else utils.invalidArgs();
   };
 
@@ -1015,6 +1111,7 @@ var RedisService = function(j_val) {
    @public
    @param args {todo} 
    @param handler {function} 
+   @return {RedisService}
    */
   this.hgetall = function(args, handler) {
     var __args = arguments;
@@ -1026,6 +1123,7 @@ var RedisService = function(j_val) {
         handler(null, ar.cause());
       }
     });
+      return that;
     } else utils.invalidArgs();
   };
 
@@ -1035,6 +1133,7 @@ var RedisService = function(j_val) {
    @public
    @param args {todo} 
    @param handler {function} 
+   @return {RedisService}
    */
   this.hincrby = function(args, handler) {
     var __args = arguments;
@@ -1046,6 +1145,7 @@ var RedisService = function(j_val) {
         handler(null, ar.cause());
       }
     });
+      return that;
     } else utils.invalidArgs();
   };
 
@@ -1055,6 +1155,7 @@ var RedisService = function(j_val) {
    @public
    @param args {todo} 
    @param handler {function} 
+   @return {RedisService}
    */
   this.hincrbyfloat = function(args, handler) {
     var __args = arguments;
@@ -1066,6 +1167,7 @@ var RedisService = function(j_val) {
         handler(null, ar.cause());
       }
     });
+      return that;
     } else utils.invalidArgs();
   };
 
@@ -1075,6 +1177,7 @@ var RedisService = function(j_val) {
    @public
    @param args {todo} 
    @param handler {function} 
+   @return {RedisService}
    */
   this.hkeys = function(args, handler) {
     var __args = arguments;
@@ -1086,6 +1189,7 @@ var RedisService = function(j_val) {
         handler(null, ar.cause());
       }
     });
+      return that;
     } else utils.invalidArgs();
   };
 
@@ -1095,6 +1199,7 @@ var RedisService = function(j_val) {
    @public
    @param args {todo} 
    @param handler {function} 
+   @return {RedisService}
    */
   this.hlen = function(args, handler) {
     var __args = arguments;
@@ -1106,6 +1211,7 @@ var RedisService = function(j_val) {
         handler(null, ar.cause());
       }
     });
+      return that;
     } else utils.invalidArgs();
   };
 
@@ -1115,6 +1221,7 @@ var RedisService = function(j_val) {
    @public
    @param args {todo} 
    @param handler {function} 
+   @return {RedisService}
    */
   this.hmget = function(args, handler) {
     var __args = arguments;
@@ -1126,6 +1233,7 @@ var RedisService = function(j_val) {
         handler(null, ar.cause());
       }
     });
+      return that;
     } else utils.invalidArgs();
   };
 
@@ -1135,6 +1243,7 @@ var RedisService = function(j_val) {
    @public
    @param args {todo} 
    @param handler {function} 
+   @return {RedisService}
    */
   this.hmset = function(args, handler) {
     var __args = arguments;
@@ -1146,6 +1255,7 @@ var RedisService = function(j_val) {
         handler(null, ar.cause());
       }
     });
+      return that;
     } else utils.invalidArgs();
   };
 
@@ -1155,6 +1265,7 @@ var RedisService = function(j_val) {
    @public
    @param args {todo} 
    @param handler {function} 
+   @return {RedisService}
    */
   this.hset = function(args, handler) {
     var __args = arguments;
@@ -1166,6 +1277,7 @@ var RedisService = function(j_val) {
         handler(null, ar.cause());
       }
     });
+      return that;
     } else utils.invalidArgs();
   };
 
@@ -1175,6 +1287,7 @@ var RedisService = function(j_val) {
    @public
    @param args {todo} 
    @param handler {function} 
+   @return {RedisService}
    */
   this.hsetnx = function(args, handler) {
     var __args = arguments;
@@ -1186,6 +1299,7 @@ var RedisService = function(j_val) {
         handler(null, ar.cause());
       }
     });
+      return that;
     } else utils.invalidArgs();
   };
 
@@ -1195,6 +1309,7 @@ var RedisService = function(j_val) {
    @public
    @param args {todo} 
    @param handler {function} 
+   @return {RedisService}
    */
   this.hvals = function(args, handler) {
     var __args = arguments;
@@ -1206,6 +1321,7 @@ var RedisService = function(j_val) {
         handler(null, ar.cause());
       }
     });
+      return that;
     } else utils.invalidArgs();
   };
 
@@ -1215,6 +1331,7 @@ var RedisService = function(j_val) {
    @public
    @param args {todo} 
    @param handler {function} 
+   @return {RedisService}
    */
   this.incr = function(args, handler) {
     var __args = arguments;
@@ -1226,6 +1343,7 @@ var RedisService = function(j_val) {
         handler(null, ar.cause());
       }
     });
+      return that;
     } else utils.invalidArgs();
   };
 
@@ -1235,6 +1353,7 @@ var RedisService = function(j_val) {
    @public
    @param args {todo} 
    @param handler {function} 
+   @return {RedisService}
    */
   this.incrby = function(args, handler) {
     var __args = arguments;
@@ -1246,6 +1365,7 @@ var RedisService = function(j_val) {
         handler(null, ar.cause());
       }
     });
+      return that;
     } else utils.invalidArgs();
   };
 
@@ -1255,6 +1375,7 @@ var RedisService = function(j_val) {
    @public
    @param args {todo} 
    @param handler {function} 
+   @return {RedisService}
    */
   this.incrbyfloat = function(args, handler) {
     var __args = arguments;
@@ -1266,6 +1387,7 @@ var RedisService = function(j_val) {
         handler(null, ar.cause());
       }
     });
+      return that;
     } else utils.invalidArgs();
   };
 
@@ -1275,6 +1397,7 @@ var RedisService = function(j_val) {
    @public
    @param args {todo} 
    @param handler {function} 
+   @return {RedisService}
    */
   this.info = function(args, handler) {
     var __args = arguments;
@@ -1286,6 +1409,7 @@ var RedisService = function(j_val) {
         handler(null, ar.cause());
       }
     });
+      return that;
     } else utils.invalidArgs();
   };
 
@@ -1295,6 +1419,7 @@ var RedisService = function(j_val) {
    @public
    @param args {todo} 
    @param handler {function} 
+   @return {RedisService}
    */
   this.keys = function(args, handler) {
     var __args = arguments;
@@ -1306,6 +1431,7 @@ var RedisService = function(j_val) {
         handler(null, ar.cause());
       }
     });
+      return that;
     } else utils.invalidArgs();
   };
 
@@ -1314,6 +1440,7 @@ var RedisService = function(j_val) {
 
    @public
    @param handler {function} 
+   @return {RedisService}
    */
   this.lastsave = function(handler) {
     var __args = arguments;
@@ -1325,6 +1452,7 @@ var RedisService = function(j_val) {
         handler(null, ar.cause());
       }
     });
+      return that;
     } else utils.invalidArgs();
   };
 
@@ -1334,6 +1462,7 @@ var RedisService = function(j_val) {
    @public
    @param args {todo} 
    @param handler {function} 
+   @return {RedisService}
    */
   this.lindex = function(args, handler) {
     var __args = arguments;
@@ -1345,6 +1474,7 @@ var RedisService = function(j_val) {
         handler(null, ar.cause());
       }
     });
+      return that;
     } else utils.invalidArgs();
   };
 
@@ -1354,6 +1484,7 @@ var RedisService = function(j_val) {
    @public
    @param args {todo} 
    @param handler {function} 
+   @return {RedisService}
    */
   this.linsert = function(args, handler) {
     var __args = arguments;
@@ -1365,6 +1496,7 @@ var RedisService = function(j_val) {
         handler(null, ar.cause());
       }
     });
+      return that;
     } else utils.invalidArgs();
   };
 
@@ -1374,6 +1506,7 @@ var RedisService = function(j_val) {
    @public
    @param args {todo} 
    @param handler {function} 
+   @return {RedisService}
    */
   this.llen = function(args, handler) {
     var __args = arguments;
@@ -1385,6 +1518,7 @@ var RedisService = function(j_val) {
         handler(null, ar.cause());
       }
     });
+      return that;
     } else utils.invalidArgs();
   };
 
@@ -1394,6 +1528,7 @@ var RedisService = function(j_val) {
    @public
    @param args {todo} 
    @param handler {function} 
+   @return {RedisService}
    */
   this.lpop = function(args, handler) {
     var __args = arguments;
@@ -1405,6 +1540,7 @@ var RedisService = function(j_val) {
         handler(null, ar.cause());
       }
     });
+      return that;
     } else utils.invalidArgs();
   };
 
@@ -1414,6 +1550,7 @@ var RedisService = function(j_val) {
    @public
    @param args {todo} 
    @param handler {function} 
+   @return {RedisService}
    */
   this.lpush = function(args, handler) {
     var __args = arguments;
@@ -1425,6 +1562,7 @@ var RedisService = function(j_val) {
         handler(null, ar.cause());
       }
     });
+      return that;
     } else utils.invalidArgs();
   };
 
@@ -1434,6 +1572,7 @@ var RedisService = function(j_val) {
    @public
    @param args {todo} 
    @param handler {function} 
+   @return {RedisService}
    */
   this.lpushx = function(args, handler) {
     var __args = arguments;
@@ -1445,6 +1584,7 @@ var RedisService = function(j_val) {
         handler(null, ar.cause());
       }
     });
+      return that;
     } else utils.invalidArgs();
   };
 
@@ -1454,6 +1594,7 @@ var RedisService = function(j_val) {
    @public
    @param args {todo} 
    @param handler {function} 
+   @return {RedisService}
    */
   this.lrange = function(args, handler) {
     var __args = arguments;
@@ -1465,6 +1606,7 @@ var RedisService = function(j_val) {
         handler(null, ar.cause());
       }
     });
+      return that;
     } else utils.invalidArgs();
   };
 
@@ -1474,6 +1616,7 @@ var RedisService = function(j_val) {
    @public
    @param args {todo} 
    @param handler {function} 
+   @return {RedisService}
    */
   this.lrem = function(args, handler) {
     var __args = arguments;
@@ -1485,6 +1628,7 @@ var RedisService = function(j_val) {
         handler(null, ar.cause());
       }
     });
+      return that;
     } else utils.invalidArgs();
   };
 
@@ -1494,6 +1638,7 @@ var RedisService = function(j_val) {
    @public
    @param args {todo} 
    @param handler {function} 
+   @return {RedisService}
    */
   this.lset = function(args, handler) {
     var __args = arguments;
@@ -1505,6 +1650,7 @@ var RedisService = function(j_val) {
         handler(null, ar.cause());
       }
     });
+      return that;
     } else utils.invalidArgs();
   };
 
@@ -1514,6 +1660,7 @@ var RedisService = function(j_val) {
    @public
    @param args {todo} 
    @param handler {function} 
+   @return {RedisService}
    */
   this.ltrim = function(args, handler) {
     var __args = arguments;
@@ -1525,6 +1672,7 @@ var RedisService = function(j_val) {
         handler(null, ar.cause());
       }
     });
+      return that;
     } else utils.invalidArgs();
   };
 
@@ -1534,6 +1682,7 @@ var RedisService = function(j_val) {
    @public
    @param args {todo} 
    @param handler {function} 
+   @return {RedisService}
    */
   this.mget = function(args, handler) {
     var __args = arguments;
@@ -1545,6 +1694,7 @@ var RedisService = function(j_val) {
         handler(null, ar.cause());
       }
     });
+      return that;
     } else utils.invalidArgs();
   };
 
@@ -1554,6 +1704,7 @@ var RedisService = function(j_val) {
    @public
    @param args {todo} 
    @param handler {function} 
+   @return {RedisService}
    */
   this.migrate = function(args, handler) {
     var __args = arguments;
@@ -1565,6 +1716,7 @@ var RedisService = function(j_val) {
         handler(null, ar.cause());
       }
     });
+      return that;
     } else utils.invalidArgs();
   };
 
@@ -1573,6 +1725,7 @@ var RedisService = function(j_val) {
 
    @public
    @param handler {function} 
+   @return {RedisService}
    */
   this.monitor = function(handler) {
     var __args = arguments;
@@ -1584,6 +1737,7 @@ var RedisService = function(j_val) {
         handler(null, ar.cause());
       }
     });
+      return that;
     } else utils.invalidArgs();
   };
 
@@ -1593,6 +1747,7 @@ var RedisService = function(j_val) {
    @public
    @param args {todo} 
    @param handler {function} 
+   @return {RedisService}
    */
   this.move = function(args, handler) {
     var __args = arguments;
@@ -1604,6 +1759,7 @@ var RedisService = function(j_val) {
         handler(null, ar.cause());
       }
     });
+      return that;
     } else utils.invalidArgs();
   };
 
@@ -1613,6 +1769,7 @@ var RedisService = function(j_val) {
    @public
    @param args {todo} 
    @param handler {function} 
+   @return {RedisService}
    */
   this.mset = function(args, handler) {
     var __args = arguments;
@@ -1624,6 +1781,7 @@ var RedisService = function(j_val) {
         handler(null, ar.cause());
       }
     });
+      return that;
     } else utils.invalidArgs();
   };
 
@@ -1633,6 +1791,7 @@ var RedisService = function(j_val) {
    @public
    @param args {todo} 
    @param handler {function} 
+   @return {RedisService}
    */
   this.msetnx = function(args, handler) {
     var __args = arguments;
@@ -1644,6 +1803,7 @@ var RedisService = function(j_val) {
         handler(null, ar.cause());
       }
     });
+      return that;
     } else utils.invalidArgs();
   };
 
@@ -1652,6 +1812,7 @@ var RedisService = function(j_val) {
 
    @public
    @param handler {function} 
+   @return {RedisService}
    */
   this.multi = function(handler) {
     var __args = arguments;
@@ -1663,6 +1824,7 @@ var RedisService = function(j_val) {
         handler(null, ar.cause());
       }
     });
+      return that;
     } else utils.invalidArgs();
   };
 
@@ -1672,6 +1834,7 @@ var RedisService = function(j_val) {
    @public
    @param args {todo} 
    @param handler {function} 
+   @return {RedisService}
    */
   this.object = function(args, handler) {
     var __args = arguments;
@@ -1683,6 +1846,7 @@ var RedisService = function(j_val) {
         handler(null, ar.cause());
       }
     });
+      return that;
     } else utils.invalidArgs();
   };
 
@@ -1692,6 +1856,7 @@ var RedisService = function(j_val) {
    @public
    @param args {todo} 
    @param handler {function} 
+   @return {RedisService}
    */
   this.persist = function(args, handler) {
     var __args = arguments;
@@ -1703,6 +1868,7 @@ var RedisService = function(j_val) {
         handler(null, ar.cause());
       }
     });
+      return that;
     } else utils.invalidArgs();
   };
 
@@ -1712,6 +1878,7 @@ var RedisService = function(j_val) {
    @public
    @param args {todo} 
    @param handler {function} 
+   @return {RedisService}
    */
   this.pexpire = function(args, handler) {
     var __args = arguments;
@@ -1723,6 +1890,7 @@ var RedisService = function(j_val) {
         handler(null, ar.cause());
       }
     });
+      return that;
     } else utils.invalidArgs();
   };
 
@@ -1732,6 +1900,7 @@ var RedisService = function(j_val) {
    @public
    @param args {todo} 
    @param handler {function} 
+   @return {RedisService}
    */
   this.pexpireat = function(args, handler) {
     var __args = arguments;
@@ -1743,6 +1912,7 @@ var RedisService = function(j_val) {
         handler(null, ar.cause());
       }
     });
+      return that;
     } else utils.invalidArgs();
   };
 
@@ -1752,6 +1922,7 @@ var RedisService = function(j_val) {
    @public
    @param args {todo} 
    @param handler {function} 
+   @return {RedisService}
    */
   this.pfadd = function(args, handler) {
     var __args = arguments;
@@ -1763,6 +1934,7 @@ var RedisService = function(j_val) {
         handler(null, ar.cause());
       }
     });
+      return that;
     } else utils.invalidArgs();
   };
 
@@ -1772,6 +1944,7 @@ var RedisService = function(j_val) {
    @public
    @param args {todo} 
    @param handler {function} 
+   @return {RedisService}
    */
   this.pfcount = function(args, handler) {
     var __args = arguments;
@@ -1783,6 +1956,7 @@ var RedisService = function(j_val) {
         handler(null, ar.cause());
       }
     });
+      return that;
     } else utils.invalidArgs();
   };
 
@@ -1792,6 +1966,7 @@ var RedisService = function(j_val) {
    @public
    @param args {todo} 
    @param handler {function} 
+   @return {RedisService}
    */
   this.pfmerge = function(args, handler) {
     var __args = arguments;
@@ -1803,6 +1978,7 @@ var RedisService = function(j_val) {
         handler(null, ar.cause());
       }
     });
+      return that;
     } else utils.invalidArgs();
   };
 
@@ -1811,6 +1987,7 @@ var RedisService = function(j_val) {
 
    @public
    @param handler {function} 
+   @return {RedisService}
    */
   this.ping = function(handler) {
     var __args = arguments;
@@ -1822,6 +1999,7 @@ var RedisService = function(j_val) {
         handler(null, ar.cause());
       }
     });
+      return that;
     } else utils.invalidArgs();
   };
 
@@ -1831,6 +2009,7 @@ var RedisService = function(j_val) {
    @public
    @param args {todo} 
    @param handler {function} 
+   @return {RedisService}
    */
   this.psetex = function(args, handler) {
     var __args = arguments;
@@ -1842,6 +2021,7 @@ var RedisService = function(j_val) {
         handler(null, ar.cause());
       }
     });
+      return that;
     } else utils.invalidArgs();
   };
 
@@ -1851,6 +2031,7 @@ var RedisService = function(j_val) {
    @public
    @param args {todo} 
    @param handler {function} 
+   @return {RedisService}
    */
   this.psubscribe = function(args, handler) {
     var __args = arguments;
@@ -1862,6 +2043,7 @@ var RedisService = function(j_val) {
         handler(null, ar.cause());
       }
     });
+      return that;
     } else utils.invalidArgs();
   };
 
@@ -1871,6 +2053,7 @@ var RedisService = function(j_val) {
    @public
    @param args {todo} 
    @param handler {function} 
+   @return {RedisService}
    */
   this.pubsub = function(args, handler) {
     var __args = arguments;
@@ -1882,6 +2065,7 @@ var RedisService = function(j_val) {
         handler(null, ar.cause());
       }
     });
+      return that;
     } else utils.invalidArgs();
   };
 
@@ -1891,6 +2075,7 @@ var RedisService = function(j_val) {
    @public
    @param args {todo} 
    @param handler {function} 
+   @return {RedisService}
    */
   this.pttl = function(args, handler) {
     var __args = arguments;
@@ -1902,6 +2087,7 @@ var RedisService = function(j_val) {
         handler(null, ar.cause());
       }
     });
+      return that;
     } else utils.invalidArgs();
   };
 
@@ -1911,6 +2097,7 @@ var RedisService = function(j_val) {
    @public
    @param args {todo} 
    @param handler {function} 
+   @return {RedisService}
    */
   this.publish = function(args, handler) {
     var __args = arguments;
@@ -1922,6 +2109,7 @@ var RedisService = function(j_val) {
         handler(null, ar.cause());
       }
     });
+      return that;
     } else utils.invalidArgs();
   };
 
@@ -1931,6 +2119,7 @@ var RedisService = function(j_val) {
    @public
    @param args {todo} 
    @param handler {function} 
+   @return {RedisService}
    */
   this.punsubscribe = function(args, handler) {
     var __args = arguments;
@@ -1942,6 +2131,7 @@ var RedisService = function(j_val) {
         handler(null, ar.cause());
       }
     });
+      return that;
     } else utils.invalidArgs();
   };
 
@@ -1950,6 +2140,7 @@ var RedisService = function(j_val) {
 
    @public
    @param handler {function} 
+   @return {RedisService}
    */
   this.quit = function(handler) {
     var __args = arguments;
@@ -1961,6 +2152,7 @@ var RedisService = function(j_val) {
         handler(null, ar.cause());
       }
     });
+      return that;
     } else utils.invalidArgs();
   };
 
@@ -1969,6 +2161,7 @@ var RedisService = function(j_val) {
 
    @public
    @param handler {function} 
+   @return {RedisService}
    */
   this.randomkey = function(handler) {
     var __args = arguments;
@@ -1980,6 +2173,7 @@ var RedisService = function(j_val) {
         handler(null, ar.cause());
       }
     });
+      return that;
     } else utils.invalidArgs();
   };
 
@@ -1989,6 +2183,7 @@ var RedisService = function(j_val) {
    @public
    @param args {todo} 
    @param handler {function} 
+   @return {RedisService}
    */
   this.rename = function(args, handler) {
     var __args = arguments;
@@ -2000,6 +2195,7 @@ var RedisService = function(j_val) {
         handler(null, ar.cause());
       }
     });
+      return that;
     } else utils.invalidArgs();
   };
 
@@ -2009,6 +2205,7 @@ var RedisService = function(j_val) {
    @public
    @param args {todo} 
    @param handler {function} 
+   @return {RedisService}
    */
   this.renamenx = function(args, handler) {
     var __args = arguments;
@@ -2020,6 +2217,7 @@ var RedisService = function(j_val) {
         handler(null, ar.cause());
       }
     });
+      return that;
     } else utils.invalidArgs();
   };
 
@@ -2029,6 +2227,7 @@ var RedisService = function(j_val) {
    @public
    @param args {todo} 
    @param handler {function} 
+   @return {RedisService}
    */
   this.restore = function(args, handler) {
     var __args = arguments;
@@ -2040,6 +2239,7 @@ var RedisService = function(j_val) {
         handler(null, ar.cause());
       }
     });
+      return that;
     } else utils.invalidArgs();
   };
 
@@ -2048,6 +2248,7 @@ var RedisService = function(j_val) {
 
    @public
    @param handler {function} 
+   @return {RedisService}
    */
   this.role = function(handler) {
     var __args = arguments;
@@ -2059,6 +2260,7 @@ var RedisService = function(j_val) {
         handler(null, ar.cause());
       }
     });
+      return that;
     } else utils.invalidArgs();
   };
 
@@ -2068,6 +2270,7 @@ var RedisService = function(j_val) {
    @public
    @param args {todo} 
    @param handler {function} 
+   @return {RedisService}
    */
   this.rpop = function(args, handler) {
     var __args = arguments;
@@ -2079,6 +2282,7 @@ var RedisService = function(j_val) {
         handler(null, ar.cause());
       }
     });
+      return that;
     } else utils.invalidArgs();
   };
 
@@ -2088,6 +2292,7 @@ var RedisService = function(j_val) {
    @public
    @param args {todo} 
    @param handler {function} 
+   @return {RedisService}
    */
   this.rpoplpush = function(args, handler) {
     var __args = arguments;
@@ -2099,6 +2304,7 @@ var RedisService = function(j_val) {
         handler(null, ar.cause());
       }
     });
+      return that;
     } else utils.invalidArgs();
   };
 
@@ -2108,6 +2314,7 @@ var RedisService = function(j_val) {
    @public
    @param args {todo} 
    @param handler {function} 
+   @return {RedisService}
    */
   this.rpush = function(args, handler) {
     var __args = arguments;
@@ -2119,6 +2326,7 @@ var RedisService = function(j_val) {
         handler(null, ar.cause());
       }
     });
+      return that;
     } else utils.invalidArgs();
   };
 
@@ -2128,6 +2336,7 @@ var RedisService = function(j_val) {
    @public
    @param args {todo} 
    @param handler {function} 
+   @return {RedisService}
    */
   this.rpushx = function(args, handler) {
     var __args = arguments;
@@ -2139,6 +2348,7 @@ var RedisService = function(j_val) {
         handler(null, ar.cause());
       }
     });
+      return that;
     } else utils.invalidArgs();
   };
 
@@ -2148,6 +2358,7 @@ var RedisService = function(j_val) {
    @public
    @param args {todo} 
    @param handler {function} 
+   @return {RedisService}
    */
   this.sadd = function(args, handler) {
     var __args = arguments;
@@ -2159,6 +2370,7 @@ var RedisService = function(j_val) {
         handler(null, ar.cause());
       }
     });
+      return that;
     } else utils.invalidArgs();
   };
 
@@ -2167,6 +2379,7 @@ var RedisService = function(j_val) {
 
    @public
    @param handler {function} 
+   @return {RedisService}
    */
   this.save = function(handler) {
     var __args = arguments;
@@ -2178,6 +2391,7 @@ var RedisService = function(j_val) {
         handler(null, ar.cause());
       }
     });
+      return that;
     } else utils.invalidArgs();
   };
 
@@ -2187,6 +2401,7 @@ var RedisService = function(j_val) {
    @public
    @param args {todo} 
    @param handler {function} 
+   @return {RedisService}
    */
   this.scard = function(args, handler) {
     var __args = arguments;
@@ -2198,6 +2413,7 @@ var RedisService = function(j_val) {
         handler(null, ar.cause());
       }
     });
+      return that;
     } else utils.invalidArgs();
   };
 
@@ -2207,6 +2423,7 @@ var RedisService = function(j_val) {
    @public
    @param args {todo} 
    @param handler {function} 
+   @return {RedisService}
    */
   this.scriptExists = function(args, handler) {
     var __args = arguments;
@@ -2218,6 +2435,7 @@ var RedisService = function(j_val) {
         handler(null, ar.cause());
       }
     });
+      return that;
     } else utils.invalidArgs();
   };
 
@@ -2226,6 +2444,7 @@ var RedisService = function(j_val) {
 
    @public
    @param handler {function} 
+   @return {RedisService}
    */
   this.scriptFlush = function(handler) {
     var __args = arguments;
@@ -2237,6 +2456,7 @@ var RedisService = function(j_val) {
         handler(null, ar.cause());
       }
     });
+      return that;
     } else utils.invalidArgs();
   };
 
@@ -2245,6 +2465,7 @@ var RedisService = function(j_val) {
 
    @public
    @param handler {function} 
+   @return {RedisService}
    */
   this.scriptKill = function(handler) {
     var __args = arguments;
@@ -2256,6 +2477,7 @@ var RedisService = function(j_val) {
         handler(null, ar.cause());
       }
     });
+      return that;
     } else utils.invalidArgs();
   };
 
@@ -2265,6 +2487,7 @@ var RedisService = function(j_val) {
    @public
    @param args {todo} 
    @param handler {function} 
+   @return {RedisService}
    */
   this.scriptLoad = function(args, handler) {
     var __args = arguments;
@@ -2276,6 +2499,7 @@ var RedisService = function(j_val) {
         handler(null, ar.cause());
       }
     });
+      return that;
     } else utils.invalidArgs();
   };
 
@@ -2285,6 +2509,7 @@ var RedisService = function(j_val) {
    @public
    @param args {todo} 
    @param handler {function} 
+   @return {RedisService}
    */
   this.sdiff = function(args, handler) {
     var __args = arguments;
@@ -2296,6 +2521,7 @@ var RedisService = function(j_val) {
         handler(null, ar.cause());
       }
     });
+      return that;
     } else utils.invalidArgs();
   };
 
@@ -2305,6 +2531,7 @@ var RedisService = function(j_val) {
    @public
    @param args {todo} 
    @param handler {function} 
+   @return {RedisService}
    */
   this.sdiffstore = function(args, handler) {
     var __args = arguments;
@@ -2316,6 +2543,7 @@ var RedisService = function(j_val) {
         handler(null, ar.cause());
       }
     });
+      return that;
     } else utils.invalidArgs();
   };
 
@@ -2325,6 +2553,7 @@ var RedisService = function(j_val) {
    @public
    @param args {todo} 
    @param handler {function} 
+   @return {RedisService}
    */
   this.select = function(args, handler) {
     var __args = arguments;
@@ -2336,6 +2565,7 @@ var RedisService = function(j_val) {
         handler(null, ar.cause());
       }
     });
+      return that;
     } else utils.invalidArgs();
   };
 
@@ -2345,6 +2575,7 @@ var RedisService = function(j_val) {
    @public
    @param args {todo} 
    @param handler {function} 
+   @return {RedisService}
    */
   this.set = function(args, handler) {
     var __args = arguments;
@@ -2356,6 +2587,7 @@ var RedisService = function(j_val) {
         handler(null, ar.cause());
       }
     });
+      return that;
     } else utils.invalidArgs();
   };
 
@@ -2365,6 +2597,7 @@ var RedisService = function(j_val) {
    @public
    @param args {todo} 
    @param handler {function} 
+   @return {RedisService}
    */
   this.setbit = function(args, handler) {
     var __args = arguments;
@@ -2376,6 +2609,7 @@ var RedisService = function(j_val) {
         handler(null, ar.cause());
       }
     });
+      return that;
     } else utils.invalidArgs();
   };
 
@@ -2385,6 +2619,7 @@ var RedisService = function(j_val) {
    @public
    @param args {todo} 
    @param handler {function} 
+   @return {RedisService}
    */
   this.setex = function(args, handler) {
     var __args = arguments;
@@ -2396,6 +2631,7 @@ var RedisService = function(j_val) {
         handler(null, ar.cause());
       }
     });
+      return that;
     } else utils.invalidArgs();
   };
 
@@ -2405,6 +2641,7 @@ var RedisService = function(j_val) {
    @public
    @param args {todo} 
    @param handler {function} 
+   @return {RedisService}
    */
   this.setnx = function(args, handler) {
     var __args = arguments;
@@ -2416,6 +2653,7 @@ var RedisService = function(j_val) {
         handler(null, ar.cause());
       }
     });
+      return that;
     } else utils.invalidArgs();
   };
 
@@ -2425,6 +2663,7 @@ var RedisService = function(j_val) {
    @public
    @param args {todo} 
    @param handler {function} 
+   @return {RedisService}
    */
   this.setrange = function(args, handler) {
     var __args = arguments;
@@ -2436,6 +2675,7 @@ var RedisService = function(j_val) {
         handler(null, ar.cause());
       }
     });
+      return that;
     } else utils.invalidArgs();
   };
 
@@ -2445,6 +2685,7 @@ var RedisService = function(j_val) {
    @public
    @param args {todo} 
    @param handler {function} 
+   @return {RedisService}
    */
   this.shutdown = function(args, handler) {
     var __args = arguments;
@@ -2456,6 +2697,7 @@ var RedisService = function(j_val) {
         handler(null, ar.cause());
       }
     });
+      return that;
     } else utils.invalidArgs();
   };
 
@@ -2465,6 +2707,7 @@ var RedisService = function(j_val) {
    @public
    @param args {todo} 
    @param handler {function} 
+   @return {RedisService}
    */
   this.sinter = function(args, handler) {
     var __args = arguments;
@@ -2476,6 +2719,7 @@ var RedisService = function(j_val) {
         handler(null, ar.cause());
       }
     });
+      return that;
     } else utils.invalidArgs();
   };
 
@@ -2485,6 +2729,7 @@ var RedisService = function(j_val) {
    @public
    @param args {todo} 
    @param handler {function} 
+   @return {RedisService}
    */
   this.sinterstore = function(args, handler) {
     var __args = arguments;
@@ -2496,6 +2741,7 @@ var RedisService = function(j_val) {
         handler(null, ar.cause());
       }
     });
+      return that;
     } else utils.invalidArgs();
   };
 
@@ -2505,6 +2751,7 @@ var RedisService = function(j_val) {
    @public
    @param args {todo} 
    @param handler {function} 
+   @return {RedisService}
    */
   this.sismember = function(args, handler) {
     var __args = arguments;
@@ -2516,6 +2763,7 @@ var RedisService = function(j_val) {
         handler(null, ar.cause());
       }
     });
+      return that;
     } else utils.invalidArgs();
   };
 
@@ -2525,6 +2773,7 @@ var RedisService = function(j_val) {
    @public
    @param args {todo} 
    @param handler {function} 
+   @return {RedisService}
    */
   this.slaveof = function(args, handler) {
     var __args = arguments;
@@ -2536,6 +2785,7 @@ var RedisService = function(j_val) {
         handler(null, ar.cause());
       }
     });
+      return that;
     } else utils.invalidArgs();
   };
 
@@ -2545,6 +2795,7 @@ var RedisService = function(j_val) {
    @public
    @param args {todo} 
    @param handler {function} 
+   @return {RedisService}
    */
   this.slowlog = function(args, handler) {
     var __args = arguments;
@@ -2556,6 +2807,7 @@ var RedisService = function(j_val) {
         handler(null, ar.cause());
       }
     });
+      return that;
     } else utils.invalidArgs();
   };
 
@@ -2565,6 +2817,7 @@ var RedisService = function(j_val) {
    @public
    @param args {todo} 
    @param handler {function} 
+   @return {RedisService}
    */
   this.smembers = function(args, handler) {
     var __args = arguments;
@@ -2576,6 +2829,7 @@ var RedisService = function(j_val) {
         handler(null, ar.cause());
       }
     });
+      return that;
     } else utils.invalidArgs();
   };
 
@@ -2585,6 +2839,7 @@ var RedisService = function(j_val) {
    @public
    @param args {todo} 
    @param handler {function} 
+   @return {RedisService}
    */
   this.smove = function(args, handler) {
     var __args = arguments;
@@ -2596,6 +2851,7 @@ var RedisService = function(j_val) {
         handler(null, ar.cause());
       }
     });
+      return that;
     } else utils.invalidArgs();
   };
 
@@ -2605,6 +2861,7 @@ var RedisService = function(j_val) {
    @public
    @param args {todo} 
    @param handler {function} 
+   @return {RedisService}
    */
   this.sort = function(args, handler) {
     var __args = arguments;
@@ -2616,6 +2873,7 @@ var RedisService = function(j_val) {
         handler(null, ar.cause());
       }
     });
+      return that;
     } else utils.invalidArgs();
   };
 
@@ -2625,6 +2883,7 @@ var RedisService = function(j_val) {
    @public
    @param args {todo} 
    @param handler {function} 
+   @return {RedisService}
    */
   this.spop = function(args, handler) {
     var __args = arguments;
@@ -2636,6 +2895,7 @@ var RedisService = function(j_val) {
         handler(null, ar.cause());
       }
     });
+      return that;
     } else utils.invalidArgs();
   };
 
@@ -2645,6 +2905,7 @@ var RedisService = function(j_val) {
    @public
    @param args {todo} 
    @param handler {function} 
+   @return {RedisService}
    */
   this.srandmember = function(args, handler) {
     var __args = arguments;
@@ -2656,6 +2917,7 @@ var RedisService = function(j_val) {
         handler(null, ar.cause());
       }
     });
+      return that;
     } else utils.invalidArgs();
   };
 
@@ -2665,6 +2927,7 @@ var RedisService = function(j_val) {
    @public
    @param args {todo} 
    @param handler {function} 
+   @return {RedisService}
    */
   this.srem = function(args, handler) {
     var __args = arguments;
@@ -2676,6 +2939,7 @@ var RedisService = function(j_val) {
         handler(null, ar.cause());
       }
     });
+      return that;
     } else utils.invalidArgs();
   };
 
@@ -2685,6 +2949,7 @@ var RedisService = function(j_val) {
    @public
    @param args {todo} 
    @param handler {function} 
+   @return {RedisService}
    */
   this.strlen = function(args, handler) {
     var __args = arguments;
@@ -2696,6 +2961,7 @@ var RedisService = function(j_val) {
         handler(null, ar.cause());
       }
     });
+      return that;
     } else utils.invalidArgs();
   };
 
@@ -2705,6 +2971,7 @@ var RedisService = function(j_val) {
    @public
    @param args {todo} 
    @param handler {function} 
+   @return {RedisService}
    */
   this.subscribe = function(args, handler) {
     var __args = arguments;
@@ -2716,6 +2983,7 @@ var RedisService = function(j_val) {
         handler(null, ar.cause());
       }
     });
+      return that;
     } else utils.invalidArgs();
   };
 
@@ -2725,6 +2993,7 @@ var RedisService = function(j_val) {
    @public
    @param args {todo} 
    @param handler {function} 
+   @return {RedisService}
    */
   this.sunion = function(args, handler) {
     var __args = arguments;
@@ -2736,6 +3005,7 @@ var RedisService = function(j_val) {
         handler(null, ar.cause());
       }
     });
+      return that;
     } else utils.invalidArgs();
   };
 
@@ -2745,6 +3015,7 @@ var RedisService = function(j_val) {
    @public
    @param args {todo} 
    @param handler {function} 
+   @return {RedisService}
    */
   this.sunionstore = function(args, handler) {
     var __args = arguments;
@@ -2756,6 +3027,7 @@ var RedisService = function(j_val) {
         handler(null, ar.cause());
       }
     });
+      return that;
     } else utils.invalidArgs();
   };
 
@@ -2764,6 +3036,7 @@ var RedisService = function(j_val) {
 
    @public
    @param handler {function} 
+   @return {RedisService}
    */
   this.sync = function(handler) {
     var __args = arguments;
@@ -2775,6 +3048,7 @@ var RedisService = function(j_val) {
         handler(null, ar.cause());
       }
     });
+      return that;
     } else utils.invalidArgs();
   };
 
@@ -2783,6 +3057,7 @@ var RedisService = function(j_val) {
 
    @public
    @param handler {function} 
+   @return {RedisService}
    */
   this.time = function(handler) {
     var __args = arguments;
@@ -2794,6 +3069,7 @@ var RedisService = function(j_val) {
         handler(null, ar.cause());
       }
     });
+      return that;
     } else utils.invalidArgs();
   };
 
@@ -2803,6 +3079,7 @@ var RedisService = function(j_val) {
    @public
    @param args {todo} 
    @param handler {function} 
+   @return {RedisService}
    */
   this.ttl = function(args, handler) {
     var __args = arguments;
@@ -2814,6 +3091,7 @@ var RedisService = function(j_val) {
         handler(null, ar.cause());
       }
     });
+      return that;
     } else utils.invalidArgs();
   };
 
@@ -2823,6 +3101,7 @@ var RedisService = function(j_val) {
    @public
    @param args {todo} 
    @param handler {function} 
+   @return {RedisService}
    */
   this.type = function(args, handler) {
     var __args = arguments;
@@ -2834,6 +3113,7 @@ var RedisService = function(j_val) {
         handler(null, ar.cause());
       }
     });
+      return that;
     } else utils.invalidArgs();
   };
 
@@ -2843,6 +3123,7 @@ var RedisService = function(j_val) {
    @public
    @param args {todo} 
    @param handler {function} 
+   @return {RedisService}
    */
   this.unsubscribe = function(args, handler) {
     var __args = arguments;
@@ -2854,6 +3135,7 @@ var RedisService = function(j_val) {
         handler(null, ar.cause());
       }
     });
+      return that;
     } else utils.invalidArgs();
   };
 
@@ -2862,6 +3144,7 @@ var RedisService = function(j_val) {
 
    @public
    @param handler {function} 
+   @return {RedisService}
    */
   this.unwatch = function(handler) {
     var __args = arguments;
@@ -2873,6 +3156,7 @@ var RedisService = function(j_val) {
         handler(null, ar.cause());
       }
     });
+      return that;
     } else utils.invalidArgs();
   };
 
@@ -2882,6 +3166,7 @@ var RedisService = function(j_val) {
    @public
    @param args {todo} 
    @param handler {function} 
+   @return {RedisService}
    */
   this.watch = function(args, handler) {
     var __args = arguments;
@@ -2893,6 +3178,7 @@ var RedisService = function(j_val) {
         handler(null, ar.cause());
       }
     });
+      return that;
     } else utils.invalidArgs();
   };
 
@@ -2902,6 +3188,7 @@ var RedisService = function(j_val) {
    @public
    @param args {todo} 
    @param handler {function} 
+   @return {RedisService}
    */
   this.zadd = function(args, handler) {
     var __args = arguments;
@@ -2913,6 +3200,7 @@ var RedisService = function(j_val) {
         handler(null, ar.cause());
       }
     });
+      return that;
     } else utils.invalidArgs();
   };
 
@@ -2922,6 +3210,7 @@ var RedisService = function(j_val) {
    @public
    @param args {todo} 
    @param handler {function} 
+   @return {RedisService}
    */
   this.zcard = function(args, handler) {
     var __args = arguments;
@@ -2933,6 +3222,7 @@ var RedisService = function(j_val) {
         handler(null, ar.cause());
       }
     });
+      return that;
     } else utils.invalidArgs();
   };
 
@@ -2942,6 +3232,7 @@ var RedisService = function(j_val) {
    @public
    @param args {todo} 
    @param handler {function} 
+   @return {RedisService}
    */
   this.zcount = function(args, handler) {
     var __args = arguments;
@@ -2953,6 +3244,7 @@ var RedisService = function(j_val) {
         handler(null, ar.cause());
       }
     });
+      return that;
     } else utils.invalidArgs();
   };
 
@@ -2962,6 +3254,7 @@ var RedisService = function(j_val) {
    @public
    @param args {todo} 
    @param handler {function} 
+   @return {RedisService}
    */
   this.zincrby = function(args, handler) {
     var __args = arguments;
@@ -2973,6 +3266,7 @@ var RedisService = function(j_val) {
         handler(null, ar.cause());
       }
     });
+      return that;
     } else utils.invalidArgs();
   };
 
@@ -2982,6 +3276,7 @@ var RedisService = function(j_val) {
    @public
    @param args {todo} 
    @param handler {function} 
+   @return {RedisService}
    */
   this.zinterstore = function(args, handler) {
     var __args = arguments;
@@ -2993,6 +3288,7 @@ var RedisService = function(j_val) {
         handler(null, ar.cause());
       }
     });
+      return that;
     } else utils.invalidArgs();
   };
 
@@ -3002,6 +3298,7 @@ var RedisService = function(j_val) {
    @public
    @param args {todo} 
    @param handler {function} 
+   @return {RedisService}
    */
   this.zlexcount = function(args, handler) {
     var __args = arguments;
@@ -3013,6 +3310,7 @@ var RedisService = function(j_val) {
         handler(null, ar.cause());
       }
     });
+      return that;
     } else utils.invalidArgs();
   };
 
@@ -3022,6 +3320,7 @@ var RedisService = function(j_val) {
    @public
    @param args {todo} 
    @param handler {function} 
+   @return {RedisService}
    */
   this.zrange = function(args, handler) {
     var __args = arguments;
@@ -3033,6 +3332,7 @@ var RedisService = function(j_val) {
         handler(null, ar.cause());
       }
     });
+      return that;
     } else utils.invalidArgs();
   };
 
@@ -3042,6 +3342,7 @@ var RedisService = function(j_val) {
    @public
    @param args {todo} 
    @param handler {function} 
+   @return {RedisService}
    */
   this.zrangebylex = function(args, handler) {
     var __args = arguments;
@@ -3053,6 +3354,7 @@ var RedisService = function(j_val) {
         handler(null, ar.cause());
       }
     });
+      return that;
     } else utils.invalidArgs();
   };
 
@@ -3062,6 +3364,7 @@ var RedisService = function(j_val) {
    @public
    @param args {todo} 
    @param handler {function} 
+   @return {RedisService}
    */
   this.zrangebyscore = function(args, handler) {
     var __args = arguments;
@@ -3073,6 +3376,7 @@ var RedisService = function(j_val) {
         handler(null, ar.cause());
       }
     });
+      return that;
     } else utils.invalidArgs();
   };
 
@@ -3082,6 +3386,7 @@ var RedisService = function(j_val) {
    @public
    @param args {todo} 
    @param handler {function} 
+   @return {RedisService}
    */
   this.zrank = function(args, handler) {
     var __args = arguments;
@@ -3093,6 +3398,7 @@ var RedisService = function(j_val) {
         handler(null, ar.cause());
       }
     });
+      return that;
     } else utils.invalidArgs();
   };
 
@@ -3102,6 +3408,7 @@ var RedisService = function(j_val) {
    @public
    @param args {todo} 
    @param handler {function} 
+   @return {RedisService}
    */
   this.zrem = function(args, handler) {
     var __args = arguments;
@@ -3113,6 +3420,7 @@ var RedisService = function(j_val) {
         handler(null, ar.cause());
       }
     });
+      return that;
     } else utils.invalidArgs();
   };
 
@@ -3122,6 +3430,7 @@ var RedisService = function(j_val) {
    @public
    @param args {todo} 
    @param handler {function} 
+   @return {RedisService}
    */
   this.zremrangebylex = function(args, handler) {
     var __args = arguments;
@@ -3133,6 +3442,7 @@ var RedisService = function(j_val) {
         handler(null, ar.cause());
       }
     });
+      return that;
     } else utils.invalidArgs();
   };
 
@@ -3142,6 +3452,7 @@ var RedisService = function(j_val) {
    @public
    @param args {todo} 
    @param handler {function} 
+   @return {RedisService}
    */
   this.zremrangebyrank = function(args, handler) {
     var __args = arguments;
@@ -3153,6 +3464,7 @@ var RedisService = function(j_val) {
         handler(null, ar.cause());
       }
     });
+      return that;
     } else utils.invalidArgs();
   };
 
@@ -3162,6 +3474,7 @@ var RedisService = function(j_val) {
    @public
    @param args {todo} 
    @param handler {function} 
+   @return {RedisService}
    */
   this.zremrangebyscore = function(args, handler) {
     var __args = arguments;
@@ -3173,6 +3486,7 @@ var RedisService = function(j_val) {
         handler(null, ar.cause());
       }
     });
+      return that;
     } else utils.invalidArgs();
   };
 
@@ -3182,6 +3496,7 @@ var RedisService = function(j_val) {
    @public
    @param args {todo} 
    @param handler {function} 
+   @return {RedisService}
    */
   this.zrevrange = function(args, handler) {
     var __args = arguments;
@@ -3193,6 +3508,7 @@ var RedisService = function(j_val) {
         handler(null, ar.cause());
       }
     });
+      return that;
     } else utils.invalidArgs();
   };
 
@@ -3202,6 +3518,7 @@ var RedisService = function(j_val) {
    @public
    @param args {todo} 
    @param handler {function} 
+   @return {RedisService}
    */
   this.zrevrangebyscore = function(args, handler) {
     var __args = arguments;
@@ -3213,6 +3530,7 @@ var RedisService = function(j_val) {
         handler(null, ar.cause());
       }
     });
+      return that;
     } else utils.invalidArgs();
   };
 
@@ -3222,6 +3540,7 @@ var RedisService = function(j_val) {
    @public
    @param args {todo} 
    @param handler {function} 
+   @return {RedisService}
    */
   this.zrevrank = function(args, handler) {
     var __args = arguments;
@@ -3233,6 +3552,7 @@ var RedisService = function(j_val) {
         handler(null, ar.cause());
       }
     });
+      return that;
     } else utils.invalidArgs();
   };
 
@@ -3242,6 +3562,7 @@ var RedisService = function(j_val) {
    @public
    @param args {todo} 
    @param handler {function} 
+   @return {RedisService}
    */
   this.zscore = function(args, handler) {
     var __args = arguments;
@@ -3253,6 +3574,7 @@ var RedisService = function(j_val) {
         handler(null, ar.cause());
       }
     });
+      return that;
     } else utils.invalidArgs();
   };
 
@@ -3262,6 +3584,7 @@ var RedisService = function(j_val) {
    @public
    @param args {todo} 
    @param handler {function} 
+   @return {RedisService}
    */
   this.zunionstore = function(args, handler) {
     var __args = arguments;
@@ -3273,6 +3596,7 @@ var RedisService = function(j_val) {
         handler(null, ar.cause());
       }
     });
+      return that;
     } else utils.invalidArgs();
   };
 
@@ -3282,6 +3606,7 @@ var RedisService = function(j_val) {
    @public
    @param args {todo} 
    @param handler {function} 
+   @return {RedisService}
    */
   this.scan = function(args, handler) {
     var __args = arguments;
@@ -3293,6 +3618,7 @@ var RedisService = function(j_val) {
         handler(null, ar.cause());
       }
     });
+      return that;
     } else utils.invalidArgs();
   };
 
@@ -3302,6 +3628,7 @@ var RedisService = function(j_val) {
    @public
    @param args {todo} 
    @param handler {function} 
+   @return {RedisService}
    */
   this.sscan = function(args, handler) {
     var __args = arguments;
@@ -3313,6 +3640,7 @@ var RedisService = function(j_val) {
         handler(null, ar.cause());
       }
     });
+      return that;
     } else utils.invalidArgs();
   };
 
@@ -3322,6 +3650,7 @@ var RedisService = function(j_val) {
    @public
    @param args {todo} 
    @param handler {function} 
+   @return {RedisService}
    */
   this.hscan = function(args, handler) {
     var __args = arguments;
@@ -3333,6 +3662,7 @@ var RedisService = function(j_val) {
         handler(null, ar.cause());
       }
     });
+      return that;
     } else utils.invalidArgs();
   };
 
@@ -3342,6 +3672,7 @@ var RedisService = function(j_val) {
    @public
    @param args {todo} 
    @param handler {function} 
+   @return {RedisService}
    */
   this.zscan = function(args, handler) {
     var __args = arguments;
@@ -3353,6 +3684,7 @@ var RedisService = function(j_val) {
         handler(null, ar.cause());
       }
     });
+      return that;
     } else utils.invalidArgs();
   };
 

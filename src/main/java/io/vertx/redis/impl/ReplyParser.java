@@ -117,6 +117,7 @@ public class ReplyParser implements Handler<Buffer> {
   }
 
   public void handle(Buffer buffer) {
+
     append(buffer);
 
     byte type;
