@@ -69,8 +69,8 @@ var RedisService = function(j_val) {
    Append a value to a key
 
    @public
-   @param args {todo} 
-   @param handler {function} 
+   @param args {todo} JsonArray [{"name":"key","type":"key"},{"name":"value","type":"string"}] 
+   @param handler {function} Handler for the result of this call. 
    */
   this.append = function(args, handler) {
     var __args = arguments;
@@ -89,8 +89,8 @@ var RedisService = function(j_val) {
    Authenticate to the server
 
    @public
-   @param args {todo} 
-   @param handler {function} 
+   @param args {todo} JsonArray [{"name":"password","type":"string"}] 
+   @param handler {function} Handler for the result of this call. 
    */
   this.auth = function(args, handler) {
     var __args = arguments;
@@ -147,8 +147,8 @@ var RedisService = function(j_val) {
    Count set bits in a string
 
    @public
-   @param args {todo} 
-   @param handler {function} 
+   @param args {todo} JsonArray [{"name":"key","type":"key"},{"name":["start","end"],"type":["integer","integer"],"multiple":true}] 
+   @param handler {function} Handler for the result of this call. 
    */
   this.bitcount = function(args, handler) {
     var __args = arguments;
@@ -167,8 +167,8 @@ var RedisService = function(j_val) {
    Perform bitwise operations between strings
 
    @public
-   @param args {todo} 
-   @param handler {function} 
+   @param args {todo} JsonArray [{"name":"operation","type":"string"},{"name":"destkey","type":"key"},{"name":"key","type":"key","multiple":true}] 
+   @param handler {function} Handler for the result of this call. 
    */
   this.bitop = function(args, handler) {
     var __args = arguments;
@@ -187,8 +187,8 @@ var RedisService = function(j_val) {
    Find first bit set or clear in a string
 
    @public
-   @param args {todo} 
-   @param handler {function} 
+   @param args {todo} JsonArray [{"name":"key","type":"key"},{"name":"bit","type":"integer"},{"name":"start","type":"integer","optional":true},{"name":"end","type":"integer","optional":true}] 
+   @param handler {function} Handler for the result of this call. 
    */
   this.bitpos = function(args, handler) {
     var __args = arguments;
@@ -207,8 +207,8 @@ var RedisService = function(j_val) {
    Remove and get the first element in a list, or block until one is available
 
    @public
-   @param args {todo} 
-   @param handler {function} 
+   @param args {todo} JsonArray [{"name":"key","type":"key","multiple":true},{"name":"timeout","type":"integer"}] 
+   @param handler {function} Handler for the result of this call. 
    */
   this.blpop = function(args, handler) {
     var __args = arguments;
@@ -227,8 +227,8 @@ var RedisService = function(j_val) {
    Remove and get the last element in a list, or block until one is available
 
    @public
-   @param args {todo} 
-   @param handler {function} 
+   @param args {todo} JsonArray [{"name":"key","type":"key","multiple":true},{"name":"timeout","type":"integer"}] 
+   @param handler {function} Handler for the result of this call. 
    */
   this.brpop = function(args, handler) {
     var __args = arguments;
@@ -247,8 +247,8 @@ var RedisService = function(j_val) {
    Pop a value from a list, push it to another list and return it; or block until one is available
 
    @public
-   @param args {todo} 
-   @param handler {function} 
+   @param args {todo} JsonArray [{"name":"source","type":"key"},{"name":"destination","type":"key"},{"name":"timeout","type":"integer"}] 
+   @param handler {function} Handler for the result of this call. 
    */
   this.brpoplpush = function(args, handler) {
     var __args = arguments;
@@ -267,8 +267,8 @@ var RedisService = function(j_val) {
    Kill the connection of a client
 
    @public
-   @param args {todo} 
-   @param handler {function} 
+   @param args {todo} JsonArray [{"name":"ip:port","type":"string","optional":true},{"command":"ID","name":"client-id","type":"integer","optional":true},{"command":"TYPE","type":"enum","enum":["normal","slave","pubsub"],"optional":true},{"command":"ADDR","name":"ip:port","type":"string","optional":true},{"command":"SKIPME","name":"yes/no","type":"string","optional":true}] 
+   @param handler {function} Handler for the result of this call. 
    */
   this.clientKill = function(args, handler) {
     var __args = arguments;
@@ -325,8 +325,8 @@ var RedisService = function(j_val) {
    Stop processing commands from clients for some time
 
    @public
-   @param args {todo} 
-   @param handler {function} 
+   @param args {todo} JsonArray [{"name":"timeout","type":"integer"}] 
+   @param handler {function} Handler for the result of this call. 
    */
   this.clientPause = function(args, handler) {
     var __args = arguments;
@@ -345,8 +345,8 @@ var RedisService = function(j_val) {
    Set the current connection name
 
    @public
-   @param args {todo} 
-   @param handler {function} 
+   @param args {todo} JsonArray [{"name":"connection-name","type":"string"}] 
+   @param handler {function} Handler for the result of this call. 
    */
   this.clientSetname = function(args, handler) {
     var __args = arguments;
@@ -441,8 +441,8 @@ var RedisService = function(j_val) {
    Get array of specific Redis command details
 
    @public
-   @param args {todo} 
-   @param handler {function} 
+   @param args {todo} JsonArray [{"name":"command-name","type":"string","multiple":true}] 
+   @param handler {function} Handler for the result of this call. 
    */
   this.commandInfo = function(args, handler) {
     var __args = arguments;
@@ -461,8 +461,8 @@ var RedisService = function(j_val) {
    Get the value of a configuration parameter
 
    @public
-   @param args {todo} 
-   @param handler {function} 
+   @param args {todo} JsonArray [{"name":"parameter","type":"string"}] 
+   @param handler {function} Handler for the result of this call. 
    */
   this.configGet = function(args, handler) {
     var __args = arguments;
@@ -500,8 +500,8 @@ var RedisService = function(j_val) {
    Set a configuration parameter to the given value
 
    @public
-   @param args {todo} 
-   @param handler {function} 
+   @param args {todo} JsonArray [{"name":"parameter","type":"string"},{"name":"value","type":"string"}] 
+   @param handler {function} Handler for the result of this call. 
    */
   this.configSet = function(args, handler) {
     var __args = arguments;
@@ -558,8 +558,8 @@ var RedisService = function(j_val) {
    Get debugging information about a key
 
    @public
-   @param args {todo} 
-   @param handler {function} 
+   @param args {todo} JsonArray [{"name":"key","type":"key"}] 
+   @param handler {function} Handler for the result of this call. 
    */
   this.debugObject = function(args, handler) {
     var __args = arguments;
@@ -597,8 +597,8 @@ var RedisService = function(j_val) {
    Decrement the integer value of a key by one
 
    @public
-   @param args {todo} 
-   @param handler {function} 
+   @param args {todo} JsonArray [{"name":"key","type":"key"}] 
+   @param handler {function} Handler for the result of this call. 
    */
   this.decr = function(args, handler) {
     var __args = arguments;
@@ -617,8 +617,8 @@ var RedisService = function(j_val) {
    Decrement the integer value of a key by the given number
 
    @public
-   @param args {todo} 
-   @param handler {function} 
+   @param args {todo} JsonArray [{"name":"key","type":"key"},{"name":"decrement","type":"integer"}] 
+   @param handler {function} Handler for the result of this call. 
    */
   this.decrby = function(args, handler) {
     var __args = arguments;
@@ -637,8 +637,8 @@ var RedisService = function(j_val) {
    Delete a key
 
    @public
-   @param args {todo} 
-   @param handler {function} 
+   @param args {todo} JsonArray [{"name":"key","type":"key","multiple":true}] 
+   @param handler {function} Handler for the result of this call. 
    */
   this.del = function(args, handler) {
     var __args = arguments;
@@ -676,8 +676,8 @@ var RedisService = function(j_val) {
    Return a serialized version of the value stored at the specified key.
 
    @public
-   @param args {todo} 
-   @param handler {function} 
+   @param args {todo} JsonArray [{"name":"key","type":"key"}] 
+   @param handler {function} Handler for the result of this call. 
    */
   this.dump = function(args, handler) {
     var __args = arguments;
@@ -696,8 +696,8 @@ var RedisService = function(j_val) {
    Echo the given string
 
    @public
-   @param args {todo} 
-   @param handler {function} 
+   @param args {todo} JsonArray [{"name":"message","type":"string"}] 
+   @param handler {function} Handler for the result of this call. 
    */
   this.echo = function(args, handler) {
     var __args = arguments;
@@ -716,8 +716,8 @@ var RedisService = function(j_val) {
    Execute a Lua script server side
 
    @public
-   @param args {todo} 
-   @param handler {function} 
+   @param args {todo} JsonArray [{"name":"script","type":"string"},{"name":"numkeys","type":"integer"},{"name":"key","type":"key","multiple":true},{"name":"arg","type":"string","multiple":true}] 
+   @param handler {function} Handler for the result of this call. 
    */
   this.eval = function(args, handler) {
     var __args = arguments;
@@ -736,8 +736,8 @@ var RedisService = function(j_val) {
    Execute a Lua script server side
 
    @public
-   @param args {todo} 
-   @param handler {function} 
+   @param args {todo} JsonArray [{"name":"sha1","type":"string"},{"name":"numkeys","type":"integer"},{"name":"key","type":"key","multiple":true},{"name":"arg","type":"string","multiple":true}] 
+   @param handler {function} Handler for the result of this call. 
    */
   this.evalsha = function(args, handler) {
     var __args = arguments;
@@ -775,8 +775,8 @@ var RedisService = function(j_val) {
    Determine if a key exists
 
    @public
-   @param args {todo} 
-   @param handler {function} 
+   @param args {todo} JsonArray [{"name":"key","type":"key"}] 
+   @param handler {function} Handler for the result of this call. 
    */
   this.exists = function(args, handler) {
     var __args = arguments;
@@ -795,8 +795,8 @@ var RedisService = function(j_val) {
    Set a key's time to live in seconds
 
    @public
-   @param args {todo} 
-   @param handler {function} 
+   @param args {todo} JsonArray [{"name":"key","type":"key"},{"name":"seconds","type":"integer"}] 
+   @param handler {function} Handler for the result of this call. 
    */
   this.expire = function(args, handler) {
     var __args = arguments;
@@ -815,8 +815,8 @@ var RedisService = function(j_val) {
    Set the expiration for a key as a UNIX timestamp
 
    @public
-   @param args {todo} 
-   @param handler {function} 
+   @param args {todo} JsonArray [{"name":"key","type":"key"},{"name":"timestamp","type":"posix time"}] 
+   @param handler {function} Handler for the result of this call. 
    */
   this.expireat = function(args, handler) {
     var __args = arguments;
@@ -873,8 +873,8 @@ var RedisService = function(j_val) {
    Get the value of a key
 
    @public
-   @param args {todo} 
-   @param handler {function} 
+   @param args {todo} JsonArray [{"name":"key","type":"key"}] 
+   @param handler {function} Handler for the result of this call. 
    */
   this.get = function(args, handler) {
     var __args = arguments;
@@ -893,8 +893,8 @@ var RedisService = function(j_val) {
    Returns the bit value at offset in the string value stored at key
 
    @public
-   @param args {todo} 
-   @param handler {function} 
+   @param args {todo} JsonArray [{"name":"key","type":"key"},{"name":"offset","type":"integer"}] 
+   @param handler {function} Handler for the result of this call. 
    */
   this.getbit = function(args, handler) {
     var __args = arguments;
@@ -913,8 +913,8 @@ var RedisService = function(j_val) {
    Get a substring of the string stored at a key
 
    @public
-   @param args {todo} 
-   @param handler {function} 
+   @param args {todo} JsonArray [{"name":"key","type":"key"},{"name":"start","type":"integer"},{"name":"end","type":"integer"}] 
+   @param handler {function} Handler for the result of this call. 
    */
   this.getrange = function(args, handler) {
     var __args = arguments;
@@ -933,8 +933,8 @@ var RedisService = function(j_val) {
    Set the string value of a key and return its old value
 
    @public
-   @param args {todo} 
-   @param handler {function} 
+   @param args {todo} JsonArray [{"name":"key","type":"key"},{"name":"value","type":"string"}] 
+   @param handler {function} Handler for the result of this call. 
    */
   this.getset = function(args, handler) {
     var __args = arguments;
@@ -953,8 +953,8 @@ var RedisService = function(j_val) {
    Delete one or more hash fields
 
    @public
-   @param args {todo} 
-   @param handler {function} 
+   @param args {todo} JsonArray [{"name":"key","type":"key"},{"name":"field","type":"string","multiple":true}] 
+   @param handler {function} Handler for the result of this call. 
    */
   this.hdel = function(args, handler) {
     var __args = arguments;
@@ -973,8 +973,8 @@ var RedisService = function(j_val) {
    Determine if a hash field exists
 
    @public
-   @param args {todo} 
-   @param handler {function} 
+   @param args {todo} JsonArray [{"name":"key","type":"key"},{"name":"field","type":"string"}] 
+   @param handler {function} Handler for the result of this call. 
    */
   this.hexists = function(args, handler) {
     var __args = arguments;
@@ -993,8 +993,8 @@ var RedisService = function(j_val) {
    Get the value of a hash field
 
    @public
-   @param args {todo} 
-   @param handler {function} 
+   @param args {todo} JsonArray [{"name":"key","type":"key"},{"name":"field","type":"string"}] 
+   @param handler {function} Handler for the result of this call. 
    */
   this.hget = function(args, handler) {
     var __args = arguments;
@@ -1013,8 +1013,8 @@ var RedisService = function(j_val) {
    Get all the fields and values in a hash
 
    @public
-   @param args {todo} 
-   @param handler {function} 
+   @param args {todo} JsonArray [{"name":"key","type":"key"}] 
+   @param handler {function} Handler for the result of this call. 
    */
   this.hgetall = function(args, handler) {
     var __args = arguments;
@@ -1033,8 +1033,8 @@ var RedisService = function(j_val) {
    Increment the integer value of a hash field by the given number
 
    @public
-   @param args {todo} 
-   @param handler {function} 
+   @param args {todo} JsonArray [{"name":"key","type":"key"},{"name":"field","type":"string"},{"name":"increment","type":"integer"}] 
+   @param handler {function} Handler for the result of this call. 
    */
   this.hincrby = function(args, handler) {
     var __args = arguments;
@@ -1053,8 +1053,8 @@ var RedisService = function(j_val) {
    Increment the float value of a hash field by the given amount
 
    @public
-   @param args {todo} 
-   @param handler {function} 
+   @param args {todo} JsonArray [{"name":"key","type":"key"},{"name":"field","type":"string"},{"name":"increment","type":"double"}] 
+   @param handler {function} Handler for the result of this call. 
    */
   this.hincrbyfloat = function(args, handler) {
     var __args = arguments;
@@ -1073,8 +1073,8 @@ var RedisService = function(j_val) {
    Get all the fields in a hash
 
    @public
-   @param args {todo} 
-   @param handler {function} 
+   @param args {todo} JsonArray [{"name":"key","type":"key"}] 
+   @param handler {function} Handler for the result of this call. 
    */
   this.hkeys = function(args, handler) {
     var __args = arguments;
@@ -1093,8 +1093,8 @@ var RedisService = function(j_val) {
    Get the number of fields in a hash
 
    @public
-   @param args {todo} 
-   @param handler {function} 
+   @param args {todo} JsonArray [{"name":"key","type":"key"}] 
+   @param handler {function} Handler for the result of this call. 
    */
   this.hlen = function(args, handler) {
     var __args = arguments;
@@ -1113,8 +1113,8 @@ var RedisService = function(j_val) {
    Get the values of all the given hash fields
 
    @public
-   @param args {todo} 
-   @param handler {function} 
+   @param args {todo} JsonArray [{"name":"key","type":"key"},{"name":"field","type":"string","multiple":true}] 
+   @param handler {function} Handler for the result of this call. 
    */
   this.hmget = function(args, handler) {
     var __args = arguments;
@@ -1133,8 +1133,8 @@ var RedisService = function(j_val) {
    Set multiple hash fields to multiple values
 
    @public
-   @param args {todo} 
-   @param handler {function} 
+   @param args {todo} JsonArray [{"name":"key","type":"key"},{"name":["field","value"],"type":["string","string"],"multiple":true}] 
+   @param handler {function} Handler for the result of this call. 
    */
   this.hmset = function(args, handler) {
     var __args = arguments;
@@ -1153,8 +1153,8 @@ var RedisService = function(j_val) {
    Set the string value of a hash field
 
    @public
-   @param args {todo} 
-   @param handler {function} 
+   @param args {todo} JsonArray [{"name":"key","type":"key"},{"name":"field","type":"string"},{"name":"value","type":"string"}] 
+   @param handler {function} Handler for the result of this call. 
    */
   this.hset = function(args, handler) {
     var __args = arguments;
@@ -1173,8 +1173,8 @@ var RedisService = function(j_val) {
    Set the value of a hash field, only if the field does not exist
 
    @public
-   @param args {todo} 
-   @param handler {function} 
+   @param args {todo} JsonArray [{"name":"key","type":"key"},{"name":"field","type":"string"},{"name":"value","type":"string"}] 
+   @param handler {function} Handler for the result of this call. 
    */
   this.hsetnx = function(args, handler) {
     var __args = arguments;
@@ -1193,8 +1193,8 @@ var RedisService = function(j_val) {
    Get all the values in a hash
 
    @public
-   @param args {todo} 
-   @param handler {function} 
+   @param args {todo} JsonArray [{"name":"key","type":"key"}] 
+   @param handler {function} Handler for the result of this call. 
    */
   this.hvals = function(args, handler) {
     var __args = arguments;
@@ -1213,8 +1213,8 @@ var RedisService = function(j_val) {
    Increment the integer value of a key by one
 
    @public
-   @param args {todo} 
-   @param handler {function} 
+   @param args {todo} JsonArray [{"name":"key","type":"key"}] 
+   @param handler {function} Handler for the result of this call. 
    */
   this.incr = function(args, handler) {
     var __args = arguments;
@@ -1233,8 +1233,8 @@ var RedisService = function(j_val) {
    Increment the integer value of a key by the given amount
 
    @public
-   @param args {todo} 
-   @param handler {function} 
+   @param args {todo} JsonArray [{"name":"key","type":"key"},{"name":"increment","type":"integer"}] 
+   @param handler {function} Handler for the result of this call. 
    */
   this.incrby = function(args, handler) {
     var __args = arguments;
@@ -1253,8 +1253,8 @@ var RedisService = function(j_val) {
    Increment the float value of a key by the given amount
 
    @public
-   @param args {todo} 
-   @param handler {function} 
+   @param args {todo} JsonArray [{"name":"key","type":"key"},{"name":"increment","type":"double"}] 
+   @param handler {function} Handler for the result of this call. 
    */
   this.incrbyfloat = function(args, handler) {
     var __args = arguments;
@@ -1273,8 +1273,8 @@ var RedisService = function(j_val) {
    Get information and statistics about the server
 
    @public
-   @param args {todo} 
-   @param handler {function} 
+   @param args {todo} JsonArray [{"name":"section","type":"string","optional":true}] 
+   @param handler {function} Handler for the result of this call. 
    */
   this.info = function(args, handler) {
     var __args = arguments;
@@ -1293,8 +1293,8 @@ var RedisService = function(j_val) {
    Find all keys matching the given pattern
 
    @public
-   @param args {todo} 
-   @param handler {function} 
+   @param args {todo} JsonArray [{"name":"pattern","type":"pattern"}] 
+   @param handler {function} Handler for the result of this call. 
    */
   this.keys = function(args, handler) {
     var __args = arguments;
@@ -1332,8 +1332,8 @@ var RedisService = function(j_val) {
    Get an element from a list by its index
 
    @public
-   @param args {todo} 
-   @param handler {function} 
+   @param args {todo} JsonArray [{"name":"key","type":"key"},{"name":"index","type":"integer"}] 
+   @param handler {function} Handler for the result of this call. 
    */
   this.lindex = function(args, handler) {
     var __args = arguments;
@@ -1352,8 +1352,8 @@ var RedisService = function(j_val) {
    Insert an element before or after another element in a list
 
    @public
-   @param args {todo} 
-   @param handler {function} 
+   @param args {todo} JsonArray [{"name":"key","type":"key"},{"name":"where","type":"enum","enum":["BEFORE","AFTER"]},{"name":"pivot","type":"string"},{"name":"value","type":"string"}] 
+   @param handler {function} Handler for the result of this call. 
    */
   this.linsert = function(args, handler) {
     var __args = arguments;
@@ -1372,8 +1372,8 @@ var RedisService = function(j_val) {
    Get the length of a list
 
    @public
-   @param args {todo} 
-   @param handler {function} 
+   @param args {todo} JsonArray [{"name":"key","type":"key"}] 
+   @param handler {function} Handler for the result of this call. 
    */
   this.llen = function(args, handler) {
     var __args = arguments;
@@ -1392,8 +1392,8 @@ var RedisService = function(j_val) {
    Remove and get the first element in a list
 
    @public
-   @param args {todo} 
-   @param handler {function} 
+   @param args {todo} JsonArray [{"name":"key","type":"key"}] 
+   @param handler {function} Handler for the result of this call. 
    */
   this.lpop = function(args, handler) {
     var __args = arguments;
@@ -1412,8 +1412,8 @@ var RedisService = function(j_val) {
    Prepend one or multiple values to a list
 
    @public
-   @param args {todo} 
-   @param handler {function} 
+   @param args {todo} JsonArray [{"name":"key","type":"key"},{"name":"value","type":"string","multiple":true}] 
+   @param handler {function} Handler for the result of this call. 
    */
   this.lpush = function(args, handler) {
     var __args = arguments;
@@ -1432,8 +1432,8 @@ var RedisService = function(j_val) {
    Prepend a value to a list, only if the list exists
 
    @public
-   @param args {todo} 
-   @param handler {function} 
+   @param args {todo} JsonArray [{"name":"key","type":"key"},{"name":"value","type":"string"}] 
+   @param handler {function} Handler for the result of this call. 
    */
   this.lpushx = function(args, handler) {
     var __args = arguments;
@@ -1452,8 +1452,8 @@ var RedisService = function(j_val) {
    Get a range of elements from a list
 
    @public
-   @param args {todo} 
-   @param handler {function} 
+   @param args {todo} JsonArray [{"name":"key","type":"key"},{"name":"start","type":"integer"},{"name":"stop","type":"integer"}] 
+   @param handler {function} Handler for the result of this call. 
    */
   this.lrange = function(args, handler) {
     var __args = arguments;
@@ -1472,8 +1472,8 @@ var RedisService = function(j_val) {
    Remove elements from a list
 
    @public
-   @param args {todo} 
-   @param handler {function} 
+   @param args {todo} JsonArray [{"name":"key","type":"key"},{"name":"count","type":"integer"},{"name":"value","type":"string"}] 
+   @param handler {function} Handler for the result of this call. 
    */
   this.lrem = function(args, handler) {
     var __args = arguments;
@@ -1492,8 +1492,8 @@ var RedisService = function(j_val) {
    Set the value of an element in a list by its index
 
    @public
-   @param args {todo} 
-   @param handler {function} 
+   @param args {todo} JsonArray [{"name":"key","type":"key"},{"name":"index","type":"integer"},{"name":"value","type":"string"}] 
+   @param handler {function} Handler for the result of this call. 
    */
   this.lset = function(args, handler) {
     var __args = arguments;
@@ -1512,8 +1512,8 @@ var RedisService = function(j_val) {
    Trim a list to the specified range
 
    @public
-   @param args {todo} 
-   @param handler {function} 
+   @param args {todo} JsonArray [{"name":"key","type":"key"},{"name":"start","type":"integer"},{"name":"stop","type":"integer"}] 
+   @param handler {function} Handler for the result of this call. 
    */
   this.ltrim = function(args, handler) {
     var __args = arguments;
@@ -1532,8 +1532,8 @@ var RedisService = function(j_val) {
    Get the values of all the given keys
 
    @public
-   @param args {todo} 
-   @param handler {function} 
+   @param args {todo} JsonArray [{"name":"key","type":"key","multiple":true}] 
+   @param handler {function} Handler for the result of this call. 
    */
   this.mget = function(args, handler) {
     var __args = arguments;
@@ -1552,8 +1552,8 @@ var RedisService = function(j_val) {
    Atomically transfer a key from a Redis instance to another one.
 
    @public
-   @param args {todo} 
-   @param handler {function} 
+   @param args {todo} JsonArray [{"name":"host","type":"string"},{"name":"port","type":"string"},{"name":"key","type":"key"},{"name":"destination-db","type":"integer"},{"name":"timeout","type":"integer"},{"name":"copy","type":"enum","enum":["COPY"],"optional":true},{"name":"replace","type":"enum","enum":["REPLACE"],"optional":true}] 
+   @param handler {function} Handler for the result of this call. 
    */
   this.migrate = function(args, handler) {
     var __args = arguments;
@@ -1591,8 +1591,8 @@ var RedisService = function(j_val) {
    Move a key to another database
 
    @public
-   @param args {todo} 
-   @param handler {function} 
+   @param args {todo} JsonArray [{"name":"key","type":"key"},{"name":"db","type":"integer"}] 
+   @param handler {function} Handler for the result of this call. 
    */
   this.move = function(args, handler) {
     var __args = arguments;
@@ -1611,8 +1611,8 @@ var RedisService = function(j_val) {
    Set multiple keys to multiple values
 
    @public
-   @param args {todo} 
-   @param handler {function} 
+   @param args {todo} JsonArray [{"name":["key","value"],"type":["key","string"],"multiple":true}] 
+   @param handler {function} Handler for the result of this call. 
    */
   this.mset = function(args, handler) {
     var __args = arguments;
@@ -1631,8 +1631,8 @@ var RedisService = function(j_val) {
    Set multiple keys to multiple values, only if none of the keys exist
 
    @public
-   @param args {todo} 
-   @param handler {function} 
+   @param args {todo} JsonArray [{"name":["key","value"],"type":["key","string"],"multiple":true}] 
+   @param handler {function} Handler for the result of this call. 
    */
   this.msetnx = function(args, handler) {
     var __args = arguments;
@@ -1670,8 +1670,8 @@ var RedisService = function(j_val) {
    Inspect the internals of Redis objects
 
    @public
-   @param args {todo} 
-   @param handler {function} 
+   @param args {todo} JsonArray [{"name":"subcommand","type":"string"},{"name":"arguments","type":"string","optional":true,"multiple":true}] 
+   @param handler {function} Handler for the result of this call. 
    */
   this.object = function(args, handler) {
     var __args = arguments;
@@ -1690,8 +1690,8 @@ var RedisService = function(j_val) {
    Remove the expiration from a key
 
    @public
-   @param args {todo} 
-   @param handler {function} 
+   @param args {todo} JsonArray [{"name":"key","type":"key"}] 
+   @param handler {function} Handler for the result of this call. 
    */
   this.persist = function(args, handler) {
     var __args = arguments;
@@ -1710,8 +1710,8 @@ var RedisService = function(j_val) {
    Set a key's time to live in milliseconds
 
    @public
-   @param args {todo} 
-   @param handler {function} 
+   @param args {todo} JsonArray [{"name":"key","type":"key"},{"name":"milliseconds","type":"integer"}] 
+   @param handler {function} Handler for the result of this call. 
    */
   this.pexpire = function(args, handler) {
     var __args = arguments;
@@ -1730,8 +1730,8 @@ var RedisService = function(j_val) {
    Set the expiration for a key as a UNIX timestamp specified in milliseconds
 
    @public
-   @param args {todo} 
-   @param handler {function} 
+   @param args {todo} JsonArray [{"name":"key","type":"key"},{"name":"milliseconds-timestamp","type":"posix time"}] 
+   @param handler {function} Handler for the result of this call. 
    */
   this.pexpireat = function(args, handler) {
     var __args = arguments;
@@ -1750,8 +1750,8 @@ var RedisService = function(j_val) {
    Adds the specified elements to the specified HyperLogLog.
 
    @public
-   @param args {todo} 
-   @param handler {function} 
+   @param args {todo} JsonArray [{"name":"key","type":"key"},{"name":"element","type":"string","multiple":true}] 
+   @param handler {function} Handler for the result of this call. 
    */
   this.pfadd = function(args, handler) {
     var __args = arguments;
@@ -1770,8 +1770,8 @@ var RedisService = function(j_val) {
    Return the approximated cardinality of the set(s) observed by the HyperLogLog at key(s).
 
    @public
-   @param args {todo} 
-   @param handler {function} 
+   @param args {todo} JsonArray [{"name":"key","type":"key","multiple":true}] 
+   @param handler {function} Handler for the result of this call. 
    */
   this.pfcount = function(args, handler) {
     var __args = arguments;
@@ -1790,8 +1790,8 @@ var RedisService = function(j_val) {
    Merge N different HyperLogLogs into a single one.
 
    @public
-   @param args {todo} 
-   @param handler {function} 
+   @param args {todo} JsonArray [{"name":"destkey","type":"key"},{"name":"sourcekey","type":"key","multiple":true}] 
+   @param handler {function} Handler for the result of this call. 
    */
   this.pfmerge = function(args, handler) {
     var __args = arguments;
@@ -1829,8 +1829,8 @@ var RedisService = function(j_val) {
    Set the value and expiration in milliseconds of a key
 
    @public
-   @param args {todo} 
-   @param handler {function} 
+   @param args {todo} JsonArray [{"name":"key","type":"key"},{"name":"milliseconds","type":"integer"},{"name":"value","type":"string"}] 
+   @param handler {function} Handler for the result of this call. 
    */
   this.psetex = function(args, handler) {
     var __args = arguments;
@@ -1849,8 +1849,8 @@ var RedisService = function(j_val) {
    Listen for messages published to channels matching the given patterns
 
    @public
-   @param args {todo} 
-   @param handler {function} 
+   @param args {todo} JsonArray [{"name":["pattern"],"type":["pattern"],"multiple":true}] 
+   @param handler {function} Handler for the result of this call. 
    */
   this.psubscribe = function(args, handler) {
     var __args = arguments;
@@ -1869,8 +1869,8 @@ var RedisService = function(j_val) {
    Inspect the state of the Pub/Sub subsystem
 
    @public
-   @param args {todo} 
-   @param handler {function} 
+   @param args {todo} JsonArray [{"name":"subcommand","type":"string"},{"name":"argument","type":"string","optional":true,"multiple":true}] 
+   @param handler {function} Handler for the result of this call. 
    */
   this.pubsub = function(args, handler) {
     var __args = arguments;
@@ -1889,8 +1889,8 @@ var RedisService = function(j_val) {
    Get the time to live for a key in milliseconds
 
    @public
-   @param args {todo} 
-   @param handler {function} 
+   @param args {todo} JsonArray [{"name":"key","type":"key"}] 
+   @param handler {function} Handler for the result of this call. 
    */
   this.pttl = function(args, handler) {
     var __args = arguments;
@@ -1909,8 +1909,8 @@ var RedisService = function(j_val) {
    Post a message to a channel
 
    @public
-   @param args {todo} 
-   @param handler {function} 
+   @param args {todo} JsonArray [{"name":"channel","type":"string"},{"name":"message","type":"string"}] 
+   @param handler {function} Handler for the result of this call. 
    */
   this.publish = function(args, handler) {
     var __args = arguments;
@@ -1929,8 +1929,8 @@ var RedisService = function(j_val) {
    Stop listening for messages posted to channels matching the given patterns
 
    @public
-   @param args {todo} 
-   @param handler {function} 
+   @param args {todo} JsonArray [{"name":"pattern","type":"pattern","optional":true,"multiple":true}] 
+   @param handler {function} Handler for the result of this call. 
    */
   this.punsubscribe = function(args, handler) {
     var __args = arguments;
@@ -1987,8 +1987,8 @@ var RedisService = function(j_val) {
    Rename a key
 
    @public
-   @param args {todo} 
-   @param handler {function} 
+   @param args {todo} JsonArray [{"name":"key","type":"key"},{"name":"newkey","type":"key"}] 
+   @param handler {function} Handler for the result of this call. 
    */
   this.rename = function(args, handler) {
     var __args = arguments;
@@ -2007,8 +2007,8 @@ var RedisService = function(j_val) {
    Rename a key, only if the new key does not exist
 
    @public
-   @param args {todo} 
-   @param handler {function} 
+   @param args {todo} JsonArray [{"name":"key","type":"key"},{"name":"newkey","type":"key"}] 
+   @param handler {function} Handler for the result of this call. 
    */
   this.renamenx = function(args, handler) {
     var __args = arguments;
@@ -2027,8 +2027,8 @@ var RedisService = function(j_val) {
    Create a key using the provided serialized value, previously obtained using DUMP.
 
    @public
-   @param args {todo} 
-   @param handler {function} 
+   @param args {todo} JsonArray [{"name":"key","type":"key"},{"name":"ttl","type":"integer"},{"name":"serialized-value","type":"string"}] 
+   @param handler {function} Handler for the result of this call. 
    */
   this.restore = function(args, handler) {
     var __args = arguments;
@@ -2066,8 +2066,8 @@ var RedisService = function(j_val) {
    Remove and get the last element in a list
 
    @public
-   @param args {todo} 
-   @param handler {function} 
+   @param args {todo} JsonArray [{"name":"key","type":"key"}] 
+   @param handler {function} Handler for the result of this call. 
    */
   this.rpop = function(args, handler) {
     var __args = arguments;
@@ -2086,8 +2086,8 @@ var RedisService = function(j_val) {
    Remove the last element in a list, append it to another list and return it
 
    @public
-   @param args {todo} 
-   @param handler {function} 
+   @param args {todo} JsonArray [{"name":"source","type":"key"},{"name":"destination","type":"key"}] 
+   @param handler {function} Handler for the result of this call. 
    */
   this.rpoplpush = function(args, handler) {
     var __args = arguments;
@@ -2106,8 +2106,8 @@ var RedisService = function(j_val) {
    Append one or multiple values to a list
 
    @public
-   @param args {todo} 
-   @param handler {function} 
+   @param args {todo} JsonArray [{"name":"key","type":"key"},{"name":"value","type":"string","multiple":true}] 
+   @param handler {function} Handler for the result of this call. 
    */
   this.rpush = function(args, handler) {
     var __args = arguments;
@@ -2126,8 +2126,8 @@ var RedisService = function(j_val) {
    Append a value to a list, only if the list exists
 
    @public
-   @param args {todo} 
-   @param handler {function} 
+   @param args {todo} JsonArray [{"name":"key","type":"key"},{"name":"value","type":"string"}] 
+   @param handler {function} Handler for the result of this call. 
    */
   this.rpushx = function(args, handler) {
     var __args = arguments;
@@ -2146,8 +2146,8 @@ var RedisService = function(j_val) {
    Add one or more members to a set
 
    @public
-   @param args {todo} 
-   @param handler {function} 
+   @param args {todo} JsonArray [{"name":"key","type":"key"},{"name":"member","type":"string","multiple":true}] 
+   @param handler {function} Handler for the result of this call. 
    */
   this.sadd = function(args, handler) {
     var __args = arguments;
@@ -2185,8 +2185,8 @@ var RedisService = function(j_val) {
    Get the number of members in a set
 
    @public
-   @param args {todo} 
-   @param handler {function} 
+   @param args {todo} JsonArray [{"name":"key","type":"key"}] 
+   @param handler {function} Handler for the result of this call. 
    */
   this.scard = function(args, handler) {
     var __args = arguments;
@@ -2205,8 +2205,8 @@ var RedisService = function(j_val) {
    Check existence of scripts in the script cache.
 
    @public
-   @param args {todo} 
-   @param handler {function} 
+   @param args {todo} JsonArray [{"name":"script","type":"string","multiple":true}] 
+   @param handler {function} Handler for the result of this call. 
    */
   this.scriptExists = function(args, handler) {
     var __args = arguments;
@@ -2263,8 +2263,8 @@ var RedisService = function(j_val) {
    Load the specified Lua script into the script cache.
 
    @public
-   @param args {todo} 
-   @param handler {function} 
+   @param args {todo} JsonArray [{"name":"script","type":"string"}] 
+   @param handler {function} Handler for the result of this call. 
    */
   this.scriptLoad = function(args, handler) {
     var __args = arguments;
@@ -2283,8 +2283,8 @@ var RedisService = function(j_val) {
    Subtract multiple sets
 
    @public
-   @param args {todo} 
-   @param handler {function} 
+   @param args {todo} JsonArray [{"name":"key","type":"key","multiple":true}] 
+   @param handler {function} Handler for the result of this call. 
    */
   this.sdiff = function(args, handler) {
     var __args = arguments;
@@ -2303,8 +2303,8 @@ var RedisService = function(j_val) {
    Subtract multiple sets and store the resulting set in a key
 
    @public
-   @param args {todo} 
-   @param handler {function} 
+   @param args {todo} JsonArray [{"name":"destination","type":"key"},{"name":"key","type":"key","multiple":true}] 
+   @param handler {function} Handler for the result of this call. 
    */
   this.sdiffstore = function(args, handler) {
     var __args = arguments;
@@ -2323,8 +2323,8 @@ var RedisService = function(j_val) {
    Change the selected database for the current connection
 
    @public
-   @param args {todo} 
-   @param handler {function} 
+   @param args {todo} JsonArray [{"name":"index","type":"integer"}] 
+   @param handler {function} Handler for the result of this call. 
    */
   this.select = function(args, handler) {
     var __args = arguments;
@@ -2343,8 +2343,8 @@ var RedisService = function(j_val) {
    Set the string value of a key
 
    @public
-   @param args {todo} 
-   @param handler {function} 
+   @param args {todo} JsonArray [{"name":"key","type":"key"},{"name":"value","type":"string"},{"command":"EX","name":"seconds","type":"integer","optional":true},{"command":"PX","name":"milliseconds","type":"integer","optional":true},{"name":"condition","type":"enum","enum":["NX","XX"],"optional":true}] 
+   @param handler {function} Handler for the result of this call. 
    */
   this.set = function(args, handler) {
     var __args = arguments;
@@ -2363,8 +2363,8 @@ var RedisService = function(j_val) {
    Sets or clears the bit at offset in the string value stored at key
 
    @public
-   @param args {todo} 
-   @param handler {function} 
+   @param args {todo} JsonArray [{"name":"key","type":"key"},{"name":"offset","type":"integer"},{"name":"value","type":"string"}] 
+   @param handler {function} Handler for the result of this call. 
    */
   this.setbit = function(args, handler) {
     var __args = arguments;
@@ -2383,8 +2383,8 @@ var RedisService = function(j_val) {
    Set the value and expiration of a key
 
    @public
-   @param args {todo} 
-   @param handler {function} 
+   @param args {todo} JsonArray [{"name":"key","type":"key"},{"name":"seconds","type":"integer"},{"name":"value","type":"string"}] 
+   @param handler {function} Handler for the result of this call. 
    */
   this.setex = function(args, handler) {
     var __args = arguments;
@@ -2403,8 +2403,8 @@ var RedisService = function(j_val) {
    Set the value of a key, only if the key does not exist
 
    @public
-   @param args {todo} 
-   @param handler {function} 
+   @param args {todo} JsonArray [{"name":"key","type":"key"},{"name":"value","type":"string"}] 
+   @param handler {function} Handler for the result of this call. 
    */
   this.setnx = function(args, handler) {
     var __args = arguments;
@@ -2423,8 +2423,8 @@ var RedisService = function(j_val) {
    Overwrite part of a string at key starting at the specified offset
 
    @public
-   @param args {todo} 
-   @param handler {function} 
+   @param args {todo} JsonArray [{"name":"key","type":"key"},{"name":"offset","type":"integer"},{"name":"value","type":"string"}] 
+   @param handler {function} Handler for the result of this call. 
    */
   this.setrange = function(args, handler) {
     var __args = arguments;
@@ -2443,8 +2443,8 @@ var RedisService = function(j_val) {
    Synchronously save the dataset to disk and then shut down the server
 
    @public
-   @param args {todo} 
-   @param handler {function} 
+   @param args {todo} JsonArray [{"name":"NOSAVE","type":"enum","enum":["NOSAVE"],"optional":true},{"name":"SAVE","type":"enum","enum":["SAVE"],"optional":true}] 
+   @param handler {function} Handler for the result of this call. 
    */
   this.shutdown = function(args, handler) {
     var __args = arguments;
@@ -2463,8 +2463,8 @@ var RedisService = function(j_val) {
    Intersect multiple sets
 
    @public
-   @param args {todo} 
-   @param handler {function} 
+   @param args {todo} JsonArray [{"name":"key","type":"key","multiple":true}] 
+   @param handler {function} Handler for the result of this call. 
    */
   this.sinter = function(args, handler) {
     var __args = arguments;
@@ -2483,8 +2483,8 @@ var RedisService = function(j_val) {
    Intersect multiple sets and store the resulting set in a key
 
    @public
-   @param args {todo} 
-   @param handler {function} 
+   @param args {todo} JsonArray [{"name":"destination","type":"key"},{"name":"key","type":"key","multiple":true}] 
+   @param handler {function} Handler for the result of this call. 
    */
   this.sinterstore = function(args, handler) {
     var __args = arguments;
@@ -2503,8 +2503,8 @@ var RedisService = function(j_val) {
    Determine if a given value is a member of a set
 
    @public
-   @param args {todo} 
-   @param handler {function} 
+   @param args {todo} JsonArray [{"name":"key","type":"key"},{"name":"member","type":"string"}] 
+   @param handler {function} Handler for the result of this call. 
    */
   this.sismember = function(args, handler) {
     var __args = arguments;
@@ -2523,8 +2523,8 @@ var RedisService = function(j_val) {
    Make the server a slave of another instance, or promote it as master
 
    @public
-   @param args {todo} 
-   @param handler {function} 
+   @param args {todo} JsonArray [{"name":"host","type":"string"},{"name":"port","type":"string"}] 
+   @param handler {function} Handler for the result of this call. 
    */
   this.slaveof = function(args, handler) {
     var __args = arguments;
@@ -2543,8 +2543,8 @@ var RedisService = function(j_val) {
    Manages the Redis slow queries log
 
    @public
-   @param args {todo} 
-   @param handler {function} 
+   @param args {todo} JsonArray [{"name":"subcommand","type":"string"},{"name":"argument","type":"string","optional":true}] 
+   @param handler {function} Handler for the result of this call. 
    */
   this.slowlog = function(args, handler) {
     var __args = arguments;
@@ -2563,8 +2563,8 @@ var RedisService = function(j_val) {
    Get all the members in a set
 
    @public
-   @param args {todo} 
-   @param handler {function} 
+   @param args {todo} JsonArray [{"name":"key","type":"key"}] 
+   @param handler {function} Handler for the result of this call. 
    */
   this.smembers = function(args, handler) {
     var __args = arguments;
@@ -2583,8 +2583,8 @@ var RedisService = function(j_val) {
    Move a member from one set to another
 
    @public
-   @param args {todo} 
-   @param handler {function} 
+   @param args {todo} JsonArray [{"name":"source","type":"key"},{"name":"destination","type":"key"},{"name":"member","type":"string"}] 
+   @param handler {function} Handler for the result of this call. 
    */
   this.smove = function(args, handler) {
     var __args = arguments;
@@ -2603,8 +2603,8 @@ var RedisService = function(j_val) {
    Sort the elements in a list, set or sorted set
 
    @public
-   @param args {todo} 
-   @param handler {function} 
+   @param args {todo} JsonArray [{"name":"key","type":"key"},{"command":"BY","name":"pattern","type":"pattern","optional":true},{"command":"LIMIT","name":["offset","count"],"type":["integer","integer"],"optional":true},{"command":"GET","name":"pattern","type":"string","optional":true,"multiple":true},{"name":"order","type":"enum","enum":["ASC","DESC"],"optional":true},{"name":"sorting","type":"enum","enum":["ALPHA"],"optional":true},{"command":"STORE","name":"destination","type":"key","optional":true}] 
+   @param handler {function} Handler for the result of this call. 
    */
   this.sort = function(args, handler) {
     var __args = arguments;
@@ -2623,8 +2623,8 @@ var RedisService = function(j_val) {
    Remove and return a random member from a set
 
    @public
-   @param args {todo} 
-   @param handler {function} 
+   @param args {todo} JsonArray [{"name":"key","type":"key"}] 
+   @param handler {function} Handler for the result of this call. 
    */
   this.spop = function(args, handler) {
     var __args = arguments;
@@ -2643,8 +2643,8 @@ var RedisService = function(j_val) {
    Get one or multiple random members from a set
 
    @public
-   @param args {todo} 
-   @param handler {function} 
+   @param args {todo} JsonArray [{"name":"key","type":"key"},{"name":"count","type":"integer","optional":true}] 
+   @param handler {function} Handler for the result of this call. 
    */
   this.srandmember = function(args, handler) {
     var __args = arguments;
@@ -2663,8 +2663,8 @@ var RedisService = function(j_val) {
    Remove one or more members from a set
 
    @public
-   @param args {todo} 
-   @param handler {function} 
+   @param args {todo} JsonArray [{"name":"key","type":"key"},{"name":"member","type":"string","multiple":true}] 
+   @param handler {function} Handler for the result of this call. 
    */
   this.srem = function(args, handler) {
     var __args = arguments;
@@ -2683,8 +2683,8 @@ var RedisService = function(j_val) {
    Get the length of the value stored in a key
 
    @public
-   @param args {todo} 
-   @param handler {function} 
+   @param args {todo} JsonArray [{"name":"key","type":"key"}] 
+   @param handler {function} Handler for the result of this call. 
    */
   this.strlen = function(args, handler) {
     var __args = arguments;
@@ -2703,8 +2703,8 @@ var RedisService = function(j_val) {
    Listen for messages published to the given channels
 
    @public
-   @param args {todo} 
-   @param handler {function} 
+   @param args {todo} JsonArray [{"name":["channel"],"type":["string"],"multiple":true}] 
+   @param handler {function} Handler for the result of this call. 
    */
   this.subscribe = function(args, handler) {
     var __args = arguments;
@@ -2723,8 +2723,8 @@ var RedisService = function(j_val) {
    Add multiple sets
 
    @public
-   @param args {todo} 
-   @param handler {function} 
+   @param args {todo} JsonArray [{"name":"key","type":"key","multiple":true}] 
+   @param handler {function} Handler for the result of this call. 
    */
   this.sunion = function(args, handler) {
     var __args = arguments;
@@ -2743,8 +2743,8 @@ var RedisService = function(j_val) {
    Add multiple sets and store the resulting set in a key
 
    @public
-   @param args {todo} 
-   @param handler {function} 
+   @param args {todo} JsonArray [{"name":"destination","type":"key"},{"name":"key","type":"key","multiple":true}] 
+   @param handler {function} Handler for the result of this call. 
    */
   this.sunionstore = function(args, handler) {
     var __args = arguments;
@@ -2801,8 +2801,8 @@ var RedisService = function(j_val) {
    Get the time to live for a key
 
    @public
-   @param args {todo} 
-   @param handler {function} 
+   @param args {todo} JsonArray [{"name":"key","type":"key"}] 
+   @param handler {function} Handler for the result of this call. 
    */
   this.ttl = function(args, handler) {
     var __args = arguments;
@@ -2821,8 +2821,8 @@ var RedisService = function(j_val) {
    Determine the type stored at key
 
    @public
-   @param args {todo} 
-   @param handler {function} 
+   @param args {todo} JsonArray [{"name":"key","type":"key"}] 
+   @param handler {function} Handler for the result of this call. 
    */
   this.type = function(args, handler) {
     var __args = arguments;
@@ -2841,8 +2841,8 @@ var RedisService = function(j_val) {
    Stop listening for messages posted to the given channels
 
    @public
-   @param args {todo} 
-   @param handler {function} 
+   @param args {todo} JsonArray [{"name":"channel","type":"string","optional":true,"multiple":true}] 
+   @param handler {function} Handler for the result of this call. 
    */
   this.unsubscribe = function(args, handler) {
     var __args = arguments;
@@ -2880,8 +2880,8 @@ var RedisService = function(j_val) {
    Watch the given keys to determine execution of the MULTI/EXEC block
 
    @public
-   @param args {todo} 
-   @param handler {function} 
+   @param args {todo} JsonArray [{"name":"key","type":"key","multiple":true}] 
+   @param handler {function} Handler for the result of this call. 
    */
   this.watch = function(args, handler) {
     var __args = arguments;
@@ -2900,8 +2900,8 @@ var RedisService = function(j_val) {
    Add one or more members to a sorted set, or update its score if it already exists
 
    @public
-   @param args {todo} 
-   @param handler {function} 
+   @param args {todo} JsonArray [{"name":"key","type":"key"},{"name":["score","member"],"type":["double","string"],"multiple":true}] 
+   @param handler {function} Handler for the result of this call. 
    */
   this.zadd = function(args, handler) {
     var __args = arguments;
@@ -2920,8 +2920,8 @@ var RedisService = function(j_val) {
    Get the number of members in a sorted set
 
    @public
-   @param args {todo} 
-   @param handler {function} 
+   @param args {todo} JsonArray [{"name":"key","type":"key"}] 
+   @param handler {function} Handler for the result of this call. 
    */
   this.zcard = function(args, handler) {
     var __args = arguments;
@@ -2940,8 +2940,8 @@ var RedisService = function(j_val) {
    Count the members in a sorted set with scores within the given values
 
    @public
-   @param args {todo} 
-   @param handler {function} 
+   @param args {todo} JsonArray [{"name":"key","type":"key"},{"name":"min","type":"double"},{"name":"max","type":"double"}] 
+   @param handler {function} Handler for the result of this call. 
    */
   this.zcount = function(args, handler) {
     var __args = arguments;
@@ -2960,8 +2960,8 @@ var RedisService = function(j_val) {
    Increment the score of a member in a sorted set
 
    @public
-   @param args {todo} 
-   @param handler {function} 
+   @param args {todo} JsonArray [{"name":"key","type":"key"},{"name":"increment","type":"integer"},{"name":"member","type":"string"}] 
+   @param handler {function} Handler for the result of this call. 
    */
   this.zincrby = function(args, handler) {
     var __args = arguments;
@@ -2980,8 +2980,8 @@ var RedisService = function(j_val) {
    Intersect multiple sorted sets and store the resulting sorted set in a new key
 
    @public
-   @param args {todo} 
-   @param handler {function} 
+   @param args {todo} JsonArray [{"name":"destination","type":"key"},{"name":"numkeys","type":"integer"},{"name":"key","type":"key","multiple":true},{"command":"WEIGHTS","name":"weight","type":"integer","variadic":true,"optional":true},{"command":"AGGREGATE","name":"aggregate","type":"enum","enum":["SUM","MIN","MAX"],"optional":true}] 
+   @param handler {function} Handler for the result of this call. 
    */
   this.zinterstore = function(args, handler) {
     var __args = arguments;
@@ -3000,8 +3000,8 @@ var RedisService = function(j_val) {
    Count the number of members in a sorted set between a given lexicographical range
 
    @public
-   @param args {todo} 
-   @param handler {function} 
+   @param args {todo} JsonArray [{"name":"key","type":"key"},{"name":"min","type":"string"},{"name":"max","type":"string"}] 
+   @param handler {function} Handler for the result of this call. 
    */
   this.zlexcount = function(args, handler) {
     var __args = arguments;
@@ -3020,8 +3020,8 @@ var RedisService = function(j_val) {
    Return a range of members in a sorted set, by index
 
    @public
-   @param args {todo} 
-   @param handler {function} 
+   @param args {todo} JsonArray [{"name":"key","type":"key"},{"name":"start","type":"integer"},{"name":"stop","type":"integer"},{"name":"withscores","type":"enum","enum":["WITHSCORES"],"optional":true}] 
+   @param handler {function} Handler for the result of this call. 
    */
   this.zrange = function(args, handler) {
     var __args = arguments;
@@ -3040,8 +3040,8 @@ var RedisService = function(j_val) {
    Return a range of members in a sorted set, by lexicographical range
 
    @public
-   @param args {todo} 
-   @param handler {function} 
+   @param args {todo} JsonArray [{"name":"key","type":"key"},{"name":"min","type":"string"},{"name":"max","type":"string"},{"command":"LIMIT","name":["offset","count"],"type":["integer","integer"],"optional":true}] 
+   @param handler {function} Handler for the result of this call. 
    */
   this.zrangebylex = function(args, handler) {
     var __args = arguments;
@@ -3060,8 +3060,8 @@ var RedisService = function(j_val) {
    Return a range of members in a sorted set, by score
 
    @public
-   @param args {todo} 
-   @param handler {function} 
+   @param args {todo} JsonArray [{"name":"key","type":"key"},{"name":"min","type":"double"},{"name":"max","type":"double"},{"name":"withscores","type":"enum","enum":["WITHSCORES"],"optional":true},{"command":"LIMIT","name":["offset","count"],"type":["integer","integer"],"optional":true}] 
+   @param handler {function} Handler for the result of this call. 
    */
   this.zrangebyscore = function(args, handler) {
     var __args = arguments;
@@ -3080,8 +3080,8 @@ var RedisService = function(j_val) {
    Determine the index of a member in a sorted set
 
    @public
-   @param args {todo} 
-   @param handler {function} 
+   @param args {todo} JsonArray [{"name":"key","type":"key"},{"name":"member","type":"string"}] 
+   @param handler {function} Handler for the result of this call. 
    */
   this.zrank = function(args, handler) {
     var __args = arguments;
@@ -3100,8 +3100,8 @@ var RedisService = function(j_val) {
    Remove one or more members from a sorted set
 
    @public
-   @param args {todo} 
-   @param handler {function} 
+   @param args {todo} JsonArray [{"name":"key","type":"key"},{"name":"member","type":"string","multiple":true}] 
+   @param handler {function} Handler for the result of this call. 
    */
   this.zrem = function(args, handler) {
     var __args = arguments;
@@ -3120,8 +3120,8 @@ var RedisService = function(j_val) {
    Remove all members in a sorted set between the given lexicographical range
 
    @public
-   @param args {todo} 
-   @param handler {function} 
+   @param args {todo} JsonArray [{"name":"key","type":"key"},{"name":"min","type":"string"},{"name":"max","type":"string"}] 
+   @param handler {function} Handler for the result of this call. 
    */
   this.zremrangebylex = function(args, handler) {
     var __args = arguments;
@@ -3140,8 +3140,8 @@ var RedisService = function(j_val) {
    Remove all members in a sorted set within the given indexes
 
    @public
-   @param args {todo} 
-   @param handler {function} 
+   @param args {todo} JsonArray [{"name":"key","type":"key"},{"name":"start","type":"integer"},{"name":"stop","type":"integer"}] 
+   @param handler {function} Handler for the result of this call. 
    */
   this.zremrangebyrank = function(args, handler) {
     var __args = arguments;
@@ -3160,8 +3160,8 @@ var RedisService = function(j_val) {
    Remove all members in a sorted set within the given scores
 
    @public
-   @param args {todo} 
-   @param handler {function} 
+   @param args {todo} JsonArray [{"name":"key","type":"key"},{"name":"min","type":"double"},{"name":"max","type":"double"}] 
+   @param handler {function} Handler for the result of this call. 
    */
   this.zremrangebyscore = function(args, handler) {
     var __args = arguments;
@@ -3180,8 +3180,8 @@ var RedisService = function(j_val) {
    Return a range of members in a sorted set, by index, with scores ordered from high to low
 
    @public
-   @param args {todo} 
-   @param handler {function} 
+   @param args {todo} JsonArray [{"name":"key","type":"key"},{"name":"start","type":"integer"},{"name":"stop","type":"integer"},{"name":"withscores","type":"enum","enum":["WITHSCORES"],"optional":true}] 
+   @param handler {function} Handler for the result of this call. 
    */
   this.zrevrange = function(args, handler) {
     var __args = arguments;
@@ -3200,8 +3200,8 @@ var RedisService = function(j_val) {
    Return a range of members in a sorted set, by score, with scores ordered from high to low
 
    @public
-   @param args {todo} 
-   @param handler {function} 
+   @param args {todo} JsonArray [{"name":"key","type":"key"},{"name":"max","type":"double"},{"name":"min","type":"double"},{"name":"withscores","type":"enum","enum":["WITHSCORES"],"optional":true},{"command":"LIMIT","name":["offset","count"],"type":["integer","integer"],"optional":true}] 
+   @param handler {function} Handler for the result of this call. 
    */
   this.zrevrangebyscore = function(args, handler) {
     var __args = arguments;
@@ -3220,8 +3220,8 @@ var RedisService = function(j_val) {
    Determine the index of a member in a sorted set, with scores ordered from high to low
 
    @public
-   @param args {todo} 
-   @param handler {function} 
+   @param args {todo} JsonArray [{"name":"key","type":"key"},{"name":"member","type":"string"}] 
+   @param handler {function} Handler for the result of this call. 
    */
   this.zrevrank = function(args, handler) {
     var __args = arguments;
@@ -3240,8 +3240,8 @@ var RedisService = function(j_val) {
    Get the score associated with the given member in a sorted set
 
    @public
-   @param args {todo} 
-   @param handler {function} 
+   @param args {todo} JsonArray [{"name":"key","type":"key"},{"name":"member","type":"string"}] 
+   @param handler {function} Handler for the result of this call. 
    */
   this.zscore = function(args, handler) {
     var __args = arguments;
@@ -3260,8 +3260,8 @@ var RedisService = function(j_val) {
    Add multiple sorted sets and store the resulting sorted set in a new key
 
    @public
-   @param args {todo} 
-   @param handler {function} 
+   @param args {todo} JsonArray [{"name":"destination","type":"key"},{"name":"numkeys","type":"integer"},{"name":"key","type":"key","multiple":true},{"command":"WEIGHTS","name":"weight","type":"integer","variadic":true,"optional":true},{"command":"AGGREGATE","name":"aggregate","type":"enum","enum":["SUM","MIN","MAX"],"optional":true}] 
+   @param handler {function} Handler for the result of this call. 
    */
   this.zunionstore = function(args, handler) {
     var __args = arguments;
@@ -3280,8 +3280,8 @@ var RedisService = function(j_val) {
    Incrementally iterate the keys space
 
    @public
-   @param args {todo} 
-   @param handler {function} 
+   @param args {todo} JsonArray [{"name":"cursor","type":"integer"},{"command":"MATCH","name":"pattern","type":"pattern","optional":true},{"command":"COUNT","name":"count","type":"integer","optional":true}] 
+   @param handler {function} Handler for the result of this call. 
    */
   this.scan = function(args, handler) {
     var __args = arguments;
@@ -3300,8 +3300,8 @@ var RedisService = function(j_val) {
    Incrementally iterate Set elements
 
    @public
-   @param args {todo} 
-   @param handler {function} 
+   @param args {todo} JsonArray [{"name":"key","type":"key"},{"name":"cursor","type":"integer"},{"command":"MATCH","name":"pattern","type":"pattern","optional":true},{"command":"COUNT","name":"count","type":"integer","optional":true}] 
+   @param handler {function} Handler for the result of this call. 
    */
   this.sscan = function(args, handler) {
     var __args = arguments;
@@ -3320,8 +3320,8 @@ var RedisService = function(j_val) {
    Incrementally iterate hash fields and associated values
 
    @public
-   @param args {todo} 
-   @param handler {function} 
+   @param args {todo} JsonArray [{"name":"key","type":"key"},{"name":"cursor","type":"integer"},{"command":"MATCH","name":"pattern","type":"pattern","optional":true},{"command":"COUNT","name":"count","type":"integer","optional":true}] 
+   @param handler {function} Handler for the result of this call. 
    */
   this.hscan = function(args, handler) {
     var __args = arguments;
@@ -3340,8 +3340,8 @@ var RedisService = function(j_val) {
    Incrementally iterate sorted sets elements and associated scores
 
    @public
-   @param args {todo} 
-   @param handler {function} 
+   @param args {todo} JsonArray [{"name":"key","type":"key"},{"name":"cursor","type":"integer"},{"command":"MATCH","name":"pattern","type":"pattern","optional":true},{"command":"COUNT","name":"count","type":"integer","optional":true}] 
+   @param handler {function} Handler for the result of this call. 
    */
   this.zscan = function(args, handler) {
     var __args = arguments;
