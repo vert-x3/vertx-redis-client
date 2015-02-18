@@ -483,7 +483,7 @@ public class RedisServiceTestBase extends VertxTestBase {
 
     redis.set(mykey, "10", reply0 -> {
       assertTrue(reply0.succeeded());
-      redis.decr(toJsonArray(mykey), reply1 -> {
+      redis.decr(mykey, reply1 -> {
         assertTrue(reply1.succeeded());
         assertEquals(9, reply1.result().longValue());
         testComplete();
@@ -498,7 +498,7 @@ public class RedisServiceTestBase extends VertxTestBase {
 
     redis.set(mykey, "10", reply0 -> {
       assertTrue(reply0.succeeded());
-      redis.decrby(toJsonArray(mykey, 5), reply1 -> {
+      redis.decrby(mykey, 5, reply1 -> {
         assertTrue(reply1.succeeded());
         assertEquals(5, reply1.result().longValue());
         testComplete();
@@ -535,7 +535,7 @@ public class RedisServiceTestBase extends VertxTestBase {
       assertTrue(reply.succeeded());
       redis.multi(reply2 ->{
         assertTrue(reply2.succeeded());
-        redis.incr(toJsonArray(key), reply3 ->{
+        redis.incr(key, reply3 ->{
           assertTrue(reply3.succeeded());
           redis.discard(reply4 ->{
             assertTrue(reply4.succeeded());
@@ -841,7 +841,7 @@ public class RedisServiceTestBase extends VertxTestBase {
   public void testGetset() {
     final String mycounter = makeKey();
 
-    redis.incr(toJsonArray(mycounter), reply0 -> {
+    redis.incr(mycounter, reply0 -> {
       assertTrue(reply0.succeeded());
       assertEquals(1, reply0.result().longValue());
 
@@ -1155,7 +1155,7 @@ public class RedisServiceTestBase extends VertxTestBase {
 
     redis.set(mykey, "10", reply0 -> {
       assertTrue(reply0.succeeded());
-      redis.incr(toJsonArray(mykey), reply1 -> {
+      redis.incr(mykey, reply1 -> {
         assertTrue(reply1.succeeded());
         assertEquals(11, reply1.result().longValue());
 
@@ -1175,7 +1175,7 @@ public class RedisServiceTestBase extends VertxTestBase {
 
     redis.set(mykey, "10", reply0 -> {
       assertTrue(reply0.succeeded());
-      redis.incrby(toJsonArray(mykey, 5), reply1 -> {
+      redis.incrby(mykey, 5, reply1 -> {
         assertTrue(reply1.succeeded());
         assertEquals(15, reply1.result().longValue());
         testComplete();
@@ -1190,13 +1190,13 @@ public class RedisServiceTestBase extends VertxTestBase {
 
     redis.set(mykey, 10.50, reply0 -> {
       assertTrue(reply0.succeeded());
-      redis.incrbyfloat(toJsonArray(mykey, 0.1), reply1 -> {
+      redis.incrbyfloat(mykey, 0.1, reply1 -> {
         assertTrue(reply1.succeeded());
         assertEquals("10.6", reply1.result());
 
         redis.set(mykey, 5.0e3, reply2 -> {
           assertTrue(reply2.succeeded());
-          redis.incrbyfloat(toJsonArray(mykey, 2.0e2), reply3 -> {
+          redis.incrbyfloat(mykey, 2.0e2, reply3 -> {
             assertTrue(reply3.succeeded());
             assertEquals("5200", reply3.result());
             testComplete();
@@ -2896,15 +2896,15 @@ public class RedisServiceTestBase extends VertxTestBase {
         assertTrue(reply2.succeeded());
         redis.multi(reply3 ->{
           assertTrue(reply3.succeeded());
-          redis.incr(toJsonArray(key), reply4 ->{
+          redis.incr(key, reply4 ->{
             assertTrue(reply4.succeeded());
               try {
                 clientLatch.wait();                
               }catch(Exception e){}
-              redis.incr(toJsonArray(key), reply5 ->{
+              redis.incr(key, reply5 ->{
                 assertTrue(reply5.succeeded());
               });  
-              redis.incrby(toJsonArray(key, 10), reply6 ->{
+              redis.incrby(key, 10, reply6 ->{
                 assertTrue(reply6.succeeded());
               });
               redis.exec(reply7 ->{
@@ -2925,7 +2925,7 @@ public class RedisServiceTestBase extends VertxTestBase {
         });
       });
     
-    rdx.incr(toJsonArray(key), reply ->{
+    rdx.incr(key, reply ->{
       assertTrue(reply.succeeded());
       clientLatch.countDown();
     });

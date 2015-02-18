@@ -278,22 +278,23 @@ public interface RedisService {
   /**
    * Decrement the integer value of a key by one
    *
-   * @param args    JsonArray [{"name":"key","type":"key"}]
+   * @param key     Key string
    * @param handler Handler for the result of this call.
    * @since 1.0.0
    * group: string
    */
-  void decr(JsonArray args, Handler<AsyncResult<Long>> handler);
+  void decr(String key, Handler<AsyncResult<Long>> handler);
 
   /**
    * Decrement the integer value of a key by the given number
    *
-   * @param args    JsonArray [{"name":"key","type":"key"},{"name":"decrement","type":"integer"}]
-   * @param handler Handler for the result of this call.
+   * @param key       Key string
+   * @param decrement Value by which to decrement
+   * @param handler   Handler for the result of this call.
    * @since 1.0.0
    * group: string
    */
-  void decrby(JsonArray args, Handler<AsyncResult<Long>> handler);
+  void decrby(String key, long decrement, Handler<AsyncResult<Long>> handler);
 
   /**
    * Delete a key
@@ -581,32 +582,34 @@ public interface RedisService {
   /**
    * Increment the integer value of a key by one
    *
-   * @param args    JsonArray [{"name":"key","type":"key"}]
+   * @param key     Key string
    * @param handler Handler for the result of this call.
    * @since 1.0.0
    * group: string
    */
-  void incr(JsonArray args, Handler<AsyncResult<Long>> handler);
+  void incr(String key, Handler<AsyncResult<Long>> handler);
 
   /**
    * Increment the integer value of a key by the given amount
    *
-   * @param args    JsonArray [{"name":"key","type":"key"},{"name":"increment","type":"integer"}]
-   * @param handler Handler for the result of this call.
+   * @param key       Key string
+   * @param increment Value by which to increment
+   * @param handler   Handler for the result of this call.
    * @since 1.0.0
    * group: string
    */
-  void incrby(JsonArray args, Handler<AsyncResult<Long>> handler);
+  void incrby(String key, long increment, Handler<AsyncResult<Long>> handler);
 
   /**
    * Increment the float value of a key by the given amount
    *
-   * @param args    JsonArray [{"name":"key","type":"key"},{"name":"increment","type":"double"}]
-   * @param handler Handler for the result of this call.
+   * @param key       Key string
+   * @param increment Value by which to increment
+   * @param handler   Handler for the result of this call.
    * @since 2.6.0
    * group: string
    */
-  void incrbyfloat(JsonArray args, Handler<AsyncResult<String>> handler);
+  void incrbyfloat(String key, double increment, Handler<AsyncResult<String>> handler);
 
   /**
    * Get information and statistics about the server

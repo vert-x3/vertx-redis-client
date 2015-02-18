@@ -121,11 +121,14 @@ public final class RedisServiceImpl extends AbstractRedisService {
     sendString("DEBUG SEGFAULT", null, handler);
   }
 
-  public void decr(JsonArray args, Handler<AsyncResult<Long>> handler) {
-    sendLong("DECR", args, handler);
+  public void decr(String key, Handler<AsyncResult<Long>> handler) {
+    sendLong("DECR", new JsonArray().add(key), handler);
   }
 
-  public void decrby(JsonArray args, Handler<AsyncResult<Long>> handler) {
+  public void decrby(String key, long decrement, Handler<AsyncResult<Long>> handler) {
+    JsonArray args = new JsonArray();
+    args.add(key);
+    args.add(decrement);
     sendLong("DECRBY", args, handler);
   }
 
@@ -248,15 +251,21 @@ public final class RedisServiceImpl extends AbstractRedisService {
     sendJsonArray("HVALS", args, handler);
   }
 
-  public void incr(JsonArray args, Handler<AsyncResult<Long>> handler) {
-    sendLong("INCR", args, handler);
+  public void incr(String key, Handler<AsyncResult<Long>> handler) {
+    sendLong("INCR", new JsonArray().add(key), handler);
   }
 
-  public void incrby(JsonArray args, Handler<AsyncResult<Long>> handler) {
+  public void incrby(String key, long increment, Handler<AsyncResult<Long>> handler) {
+    JsonArray args = new JsonArray();
+    args.add(key);
+    args.add(increment);
     sendLong("INCRBY", args, handler);
   }
 
-  public void incrbyfloat(JsonArray args, Handler<AsyncResult<String>> handler) {
+  public void incrbyfloat(String key, double increment, Handler<AsyncResult<String>> handler) {
+    JsonArray args = new JsonArray();
+    args.add(key);
+    args.add(increment);
     sendString("INCRBYFLOAT", args, handler);
   }
 
