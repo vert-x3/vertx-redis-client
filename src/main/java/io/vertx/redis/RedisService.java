@@ -1139,6 +1139,18 @@ public interface RedisService {
   void set(String key, Object value, Handler<AsyncResult<Void>> handler);
 
   /**
+   * Set the string value of a key
+   *
+   * @param key     Key of which value to set
+   * @param value   New value for the key
+   * @param options JsonArray [{"command":"EX","name":"seconds","type":"integer","optional":true},{"command":"PX","name":"milliseconds","type":"integer","optional":true},{"name":"condition","type":"enum","enum":["NX","XX"],"optional":true}]
+   * @param handler Handler for the result of this call.
+   * @since 1.0.0
+   * group: string
+   */
+  void setWithOptions(String key, Object value, JsonArray options, Handler<AsyncResult<Void>> handler);
+
+  /**
    * Sets or clears the bit at offset in the string value stored at key
    *
    * @param args    JsonArray [{"name":"key","type":"key"},{"name":"offset","type":"integer"},{"name":"value","type":"string"}]

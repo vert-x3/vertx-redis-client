@@ -3,6 +3,7 @@ package io.vertx.test.redis;
 import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;
 import io.vertx.redis.RedisService;
+import io.vertx.redis.SetOptions;
 import io.vertx.test.core.VertxTestBase;
 
 import java.util.Arrays;
@@ -2262,6 +2263,29 @@ public class RedisServiceTestBase extends VertxTestBase {
             testComplete();
           });
         });
+    await();
+  }
+
+  @Test
+  public void testSetWithOptions() {
+    final String mykey = makeKey();
+    redis.setWithOptions(mykey, "Hello!", new SetOptions().setNX(true).setEX(10).toJson(), reply0 -> {
+      assertTrue(reply0.succeeded());
+      redis.get(mykey, reply1 -> {
+        assertTrue(reply1.succeeded());
+        assertEquals("Hello!", reply1.result());
+
+        redis.setWithOptions(mykey, "Hello again!", new SetOptions().setNX(true).setEX(10).toJson(), reply2 -> {
+          assertTrue(reply2.succeeded());
+          redis.get(mykey, reply3 -> {
+            assertTrue(reply3.succeeded());
+            // It's not 'Hello again!' but the old value since we used NX which means set unless exists
+            assertEquals("Hello!", reply1.result());
+            testComplete();
+          });
+        });
+      });
+    });
     await();
   }
 

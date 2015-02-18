@@ -474,9 +474,18 @@ public final class RedisServiceImpl extends AbstractRedisService {
   }
 
   public void set(String key, Object value, Handler<AsyncResult<Void>> handler) {
+    setWithOptions(key, value, null, handler);
+  }
+
+  public void setWithOptions(String key, Object value, JsonArray options, Handler<AsyncResult<Void>> handler) {
     JsonArray params = new JsonArray();
     params.add(key);
     params.add(validateStringOrNumberOrBoolean(value));
+    if (options != null) {
+      for (Object option: options.getList()) {
+        params.add(option);
+      }
+    }
     sendVoid("SET", params, handler);
   }
 
