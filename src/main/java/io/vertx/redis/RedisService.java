@@ -11,6 +11,8 @@ import io.vertx.core.json.JsonObject;
 import io.vertx.redis.impl.RedisServiceImpl;
 import io.vertx.serviceproxy.ProxyHelper;
 
+import java.util.List;
+
 @VertxGen
 @ProxyGen
 public interface RedisService {
@@ -299,12 +301,12 @@ public interface RedisService {
   /**
    * Delete a key
    *
-   * @param args    JsonArray [{"name":"key","type":"key","multiple":true}]
+   * @param keys    List of keys to delete
    * @param handler Handler for the result of this call.
    * @since 1.0.0
    * group: generic
    */
-  void del(JsonArray args, Handler<AsyncResult<Long>> handler);
+  void del(List<String> keys, Handler<AsyncResult<Long>> handler);
 
   /**
    * Discard all commands issued after MULTI
@@ -317,12 +319,12 @@ public interface RedisService {
   /**
    * Return a serialized version of the value stored at the specified key.
    *
-   * @param args    JsonArray [{"name":"key","type":"key"}]
+   * @param key     Key string
    * @param handler Handler for the result of this call.
    * @since 2.6.0
    * group: generic
    */
-  void dump(JsonArray args, Handler<AsyncResult<String>> handler);
+  void dump(String key, Handler<AsyncResult<String>> handler);
 
   /**
    * Echo the given string
@@ -365,32 +367,34 @@ public interface RedisService {
   /**
    * Determine if a key exists
    *
-   * @param args    JsonArray [{"name":"key","type":"key"}]
+   * @param key     Key string
    * @param handler Handler for the result of this call.
    * @since 1.0.0
    * group: generic
    */
-  void exists(JsonArray args, Handler<AsyncResult<Long>> handler);
+  void exists(String key, Handler<AsyncResult<Long>> handler);
 
   /**
    * Set a key's time to live in seconds
    *
-   * @param args    JsonArray [{"name":"key","type":"key"},{"name":"seconds","type":"integer"}]
+   * @param key     Key string
+   * @param seconds Time to live in seconds
    * @param handler Handler for the result of this call.
    * @since 1.0.0
    * group: generic
    */
-  void expire(JsonArray args, Handler<AsyncResult<Long>> handler);
+  void expire(String key, int seconds, Handler<AsyncResult<Long>> handler);
 
   /**
    * Set the expiration for a key as a UNIX timestamp
    *
-   * @param args    JsonArray [{"name":"key","type":"key"},{"name":"timestamp","type":"posix time"}]
-   * @param handler Handler for the result of this call.
+   * @param key       Key string
+   * @param timestamp Expiry time as Unix timestamp
+   * @param handler   Handler for the result of this call.
    * @since 1.2.0
    * group: generic
    */
-  void expireat(JsonArray args, Handler<AsyncResult<Long>> handler);
+  void expireat(String key, long timestamp, Handler<AsyncResult<Long>> handler);
 
   /**
    * Remove all keys from all databases
@@ -818,12 +822,12 @@ public interface RedisService {
   /**
    * Remove the expiration from a key
    *
-   * @param args    JsonArray [{"name":"key","type":"key"}]
+   * @param key     Key string
    * @param handler Handler for the result of this call.
    * @since 2.2.0
    * group: generic
    */
-  void persist(JsonArray args, Handler<AsyncResult<Long>> handler);
+  void persist(String key, Handler<AsyncResult<Long>> handler);
 
   /**
    * Set a key's time to live in milliseconds
@@ -962,22 +966,24 @@ public interface RedisService {
   /**
    * Rename a key
    *
-   * @param args    JsonArray [{"name":"key","type":"key"},{"name":"newkey","type":"key"}]
+   * @param key  Key string to be renamed
+   * @param newkey  New key string
    * @param handler Handler for the result of this call.
    * @since 1.0.0
    * group: generic
    */
-  void rename(JsonArray args, Handler<AsyncResult<String>> handler);
+  void rename(String key, String newkey, Handler<AsyncResult<String>> handler);
 
   /**
    * Rename a key, only if the new key does not exist
    *
-   * @param args    JsonArray [{"name":"key","type":"key"},{"name":"newkey","type":"key"}]
+   * @param key  Key string to be renamed
+   * @param newkey  New key string
    * @param handler Handler for the result of this call.
    * @since 1.0.0
    * group: generic
    */
-  void renamenx(JsonArray args, Handler<AsyncResult<Long>> handler);
+  void renamenx(String key, String newkey, Handler<AsyncResult<Long>> handler);
 
   /**
    * Create a key using the provided serialized value, previously obtained using DUMP.
@@ -1376,22 +1382,22 @@ public interface RedisService {
   /**
    * Get the time to live for a key
    *
-   * @param args    JsonArray [{"name":"key","type":"key"}]
+   * @param key     Key string
    * @param handler Handler for the result of this call.
    * @since 1.0.0
    * group: generic
    */
-  void ttl(JsonArray args, Handler<AsyncResult<Long>> handler);
+  void ttl(String key, Handler<AsyncResult<Long>> handler);
 
   /**
    * Determine the type stored at key
    *
-   * @param args    JsonArray [{"name":"key","type":"key"}]
+   * @param key     Key string
    * @param handler Handler for the result of this call.
    * @since 1.0.0
    * group: generic
    */
-  void type(JsonArray args, Handler<AsyncResult<String>> handler);
+  void type(String key, Handler<AsyncResult<String>> handler);
 
   /**
    * Stop listening for messages posted to the given channels

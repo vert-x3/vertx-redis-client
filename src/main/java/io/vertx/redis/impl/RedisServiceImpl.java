@@ -6,6 +6,8 @@ import io.vertx.core.Vertx;
 import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;
 
+import java.util.List;
+
 public final class RedisServiceImpl extends AbstractRedisService {
 
   public RedisServiceImpl(Vertx vertx, JsonObject config) {
@@ -131,16 +133,16 @@ public final class RedisServiceImpl extends AbstractRedisService {
     sendLong("DECRBY", args, handler);
   }
 
-  public void del(JsonArray args, Handler<AsyncResult<Long>> handler) {
-    sendLong("DEL", args, handler);
+  public void del(List<String> keys, Handler<AsyncResult<Long>> handler) {
+    sendLong("DEL", new JsonArray(keys), handler);
   }
 
   public void discard(Handler<AsyncResult<String>> handler) {
     sendString("DISCARD", null, handler);
   }
 
-  public void dump(JsonArray args, Handler<AsyncResult<String>> handler) {
-    sendString("DUMP", args, handler);
+  public void dump(String key, Handler<AsyncResult<String>> handler) {
+    sendString("DUMP", new JsonArray().add(key), handler);
   }
 
   public void echo(JsonArray args, Handler<AsyncResult<String>> handler) {
@@ -159,15 +161,21 @@ public final class RedisServiceImpl extends AbstractRedisService {
     sendVoid("EXEC", null, handler);
   }
 
-  public void exists(JsonArray args, Handler<AsyncResult<Long>> handler) {
-    sendLong("EXISTS", args, handler);
+  public void exists(String key, Handler<AsyncResult<Long>> handler) {
+    sendLong("EXISTS", new JsonArray().add(key), handler);
   }
 
-  public void expire(JsonArray args, Handler<AsyncResult<Long>> handler) {
+  public void expire(String key, int seconds, Handler<AsyncResult<Long>> handler) {
+    JsonArray args = new JsonArray();
+    args.add(key);
+    args.add(seconds);
     sendLong("EXPIRE", args, handler);
   }
 
-  public void expireat(JsonArray args, Handler<AsyncResult<Long>> handler) {
+  public void expireat(String key, long timestamp, Handler<AsyncResult<Long>> handler) {
+    JsonArray args = new JsonArray();
+    args.add(key);
+    args.add(timestamp);
     sendLong("EXPIREAT", args, handler);
   }
 
@@ -352,8 +360,8 @@ public final class RedisServiceImpl extends AbstractRedisService {
     sendVoid("OBJECT", args, handler);
   }
 
-  public void persist(JsonArray args, Handler<AsyncResult<Long>> handler) {
-    sendLong("PERSIST", args, handler);
+  public void persist(String key, Handler<AsyncResult<Long>> handler) {
+    sendLong("PERSIST", new JsonArray().add(key), handler);
   }
 
   public void pexpire(JsonArray args, Handler<AsyncResult<Long>> handler) {
@@ -412,11 +420,17 @@ public final class RedisServiceImpl extends AbstractRedisService {
     sendString("RANDOMKEY", null, handler);
   }
 
-  public void rename(JsonArray args, Handler<AsyncResult<String>> handler) {
+  public void rename(String key, String newkey, Handler<AsyncResult<String>> handler) {
+    JsonArray args = new JsonArray();
+    args.add(key);
+    args.add(newkey);
     sendString("RENAME", args, handler);
   }
 
-  public void renamenx(JsonArray args, Handler<AsyncResult<Long>> handler) {
+  public void renamenx(String key, String newkey, Handler<AsyncResult<Long>> handler) {
+    JsonArray args = new JsonArray();
+    args.add(key);
+    args.add(newkey);
     sendLong("RENAMENX", args, handler);
   }
 
@@ -595,12 +609,12 @@ public final class RedisServiceImpl extends AbstractRedisService {
     sendJsonArray("TIME", null, handler);
   }
 
-  public void ttl(JsonArray args, Handler<AsyncResult<Long>> handler) {
-    sendLong("TTL", args, handler);
+  public void ttl(String key, Handler<AsyncResult<Long>> handler) {
+    sendLong("TTL", new JsonArray().add(key), handler);
   }
 
-  public void type(JsonArray args, Handler<AsyncResult<String>> handler) {
-    sendString("TYPE", args, handler);
+  public void type(String key, Handler<AsyncResult<String>> handler) {
+    sendString("TYPE", new JsonArray().add(key), handler);
   }
 
   public void unsubscribe(JsonArray args, Handler<AsyncResult<Void>> handler) {
