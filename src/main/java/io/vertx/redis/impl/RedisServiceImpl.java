@@ -5,6 +5,9 @@ import io.vertx.core.Handler;
 import io.vertx.core.Vertx;
 import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;
+import io.vertx.redis.ObjectCmd;
+
+import java.util.List;
 
 import java.util.List;
 
@@ -356,7 +359,10 @@ public final class RedisServiceImpl extends AbstractRedisService {
     sendString("MULTI", null, handler);
   }
 
-  public void object(JsonArray args, Handler<AsyncResult<Void>> handler) {
+  public void object(String key, ObjectCmd cmd, Handler<AsyncResult<Void>> handler) {
+    JsonArray args = new JsonArray();
+    args.add(cmd.name());
+    args.add(key);
     sendVoid("OBJECT", args, handler);
   }
 

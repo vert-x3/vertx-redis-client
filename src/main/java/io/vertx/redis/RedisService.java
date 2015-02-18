@@ -812,12 +812,13 @@ public interface RedisService {
   /**
    * Inspect the internals of Redis objects
    *
-   * @param args    JsonArray [{"name":"subcommand","type":"string"},{"name":"arguments","type":"string","optional":true,"multiple":true}]
+   * @param key     Key string
+   * @param cmd     Object sub command
    * @param handler Handler for the result of this call.
    * @since 2.2.3
    * group: generic
    */
-  void object(JsonArray args, Handler<AsyncResult<Void>> handler);
+  void object(String key, ObjectCmd cmd, Handler<AsyncResult<Void>> handler);
 
   /**
    * Remove the expiration from a key

@@ -2,6 +2,7 @@ package io.vertx.test.redis;
 
 import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;
+import io.vertx.redis.ObjectCmd;
 import io.vertx.redis.RedisService;
 import io.vertx.redis.SetOptions;
 import io.vertx.test.core.VertxTestBase;
@@ -1663,11 +1664,11 @@ public class RedisServiceTestBase extends VertxTestBase {
     String mykey = makeKey();
     redis.set(mykey, "test", reply ->{
       assertTrue(reply.succeeded());
-      redis.object(toJsonArray("REFCOUNT", mykey), reply2 ->{
+      redis.object(mykey, ObjectCmd.REFCOUNT, reply2 ->{
         assertTrue(reply2.succeeded());
-        redis.object(toJsonArray("ENCODING", mykey), reply3 ->{
+        redis.object(mykey, ObjectCmd.ENCODING, reply3 ->{
           assertTrue(reply3.succeeded());
-          redis.object(toJsonArray("IDLETIME", mykey), reply4 ->{
+          redis.object(mykey, ObjectCmd.IDLETIME, reply4 ->{
             assertTrue(reply4.succeeded());
             testComplete();
           });
