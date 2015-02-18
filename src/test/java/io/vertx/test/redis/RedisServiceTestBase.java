@@ -845,7 +845,7 @@ public class RedisServiceTestBase extends VertxTestBase {
       assertTrue(reply0.succeeded());
       assertEquals(1, reply0.result().longValue());
 
-      redis.getset(toJsonArray(mycounter, "0"), reply1 -> {
+      redis.getset(mycounter, "0", reply1 -> {
         assertTrue(reply1.succeeded());
         assertEquals("1", reply1.result());
 

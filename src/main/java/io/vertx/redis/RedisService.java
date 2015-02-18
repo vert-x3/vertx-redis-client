@@ -440,12 +440,13 @@ public interface RedisService {
   /**
    * Set the string value of a key and return its old value
    *
-   * @param args    JsonArray [{"name":"key","type":"key"},{"name":"value","type":"string"}]
+   * @param key     Key of which value to set
+   * @param value   New value for the key
    * @param handler Handler for the result of this call.
    * @since 1.0.0
    * group: string
    */
-  void getset(JsonArray args, Handler<AsyncResult<String>> handler);
+  void getset(String key, Object value, Handler<AsyncResult<String>> handler);
 
   /**
    * Delete one or more hash fields

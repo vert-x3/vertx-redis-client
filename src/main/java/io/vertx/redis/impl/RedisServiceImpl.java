@@ -189,8 +189,11 @@ public final class RedisServiceImpl extends AbstractRedisService {
     sendString("GETRANGE", args, handler);
   }
 
-  public void getset(JsonArray args, Handler<AsyncResult<String>> handler) {
-    sendString("GETSET", args, handler);
+  public void getset(String key, Object value, Handler<AsyncResult<String>> handler) {
+    JsonArray params = new JsonArray();
+    params.add(key);
+    params.add(validateStringOrNumberOrBoolean(value));
+    sendString("GETSET", params, handler);
   }
 
   public void hdel(JsonArray args, Handler<AsyncResult<Long>> handler) {
