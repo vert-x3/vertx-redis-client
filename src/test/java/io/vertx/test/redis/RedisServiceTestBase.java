@@ -11,7 +11,6 @@ import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CountDownLatch;
-import java.util.concurrent.TimeUnit;
 
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
@@ -531,7 +530,7 @@ public class RedisServiceTestBase extends VertxTestBase {
   public void testDiscard() {
     
     String key = makeKey();    
-    redis.set(key, 0, reply ->{
+    redis.set(key, "0", reply ->{
       assertTrue(reply.succeeded());
       redis.multi(reply2 ->{
         assertTrue(reply2.succeeded());
@@ -1188,13 +1187,13 @@ public class RedisServiceTestBase extends VertxTestBase {
   public void testIncrbyfloat() {
     final String mykey = makeKey();
 
-    redis.set(mykey, 10.50, reply0 -> {
+    redis.set(mykey, "10.50", reply0 -> {
       assertTrue(reply0.succeeded());
       redis.incrbyfloat(mykey, 0.1, reply1 -> {
         assertTrue(reply1.succeeded());
         assertEquals("10.6", reply1.result());
 
-        redis.set(mykey, 5.0e3, reply2 -> {
+        redis.set(mykey, "5.0e3", reply2 -> {
           assertTrue(reply2.succeeded());
           redis.incrbyfloat(mykey, 2.0e2, reply3 -> {
             assertTrue(reply3.succeeded());
@@ -1637,16 +1636,16 @@ public class RedisServiceTestBase extends VertxTestBase {
 
     awaitLatch(latch);
     
-    redis.set(key, 0, reply ->{
+    redis.set(key, "0", reply ->{
       assertTrue(reply.succeeded());
       
     });
     
     redis.multi(reply -> {
       assertTrue(reply.succeeded());
-      redis.set(makeKey(), 0, reply2 -> {
+      redis.set(makeKey(), "0", reply2 -> {
         assertTrue(reply2.succeeded());
-        redis.set(makeKey(), 0, reply3 ->{
+        redis.set(makeKey(), "0", reply3 ->{
           assertTrue(reply3.succeeded());
         });
         redis.exec(reply4 ->{
@@ -1803,7 +1802,7 @@ public class RedisServiceTestBase extends VertxTestBase {
   @Test
   public void testPublish() {
     String key = makeKey();
-    redis.set(key, 0, reply ->{
+    redis.set(key, "0", reply ->{
       assertTrue(reply.succeeded());
       redis.publish(toJsonArray(key, 1), reply2 ->{
         assertTrue(reply2.succeeded());
@@ -2890,7 +2889,7 @@ public class RedisServiceTestBase extends VertxTestBase {
     
     CountDownLatch clientLatch = new CountDownLatch(1);
     
-    redis.set(key, 0, reply ->{
+    redis.set(key, "0", reply ->{
       assertTrue(reply.succeeded());
       redis.watch(toJsonArray(key), reply2 ->{
         assertTrue(reply2.succeeded());

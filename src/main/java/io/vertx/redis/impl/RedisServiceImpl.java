@@ -5,7 +5,6 @@ import io.vertx.core.Handler;
 import io.vertx.core.Vertx;
 import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;
-import io.vertx.core.json.impl.Json;
 
 public final class RedisServiceImpl extends AbstractRedisService {
 
@@ -192,10 +191,10 @@ public final class RedisServiceImpl extends AbstractRedisService {
     sendString("GETRANGE", args, handler);
   }
 
-  public void getset(String key, Object value, Handler<AsyncResult<String>> handler) {
+  public void getset(String key, String value, Handler<AsyncResult<String>> handler) {
     JsonArray params = new JsonArray();
     params.add(key);
-    params.add(validateStringOrNumberOrBoolean(value));
+    params.add(value);
     sendString("GETSET", params, handler);
   }
 
@@ -485,14 +484,14 @@ public final class RedisServiceImpl extends AbstractRedisService {
     sendString("SELECT", args, handler);
   }
 
-  public void set(String key, Object value, Handler<AsyncResult<Void>> handler) {
+  public void set(String key, String value, Handler<AsyncResult<Void>> handler) {
     setWithOptions(key, value, null, handler);
   }
 
-  public void setWithOptions(String key, Object value, JsonArray options, Handler<AsyncResult<Void>> handler) {
+  public void setWithOptions(String key, String value, JsonArray options, Handler<AsyncResult<Void>> handler) {
     JsonArray params = new JsonArray();
     params.add(key);
-    params.add(validateStringOrNumberOrBoolean(value));
+    params.add(value);
     if (options != null) {
       for (Object option: options.getList()) {
         params.add(option);
@@ -505,18 +504,18 @@ public final class RedisServiceImpl extends AbstractRedisService {
     sendLong("SETBIT", args, handler);
   }
 
-  public void setex(String key, long seconds, Object value, Handler<AsyncResult<String>> handler) {
+  public void setex(String key, long seconds, String value, Handler<AsyncResult<String>> handler) {
     JsonArray args = new JsonArray();
     args.add(key);
     args.add(seconds);
-    args.add(validateStringOrNumberOrBoolean(value));
+    args.add(value);
     sendString("SETEX", args, handler);
   }
 
-  public void setnx(String key, Object value, Handler<AsyncResult<Long>> handler) {
+  public void setnx(String key, String value, Handler<AsyncResult<Long>> handler) {
     JsonArray params = new JsonArray();
     params.add(key);
-    params.add(validateStringOrNumberOrBoolean(value));
+    params.add(value);
     sendLong("SETNX", params, handler);
   }
 
@@ -706,13 +705,5 @@ public final class RedisServiceImpl extends AbstractRedisService {
 
   public void zscan(JsonArray args, Handler<AsyncResult<Void>> handler) {
     sendVoid("ZSCAN", args, handler);
-  }
-
-  private Object validateStringOrNumberOrBoolean(Object value) {
-    if (value instanceof String || value instanceof Long || value instanceof Integer
-      || value instanceof Double || value instanceof Float || value instanceof Boolean) {
-      return value;
-    }
-    throw new IllegalArgumentException("Value is not of type string, number, or boolean");
   }
 }

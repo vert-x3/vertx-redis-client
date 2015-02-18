@@ -447,7 +447,7 @@ public interface RedisService {
    * @since 1.0.0
    * group: string
    */
-  void getset(String key, Object value, Handler<AsyncResult<String>> handler);
+  void getset(String key, String value, Handler<AsyncResult<String>> handler);
 
   /**
    * Delete one or more hash fields
@@ -1140,7 +1140,7 @@ public interface RedisService {
    * @since 1.0.0
    * group: string
    */
-  void set(String key, Object value, Handler<AsyncResult<Void>> handler);
+  void set(String key, String value, Handler<AsyncResult<Void>> handler);
 
   /**
    * Set the string value of a key
@@ -1152,7 +1152,7 @@ public interface RedisService {
    * @since 1.0.0
    * group: string
    */
-  void setWithOptions(String key, Object value, JsonArray options, Handler<AsyncResult<Void>> handler);
+  void setWithOptions(String key, String value, JsonArray options, Handler<AsyncResult<Void>> handler);
 
   /**
    * Sets or clears the bit at offset in the string value stored at key
@@ -1174,7 +1174,7 @@ public interface RedisService {
    * @since 2.0.0
    * group: string
    */
-  void setex(String key, long seconds, Object value, Handler<AsyncResult<String>> handler);
+  void setex(String key, long seconds, String value, Handler<AsyncResult<String>> handler);
 
   /**
    * Set the value of a key, only if the key does not exist
@@ -1185,7 +1185,7 @@ public interface RedisService {
    * @since 1.0.0
    * group: string
    */
-  void setnx(String key, Object value, Handler<AsyncResult<Long>> handler);
+  void setnx(String key, String value, Handler<AsyncResult<Long>> handler);
 
   /**
    * Overwrite part of a string at key starting at the specified offset
