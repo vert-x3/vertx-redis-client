@@ -410,12 +410,12 @@ public interface RedisService {
   /**
    * Get the value of a key
    *
-   * @param args    JsonArray [{"name":"key","type":"key"}]
+   * @param key     Key string
    * @param handler Handler for the result of this call.
    * @since 1.0.0
    * group: string
    */
-  void get(JsonArray args, Handler<AsyncResult<String>> handler);
+  void get(String key, Handler<AsyncResult<String>> handler);
 
   /**
    * Returns the bit value at offset in the string value stored at key
@@ -1130,12 +1130,13 @@ public interface RedisService {
   /**
    * Set the string value of a key
    *
-   * @param args    JsonArray [{"name":"key","type":"key"},{"name":"value","type":"string"},{"command":"EX","name":"seconds","type":"integer","optional":true},{"command":"PX","name":"milliseconds","type":"integer","optional":true},{"name":"condition","type":"enum","enum":["NX","XX"],"optional":true}]
+   * @param key     Key of which value to set
+   * @param value   New value for the key
    * @param handler Handler for the result of this call.
    * @since 1.0.0
    * group: string
    */
-  void set(JsonArray args, Handler<AsyncResult<Void>> handler);
+  void set(String key, Object value, Handler<AsyncResult<Void>> handler);
 
   /**
    * Sets or clears the bit at offset in the string value stored at key

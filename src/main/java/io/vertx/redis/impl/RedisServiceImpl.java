@@ -5,6 +5,7 @@ import io.vertx.core.Handler;
 import io.vertx.core.Vertx;
 import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;
+import io.vertx.core.json.impl.Json;
 
 public final class RedisServiceImpl extends AbstractRedisService {
 
@@ -176,8 +177,8 @@ public final class RedisServiceImpl extends AbstractRedisService {
     sendString("FLUSHDB", null, handler);
   }
 
-  public void get(JsonArray args, Handler<AsyncResult<String>> handler) {
-    sendString("GET", args, handler);
+  public void get(String key, Handler<AsyncResult<String>> handler) {
+    sendString("GET", new JsonArray().add(key), handler);
   }
 
   public void getbit(JsonArray args, Handler<AsyncResult<Long>> handler) {
@@ -472,8 +473,11 @@ public final class RedisServiceImpl extends AbstractRedisService {
     sendString("SELECT", args, handler);
   }
 
-  public void set(JsonArray args, Handler<AsyncResult<Void>> handler) {
-    sendVoid("SET", args, handler);
+  public void set(String key, Object value, Handler<AsyncResult<Void>> handler) {
+    JsonArray params = new JsonArray();
+    params.add(key);
+    params.add(validateStringOrNumberOrBoolean(value));
+    sendVoid("SET", params, handler);
   }
 
   public void setbit(JsonArray args, Handler<AsyncResult<Long>> handler) {
@@ -676,4 +680,11 @@ public final class RedisServiceImpl extends AbstractRedisService {
     sendVoid("ZSCAN", args, handler);
   }
 
+  private Object validateStringOrNumberOrBoolean(Object value) {
+    if (value instanceof String || value instanceof Long || value instanceof Integer
+      || value instanceof Double || value instanceof Float || value instanceof Boolean) {
+      return value;
+    }
+    throw new IllegalArgumentException("Value is not of type string, number, or boolean");
+  }
 }

@@ -17,6 +17,7 @@
 package io.vertx.test.redis;
 
 import io.vertx.redis.RedisService;
+import org.junit.Test;
 
 import java.util.concurrent.CountDownLatch;
 
