@@ -493,12 +493,19 @@ public final class RedisServiceImpl extends AbstractRedisService {
     sendLong("SETBIT", args, handler);
   }
 
-  public void setex(JsonArray args, Handler<AsyncResult<String>> handler) {
+  public void setex(String key, long seconds, Object value, Handler<AsyncResult<String>> handler) {
+    JsonArray args = new JsonArray();
+    args.add(key);
+    args.add(seconds);
+    args.add(validateStringOrNumberOrBoolean(value));
     sendString("SETEX", args, handler);
   }
 
-  public void setnx(JsonArray args, Handler<AsyncResult<Long>> handler) {
-    sendLong("SETNX", args, handler);
+  public void setnx(String key, Object value, Handler<AsyncResult<Long>> handler) {
+    JsonArray params = new JsonArray();
+    params.add(key);
+    params.add(validateStringOrNumberOrBoolean(value));
+    sendLong("SETNX", params, handler);
   }
 
   public void setrange(JsonArray args, Handler<AsyncResult<Long>> handler) {

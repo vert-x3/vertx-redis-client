@@ -1163,22 +1163,25 @@ public interface RedisService {
   /**
    * Set the value and expiration of a key
    *
-   * @param args    JsonArray [{"name":"key","type":"key"},{"name":"seconds","type":"integer"},{"name":"value","type":"string"}]
+   * @param key     Key string
+   * @param seconds Number of seconds until the key expires
+   * @param value   New value for key
    * @param handler Handler for the result of this call.
    * @since 2.0.0
    * group: string
    */
-  void setex(JsonArray args, Handler<AsyncResult<String>> handler);
+  void setex(String key, long seconds, Object value, Handler<AsyncResult<String>> handler);
 
   /**
    * Set the value of a key, only if the key does not exist
    *
-   * @param args    JsonArray [{"name":"key","type":"key"},{"name":"value","type":"string"}]
+   * @param key     Key of which value to set
+   * @param value   New value for the key
    * @param handler Handler for the result of this call.
    * @since 1.0.0
    * group: string
    */
-  void setnx(JsonArray args, Handler<AsyncResult<Long>> handler);
+  void setnx(String key, Object value, Handler<AsyncResult<Long>> handler);
 
   /**
    * Overwrite part of a string at key starting at the specified offset

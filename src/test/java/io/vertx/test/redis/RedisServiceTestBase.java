@@ -2311,7 +2311,7 @@ public class RedisServiceTestBase extends VertxTestBase {
   @Test
   public void testSetex() {
     final String mykey = makeKey();
-    redis.setex(toJsonArray(mykey, 10, "Hello"), reply0 -> {
+    redis.setex(mykey, 10, "Hello", reply0 -> {
       assertTrue(reply0.succeeded());
       redis.ttl(toJsonArray(mykey), reply1 -> {
         assertTrue(reply1.succeeded());
@@ -2329,10 +2329,10 @@ public class RedisServiceTestBase extends VertxTestBase {
   @Test
   public void testSetnx() {
     final String mykey = makeKey();
-    redis.setnx(toJsonArray(mykey, "Hello"), reply0 -> {
+    redis.setnx(mykey, "Hello", reply0 -> {
       assertTrue(reply0.succeeded());
       assertEquals(1, reply0.result().longValue());
-      redis.setnx(toJsonArray(mykey, "World"), reply1 -> {
+      redis.setnx(mykey, "World", reply1 -> {
         assertTrue(reply1.succeeded());
         assertEquals(0, reply1.result().longValue());
         redis.get(mykey, reply2 -> {
