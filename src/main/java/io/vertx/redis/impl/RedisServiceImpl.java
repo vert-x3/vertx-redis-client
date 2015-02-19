@@ -47,37 +47,23 @@ public final class RedisServiceImpl extends AbstractRedisService {
   }
 
   public void blpop(String key, int seconds, Handler<AsyncResult<JsonArray>> handler) {
-    sendJsonArray("BLPOP", new JsonArray().add(key).add(seconds), handler);
+    sendJsonArray("BLPOP", toPayload(key, seconds), handler);
   }
 
   public void blpopMany(List<String> keys, int seconds, Handler<AsyncResult<JsonArray>> handler) {
-    JsonArray args = new JsonArray();
-    for (String key: keys) {
-      args.add(key);
-    }
-    args.add(seconds);
-    sendJsonArray("BLPOP", args, handler);
+    sendJsonArray("BLPOP", toPayload(keys, seconds), handler);
   }
 
   public void brpop(String key, int seconds, Handler<AsyncResult<JsonArray>> handler) {
-    sendJsonArray("BRPOP", new JsonArray().add(key).add(seconds), handler);
+    sendJsonArray("BRPOP", toPayload(key, seconds), handler);
   }
 
   public void brpopMany(List<String> keys, int seconds, Handler<AsyncResult<JsonArray>> handler) {
-    JsonArray args = new JsonArray();
-    for (String key: keys) {
-      args.add(key);
-    }
-    args.add(seconds);
-    sendJsonArray("BRPOP", args, handler);
+    sendJsonArray("BRPOP", toPayload(keys, seconds), handler);
   }
 
   public void brpoplpush(String key, String destkey, int seconds, Handler<AsyncResult<Void>> handler) {
-    JsonArray args = new JsonArray();
-    args.add(key);
-    args.add(destkey);
-    args.add(seconds);
-    sendVoid("BRPOPLPUSH", args, handler);
+    sendVoid("BRPOPLPUSH", toPayload(key, destkey, seconds), handler);
   }
 
   public void clientKill(JsonArray args, Handler<AsyncResult<Long>> handler) {
@@ -149,18 +135,15 @@ public final class RedisServiceImpl extends AbstractRedisService {
   }
 
   public void decr(String key, Handler<AsyncResult<Long>> handler) {
-    sendLong("DECR", new JsonArray().add(key), handler);
+    sendLong("DECR", toPayload(key), handler);
   }
 
   public void decrby(String key, long decrement, Handler<AsyncResult<Long>> handler) {
-    JsonArray args = new JsonArray();
-    args.add(key);
-    args.add(decrement);
-    sendLong("DECRBY", args, handler);
+    sendLong("DECRBY", toPayload(key, decrement), handler);
   }
 
   public void del(List<String> keys, Handler<AsyncResult<Long>> handler) {
-    sendLong("DEL", new JsonArray(keys), handler);
+    sendLong("DEL", toPayload(keys), handler);
   }
 
   public void discard(Handler<AsyncResult<String>> handler) {
@@ -168,7 +151,7 @@ public final class RedisServiceImpl extends AbstractRedisService {
   }
 
   public void dump(String key, Handler<AsyncResult<String>> handler) {
-    sendString("DUMP", new JsonArray().add(key), handler);
+    sendString("DUMP", toPayload(key), handler);
   }
 
   public void echo(JsonArray args, Handler<AsyncResult<String>> handler) {
@@ -188,21 +171,15 @@ public final class RedisServiceImpl extends AbstractRedisService {
   }
 
   public void exists(String key, Handler<AsyncResult<Long>> handler) {
-    sendLong("EXISTS", new JsonArray().add(key), handler);
+    sendLong("EXISTS", toPayload(key), handler);
   }
 
   public void expire(String key, int seconds, Handler<AsyncResult<Long>> handler) {
-    JsonArray args = new JsonArray();
-    args.add(key);
-    args.add(seconds);
-    sendLong("EXPIRE", args, handler);
+    sendLong("EXPIRE", toPayload(key, seconds), handler);
   }
 
   public void expireat(String key, long timestamp, Handler<AsyncResult<Long>> handler) {
-    JsonArray args = new JsonArray();
-    args.add(key);
-    args.add(timestamp);
-    sendLong("EXPIREAT", args, handler);
+    sendLong("EXPIREAT", toPayload(key, timestamp), handler);
   }
 
   public void flushall(Handler<AsyncResult<String>> handler) {
@@ -214,7 +191,7 @@ public final class RedisServiceImpl extends AbstractRedisService {
   }
 
   public void get(String key, Handler<AsyncResult<String>> handler) {
-    sendString("GET", new JsonArray().add(key), handler);
+    sendString("GET", toPayload(key), handler);
   }
 
   public void getbit(JsonArray args, Handler<AsyncResult<Long>> handler) {
@@ -226,82 +203,55 @@ public final class RedisServiceImpl extends AbstractRedisService {
   }
 
   public void getset(String key, String value, Handler<AsyncResult<String>> handler) {
-    JsonArray params = new JsonArray();
-    params.add(key);
-    params.add(value);
-    sendString("GETSET", params, handler);
+    sendString("GETSET", toPayload(key, value), handler);
   }
 
   public void hdel(String key, String field, Handler<AsyncResult<Long>> handler) {
-    sendLong("HDEL", new JsonArray().add(key).add(field), handler);
+    sendLong("HDEL", toPayload(key, field), handler);
   }
 
   public void hdelMany(String key, List<String> fields, Handler<AsyncResult<Long>> handler) {
-    JsonArray args = new JsonArray();
-    args.add(key);
-    for (String field: fields) {
-      args.add(field);
-    }
-    sendLong("HDEL", args, handler);
+    sendLong("HDEL", toPayload(key, fields), handler);
   }
 
   public void hexists(String key, String field, Handler<AsyncResult<Long>> handler) {
-    sendLong("HEXISTS", new JsonArray().add(key).add(field), handler);
+    sendLong("HEXISTS", toPayload(key, field), handler);
   }
 
   public void hget(String key, String field, Handler<AsyncResult<String>> handler) {
-    sendString("HGET", new JsonArray().add(key).add(field), handler);
+    sendString("HGET", toPayload(key, field), handler);
   }
 
   public void hgetall(String key, Handler<AsyncResult<JsonObject>> handler) {
-    sendJsonObject("HGETALL", new JsonArray().add(key), handler);
+    sendJsonObject("HGETALL", toPayload(key), handler);
   }
 
   public void hincrby(String key, String field, long increment, Handler<AsyncResult<Long>> handler) {
-    JsonArray args = new JsonArray();
-    args.add(key);
-    args.add(field);
-    args.add(increment);
-    sendLong("HINCRBY", args, handler);
+    sendLong("HINCRBY", toPayload(key, field, increment), handler);
   }
 
   public void hincrbyfloat(String key, String field, double increment, Handler<AsyncResult<String>> handler) {
-    JsonArray args = new JsonArray();
-    args.add(key);
-    args.add(field);
-    args.add(increment);
-    sendString("HINCRBYFLOAT", args, handler);
+    sendString("HINCRBYFLOAT", toPayload(key, field, increment), handler);
   }
 
   public void hkeys(String key, Handler<AsyncResult<JsonArray>> handler) {
-    sendJsonArray("HKEYS", new JsonArray().add(key), handler);
+    sendJsonArray("HKEYS", toPayload(key), handler);
   }
 
   public void hlen(String key, Handler<AsyncResult<Long>> handler) {
-    sendLong("HLEN", new JsonArray().add(key), handler);
+    sendLong("HLEN", toPayload(key), handler);
   }
 
   public void hmgetOne(String key, String field, Handler<AsyncResult<JsonArray>> handler) {
-    sendJsonArray("HMGET", new JsonArray().add(key).add(field), handler);
+    sendJsonArray("HMGET", toPayload(key, field), handler);
   }
 
   public void hmget(String key, List<String> fields, Handler<AsyncResult<JsonArray>> handler) {
-    JsonArray args = new JsonArray();
-    args.add(key);
-    for (String field: fields) {
-      args.add(field);
-    }
-    sendJsonArray("HMGET", args, handler);
+    sendJsonArray("HMGET", toPayload(key, fields), handler);
   }
 
   public void hmset(String key, Map<String, String> values, Handler<AsyncResult<String>> handler) {
-    JsonArray args = new JsonArray();
-    args.add(key);
-    for (Map.Entry<String, String> pair: values.entrySet()) {
-      args.add(pair.getKey());
-      args.add(pair.getValue());
-    }
-    sendString("HMSET", args, handler);
+    sendString("HMSET", toPayload(key, values), handler);
   }
 
   public void hset(JsonArray args, Handler<AsyncResult<Long>> handler) {
@@ -317,21 +267,15 @@ public final class RedisServiceImpl extends AbstractRedisService {
   }
 
   public void incr(String key, Handler<AsyncResult<Long>> handler) {
-    sendLong("INCR", new JsonArray().add(key), handler);
+    sendLong("INCR", toPayload(key), handler);
   }
 
   public void incrby(String key, long increment, Handler<AsyncResult<Long>> handler) {
-    JsonArray args = new JsonArray();
-    args.add(key);
-    args.add(increment);
-    sendLong("INCRBY", args, handler);
+    sendLong("INCRBY", toPayload(key, increment), handler);
   }
 
   public void incrbyfloat(String key, double increment, Handler<AsyncResult<String>> handler) {
-    JsonArray args = new JsonArray();
-    args.add(key);
-    args.add(increment);
-    sendString("INCRBYFLOAT", args, handler);
+    sendString("INCRBYFLOAT", toPayload(key, increment), handler);
   }
 
   public void info(JsonArray args, Handler<AsyncResult<JsonObject>> handler) {
@@ -347,76 +291,47 @@ public final class RedisServiceImpl extends AbstractRedisService {
   }
 
   public void lindex(String key, int index, Handler<AsyncResult<String>> handler) {
-    JsonArray args = new JsonArray();
-    args.add(key);
-    args.add(index);
-    sendString("LINDEX", args, handler);
+    sendString("LINDEX", toPayload(key, index), handler);
   }
 
   public void linsert(String key, InsertOptions option, String pivot, String value, Handler<AsyncResult<Long>> handler) {
-    JsonArray args = new JsonArray();
-    args.add(key);
-    args.add(option.name());
-    args.add(pivot);
-    args.add(value);
-    sendLong("LINSERT", args, handler);
+    sendLong("LINSERT", toPayload(key, option.name(), pivot, value), handler);
   }
 
   public void llen(String key, Handler<AsyncResult<Long>> handler) {
-    sendLong("LLEN", new JsonArray().add(key), handler);
+    sendLong("LLEN", toPayload(key), handler);
   }
 
   public void lpop(String key, Handler<AsyncResult<String>> handler) {
-    sendString("LPOP", new JsonArray().add(key), handler);
+    sendString("LPOP", toPayload(key), handler);
   }
 
   public void lpushMany(String key, List<String> values, Handler<AsyncResult<Long>> handler) {
-    JsonArray args = new JsonArray();
-    args.add(key);
-    for (String value: values) {
-      args.add(value);
-    }
-    sendLong("LPUSH", args, handler);
+    sendLong("LPUSH", toPayload(key, values), handler);
   }
 
   public void lpush(String key, String value, Handler<AsyncResult<Long>> handler) {
-    sendLong("LPUSH", new JsonArray().add(key).add(value), handler);
+    sendLong("LPUSH", toPayload(key, value), handler);
   }
 
   public void lpushx(String key, String value, Handler<AsyncResult<Long>> handler) {
-    sendLong("LPUSHX", new JsonArray().add(key).add(value), handler);
+    sendLong("LPUSHX", toPayload(key, value), handler);
   }
 
   public void lrange(String key, int from, int to, Handler<AsyncResult<JsonArray>> handler) {
-    JsonArray args = new JsonArray();
-    args.add(key);
-    args.add(from);
-    args.add(to);
-    sendJsonArray("LRANGE", args, handler);
+    sendJsonArray("LRANGE", toPayload(key, from, to), handler);
   }
 
   public void lrem(String key, int count, String value, Handler<AsyncResult<Long>> handler) {
-    JsonArray args = new JsonArray();
-    args.add(key);
-    args.add(count);
-    args.add(value);
-    sendLong("LREM", args, handler);
+    sendLong("LREM", toPayload(key, count, value), handler);
   }
 
   public void lset(String key, int index, String value, Handler<AsyncResult<String>> handler) {
-    JsonArray args = new JsonArray();
-    args.add(key);
-    args.add(index);
-    args.add(value);
-    sendString("LSET", args, handler);
+    sendString("LSET", toPayload(key, index, value), handler);
   }
 
   public void ltrim(String key, int from, int to, Handler<AsyncResult<String>> handler) {
-    JsonArray args = new JsonArray();
-    args.add(key);
-    args.add(from);
-    args.add(to);
-    sendString("LTRIM", args, handler);
+    sendString("LTRIM", toPayload(key, from, to), handler);
   }
 
   public void mget(JsonArray args, Handler<AsyncResult<JsonArray>> handler) {
@@ -448,14 +363,11 @@ public final class RedisServiceImpl extends AbstractRedisService {
   }
 
   public void object(String key, ObjectCmd cmd, Handler<AsyncResult<Void>> handler) {
-    JsonArray args = new JsonArray();
-    args.add(cmd.name());
-    args.add(key);
-    sendVoid("OBJECT", args, handler);
+    sendVoid("OBJECT", toPayload(cmd.name(), key), handler);
   }
 
   public void persist(String key, Handler<AsyncResult<Long>> handler) {
-    sendLong("PERSIST", new JsonArray().add(key), handler);
+    sendLong("PERSIST", toPayload(key), handler);
   }
 
   public void pexpire(JsonArray args, Handler<AsyncResult<Long>> handler) {
@@ -515,17 +427,11 @@ public final class RedisServiceImpl extends AbstractRedisService {
   }
 
   public void rename(String key, String newkey, Handler<AsyncResult<String>> handler) {
-    JsonArray args = new JsonArray();
-    args.add(key);
-    args.add(newkey);
-    sendString("RENAME", args, handler);
+    sendString("RENAME", toPayload(key, newkey), handler);
   }
 
   public void renamenx(String key, String newkey, Handler<AsyncResult<Long>> handler) {
-    JsonArray args = new JsonArray();
-    args.add(key);
-    args.add(newkey);
-    sendLong("RENAMENX", args, handler);
+    sendLong("RENAMENX", toPayload(key, newkey), handler);
   }
 
   public void restore(JsonArray args, Handler<AsyncResult<String>> handler) {
@@ -537,28 +443,23 @@ public final class RedisServiceImpl extends AbstractRedisService {
   }
 
   public void rpop(String key, Handler<AsyncResult<String>> handler) {
-    sendString("RPOP", new JsonArray().add(key), handler);
+    sendString("RPOP", toPayload(key), handler);
   }
 
   public void rpoplpush(String key, String destkey, Handler<AsyncResult<String>> handler) {
-    sendString("RPOPLPUSH", new JsonArray().add(key).add(destkey), handler);
+    sendString("RPOPLPUSH", toPayload(key, destkey), handler);
   }
 
   public void rpushMany(String key, List<String> values, Handler<AsyncResult<Long>> handler) {
-    JsonArray args = new JsonArray();
-    args.add(key);
-    for (String value: values) {
-      args.add(value);
-    }
-    sendLong("RPUSH", args, handler);
+    sendLong("RPUSH", toPayload(key, values), handler);
   }
 
   public void rpush(String key, String value, Handler<AsyncResult<Long>> handler) {
-    sendLong("RPUSH", new JsonArray().add(key).add(value), handler);
+    sendLong("RPUSH", toPayload(key, value), handler);
   }
 
   public void rpushx(String key, String value, Handler<AsyncResult<Long>> handler) {
-    sendLong("RPUSHX", new JsonArray().add(key).add(value), handler);
+    sendLong("RPUSHX", toPayload(key, value), handler);
   }
 
   public void sadd(JsonArray args, Handler<AsyncResult<Long>> handler) {
@@ -606,15 +507,7 @@ public final class RedisServiceImpl extends AbstractRedisService {
   }
 
   public void setWithOptions(String key, String value, JsonArray options, Handler<AsyncResult<Void>> handler) {
-    JsonArray params = new JsonArray();
-    params.add(key);
-    params.add(value);
-    if (options != null) {
-      for (Object option: options.getList()) {
-        params.add(option);
-      }
-    }
-    sendVoid("SET", params, handler);
+    sendVoid("SET", toPayload(key, value, options != null ? options.getList() : null), handler);
   }
 
   public void setbit(JsonArray args, Handler<AsyncResult<Long>> handler) {
@@ -622,18 +515,11 @@ public final class RedisServiceImpl extends AbstractRedisService {
   }
 
   public void setex(String key, long seconds, String value, Handler<AsyncResult<String>> handler) {
-    JsonArray args = new JsonArray();
-    args.add(key);
-    args.add(seconds);
-    args.add(value);
-    sendString("SETEX", args, handler);
+    sendString("SETEX", toPayload(key, seconds, value), handler);
   }
 
   public void setnx(String key, String value, Handler<AsyncResult<Long>> handler) {
-    JsonArray params = new JsonArray();
-    params.add(key);
-    params.add(value);
-    sendLong("SETNX", params, handler);
+    sendLong("SETNX", toPayload(key, value), handler);
   }
 
   public void setrange(JsonArray args, Handler<AsyncResult<Long>> handler) {
@@ -713,11 +599,11 @@ public final class RedisServiceImpl extends AbstractRedisService {
   }
 
   public void ttl(String key, Handler<AsyncResult<Long>> handler) {
-    sendLong("TTL", new JsonArray().add(key), handler);
+    sendLong("TTL", toPayload(key), handler);
   }
 
   public void type(String key, Handler<AsyncResult<String>> handler) {
-    sendString("TYPE", new JsonArray().add(key), handler);
+    sendString("TYPE", toPayload(key), handler);
   }
 
   public void unsubscribe(JsonArray args, Handler<AsyncResult<Void>> handler) {
@@ -836,10 +722,15 @@ public final class RedisServiceImpl extends AbstractRedisService {
     JsonArray result = new JsonArray();
     for (Object param: parameters) {
       if (param instanceof List) {
-        for (Object el: (List) param) {
+        for (Object el : (List) param) {
           if (el != null) {
             result.add(el);
           }
+        }
+      } else if (param instanceof Map) {
+        for (Map.Entry<?, ?> pair: ((Map<?, ?>) param).entrySet()) {
+          result.add(pair.getKey());
+          result.add(pair.getValue());
         }
       } else if (param != null) {
         result.add(param);
