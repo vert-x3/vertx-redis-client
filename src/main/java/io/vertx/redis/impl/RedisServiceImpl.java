@@ -812,23 +812,39 @@ public final class RedisServiceImpl extends AbstractRedisService {
     sendVoid("SCAN", args, handler);
   }
 
-  public void sscan(JsonArray args, Handler<AsyncResult<Void>> handler) {
-    sendVoid("SSCAN", args, handler);
+  public void sscan(String key, String cursor, ScanOptions options, Handler<AsyncResult<Void>> handler) {
+    sendVoid("SSCAN", toPayload(key, cursor, options != null ? options.toJsonArray().getList() : null), handler);
   }
 
   public void hscan(String key, String cursor, ScanOptions options, Handler<AsyncResult<JsonArray>> handler) {
-    JsonArray args = new JsonArray();
-    args.add(key);
-    args.add(cursor);
-    if (options != null) {
-      for (Object option: options.toJsonArray().getList()) {
-        args.add(option);
-      }
-    }
-    sendJsonArray("HSCAN", args, handler);
+    sendJsonArray("HSCAN", toPayload(key, cursor, options != null ? options.toJsonArray().getList() : null), handler);
   }
 
   public void zscan(JsonArray args, Handler<AsyncResult<Void>> handler) {
     sendVoid("ZSCAN", args, handler);
+  }
+
+  /**
+   * A helper method to package method parameters into JsonArray payload.
+   *
+   * Null parameters are ignored.
+   *
+   * @param parameters Call parameters
+   * @return JsonArray that can be passed to send()
+   */
+  private static JsonArray toPayload(Object ... parameters) {
+    JsonArray result = new JsonArray();
+    for (Object param: parameters) {
+      if (param instanceof List) {
+        for (Object el: (List) param) {
+          if (el != null) {
+            result.add(el);
+          }
+        }
+      } else if (param != null) {
+        result.add(param);
+      }
+    }
+    return result;
   }
 }
