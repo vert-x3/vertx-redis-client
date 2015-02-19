@@ -5,6 +5,7 @@ import io.vertx.core.json.JsonObject;
 import io.vertx.redis.InsertOptions;
 import io.vertx.redis.ObjectCmd;
 import io.vertx.redis.RedisService;
+import io.vertx.redis.ScanOptions;
 import io.vertx.redis.SetOptions;
 import io.vertx.test.core.VertxTestBase;
 
@@ -101,6 +102,10 @@ public class RedisServiceTestBase extends VertxTestBase {
 
   private static Object[] toArray(final Object... params) {
     return params;
+  }
+
+  private static String errorMessage(Throwable t) {
+    return t != null ? t.getMessage() : "";
   }
 
   private static String makeKey() {
@@ -270,7 +275,7 @@ public class RedisServiceTestBase extends VertxTestBase {
         assertEquals(3, reply1.result().longValue());
 
         redis.brpopMany(Arrays.asList(list1, list2), 0, reply2 -> {
-          assertTrue(reply2.succeeded());
+          assertTrue(errorMessage(reply2.cause()), reply2.succeeded());
           assertArrayEquals(toArray(list1, "c"), reply2.result().getList().toArray());
           testComplete();
         });
@@ -3327,6 +3332,31 @@ public class RedisServiceTestBase extends VertxTestBase {
             });
           });
         });
+      });
+    });
+    await();
+  }
+
+  // TODO redis-embedded version of redis does not support HSCAN
+  //@Test
+  public void testHscan() {
+    final String key = makeKey();
+    Map<String, String> obj = new HashMap<>();
+    for (int i = 0; i < 100; i++) {
+      obj.put("field" + i, "val" + i);
+    }
+    redis.hmset(key, obj, reply0 -> {
+      assertTrue(reply0.succeeded());
+      assertEquals("OK", reply0.result().toString());
+      redis.hscan(key, "0", new ScanOptions().setMatch("field1*"), reply1 -> {
+        assertTrue(String.valueOf(reply1.cause()), reply1.succeeded());
+        JsonArray result = reply1.result();
+        assertEquals(2, result.size());
+
+        JsonArray page = result.getJsonArray(1);
+        assertEquals("22", page.size());
+
+        testComplete();
       });
     });
     await();

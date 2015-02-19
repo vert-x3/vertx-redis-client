@@ -1727,12 +1727,14 @@ public interface RedisService {
   /**
    * Incrementally iterate hash fields and associated values
    *
-   * @param args    JsonArray [{"name":"key","type":"key"},{"name":"cursor","type":"integer"},{"command":"MATCH","name":"pattern","type":"pattern","optional":true},{"command":"COUNT","name":"count","type":"integer","optional":true}]
+   * @param key     Key string
+   * @param cursor  Cursor id
+   * @param options Scan options
    * @param handler Handler for the result of this call.
    * @since 2.8.0
    * group: hash
    */
-  void hscan(JsonArray args, Handler<AsyncResult<Void>> handler);
+  void hscan(String key, String cursor, ScanOptions options, Handler<AsyncResult<JsonArray>> handler);
 
   /**
    * Incrementally iterate sorted sets elements and associated scores

@@ -7,6 +7,7 @@ import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;
 import io.vertx.redis.InsertOptions;
 import io.vertx.redis.ObjectCmd;
+import io.vertx.redis.ScanOptions;
 
 import java.util.List;
 import java.util.Map;
@@ -815,8 +816,16 @@ public final class RedisServiceImpl extends AbstractRedisService {
     sendVoid("SSCAN", args, handler);
   }
 
-  public void hscan(JsonArray args, Handler<AsyncResult<Void>> handler) {
-    sendVoid("HSCAN", args, handler);
+  public void hscan(String key, String cursor, ScanOptions options, Handler<AsyncResult<JsonArray>> handler) {
+    JsonArray args = new JsonArray();
+    args.add(key);
+    args.add(cursor);
+    if (options != null) {
+      for (Object option: options.toJsonArray().getList()) {
+        args.add(option);
+      }
+    }
+    sendJsonArray("HSCAN", args, handler);
   }
 
   public void zscan(JsonArray args, Handler<AsyncResult<Void>> handler) {
