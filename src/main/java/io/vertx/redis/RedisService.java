@@ -646,102 +646,127 @@ public interface RedisService {
   /**
    * Get an element from a list by its index
    *
-   * @param args    JsonArray [{"name":"key","type":"key"},{"name":"index","type":"integer"}]
+   * @param key     Key string
+   * @param index   Index of list element to get
    * @param handler Handler for the result of this call.
    * @since 1.0.0
    * group: list
    */
-  void lindex(JsonArray args, Handler<AsyncResult<String>> handler);
+  void lindex(String key, int index, Handler<AsyncResult<String>> handler);
 
   /**
    * Insert an element before or after another element in a list
    *
-   * @param args    JsonArray [{"name":"key","type":"key"},{"name":"where","type":"enum","enum":["BEFORE","AFTER"]},{"name":"pivot","type":"string"},{"name":"value","type":"string"}]
+   * @param key     Key string
+   * @param option  BEFORE or AFTER
+   * @param pivot   Key to use as a pivot
+   * @param value   Value to be inserted before or after the pivot
    * @param handler Handler for the result of this call.
    * @since 2.2.0
    * group: list
    */
-  void linsert(JsonArray args, Handler<AsyncResult<Long>> handler);
+  void linsert(String key, InsertOptions option, String pivot, String value, Handler<AsyncResult<Long>> handler);
 
   /**
    * Get the length of a list
    *
-   * @param args    JsonArray [{"name":"key","type":"key"}]
+   * @param key     String key
    * @param handler Handler for the result of this call.
    * @since 1.0.0
    * group: list
    */
-  void llen(JsonArray args, Handler<AsyncResult<Long>> handler);
+  void llen(String key, Handler<AsyncResult<Long>> handler);
 
   /**
    * Remove and get the first element in a list
    *
-   * @param args    JsonArray [{"name":"key","type":"key"}]
+   * @param key     String key
    * @param handler Handler for the result of this call.
    * @since 1.0.0
    * group: list
    */
-  void lpop(JsonArray args, Handler<AsyncResult<String>> handler);
+  void lpop(String key, Handler<AsyncResult<String>> handler);
 
   /**
    * Prepend one or multiple values to a list
    *
-   * @param args    JsonArray [{"name":"key","type":"key"},{"name":"value","type":"string","multiple":true}]
+   * @param key     Key string
+   * @param values  Values to be added at the beginning of the list, one by one
    * @param handler Handler for the result of this call.
    * @since 1.0.0
    * group: list
    */
-  void lpush(JsonArray args, Handler<AsyncResult<Long>> handler);
+  void lpushMany(String key, List<String> values, Handler<AsyncResult<Long>> handler);
+
+  /**
+   * Prepend one value to a list
+   *
+   * @param key     Key string
+   * @param value   Value to be added at the beginning of the list
+   * @param handler Handler for the result of this call.
+   * @since 1.0.0
+   * group: list
+   */
+  void lpush(String key, String value, Handler<AsyncResult<Long>> handler);
 
   /**
    * Prepend a value to a list, only if the list exists
    *
-   * @param args    JsonArray [{"name":"key","type":"key"},{"name":"value","type":"string"}]
+   * @param key     Key string
+   * @param value   Value to add at the beginning of the list
    * @param handler Handler for the result of this call.
    * @since 2.2.0
    * group: list
    */
-  void lpushx(JsonArray args, Handler<AsyncResult<Long>> handler);
+  void lpushx(String key, String value, Handler<AsyncResult<Long>> handler);
 
   /**
    * Get a range of elements from a list
    *
-   * @param args    JsonArray [{"name":"key","type":"key"},{"name":"start","type":"integer"},{"name":"stop","type":"integer"}]
+   * @param key     Key string
+   * @param from    Start index
+   * @param to      Stop index
    * @param handler Handler for the result of this call.
    * @since 1.0.0
    * group: list
    */
-  void lrange(JsonArray args, Handler<AsyncResult<JsonArray>> handler);
+  void lrange(String key, int from, int to, Handler<AsyncResult<JsonArray>> handler);
 
   /**
    * Remove elements from a list
    *
-   * @param args    JsonArray [{"name":"key","type":"key"},{"name":"count","type":"integer"},{"name":"value","type":"string"}]
+   * @param key     Key string
+   * @param count   Number of first found occurrences equal to $value to remove from the list
+   * @param value   Value to be removed
    * @param handler Handler for the result of this call.
    * @since 1.0.0
    * group: list
    */
-  void lrem(JsonArray args, Handler<AsyncResult<Long>> handler);
+  void lrem(String key, int count, String value, Handler<AsyncResult<Long>> handler);
 
   /**
    * Set the value of an element in a list by its index
    *
-   * @param args    JsonArray [{"name":"key","type":"key"},{"name":"index","type":"integer"},{"name":"value","type":"string"}]
+   * @param key     Key string
+   * @param index   Position within list
+   * @param value   New value
    * @param handler Handler for the result of this call.
    * @since 1.0.0
    * group: list
    */
-  void lset(JsonArray args, Handler<AsyncResult<String>> handler);
+  void lset(String key, int index, String value, Handler<AsyncResult<String>> handler);
 
   /**
    * Trim a list to the specified range
    *
-   * @param args    JsonArray [{"name":"key","type":"key"},{"name":"start","type":"integer"},{"name":"stop","type":"integer"}]
+   * @param key     Key string
+   * @param from    Start index
+   * @param to      Stop index
    * @param handler Handler for the result of this call.
    * @since 1.0.0
    * group: list
    */
-  void ltrim(JsonArray args, Handler<AsyncResult<String>> handler);
+  void ltrim(String key, int from, int to, Handler<AsyncResult<String>> handler);
 
   /**
    * Get the values of all the given keys
@@ -1007,42 +1032,56 @@ public interface RedisService {
   /**
    * Remove and get the last element in a list
    *
-   * @param args    JsonArray [{"name":"key","type":"key"}]
+   * @param key     Key string
    * @param handler Handler for the result of this call.
    * @since 1.0.0
    * group: list
    */
-  void rpop(JsonArray args, Handler<AsyncResult<String>> handler);
+  void rpop(String key, Handler<AsyncResult<String>> handler);
 
   /**
    * Remove the last element in a list, append it to another list and return it
    *
-   * @param args    JsonArray [{"name":"source","type":"key"},{"name":"destination","type":"key"}]
+   * @param key     Key string identifying source list
+   * @param destkey Key string identifying destination list
    * @param handler Handler for the result of this call.
    * @since 1.2.0
    * group: list
    */
-  void rpoplpush(JsonArray args, Handler<AsyncResult<String>> handler);
+  void rpoplpush(String key, String destkey, Handler<AsyncResult<String>> handler);
 
   /**
    * Append one or multiple values to a list
    *
-   * @param args    JsonArray [{"name":"key","type":"key"},{"name":"value","type":"string","multiple":true}]
+   * @param key     Key string
+   * @param values  List of values to add to the end of the list
    * @param handler Handler for the result of this call.
    * @since 1.0.0
    * group: list
    */
-  void rpush(JsonArray args, Handler<AsyncResult<Long>> handler);
+  void rpushMany(String key, List<String> values, Handler<AsyncResult<Long>> handler);
+
+  /**
+   * Append one or multiple values to a list
+   *
+   * @param key     Key string
+   * @param value   Value to be added to the end of the list
+   * @param handler Handler for the result of this call.
+   * @since 1.0.0
+   * group: list
+   */
+  void rpush(String key, String value, Handler<AsyncResult<Long>> handler);
 
   /**
    * Append a value to a list, only if the list exists
    *
-   * @param args    JsonArray [{"name":"key","type":"key"},{"name":"value","type":"string"}]
+   * @param key     Key string
+   * @param value   Value to be added to the end of the list
    * @param handler Handler for the result of this call.
    * @since 2.2.0
    * group: list
    */
-  void rpushx(JsonArray args, Handler<AsyncResult<Long>> handler);
+  void rpushx(String key, String value, Handler<AsyncResult<Long>> handler);
 
   /**
    * Add one or more members to a set

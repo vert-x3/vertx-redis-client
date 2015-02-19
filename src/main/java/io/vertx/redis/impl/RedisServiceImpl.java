@@ -5,9 +5,8 @@ import io.vertx.core.Handler;
 import io.vertx.core.Vertx;
 import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;
+import io.vertx.redis.InsertOptions;
 import io.vertx.redis.ObjectCmd;
-
-import java.util.List;
 
 import java.util.List;
 
@@ -291,43 +290,76 @@ public final class RedisServiceImpl extends AbstractRedisService {
     sendLong("LASTSAVE", null, handler);
   }
 
-  public void lindex(JsonArray args, Handler<AsyncResult<String>> handler) {
+  public void lindex(String key, int index, Handler<AsyncResult<String>> handler) {
+    JsonArray args = new JsonArray();
+    args.add(key);
+    args.add(index);
     sendString("LINDEX", args, handler);
   }
 
-  public void linsert(JsonArray args, Handler<AsyncResult<Long>> handler) {
+  public void linsert(String key, InsertOptions option, String pivot, String value, Handler<AsyncResult<Long>> handler) {
+    JsonArray args = new JsonArray();
+    args.add(key);
+    args.add(option.name());
+    args.add(pivot);
+    args.add(value);
     sendLong("LINSERT", args, handler);
   }
 
-  public void llen(JsonArray args, Handler<AsyncResult<Long>> handler) {
-    sendLong("LLEN", args, handler);
+  public void llen(String key, Handler<AsyncResult<Long>> handler) {
+    sendLong("LLEN", new JsonArray().add(key), handler);
   }
 
-  public void lpop(JsonArray args, Handler<AsyncResult<String>> handler) {
-    sendString("LPOP", args, handler);
+  public void lpop(String key, Handler<AsyncResult<String>> handler) {
+    sendString("LPOP", new JsonArray().add(key), handler);
   }
 
-  public void lpush(JsonArray args, Handler<AsyncResult<Long>> handler) {
+  public void lpushMany(String key, List<String> values, Handler<AsyncResult<Long>> handler) {
+    JsonArray args = new JsonArray();
+    args.add(key);
+    for (String value: values) {
+      args.add(value);
+    }
     sendLong("LPUSH", args, handler);
   }
 
-  public void lpushx(JsonArray args, Handler<AsyncResult<Long>> handler) {
-    sendLong("LPUSHX", args, handler);
+  public void lpush(String key, String value, Handler<AsyncResult<Long>> handler) {
+    sendLong("LPUSH", new JsonArray().add(key).add(value), handler);
   }
 
-  public void lrange(JsonArray args, Handler<AsyncResult<JsonArray>> handler) {
+  public void lpushx(String key, String value, Handler<AsyncResult<Long>> handler) {
+    sendLong("LPUSHX", new JsonArray().add(key).add(value), handler);
+  }
+
+  public void lrange(String key, int from, int to, Handler<AsyncResult<JsonArray>> handler) {
+    JsonArray args = new JsonArray();
+    args.add(key);
+    args.add(from);
+    args.add(to);
     sendJsonArray("LRANGE", args, handler);
   }
 
-  public void lrem(JsonArray args, Handler<AsyncResult<Long>> handler) {
+  public void lrem(String key, int count, String value, Handler<AsyncResult<Long>> handler) {
+    JsonArray args = new JsonArray();
+    args.add(key);
+    args.add(count);
+    args.add(value);
     sendLong("LREM", args, handler);
   }
 
-  public void lset(JsonArray args, Handler<AsyncResult<String>> handler) {
+  public void lset(String key, int index, String value, Handler<AsyncResult<String>> handler) {
+    JsonArray args = new JsonArray();
+    args.add(key);
+    args.add(index);
+    args.add(value);
     sendString("LSET", args, handler);
   }
 
-  public void ltrim(JsonArray args, Handler<AsyncResult<String>> handler) {
+  public void ltrim(String key, int from, int to, Handler<AsyncResult<String>> handler) {
+    JsonArray args = new JsonArray();
+    args.add(key);
+    args.add(from);
+    args.add(to);
     sendString("LTRIM", args, handler);
   }
 
@@ -448,20 +480,29 @@ public final class RedisServiceImpl extends AbstractRedisService {
     sendJsonArray("ROLE", null, handler);
   }
 
-  public void rpop(JsonArray args, Handler<AsyncResult<String>> handler) {
-    sendString("RPOP", args, handler);
+  public void rpop(String key, Handler<AsyncResult<String>> handler) {
+    sendString("RPOP", new JsonArray().add(key), handler);
   }
 
-  public void rpoplpush(JsonArray args, Handler<AsyncResult<String>> handler) {
-    sendString("RPOPLPUSH", args, handler);
+  public void rpoplpush(String key, String destkey, Handler<AsyncResult<String>> handler) {
+    sendString("RPOPLPUSH", new JsonArray().add(key).add(destkey), handler);
   }
 
-  public void rpush(JsonArray args, Handler<AsyncResult<Long>> handler) {
+  public void rpushMany(String key, List<String> values, Handler<AsyncResult<Long>> handler) {
+    JsonArray args = new JsonArray();
+    args.add(key);
+    for (String value: values) {
+      args.add(value);
+    }
     sendLong("RPUSH", args, handler);
   }
 
-  public void rpushx(JsonArray args, Handler<AsyncResult<Long>> handler) {
-    sendLong("RPUSHX", args, handler);
+  public void rpush(String key, String value, Handler<AsyncResult<Long>> handler) {
+    sendLong("RPUSH", new JsonArray().add(key).add(value), handler);
+  }
+
+  public void rpushx(String key, String value, Handler<AsyncResult<Long>> handler) {
+    sendLong("RPUSHX", new JsonArray().add(key).add(value), handler);
   }
 
   public void sadd(JsonArray args, Handler<AsyncResult<Long>> handler) {
