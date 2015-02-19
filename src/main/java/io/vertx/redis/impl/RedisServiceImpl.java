@@ -9,6 +9,7 @@ import io.vertx.redis.InsertOptions;
 import io.vertx.redis.ObjectCmd;
 
 import java.util.List;
+import java.util.Map;
 
 public final class RedisServiceImpl extends AbstractRedisService {
 
@@ -44,15 +45,37 @@ public final class RedisServiceImpl extends AbstractRedisService {
     sendLong("BITPOS", args, handler);
   }
 
-  public void blpop(JsonArray args, Handler<AsyncResult<JsonArray>> handler) {
+  public void blpop(String key, int seconds, Handler<AsyncResult<JsonArray>> handler) {
+    sendJsonArray("BLPOP", new JsonArray().add(key).add(seconds), handler);
+  }
+
+  public void blpopMany(List<String> keys, int seconds, Handler<AsyncResult<JsonArray>> handler) {
+    JsonArray args = new JsonArray();
+    for (String key: keys) {
+      args.add(key);
+    }
+    args.add(seconds);
     sendJsonArray("BLPOP", args, handler);
   }
 
-  public void brpop(JsonArray args, Handler<AsyncResult<JsonArray>> handler) {
+  public void brpop(String key, int seconds, Handler<AsyncResult<JsonArray>> handler) {
+    sendJsonArray("BRPOP", new JsonArray().add(key).add(seconds), handler);
+  }
+
+  public void brpopMany(List<String> keys, int seconds, Handler<AsyncResult<JsonArray>> handler) {
+    JsonArray args = new JsonArray();
+    for (String key: keys) {
+      args.add(key);
+    }
+    args.add(seconds);
     sendJsonArray("BRPOP", args, handler);
   }
 
-  public void brpoplpush(JsonArray args, Handler<AsyncResult<Void>> handler) {
+  public void brpoplpush(String key, String destkey, int seconds, Handler<AsyncResult<Void>> handler) {
+    JsonArray args = new JsonArray();
+    args.add(key);
+    args.add(destkey);
+    args.add(seconds);
     sendVoid("BRPOPLPUSH", args, handler);
   }
 
@@ -208,43 +231,75 @@ public final class RedisServiceImpl extends AbstractRedisService {
     sendString("GETSET", params, handler);
   }
 
-  public void hdel(JsonArray args, Handler<AsyncResult<Long>> handler) {
+  public void hdel(String key, String field, Handler<AsyncResult<Long>> handler) {
+    sendLong("HDEL", new JsonArray().add(key).add(field), handler);
+  }
+
+  public void hdelMany(String key, List<String> fields, Handler<AsyncResult<Long>> handler) {
+    JsonArray args = new JsonArray();
+    args.add(key);
+    for (String field: fields) {
+      args.add(field);
+    }
     sendLong("HDEL", args, handler);
   }
 
-  public void hexists(JsonArray args, Handler<AsyncResult<Long>> handler) {
-    sendLong("HEXISTS", args, handler);
+  public void hexists(String key, String field, Handler<AsyncResult<Long>> handler) {
+    sendLong("HEXISTS", new JsonArray().add(key).add(field), handler);
   }
 
-  public void hget(JsonArray args, Handler<AsyncResult<String>> handler) {
-    sendString("HGET", args, handler);
+  public void hget(String key, String field, Handler<AsyncResult<String>> handler) {
+    sendString("HGET", new JsonArray().add(key).add(field), handler);
   }
 
-  public void hgetall(JsonArray args, Handler<AsyncResult<JsonObject>> handler) {
-    sendJsonObject("HGETALL", args, handler);
+  public void hgetall(String key, Handler<AsyncResult<JsonObject>> handler) {
+    sendJsonObject("HGETALL", new JsonArray().add(key), handler);
   }
 
-  public void hincrby(JsonArray args, Handler<AsyncResult<Long>> handler) {
+  public void hincrby(String key, String field, long increment, Handler<AsyncResult<Long>> handler) {
+    JsonArray args = new JsonArray();
+    args.add(key);
+    args.add(field);
+    args.add(increment);
     sendLong("HINCRBY", args, handler);
   }
 
-  public void hincrbyfloat(JsonArray args, Handler<AsyncResult<String>> handler) {
+  public void hincrbyfloat(String key, String field, double increment, Handler<AsyncResult<String>> handler) {
+    JsonArray args = new JsonArray();
+    args.add(key);
+    args.add(field);
+    args.add(increment);
     sendString("HINCRBYFLOAT", args, handler);
   }
 
-  public void hkeys(JsonArray args, Handler<AsyncResult<JsonArray>> handler) {
-    sendJsonArray("HKEYS", args, handler);
+  public void hkeys(String key, Handler<AsyncResult<JsonArray>> handler) {
+    sendJsonArray("HKEYS", new JsonArray().add(key), handler);
   }
 
-  public void hlen(JsonArray args, Handler<AsyncResult<Long>> handler) {
-    sendLong("HLEN", args, handler);
+  public void hlen(String key, Handler<AsyncResult<Long>> handler) {
+    sendLong("HLEN", new JsonArray().add(key), handler);
   }
 
-  public void hmget(JsonArray args, Handler<AsyncResult<JsonArray>> handler) {
+  public void hmgetOne(String key, String field, Handler<AsyncResult<JsonArray>> handler) {
+    sendJsonArray("HMGET", new JsonArray().add(key).add(field), handler);
+  }
+
+  public void hmget(String key, List<String> fields, Handler<AsyncResult<JsonArray>> handler) {
+    JsonArray args = new JsonArray();
+    args.add(key);
+    for (String field: fields) {
+      args.add(field);
+    }
     sendJsonArray("HMGET", args, handler);
   }
 
-  public void hmset(JsonArray args, Handler<AsyncResult<String>> handler) {
+  public void hmset(String key, Map<String, String> values, Handler<AsyncResult<String>> handler) {
+    JsonArray args = new JsonArray();
+    args.add(key);
+    for (Map.Entry<String, String> pair: values.entrySet()) {
+      args.add(pair.getKey());
+      args.add(pair.getValue());
+    }
     sendString("HMSET", args, handler);
   }
 

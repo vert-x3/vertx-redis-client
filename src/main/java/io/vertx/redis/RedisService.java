@@ -12,6 +12,7 @@ import io.vertx.redis.impl.RedisServiceImpl;
 import io.vertx.serviceproxy.ProxyHelper;
 
 import java.util.List;
+import java.util.Map;
 
 @VertxGen
 @ProxyGen
@@ -100,32 +101,58 @@ public interface RedisService {
   /**
    * Remove and get the first element in a list, or block until one is available
    *
-   * @param args    JsonArray [{"name":"key","type":"key","multiple":true},{"name":"timeout","type":"integer"}]
+   * @param key     Key string identifying a list to watch
+   * @param seconds Timeout in seconds
    * @param handler Handler for the result of this call.
    * @since 2.0.0
    * group: list
    */
-  void blpop(JsonArray args, Handler<AsyncResult<JsonArray>> handler);
+  void blpop(String key, int seconds, Handler<AsyncResult<JsonArray>> handler);
+
+  /**
+   * Remove and get the first element in any of the lists, or block until one is available
+   *
+   * @param keys    List of key strings identifying lists to watch
+   * @param seconds Timeout in seconds
+   * @param handler Handler for the result of this call.
+   * @since 2.0.0
+   * group: list
+   */
+  void blpopMany(List<String> keys, int seconds, Handler<AsyncResult<JsonArray>> handler);
 
   /**
    * Remove and get the last element in a list, or block until one is available
    *
-   * @param args    JsonArray [{"name":"key","type":"key","multiple":true},{"name":"timeout","type":"integer"}]
+   * @param key     Key string identifying a list to watch
+   * @param seconds Timeout in seconds
    * @param handler Handler for the result of this call.
    * @since 2.0.0
    * group: list
    */
-  void brpop(JsonArray args, Handler<AsyncResult<JsonArray>> handler);
+  void brpop(String key, int seconds, Handler<AsyncResult<JsonArray>> handler);
+
+  /**
+   * Remove and get the last element in any of the lists, or block until one is available
+   *
+   * @param keys    List of key strings identifying lists to watch
+   * @param seconds Timeout in seconds
+   * @param handler Handler for the result of this call.
+   * @since 2.0.0
+   * group: list
+   */
+  void brpopMany(List<String> keys, int seconds, Handler<AsyncResult<JsonArray>> handler);
 
   /**
    * Pop a value from a list, push it to another list and return it; or block until one is available
    *
-   * @param args    JsonArray [{"name":"source","type":"key"},{"name":"destination","type":"key"},{"name":"timeout","type":"integer"}]
+   * @param key     Key string identifying the source list
+   * @param destkey Key string identifying the destination list
+   * @param seconds Timeout in seconds
    * @param handler Handler for the result of this call.
    * @since 2.2.0
    * group: list
    */
-  void brpoplpush(JsonArray args, Handler<AsyncResult<Void>> handler);
+  void brpoplpush(String key, String destkey, int seconds, Handler<AsyncResult<Void>> handler);
 
   /**
    * Kill the connection of a client
@@ -456,102 +483,122 @@ public interface RedisService {
   /**
    * Delete one or more hash fields
    *
-   * @param args    JsonArray [{"name":"key","type":"key"},{"name":"field","type":"string","multiple":true}]
+   * @param key     Key string
+   * @param field   Field name
    * @param handler Handler for the result of this call.
    * @since 2.0.0
    * group: hash
    */
-  void hdel(JsonArray args, Handler<AsyncResult<Long>> handler);
+  void hdel(String key, String field, Handler<AsyncResult<Long>> handler);
+
+  /**
+   * Delete one or more hash fields
+   *
+   * @param key     Key string
+   * @param fields  Field names
+   * @param handler Handler for the result of this call.
+   * @since 2.0.0
+   * group: hash
+   */
+  void hdelMany(String key, List<String> fields, Handler<AsyncResult<Long>> handler);
 
   /**
    * Determine if a hash field exists
    *
-   * @param args    JsonArray [{"name":"key","type":"key"},{"name":"field","type":"string"}]
+   * @param key     Key string
+   * @param field   Field name
    * @param handler Handler for the result of this call.
    * @since 2.0.0
    * group: hash
    */
-  void hexists(JsonArray args, Handler<AsyncResult<Long>> handler);
+  void hexists(String key, String field, Handler<AsyncResult<Long>> handler);
 
   /**
    * Get the value of a hash field
    *
-   * @param args    JsonArray [{"name":"key","type":"key"},{"name":"field","type":"string"}]
+   * @param key     Key string
+   * @param field   Field name
    * @param handler Handler for the result of this call.
    * @since 2.0.0
    * group: hash
    */
-  void hget(JsonArray args, Handler<AsyncResult<String>> handler);
+  void hget(String key, String field, Handler<AsyncResult<String>> handler);
 
   /**
    * Get all the fields and values in a hash
    *
-   * @param args    JsonArray [{"name":"key","type":"key"}]
+   * @param key     Key string
    * @param handler Handler for the result of this call.
    * @since 2.0.0
    * group: hash
    */
-  void hgetall(JsonArray args, Handler<AsyncResult<JsonObject>> handler);
+  void hgetall(String key, Handler<AsyncResult<JsonObject>> handler);
 
   /**
    * Increment the integer value of a hash field by the given number
    *
-   * @param args    JsonArray [{"name":"key","type":"key"},{"name":"field","type":"string"},{"name":"increment","type":"integer"}]
-   * @param handler Handler for the result of this call.
+   * @param key       Key string
+   * @param field     Field name
+   * @param increment Value by which to increment
+   * @param handler   Handler for the result of this call.
    * @since 2.0.0
    * group: hash
    */
-  void hincrby(JsonArray args, Handler<AsyncResult<Long>> handler);
+  void hincrby(String key, String field, long increment, Handler<AsyncResult<Long>> handler);
 
   /**
    * Increment the float value of a hash field by the given amount
    *
-   * @param args    JsonArray [{"name":"key","type":"key"},{"name":"field","type":"string"},{"name":"increment","type":"double"}]
-   * @param handler Handler for the result of this call.
+   * @param key       Key string
+   * @param field     Field name
+   * @param increment Value by which to increment
+   * @param handler   Handler for the result of this call.
    * @since 2.6.0
    * group: hash
    */
-  void hincrbyfloat(JsonArray args, Handler<AsyncResult<String>> handler);
+  void hincrbyfloat(String key, String field, double increment, Handler<AsyncResult<String>> handler);
 
   /**
    * Get all the fields in a hash
    *
-   * @param args    JsonArray [{"name":"key","type":"key"}]
+   * @param key     Key string
    * @param handler Handler for the result of this call.
    * @since 2.0.0
    * group: hash
    */
-  void hkeys(JsonArray args, Handler<AsyncResult<JsonArray>> handler);
+  void hkeys(String key, Handler<AsyncResult<JsonArray>> handler);
 
   /**
    * Get the number of fields in a hash
    *
-   * @param args    JsonArray [{"name":"key","type":"key"}]
+   * @param key     Key string
    * @param handler Handler for the result of this call.
    * @since 2.0.0
    * group: hash
    */
-  void hlen(JsonArray args, Handler<AsyncResult<Long>> handler);
+  void hlen(String key, Handler<AsyncResult<Long>> handler);
 
   /**
    * Get the values of all the given hash fields
    *
-   * @param args    JsonArray [{"name":"key","type":"key"},{"name":"field","type":"string","multiple":true}]
+   * @param key     Key string
+   * @param fields  Field names
    * @param handler Handler for the result of this call.
    * @since 2.0.0
    * group: hash
    */
-  void hmget(JsonArray args, Handler<AsyncResult<JsonArray>> handler);
+  void hmget(String key, List<String> fields, Handler<AsyncResult<JsonArray>> handler);
 
   /**
    * Set multiple hash fields to multiple values
    *
-   * @param args    JsonArray [{"name":"key","type":"key"},{"name":["field","value"],"type":["string","string"],"multiple":true}]
+   * @param key     Key string
+   * @param values  Map of field:value pairs
    * @param handler Handler for the result of this call.
    * @since 2.0.0
    * group: hash
    */
-  void hmset(JsonArray args, Handler<AsyncResult<String>> handler);
+  void hmset(String key, Map<String, String> values, Handler<AsyncResult<String>> handler);
 
   /**
    * Set the string value of a hash field
