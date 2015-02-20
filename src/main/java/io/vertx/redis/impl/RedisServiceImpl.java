@@ -242,10 +242,6 @@ public final class RedisServiceImpl extends AbstractRedisService {
     sendLong("HLEN", toPayload(key), handler);
   }
 
-  public void hmgetOne(String key, String field, Handler<AsyncResult<JsonArray>> handler) {
-    sendJsonArray("HMGET", toPayload(key, field), handler);
-  }
-
   public void hmget(String key, List<String> fields, Handler<AsyncResult<JsonArray>> handler) {
     sendJsonArray("HMGET", toPayload(key, fields), handler);
   }
@@ -254,16 +250,16 @@ public final class RedisServiceImpl extends AbstractRedisService {
     sendString("HMSET", toPayload(key, values), handler);
   }
 
-  public void hset(JsonArray args, Handler<AsyncResult<Long>> handler) {
-    sendLong("HSET", args, handler);
+  public void hset(String key, String field, String value, Handler<AsyncResult<Long>> handler) {
+    sendLong("HSET", toPayload(key, field, value), handler);
   }
 
-  public void hsetnx(JsonArray args, Handler<AsyncResult<Long>> handler) {
-    sendLong("HSETNX", args, handler);
+  public void hsetnx(String key, String field, String value, Handler<AsyncResult<Long>> handler) {
+    sendLong("HSETNX", toPayload(key, field, value), handler);
   }
 
-  public void hvals(JsonArray args, Handler<AsyncResult<JsonArray>> handler) {
-    sendJsonArray("HVALS", args, handler);
+  public void hvals(String key, Handler<AsyncResult<JsonArray>> handler) {
+    sendJsonArray("HVALS", toPayload(key), handler);
   }
 
   public void incr(String key, Handler<AsyncResult<Long>> handler) {

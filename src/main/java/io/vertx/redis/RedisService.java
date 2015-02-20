@@ -603,32 +603,36 @@ public interface RedisService {
   /**
    * Set the string value of a hash field
    *
-   * @param args    JsonArray [{"name":"key","type":"key"},{"name":"field","type":"string"},{"name":"value","type":"string"}]
+   * @param key     Key string
+   * @param field   Field name
+   * @param value   New value
    * @param handler Handler for the result of this call.
    * @since 2.0.0
    * group: hash
    */
-  void hset(JsonArray args, Handler<AsyncResult<Long>> handler);
+  void hset(String key, String field, String value, Handler<AsyncResult<Long>> handler);
 
   /**
    * Set the value of a hash field, only if the field does not exist
    *
-   * @param args    JsonArray [{"name":"key","type":"key"},{"name":"field","type":"string"},{"name":"value","type":"string"}]
+   * @param key     Key string
+   * @param field   Field name
+   * @param value   New value
    * @param handler Handler for the result of this call.
    * @since 2.0.0
    * group: hash
    */
-  void hsetnx(JsonArray args, Handler<AsyncResult<Long>> handler);
+  void hsetnx(String key, String field, String value, Handler<AsyncResult<Long>> handler);
 
   /**
    * Get all the values in a hash
    *
-   * @param args    JsonArray [{"name":"key","type":"key"}]
+   * @param key     Key string
    * @param handler Handler for the result of this call.
    * @since 2.0.0
    * group: hash
    */
-  void hvals(JsonArray args, Handler<AsyncResult<JsonArray>> handler);
+  void hvals(String key, Handler<AsyncResult<JsonArray>> handler);
 
   /**
    * Increment the integer value of a key by one

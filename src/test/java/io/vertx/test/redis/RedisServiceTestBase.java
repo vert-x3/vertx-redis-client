@@ -868,7 +868,7 @@ public class RedisServiceTestBase extends VertxTestBase {
   public void testHdel() {
     final String myhash = makeKey();
 
-    redis.hset(toJsonArray(myhash, "field1", "foo"), reply0 -> {
+    redis.hset(myhash, "field1", "foo", reply0 -> {
       assertTrue(reply0.succeeded());
       assertEquals(1, reply0.result().longValue());
 
@@ -890,7 +890,7 @@ public class RedisServiceTestBase extends VertxTestBase {
   public void testHexists() {
     final String myhash = makeKey();
 
-    redis.hset(toJsonArray(myhash, "field1", "foo"), reply0 -> {
+    redis.hset(myhash, "field1", "foo", reply0 -> {
       assertTrue(reply0.succeeded());
       assertEquals(1, reply0.result().longValue());
 
@@ -912,7 +912,7 @@ public class RedisServiceTestBase extends VertxTestBase {
   public void testHget() {
     final String myhash = makeKey();
 
-    redis.hset(toJsonArray(myhash, "field1", "foo"), reply0 -> {
+    redis.hset(myhash, "field1", "foo", reply0 -> {
       assertTrue(reply0.succeeded());
       assertEquals(1, reply0.result().longValue());
 
@@ -934,11 +934,11 @@ public class RedisServiceTestBase extends VertxTestBase {
   public void testHgetall() {
     final String myhash = makeKey();
 
-    redis.hset(toJsonArray(myhash, "field1", "Hello"), reply0 -> {
+    redis.hset(myhash, "field1", "Hello", reply0 -> {
       assertTrue(reply0.succeeded());
       assertEquals(1, reply0.result().longValue());
 
-      redis.hset(toJsonArray(myhash, "field2", "World"), reply1 -> {
+      redis.hset(myhash, "field2", "World", reply1 -> {
         assertTrue(reply1.succeeded());
         assertEquals(1, reply1.result().longValue());
 
@@ -958,7 +958,7 @@ public class RedisServiceTestBase extends VertxTestBase {
   public void testHincrby() {
     final String myhash = makeKey();
 
-    redis.hset(toJsonArray(myhash, "field", 5), reply0 -> {
+    redis.hset(myhash, "field", "5", reply0 -> {
       assertTrue(reply0.succeeded());
       assertEquals(1, reply0.result().longValue());
 
@@ -985,7 +985,7 @@ public class RedisServiceTestBase extends VertxTestBase {
   public void testHIncrbyfloat() {
     final String mykey = makeKey();
 
-    redis.hset(toJsonArray(mykey, "field", 10.50), reply0 -> {
+    redis.hset(mykey, "field", "10.50", reply0 -> {
       assertTrue(reply0.succeeded());
       assertEquals(1, reply0.result().longValue());
 
@@ -993,7 +993,7 @@ public class RedisServiceTestBase extends VertxTestBase {
         assertTrue(reply1.succeeded());
         assertEquals("10.6", reply1.result());
 
-        redis.hset(toJsonArray(mykey, "field", 5.0e3), reply2 -> {
+        redis.hset(mykey, "field", "5.0e3", reply2 -> {
           assertTrue(reply2.succeeded());
           assertEquals(0, reply2.result().longValue());
 
@@ -1012,11 +1012,11 @@ public class RedisServiceTestBase extends VertxTestBase {
   public void testHkeys() {
     final String myhash = makeKey();
 
-    redis.hset(toJsonArray(myhash, "field1", "Hello"), reply0 -> {
+    redis.hset(myhash, "field1", "Hello", reply0 -> {
       assertTrue(reply0.succeeded());
       assertEquals(1, reply0.result().longValue());
 
-      redis.hset(toJsonArray(myhash, "field2", "World"), reply1 -> {
+      redis.hset(myhash, "field2", "World", reply1 -> {
         assertTrue(reply1.succeeded());
         assertEquals(1, reply1.result().longValue());
 
@@ -1034,11 +1034,11 @@ public class RedisServiceTestBase extends VertxTestBase {
   public void testHlen() {
     final String myhash = makeKey();
 
-    redis.hset(toJsonArray(myhash, "field1", "Hello"), reply0 -> {
+    redis.hset(myhash, "field1", "Hello", reply0 -> {
       assertTrue(reply0.succeeded());
       assertEquals(1, reply0.result().longValue());
 
-      redis.hset(toJsonArray(myhash, "field2", "World"), reply1 -> {
+      redis.hset(myhash, "field2", "World", reply1 -> {
         assertTrue(reply1.succeeded());
         assertEquals(1, reply1.result().longValue());
 
@@ -1056,11 +1056,11 @@ public class RedisServiceTestBase extends VertxTestBase {
   public void testHmget() {
     final String myhash = makeKey();
 
-    redis.hset(toJsonArray(myhash, "field1", "Hello"), reply0 -> {
+    redis.hset(myhash, "field1", "Hello", reply0 -> {
       assertTrue(reply0.succeeded());
       assertEquals(1, reply0.result().longValue());
 
-      redis.hset(toJsonArray(myhash, "field2", "World"), reply1 -> {
+      redis.hset(myhash, "field2", "World", reply1 -> {
         assertTrue(reply1.succeeded());
         assertEquals(1, reply1.result().longValue());
 
@@ -1099,7 +1099,7 @@ public class RedisServiceTestBase extends VertxTestBase {
   public void testHset() {
     final String myhash = makeKey();
 
-    redis.hset(toJsonArray(myhash, "field1", "Hello"), reply0 -> {
+    redis.hset(myhash, "field1", "Hello", reply0 -> {
       assertTrue(reply0.succeeded());
       assertEquals(1, reply0.result().longValue());
 
@@ -1116,11 +1116,11 @@ public class RedisServiceTestBase extends VertxTestBase {
   public void testHsetnx() {
     final String myhash = makeKey();
 
-    redis.hsetnx(toJsonArray(myhash, "field", "Hello"), reply0 -> {
+    redis.hsetnx(myhash, "field", "Hello", reply0 -> {
       assertTrue(reply0.succeeded());
       assertEquals(1, reply0.result().longValue());
 
-      redis.hsetnx(toJsonArray(myhash, "field", "World"), reply1 -> {
+      redis.hsetnx(myhash, "field", "World", reply1 -> {
         assertTrue(reply1.succeeded());
         assertEquals(0, reply1.result().longValue());
 
@@ -1138,15 +1138,15 @@ public class RedisServiceTestBase extends VertxTestBase {
   public void testHvals() {
     final String myhash = makeKey();
 
-    redis.hset(toJsonArray(myhash, "field1", "Hello"), reply0 -> {
+    redis.hset(myhash, "field1", "Hello", reply0 -> {
       assertTrue(reply0.succeeded());
       assertEquals(1, reply0.result().longValue());
 
-      redis.hset(toJsonArray(myhash, "field2", "World"), reply1 -> {
+      redis.hset(myhash, "field2", "World", reply1 -> {
         assertTrue(reply1.succeeded());
         assertEquals(1, reply1.result().longValue());
 
-        redis.hvals(toJsonArray(myhash), reply2 -> {
+        redis.hvals(myhash, reply2 -> {
           assertTrue(reply2.succeeded());
           assertArrayEquals(toArray("Hello", "World"), reply2.result().getList().toArray());
           testComplete();
