@@ -9,8 +9,11 @@ import io.vertx.redis.InsertOptions;
 import io.vertx.redis.ObjectCmd;
 import io.vertx.redis.ScanOptions;
 
+import java.util.Arrays;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Stream;
 
 public final class RedisServiceImpl extends AbstractRedisService {
 
@@ -764,8 +767,15 @@ public final class RedisServiceImpl extends AbstractRedisService {
   }
 
   @Override
-  public void zadd(JsonArray args, Handler<AsyncResult<Long>> handler) {
-    sendLong("ZADD", args, handler);
+  public void zadd(String key, double score, String value, Handler<AsyncResult<Long>> handler) {
+    sendLong("ZADD", toPayload(key, score, value), handler);
+  }
+
+  @Override
+  public void zaddMany(String key, Map<String, Double> values, Handler<AsyncResult<Long>> handler) {
+    // flip from <String, Double> to <Double, String> when wrapping
+    Stream flipped = values.entrySet().stream().map(e -> new Object[] { e.getValue(), e.getKey() });
+    sendLong("ZADD", toPayload(key, flipped), handler);
   }
 
   @Override
@@ -896,13 +906,49 @@ public final class RedisServiceImpl extends AbstractRedisService {
           }
         }
       } else if (param instanceof Map) {
-        for (Map.Entry<?, ?> pair: ((Map<?, ?>) param).entrySet()) {
+        for (Map.Entry<?, ?> pair : ((Map<?, ?>) param).entrySet()) {
           result.add(pair.getKey());
           result.add(pair.getValue());
         }
+      } else if (param instanceof Stream) {
+        ((Stream) param).forEach(e -> {
+          if (e instanceof Object[]) {
+            for (Object item: (Object []) e) {
+              result.add(item);
+            }
+          } else {
+            result.add(e);
+          }
+        });
       } else if (param != null) {
         result.add(param);
       }
+    }
+    return result;
+  }
+
+  /**
+   * Merge two list into one by first adding the next item from the first list,
+   * followed by the next item from the second list
+   *
+   * @param list1 First list
+   * @param list2 Second list
+   * @return JsonArray that can be passed to send()
+   */
+  private static JsonArray zip(List<?> list1, List<?> list2) {
+    JsonArray result = new JsonArray();
+    if (list1 == null && list2 == null) {
+      return result;
+    }
+    if (list1.size() != list2.size()) {
+      throw new IllegalArgumentException("Lists should be the same size");
+    }
+
+    Iterator<?> it1 = list1.iterator();
+    Iterator<?> it2 = list2.iterator();
+    while (it1.hasNext() && it2.hasNext()) {
+      result.add(it1.next());
+      result.add(it2.next());
     }
     return result;
   }

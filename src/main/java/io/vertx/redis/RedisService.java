@@ -1521,12 +1521,25 @@ public interface RedisService {
   /**
    * Add one or more members to a sorted set, or update its score if it already exists
    *
-   * @param args    JsonArray [{"name":"key","type":"key"},{"name":["score","member"],"type":["double","string"],"multiple":true}]
+   * @param key     Key string
+   * @param score   Score used for sorting
+   * @param value   New member value
    * @param handler Handler for the result of this call.
    * @since 1.2.0
    * group: sorted_set
    */
-  void zadd(JsonArray args, Handler<AsyncResult<Long>> handler);
+  void zadd(String key, double score, String value, Handler<AsyncResult<Long>> handler);
+
+  /**
+   * Add one or more members to a sorted set, or update its score if it already exists
+   *
+   * @param key     Key string
+   * @param values  New member values and their scores
+   * @param handler Handler for the result of this call.
+   * @since 1.2.0
+   * group: sorted_set
+   */
+  void zaddMany(String key, Map<String, Double> values, Handler<AsyncResult<Long>> handler);
 
   /**
    * Get the number of members in a sorted set
