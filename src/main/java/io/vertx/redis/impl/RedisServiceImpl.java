@@ -767,30 +767,32 @@ public final class RedisServiceImpl extends AbstractRedisService {
   }
 
   @Override
-  public void zadd(String key, double score, String value, Handler<AsyncResult<Long>> handler) {
-    sendLong("ZADD", toPayload(key, score, value), handler);
+  public void zadd(String key, double score, String member, Handler<AsyncResult<Long>> handler) {
+    sendLong("ZADD", toPayload(key, score, member), handler);
   }
 
   @Override
-  public void zaddMany(String key, Map<String, Double> values, Handler<AsyncResult<Long>> handler) {
+  public void zaddMany(String key, Map<String, Double> members, Handler<AsyncResult<Long>> handler) {
     // flip from <String, Double> to <Double, String> when wrapping
-    Stream flipped = values.entrySet().stream().map(e -> new Object[] { e.getValue(), e.getKey() });
+    Stream flipped = members.entrySet().stream().map(e -> new Object[] { e.getValue(), e.getKey() });
     sendLong("ZADD", toPayload(key, flipped), handler);
   }
 
   @Override
-  public void zcard(JsonArray args, Handler<AsyncResult<Long>> handler) {
-    sendLong("ZCARD", args, handler);
+  public void zcard(String key, Handler<AsyncResult<Long>> handler) {
+    sendLong("ZCARD", toPayload(key), handler);
   }
 
   @Override
-  public void zcount(JsonArray args, Handler<AsyncResult<Long>> handler) {
-    sendLong("ZCOUNT", args, handler);
+  public void zcount(String key, double min, double max, Handler<AsyncResult<Long>> handler) {
+    String minVal = (min == Double.NEGATIVE_INFINITY) ? "-inf" : String.valueOf(min);
+    String maxVal = (max == Double.POSITIVE_INFINITY) ? "+inf" : String.valueOf(max);
+    sendLong("ZCOUNT", toPayload(key, minVal, maxVal), handler);
   }
 
   @Override
-  public void zincrby(JsonArray args, Handler<AsyncResult<String>> handler) {
-    sendString("ZINCRBY", args, handler);
+  public void zincrby(String key, double increment, String member, Handler<AsyncResult<String>> handler) {
+    sendString("ZINCRBY", toPayload(key, increment, member), handler);
   }
 
   @Override

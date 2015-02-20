@@ -1523,53 +1523,57 @@ public interface RedisService {
    *
    * @param key     Key string
    * @param score   Score used for sorting
-   * @param value   New member value
+   * @param member  New member key
    * @param handler Handler for the result of this call.
    * @since 1.2.0
    * group: sorted_set
    */
-  void zadd(String key, double score, String value, Handler<AsyncResult<Long>> handler);
+  void zadd(String key, double score, String member, Handler<AsyncResult<Long>> handler);
 
   /**
    * Add one or more members to a sorted set, or update its score if it already exists
    *
    * @param key     Key string
-   * @param values  New member values and their scores
+   * @param members New member keys and their scores
    * @param handler Handler for the result of this call.
    * @since 1.2.0
    * group: sorted_set
    */
-  void zaddMany(String key, Map<String, Double> values, Handler<AsyncResult<Long>> handler);
+  void zaddMany(String key, Map<String, Double> members, Handler<AsyncResult<Long>> handler);
 
   /**
    * Get the number of members in a sorted set
    *
-   * @param args    JsonArray [{"name":"key","type":"key"}]
+   * @param key     Key string
    * @param handler Handler for the result of this call.
    * @since 1.2.0
    * group: sorted_set
    */
-  void zcard(JsonArray args, Handler<AsyncResult<Long>> handler);
+  void zcard(String key, Handler<AsyncResult<Long>> handler);
 
   /**
    * Count the members in a sorted set with scores within the given values
    *
-   * @param args    JsonArray [{"name":"key","type":"key"},{"name":"min","type":"double"},{"name":"max","type":"double"}]
+   * @param key     Key string
+   * @param min     Minimum score
+   * @param max     Maximum score
    * @param handler Handler for the result of this call.
    * @since 2.0.0
    * group: sorted_set
    */
-  void zcount(JsonArray args, Handler<AsyncResult<Long>> handler);
+  void zcount(String key, double min, double max, Handler<AsyncResult<Long>> handler);
 
   /**
    * Increment the score of a member in a sorted set
    *
-   * @param args    JsonArray [{"name":"key","type":"key"},{"name":"increment","type":"integer"},{"name":"member","type":"string"}]
-   * @param handler Handler for the result of this call.
+   * @param key       Key string
+   * @param increment Increment amount
+   * @param member    Member key
+   * @param handler   Handler for the result of this call.
    * @since 1.2.0
    * group: sorted_set
    */
-  void zincrby(JsonArray args, Handler<AsyncResult<String>> handler);
+  void zincrby(String key, double increment, String member, Handler<AsyncResult<String>> handler);
 
   /**
    * Intersect multiple sorted sets and store the resulting sorted set in a new key

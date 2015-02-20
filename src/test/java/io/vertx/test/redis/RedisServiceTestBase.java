@@ -3001,7 +3001,7 @@ public class RedisServiceTestBase extends VertxTestBase {
       redis.zadd(key, 2, "two", reply1 -> {
         assertTrue(reply1.succeeded());
         assertEquals(1, reply1.result().longValue());
-        redis.zcard(toJsonArray(key), reply2 -> {
+        redis.zcard(key, reply2 -> {
           assertTrue(reply2.succeeded());
           assertEquals(2, reply2.result().longValue());
           testComplete();
@@ -3023,7 +3023,7 @@ public class RedisServiceTestBase extends VertxTestBase {
         redis.zadd(key, 3, "three", reply2 -> {
           assertTrue(reply2.succeeded());
           assertEquals(1, reply2.result().longValue());
-          redis.zcount(toJsonArray(key, "-inf", "+inf"), reply3 -> {
+          redis.zcount(key, Double.NEGATIVE_INFINITY, Double.POSITIVE_INFINITY, reply3 -> {
             assertTrue(reply3.succeeded());
             assertEquals(3, reply3.result().longValue());
             testComplete();
@@ -3043,7 +3043,7 @@ public class RedisServiceTestBase extends VertxTestBase {
       redis.zadd(key, 2, "two", reply1 -> {
         assertTrue(reply1.succeeded());
         assertEquals(1, reply1.result().longValue());
-        redis.zincrby(toJsonArray(key, 2, "one"), reply2 -> {
+        redis.zincrby(key, 2, "one", reply2 -> {
           assertTrue(reply2.succeeded());
           assertEquals("3", reply2.result());
           testComplete();
