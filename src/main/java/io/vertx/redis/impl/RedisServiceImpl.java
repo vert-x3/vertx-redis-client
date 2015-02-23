@@ -22,13 +22,13 @@ public final class RedisServiceImpl extends AbstractRedisService {
   }
 
   @Override
-  public void append(JsonArray args, Handler<AsyncResult<Long>> handler) {
-    sendLong("APPEND", args, handler);
+  public void append(String key, String value, Handler<AsyncResult<Long>> handler) {
+    sendLong("APPEND", toPayload(key, value), handler);
   }
 
   @Override
-  public void auth(JsonArray args, Handler<AsyncResult<String>> handler) {
-    sendString("AUTH", args, handler);
+  public void auth(String password, Handler<AsyncResult<String>> handler) {
+    sendString("AUTH", toPayload(password), handler);
   }
 
   @Override
@@ -42,8 +42,12 @@ public final class RedisServiceImpl extends AbstractRedisService {
   }
 
   @Override
-  public void bitcount(JsonArray args, Handler<AsyncResult<Long>> handler) {
-    sendLong("BITCOUNT", args, handler);
+  public void bitcount(String key, Handler<AsyncResult<Long>> handler) {
+    sendLong("BITCOUNT", toPayload(key), handler);
+  }
+
+  public void bitcountRange(String key, long start, long end, Handler<AsyncResult<Long>> handler) {
+    sendLong("BITCOUNT", toPayload(key, start, end), handler);
   }
 
   @Override

@@ -122,11 +122,11 @@ public class RedisServiceTestBase extends VertxTestBase {
     redis.del(Arrays.asList(key), reply0 -> {
       assertTrue(reply0.succeeded());
 
-      redis.append(toJsonArray(key, "Hello"), reply1 -> {
+      redis.append(key, "Hello", reply1 -> {
         assertTrue(reply1.succeeded());
         assertEquals(5l, reply1.result().longValue());
 
-        redis.append(toJsonArray(key, " World"), reply2 -> {
+        redis.append(key, " World", reply2 -> {
           assertTrue(reply2.succeeded());
           assertEquals(11l, reply2.result().longValue());
 
@@ -161,9 +161,9 @@ public class RedisServiceTestBase extends VertxTestBase {
 
       awaitLatch(latch);
 
-      rdx.auth(new JsonArray().add("barfoo"), reply -> {
+      rdx.auth("barfoo", reply -> {
         assertFalse(reply.succeeded());
-        rdx.auth(new JsonArray().add("foobar"), reply2 -> {
+        rdx.auth("foobar", reply2 -> {
           assertTrue(reply2.succeeded());
           try{
             server.stop();            
@@ -201,15 +201,15 @@ public class RedisServiceTestBase extends VertxTestBase {
     redis.set(key, "foobar", reply0 -> {
       assertTrue(reply0.succeeded());
 
-      redis.bitcount(toJsonArray(key), reply1 -> {
+      redis.bitcount(key, reply1 -> {
         assertTrue(reply1.succeeded());
         assertEquals(26, reply1.result().longValue());
 
-        redis.bitcount(toJsonArray(key, 0, 0), reply2 -> {
+        redis.bitcountRange(key, 0, 0, reply2 -> {
           assertTrue(reply2.succeeded());
           assertEquals(4, reply2.result().longValue());
 
-          redis.bitcount(toJsonArray(key, 1, 1), reply3 -> {
+          redis.bitcountRange(key, 1, 1, reply3 -> {
             assertTrue(reply3.succeeded());
             assertEquals(6, reply3.result().longValue());
             testComplete();

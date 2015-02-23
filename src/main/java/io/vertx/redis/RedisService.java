@@ -35,22 +35,23 @@ public interface RedisService {
   /**
    * Append a value to a key
    *
-   * @param args    JsonArray [{"name":"key","type":"key"},{"name":"value","type":"string"}]
+   * @param key     Key string
+   * @param value   Value to append
    * @param handler Handler for the result of this call.
    * @since 2.0.0
    * group: string
    */
-  void append(JsonArray args, Handler<AsyncResult<Long>> handler);
+  void append(String key, String value, Handler<AsyncResult<Long>> handler);
 
   /**
    * Authenticate to the server
    *
-   * @param args    JsonArray [{"name":"password","type":"string"}]
-   * @param handler Handler for the result of this call.
+   * @param password Password for authentication
+   * @param handler  Handler for the result of this call.
    * @since 1.0.0
    * group: connection
    */
-  void auth(JsonArray args, Handler<AsyncResult<String>> handler);
+  void auth(String password, Handler<AsyncResult<String>> handler);
 
   /**
    * Asynchronously rewrite the append-only file
@@ -71,12 +72,24 @@ public interface RedisService {
   /**
    * Count set bits in a string
    *
-   * @param args    JsonArray [{"name":"key","type":"key"},{"name":["start","end"],"type":["integer","integer"],"multiple":true}]
+   * @param key     Key string
    * @param handler Handler for the result of this call.
    * @since 2.6.0
    * group: string
    */
-  void bitcount(JsonArray args, Handler<AsyncResult<Long>> handler);
+  void bitcount(String key, Handler<AsyncResult<Long>> handler);
+
+  /**
+   * Count set bits in a string
+   *
+   * @param key     Key string
+   * @param start   Start index
+   * @param end     End index
+   * @param handler Handler for the result of this call.
+   * @since 2.6.0
+   * group: string
+   */
+  void bitcountRange(String key, long start, long end, Handler<AsyncResult<Long>> handler);
 
   /**
    * Perform bitwise operations between strings
