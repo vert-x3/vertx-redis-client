@@ -2,6 +2,7 @@ package io.vertx.test.redis;
 
 import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;
+import io.vertx.redis.BitOperation;
 import io.vertx.redis.InsertOptions;
 import io.vertx.redis.ObjectCmd;
 import io.vertx.redis.RedisService;
@@ -230,7 +231,7 @@ public class RedisServiceTestBase extends VertxTestBase {
       assertTrue(reply0.succeeded());
       redis.set(key2, "abcdef", reply1 -> {
         assertTrue(reply1.succeeded());
-        redis.bitop(toJsonArray("and", destkey, key1, key2), reply2 -> {
+        redis.bitop(BitOperation.AND, destkey, Arrays.asList(key1, key2), reply2 -> {
           assertTrue(reply2.succeeded());
           redis.get(destkey, reply3 -> {
             assertTrue(reply3.succeeded());

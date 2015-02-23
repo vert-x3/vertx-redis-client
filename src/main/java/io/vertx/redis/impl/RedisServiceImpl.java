@@ -5,6 +5,7 @@ import io.vertx.core.Handler;
 import io.vertx.core.Vertx;
 import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;
+import io.vertx.redis.BitOperation;
 import io.vertx.redis.InsertOptions;
 import io.vertx.redis.ObjectCmd;
 import io.vertx.redis.ScanOptions;
@@ -51,8 +52,8 @@ public final class RedisServiceImpl extends AbstractRedisService {
   }
 
   @Override
-  public void bitop(JsonArray args, Handler<AsyncResult<Long>> handler) {
-    sendLong("BITOP", args, handler);
+  public void bitop(BitOperation operation, String destkey, List<String> keys, Handler<AsyncResult<Long>> handler) {
+    sendLong("BITOP", toPayload(operation.name(), destkey, keys), handler);
   }
 
   @Override

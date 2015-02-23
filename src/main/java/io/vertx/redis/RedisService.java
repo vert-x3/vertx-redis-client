@@ -94,12 +94,14 @@ public interface RedisService {
   /**
    * Perform bitwise operations between strings
    *
-   * @param args    JsonArray [{"name":"operation","type":"string"},{"name":"destkey","type":"key"},{"name":"key","type":"key","multiple":true}]
-   * @param handler Handler for the result of this call.
+   * @param operation Bitwise operation to perform
+   * @param destkey   Destination key where result is stored
+   * @param keys      List of keys on which to perform the operation
+   * @param handler   Handler for the result of this call.
    * @since 2.6.0
    * group: string
    */
-  void bitop(JsonArray args, Handler<AsyncResult<Long>> handler);
+  void bitop(BitOperation operation, String destkey, List<String> keys, Handler<AsyncResult<Long>> handler);
 
   /**
    * Find first bit set or clear in a string
