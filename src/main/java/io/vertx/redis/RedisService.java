@@ -203,12 +203,12 @@ public interface RedisService {
   /**
    * Kill the connection of a client
    *
-   * @param args    JsonArray [{"name":"ip:port","type":"string","optional":true},{"command":"ID","name":"client-id","type":"integer","optional":true},{"command":"TYPE","type":"enum","enum":["normal","slave","pubsub"],"optional":true},{"command":"ADDR","name":"ip:port","type":"string","optional":true},{"command":"SKIPME","name":"yes/no","type":"string","optional":true}]
+   * @param filter  Filter options
    * @param handler Handler for the result of this call.
    * @since 2.4.0
    * group: server
    */
-  void clientKill(JsonArray args, Handler<AsyncResult<Long>> handler);
+  void clientKill(KillFilter filter, Handler<AsyncResult<Long>> handler);
 
   /**
    * Get the list of client connections

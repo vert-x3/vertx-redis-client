@@ -5,6 +5,7 @@ import io.vertx.core.json.JsonObject;
 import io.vertx.redis.BitOperation;
 import io.vertx.redis.BitOption;
 import io.vertx.redis.InsertOptions;
+import io.vertx.redis.KillFilter;
 import io.vertx.redis.ObjectCmd;
 import io.vertx.redis.RedisService;
 import io.vertx.redis.ScanOptions;
@@ -331,7 +332,7 @@ public class RedisServiceTestBase extends VertxTestBase {
       assertTrue(reply.succeeded());
       String clients = reply.result();
       String add = clients.split("\\s")[0].split("=")[1];
-      redis.clientKill(toJsonArray(add), reply2 ->{
+      redis.clientKill(new KillFilter().setAddr(add), reply2 ->{
         assertTrue(reply2.succeeded());
         testComplete();
       });

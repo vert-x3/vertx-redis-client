@@ -8,10 +8,10 @@ import io.vertx.core.json.JsonObject;
 import io.vertx.redis.BitOperation;
 import io.vertx.redis.BitOption;
 import io.vertx.redis.InsertOptions;
+import io.vertx.redis.KillFilter;
 import io.vertx.redis.ObjectCmd;
 import io.vertx.redis.ScanOptions;
 
-import java.nio.charset.Charset;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -98,8 +98,8 @@ public final class RedisServiceImpl extends AbstractRedisService {
   }
 
   @Override
-  public void clientKill(JsonArray args, Handler<AsyncResult<Long>> handler) {
-    sendLong("CLIENT KILL", args, handler);
+  public void clientKill(KillFilter filter, Handler<AsyncResult<Long>> handler) {
+    sendLong("CLIENT KILL", filter.toJsonArray(), handler);
   }
 
   @Override
