@@ -624,7 +624,7 @@ public class RedisServiceTestBase extends VertxTestBase {
     redis.scriptLoad(new JsonArray().add(inline), reply->{
       assertTrue(reply.succeeded());
       assertNotNull(reply.result());
-      redis.evalsha(reply.result(), null, null, reply2 ->{
+      redis.evalsha(reply.result(), Collections.emptyList(), Collections.emptyList(), reply2 ->{
         assertTrue(reply2.succeeded());
         testComplete();
       });
