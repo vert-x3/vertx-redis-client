@@ -403,32 +403,36 @@ public interface RedisService {
   /**
    * Echo the given string
    *
-   * @param args    JsonArray [{"name":"message","type":"string"}]
+   * @param message String to echo
    * @param handler Handler for the result of this call.
    * @since 1.0.0
    * group: connection
    */
-  void echo(JsonArray args, Handler<AsyncResult<String>> handler);
+  void echo(String message, Handler<AsyncResult<String>> handler);
 
   /**
    * Execute a Lua script server side
    *
-   * @param args    JsonArray [{"name":"script","type":"string"},{"name":"numkeys","type":"integer"},{"name":"key","type":"key","multiple":true},{"name":"arg","type":"string","multiple":true}]
+   * @param script  Lua script to evaluate
+   * @param keys    List of keys
+   * @param args    List of argument values
    * @param handler Handler for the result of this call.
    * @since 2.6.0
    * group: scripting
    */
-  void eval(JsonArray args, Handler<AsyncResult<Void>> handler);
+  void eval(String script, List<String> keys, List<String> args, Handler<AsyncResult<Void>> handler);
 
   /**
    * Execute a Lua script server side
    *
-   * @param args    JsonArray [{"name":"sha1","type":"string"},{"name":"numkeys","type":"integer"},{"name":"key","type":"key","multiple":true},{"name":"arg","type":"string","multiple":true}]
+   * @param sha1    SHA1 digest of the script cached on the server
+   * @param keys    List of keys
+   * @param values  List of values
    * @param handler Handler for the result of this call.
    * @since 2.6.0
    * group: scripting
    */
-  void evalsha(JsonArray args, Handler<AsyncResult<Void>> handler);
+  void evalsha(String sha1, List<String> keys, List<String> values, Handler<AsyncResult<Void>> handler);
 
   /**
    * Execute all commands issued after MULTI

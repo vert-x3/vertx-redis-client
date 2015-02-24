@@ -12,6 +12,7 @@ import io.vertx.redis.KillFilter;
 import io.vertx.redis.ObjectCmd;
 import io.vertx.redis.ScanOptions;
 
+import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -208,18 +209,30 @@ public final class RedisServiceImpl extends AbstractRedisService {
   }
 
   @Override
-  public void echo(JsonArray args, Handler<AsyncResult<String>> handler) {
-    sendString("ECHO", args, handler);
+  public void echo(String message, Handler<AsyncResult<String>> handler) {
+    sendString("ECHO", toPayload(message), handler);
   }
 
   @Override
-  public void eval(JsonArray args, Handler<AsyncResult<Void>> handler) {
-    sendVoid("EVAL", args, handler);
+  public void eval(String script, List<String> keys, List<String> args, Handler<AsyncResult<Void>> handler) {
+    keys = (keys != null) ? keys : Collections.emptyList();
+    args = (args != null) ? args : Collections.emptyList();
+    if (keys.size() != args.size()) {
+      handler.handle(new RedisAsyncResult<Void>(new IllegalArgumentException("Key list, and argument list are not the same size")));
+      return;
+    }
+    sendVoid("EVAL", toPayload(script, keys.size(), keys, args), handler);
   }
 
   @Override
-  public void evalsha(JsonArray args, Handler<AsyncResult<Void>> handler) {
-    sendVoid("EVALSHA", args, handler);
+  public void evalsha(String sha1, List<String> keys, List<String> args, Handler<AsyncResult<Void>> handler) {
+    keys = (keys != null) ? keys : Collections.emptyList();
+    args = (args != null) ? args : Collections.emptyList();
+    if (keys.size() != args.size()) {
+      handler.handle(new RedisAsyncResult<Void>(new IllegalArgumentException("Key list, and argument list are not the same size")));
+      return;
+    }
+    sendVoid("EVALSHA", toPayload(sha1, keys.size(), keys, args), handler);
   }
 
   @Override

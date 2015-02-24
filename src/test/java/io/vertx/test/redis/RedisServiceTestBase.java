@@ -14,6 +14,7 @@ import io.vertx.test.core.VertxTestBase;
 
 import java.nio.charset.Charset;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
@@ -595,7 +596,7 @@ public class RedisServiceTestBase extends VertxTestBase {
 
   @Test
   public void testEcho() {
-    redis.echo(toJsonArray("Hello World!"), reply0 -> {
+    redis.echo("Hello World!", reply0 -> {
       assertTrue(reply0.succeeded());
       assertEquals("Hello World!", reply0.result());
       testComplete();
@@ -608,7 +609,7 @@ public class RedisServiceTestBase extends VertxTestBase {
 
     final String key1 = makeKey();
     final String key2 = makeKey();
-    redis.eval(toJsonArray("return {KEYS[1],KEYS[2],ARGV[1],ARGV[2]}", 2, key1, key2, "first","second"),
+    redis.eval("return {KEYS[1],KEYS[2],ARGV[1],ARGV[2]}", Arrays.asList(key1, key2), Arrays.asList("first","second"),
         reply -> {
           assertTrue(reply.succeeded());
           Object r = reply.result();
@@ -624,7 +625,7 @@ public class RedisServiceTestBase extends VertxTestBase {
     redis.scriptLoad(new JsonArray().add(inline), reply->{
       assertTrue(reply.succeeded());
       assertNotNull(reply.result());
-      redis.evalsha(new JsonArray().add(reply.result()).add(0) , reply2 ->{
+      redis.evalsha(reply.result(), null, null, reply2 ->{
         assertTrue(reply2.succeeded());
         testComplete();
       });
@@ -2133,7 +2134,7 @@ public class RedisServiceTestBase extends VertxTestBase {
   public void testScriptkill() throws Exception {
 
     String inline = "while true do end";
-    redis.eval(new JsonArray().add(inline).add(0), reply ->{
+    redis.eval(inline, Collections.emptyList(), Collections.emptyList(), reply ->{
       //server should be locked at this point
     });
 
