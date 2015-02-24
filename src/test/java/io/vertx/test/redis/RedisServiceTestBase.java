@@ -386,7 +386,7 @@ public class RedisServiceTestBase extends VertxTestBase {
 
   @Test
   public void testConfigGet() {
-    redis.configGet(toJsonArray("*"), reply -> {
+    redis.configGet("*", reply -> {
       assertTrue(reply.succeeded());
       assertTrue(reply.result() != null && reply.result().size() > 0);
       testComplete();
@@ -397,9 +397,9 @@ public class RedisServiceTestBase extends VertxTestBase {
   @Test
   public void testConfigSetAndGet() {
 
-    redis.configSet(new JsonArray().add("dbfilename").add("redis.dump"), reply ->{
+    redis.configSet("dbfilename", "redis.dump", reply ->{
       if(reply.succeeded()){
-        redis.configGet(new JsonArray().add("dbfilename"), reply2 -> {
+        redis.configGet("dbfilename", reply2 -> {
           if(reply2.succeeded()){
             assertNotNull(reply2.result().getString(0));
             assertTrue(reply2.result().getString(1).equals("redis.dump"));

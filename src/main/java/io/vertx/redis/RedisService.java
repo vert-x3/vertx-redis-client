@@ -281,22 +281,22 @@ public interface RedisService {
   /**
    * Get array of specific Redis command details
    *
-   * @param args    JsonArray [{"name":"command-name","type":"string","multiple":true}]
-   * @param handler Handler for the result of this call.
+   * @param commands List of commands to get info for
+   * @param handler  Handler for the result of this call.
    * @since 2.8.13
    * group: server
    */
-  void commandInfo(JsonArray args, Handler<AsyncResult<JsonArray>> handler);
+  void commandInfo(List<String> commands, Handler<AsyncResult<JsonArray>> handler);
 
   /**
    * Get the value of a configuration parameter
    *
-   * @param args    JsonArray [{"name":"parameter","type":"string"}]
-   * @param handler Handler for the result of this call.
+   * @param parameter Configuration parameter
+   * @param handler   Handler for the result of this call.
    * @since 2.0.0
    * group: server
    */
-  void configGet(JsonArray args, Handler<AsyncResult<JsonArray>> handler);
+  void configGet(String parameter, Handler<AsyncResult<JsonArray>> handler);
 
   /**
    * Rewrite the configuration file with the in memory configuration
@@ -309,12 +309,13 @@ public interface RedisService {
   /**
    * Set a configuration parameter to the given value
    *
-   * @param args    JsonArray [{"name":"parameter","type":"string"},{"name":"value","type":"string"}]
-   * @param handler Handler for the result of this call.
+   * @param parameter Configuration parameter
+   * @param value     New value
+   * @param handler   Handler for the result of this call.
    * @since 2.0.0
    * group: server
    */
-  void configSet(JsonArray args, Handler<AsyncResult<String>> handler);
+  void configSet(String parameter, String value, Handler<AsyncResult<String>> handler);
 
   /**
    * Reset the stats returned by INFO

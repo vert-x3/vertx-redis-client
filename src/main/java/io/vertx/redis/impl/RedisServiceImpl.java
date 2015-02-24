@@ -143,13 +143,13 @@ public final class RedisServiceImpl extends AbstractRedisService {
   }
 
   @Override
-  public void commandInfo(JsonArray args, Handler<AsyncResult<JsonArray>> handler) {
-    sendJsonArray("COMMAND INFO", args, handler);
+  public void commandInfo(List<String> commands, Handler<AsyncResult<JsonArray>> handler) {
+    sendJsonArray("COMMAND INFO", toPayload(commands), handler);
   }
 
   @Override
-  public void configGet(JsonArray args, Handler<AsyncResult<JsonArray>> handler) {
-    sendJsonArray("CONFIG GET", args, handler);
+  public void configGet(String parameter, Handler<AsyncResult<JsonArray>> handler) {
+    sendJsonArray("CONFIG GET", toPayload(parameter), handler);
   }
 
   @Override
@@ -158,8 +158,8 @@ public final class RedisServiceImpl extends AbstractRedisService {
   }
 
   @Override
-  public void configSet(JsonArray args, Handler<AsyncResult<String>> handler) {
-    sendString("CONFIG SET", args, handler);
+  public void configSet(String parameter, String value, Handler<AsyncResult<String>> handler) {
+    sendString("CONFIG SET", toPayload(parameter, value), handler);
   }
 
   @Override
