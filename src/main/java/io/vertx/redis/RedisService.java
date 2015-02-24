@@ -524,12 +524,14 @@ public interface RedisService {
   /**
    * Get a substring of the string stored at a key
    *
-   * @param args    JsonArray [{"name":"key","type":"key"},{"name":"start","type":"integer"},{"name":"end","type":"integer"}]
+   * @param key     Key string
+   * @param start   Start offset
+   * @param end     End offset - inclusive
    * @param handler Handler for the result of this call.
    * @since 2.4.0
    * group: string
    */
-  void getrange(JsonArray args, Handler<AsyncResult<String>> handler);
+  void getrange(String key, long start, long end, Handler<AsyncResult<String>> handler);
 
   /**
    * Set the string value of a key and return its old value

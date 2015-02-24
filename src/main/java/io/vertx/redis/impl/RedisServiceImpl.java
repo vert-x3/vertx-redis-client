@@ -280,8 +280,8 @@ public final class RedisServiceImpl extends AbstractRedisService {
   }
 
   @Override
-  public void getrange(JsonArray args, Handler<AsyncResult<String>> handler) {
-    sendString("GETRANGE", args, handler);
+  public void getrange(String key, long start, long end, Handler<AsyncResult<String>> handler) {
+    sendString("GETRANGE", toPayload(key, start, end), handler);
   }
 
   @Override

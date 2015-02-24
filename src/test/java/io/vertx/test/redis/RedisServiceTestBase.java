@@ -822,19 +822,19 @@ public class RedisServiceTestBase extends VertxTestBase {
 
     redis.set(mykey, "This is a string", reply0 -> {
       assertTrue(reply0.succeeded());
-      redis.getrange(toJsonArray(mykey, 0, 3), reply1 -> {
+      redis.getrange(mykey, 0, 3, reply1 -> {
         assertTrue(reply1.succeeded());
         assertEquals("This", reply1.result());
 
-        redis.getrange(toJsonArray(mykey, -3, -1), reply2 -> {
+        redis.getrange(mykey, -3, -1, reply2 -> {
           assertTrue(reply2.succeeded());
           assertEquals("ing", reply2.result());
 
-          redis.getrange(toJsonArray(mykey, 0, -1), reply3 -> {
+          redis.getrange(mykey, 0, -1, reply3 -> {
             assertTrue(reply3.succeeded());
             assertEquals("This is a string", reply3.result());
 
-            redis.getrange(toJsonArray(mykey, 10, 100), reply4 -> {
+            redis.getrange(mykey, 10, 100, reply4 -> {
               assertTrue(reply4.succeeded());
               assertEquals("string", reply4.result());
               testComplete();
