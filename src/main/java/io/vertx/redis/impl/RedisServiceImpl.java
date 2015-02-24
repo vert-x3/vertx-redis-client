@@ -113,13 +113,13 @@ public final class RedisServiceImpl extends AbstractRedisService {
   }
 
   @Override
-  public void clientPause(JsonArray args, Handler<AsyncResult<String>> handler) {
-    sendString("CLIENT PAUSE", args, handler);
+  public void clientPause(long millis, Handler<AsyncResult<String>> handler) {
+    sendString("CLIENT PAUSE", toPayload(millis), handler);
   }
 
   @Override
-  public void clientSetname(JsonArray args, Handler<AsyncResult<String>> handler) {
-    sendString("CLIENT SETNAME", args, handler);
+  public void clientSetname(String name, Handler<AsyncResult<String>> handler) {
+    sendString("CLIENT SETNAME", toPayload(name), handler);
   }
 
   @Override

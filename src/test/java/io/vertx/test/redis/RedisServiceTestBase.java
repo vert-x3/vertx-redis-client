@@ -367,9 +367,7 @@ public class RedisServiceTestBase extends VertxTestBase {
     awaitLatch(clientLatch);
 
     CountDownLatch setLatch = new CountDownLatch(1);
-    JsonArray args = new JsonArray();
-    args.add("test-connection");
-    redis.clientSetname(args, result -> {
+    redis.clientSetname("test-connection", result -> {
       assertTrue(result.succeeded());
       setLatch.countDown();
     });

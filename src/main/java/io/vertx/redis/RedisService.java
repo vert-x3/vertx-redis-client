@@ -229,22 +229,22 @@ public interface RedisService {
   /**
    * Stop processing commands from clients for some time
    *
-   * @param args    JsonArray [{"name":"timeout","type":"integer"}]
+   * @param millis  Pause time in milliseconds
    * @param handler Handler for the result of this call.
    * @since 2.9.50
    * group: server
    */
-  void clientPause(JsonArray args, Handler<AsyncResult<String>> handler);
+  void clientPause(long millis, Handler<AsyncResult<String>> handler);
 
   /**
    * Set the current connection name
    *
-   * @param args    JsonArray [{"name":"connection-name","type":"string"}]
+   * @param name    New name for current connection
    * @param handler Handler for the result of this call.
    * @since 2.6.9
    * group: server
    */
-  void clientSetname(JsonArray args, Handler<AsyncResult<String>> handler);
+  void clientSetname(String name, Handler<AsyncResult<String>> handler);
 
   /**
    * Get array of Cluster slot to node mappings
