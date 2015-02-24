@@ -375,13 +375,18 @@ public final class RedisServiceImpl extends AbstractRedisService {
   }
 
   @Override
-  public void info(JsonArray args, Handler<AsyncResult<JsonObject>> handler) {
-    sendJsonObject("INFO", args, handler);
+  public void info(Handler<AsyncResult<JsonObject>> handler) {
+    sendJsonObject("INFO", new JsonArray(), handler);
   }
 
   @Override
-  public void keys(JsonArray args, Handler<AsyncResult<JsonArray>> handler) {
-    sendJsonArray("KEYS", args, handler);
+  public void infoSection(String section, Handler<AsyncResult<JsonObject>> handler) {
+    sendJsonObject("INFO", toPayload(section), handler);
+  }
+
+  @Override
+  public void keys(String pattern, Handler<AsyncResult<JsonArray>> handler) {
+    sendJsonArray("KEYS", toPayload(pattern), handler);
   }
 
   @Override

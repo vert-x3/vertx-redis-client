@@ -733,22 +733,31 @@ public interface RedisService {
   /**
    * Get information and statistics about the server
    *
-   * @param args    JsonArray [{"name":"section","type":"string","optional":true}]
    * @param handler Handler for the result of this call.
    * @since 1.0.0
    * group: server
    */
-  void info(JsonArray args, Handler<AsyncResult<JsonObject>> handler);
+  void info(Handler<AsyncResult<JsonObject>> handler);
+
+  /**
+   * Get information and statistics about the server
+   *
+   * @param section Specific section of information to return
+   * @param handler Handler for the result of this call.
+   * @since 1.0.0
+   * group: server
+   */
+  void infoSection(String section, Handler<AsyncResult<JsonObject>> handler);
 
   /**
    * Find all keys matching the given pattern
    *
-   * @param args    JsonArray [{"name":"pattern","type":"pattern"}]
+   * @param pattern Pattern to limit the keys returned
    * @param handler Handler for the result of this call.
    * @since 1.0.0
    * group: generic
    */
-  void keys(JsonArray args, Handler<AsyncResult<JsonArray>> handler);
+  void keys(String pattern, Handler<AsyncResult<JsonArray>> handler);
 
   /**
    * Get the UNIX time stamp of the last successful save to disk

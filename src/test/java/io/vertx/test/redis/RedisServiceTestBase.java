@@ -415,14 +415,14 @@ public class RedisServiceTestBase extends VertxTestBase {
   @Test
   public void testConfigResetstat() {
 
-    redis.info(new JsonArray(), reply ->{
+    redis.info(reply ->{
       assertTrue(reply.succeeded());
       JsonObject result = reply.result().getJsonObject("stats");
       Integer conn = Integer.valueOf(result.getString("total_connections_received"));
       assertTrue(conn > 0);
       redis.configResetstat(reply2 -> {
         assertTrue(reply2.succeeded());
-        redis.info(new JsonArray(), reply3 ->{
+        redis.info(reply3 ->{
           assertTrue(reply3.succeeded());
           //Note, this may appear strange, but the embedded server handles stats differently
           //Many are not reset correctly. Here we just test the flow of the COMMANDS
@@ -475,7 +475,7 @@ public class RedisServiceTestBase extends VertxTestBase {
 
     rdx.debugSegfault(reply ->{
       assertTrue(reply.succeeded());
-      rdx.info(new JsonArray(), reply2 ->{
+      rdx.info(reply2 ->{
         assertFalse(reply2.succeeded());
         try{
           server.stop();          
@@ -1220,7 +1220,7 @@ public class RedisServiceTestBase extends VertxTestBase {
 
   @Test
   public void testInfo() {
-    redis.info(toJsonArray(), reply0 -> {
+    redis.info(reply0 -> {
       assertTrue(reply0.succeeded());
       assertNotNull(reply0.result());
       testComplete();
@@ -1232,18 +1232,18 @@ public class RedisServiceTestBase extends VertxTestBase {
   public void testKeys() {
     redis.mset(toJsonArray("one", 1, "two", 2, "three", 3, "four", 4), reply0 -> {
       assertTrue(reply0.succeeded());
-      redis.keys(toJsonArray("*o*"), reply1 -> {
+      redis.keys("*o*", reply1 -> {
         assertTrue(reply1.succeeded());
         JsonArray array = reply1.result();
         // this is because there are leftovers from previous tests
         assertTrue(3 <= array.size());
 
-        redis.keys(toJsonArray("t??"), reply2 -> {
+        redis.keys("t??", reply2 -> {
           assertTrue(reply2.succeeded());
           JsonArray array2 = reply2.result();
           assertTrue(1 == array2.size());
 
-          redis.keys(toJsonArray("*"), reply3 -> {
+          redis.keys("*", reply3 -> {
             assertTrue(reply3.succeeded());
             JsonArray array3 = reply3.result();
             assertTrue(4 <= array3.size());
@@ -2150,7 +2150,7 @@ public class RedisServiceTestBase extends VertxTestBase {
 
     rdx.scriptKill(reply ->{
       assertTrue(reply.succeeded());
-      rdx.info(new JsonArray(), reply2 ->{
+      rdx.info(reply2 ->{
         assertTrue(reply2.succeeded());
         testComplete();
       });
