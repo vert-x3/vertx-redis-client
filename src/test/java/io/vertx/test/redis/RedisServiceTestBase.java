@@ -3,6 +3,7 @@ package io.vertx.test.redis;
 import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;
 import io.vertx.redis.BitOperation;
+import io.vertx.redis.BitOption;
 import io.vertx.redis.InsertOptions;
 import io.vertx.redis.ObjectCmd;
 import io.vertx.redis.RedisService;
@@ -10,6 +11,7 @@ import io.vertx.redis.ScanOptions;
 import io.vertx.redis.SetOptions;
 import io.vertx.test.core.VertxTestBase;
 
+import java.nio.charset.Charset;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -3310,7 +3312,7 @@ public class RedisServiceTestBase extends VertxTestBase {
   }
 
   // TODO redis-embedded version of redis does not support HSCAN
-  //@Test
+  @Test
   public void testHscan() {
     final String key = makeKey();
     Map<String, String> obj = new HashMap<>();
@@ -3326,7 +3328,74 @@ public class RedisServiceTestBase extends VertxTestBase {
         assertEquals(2, result.size());
 
         JsonArray page = result.getJsonArray(1);
-        assertEquals("22", page.size());
+        assertEquals(22, page.size());
+
+        testComplete();
+      });
+    });
+    await();
+  }
+
+  @Test
+  public void testBitpos() {
+    final String key = makeKey();
+    final byte[] value = new byte[] {(byte) 0xff, (byte) 0xf0, (byte) 0x00};
+    Charset charset = Charset.forName("iso-8859-1");
+    redis.setBinary(key, new String(value, charset), reply0 -> {
+      assertTrue(reply0.succeeded());
+      redis.bitpos(key, BitOption.ZERO, reply1 -> {
+        assertTrue(String.valueOf(reply1.cause()), reply1.succeeded());
+        assertEquals(12, reply1.result().longValue());
+
+        final byte[] value2 = new byte[] {0, 0, 0};
+        redis.setBinary(key, new String(value2, charset), reply2 -> {
+          assertTrue(reply2.succeeded());
+          redis.bitpos(key, BitOption.ONE, reply3 -> {
+            assertTrue(String.valueOf(reply3.cause()), reply3.succeeded());
+            assertEquals(-1, reply3.result().longValue());
+
+            testComplete();
+          });
+        });
+      });
+    });
+    await();
+  }
+
+  @Test
+  public void testBitposFrom() {
+    final String key = makeKey();
+    final byte[] value = new byte[] {(byte) 0x00, (byte) 0xff, (byte) 0xf0};
+    Charset charset = Charset.forName("iso-8859-1");
+    redis.setBinary(key, new String(value, charset), reply0 -> {
+      assertTrue(reply0.succeeded());
+      redis.bitposFrom(key, BitOption.ONE, 0, reply1 -> {
+        assertTrue(String.valueOf(reply1.cause()), reply1.succeeded());
+        assertEquals(8, reply1.result().longValue());
+        redis.bitposFrom(key, BitOption.ONE, 2, reply2 -> {
+          assertTrue(String.valueOf(reply2.cause()), reply2.succeeded());
+          assertEquals(16, reply2.result().longValue());
+
+          testComplete();
+        });
+      });
+    });
+    await();
+  }
+
+  @Test
+  public void testBinarySetAndGet() {
+    final String key = makeKey();
+    final byte[] value = new byte[256];
+    for (int i=0; i < value.length; i++) {
+      value[i] = (byte) i;
+    }
+    Charset charset = Charset.forName("iso-8859-1");
+    redis.setBinary(key, new String(value, charset), reply0 -> {
+      assertTrue(reply0.succeeded());
+      redis.getBinary(key, reply1 -> {
+        assertTrue(String.valueOf(reply1.cause()), reply1.succeeded());
+        assertArrayEquals(value, reply1.result().getBytes(charset));
 
         testComplete();
       });

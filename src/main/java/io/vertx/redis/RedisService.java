@@ -106,12 +106,43 @@ public interface RedisService {
   /**
    * Find first bit set or clear in a string
    *
-   * @param args    JsonArray [{"name":"key","type":"key"},{"name":"bit","type":"integer"},{"name":"start","type":"integer","optional":true},{"name":"end","type":"integer","optional":true}]
+   * @param key     Key string
+   * @param bit     Bit option specifying whether to look for 1, or for 0
    * @param handler Handler for the result of this call.
    * @since 2.8.7
    * group: string
    */
-  void bitpos(JsonArray args, Handler<AsyncResult<Long>> handler);
+  void bitpos(String key, BitOption bit, Handler<AsyncResult<Long>> handler);
+
+  /**
+   * Find first bit set or clear in a string
+   *
+   * See also bitposRange() method, which takes start, and stop offset.
+   *
+   * @param key     Key string
+   * @param bit     Bit option specifying whether to look for 1, or for 0
+   * @param start   Start offset
+   * @param handler Handler for the result of this call.
+   * @since 2.8.7
+   * group: string
+   */
+  void bitposFrom(String key, BitOption bit, int start, Handler<AsyncResult<Long>> handler);
+
+  /**
+   * Find first bit set or clear in a string
+   *
+   * Note: when both start, and stop offsets are specified,
+   * behaviour is slightly different than if only start is specified
+   *
+   * @param key     Key string
+   * @param bit     Bit option specifying whether to look for 1, or for 0
+   * @param start   Start offset
+   * @param stop    End offset - inclusive
+   * @param handler Handler for the result of this call.
+   * @since 2.8.7
+   * group: string
+   */
+  void bitposRange(String key, BitOption bit, int start, int stop, Handler<AsyncResult<Long>> handler);
 
   /**
    * Remove and get the first element in a list, or block until one is available
@@ -463,6 +494,16 @@ public interface RedisService {
    * group: string
    */
   void get(String key, Handler<AsyncResult<String>> handler);
+
+  /**
+   * Get the value of a key - without decoding as utf-8
+   *
+   * @param key     Key string
+   * @param handler Handler for the result of this call.
+   * @since 1.0.0
+   * group: string
+   */
+  void getBinary(String key, Handler<AsyncResult<String>> handler);
 
   /**
    * Returns the bit value at offset in the string value stored at key
@@ -1265,6 +1306,17 @@ public interface RedisService {
    * group: string
    */
   void setWithOptions(String key, String value, JsonArray options, Handler<AsyncResult<Void>> handler);
+
+  /**
+   * Set the binary string value of a key - without encoding as utf-8
+   *
+   * @param key     Key of which value to set
+   * @param value   New value for the key
+   * @param handler Handler for the result of this call.
+   * @since 1.0.0
+   * group: string
+   */
+  void setBinary(String key, String value, Handler<AsyncResult<Void>> handler);
 
   /**
    * Sets or clears the bit at offset in the string value stored at key

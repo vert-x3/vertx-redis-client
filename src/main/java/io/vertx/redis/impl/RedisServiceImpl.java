@@ -6,11 +6,12 @@ import io.vertx.core.Vertx;
 import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;
 import io.vertx.redis.BitOperation;
+import io.vertx.redis.BitOption;
 import io.vertx.redis.InsertOptions;
 import io.vertx.redis.ObjectCmd;
 import io.vertx.redis.ScanOptions;
 
-import java.util.Arrays;
+import java.nio.charset.Charset;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -57,8 +58,18 @@ public final class RedisServiceImpl extends AbstractRedisService {
   }
 
   @Override
-  public void bitpos(JsonArray args, Handler<AsyncResult<Long>> handler) {
-    sendLong("BITPOS", args, handler);
+  public void bitpos(String key, BitOption bit, Handler<AsyncResult<Long>> handler) {
+    sendLong("BITPOS", toPayload(key, bit.value()), handler);
+  }
+
+  @Override
+  public void bitposFrom(String key, BitOption bit, int start, Handler<AsyncResult<Long>> handler) {
+    sendLong("BITPOS", toPayload(key, bit.value(), start), handler);
+  }
+
+  @Override
+  public void bitposRange(String key, BitOption bit, int start, int stop, Handler<AsyncResult<Long>> handler) {
+    sendLong("BITPOS", toPayload(key, bit.value(), start, stop), handler);
   }
 
   @Override
@@ -244,6 +255,11 @@ public final class RedisServiceImpl extends AbstractRedisService {
   @Override
   public void get(String key, Handler<AsyncResult<String>> handler) {
     sendString("GET", toPayload(key), handler);
+  }
+
+  @Override
+  public void getBinary(String key, Handler<AsyncResult<String>> handler) {
+    send("GET", toPayload(key), String.class, true, handler);
   }
 
   @Override
@@ -634,6 +650,11 @@ public final class RedisServiceImpl extends AbstractRedisService {
   @Override
   public void setWithOptions(String key, String value, JsonArray options, Handler<AsyncResult<Void>> handler) {
     sendVoid("SET", toPayload(key, value, options != null ? options.getList() : null), handler);
+  }
+
+  @Override
+  public void setBinary(String key, String value, Handler<AsyncResult<Void>> handler) {
+    send("SET", toPayload(key, value), Void.class, true, handler);
   }
 
   @Override
