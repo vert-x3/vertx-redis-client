@@ -6,7 +6,6 @@ import io.vertx.core.Vertx;
 import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;
 import io.vertx.redis.BitOperation;
-import io.vertx.redis.BitOption;
 import io.vertx.redis.InsertOptions;
 import io.vertx.redis.KillFilter;
 import io.vertx.redis.ObjectCmd;
@@ -59,18 +58,18 @@ public final class RedisServiceImpl extends AbstractRedisService {
   }
 
   @Override
-  public void bitpos(String key, BitOption bit, Handler<AsyncResult<Long>> handler) {
-    sendLong("BITPOS", toPayload(key, bit.value()), handler);
+  public void bitpos(String key, int bit, Handler<AsyncResult<Long>> handler) {
+    sendLong("BITPOS", toPayload(key, bit), handler);
   }
 
   @Override
-  public void bitposFrom(String key, BitOption bit, int start, Handler<AsyncResult<Long>> handler) {
-    sendLong("BITPOS", toPayload(key, bit.value(), start), handler);
+  public void bitposFrom(String key, int bit, int start, Handler<AsyncResult<Long>> handler) {
+    sendLong("BITPOS", toPayload(key, bit, start), handler);
   }
 
   @Override
-  public void bitposRange(String key, BitOption bit, int start, int stop, Handler<AsyncResult<Long>> handler) {
-    sendLong("BITPOS", toPayload(key, bit.value(), start, stop), handler);
+  public void bitposRange(String key, int bit, int start, int stop, Handler<AsyncResult<Long>> handler) {
+    sendLong("BITPOS", toPayload(key, bit, start, stop), handler);
   }
 
   @Override
@@ -276,8 +275,8 @@ public final class RedisServiceImpl extends AbstractRedisService {
   }
 
   @Override
-  public void getbit(JsonArray args, Handler<AsyncResult<Long>> handler) {
-    sendLong("GETBIT", args, handler);
+  public void getbit(String key, long offset, Handler<AsyncResult<Long>> handler) {
+    sendLong("GETBIT", toPayload(key, offset), handler);
   }
 
   @Override
@@ -671,8 +670,8 @@ public final class RedisServiceImpl extends AbstractRedisService {
   }
 
   @Override
-  public void setbit(JsonArray args, Handler<AsyncResult<Long>> handler) {
-    sendLong("SETBIT", args, handler);
+  public void setbit(String key, long offset, int bit, Handler<AsyncResult<Long>> handler) {
+    sendLong("SETBIT", toPayload(key, offset, bit), handler);
   }
 
   @Override

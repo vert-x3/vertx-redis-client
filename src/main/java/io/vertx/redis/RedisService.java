@@ -107,12 +107,12 @@ public interface RedisService {
    * Find first bit set or clear in a string
    *
    * @param key     Key string
-   * @param bit     Bit option specifying whether to look for 1, or for 0
+   * @param bit     What bit value to look for - must be 1, or 0
    * @param handler Handler for the result of this call.
    * @since 2.8.7
    * group: string
    */
-  void bitpos(String key, BitOption bit, Handler<AsyncResult<Long>> handler);
+  void bitpos(String key, int bit, Handler<AsyncResult<Long>> handler);
 
   /**
    * Find first bit set or clear in a string
@@ -120,13 +120,13 @@ public interface RedisService {
    * See also bitposRange() method, which takes start, and stop offset.
    *
    * @param key     Key string
-   * @param bit     Bit option specifying whether to look for 1, or for 0
+   * @param bit     What bit value to look for - must be 1, or 0
    * @param start   Start offset
    * @param handler Handler for the result of this call.
    * @since 2.8.7
    * group: string
    */
-  void bitposFrom(String key, BitOption bit, int start, Handler<AsyncResult<Long>> handler);
+  void bitposFrom(String key, int bit, int start, Handler<AsyncResult<Long>> handler);
 
   /**
    * Find first bit set or clear in a string
@@ -135,14 +135,14 @@ public interface RedisService {
    * behaviour is slightly different than if only start is specified
    *
    * @param key     Key string
-   * @param bit     Bit option specifying whether to look for 1, or for 0
+   * @param bit     What bit value to look for - must be 1, or 0
    * @param start   Start offset
    * @param stop    End offset - inclusive
    * @param handler Handler for the result of this call.
    * @since 2.8.7
    * group: string
    */
-  void bitposRange(String key, BitOption bit, int start, int stop, Handler<AsyncResult<Long>> handler);
+  void bitposRange(String key, int bit, int start, int stop, Handler<AsyncResult<Long>> handler);
 
   /**
    * Remove and get the first element in a list, or block until one is available
@@ -513,12 +513,13 @@ public interface RedisService {
   /**
    * Returns the bit value at offset in the string value stored at key
    *
-   * @param args    JsonArray [{"name":"key","type":"key"},{"name":"offset","type":"integer"}]
+   * @param key     Key string
+   * @param offset  Offset in bits
    * @param handler Handler for the result of this call.
    * @since 2.2.0
    * group: string
    */
-  void getbit(JsonArray args, Handler<AsyncResult<Long>> handler);
+  void getbit(String key, long offset, Handler<AsyncResult<Long>> handler);
 
   /**
    * Get a substring of the string stored at a key
@@ -1326,12 +1327,14 @@ public interface RedisService {
   /**
    * Sets or clears the bit at offset in the string value stored at key
    *
-   * @param args    JsonArray [{"name":"key","type":"key"},{"name":"offset","type":"integer"},{"name":"value","type":"string"}]
+   * @param key     Key string
+   * @param offset  Bit offset
+   * @param bit     New value - must be 1 or 0
    * @param handler Handler for the result of this call.
    * @since 2.2.0
    * group: string
    */
-  void setbit(JsonArray args, Handler<AsyncResult<Long>> handler);
+  void setbit(String key, long offset, int bit, Handler<AsyncResult<Long>> handler);
 
   /**
    * Set the value and expiration of a key
