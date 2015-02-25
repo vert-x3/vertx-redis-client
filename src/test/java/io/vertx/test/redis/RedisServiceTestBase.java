@@ -5,6 +5,7 @@ import io.vertx.core.json.JsonObject;
 import io.vertx.redis.BitOperation;
 import io.vertx.redis.InsertOptions;
 import io.vertx.redis.KillFilter;
+import io.vertx.redis.MigrateOptions;
 import io.vertx.redis.ObjectCmd;
 import io.vertx.redis.RedisService;
 import io.vertx.redis.ScanOptions;
@@ -1543,7 +1544,7 @@ public class RedisServiceTestBase extends VertxTestBase {
       assertTrue(reply0.succeeded());
       redis.set(mykey2, "World", reply1 -> {
         assertTrue(reply1.succeeded());
-        redis.mget(toJsonArray(mykey1, mykey2, "nonexisting"), reply2 -> {
+        redis.mgetMany(Arrays.asList(mykey1, mykey2, "nonexisting"), reply2 -> {
           assertTrue(reply2.succeeded());
           assertArrayEquals(toArray("Hello", "World", null), reply2.result().getList().toArray());
           testComplete();
@@ -1570,8 +1571,8 @@ public class RedisServiceTestBase extends VertxTestBase {
     String key = makeKey();
     redis.set(key, "migrate", reply ->{
       assertTrue(reply.succeeded());
-      redis.migrate(toJsonArray("localhost", 6382, key, 0, 20000), reply2 ->{
-        assertTrue(reply2.succeeded());
+      redis.migrate("localhost", 6382, key, 0, 20000, MigrateOptions.NONE, reply2 ->{
+        assertTrue(String.valueOf(reply2.cause()), reply2.succeeded());
         rdx.get(key, reply3 ->{
           assertTrue(reply3.succeeded());
           assertTrue("migrate".equals(reply3.result()));
@@ -1644,7 +1645,7 @@ public class RedisServiceTestBase extends VertxTestBase {
       redis.msetnx(toJsonArray(mykey2, "there", mykey3, "world"), reply1 -> {
         assertTrue(reply1.succeeded());
         assertEquals(0, reply1.result().longValue());
-        redis.mget(toJsonArray(mykey1, mykey2, mykey3), reply2 -> {
+        redis.mgetMany(Arrays.asList(mykey1, mykey2, mykey3), reply2 -> {
           assertTrue(reply2.succeeded());
           assertArrayEquals(toArray("Hello", "there", null), reply2.result().getList().toArray());
           testComplete();

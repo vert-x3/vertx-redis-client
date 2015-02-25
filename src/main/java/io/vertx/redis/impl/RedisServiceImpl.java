@@ -8,6 +8,7 @@ import io.vertx.core.json.JsonObject;
 import io.vertx.redis.BitOperation;
 import io.vertx.redis.InsertOptions;
 import io.vertx.redis.KillFilter;
+import io.vertx.redis.MigrateOptions;
 import io.vertx.redis.ObjectCmd;
 import io.vertx.redis.ScanOptions;
 
@@ -450,13 +451,18 @@ public final class RedisServiceImpl extends AbstractRedisService {
   }
 
   @Override
-  public void mget(JsonArray args, Handler<AsyncResult<JsonArray>> handler) {
-    sendJsonArray("MGET", args, handler);
+  public void mget(String key, Handler<AsyncResult<JsonArray>> handler) {
+    sendJsonArray("MGET", toPayload(key), handler);
   }
 
   @Override
-  public void migrate(JsonArray args, Handler<AsyncResult<String>> handler) {
-    sendString("MIGRATE", args, handler);
+  public void mgetMany(List<String> keys, Handler<AsyncResult<JsonArray>> handler) {
+    sendJsonArray("MGET", toPayload(keys), handler);
+  }
+
+  @Override
+  public void migrate(String host, int port, String key, int destdb, long timeout, MigrateOptions options, Handler<AsyncResult<String>> handler) {
+    sendString("MIGRATE", toPayload(host, port, key, destdb, timeout, options != null ? options.toJsonArray() : null), handler);
   }
 
   @Override
@@ -666,7 +672,7 @@ public final class RedisServiceImpl extends AbstractRedisService {
 
   @Override
   public void setWithOptions(String key, String value, JsonArray options, Handler<AsyncResult<Void>> handler) {
-    sendVoid("SET", toPayload(key, value, options != null ? options.getList() : null), handler);
+    sendVoid("SET", toPayload(key, value, options), handler);
   }
 
   @Override
@@ -920,12 +926,12 @@ public final class RedisServiceImpl extends AbstractRedisService {
 
   @Override
   public void sscan(String key, String cursor, ScanOptions options, Handler<AsyncResult<Void>> handler) {
-    sendVoid("SSCAN", toPayload(key, cursor, options != null ? options.toJsonArray().getList() : null), handler);
+    sendVoid("SSCAN", toPayload(key, cursor, options != null ? options.toJsonArray() : null), handler);
   }
 
   @Override
   public void hscan(String key, String cursor, ScanOptions options, Handler<AsyncResult<JsonArray>> handler) {
-    sendJsonArray("HSCAN", toPayload(key, cursor, options != null ? options.toJsonArray().getList() : null), handler);
+    sendJsonArray("HSCAN", toPayload(key, cursor, options != null ? options.toJsonArray() : null), handler);
   }
 
   @Override
@@ -944,6 +950,9 @@ public final class RedisServiceImpl extends AbstractRedisService {
   private static JsonArray toPayload(Object ... parameters) {
     JsonArray result = new JsonArray();
     for (Object param: parameters) {
+      if (param instanceof JsonArray) {
+        param = ((JsonArray) param).getList();
+      }
       if (param instanceof List) {
         for (Object el : (List) param) {
           if (el != null) {
@@ -958,7 +967,7 @@ public final class RedisServiceImpl extends AbstractRedisService {
       } else if (param instanceof Stream) {
         ((Stream) param).forEach(e -> {
           if (e instanceof Object[]) {
-            for (Object item: (Object []) e) {
+            for (Object item : (Object[]) e) {
               result.add(item);
             }
           } else {

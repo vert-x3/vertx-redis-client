@@ -893,24 +893,38 @@ public interface RedisService {
   void ltrim(String key, long from, long to, Handler<AsyncResult<String>> handler);
 
   /**
-   * Get the values of all the given keys
+   * Get the value of the given key
    *
-   * @param args    JsonArray [{"name":"key","type":"key","multiple":true}]
+   * @param key     Key string
    * @param handler Handler for the result of this call.
    * @since 1.0.0
    * group: string
    */
-  void mget(JsonArray args, Handler<AsyncResult<JsonArray>> handler);
+  void mget(String key, Handler<AsyncResult<JsonArray>> handler);
+
+  /**
+   * Get the values of all the given keys
+   *
+   * @param keys    List of keys to get
+   * @param handler Handler for the result of this call.
+   * @since 1.0.0
+   * group: string
+   */
+  void mgetMany(List<String> keys, Handler<AsyncResult<JsonArray>> handler);
 
   /**
    * Atomically transfer a key from a Redis instance to another one.
    *
-   * @param args    JsonArray [{"name":"host","type":"string"},{"name":"port","type":"string"},{"name":"key","type":"key"},{"name":"destination-db","type":"integer"},{"name":"timeout","type":"integer"},{"name":"copy","type":"enum","enum":["COPY"],"optional":true},{"name":"replace","type":"enum","enum":["REPLACE"],"optional":true}]
+   * @param host    Destination host
+   * @param port    Destination port
+   * @param key     Key to migrate
+   * @param destdb  Destination database index
+   * @param options Migrate options
    * @param handler Handler for the result of this call.
    * @since 2.6.0
    * group: generic
    */
-  void migrate(JsonArray args, Handler<AsyncResult<String>> handler);
+  void migrate(String host, int port, String key, int destdb, long timeout, MigrateOptions options, Handler<AsyncResult<String>> handler);
 
   /**
    * Listen for all requests received by the server in real time
