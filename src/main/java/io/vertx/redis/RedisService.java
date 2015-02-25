@@ -1039,24 +1039,35 @@ public interface RedisService {
   void pfaddMany(String key, List<String> elements, Handler<AsyncResult<Long>> handler);
 
   /**
-   * Return the approximated cardinality of the set(s) observed by the HyperLogLog at key(s).
+   * Return the approximated cardinality of the set observed by the HyperLogLog at key.
    *
-   * @param args    JsonArray [{"name":"key","type":"key","multiple":true}]
+   * @param key     Key string
    * @param handler Handler for the result of this call.
    * @since 2.8.9
    * group: hyperloglog
    */
-  void pfcount(JsonArray args, Handler<AsyncResult<Long>> handler);
+  void pfcount(String key, Handler<AsyncResult<Long>> handler);
+
+  /**
+   * Return the approximated cardinality of the set(s) observed by the HyperLogLog at key(s).
+   *
+   * @param keys    List of keys
+   * @param handler Handler for the result of this call.
+   * @since 2.8.9
+   * group: hyperloglog
+   */
+  void pfcountMany(List<String> keys, Handler<AsyncResult<Long>> handler);
 
   /**
    * Merge N different HyperLogLogs into a single one.
    *
-   * @param args    JsonArray [{"name":"destkey","type":"key"},{"name":"sourcekey","type":"key","multiple":true}]
+   * @param destkey Destination key
+   * @param keys    List of source keys
    * @param handler Handler for the result of this call.
    * @since 2.8.9
    * group: hyperloglog
    */
-  void pfmerge(JsonArray args, Handler<AsyncResult<String>> handler);
+  void pfmerge(String destkey, List<String> keys, Handler<AsyncResult<String>> handler);
 
   /**
    * Ping the server
@@ -1069,22 +1080,34 @@ public interface RedisService {
   /**
    * Set the value and expiration in milliseconds of a key
    *
-   * @param args    JsonArray [{"name":"key","type":"key"},{"name":"milliseconds","type":"integer"},{"name":"value","type":"string"}]
+   * @param key     Key string
+   * @param millis  Number of milliseconds until the key expires
+   * @param value   New value for key
    * @param handler Handler for the result of this call.
    * @since 2.6.0
    * group: string
    */
-  void psetex(JsonArray args, Handler<AsyncResult<Void>> handler);
+  void psetex(String key, long millis, String value, Handler<AsyncResult<Void>> handler);
 
   /**
-   * Listen for messages published to channels matching the given patterns
+   * Listen for messages published to channels matching the given pattern
    *
-   * @param args    JsonArray [{"name":["pattern"],"type":["pattern"],"multiple":true}]
+   * @param pattern Pattern string
    * @param handler Handler for the result of this call.
    * @since 2.0.0
    * group: pubsub
    */
-  void psubscribe(JsonArray args, Handler<AsyncResult<Void>> handler);
+  void psubscribe(String pattern, Handler<AsyncResult<Void>> handler);
+
+  /**
+   * Listen for messages published to channels matching the given patterns
+   *
+   * @param patterns List of patterns
+   * @param handler  Handler for the result of this call.
+   * @since 2.0.0
+   * group: pubsub
+   */
+  void psubscribeMany(List<String> patterns, Handler<AsyncResult<Void>> handler);
 
   /**
    * Inspect the state of the Pub/Sub subsystem

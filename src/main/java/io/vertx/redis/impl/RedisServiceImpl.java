@@ -521,13 +521,18 @@ public final class RedisServiceImpl extends AbstractRedisService {
   }
 
   @Override
-  public void pfcount(JsonArray args, Handler<AsyncResult<Long>> handler) {
-    sendLong("PFCOUNT", args, handler);
+  public void pfcount(String key, Handler<AsyncResult<Long>> handler) {
+    sendLong("PFCOUNT", toPayload(key), handler);
   }
 
   @Override
-  public void pfmerge(JsonArray args, Handler<AsyncResult<String>> handler) {
-    sendString("PFMERGE", args, handler);
+  public void pfcountMany(List<String> key, Handler<AsyncResult<Long>> handler) {
+    sendLong("PFCOUNT", toPayload(key), handler);
+  }
+
+  @Override
+  public void pfmerge(String destkey, List<String> keys, Handler<AsyncResult<String>> handler) {
+    sendString("PFMERGE", toPayload(destkey, keys), handler);
   }
 
   @Override
@@ -536,13 +541,18 @@ public final class RedisServiceImpl extends AbstractRedisService {
   }
 
   @Override
-  public void psetex(JsonArray args, Handler<AsyncResult<Void>> handler) {
-    sendVoid("PSETEX", args, handler);
+  public void psetex(String key, long millis, String value, Handler<AsyncResult<Void>> handler) {
+    sendVoid("PSETEX", toPayload(key, millis, value), handler);
   }
 
   @Override
-  public void psubscribe(JsonArray args, Handler<AsyncResult<Void>> handler) {
-    sendVoid("PSUBSCRIBE", args, handler);
+  public void psubscribe(String pattern, Handler<AsyncResult<Void>> handler) {
+    sendVoid("PSUBSCRIBE", toPayload(pattern), handler);
+  }
+
+  @Override
+  public void psubscribeMany(List<String> patterns, Handler<AsyncResult<Void>> handler) {
+    sendVoid("PSUBSCRIBE", toPayload(patterns), handler);
   }
 
   @Override

@@ -1805,7 +1805,7 @@ public class RedisServiceTestBase extends VertxTestBase {
   @Test
   public void testPsetex() {
     final String mykey = makeKey();
-    redis.psetex(toJsonArray(mykey, 2000, "Hello"), reply0 -> {
+    redis.psetex(mykey, 2000, "Hello", reply0 -> {
       assertTrue(reply0.succeeded());
       redis.pttl(toJsonArray(mykey), reply1 -> {
         assertTrue(reply1.succeeded());
