@@ -1282,14 +1282,26 @@ public interface RedisService {
   void rpushx(String key, String value, Handler<AsyncResult<Long>> handler);
 
   /**
-   * Add one or more members to a set
+   * Add a member to a set
    *
-   * @param args    JsonArray [{"name":"key","type":"key"},{"name":"member","type":"string","multiple":true}]
+   * @param key     Key string
+   * @param member  Value to be added to the set
    * @param handler Handler for the result of this call.
    * @since 1.0.0
    * group: set
    */
-  void sadd(JsonArray args, Handler<AsyncResult<Long>> handler);
+  void sadd(String key, String member, Handler<AsyncResult<Long>> handler);
+
+  /**
+   * Add one or more members to a set
+   *
+   * @param key     Key string
+   * @param members Values to be added to the set
+   * @param handler Handler for the result of this call.
+   * @since 1.0.0
+   * group: set
+   */
+  void saddMany(String key, List<String> members, Handler<AsyncResult<Long>> handler);
 
   /**
    * Synchronously save the dataset to disk

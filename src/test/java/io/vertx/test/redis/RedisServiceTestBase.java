@@ -23,6 +23,7 @@ import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.TimeUnit;
 
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
@@ -1974,7 +1975,7 @@ public class RedisServiceTestBase extends VertxTestBase {
         assertTrue(reply1.succeeded());
         String dump = reply1.result();
         redis.restore(myotherkey, 0, dump, reply2 -> {
-          assertTrue(reply2.succeeded());
+          assertTrue(String.valueOf(reply2.cause()), reply2.succeeded());
           redis.getBinary(myotherkey, reply3 -> {
             assertTrue(reply3.succeeded());
             assertEquals(value, reply3.result());
@@ -1983,8 +1984,8 @@ public class RedisServiceTestBase extends VertxTestBase {
           });
         });
       });
-      await();
     });
+    await();
   }
 
   @Test
@@ -2098,13 +2099,13 @@ public class RedisServiceTestBase extends VertxTestBase {
   @Test
   public void testSadd() {
     final String mykey = makeKey();
-    redis.sadd(toJsonArray(mykey, "Hello"), reply0 -> {
+    redis.sadd(mykey, "Hello", reply0 -> {
       assertTrue(reply0.succeeded());
       assertEquals(1, reply0.result().longValue());
-      redis.sadd(toJsonArray(mykey, "World"), reply1 -> {
+      redis.sadd(mykey, "World", reply1 -> {
         assertTrue(reply1.succeeded());
         assertEquals(1, reply1.result().longValue());
-        redis.sadd(toJsonArray(mykey, "World"), reply2 -> {
+        redis.sadd(mykey, "World", reply2 -> {
           assertTrue(reply2.succeeded());
           assertEquals(0, reply2.result().longValue());
           redis.smembers(toJsonArray(mykey), reply3 -> {
@@ -2134,17 +2135,13 @@ public class RedisServiceTestBase extends VertxTestBase {
   @Test
   public void testScard() {
     final String mykey = makeKey();
-    redis.sadd(toJsonArray(mykey, "Hello"), reply0 -> {
+    redis.saddMany(mykey, toList("Hello", "World"), reply0 -> {
       assertTrue(reply0.succeeded());
-      assertEquals(1, reply0.result().longValue());
-      redis.sadd(toJsonArray(mykey, "World"), reply1 -> {
-        assertTrue(reply1.succeeded());
-        assertEquals(1, reply1.result().longValue());
-        redis.scard(toJsonArray(mykey), reply2 -> {
-          assertTrue(reply2.succeeded());
-          assertEquals(2, reply2.result().longValue());
-          testComplete();
-        });
+      assertEquals(2, reply0.result().longValue());
+      redis.scard(toJsonArray(mykey), reply2 -> {
+        assertTrue(reply2.succeeded());
+        assertEquals(2, reply2.result().longValue());
+        testComplete();
       });
     });
     await();
@@ -2232,35 +2229,19 @@ public class RedisServiceTestBase extends VertxTestBase {
     final String mykey1 = makeKey();
     final String mykey2 = makeKey();
 
-    redis.sadd(toJsonArray(mykey1, "a"), reply0 -> {
+    redis.saddMany(mykey1, toList("a", "b", "c"), reply0 -> {
       assertTrue(reply0.succeeded());
-      assertEquals(1, reply0.result().longValue());
-      redis.sadd(toJsonArray(mykey1, "b"), reply1 -> {
+      assertEquals(3, reply0.result().longValue());
+      redis.saddMany(mykey2, toList("c", "d", "e"), reply1 -> {
         assertTrue(reply1.succeeded());
-        assertEquals(1, reply1.result().longValue());
-        redis.sadd(toJsonArray(mykey1, "c"), reply2 -> {
+        assertEquals(3, reply1.result().longValue());
+        redis.sdiff(toJsonArray(mykey1, mykey2), reply2 -> {
           assertTrue(reply2.succeeded());
-          assertEquals(1, reply2.result().longValue());
-          redis.sadd(toJsonArray(mykey2, "c"), reply3 -> {
-            assertTrue(reply3.succeeded());
-            assertEquals(1, reply3.result().longValue());
-            redis.sadd(toJsonArray(mykey2, "d"), reply4 -> {
-              assertTrue(reply4.succeeded());
-              assertEquals(1, reply4.result().longValue());
-              redis.sadd(toJsonArray(mykey2, "e"), reply5 -> {
-                assertTrue(reply5.succeeded());
-                assertEquals(1, reply5.result().longValue());
-                redis.sdiff(toJsonArray(mykey1, mykey2), reply6 -> {
-                  assertTrue(reply6.succeeded());
-                  Object[] expected = new Object[]{"a", "b"};
-                  Object[] result = reply6.result().getList().toArray();
-                  Arrays.sort(result);
-                  assertArrayEquals(expected, result);
-                  testComplete();
-                });
-              });
-            });
-          });
+          Object[] expected = new Object[]{"a", "b"};
+          Object[] result = reply2.result().getList().toArray();
+          Arrays.sort(result);
+          assertArrayEquals(expected, result);
+          testComplete();
         });
       });
     });
@@ -2273,38 +2254,22 @@ public class RedisServiceTestBase extends VertxTestBase {
     final String mykey1 = makeKey();
     final String mykey2 = makeKey();
 
-    redis.sadd(toJsonArray(mykey1, "a"), reply0 -> {
+    redis.saddMany(mykey1, toList("a", "b", "c"), reply0 -> {
       assertTrue(reply0.succeeded());
-      assertEquals(1, reply0.result().longValue());
-      redis.sadd(toJsonArray(mykey1, "b"), reply1 -> {
+      assertEquals(3, reply0.result().longValue());
+      redis.saddMany(mykey2, toList("c", "d", "e"), reply1 -> {
         assertTrue(reply1.succeeded());
-        assertEquals(1, reply1.result().longValue());
-        redis.sadd(toJsonArray(mykey1, "c"), reply2 -> {
+        assertEquals(3, reply1.result().longValue());
+        redis.sdiffstore(toJsonArray(mykey, mykey1, mykey2), reply2 -> {
           assertTrue(reply2.succeeded());
-          assertEquals(1, reply2.result().longValue());
-          redis.sadd(toJsonArray(mykey2, "c"), reply3 -> {
-            assertTrue(reply3.succeeded());
-            assertEquals(1, reply3.result().longValue());
-            redis.sadd(toJsonArray(mykey2, "d"), reply4 -> {
-              assertTrue(reply4.succeeded());
-              assertEquals(1, reply4.result().longValue());
-              redis.sadd(toJsonArray(mykey2, "e"), reply5 -> {
-                assertTrue(reply5.succeeded());
-                assertEquals(1, reply5.result().longValue());
-                redis.sdiffstore(toJsonArray(mykey, mykey1, mykey2), reply6 -> {
-                  assertTrue(reply6.succeeded());
-                  Long diff = reply6.result().longValue();
-                  assertTrue(diff == 2);
-                  redis.smembers(new JsonArray().add(mykey), reply7 ->{
-                    Set<String> expected = new HashSet(toList("a", "b"));
-                    JsonArray members = reply7.result();
-                    Set<String> result = new HashSet(members.getList());
-                    assertEquals(expected, result);
-                    testComplete();
-                  });
-                });
-              });
-            });
+          Long diff = reply2.result().longValue();
+          assertTrue(diff == 2);
+          redis.smembers(new JsonArray().add(mykey), reply3 ->{
+            Set<String> expected = new HashSet(toList("a", "b"));
+            JsonArray members = reply3.result();
+            Set<String> result = new HashSet(members.getList());
+            assertEquals(expected, result);
+            testComplete();
           });
         });
       });
@@ -2487,32 +2452,16 @@ public class RedisServiceTestBase extends VertxTestBase {
     final String mykey1 = makeKey();
     final String mykey2 = makeKey();
 
-    redis.sadd(toJsonArray(mykey1, "a"), reply0 -> {
+    redis.saddMany(mykey1, toList("a", "b", "c"), reply0 -> {
       assertTrue(reply0.succeeded());
-      assertEquals(1, reply0.result().longValue());
-      redis.sadd(toJsonArray(mykey1, "b"), reply1 -> {
+      assertEquals(3, reply0.result().longValue());
+      redis.saddMany(mykey2, toList("c", "d", "e"), reply1 -> {
         assertTrue(reply1.succeeded());
-        assertEquals(1, reply1.result().longValue());
-        redis.sadd(toJsonArray(mykey1, "c"), reply2 -> {
+        assertEquals(3, reply1.result().longValue());
+        redis.sinter(toJsonArray(mykey1, mykey2), reply2 -> {
           assertTrue(reply2.succeeded());
-          assertEquals(1, reply2.result().longValue());
-          redis.sadd(toJsonArray(mykey2, "c"), reply3 -> {
-            assertTrue(reply3.succeeded());
-            assertEquals(1, reply3.result().longValue());
-            redis.sadd(toJsonArray(mykey2, "d"), reply4 -> {
-              assertTrue(reply4.succeeded());
-              assertEquals(1, reply4.result().longValue());
-              redis.sadd(toJsonArray(mykey2, "e"), reply5 -> {
-                assertTrue(reply5.succeeded());
-                assertEquals(1, reply5.result().longValue());
-                redis.sinter(toJsonArray(mykey1, mykey2), reply6 -> {
-                  assertTrue(reply6.succeeded());
-                  assertArrayEquals(new Object[]{"c"}, reply6.result().getList().toArray());
-                  testComplete();
-                });
-              });
-            });
-          });
+          assertArrayEquals(new Object[]{"c"}, reply2.result().getList().toArray());
+          testComplete();
         });
       });
     });
@@ -2525,33 +2474,17 @@ public class RedisServiceTestBase extends VertxTestBase {
     final String mykey1 = makeKey();
     final String mykey2 = makeKey();
 
-    redis.sadd(toJsonArray(mykey1, "a"), reply0 -> {
+    redis.saddMany(mykey1, toList("a", "b", "c"), reply0 -> {
       assertTrue(reply0.succeeded());
-      assertEquals(1, reply0.result().longValue());
-      redis.sadd(toJsonArray(mykey1, "b"), reply1 -> {
+      assertEquals(3, reply0.result().longValue());
+      redis.saddMany(mykey2, toList("c", "d", "e"), reply1 -> {
         assertTrue(reply1.succeeded());
-        assertEquals(1, reply1.result().longValue());
-        redis.sadd(toJsonArray(mykey1, "c"), reply2 -> {
+        assertEquals(3, reply1.result().longValue());
+        redis.sinterstore(toJsonArray(mykey, mykey1, mykey2), reply2 -> {
           assertTrue(reply2.succeeded());
-          assertEquals(1, reply2.result().longValue());
-          redis.sadd(toJsonArray(mykey2, "c"), reply3 -> {
-            assertTrue(reply3.succeeded());
-            assertEquals(1, reply3.result().longValue());
-            redis.sadd(toJsonArray(mykey2, "d"), reply4 -> {
-              assertTrue(reply4.succeeded());
-              assertEquals(1, reply4.result().longValue());
-              redis.sadd(toJsonArray(mykey2, "e"), reply5 -> {
-                assertTrue(reply5.succeeded());
-                assertEquals(1, reply5.result().longValue());
-                redis.sinterstore(toJsonArray(mykey, mykey1, mykey2), reply6 -> {
-                  assertTrue(reply6.succeeded());
-                  assertTrue(reply6.result() == 1);
-                  //assertArrayEquals(new Object[]{"c"}, reply6.result().getList().toArray());
-                  testComplete();
-                });
-              });
-            });
-          });
+          assertTrue(reply2.result() == 1);
+          //assertArrayEquals(new Object[]{"c"}, reply6.result().getList().toArray());
+          testComplete();
         });
       });
     });
@@ -2561,7 +2494,7 @@ public class RedisServiceTestBase extends VertxTestBase {
   @Test
   public void testSismember() {
     final String mykey = makeKey();
-    redis.sadd(toJsonArray(mykey, "one"), reply0 -> {
+    redis.sadd(mykey, "one", reply0 -> {
       assertTrue(reply0.succeeded());
       redis.sismember(toJsonArray(mykey, "one"), reply1 -> {
         assertTrue(reply1.succeeded());
@@ -2589,20 +2522,16 @@ public class RedisServiceTestBase extends VertxTestBase {
   @Test
   public void testSmembers() {
     final String mykey = makeKey();
-    redis.sadd(toJsonArray(mykey, "Hello"), reply0 -> {
+    redis.saddMany(mykey, toList("Hello", "World"), reply0 -> {
       assertTrue(reply0.succeeded());
-      assertEquals(1, reply0.result().longValue());
-      redis.sadd(toJsonArray(mykey, "World"), reply1 -> {
+      assertEquals(2, reply0.result().longValue());
+      redis.smembers(toJsonArray(mykey), reply1 -> {
         assertTrue(reply1.succeeded());
-        assertEquals(1, reply1.result().longValue());
-        redis.smembers(toJsonArray(mykey), reply2 -> {
-          assertTrue(reply2.succeeded());
-          Object[] expected = new Object[]{"Hello", "World"};
-          Object[] result = reply2.result().getList().toArray();
-          Arrays.sort(result);
-          assertArrayEquals(expected, result);
-          testComplete();
-        });
+        Object[] expected = new Object[]{"Hello", "World"};
+        Object[] result = reply1.result().getList().toArray();
+        Arrays.sort(result);
+        assertArrayEquals(expected, result);
+        testComplete();
       });
     });
     await();
@@ -2612,32 +2541,28 @@ public class RedisServiceTestBase extends VertxTestBase {
   public void testSmove() {
     final String mykey = makeKey();
     final String myotherkey = makeKey();
-    redis.sadd(toJsonArray(mykey, "one"), reply0 -> {
+    redis.saddMany(mykey, toList("one", "two"), reply0 -> {
       assertTrue(reply0.succeeded());
-      assertEquals(1, reply0.result().longValue());
-      redis.sadd(toJsonArray(mykey, "two"), reply1 -> {
+      assertEquals(2, reply0.result().longValue());
+      redis.sadd(myotherkey, "three", reply1 -> {
         assertTrue(reply1.succeeded());
         assertEquals(1, reply1.result().longValue());
-        redis.sadd(toJsonArray(myotherkey, "three"), reply2 -> {
+        redis.smove(toJsonArray(mykey, myotherkey, "two"), reply2 -> {
           assertTrue(reply2.succeeded());
           assertEquals(1, reply2.result().longValue());
-          redis.smove(toJsonArray(mykey, myotherkey, "two"), reply3 -> {
+          redis.smembers(toJsonArray(mykey), reply3 -> {
             assertTrue(reply3.succeeded());
-            assertEquals(1, reply3.result().longValue());
-            redis.smembers(toJsonArray(mykey), reply4 -> {
+            Object[] expected = new Object[]{"one"};
+            Object[] result = reply3.result().getList().toArray();
+            Arrays.sort(result);
+            assertArrayEquals(expected, result);
+            redis.smembers(toJsonArray(myotherkey), reply4 -> {
               assertTrue(reply4.succeeded());
-              Object[] expected = new Object[]{"one"};
-              Object[] result = reply4.result().getList().toArray();
-              Arrays.sort(result);
-              assertArrayEquals(expected, result);
-              redis.smembers(toJsonArray(myotherkey), reply5 -> {
-                assertTrue(reply5.succeeded());
-                Object[] expected1 = new Object[]{"three", "two"};
-                Object[] result1 = reply5.result().getList().toArray();
-                Arrays.sort(result1);
-                assertArrayEquals(expected1, result1);
-                testComplete();
-              });
+              Object[] expected1 = new Object[]{"three", "two"};
+              Object[] result1 = reply4.result().getList().toArray();
+              Arrays.sort(result1);
+              assertArrayEquals(expected1, result1);
+              testComplete();
             });
           });
         });
@@ -2655,7 +2580,7 @@ public class RedisServiceTestBase extends VertxTestBase {
     final String k3 = mykey + ":3";
     final String kx = mykey + ":*";
 
-    redis.sadd(toJsonArray(mykey, "1", "2", "3"), reply0 -> {
+    redis.saddMany(mykey, toList("1", "2", "3"), reply0 -> {
       assertTrue(reply0.succeeded());
       assertEquals(3, reply0.result().longValue());
       redis.set(k1, "one", reply1 -> {
@@ -2679,39 +2604,31 @@ public class RedisServiceTestBase extends VertxTestBase {
   @Test
   public void testSpop() {
     final String mykey = makeKey();
-    redis.sadd(toJsonArray(mykey, "one"), reply0 -> {
+    redis.saddMany(mykey, toList("one", "two", "three"), reply0 -> {
       assertTrue(reply0.succeeded());
-      assertEquals(1, reply0.result().longValue());
-      redis.sadd(toJsonArray(mykey, "two"), reply1 -> {
+      assertEquals(3, reply0.result().longValue());
+      redis.spop(toJsonArray(mykey), reply1 -> {
         assertTrue(reply1.succeeded());
-        assertEquals(1, reply1.result().longValue());
-        redis.sadd(toJsonArray(mykey, "three"), reply2 -> {
+        String ret = reply1.result();
+        assertTrue(ret.equals("one") || ret.equals("two") || ret.equals("three"));
+        JsonArray expected = new JsonArray();
+        if (!ret.equals("one")) {
+          expected.add("one");
+        }
+        if (!ret.equals("two")) {
+          expected.add("two");
+        }
+        if (!ret.equals("three")) {
+          expected.add("three");
+        }
+        redis.smembers(toJsonArray(mykey), reply2 -> {
           assertTrue(reply2.succeeded());
-          assertEquals(1, reply2.result().longValue());
-          redis.spop(toJsonArray(mykey), reply3 -> {
-            assertTrue(reply3.succeeded());
-            String ret = reply3.result();
-            assertTrue(ret.equals("one") || ret.equals("two") || ret.equals("three"));
-            JsonArray expected = new JsonArray();
-            if (!ret.equals("one")) {
-              expected.add("one");
-            }
-            if (!ret.equals("two")) {
-              expected.add("two");
-            }
-            if (!ret.equals("three")) {
-              expected.add("three");
-            }
-            redis.smembers(toJsonArray(mykey), reply4 -> {
-              assertTrue(reply4.succeeded());
-              Object[] expectedA = expected.getList().toArray();
-              Arrays.sort(expectedA);
-              Object[] res = reply4.result().getList().toArray();
-              Arrays.sort(res);
-              assertArrayEquals(expectedA, res);
-              testComplete();
-            });
-          });
+          Object[] expectedA = expected.getList().toArray();
+          Arrays.sort(expectedA);
+          Object[] res = reply2.result().getList().toArray();
+          Arrays.sort(res);
+          assertArrayEquals(expectedA, res);
+          testComplete();
         });
       });
     });
@@ -2737,24 +2654,16 @@ public class RedisServiceTestBase extends VertxTestBase {
   @Test
   public void testSrem() {
     final String mykey = makeKey();
-    redis.sadd(toJsonArray(mykey, "one"), reply0 -> {
+    redis.saddMany(mykey, toList("one", "two", "three"), reply0 -> {
       assertTrue(reply0.succeeded());
-      assertEquals(1, reply0.result().longValue());
-      redis.sadd(toJsonArray(mykey, "two"), reply1 -> {
+      assertEquals(3, reply0.result().longValue());
+      redis.srem(toJsonArray(mykey, "one"), reply1 -> {
         assertTrue(reply1.succeeded());
         assertEquals(1, reply1.result().longValue());
-        redis.sadd(toJsonArray(mykey, "three"), reply2 -> {
+        redis.srem(toJsonArray(mykey, "four"), reply2 -> {
           assertTrue(reply2.succeeded());
-          assertEquals(1, reply2.result().longValue());
-          redis.srem(toJsonArray(mykey, "one"), reply3 -> {
-            assertTrue(reply3.succeeded());
-            assertEquals(1, reply3.result().longValue());
-            redis.srem(toJsonArray(mykey, "four"), reply4 -> {
-              assertTrue(reply4.succeeded());
-              assertEquals(0, reply4.result().longValue());
-              testComplete();
-            });
-          });
+          assertEquals(0, reply2.result().longValue());
+          testComplete();
         });
       });
     });
@@ -2794,32 +2703,47 @@ public class RedisServiceTestBase extends VertxTestBase {
   }
 
   @Test
-  public void testSunion() {
+  public void testSunion() throws Exception {
     final String mykey1 = makeKey();
     final String mykey2 = makeKey();
 
-    redis.sadd(toJsonArray(mykey1, "a"), reply0 -> {
+    CountDownLatch latch = new CountDownLatch(6);
+
+    redis.sadd(mykey1, "a", reply0 -> {
       assertTrue(reply0.succeeded());
       assertEquals(1, reply0.result().longValue());
-      redis.sadd(toJsonArray(mykey1, "b"), reply1 -> {
+      latch.countDown();
+
+      redis.sadd(mykey1, "b", reply1 -> {
         assertTrue(reply1.succeeded());
         assertEquals(1, reply1.result().longValue());
+        latch.countDown();
       });
-      redis.sadd(toJsonArray(mykey1, "c"), reply2 -> {
+      redis.sadd(mykey1, "c", reply2 -> {
         assertTrue(reply2.succeeded());
         assertEquals(1, reply2.result().longValue());
+        latch.countDown();
       });
-      redis.sadd(toJsonArray(mykey2, "c"), reply3 -> {
+      redis.sadd(mykey2, "c", reply3 -> {
         assertTrue(reply3.succeeded());
         assertEquals(1, reply3.result().longValue());
+        latch.countDown();
       });
-      redis.sadd(toJsonArray(mykey2, "d"), reply4 -> {
+      redis.sadd(mykey2, "d", reply4 -> {
         assertTrue(reply4.succeeded());
         assertEquals(1, reply4.result().longValue());
+        latch.countDown();
       });
-      redis.sadd(toJsonArray(mykey2, "e"), reply5 -> {
+      redis.sadd(mykey2, "e", reply5 -> {
         assertTrue(reply5.succeeded());
         assertEquals(1, reply5.result().longValue());
+        latch.countDown();
+        try {
+          latch.await(10, TimeUnit.SECONDS);
+        } catch (InterruptedException e) {
+          testComplete();
+          fail("Time out while waiting for all SADD calls to finish");
+        }
         redis.sunion(toJsonArray(mykey1, mykey2), reply6 -> {
           assertTrue(reply6.succeeded());
           JsonArray arr = reply6.result();
@@ -2840,32 +2764,16 @@ public class RedisServiceTestBase extends VertxTestBase {
     final String mykey1 = makeKey();
     final String mykey2 = makeKey();
 
-    redis.sadd(toJsonArray(mykey1, "a"), reply0 -> {
+    redis.saddMany(mykey1, toList("a", "b", "c"), reply0 -> {
       assertTrue(reply0.succeeded());
-      assertEquals(1, reply0.result().longValue());
-      redis.sadd(toJsonArray(mykey1, "b"), reply1 -> {
+      assertEquals(3, reply0.result().longValue());
+      redis.saddMany(mykey2, toList("c", "d", "e"), reply1 -> {
         assertTrue(reply1.succeeded());
-        assertEquals(1, reply1.result().longValue());
-      });
-      redis.sadd(toJsonArray(mykey1, "c"), reply2 -> {
-        assertTrue(reply2.succeeded());
-        assertEquals(1, reply2.result().longValue());
-      });
-      redis.sadd(toJsonArray(mykey2, "c"), reply3 -> {
-        assertTrue(reply3.succeeded());
-        assertEquals(1, reply3.result().longValue());
-      });
-      redis.sadd(toJsonArray(mykey2, "d"), reply4 -> {
-        assertTrue(reply4.succeeded());
-        assertEquals(1, reply4.result().longValue());
-      });
-      redis.sadd(toJsonArray(mykey2, "e"), reply5 -> {
-        assertTrue(reply5.succeeded());
-        assertEquals(1, reply5.result().longValue());
-        redis.sunionstore(toJsonArray(mykey,mykey1, mykey2), reply6 -> {
-          assertTrue(reply6.succeeded());
-          assertTrue(reply6.result() == 5);
-          //          JsonArray arr = reply6.result();
+        assertEquals(3, reply1.result().longValue());
+        redis.sunionstore(toJsonArray(mykey, mykey1, mykey2), reply2 -> {
+          assertTrue(reply2.succeeded());
+          assertTrue(reply2.result() == 5);
+          //          JsonArray arr = reply2.result();
           //          Object[] array = arr.getList().toArray();
           //          Arrays.sort(array);
           //          assertTrue(array.length == 5);
@@ -2921,7 +2829,7 @@ public class RedisServiceTestBase extends VertxTestBase {
       redis.lpush(key2, "value", reply1 -> {
         assertTrue(reply1.succeeded());
         assertEquals(1, reply1.result().longValue());
-        redis.sadd(toJsonArray(key3, "value"), reply2 -> {
+        redis.sadd(key3, "value", reply2 -> {
           assertTrue(reply2.succeeded());
           assertEquals(1, reply2.result().longValue());
           redis.type(key1, reply3 -> {

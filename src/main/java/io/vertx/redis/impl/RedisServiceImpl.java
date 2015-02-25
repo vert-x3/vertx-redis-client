@@ -10,6 +10,7 @@ import io.vertx.redis.InsertOptions;
 import io.vertx.redis.KillFilter;
 import io.vertx.redis.MigrateOptions;
 import io.vertx.redis.ObjectCmd;
+import io.vertx.redis.RedisEncoding;
 import io.vertx.redis.ScanOptions;
 import io.vertx.redis.SetOptions;
 
@@ -206,7 +207,7 @@ public final class RedisServiceImpl extends AbstractRedisService {
 
   @Override
   public void dump(String key, Handler<AsyncResult<String>> handler) {
-    sendString("DUMP", toPayload(key), handler);
+    send("DUMP", toPayload(key), String.class, true, new DumpHandler(handler));
   }
 
   @Override
@@ -606,7 +607,7 @@ public final class RedisServiceImpl extends AbstractRedisService {
 
   @Override
   public void restore(String key, long millis, String serialized, Handler<AsyncResult<String>> handler) {
-    sendString("RESTORE", toPayload(key, millis, serialized), handler);
+    send("RESTORE", toPayload(key, millis, RedisEncoding.decode(serialized)), String.class, true, handler);
   }
 
   @Override
@@ -640,8 +641,13 @@ public final class RedisServiceImpl extends AbstractRedisService {
   }
 
   @Override
-  public void sadd(JsonArray args, Handler<AsyncResult<Long>> handler) {
-    sendLong("SADD", args, handler);
+  public void sadd(String key, String member, Handler<AsyncResult<Long>> handler) {
+    sendLong("SADD", toPayload(key, member), handler);
+  }
+
+  @Override
+  public void saddMany(String key, List<String> members, Handler<AsyncResult<Long>> handler) {
+    sendLong("SADD", toPayload(key, members), handler);
   }
 
   @Override
