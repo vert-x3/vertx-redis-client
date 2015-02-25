@@ -1782,7 +1782,7 @@ public class RedisServiceTestBase extends VertxTestBase {
         redis.ttl(mykey, reply2 -> {
           assertTrue(reply2.succeeded());
           assertTrue(200000000 > reply2.result() && reply2.result() > 0);
-          redis.pttl(toJsonArray(mykey), reply3 -> {
+          redis.pttl(mykey, reply3 -> {
             assertTrue(reply3.succeeded());
             assertTrue(1555555555005L > reply3.result() && reply3.result() > 0);
             testComplete();
@@ -1807,7 +1807,7 @@ public class RedisServiceTestBase extends VertxTestBase {
     final String mykey = makeKey();
     redis.psetex(mykey, 2000, "Hello", reply0 -> {
       assertTrue(reply0.succeeded());
-      redis.pttl(toJsonArray(mykey), reply1 -> {
+      redis.pttl(mykey, reply1 -> {
         assertTrue(reply1.succeeded());
         assertTrue(3000 > reply1.result() && reply1.result() > 0);
         redis.get(mykey, reply2 -> {
@@ -1859,7 +1859,7 @@ public class RedisServiceTestBase extends VertxTestBase {
       redis.expire(mykey, 3, reply1 -> {
         assertTrue(reply1.succeeded());
         assertEquals(1, reply1.result().longValue());
-        redis.pttl(toJsonArray(mykey), reply2 -> {
+        redis.pttl(mykey, reply2 -> {
           assertTrue(reply2.succeeded());
           assertTrue(3000 >= reply2.result() && reply2.result() > 0);
           testComplete();
@@ -1874,7 +1874,7 @@ public class RedisServiceTestBase extends VertxTestBase {
     String key = makeKey();
     redis.set(key, "0", reply ->{
       assertTrue(reply.succeeded());
-      redis.publish(toJsonArray(key, 1), reply2 ->{
+      redis.publish(key,"1", reply2 ->{
         assertTrue(reply2.succeeded());
         assertTrue(reply2.result() == 0);
         testComplete();
@@ -1964,8 +1964,27 @@ public class RedisServiceTestBase extends VertxTestBase {
   }
 
   @Test
-  @Ignore
   public void testRestore() {
+    final String mykey = makeKey();
+    final String myotherkey = makeKey();
+    final String value = new String(new char[] {0xff, 0xf0, 0x00, 'A', 'B', 'C'});
+    redis.setBinary(mykey, value, reply0 -> {
+      assertTrue(reply0.succeeded());
+      redis.dump(mykey, reply1 -> {
+        assertTrue(reply1.succeeded());
+        String dump = reply1.result();
+        redis.restore(myotherkey, 0, dump, reply2 -> {
+          assertTrue(reply2.succeeded());
+          redis.getBinary(myotherkey, reply3 -> {
+            assertTrue(reply3.succeeded());
+            assertEquals(value, reply3.result());
+
+            testComplete();
+          });
+        });
+      });
+      await();
+    });
   }
 
   @Test

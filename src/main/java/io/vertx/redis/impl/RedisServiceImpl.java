@@ -570,18 +570,18 @@ public final class RedisServiceImpl extends AbstractRedisService {
   }
 
   @Override
-  public void pttl(JsonArray args, Handler<AsyncResult<Long>> handler) {
-    sendLong("PTTL", args, handler);
+  public void pttl(String key, Handler<AsyncResult<Long>> handler) {
+    sendLong("PTTL", toPayload(key), handler);
   }
 
   @Override
-  public void publish(JsonArray args, Handler<AsyncResult<Long>> handler) {
-    sendLong("PUBLISH", args, handler);
+  public void publish(String channel, String message, Handler<AsyncResult<Long>> handler) {
+    sendLong("PUBLISH", toPayload(channel, message), handler);
   }
 
   @Override
-  public void punsubscribe(JsonArray args, Handler<AsyncResult<Void>> handler) {
-    sendVoid("PUNSUBSCRIBE", args, handler);
+  public void punsubscribe(List<String> patterns, Handler<AsyncResult<Void>> handler) {
+    sendVoid("PUNSUBSCRIBE", toPayload(patterns), handler);
   }
 
   @Override
@@ -605,8 +605,8 @@ public final class RedisServiceImpl extends AbstractRedisService {
   }
 
   @Override
-  public void restore(JsonArray args, Handler<AsyncResult<String>> handler) {
-    sendString("RESTORE", args, handler);
+  public void restore(String key, long millis, String serialized, Handler<AsyncResult<String>> handler) {
+    sendString("RESTORE", toPayload(key, millis, serialized), handler);
   }
 
   @Override

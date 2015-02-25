@@ -1141,32 +1141,33 @@ public interface RedisService {
   /**
    * Get the time to live for a key in milliseconds
    *
-   * @param args    JsonArray [{"name":"key","type":"key"}]
+   * @param key     Key string
    * @param handler Handler for the result of this call.
    * @since 2.6.0
    * group: generic
    */
-  void pttl(JsonArray args, Handler<AsyncResult<Long>> handler);
+  void pttl(String key, Handler<AsyncResult<Long>> handler);
 
   /**
    * Post a message to a channel
    *
-   * @param args    JsonArray [{"name":"channel","type":"string"},{"name":"message","type":"string"}]
+   * @param channel Channel key
+   * @param message Message to send to channel
    * @param handler Handler for the result of this call.
    * @since 2.0.0
    * group: pubsub
    */
-  void publish(JsonArray args, Handler<AsyncResult<Long>> handler);
+  void publish(String channel, String message, Handler<AsyncResult<Long>> handler);
 
   /**
    * Stop listening for messages posted to channels matching the given patterns
    *
-   * @param args    JsonArray [{"name":"pattern","type":"pattern","optional":true,"multiple":true}]
-   * @param handler Handler for the result of this call.
+   * @param patterns List of patterns to match against
+   * @param handler  Handler for the result of this call.
    * @since 2.0.0
    * group: pubsub
    */
-  void punsubscribe(JsonArray args, Handler<AsyncResult<Void>> handler);
+  void punsubscribe(List<String> patterns, Handler<AsyncResult<Void>> handler);
 
   /**
    * Close the connection
@@ -1209,12 +1210,14 @@ public interface RedisService {
   /**
    * Create a key using the provided serialized value, previously obtained using DUMP.
    *
-   * @param args    JsonArray [{"name":"key","type":"key"},{"name":"ttl","type":"integer"},{"name":"serialized-value","type":"string"}]
-   * @param handler Handler for the result of this call.
+   * @param key        Key string
+   * @param millis     Expiry time in milliseconds to set on the key
+   * @param serialized Serialized form of the key value as obtained using DUMP
+   * @param handler    Handler for the result of this call.
    * @since 2.6.0
    * group: generic
    */
-  void restore(JsonArray args, Handler<AsyncResult<String>> handler);
+  void restore(String key, long millis, String serialized, Handler<AsyncResult<String>> handler);
 
   /**
    * Return the role of the instance in the context of replication
