@@ -467,12 +467,12 @@ public interface RedisService {
    * Set the expiration for a key as a UNIX timestamp
    *
    * @param key       Key string
-   * @param timestamp Expiry time as Unix timestamp
+   * @param seconds   Expiry time as Unix timestamp in seconds
    * @param handler   Handler for the result of this call.
    * @since 1.2.0
    * group: generic
    */
-  void expireat(String key, long timestamp, Handler<AsyncResult<Long>> handler);
+  void expireat(String key, long seconds, Handler<AsyncResult<Long>> handler);
 
   /**
    * Remove all keys from all databases
@@ -997,32 +997,46 @@ public interface RedisService {
   /**
    * Set a key's time to live in milliseconds
    *
-   * @param args    JsonArray [{"name":"key","type":"key"},{"name":"milliseconds","type":"integer"}]
+   * @param key     String key
+   * @param millis  Time to live in milliseconds
    * @param handler Handler for the result of this call.
    * @since 2.6.0
    * group: generic
    */
-  void pexpire(JsonArray args, Handler<AsyncResult<Long>> handler);
+  void pexpire(String key, long millis, Handler<AsyncResult<Long>> handler);
 
   /**
    * Set the expiration for a key as a UNIX timestamp specified in milliseconds
    *
-   * @param args    JsonArray [{"name":"key","type":"key"},{"name":"milliseconds-timestamp","type":"posix time"}]
+   * @param key     Key string
+   * @param millis  Expiry time as Unix timestamp in milliseconds
    * @param handler Handler for the result of this call.
    * @since 2.6.0
    * group: generic
    */
-  void pexpireat(JsonArray args, Handler<AsyncResult<Long>> handler);
+  void pexpireat(String key, long millis, Handler<AsyncResult<Long>> handler);
 
   /**
-   * Adds the specified elements to the specified HyperLogLog.
+   * Adds the specified element to the specified HyperLogLog.
    *
-   * @param args    JsonArray [{"name":"key","type":"key"},{"name":"element","type":"string","multiple":true}]
+   * @param key     Key string
+   * @param element Element to add
    * @param handler Handler for the result of this call.
    * @since 2.8.9
    * group: hyperloglog
    */
-  void pfadd(JsonArray args, Handler<AsyncResult<Long>> handler);
+  void pfadd(String key, String element, Handler<AsyncResult<Long>> handler);
+
+  /**
+   * Adds the specified elements to the specified HyperLogLog.
+   *
+   * @param key      Key string
+   * @param elements Elementa to add
+   * @param handler  Handler for the result of this call.
+   * @since 2.8.9
+   * group: hyperloglog
+   */
+  void pfaddMany(String key, List<String> elements, Handler<AsyncResult<Long>> handler);
 
   /**
    * Return the approximated cardinality of the set(s) observed by the HyperLogLog at key(s).

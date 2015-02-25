@@ -251,8 +251,8 @@ public final class RedisServiceImpl extends AbstractRedisService {
   }
 
   @Override
-  public void expireat(String key, long timestamp, Handler<AsyncResult<Long>> handler) {
-    sendLong("EXPIREAT", toPayload(key, timestamp), handler);
+  public void expireat(String key, long seconds, Handler<AsyncResult<Long>> handler) {
+    sendLong("EXPIREAT", toPayload(key, seconds), handler);
   }
 
   @Override
@@ -501,18 +501,23 @@ public final class RedisServiceImpl extends AbstractRedisService {
   }
 
   @Override
-  public void pexpire(JsonArray args, Handler<AsyncResult<Long>> handler) {
-    sendLong("PEXPIRE", args, handler);
+  public void pexpire(String key, long millis, Handler<AsyncResult<Long>> handler) {
+    sendLong("PEXPIRE", toPayload(key, millis), handler);
   }
 
   @Override
-  public void pexpireat(JsonArray args, Handler<AsyncResult<Long>> handler) {
-    sendLong("PEXPIREAT", args, handler);
+  public void pexpireat(String key, long millis, Handler<AsyncResult<Long>> handler) {
+    sendLong("PEXPIREAT", toPayload(key, millis), handler);
   }
 
   @Override
-  public void pfadd(JsonArray args, Handler<AsyncResult<Long>> handler) {
-    sendLong("PFADD", args, handler);
+  public void pfadd(String key, String element, Handler<AsyncResult<Long>> handler) {
+    sendLong("PFADD", toPayload(key, element), handler);
+  }
+
+  @Override
+  public void pfaddMany(String key, List<String> elements, Handler<AsyncResult<Long>> handler) {
+    sendLong("PFADD", toPayload(key, elements), handler);
   }
 
   @Override

@@ -1759,7 +1759,7 @@ public class RedisServiceTestBase extends VertxTestBase {
     final String mykey = makeKey();
     redis.set(mykey, "Hello", reply0 -> {
       assertTrue(reply0.succeeded());
-      redis.pexpire(toJsonArray(mykey, 1000), reply1 -> {
+      redis.pexpire(mykey, 1000, reply1 -> {
         assertTrue(reply1.succeeded());
         assertEquals(1, reply1.result().longValue());                
         redis.get(mykey, reply2 -> {
@@ -1776,7 +1776,7 @@ public class RedisServiceTestBase extends VertxTestBase {
     final String mykey = makeKey();
     redis.set(mykey, "Hello", reply0 -> {
       assertTrue(reply0.succeeded());
-      redis.pexpireat(toJsonArray(mykey, 1555555555005l), reply1 -> {
+      redis.pexpireat(mykey, 1555555555005L, reply1 -> {
         assertTrue(reply1.succeeded());
         assertEquals(1, reply1.result().longValue());
         redis.ttl(mykey, reply2 -> {
@@ -1784,7 +1784,7 @@ public class RedisServiceTestBase extends VertxTestBase {
           assertTrue(200000000 > reply2.result() && reply2.result() > 0);
           redis.pttl(toJsonArray(mykey), reply3 -> {
             assertTrue(reply3.succeeded());
-            assertTrue(1555555555005l > reply3.result() && reply3.result() > 0);
+            assertTrue(1555555555005L > reply3.result() && reply3.result() > 0);
             testComplete();
           });
         });
