@@ -937,32 +937,33 @@ public interface RedisService {
   /**
    * Move a key to another database
    *
-   * @param args    JsonArray [{"name":"key","type":"key"},{"name":"db","type":"integer"}]
+   * @param key     Key to migrate
+   * @param destdb  Destination database index
    * @param handler Handler for the result of this call.
    * @since 1.0.0
    * group: generic
    */
-  void move(JsonArray args, Handler<AsyncResult<Long>> handler);
+  void move(String key, int destdb, Handler<AsyncResult<Long>> handler);
 
   /**
    * Set multiple keys to multiple values
    *
-   * @param args    JsonArray [{"name":["key","value"],"type":["key","string"],"multiple":true}]
+   * @param keyvals Key value pairs to set
    * @param handler Handler for the result of this call.
    * @since 1.0.1
    * group: string
    */
-  void mset(JsonArray args, Handler<AsyncResult<String>> handler);
+  void mset(Map<String, String> keyvals, Handler<AsyncResult<String>> handler);
 
   /**
    * Set multiple keys to multiple values, only if none of the keys exist
    *
-   * @param args    JsonArray [{"name":["key","value"],"type":["key","string"],"multiple":true}]
+   * @param keyvals Key value pairs to set
    * @param handler Handler for the result of this call.
    * @since 1.0.1
    * group: string
    */
-  void msetnx(JsonArray args, Handler<AsyncResult<Long>> handler);
+  void msetnx(Map<String, String> keyvals, Handler<AsyncResult<Long>> handler);
 
   /**
    * Mark the start of a transaction block

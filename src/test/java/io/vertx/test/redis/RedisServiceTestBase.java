@@ -17,6 +17,7 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
@@ -119,12 +120,32 @@ public class RedisServiceTestBase extends VertxTestBase {
     return UUID.randomUUID().toString();
   }
 
+  private static Map<String, String> toMap(final String ... params) {
+    if (params.length % 2 != 0) {
+      throw new IllegalArgumentException("Last key has no value");
+    }
+    Map<String, String> result = new HashMap<>();
+    String key = null;
+    for (String param: params) {
+      if (key == null) {
+        key = param;
+      } else {
+        result.put(key, param);
+        key = null;
+      }
+    }
+    return result;
+  }
+
+  private static <T> List<T> toList(final T ... params) {
+    return Arrays.asList(params);
+  }
 
   @Test
   public void testAppend() {
     final String key = makeKey();
 
-    redis.del(Arrays.asList(key), reply0 -> {
+    redis.del(toList(key), reply0 -> {
       assertTrue(reply0.succeeded());
 
       redis.append(key, "Hello", reply1 -> {
@@ -235,7 +256,7 @@ public class RedisServiceTestBase extends VertxTestBase {
       assertTrue(reply0.succeeded());
       redis.set(key2, "abcdef", reply1 -> {
         assertTrue(reply1.succeeded());
-        redis.bitop(BitOperation.AND, destkey, Arrays.asList(key1, key2), reply2 -> {
+        redis.bitop(BitOperation.AND, destkey, toList(key1, key2), reply2 -> {
           assertTrue(reply2.succeeded());
           redis.get(destkey, reply3 -> {
             assertTrue(reply3.succeeded());
@@ -252,14 +273,14 @@ public class RedisServiceTestBase extends VertxTestBase {
     final String list1 = makeKey();
     final String list2 = makeKey();
 
-    redis.del(Arrays.asList(list1, list2), reply0 -> {
+    redis.del(toList(list1, list2), reply0 -> {
       assertTrue(reply0.succeeded());
 
-      redis.rpushMany(list1, Arrays.asList("a", "b", "c"), reply1 -> {
+      redis.rpushMany(list1, toList("a", "b", "c"), reply1 -> {
         assertTrue(reply1.succeeded());
         assertEquals(3, reply1.result().longValue());
 
-        redis.blpopMany(Arrays.asList(list1, list2), 0, reply2 -> {
+        redis.blpopMany(toList(list1, list2), 0, reply2 -> {
           assertTrue(reply2.succeeded());
           assertArrayEquals(toArray(list1, "a"), reply2.result().getList().toArray());
           testComplete();
@@ -274,14 +295,14 @@ public class RedisServiceTestBase extends VertxTestBase {
     final String list1 = makeKey();
     final String list2 = makeKey();
 
-    redis.del(Arrays.asList(list1, list2), reply0 -> {
+    redis.del(toList(list1, list2), reply0 -> {
       assertTrue(reply0.succeeded());
 
-      redis.rpushMany(list1, Arrays.asList("a", "b", "c"), reply1 -> {
+      redis.rpushMany(list1, toList("a", "b", "c"), reply1 -> {
         assertTrue(reply1.succeeded());
         assertEquals(3, reply1.result().longValue());
 
-        redis.brpopMany(Arrays.asList(list1, list2), 0, reply2 -> {
+        redis.brpopMany(toList(list1, list2), 0, reply2 -> {
           assertTrue(errorMessage(reply2.cause()), reply2.succeeded());
           assertArrayEquals(toArray(list1, "c"), reply2.result().getList().toArray());
           testComplete();
@@ -527,7 +548,7 @@ public class RedisServiceTestBase extends VertxTestBase {
       assertTrue(reply0.succeeded());
       redis.set(key2, "World", reply1 -> {
         assertTrue(reply1.succeeded());
-        redis.del(Arrays.asList(key1, key2, key3), reply2 -> {
+        redis.del(toList(key1, key2, key3), reply2 -> {
           assertTrue(reply2.succeeded());
           assertEquals(2, reply2.result().longValue());
           testComplete();
@@ -609,7 +630,7 @@ public class RedisServiceTestBase extends VertxTestBase {
 
     final String key1 = makeKey();
     final String key2 = makeKey();
-    redis.eval("return {KEYS[1],KEYS[2],ARGV[1],ARGV[2]}", Arrays.asList(key1, key2), Arrays.asList("first","second"),
+    redis.eval("return {KEYS[1],KEYS[2],ARGV[1],ARGV[2]}", toList(key1, key2), toList("first","second"),
         reply -> {
           assertTrue(reply.succeeded());
           Object r = reply.result();
@@ -1069,7 +1090,7 @@ public class RedisServiceTestBase extends VertxTestBase {
         assertTrue(reply1.succeeded());
         assertEquals(1, reply1.result().longValue());
 
-        redis.hmget(myhash, Arrays.asList("field1", "field2", "nofield"), reply2 -> {
+        redis.hmget(myhash, toList("field1", "field2", "nofield"), reply2 -> {
           assertTrue(reply2.succeeded());
           assertArrayEquals(toArray("Hello", "World", null), reply2.result().getList().toArray());
           testComplete();
@@ -1082,10 +1103,8 @@ public class RedisServiceTestBase extends VertxTestBase {
   @Test
   public void testHmset() {
     final String myhash = makeKey();
-    Map<String, String> obj = new HashMap<>();
-    obj.put("field1", "Hello");
-    obj.put("field2", "World");
-    redis.hmset(myhash, obj, reply0 -> {
+
+    redis.hmset(myhash, toMap("field1", "Hello", "field2", "World"), reply0 -> {
       assertTrue(reply0.succeeded());
       redis.hget(myhash, "field1", reply1 -> {
         assertTrue(reply1.succeeded());
@@ -1231,7 +1250,7 @@ public class RedisServiceTestBase extends VertxTestBase {
 
   @Test
   public void testKeys() {
-    redis.mset(toJsonArray("one", 1, "two", 2, "three", 3, "four", 4), reply0 -> {
+    redis.mset(toMap("one", "1", "two", "2", "three", "3", "four", "4"), reply0 -> {
       assertTrue(reply0.succeeded());
       redis.keys("*o*", reply1 -> {
         assertTrue(reply1.succeeded());
@@ -1378,10 +1397,10 @@ public class RedisServiceTestBase extends VertxTestBase {
   @Test
   public void testLpush() {
     final String mykey = makeKey();
-    redis.lpushMany(mykey, Arrays.asList("!", "world"), reply0 -> {
+    redis.lpushMany(mykey, toList("!", "world"), reply0 -> {
       assertTrue(reply0.succeeded());
       assertEquals(2, reply0.result().longValue());
-      redis.lpushMany(mykey, Arrays.asList(",", "hello"), reply1 -> {
+      redis.lpushMany(mykey, toList(",", "hello"), reply1 -> {
         assertTrue(reply1.succeeded());
         assertEquals(4, reply1.result().longValue());
         redis.lrange(mykey, 0, -1, reply2 -> {
@@ -1544,7 +1563,7 @@ public class RedisServiceTestBase extends VertxTestBase {
       assertTrue(reply0.succeeded());
       redis.set(mykey2, "World", reply1 -> {
         assertTrue(reply1.succeeded());
-        redis.mgetMany(Arrays.asList(mykey1, mykey2, "nonexisting"), reply2 -> {
+        redis.mgetMany(toList(mykey1, mykey2, "nonexisting"), reply2 -> {
           assertTrue(reply2.succeeded());
           assertArrayEquals(toArray("Hello", "World", null), reply2.result().getList().toArray());
           testComplete();
@@ -1605,7 +1624,7 @@ public class RedisServiceTestBase extends VertxTestBase {
     String key = makeKey();
     redis.set(key, "moved_key", reply ->{
       assertTrue(reply.succeeded());
-      redis.move(new JsonArray().add(key).add(1), reply2 ->{
+      redis.move(key, 1, reply2 ->{
         assertTrue(reply2.succeeded());
         assertTrue(new Long(1).equals(reply2.result()));
         testComplete();
@@ -1618,7 +1637,7 @@ public class RedisServiceTestBase extends VertxTestBase {
   public void testMset() {
     final String mykey1 = makeKey();
     final String mykey2 = makeKey();
-    redis.mset(toJsonArray(mykey1, "Hello", mykey2, "World"), reply0 -> {
+    redis.mset(toMap(mykey1, "Hello", mykey2, "World"), reply0 -> {
       assertTrue(reply0.succeeded());
       redis.get(mykey1, reply1 -> {
         assertTrue(reply1.succeeded());
@@ -1639,13 +1658,13 @@ public class RedisServiceTestBase extends VertxTestBase {
     final String mykey2 = makeKey();
     final String mykey3 = makeKey();
 
-    redis.msetnx(toJsonArray(mykey1, "Hello", mykey2, "there"), reply0 -> {
+    redis.msetnx(toMap(mykey1, "Hello", mykey2, "there"), reply0 -> {
       assertTrue(reply0.succeeded());
       assertEquals(1, reply0.result().longValue());
-      redis.msetnx(toJsonArray(mykey2, "there", mykey3, "world"), reply1 -> {
+      redis.msetnx(toMap(mykey2, "there", mykey3, "world"), reply1 -> {
         assertTrue(reply1.succeeded());
         assertEquals(0, reply1.result().longValue());
-        redis.mgetMany(Arrays.asList(mykey1, mykey2, mykey3), reply2 -> {
+        redis.mgetMany(toList(mykey1, mykey2, mykey3), reply2 -> {
           assertTrue(reply2.succeeded());
           assertArrayEquals(toArray("Hello", "there", null), reply2.result().getList().toArray());
           testComplete();
@@ -2239,7 +2258,7 @@ public class RedisServiceTestBase extends VertxTestBase {
                   Long diff = reply6.result().longValue();
                   assertTrue(diff == 2);
                   redis.smembers(new JsonArray().add(mykey), reply7 ->{
-                    Set<String> expected = new HashSet(Arrays.asList("a", "b"));
+                    Set<String> expected = new HashSet(toList("a", "b"));
                     JsonArray members = reply7.result();
                     Set<String> result = new HashSet(members.getList());
                     assertEquals(expected, result);

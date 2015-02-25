@@ -471,18 +471,18 @@ public final class RedisServiceImpl extends AbstractRedisService {
   }
 
   @Override
-  public void move(JsonArray args, Handler<AsyncResult<Long>> handler) {
-    sendLong("MOVE", args, handler);
+  public void move(String key, int destdb, Handler<AsyncResult<Long>> handler) {
+    sendLong("MOVE", toPayload(key, destdb), handler);
   }
 
   @Override
-  public void mset(JsonArray args, Handler<AsyncResult<String>> handler) {
-    sendString("MSET", args, handler);
+  public void mset(Map<String, String> keyvals, Handler<AsyncResult<String>> handler) {
+    sendString("MSET", toPayload(keyvals), handler);
   }
 
   @Override
-  public void msetnx(JsonArray args, Handler<AsyncResult<Long>> handler) {
-    sendLong("MSETNX", args, handler);
+  public void msetnx(Map<String, String> keyvals, Handler<AsyncResult<Long>> handler) {
+    sendLong("MSETNX", toPayload(keyvals), handler);
   }
 
   @Override
