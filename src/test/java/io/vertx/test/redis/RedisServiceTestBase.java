@@ -354,7 +354,7 @@ public class RedisServiceTestBase extends VertxTestBase {
       assertTrue(reply.succeeded());
       String clients = reply.result();
       String add = clients.split("\\s")[0].split("=")[1];
-      redis.clientKill(new KillFilter().setAddr(add), reply2 ->{
+      redis.clientKill(new KillFilter().setAddr(add).setType(KillFilter.Type.NORMAL), reply2 ->{
         assertTrue(reply2.succeeded());
         testComplete();
       });
@@ -630,7 +630,7 @@ public class RedisServiceTestBase extends VertxTestBase {
 
     final String key1 = makeKey();
     final String key2 = makeKey();
-    redis.eval("return {KEYS[1],KEYS[2],ARGV[1],ARGV[2]}", toList(key1, key2), toList("first","second"),
+    redis.eval("return {KEYS[1],KEYS[2],ARGV[1],ARGV[2]}", toList(key1, key2), toList("first", "second"),
         reply -> {
           assertTrue(reply.succeeded());
           Object r = reply.result();

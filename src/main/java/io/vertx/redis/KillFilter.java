@@ -12,7 +12,7 @@ public class KillFilter {
 
   private String addr;
   private String clientid;
-  private KillType type;
+  private Type type;
   private Boolean skipme;
 
   public KillFilter() {}
@@ -35,7 +35,7 @@ public class KillFilter {
     }
     value = json.getString("type");
     if (value != null) {
-      type = KillType.valueOf(value.toUpperCase());
+      type = Type.valueOf(value.toUpperCase());
     }
     Boolean bval = json.getBoolean("skipme");
     if (bval != null) {
@@ -71,7 +71,7 @@ public class KillFilter {
    * @param type KillType to include
    * @return This
    */
-  public KillFilter setType(KillType type) {
+  public KillFilter setType(Type type) {
     this.type = type;
     return this;
   }
@@ -123,5 +123,11 @@ public class KillFilter {
       result.add(skipme ? "yes" : "no");
     }
     return result;
+  }
+
+  public static enum Type {
+    NORMAL,
+    SLAVE,
+    PUBSUB
   }
 }
