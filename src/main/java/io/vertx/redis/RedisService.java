@@ -1110,14 +1110,33 @@ public interface RedisService {
   void psubscribeMany(List<String> patterns, Handler<AsyncResult<Void>> handler);
 
   /**
-   * Inspect the state of the Pub/Sub subsystem
+   * Lists the currently active channels - only those matching the pattern
    *
-   * @param args    JsonArray [{"name":"subcommand","type":"string"},{"name":"argument","type":"string","optional":true,"multiple":true}]
+   * @param pattern A glob-style pattern - an empty string means no pattern
    * @param handler Handler for the result of this call.
    * @since 2.8.0
    * group: pubsub
    */
-  void pubsub(JsonArray args, Handler<AsyncResult<Long>> handler);
+  void pubsubChannels(String pattern, Handler<AsyncResult<JsonArray>> handler);
+
+  /**
+   * Returns the number of subscribers (not counting clients subscribed to patterns) for the specified channels
+   *
+   * @param channels List of channels
+   * @param handler  Handler for the result of this call.
+   * @since 2.8.0
+   * group: pubsub
+   */
+  void pubsubNumsub(List<String> channels, Handler<AsyncResult<JsonArray>> handler);
+
+  /**
+   * Returns the number of subscriptions to patterns (that are performed using the PSUBSCRIBE command)
+   *
+   * @param handler Handler for the result of this call.
+   * @since 2.8.0
+   * group: pubsub
+   */
+  void pubsubNumpat(Handler<AsyncResult<Long>> handler);
 
   /**
    * Get the time to live for a key in milliseconds

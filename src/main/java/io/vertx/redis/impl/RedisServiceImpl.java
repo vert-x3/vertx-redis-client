@@ -557,8 +557,16 @@ public final class RedisServiceImpl extends AbstractRedisService {
   }
 
   @Override
-  public void pubsub(JsonArray args, Handler<AsyncResult<Long>> handler) {
-    sendLong("PUBSUB", args, handler);
+  public void pubsubChannels(String pattern, Handler<AsyncResult<JsonArray>> handler) {
+    sendJsonArray("PUBSUB", toPayload("CHANNELS", pattern == null || "".equals(pattern) ? null : pattern), handler);
+  }
+
+  public void pubsubNumsub(List<String> channels, Handler<AsyncResult<JsonArray>> handler) {
+    sendJsonArray("PUBSUB", toPayload("NUMSUB", channels), handler);
+  }
+
+  public void pubsubNumpat(Handler<AsyncResult<Long>> handler) {
+    sendLong("PUBSUB", toPayload("NUMPAT"), handler);
   }
 
   @Override

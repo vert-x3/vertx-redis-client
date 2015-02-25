@@ -1821,12 +1821,31 @@ public class RedisServiceTestBase extends VertxTestBase {
   }
 
   @Test
-  public void testPubSub() {
+  public void testPubSubChannels() {
 
     redis.subscribe(new JsonArray().add("rustic"), sub->{
 
     });
   }
+
+  @Test
+  @Ignore
+  public void testPubSubNumsub() {
+
+    redis.subscribe(new JsonArray().add("rustic"), sub->{
+
+    });
+  }
+
+  @Test
+  @Ignore
+  public void testPubSubNumpat() {
+
+    redis.subscribe(new JsonArray().add("rustic"), sub->{
+
+    });
+  }
+
   @Test
   @Ignore
   public void testPsubscribe() {
