@@ -1369,12 +1369,12 @@ public interface RedisService {
    *
    * @param key     Key of which value to set
    * @param value   New value for the key
-   * @param options JsonArray [{"command":"EX","name":"seconds","type":"integer","optional":true},{"command":"PX","name":"milliseconds","type":"integer","optional":true},{"name":"condition","type":"enum","enum":["NX","XX"],"optional":true}]
+   * @param options Set options
    * @param handler Handler for the result of this call.
    * @since 1.0.0
    * group: string
    */
-  void setWithOptions(String key, String value, JsonArray options, Handler<AsyncResult<Void>> handler);
+  void setWithOptions(String key, String value, SetOptions options, Handler<AsyncResult<Void>> handler);
 
   /**
    * Set the binary string value of a key - without encoding as utf-8

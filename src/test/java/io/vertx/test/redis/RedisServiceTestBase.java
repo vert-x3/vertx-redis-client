@@ -2319,13 +2319,13 @@ public class RedisServiceTestBase extends VertxTestBase {
   @Test
   public void testSetWithOptions() {
     final String mykey = makeKey();
-    redis.setWithOptions(mykey, "Hello!", new SetOptions().setNX(true).setEX(10).toJson(), reply0 -> {
+    redis.setWithOptions(mykey, "Hello!", new SetOptions().setNX(true).setEX(10), reply0 -> {
       assertTrue(reply0.succeeded());
       redis.get(mykey, reply1 -> {
         assertTrue(reply1.succeeded());
         assertEquals("Hello!", reply1.result());
 
-        redis.setWithOptions(mykey, "Hello again!", new SetOptions().setNX(true).setEX(10).toJson(), reply2 -> {
+        redis.setWithOptions(mykey, "Hello again!", new SetOptions().setNX(true).setEX(10), reply2 -> {
           assertTrue(reply2.succeeded());
           redis.get(mykey, reply3 -> {
             assertTrue(reply3.succeeded());

@@ -1,18 +1,65 @@
 package io.vertx.redis;
 
+import io.vertx.codegen.annotations.DataObject;
 import io.vertx.core.json.JsonArray;
+import io.vertx.core.json.JsonObject;
 
 /**
  * @author <a href="mailto:marko.strukelj@gmail.com">Marko Strukelj</a>
  */
+@DataObject
 public class SetOptions {
+
+  public static final SetOptions NONE = new SetOptions();
 
   private Long ex;
   private Long px;
   private Boolean nx;
   private Boolean xx;
 
-  public SetOptions() {
+  public SetOptions() {}
+
+  public SetOptions(SetOptions obj) {
+    this.ex = obj.ex;
+    this.px = obj.px;
+    this.nx = obj.nx;
+    this.xx = obj.xx;
+  }
+
+  public SetOptions(JsonObject json) {
+    Long lval = json.getLong("ex");
+    if (lval != null) {
+      ex = lval;
+    }
+    lval = json.getLong("px");
+    if (lval != null) {
+      px = lval;
+    }
+    Boolean bval = json.getBoolean("nx");
+    if (bval != null) {
+      nx = bval;
+    }
+    bval = json.getBoolean("xx");
+    if (bval != null) {
+      xx = bval;
+    }
+  }
+
+  public JsonObject toJson() {
+    JsonObject json = new JsonObject();
+    if (ex != null) {
+      json.put("ex", ex);
+    }
+    if (px != null) {
+      json.put("px", px);
+    }
+    if (nx != null && nx) {
+      json.put("nx", nx);
+    }
+    if (xx != null && xx) {
+      json.put("xx", xx);
+    }
+    return json;
   }
 
   public SetOptions setEX(long seconds) {
@@ -54,7 +101,7 @@ public class SetOptions {
     return this;
   }
 
-  public JsonArray toJson() {
+  public JsonArray toJsonArray() {
     JsonArray result = new JsonArray();
     if (ex != null) {
       result.add("EX").add(ex);

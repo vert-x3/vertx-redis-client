@@ -26,6 +26,8 @@ import io.vertx.core.json.JsonObject;
 @DataObject
 public class ScanOptions {
 
+  public static final ScanOptions NONE = new ScanOptions();
+
   private String pattern;
   private Integer count;
 
@@ -42,16 +44,6 @@ public class ScanOptions {
     this.count = obj.getInteger("count");
   }
 
-  public ScanOptions setCount(int count) {
-    this.count = count;
-    return this;
-  }
-
-  public ScanOptions setMatch(String pattern) {
-    this.pattern = pattern;
-    return this;
-  }
-
   public JsonObject toJson() {
     JsonObject result = new JsonObject();
     if (count != null) {
@@ -60,6 +52,16 @@ public class ScanOptions {
       result.put("pattern", pattern);
     }
     return result;
+  }
+
+  public ScanOptions setCount(int count) {
+    this.count = count;
+    return this;
+  }
+
+  public ScanOptions setMatch(String pattern) {
+    this.pattern = pattern;
+    return this;
   }
 
   public JsonArray toJsonArray() {

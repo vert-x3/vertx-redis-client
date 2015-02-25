@@ -11,6 +11,7 @@ import io.vertx.redis.KillFilter;
 import io.vertx.redis.MigrateOptions;
 import io.vertx.redis.ObjectCmd;
 import io.vertx.redis.ScanOptions;
+import io.vertx.redis.SetOptions;
 
 import java.util.Collections;
 import java.util.Iterator;
@@ -682,12 +683,12 @@ public final class RedisServiceImpl extends AbstractRedisService {
 
   @Override
   public void set(String key, String value, Handler<AsyncResult<Void>> handler) {
-    setWithOptions(key, value, null, handler);
+    sendVoid("SET", toPayload(key, value), handler);
   }
 
   @Override
-  public void setWithOptions(String key, String value, JsonArray options, Handler<AsyncResult<Void>> handler) {
-    sendVoid("SET", toPayload(key, value, options), handler);
+  public void setWithOptions(String key, String value, SetOptions options, Handler<AsyncResult<Void>> handler) {
+    sendVoid("SET", toPayload(key, value, options != null ? options.toJsonArray() : null), handler);
   }
 
   @Override
