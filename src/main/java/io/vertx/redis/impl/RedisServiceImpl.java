@@ -430,22 +430,22 @@ public final class RedisServiceImpl extends AbstractRedisService {
   }
 
   @Override
-  public void lrange(String key, int from, int to, Handler<AsyncResult<JsonArray>> handler) {
+  public void lrange(String key, long from, long to, Handler<AsyncResult<JsonArray>> handler) {
     sendJsonArray("LRANGE", toPayload(key, from, to), handler);
   }
 
   @Override
-  public void lrem(String key, int count, String value, Handler<AsyncResult<Long>> handler) {
+  public void lrem(String key, long count, String value, Handler<AsyncResult<Long>> handler) {
     sendLong("LREM", toPayload(key, count, value), handler);
   }
 
   @Override
-  public void lset(String key, int index, String value, Handler<AsyncResult<String>> handler) {
+  public void lset(String key, long index, String value, Handler<AsyncResult<String>> handler) {
     sendString("LSET", toPayload(key, index, value), handler);
   }
 
   @Override
-  public void ltrim(String key, int from, int to, Handler<AsyncResult<String>> handler) {
+  public void ltrim(String key, long from, long to, Handler<AsyncResult<String>> handler) {
     sendString("LTRIM", toPayload(key, from, to), handler);
   }
 

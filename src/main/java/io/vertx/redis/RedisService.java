@@ -854,7 +854,7 @@ public interface RedisService {
    * @since 1.0.0
    * group: list
    */
-  void lrange(String key, int from, int to, Handler<AsyncResult<JsonArray>> handler);
+  void lrange(String key, long from, long to, Handler<AsyncResult<JsonArray>> handler);
 
   /**
    * Remove elements from a list
@@ -866,7 +866,7 @@ public interface RedisService {
    * @since 1.0.0
    * group: list
    */
-  void lrem(String key, int count, String value, Handler<AsyncResult<Long>> handler);
+  void lrem(String key, long count, String value, Handler<AsyncResult<Long>> handler);
 
   /**
    * Set the value of an element in a list by its index
@@ -878,7 +878,7 @@ public interface RedisService {
    * @since 1.0.0
    * group: list
    */
-  void lset(String key, int index, String value, Handler<AsyncResult<String>> handler);
+  void lset(String key, long index, String value, Handler<AsyncResult<String>> handler);
 
   /**
    * Trim a list to the specified range
@@ -890,7 +890,7 @@ public interface RedisService {
    * @since 1.0.0
    * group: list
    */
-  void ltrim(String key, int from, int to, Handler<AsyncResult<String>> handler);
+  void ltrim(String key, long from, long to, Handler<AsyncResult<String>> handler);
 
   /**
    * Get the values of all the given keys
