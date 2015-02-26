@@ -1360,7 +1360,7 @@ public interface RedisService {
   /**
    * Load the specified Lua script into the script cache.
    *
-   * @param script  Lua Script
+   * @param script  Lua script
    * @param handler Handler for the result of this call.
    * @since 2.6.0
    * group: scripting
@@ -1370,32 +1370,35 @@ public interface RedisService {
   /**
    * Subtract multiple sets
    *
-   * @param args    JsonArray [{"name":"key","type":"key","multiple":true}]
+   * @param key     Key identifying the set to compare with all other sets combined
+   * @param cmpkeys List of keys identifying sets to subtract from the key set
    * @param handler Handler for the result of this call.
    * @since 1.0.0
    * group: set
    */
-  void sdiff(JsonArray args, Handler<AsyncResult<JsonArray>> handler);
+  void sdiff(String key, List<String> cmpkeys, Handler<AsyncResult<JsonArray>> handler);
 
   /**
    * Subtract multiple sets and store the resulting set in a key
    *
-   * @param args    JsonArray [{"name":"destination","type":"key"},{"name":"key","type":"key","multiple":true}]
+   * @param destkey Destination key where the result should be stored
+   * @param key     Key identifying the set to compare with all other sets combined
+   * @param cmpkeys List of keys identifying sets to subtract from the key set
    * @param handler Handler for the result of this call.
    * @since 1.0.0
    * group: set
    */
-  void sdiffstore(JsonArray args, Handler<AsyncResult<Long>> handler);
+  void sdiffstore(String destkey, String key, List<String> cmpkeys, Handler<AsyncResult<Long>> handler);
 
   /**
    * Change the selected database for the current connection
    *
-   * @param args    JsonArray [{"name":"index","type":"integer"}]
+   * @param dbindex Index identifying the new active database
    * @param handler Handler for the result of this call.
    * @since 1.0.0
    * group: connection
    */
-  void select(JsonArray args, Handler<AsyncResult<String>> handler);
+  void select(int dbindex, Handler<AsyncResult<String>> handler);
 
   /**
    * Set the string value of a key

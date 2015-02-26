@@ -2234,7 +2234,7 @@ public class RedisServiceTestBase extends VertxTestBase {
       redis.saddMany(mykey2, toList("c", "d", "e"), reply1 -> {
         assertTrue(reply1.succeeded());
         assertEquals(3, reply1.result().longValue());
-        redis.sdiff(toJsonArray(mykey1, mykey2), reply2 -> {
+        redis.sdiff(mykey1, toList(mykey2), reply2 -> {
           assertTrue(reply2.succeeded());
           Object[] expected = new Object[]{"a", "b"};
           Object[] result = reply2.result().getList().toArray();
@@ -2259,7 +2259,7 @@ public class RedisServiceTestBase extends VertxTestBase {
       redis.saddMany(mykey2, toList("c", "d", "e"), reply1 -> {
         assertTrue(reply1.succeeded());
         assertEquals(3, reply1.result().longValue());
-        redis.sdiffstore(toJsonArray(mykey, mykey1, mykey2), reply2 -> {
+        redis.sdiffstore(mykey, mykey1, toList(mykey2), reply2 -> {
           assertTrue(reply2.succeeded());
           Long diff = reply2.result().longValue();
           assertTrue(diff == 2);
@@ -2279,13 +2279,13 @@ public class RedisServiceTestBase extends VertxTestBase {
   @Test
   public void testSelect() {
     //Gee, think redis should have a get current DB command?
-    redis.select(new JsonArray().add(1), reply -> {
+    redis.select(1, reply -> {
       if(reply.succeeded()){
         redis.set("first", "value", reply2->{
           if(reply2.succeeded()){
-            redis.select(new JsonArray().add(0), reply3 ->{
+            redis.select(0, reply3 ->{
               if(reply3.succeeded()){
-                redis.select(new JsonArray().add(1), reply4 -> {
+                redis.select(1, reply4 -> {
                   if(reply4.succeeded()){
                     redis.get("first",reply5->{
                       if(reply5.succeeded()){

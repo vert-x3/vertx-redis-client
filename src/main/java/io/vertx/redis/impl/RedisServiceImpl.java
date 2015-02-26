@@ -686,18 +686,18 @@ public final class RedisServiceImpl extends AbstractRedisService {
   }
 
   @Override
-  public void sdiff(JsonArray args, Handler<AsyncResult<JsonArray>> handler) {
-    sendJsonArray("SDIFF", args, handler);
+  public void sdiff(String key, List<String> cmpkeys, Handler<AsyncResult<JsonArray>> handler) {
+    sendJsonArray("SDIFF", toPayload(key, cmpkeys), handler);
   }
 
   @Override
-  public void sdiffstore(JsonArray args, Handler<AsyncResult<Long>> handler) {
-    sendLong("SDIFFSTORE", args, handler);
+  public void sdiffstore(String destkey, String key, List<String> cmpkeys, Handler<AsyncResult<Long>> handler) {
+    sendLong("SDIFFSTORE", toPayload(destkey, key, cmpkeys), handler);
   }
 
   @Override
-  public void select(JsonArray args, Handler<AsyncResult<String>> handler) {
-    sendString("SELECT", args, handler);
+  public void select(int dbindex, Handler<AsyncResult<String>> handler) {
+    sendString("SELECT", toPayload(dbindex), handler);
   }
 
   @Override
