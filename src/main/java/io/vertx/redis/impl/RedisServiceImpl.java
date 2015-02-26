@@ -14,6 +14,7 @@ import io.vertx.redis.RedisEncoding;
 import io.vertx.redis.ScanOptions;
 import io.vertx.redis.SetOptions;
 import io.vertx.redis.ShutdownOptions;
+import io.vertx.redis.SortOptions;
 
 import java.util.Collections;
 import java.util.Iterator;
@@ -782,18 +783,18 @@ public final class RedisServiceImpl extends AbstractRedisService {
   }
 
   @Override
-  public void smembers(JsonArray args, Handler<AsyncResult<JsonArray>> handler) {
-    sendJsonArray("SMEMBERS", args, handler);
+  public void smembers(String key, Handler<AsyncResult<JsonArray>> handler) {
+    sendJsonArray("SMEMBERS", toPayload(key), handler);
   }
 
   @Override
-  public void smove(JsonArray args, Handler<AsyncResult<Long>> handler) {
-    sendLong("SMOVE", args, handler);
+  public void smove(String key, String destkey, String member, Handler<AsyncResult<Long>> handler) {
+    sendLong("SMOVE", toPayload(key, destkey, member), handler);
   }
 
   @Override
-  public void sort(JsonArray args, Handler<AsyncResult<JsonArray>> handler) {
-    sendJsonArray("SORT", args, handler);
+  public void sort(String key, SortOptions options, Handler<AsyncResult<JsonArray>> handler) {
+    sendJsonArray("SORT", toPayload(key, options != null ? options.toJsonArray() : null), handler);
   }
 
   @Override

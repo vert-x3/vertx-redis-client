@@ -11,6 +11,7 @@ import io.vertx.redis.RedisService;
 import io.vertx.redis.ScanOptions;
 import io.vertx.redis.SetOptions;
 import io.vertx.redis.ShutdownOptions;
+import io.vertx.redis.SortOptions;
 import io.vertx.test.core.VertxTestBase;
 
 import java.nio.charset.Charset;
@@ -2108,7 +2109,7 @@ public class RedisServiceTestBase extends VertxTestBase {
         redis.sadd(mykey, "World", reply2 -> {
           assertTrue(reply2.succeeded());
           assertEquals(0, reply2.result().longValue());
-          redis.smembers(toJsonArray(mykey), reply3 -> {
+          redis.smembers(mykey, reply3 -> {
             assertTrue(reply3.succeeded());
             Object[] expected = new Object[]{"Hello", "World"};
             Object[] result = reply3.result().getList().toArray();
@@ -2264,7 +2265,7 @@ public class RedisServiceTestBase extends VertxTestBase {
           assertTrue(reply2.succeeded());
           Long diff = reply2.result().longValue();
           assertTrue(diff == 2);
-          redis.smembers(new JsonArray().add(mykey), reply3 ->{
+          redis.smembers(mykey, reply3 ->{
             Set<String> expected = new HashSet(toList("a", "b"));
             JsonArray members = reply3.result();
             Set<String> result = new HashSet(members.getList());
@@ -2526,7 +2527,7 @@ public class RedisServiceTestBase extends VertxTestBase {
     redis.saddMany(mykey, toList("Hello", "World"), reply0 -> {
       assertTrue(reply0.succeeded());
       assertEquals(2, reply0.result().longValue());
-      redis.smembers(toJsonArray(mykey), reply1 -> {
+      redis.smembers(mykey, reply1 -> {
         assertTrue(reply1.succeeded());
         Object[] expected = new Object[]{"Hello", "World"};
         Object[] result = reply1.result().getList().toArray();
@@ -2548,16 +2549,16 @@ public class RedisServiceTestBase extends VertxTestBase {
       redis.sadd(myotherkey, "three", reply1 -> {
         assertTrue(reply1.succeeded());
         assertEquals(1, reply1.result().longValue());
-        redis.smove(toJsonArray(mykey, myotherkey, "two"), reply2 -> {
+        redis.smove(mykey, myotherkey, "two", reply2 -> {
           assertTrue(reply2.succeeded());
           assertEquals(1, reply2.result().longValue());
-          redis.smembers(toJsonArray(mykey), reply3 -> {
+          redis.smembers(mykey, reply3 -> {
             assertTrue(reply3.succeeded());
             Object[] expected = new Object[]{"one"};
             Object[] result = reply3.result().getList().toArray();
             Arrays.sort(result);
             assertArrayEquals(expected, result);
-            redis.smembers(toJsonArray(myotherkey), reply4 -> {
+            redis.smembers(myotherkey, reply4 -> {
               assertTrue(reply4.succeeded());
               Object[] expected1 = new Object[]{"three", "two"};
               Object[] result1 = reply4.result().getList().toArray();
@@ -2590,7 +2591,7 @@ public class RedisServiceTestBase extends VertxTestBase {
           assertTrue(reply2.succeeded());
           redis.set(k3, "three", reply3 -> {
             assertTrue(reply3.succeeded());
-            redis.sort(toJsonArray(mykey, "desc", "get", kx), reply4 -> {
+            redis.sort(mykey, new SortOptions().useDescending().addGet(kx), reply4 -> {
               assertTrue(reply4.succeeded());
               assertArrayEquals(toArray("three", "two", "one"), reply4.result().getList().toArray());
               testComplete();
@@ -2622,7 +2623,7 @@ public class RedisServiceTestBase extends VertxTestBase {
         if (!ret.equals("three")) {
           expected.add("three");
         }
-        redis.smembers(toJsonArray(mykey), reply2 -> {
+        redis.smembers(mykey, reply2 -> {
           assertTrue(reply2.succeeded());
           Object[] expectedA = expected.getList().toArray();
           Arrays.sort(expectedA);

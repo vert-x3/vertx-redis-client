@@ -1574,32 +1574,35 @@ public interface RedisService {
   /**
    * Get all the members in a set
    *
-   * @param args    JsonArray [{"name":"key","type":"key"}]
+   * @param key     Key string
    * @param handler Handler for the result of this call.
    * @since 1.0.0
    * group: set
    */
-  void smembers(JsonArray args, Handler<AsyncResult<JsonArray>> handler);
+  void smembers(String key, Handler<AsyncResult<JsonArray>> handler);
 
   /**
    * Move a member from one set to another
    *
-   * @param args    JsonArray [{"name":"source","type":"key"},{"name":"destination","type":"key"},{"name":"member","type":"string"}]
+   * @param key     Key of source set currently containing the member
+   * @param destkey Key identifying the destination set
+   * @param member   Member to move
    * @param handler Handler for the result of this call.
    * @since 1.0.0
    * group: set
    */
-  void smove(JsonArray args, Handler<AsyncResult<Long>> handler);
+  void smove(String key, String destkey, String member, Handler<AsyncResult<Long>> handler);
 
   /**
    * Sort the elements in a list, set or sorted set
    *
-   * @param args    JsonArray [{"name":"key","type":"key"},{"command":"BY","name":"pattern","type":"pattern","optional":true},{"command":"LIMIT","name":["offset","count"],"type":["integer","integer"],"optional":true},{"command":"GET","name":"pattern","type":"string","optional":true,"multiple":true},{"name":"order","type":"enum","enum":["ASC","DESC"],"optional":true},{"name":"sorting","type":"enum","enum":["ALPHA"],"optional":true},{"command":"STORE","name":"destination","type":"key","optional":true}]
+   * @param key     Key string
+   * @param options Sort options
    * @param handler Handler for the result of this call.
    * @since 1.0.0
    * group: generic
    */
-  void sort(JsonArray args, Handler<AsyncResult<JsonArray>> handler);
+  void sort(String key, SortOptions options, Handler<AsyncResult<JsonArray>> handler);
 
   /**
    * Remove and return a random member from a set
