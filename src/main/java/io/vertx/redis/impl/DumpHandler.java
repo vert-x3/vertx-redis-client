@@ -23,6 +23,7 @@ public class DumpHandler implements Handler<AsyncResult<String>> {
   private static class DelegatingAsyncResult implements AsyncResult<String> {
 
     private AsyncResult<String> delegate;
+    private Throwable err;
 
     private DelegatingAsyncResult(AsyncResult<String> event) {
       this.delegate = event;
@@ -34,22 +35,27 @@ public class DumpHandler implements Handler<AsyncResult<String>> {
       if (result == null) {
         return null;
       }
-      return RedisEncoding.encode(result);
+      try {
+        return RedisEncoding.encode(result);
+      } catch (Throwable th) {
+        err = th;
+      }
+      return null;
     }
 
     @Override
     public Throwable cause() {
-      return delegate.cause();
+      return err != null ? err : delegate.cause();
     }
 
     @Override
     public boolean succeeded() {
-      return delegate.succeeded();
+      return err != null ? false : delegate.succeeded();
     }
 
     @Override
     public boolean failed() {
-      return delegate.failed();
+      return err != null ? true : delegate.failed();
     }
   }
 }
