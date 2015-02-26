@@ -13,6 +13,7 @@ import io.vertx.redis.ObjectCmd;
 import io.vertx.redis.RedisEncoding;
 import io.vertx.redis.ScanOptions;
 import io.vertx.redis.SetOptions;
+import io.vertx.redis.ShutdownOptions;
 
 import java.util.Collections;
 import java.util.Iterator;
@@ -731,33 +732,38 @@ public final class RedisServiceImpl extends AbstractRedisService {
   }
 
   @Override
-  public void setrange(JsonArray args, Handler<AsyncResult<Long>> handler) {
-    sendLong("SETRANGE", args, handler);
+  public void setrange(String key, int offset, String value, Handler<AsyncResult<Long>> handler) {
+    sendLong("SETRANGE", toPayload(key, offset, value), handler);
   }
 
   @Override
-  public void shutdown(JsonArray args, Handler<AsyncResult<String>> handler) {
-    sendString("SHUTDOWN", args, handler);
+  public void shutdown(ShutdownOptions options, Handler<AsyncResult<String>> handler) {
+    sendString("SHUTDOWN", toPayload(options.toJsonArray()), handler);
   }
 
   @Override
-  public void sinter(JsonArray args, Handler<AsyncResult<JsonArray>> handler) {
-    sendJsonArray("SINTER", args, handler);
+  public void sinter(List<String> keys, Handler<AsyncResult<JsonArray>> handler) {
+    sendJsonArray("SINTER", toPayload(keys), handler);
   }
 
   @Override
-  public void sinterstore(JsonArray args, Handler<AsyncResult<Long>> handler) {
-    sendLong("SINTERSTORE", args, handler);
+  public void sinterstore(String destkey, List<String> keys, Handler<AsyncResult<Long>> handler) {
+    sendLong("SINTERSTORE", toPayload(destkey, keys), handler);
   }
 
   @Override
-  public void sismember(JsonArray args, Handler<AsyncResult<Long>> handler) {
-    sendLong("SISMEMBER", args, handler);
+  public void sismember(String key, String member, Handler<AsyncResult<Long>> handler) {
+    sendLong("SISMEMBER", toPayload(key, member), handler);
   }
 
   @Override
-  public void slaveof(JsonArray args, Handler<AsyncResult<String>> handler) {
-    sendString("SLAVEOF", args, handler);
+  public void slaveof(String host, int port, Handler<AsyncResult<String>> handler) {
+    sendString("SLAVEOF", toPayload(host, port), handler);
+  }
+
+  @Override
+  public void slaveofNoone(Handler<AsyncResult<String>> handler) {
+    sendString("SLAVEOF", toPayload("NO", "ONE"), handler);
   }
 
   @Override

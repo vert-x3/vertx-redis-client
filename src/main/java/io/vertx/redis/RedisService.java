@@ -1472,62 +1472,76 @@ public interface RedisService {
   /**
    * Overwrite part of a string at key starting at the specified offset
    *
-   * @param args    JsonArray [{"name":"key","type":"key"},{"name":"offset","type":"integer"},{"name":"value","type":"string"}]
+   * @param key     Key string
+   * @param offset  Offset - the maximum offset that you can set is 2^29 -1 (536870911), as Redis Strings are limited to 512 megabytes
+   * @param value   Value to overwrite with
    * @param handler Handler for the result of this call.
    * @since 2.2.0
    * group: string
    */
-  void setrange(JsonArray args, Handler<AsyncResult<Long>> handler);
+  void setrange(String key, int offset, String value, Handler<AsyncResult<Long>> handler);
 
   /**
    * Synchronously save the dataset to disk and then shut down the server
    *
-   * @param args    JsonArray [{"name":"NOSAVE","type":"enum","enum":["NOSAVE"],"optional":true},{"name":"SAVE","type":"enum","enum":["SAVE"],"optional":true}]
+   * @param options Shutdown options
    * @param handler Handler for the result of this call.
    * @since 1.0.0
    * group: server
    */
-  void shutdown(JsonArray args, Handler<AsyncResult<String>> handler);
+  void shutdown(ShutdownOptions options, Handler<AsyncResult<String>> handler);
 
   /**
    * Intersect multiple sets
    *
-   * @param args    JsonArray [{"name":"key","type":"key","multiple":true}]
+   * @param keys    List of keys to perform intersection on
    * @param handler Handler for the result of this call.
    * @since 1.0.0
    * group: set
    */
-  void sinter(JsonArray args, Handler<AsyncResult<JsonArray>> handler);
+  void sinter(List<String> keys, Handler<AsyncResult<JsonArray>> handler);
 
   /**
    * Intersect multiple sets and store the resulting set in a key
    *
-   * @param args    JsonArray [{"name":"destination","type":"key"},{"name":"key","type":"key","multiple":true}]
+   * @param destkey Key where to store the results
+   * @param keys    List of keys to perform intersection on
    * @param handler Handler for the result of this call.
    * @since 1.0.0
    * group: set
    */
-  void sinterstore(JsonArray args, Handler<AsyncResult<Long>> handler);
+  void sinterstore(String destkey, List<String> keys, Handler<AsyncResult<Long>> handler);
 
   /**
    * Determine if a given value is a member of a set
    *
-   * @param args    JsonArray [{"name":"key","type":"key"},{"name":"member","type":"string"}]
+   * @param key     Key string
+   * @param member  Member to look for
    * @param handler Handler for the result of this call.
    * @since 1.0.0
    * group: set
    */
-  void sismember(JsonArray args, Handler<AsyncResult<Long>> handler);
+  void sismember(String key, String member, Handler<AsyncResult<Long>> handler);
 
   /**
-   * Make the server a slave of another instance, or promote it as master
+   * Make the server a slave of another instance
    *
-   * @param args    JsonArray [{"name":"host","type":"string"},{"name":"port","type":"string"}]
+   * @param host    Host to become this server's master
+   * @param port    Port of our new master
    * @param handler Handler for the result of this call.
    * @since 1.0.0
    * group: server
    */
-  void slaveof(JsonArray args, Handler<AsyncResult<String>> handler);
+  void slaveof(String host, int port, Handler<AsyncResult<String>> handler);
+
+  /**
+   * Make this server a master
+   *
+   * @param handler Handler for the result of this call.
+   * @since 1.0.0
+   * group: server
+   */
+  void slaveofNoone(Handler<AsyncResult<String>> handler);
 
   /**
    * Manages the Redis slow queries log

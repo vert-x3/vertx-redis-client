@@ -10,6 +10,7 @@ import io.vertx.redis.ObjectCmd;
 import io.vertx.redis.RedisService;
 import io.vertx.redis.ScanOptions;
 import io.vertx.redis.SetOptions;
+import io.vertx.redis.ShutdownOptions;
 import io.vertx.test.core.VertxTestBase;
 
 import java.nio.charset.Charset;
@@ -2402,7 +2403,7 @@ public class RedisServiceTestBase extends VertxTestBase {
     final String mykey = makeKey();
     redis.set(mykey, "Hello World", reply0 -> {
       assertTrue(reply0.succeeded());
-      redis.setrange(toJsonArray(mykey, 6, "Redis"), reply1 -> {
+      redis.setrange(mykey, 6, "Redis", reply1 -> {
         assertTrue(reply1.succeeded());
         assertEquals(11, reply1.result().longValue());
         redis.get(mykey, reply2 -> {
@@ -2435,7 +2436,7 @@ public class RedisServiceTestBase extends VertxTestBase {
 
     awaitLatch(latch);
 
-    rdx.shutdown(new JsonArray().add("NOSAVE"), reply ->{
+    rdx.shutdown(ShutdownOptions.NOSAVE, reply ->{
       fail("server has been terminated. No reply expected");
     });
 
@@ -2457,7 +2458,7 @@ public class RedisServiceTestBase extends VertxTestBase {
       redis.saddMany(mykey2, toList("c", "d", "e"), reply1 -> {
         assertTrue(reply1.succeeded());
         assertEquals(3, reply1.result().longValue());
-        redis.sinter(toJsonArray(mykey1, mykey2), reply2 -> {
+        redis.sinter(toList(mykey1, mykey2), reply2 -> {
           assertTrue(reply2.succeeded());
           assertArrayEquals(new Object[]{"c"}, reply2.result().getList().toArray());
           testComplete();
@@ -2479,7 +2480,7 @@ public class RedisServiceTestBase extends VertxTestBase {
       redis.saddMany(mykey2, toList("c", "d", "e"), reply1 -> {
         assertTrue(reply1.succeeded());
         assertEquals(3, reply1.result().longValue());
-        redis.sinterstore(toJsonArray(mykey, mykey1, mykey2), reply2 -> {
+        redis.sinterstore(mykey, toList(mykey1, mykey2), reply2 -> {
           assertTrue(reply2.succeeded());
           assertTrue(reply2.result() == 1);
           //assertArrayEquals(new Object[]{"c"}, reply6.result().getList().toArray());
@@ -2495,10 +2496,10 @@ public class RedisServiceTestBase extends VertxTestBase {
     final String mykey = makeKey();
     redis.sadd(mykey, "one", reply0 -> {
       assertTrue(reply0.succeeded());
-      redis.sismember(toJsonArray(mykey, "one"), reply1 -> {
+      redis.sismember(mykey, "one", reply1 -> {
         assertTrue(reply1.succeeded());
         assertEquals(1, reply1.result().longValue());
-        redis.sismember(toJsonArray(mykey, "two"), reply2 -> {
+        redis.sismember(mykey, "two", reply2 -> {
           assertTrue(reply2.succeeded());
           assertEquals(0, reply2.result().longValue());
           testComplete();
