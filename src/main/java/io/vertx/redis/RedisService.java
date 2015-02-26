@@ -336,12 +336,12 @@ public interface RedisService {
   /**
    * Get debugging information about a key
    *
-   * @param args    JsonArray [{"name":"key","type":"key"}]
+   * @param key     Key string
    * @param handler Handler for the result of this call.
    * @since 1.0.0
    * group: server
    */
-  void debugObject(JsonArray args, Handler<AsyncResult<String>> handler);
+  void debugObject(String key, Handler<AsyncResult<String>> handler);
 
   /**
    * Make the server crash
@@ -1314,22 +1314,32 @@ public interface RedisService {
   /**
    * Get the number of members in a set
    *
-   * @param args    JsonArray [{"name":"key","type":"key"}]
+   * @param key     Key string
    * @param handler Handler for the result of this call.
    * @since 1.0.0
    * group: set
    */
-  void scard(JsonArray args, Handler<AsyncResult<Long>> handler);
+  void scard(String key, Handler<AsyncResult<Long>> handler);
 
   /**
-   * Check existence of scripts in the script cache.
+   * Check existence of script in the script cache.
    *
-   * @param args    JsonArray [{"name":"script","type":"string","multiple":true}]
+   * @param script  SHA1 digest identifying a script in the script cache
    * @param handler Handler for the result of this call.
    * @since 2.6.0
    * group: scripting
    */
-  void scriptExists(JsonArray args, Handler<AsyncResult<JsonArray>> handler);
+  void scriptExists(String script, Handler<AsyncResult<JsonArray>> handler);
+
+  /**
+   * Check existence of scripts in the script cache.
+   *
+   * @param scripts List of SHA1 digests identifying scripts in the script cache
+   * @param handler Handler for the result of this call.
+   * @since 2.6.0
+   * group: scripting
+   */
+  void scriptExistsMany(List<String> scripts, Handler<AsyncResult<JsonArray>> handler);
 
   /**
    * Remove all the scripts from the script cache.
@@ -1350,12 +1360,12 @@ public interface RedisService {
   /**
    * Load the specified Lua script into the script cache.
    *
-   * @param args    JsonArray [{"name":"script","type":"string"}]
+   * @param script  Lua Script
    * @param handler Handler for the result of this call.
    * @since 2.6.0
    * group: scripting
    */
-  void scriptLoad(JsonArray args, Handler<AsyncResult<String>> handler);
+  void scriptLoad(String script, Handler<AsyncResult<String>> handler);
 
   /**
    * Subtract multiple sets

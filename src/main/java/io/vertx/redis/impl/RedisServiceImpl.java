@@ -176,8 +176,8 @@ public final class RedisServiceImpl extends AbstractRedisService {
   }
 
   @Override
-  public void debugObject(JsonArray args, Handler<AsyncResult<String>> handler) {
-    sendString("DEBUG OBJECT", args, handler);
+  public void debugObject(String key, Handler<AsyncResult<String>> handler) {
+    sendString("DEBUG OBJECT", toPayload(key), handler);
   }
 
   @Override
@@ -656,13 +656,18 @@ public final class RedisServiceImpl extends AbstractRedisService {
   }
 
   @Override
-  public void scard(JsonArray args, Handler<AsyncResult<Long>> handler) {
-    sendLong("SCARD", args, handler);
+  public void scard(String key, Handler<AsyncResult<Long>> handler) {
+    sendLong("SCARD", toPayload(key), handler);
   }
 
   @Override
-  public void scriptExists(JsonArray args, Handler<AsyncResult<JsonArray>> handler) {
-    sendJsonArray("SCRIPT EXISTS", args, handler);
+  public void scriptExists(String script, Handler<AsyncResult<JsonArray>> handler) {
+    sendJsonArray("SCRIPT EXISTS", toPayload(script), handler);
+  }
+
+  @Override
+  public void scriptExistsMany(List<String> scripts, Handler<AsyncResult<JsonArray>> handler) {
+    sendJsonArray("SCRIPT EXISTS", toPayload(scripts), handler);
   }
 
   @Override
@@ -676,8 +681,8 @@ public final class RedisServiceImpl extends AbstractRedisService {
   }
 
   @Override
-  public void scriptLoad(JsonArray args, Handler<AsyncResult<String>> handler) {
-    sendString("SCRIPT LOAD", args, handler);
+  public void scriptLoad(String script, Handler<AsyncResult<String>> handler) {
+    sendString("SCRIPT LOAD", toPayload(script), handler);
   }
 
   @Override

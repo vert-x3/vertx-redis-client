@@ -644,7 +644,7 @@ public class RedisServiceTestBase extends VertxTestBase {
   @Test
   public void testEvalsha() {
     String inline = "return 1";
-    redis.scriptLoad(new JsonArray().add(inline), reply->{
+    redis.scriptLoad(inline, reply->{
       assertTrue(reply.succeeded());
       assertNotNull(reply.result());
       redis.evalsha(reply.result(), Collections.emptyList(), Collections.emptyList(), reply2 ->{
@@ -2047,7 +2047,6 @@ public class RedisServiceTestBase extends VertxTestBase {
     );
 
     await();
-
   }
 
   @Test
@@ -2138,7 +2137,7 @@ public class RedisServiceTestBase extends VertxTestBase {
     redis.saddMany(mykey, toList("Hello", "World"), reply0 -> {
       assertTrue(reply0.succeeded());
       assertEquals(2, reply0.result().longValue());
-      redis.scard(toJsonArray(mykey), reply2 -> {
+      redis.scard(mykey, reply2 -> {
         assertTrue(reply2.succeeded());
         assertEquals(2, reply2.result().longValue());
         testComplete();
@@ -2150,10 +2149,10 @@ public class RedisServiceTestBase extends VertxTestBase {
   @Test
   public void testScriptexists() {
     String inline = "return 1";
-    redis.scriptLoad(new JsonArray().add(inline), reply ->{
+    redis.scriptLoad(inline, reply ->{
       assertTrue(reply.succeeded());
       String hash = reply.result();
-      redis.scriptExists(new JsonArray().add(hash), reply2 ->{
+      redis.scriptExists(hash, reply2 ->{
         assertTrue(reply2.succeeded());
         assertTrue(reply2.result().getInteger(0) > 0);
         testComplete();
@@ -2165,15 +2164,15 @@ public class RedisServiceTestBase extends VertxTestBase {
   @Test
   public void testScriptflush() {
     String inline = "return 1";
-    redis.scriptLoad(new JsonArray().add(inline), reply ->{
+    redis.scriptLoad(inline, reply ->{
       assertTrue(reply.succeeded());
       String hash = reply.result();
-      redis.scriptExists(new JsonArray().add(hash), reply2 ->{
+      redis.scriptExists(hash, reply2 ->{
         assertTrue(reply2.succeeded());
         assertTrue(reply2.result().getInteger(0) > 0);
         redis.scriptFlush(reply3 ->{
           assertTrue(reply3.succeeded());
-          redis.scriptExists(new JsonArray().add(hash), reply4 ->{
+          redis.scriptExists(hash, reply4 ->{
             assertTrue(reply4.succeeded());
             assertTrue(reply4.result().getInteger(0) == 0);
             testComplete();
@@ -2216,7 +2215,7 @@ public class RedisServiceTestBase extends VertxTestBase {
   @Test
   public void testScriptload() {
     String inline = "return 1";
-    redis.scriptLoad(new JsonArray().add(inline), reply->{
+    redis.scriptLoad(inline, reply->{
       assertTrue(reply.succeeded());
       assertNotNull(reply.result());
       testComplete();
