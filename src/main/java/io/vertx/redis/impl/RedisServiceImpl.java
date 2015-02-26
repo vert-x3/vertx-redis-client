@@ -767,8 +767,18 @@ public final class RedisServiceImpl extends AbstractRedisService {
   }
 
   @Override
-  public void slowlog(JsonArray args, Handler<AsyncResult<Void>> handler) {
-    sendVoid("SLOWLOG", args, handler);
+  public void slowlogGet(int limit, Handler<AsyncResult<JsonArray>> handler) {
+    sendJsonArray("SLOWLOG GET", toPayload(limit < 0 ? null : limit), handler);
+  }
+
+  @Override
+  public void slowlogLen(Handler<AsyncResult<Long>> handler) {
+    sendLong("SLOWLOG LEN", null, handler);
+  }
+
+  @Override
+  public void slowlogReset(Handler<AsyncResult<Void>> handler) {
+    sendVoid("SLOWLOG RESET", null, handler);
   }
 
   @Override

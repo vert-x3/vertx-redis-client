@@ -2517,6 +2517,7 @@ public class RedisServiceTestBase extends VertxTestBase {
   @Test
   @Ignore
   public void testSlowlog() {
+    // TODO
   }
 
   @Test

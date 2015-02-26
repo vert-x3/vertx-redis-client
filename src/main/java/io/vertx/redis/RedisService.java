@@ -1544,14 +1544,32 @@ public interface RedisService {
   void slaveofNoone(Handler<AsyncResult<String>> handler);
 
   /**
-   * Manages the Redis slow queries log
+   * Read the Redis slow queries log
    *
-   * @param args    JsonArray [{"name":"subcommand","type":"string"},{"name":"argument","type":"string","optional":true}]
+   * @param limit   Number of log entries to return. If value is less than zero all entries are returned
    * @param handler Handler for the result of this call.
    * @since 2.2.12
    * group: server
    */
-  void slowlog(JsonArray args, Handler<AsyncResult<Void>> handler);
+  void slowlogGet(int limit, Handler<AsyncResult<JsonArray>> handler);
+
+  /**
+   * Get the length of the Redis slow queries log
+   *
+   * @param handler Handler for the result of this call.
+   * @since 2.2.12
+   * group: server
+   */
+  void slowlogLen(Handler<AsyncResult<Long>> handler);
+
+  /**
+   * Reset the Redis slow queries log
+   *
+   * @param handler Handler for the result of this call.
+   * @since 2.2.12
+   * group: server
+   */
+  void slowlogReset(Handler<AsyncResult<Void>> handler);
 
   /**
    * Get all the members in a set
