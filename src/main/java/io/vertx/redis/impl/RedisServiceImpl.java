@@ -798,23 +798,33 @@ public final class RedisServiceImpl extends AbstractRedisService {
   }
 
   @Override
-  public void spop(JsonArray args, Handler<AsyncResult<String>> handler) {
-    sendString("SPOP", args, handler);
+  public void spop(String key, Handler<AsyncResult<String>> handler) {
+    sendString("SPOP", toPayload(key), handler);
   }
 
   @Override
-  public void srandmember(JsonArray args, Handler<AsyncResult<JsonArray>> handler) {
-    sendJsonArray("SRANDMEMBER", args, handler);
+  public void spopMany(String key, int count, Handler<AsyncResult<String>> handler) {
+    sendString("SPOP", toPayload(key, count), handler);
   }
 
   @Override
-  public void srem(JsonArray args, Handler<AsyncResult<Long>> handler) {
-    sendLong("SREM", args, handler);
+  public void srandmember(String key, int count, Handler<AsyncResult<JsonArray>> handler) {
+    sendJsonArray("SRANDMEMBER", toPayload(key, count), handler);
   }
 
   @Override
-  public void strlen(JsonArray args, Handler<AsyncResult<Long>> handler) {
-    sendLong("STRLEN", args, handler);
+  public void srem(String key, String member, Handler<AsyncResult<Long>> handler) {
+    sendLong("SREM", toPayload(key, member), handler);
+  }
+
+  @Override
+  public void sremMany(String key, List<String> members, Handler<AsyncResult<Long>> handler) {
+    sendLong("SREM", toPayload(key, members), handler);
+  }
+
+  @Override
+  public void strlen(String key, Handler<AsyncResult<Long>> handler) {
+    sendLong("STRLEN", toPayload(key), handler);
   }
 
   @Override

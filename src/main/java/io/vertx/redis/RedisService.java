@@ -1607,42 +1607,66 @@ public interface RedisService {
   /**
    * Remove and return a random member from a set
    *
-   * @param args    JsonArray [{"name":"key","type":"key"}]
+   * @param key     Key string
    * @param handler Handler for the result of this call.
    * @since 1.0.0
    * group: set
    */
-  void spop(JsonArray args, Handler<AsyncResult<String>> handler);
+  void spop(String key, Handler<AsyncResult<String>> handler);
+
+  /**
+   * Remove and return random members from a set
+   *
+   * @param key     Key string
+   * @param count   Number of members to remove
+   * @param handler Handler for the result of this call.
+   * @since 1.0.0
+   * group: set
+   */
+  void spopMany(String key, int count, Handler<AsyncResult<String>> handler);
 
   /**
    * Get one or multiple random members from a set
    *
-   * @param args    JsonArray [{"name":"key","type":"key"},{"name":"count","type":"integer","optional":true}]
+   * @param key     Key string
+   * @param count   Number of members to get
    * @param handler Handler for the result of this call.
    * @since 1.0.0
    * group: set
    */
-  void srandmember(JsonArray args, Handler<AsyncResult<JsonArray>> handler);
+  void srandmember(String key, int count, Handler<AsyncResult<JsonArray>> handler);
+
+  /**
+   * Remove one member from a set
+   *
+   * @param key     Key string
+   * @param member  Member to remove
+   * @param handler Handler for the result of this call.
+   * @since 1.0.0
+   * group: set
+   */
+  void srem(String key, String member, Handler<AsyncResult<Long>> handler);
 
   /**
    * Remove one or more members from a set
    *
-   * @param args    JsonArray [{"name":"key","type":"key"},{"name":"member","type":"string","multiple":true}]
+   * @param key     Key string
+   * @param members Members to remove
    * @param handler Handler for the result of this call.
    * @since 1.0.0
    * group: set
    */
-  void srem(JsonArray args, Handler<AsyncResult<Long>> handler);
+  void sremMany(String key, List<String> members, Handler<AsyncResult<Long>> handler);
 
   /**
    * Get the length of the value stored in a key
    *
-   * @param args    JsonArray [{"name":"key","type":"key"}]
+   * @param key     Key string
    * @param handler Handler for the result of this call.
    * @since 2.2.0
    * group: string
    */
-  void strlen(JsonArray args, Handler<AsyncResult<Long>> handler);
+  void strlen(String key, Handler<AsyncResult<Long>> handler);
 
   /**
    * Listen for messages published to the given channels

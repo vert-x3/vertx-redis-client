@@ -2609,8 +2609,8 @@ public class RedisServiceTestBase extends VertxTestBase {
     redis.saddMany(mykey, toList("one", "two", "three"), reply0 -> {
       assertTrue(reply0.succeeded());
       assertEquals(3, reply0.result().longValue());
-      redis.spop(toJsonArray(mykey), reply1 -> {
-        assertTrue(reply1.succeeded());
+      redis.spop(mykey, reply1 -> {
+        assertTrue(String.valueOf(reply1.cause()), reply1.succeeded());
         String ret = reply1.result();
         assertTrue(ret.equals("one") || ret.equals("two") || ret.equals("three"));
         JsonArray expected = new JsonArray();
@@ -2659,10 +2659,10 @@ public class RedisServiceTestBase extends VertxTestBase {
     redis.saddMany(mykey, toList("one", "two", "three"), reply0 -> {
       assertTrue(reply0.succeeded());
       assertEquals(3, reply0.result().longValue());
-      redis.srem(toJsonArray(mykey, "one"), reply1 -> {
+      redis.srem(mykey, "one", reply1 -> {
         assertTrue(reply1.succeeded());
         assertEquals(1, reply1.result().longValue());
-        redis.srem(toJsonArray(mykey, "four"), reply2 -> {
+        redis.srem(mykey, "four", reply2 -> {
           assertTrue(reply2.succeeded());
           assertEquals(0, reply2.result().longValue());
           testComplete();
@@ -2677,10 +2677,10 @@ public class RedisServiceTestBase extends VertxTestBase {
     final String mykey = makeKey();
     redis.set(mykey, "Hello world", reply0 -> {
       assertTrue(reply0.succeeded());
-      redis.strlen(toJsonArray(mykey), reply1 -> {
+      redis.strlen(mykey, reply1 -> {
         assertTrue(reply1.succeeded());
         assertEquals(11, reply1.result().longValue());
-        redis.strlen(toJsonArray("nonexisting"), reply2 -> {
+        redis.strlen("nonexisting", reply2 -> {
           assertTrue(reply2.succeeded());
           assertEquals(0, reply2.result().longValue());
           testComplete();
