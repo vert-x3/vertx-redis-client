@@ -2,6 +2,7 @@ package io.vertx.test.redis;
 
 import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;
+import io.vertx.redis.AggregateOptions;
 import io.vertx.redis.BitOperation;
 import io.vertx.redis.InsertOptions;
 import io.vertx.redis.KillFilter;
@@ -2890,7 +2891,7 @@ public class RedisServiceTestBase extends VertxTestBase {
     
     redis.set(key, "0", reply ->{
       assertTrue(reply.succeeded());
-      redis.watch(toJsonArray(key), reply2 ->{
+      redis.watch(toList(key), reply2 ->{
         assertTrue(reply2.succeeded());
         redis.multi(reply3 ->{
           assertTrue(reply3.succeeded());
@@ -3044,7 +3045,10 @@ public class RedisServiceTestBase extends VertxTestBase {
             redis.zadd(key2, 3, "three", reply4 -> {
               assertTrue(reply4.succeeded());
               assertEquals(1, reply4.result().longValue());
-              redis.zinterstore(toJsonArray(key3, 2, key1, key2, "weights", 2, 3), reply5 -> {
+              Map<String, Double> sets = new HashMap<>();
+              sets.put(key1, 2.0);
+              sets.put(key2, 3.0);
+              redis.zinterstoreWeighed(key3, sets, AggregateOptions.NONE, reply5 -> {
                 assertTrue(reply5.succeeded());
                 assertEquals(2, reply5.result().longValue());
                 testComplete();
@@ -3268,8 +3272,12 @@ public class RedisServiceTestBase extends VertxTestBase {
       redis.zaddMany(key2, values, reply2 -> {
         assertTrue(reply2.succeeded());
         assertEquals(3, reply2.result().longValue());
-        redis.zunionstore(toJsonArray(key3, 2, key1, key2, "weights", 2, 3), reply5 -> {
-          assertTrue(reply5.succeeded());
+
+        Map<String, Double> weighedSets = new HashMap<>();
+        weighedSets.put(key1, 2.0);
+        weighedSets.put(key2, 3.0);
+        redis.zunionstoreWeighed(key3, weighedSets, AggregateOptions.NONE, reply5 -> {
+          assertTrue(String.valueOf(reply5.cause()), reply5.succeeded());
           assertEquals(3, reply5.result().longValue());
           testComplete();
         });

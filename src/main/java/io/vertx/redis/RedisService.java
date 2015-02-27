@@ -1756,12 +1756,12 @@ public interface RedisService {
   /**
    * Watch the given keys to determine execution of the MULTI/EXEC block
    *
-   * @param args    JsonArray [{"name":"key","type":"key","multiple":true}]
+   * @param keys    List of keys to watch
    * @param handler Handler for the result of this call.
    * @since 2.2.0
    * group: transactions
    */
-  void watch(JsonArray args, Handler<AsyncResult<String>> handler);
+  void watch(List<String> keys, Handler<AsyncResult<String>> handler);
 
   /**
    * Add one or more members to a sorted set, or update its score if it already exists
@@ -1823,12 +1823,26 @@ public interface RedisService {
   /**
    * Intersect multiple sorted sets and store the resulting sorted set in a new key
    *
-   * @param args    JsonArray [{"name":"destination","type":"key"},{"name":"numkeys","type":"integer"},{"name":"key","type":"key","multiple":true},{"command":"WEIGHTS","name":"weight","type":"integer","variadic":true,"optional":true},{"command":"AGGREGATE","name":"aggregate","type":"enum","enum":["SUM","MIN","MAX"],"optional":true}]
+   * @param destkey Destination key
+   * @param sets    List of keys identifying sorted sets to intersect
+   * @param options Aggregation options
    * @param handler Handler for the result of this call.
    * @since 2.0.0
    * group: sorted_set
    */
-  void zinterstore(JsonArray args, Handler<AsyncResult<Long>> handler);
+  void zinterstore(String destkey, List<String> sets, AggregateOptions options, Handler<AsyncResult<Long>> handler);
+
+  /**
+   * Intersect multiple sorted sets and store the resulting sorted set in a new key using weights for scoring
+   *
+   * @param destkey Destination key
+   * @param sets    List of keys identifying sorted sets to intersect
+   * @param options Aggregation options
+   * @param handler Handler for the result of this call.
+   * @since 2.0.0
+   * group: sorted_set
+   */
+  void zinterstoreWeighed(String destkey, Map<String, Double> sets, AggregateOptions options, Handler<AsyncResult<Long>> handler);
 
   /**
    * Count the number of members in a sorted set between a given lexicographical range
@@ -1963,12 +1977,26 @@ public interface RedisService {
   /**
    * Add multiple sorted sets and store the resulting sorted set in a new key
    *
-   * @param args    JsonArray [{"name":"destination","type":"key"},{"name":"numkeys","type":"integer"},{"name":"key","type":"key","multiple":true},{"command":"WEIGHTS","name":"weight","type":"integer","variadic":true,"optional":true},{"command":"AGGREGATE","name":"aggregate","type":"enum","enum":["SUM","MIN","MAX"],"optional":true}]
+   * @param destkey Destination key
+   * @param sets    List of keys identifying sorted sets
+   * @param options Aggregation options
    * @param handler Handler for the result of this call.
    * @since 2.0.0
    * group: sorted_set
    */
-  void zunionstore(JsonArray args, Handler<AsyncResult<Long>> handler);
+  void zunionstore(String destkey, List<String> sets, AggregateOptions options, Handler<AsyncResult<Long>> handler);
+
+  /**
+   * Add multiple sorted sets using weights, and store the resulting sorted set in a new key
+   *
+   * @param key     Destination key
+   * @param sets    Map containing set-key:weight pairs
+   * @param options Aggregation options
+   * @param handler Handler for the result of this call.
+   * @since 2.0.0
+   * group: sorted_set
+   */
+  void zunionstoreWeighed(String key, Map<String, Double> sets, AggregateOptions options, Handler<AsyncResult<Long>> handler);
 
   /**
    * Incrementally iterate the keys space

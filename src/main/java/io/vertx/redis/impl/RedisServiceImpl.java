@@ -5,6 +5,7 @@ import io.vertx.core.Handler;
 import io.vertx.core.Vertx;
 import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;
+import io.vertx.redis.AggregateOptions;
 import io.vertx.redis.BitOperation;
 import io.vertx.redis.InsertOptions;
 import io.vertx.redis.KillFilter;
@@ -16,8 +17,8 @@ import io.vertx.redis.SetOptions;
 import io.vertx.redis.ShutdownOptions;
 import io.vertx.redis.SortOptions;
 
+import java.util.Collection;
 import java.util.Collections;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Stream;
@@ -873,8 +874,8 @@ public final class RedisServiceImpl extends AbstractRedisService {
   }
 
   @Override
-  public void watch(JsonArray args, Handler<AsyncResult<String>> handler) {
-    sendString("WATCH", args, handler);
+  public void watch(List<String> keys, Handler<AsyncResult<String>> handler) {
+    sendString("WATCH", toPayload(keys), handler);
   }
 
   @Override
@@ -907,8 +908,14 @@ public final class RedisServiceImpl extends AbstractRedisService {
   }
 
   @Override
-  public void zinterstore(JsonArray args, Handler<AsyncResult<Long>> handler) {
-    sendLong("ZINTERSTORE", args, handler);
+  public void zinterstore(String destkey, List<String> sets, AggregateOptions options, Handler<AsyncResult<Long>> handler) {
+    sendLong("ZINTERSTORE", toPayload(destkey, sets.size(), sets, options != null ? options.name() : null), handler);
+  }
+
+  @Override
+  public void zinterstoreWeighed(String destkey, Map<String, Double> sets, AggregateOptions options, Handler<AsyncResult<Long>> handler) {
+    sendLong("ZINTERSTORE", toPayload(destkey, sets.size(), sets.keySet(), "WEIGHTS", sets.values(),
+      options != null ? options.toJsonArray() : null), handler);
   }
 
   @Override
@@ -977,8 +984,14 @@ public final class RedisServiceImpl extends AbstractRedisService {
   }
 
   @Override
-  public void zunionstore(JsonArray args, Handler<AsyncResult<Long>> handler) {
-    sendLong("ZUNIONSTORE", args, handler);
+  public void zunionstore(String destkey, List<String> sets, AggregateOptions options, Handler<AsyncResult<Long>> handler) {
+    sendLong("ZUNIONSTORE", toPayload(destkey, sets.size(), sets, options != null ? options.name() : null), handler);
+  }
+
+  @Override
+  public void zunionstoreWeighed(String destkey, Map<String, Double> sets, AggregateOptions options, Handler<AsyncResult<Long>> handler) {
+    sendLong("ZUNIONSTORE", toPayload(destkey, sets.size(), sets.keySet(), "WEIGHTS", sets.values(),
+      options != null ? options.toJsonArray() : null), handler);
   }
 
   @Override
@@ -1015,8 +1028,8 @@ public final class RedisServiceImpl extends AbstractRedisService {
       if (param instanceof JsonArray) {
         param = ((JsonArray) param).getList();
       }
-      if (param instanceof List) {
-        for (Object el : (List) param) {
+      if (param instanceof Collection) {
+        for (Object el : (Collection) param) {
           if (el != null) {
             result.add(el);
           }
@@ -1039,32 +1052,6 @@ public final class RedisServiceImpl extends AbstractRedisService {
       } else if (param != null) {
         result.add(param);
       }
-    }
-    return result;
-  }
-
-  /**
-   * Merge two list into one by first adding the next item from the first list,
-   * followed by the next item from the second list
-   *
-   * @param list1 First list
-   * @param list2 Second list
-   * @return JsonArray that can be passed to send()
-   */
-  private static JsonArray zip(List<?> list1, List<?> list2) {
-    JsonArray result = new JsonArray();
-    if (list1 == null && list2 == null) {
-      return result;
-    }
-    if (list1.size() != list2.size()) {
-      throw new IllegalArgumentException("Lists should be the same size");
-    }
-
-    Iterator<?> it1 = list1.iterator();
-    Iterator<?> it2 = list2.iterator();
-    while (it1.hasNext() && it2.hasNext()) {
-      result.add(it1.next());
-      result.add(it2.next());
     }
     return result;
   }
