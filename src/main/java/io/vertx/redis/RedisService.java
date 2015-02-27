@@ -1671,32 +1671,33 @@ public interface RedisService {
   /**
    * Listen for messages published to the given channels
    *
-   * @param args    JsonArray [{"name":["channel"],"type":["string"],"multiple":true}]
-   * @param handler Handler for the result of this call.
+   * @param channels List of channels to subscribe to
+   * @param handler  Handler for the result of this call.
    * @since 2.0.0
    * group: pubsub
    */
-  void subscribe(JsonArray args, Handler<AsyncResult<Void>> handler);
+  void subscribe(List<String> channels, Handler<AsyncResult<Void>> handler);
 
   /**
    * Add multiple sets
    *
-   * @param args    JsonArray [{"name":"key","type":"key","multiple":true}]
+   * @param keys    List of keys identifying sets to add up
    * @param handler Handler for the result of this call.
    * @since 1.0.0
    * group: set
    */
-  void sunion(JsonArray args, Handler<AsyncResult<JsonArray>> handler);
+  void sunion(List<String> keys, Handler<AsyncResult<JsonArray>> handler);
 
   /**
    * Add multiple sets and store the resulting set in a key
    *
-   * @param args    JsonArray [{"name":"destination","type":"key"},{"name":"key","type":"key","multiple":true}]
+   * @param destkey Destination key
+   * @param keys    List of keys identifying sets to add up
    * @param handler Handler for the result of this call.
    * @since 1.0.0
    * group: set
    */
-  void sunionstore(JsonArray args, Handler<AsyncResult<Long>> handler);
+  void sunionstore(String destkey, List<String> keys, Handler<AsyncResult<Long>> handler);
 
   /**
    * Internal command used for replication
@@ -1737,12 +1738,12 @@ public interface RedisService {
   /**
    * Stop listening for messages posted to the given channels
    *
-   * @param args    JsonArray [{"name":"channel","type":"string","optional":true,"multiple":true}]
-   * @param handler Handler for the result of this call.
+   * @param channels List of channels to subscribe to
+   * @param handler  Handler for the result of this call.
    * @since 2.0.0
    * group: pubsub
    */
-  void unsubscribe(JsonArray args, Handler<AsyncResult<Void>> handler);
+  void unsubscribe(List<String> channels, Handler<AsyncResult<Void>> handler);
 
   /**
    * Forget about all watched keys

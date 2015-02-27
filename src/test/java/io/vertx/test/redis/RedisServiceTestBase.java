@@ -1826,7 +1826,7 @@ public class RedisServiceTestBase extends VertxTestBase {
   @Test
   public void testPubSubChannels() {
 
-    redis.subscribe(new JsonArray().add("rustic"), sub->{
+    redis.subscribe(toList("rustic"), sub->{
 
     });
   }
@@ -1835,7 +1835,7 @@ public class RedisServiceTestBase extends VertxTestBase {
   @Ignore
   public void testPubSubNumsub() {
 
-    redis.subscribe(new JsonArray().add("rustic"), sub->{
+    redis.subscribe(toList("rustic"), sub->{
 
     });
   }
@@ -1844,7 +1844,7 @@ public class RedisServiceTestBase extends VertxTestBase {
   @Ignore
   public void testPubSubNumpat() {
 
-    redis.subscribe(new JsonArray().add("rustic"), sub->{
+    redis.subscribe(toList("rustic"), sub->{
 
     });
   }
@@ -2694,9 +2694,9 @@ public class RedisServiceTestBase extends VertxTestBase {
   public void testSubscribe() {
     
     String key = makeKey();
-    redis.subscribe(toJsonArray(key), reply ->{
+    redis.subscribe(toList(key), reply ->{
       assertTrue(reply.succeeded());
-      redis.unsubscribe(toJsonArray(key), reply2 ->{
+      redis.unsubscribe(toList(key), reply2 ->{
         assertTrue(reply2.succeeded());
         testComplete();
       });
@@ -2746,7 +2746,7 @@ public class RedisServiceTestBase extends VertxTestBase {
           testComplete();
           fail("Time out while waiting for all SADD calls to finish");
         }
-        redis.sunion(toJsonArray(mykey1, mykey2), reply6 -> {
+        redis.sunion(toList(mykey1, mykey2), reply6 -> {
           assertTrue(reply6.succeeded());
           JsonArray arr = reply6.result();
           Object[] array = arr.getList().toArray();
@@ -2772,7 +2772,7 @@ public class RedisServiceTestBase extends VertxTestBase {
       redis.saddMany(mykey2, toList("c", "d", "e"), reply1 -> {
         assertTrue(reply1.succeeded());
         assertEquals(3, reply1.result().longValue());
-        redis.sunionstore(toJsonArray(mykey, mykey1, mykey2), reply2 -> {
+        redis.sunionstore(mykey, toList(mykey1, mykey2), reply2 -> {
           assertTrue(reply2.succeeded());
           assertTrue(reply2.result() == 5);
           //          JsonArray arr = reply2.result();
@@ -2856,9 +2856,9 @@ public class RedisServiceTestBase extends VertxTestBase {
   @Test
   public void testUnsubscribe() {
     String key = makeKey();
-    redis.subscribe(toJsonArray(key), reply ->{
+    redis.subscribe(toList(key), reply ->{
       assertTrue(reply.succeeded());
-      redis.unsubscribe(toJsonArray(key), reply2 ->{
+      redis.unsubscribe(toList(key), reply2 ->{
         assertTrue(reply2.succeeded());
         testComplete();
       });

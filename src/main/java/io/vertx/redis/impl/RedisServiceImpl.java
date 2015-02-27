@@ -828,18 +828,18 @@ public final class RedisServiceImpl extends AbstractRedisService {
   }
 
   @Override
-  public void subscribe(JsonArray args, Handler<AsyncResult<Void>> handler) {
-    sendVoid("SUBSCRIBE", args, handler);
+  public void subscribe(List<String> channels, Handler<AsyncResult<Void>> handler) {
+    sendVoid("SUBSCRIBE", toPayload(channels), handler);
   }
 
   @Override
-  public void sunion(JsonArray args, Handler<AsyncResult<JsonArray>> handler) {
-    sendJsonArray("SUNION", args, handler);
+  public void sunion(List<String> keys, Handler<AsyncResult<JsonArray>> handler) {
+    sendJsonArray("SUNION", toPayload(keys), handler);
   }
 
   @Override
-  public void sunionstore(JsonArray args, Handler<AsyncResult<Long>> handler) {
-    sendLong("SUNIONSTORE", args, handler);
+  public void sunionstore(String destkey, List<String> keys, Handler<AsyncResult<Long>> handler) {
+    sendLong("SUNIONSTORE", toPayload(destkey, keys), handler);
   }
 
   @Override
@@ -863,8 +863,8 @@ public final class RedisServiceImpl extends AbstractRedisService {
   }
 
   @Override
-  public void unsubscribe(JsonArray args, Handler<AsyncResult<Void>> handler) {
-    sendVoid("UNSUBSCRIBE", args, handler);
+  public void unsubscribe(List<String> channels, Handler<AsyncResult<Void>> handler) {
+    sendVoid("UNSUBSCRIBE", toPayload(channels), handler);
   }
 
   @Override
