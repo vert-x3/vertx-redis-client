@@ -1847,22 +1847,39 @@ public interface RedisService {
   /**
    * Count the number of members in a sorted set between a given lexicographical range
    *
-   * @param args    JsonArray [{"name":"key","type":"key"},{"name":"min","type":"string"},{"name":"max","type":"string"}]
+   * @param key     Key string
+   * @param min     Pattern to compare against for minimum value
+   * @param max     Pattern to compare against for maximum value
    * @param handler Handler for the result of this call.
    * @since 2.8.9
    * group: sorted_set
    */
-  void zlexcount(JsonArray args, Handler<AsyncResult<Long>> handler);
+  void zlexcount(String key, String min, String max, Handler<AsyncResult<Long>> handler);
 
   /**
    * Return a range of members in a sorted set, by index
    *
-   * @param args    JsonArray [{"name":"key","type":"key"},{"name":"start","type":"integer"},{"name":"stop","type":"integer"},{"name":"withscores","type":"enum","enum":["WITHSCORES"],"optional":true}]
+   * @param key     Key string
+   * @param start   Start index for the range
+   * @param stop    Stop index for the range - inclusive
    * @param handler Handler for the result of this call.
    * @since 1.2.0
    * group: sorted_set
    */
-  void zrange(JsonArray args, Handler<AsyncResult<JsonArray>> handler);
+  void zrange(String key, long start, long stop, Handler<AsyncResult<JsonArray>> handler);
+
+  /**
+   * Return a range of members in a sorted set, by index
+   *
+   * @param key     Key string
+   * @param start   Start index for the range
+   * @param stop    Stop index for the range - inclusive
+   * @param options Range options
+   * @param handler Handler for the result of this call.
+   * @since 1.2.0
+   * group: sorted_set
+   */
+  void zrangeWithOptions(String key, long start, long stop, RangeOptions options, Handler<AsyncResult<JsonArray>> handler);
 
   /**
    * Return a range of members in a sorted set, by lexicographical range

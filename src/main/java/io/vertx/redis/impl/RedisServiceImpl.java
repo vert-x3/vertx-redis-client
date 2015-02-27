@@ -11,6 +11,7 @@ import io.vertx.redis.InsertOptions;
 import io.vertx.redis.KillFilter;
 import io.vertx.redis.MigrateOptions;
 import io.vertx.redis.ObjectCmd;
+import io.vertx.redis.RangeOptions;
 import io.vertx.redis.RedisEncoding;
 import io.vertx.redis.ScanOptions;
 import io.vertx.redis.SetOptions;
@@ -919,13 +920,18 @@ public final class RedisServiceImpl extends AbstractRedisService {
   }
 
   @Override
-  public void zlexcount(JsonArray args, Handler<AsyncResult<Long>> handler) {
-    sendLong("ZLEXCOUNT", args, handler);
+  public void zlexcount(String key, String min, String max, Handler<AsyncResult<Long>> handler) {
+    sendLong("ZLEXCOUNT", toPayload(key, min, max), handler);
   }
 
   @Override
-  public void zrange(JsonArray args, Handler<AsyncResult<JsonArray>> handler) {
-    sendJsonArray("ZRANGE", args, handler);
+  public void zrange(String key, long start, long stop, Handler<AsyncResult<JsonArray>> handler) {
+    sendJsonArray("ZRANGE", toPayload(key, start, stop), handler);
+  }
+
+  @Override
+  public void zrangeWithOptions(String key, long start, long stop, RangeOptions options, Handler<AsyncResult<JsonArray>> handler) {
+    sendJsonArray("ZRANGE", toPayload(key, start, stop, options != null ? options.toJsonArray() : null), handler);
   }
 
   @Override

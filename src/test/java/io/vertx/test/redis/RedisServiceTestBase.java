@@ -8,6 +8,7 @@ import io.vertx.redis.InsertOptions;
 import io.vertx.redis.KillFilter;
 import io.vertx.redis.MigrateOptions;
 import io.vertx.redis.ObjectCmd;
+import io.vertx.redis.RangeOptions;
 import io.vertx.redis.RedisService;
 import io.vertx.redis.ScanOptions;
 import io.vertx.redis.SetOptions;
@@ -2951,7 +2952,7 @@ public class RedisServiceTestBase extends VertxTestBase {
           redis.zadd(key, 3, "two", reply3 -> {
             assertTrue(reply3.succeeded());
             assertEquals(0, reply3.result().longValue());
-            redis.zrange(toJsonArray(key, 0, -1, "withscores"), reply4 -> {
+            redis.zrangeWithOptions(key, 0, -1, RangeOptions.WITHSCORES, reply4 -> {
               assertTrue(reply4.succeeded());
               assertArrayEquals(toArray("one", "1", "uno", "1", "two", "3"), reply4.result().getList().toArray());
               testComplete();
@@ -3073,7 +3074,7 @@ public class RedisServiceTestBase extends VertxTestBase {
         redis.zadd(key, 3, "three", reply2 -> {
           assertTrue(reply2.succeeded());
           assertEquals(1, reply2.result().longValue());
-          redis.zrange(toJsonArray(key, 0, -1), reply3 -> {
+          redis.zrange(key, 0, -1, reply3 -> {
             assertTrue(reply3.succeeded());
             assertArrayEquals(toArray("one", "two", "three"), reply3.result().getList().toArray());
             testComplete();
