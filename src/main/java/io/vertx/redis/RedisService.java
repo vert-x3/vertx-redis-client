@@ -1884,22 +1884,28 @@ public interface RedisService {
   /**
    * Return a range of members in a sorted set, by lexicographical range
    *
-   * @param args    JsonArray [{"name":"key","type":"key"},{"name":"min","type":"string"},{"name":"max","type":"string"},{"command":"LIMIT","name":["offset","count"],"type":["integer","integer"],"optional":true}]
+   * @param key     Key string
+   * @param min     Pattern representing a minimum allowed value
+   * @param max     Pattern representing a maximum allowed value
+   * @param options Limit options where limit can be specified
    * @param handler Handler for the result of this call.
    * @since 2.8.9
    * group: sorted_set
    */
-  void zrangebylex(JsonArray args, Handler<AsyncResult<JsonArray>> handler);
+  void zrangebylex(String key, String min, String max, LimitOptions options, Handler<AsyncResult<JsonArray>> handler);
 
   /**
    * Return a range of members in a sorted set, by score
    *
-   * @param args    JsonArray [{"name":"key","type":"key"},{"name":"min","type":"double"},{"name":"max","type":"double"},{"name":"withscores","type":"enum","enum":["WITHSCORES"],"optional":true},{"command":"LIMIT","name":["offset","count"],"type":["integer","integer"],"optional":true}]
+   * @param key     Key string
+   * @param min     Pattern representing a minimum allowed value
+   * @param max     Pattern representing a maximum allowed value
+   * @param options Range and limit options
    * @param handler Handler for the result of this call.
    * @since 1.0.5
    * group: sorted_set
    */
-  void zrangebyscore(JsonArray args, Handler<AsyncResult<JsonArray>> handler);
+  void zrangebyscore(String key, String min, String max, RangeLimitOptions options, Handler<AsyncResult<JsonArray>> handler);
 
   /**
    * Determine the index of a member in a sorted set

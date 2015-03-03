@@ -14,6 +14,8 @@ import java.util.List;
 @DataObject
 public class SortOptions {
 
+  public static final SortOptions NONE = new SortOptions();
+
   private Long offset;
   private Long count;
   private String by;

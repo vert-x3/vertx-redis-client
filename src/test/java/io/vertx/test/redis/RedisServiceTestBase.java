@@ -8,6 +8,7 @@ import io.vertx.redis.InsertOptions;
 import io.vertx.redis.KillFilter;
 import io.vertx.redis.MigrateOptions;
 import io.vertx.redis.ObjectCmd;
+import io.vertx.redis.RangeLimitOptions;
 import io.vertx.redis.RangeOptions;
 import io.vertx.redis.RedisService;
 import io.vertx.redis.ScanOptions;
@@ -3097,7 +3098,7 @@ public class RedisServiceTestBase extends VertxTestBase {
         redis.zadd(key, 3, "three", reply2 -> {
           assertTrue(reply2.succeeded());
           assertEquals(1, reply2.result().longValue());
-          redis.zrangebyscore(toJsonArray(key, "-inf", "+inf"), reply3 -> {
+          redis.zrangebyscore(key, "-inf", "+inf", RangeLimitOptions.NONE, reply3 -> {
             assertTrue(reply3.succeeded());
             assertArrayEquals(toArray("one", "two", "three"), reply3.result().getList().toArray());
             testComplete();

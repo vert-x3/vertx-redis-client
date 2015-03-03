@@ -9,8 +9,10 @@ import io.vertx.redis.AggregateOptions;
 import io.vertx.redis.BitOperation;
 import io.vertx.redis.InsertOptions;
 import io.vertx.redis.KillFilter;
+import io.vertx.redis.LimitOptions;
 import io.vertx.redis.MigrateOptions;
 import io.vertx.redis.ObjectCmd;
+import io.vertx.redis.RangeLimitOptions;
 import io.vertx.redis.RangeOptions;
 import io.vertx.redis.RedisEncoding;
 import io.vertx.redis.ScanOptions;
@@ -935,13 +937,13 @@ public final class RedisServiceImpl extends AbstractRedisService {
   }
 
   @Override
-  public void zrangebylex(JsonArray args, Handler<AsyncResult<JsonArray>> handler) {
-    sendJsonArray("ZRANGEBYLEX", args, handler);
+  public void zrangebylex(String key, String min, String max, LimitOptions options, Handler<AsyncResult<JsonArray>> handler) {
+    sendJsonArray("ZRANGEBYLEX", toPayload(key, min, max, options != null ? options.toJsonArray() : null), handler);
   }
 
   @Override
-  public void zrangebyscore(JsonArray args, Handler<AsyncResult<JsonArray>> handler) {
-    sendJsonArray("ZRANGEBYSCORE", args, handler);
+  public void zrangebyscore(String key, String min, String max, RangeLimitOptions options, Handler<AsyncResult<JsonArray>> handler) {
+    sendJsonArray("ZRANGEBYSCORE", toPayload(key, min, max, options != null ? options.toJsonArray() : null), handler);
   }
 
   @Override
