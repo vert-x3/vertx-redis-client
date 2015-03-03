@@ -1911,8 +1911,8 @@ public interface RedisService {
    * Return a range of members in a sorted set, by score
    *
    * @param key     Key string
-   * @param min     Pattern representing a minimum allowed value
-   * @param max     Pattern representing a maximum allowed value
+   * @param min     Pattern defining a minimum value
+   * @param max     Pattern defining a maximum value
    * @param options Range and limit options
    * @param handler Handler for the result of this call.
    * @since 1.0.5
@@ -1923,52 +1923,70 @@ public interface RedisService {
   /**
    * Determine the index of a member in a sorted set
    *
-   * @param args    JsonArray [{"name":"key","type":"key"},{"name":"member","type":"string"}]
+   * @param key     Key string
+   * @param member  Member in the sorted set identified by key
    * @param handler Handler for the result of this call.
    * @since 2.0.0
    * group: sorted_set
    */
-  void zrank(JsonArray args, Handler<AsyncResult<Long>> handler);
+  void zrank(String key, String member, Handler<AsyncResult<Long>> handler);
+
+  /**
+   * Remove one member from a sorted set
+   *
+   * @param key     Key string
+   * @param member  Member in the sorted set identified by key
+   * @param handler Handler for the result of this call.
+   * @since 1.2.0
+   * group: sorted_set
+   */
+  void zrem(String key, String member, Handler<AsyncResult<Long>> handler);
 
   /**
    * Remove one or more members from a sorted set
    *
-   * @param args    JsonArray [{"name":"key","type":"key"},{"name":"member","type":"string","multiple":true}]
+   * @param key     Key string
+   * @param members Members in the sorted set identified by key
    * @param handler Handler for the result of this call.
    * @since 1.2.0
    * group: sorted_set
    */
-  void zrem(JsonArray args, Handler<AsyncResult<Long>> handler);
+  void zremMany(String key, List<String> members, Handler<AsyncResult<Long>> handler);
 
   /**
    * Remove all members in a sorted set between the given lexicographical range
    *
-   * @param args    JsonArray [{"name":"key","type":"key"},{"name":"min","type":"string"},{"name":"max","type":"string"}]
+   * @param key     Key string
+   * @param min     Pattern defining a minimum value
+   * @param max     Pattern defining a maximum value
    * @param handler Handler for the result of this call.
    * @since 2.8.9
    * group: sorted_set
    */
-  void zremrangebylex(JsonArray args, Handler<AsyncResult<Long>> handler);
+  void zremrangebylex(String key, String min, String max, Handler<AsyncResult<Long>> handler);
 
   /**
    * Remove all members in a sorted set within the given indexes
    *
-   * @param args    JsonArray [{"name":"key","type":"key"},{"name":"start","type":"integer"},{"name":"stop","type":"integer"}]
+   * @param key     Key string
+   * @param start   Start index
+   * @param stop    Stop index
    * @param handler Handler for the result of this call.
    * @since 2.0.0
    * group: sorted_set
    */
-  void zremrangebyrank(JsonArray args, Handler<AsyncResult<Long>> handler);
+  void zremrangebyrank(String key, long start, long stop, Handler<AsyncResult<Long>> handler);
 
   /**
    * Remove all members in a sorted set within the given scores
    *
-   * @param args    JsonArray [{"name":"key","type":"key"},{"name":"min","type":"double"},{"name":"max","type":"double"}]
-   * @param handler Handler for the result of this call.
+   * @param key     JsonArray [{"name":"key","type":"key"},{"name":"min","type":"double"},{"name":"max","type":"double"}]
+   * @param min     Pattern defining a minimum value
+   * @param max     Pattern defining a maximum value
    * @since 1.2.0
    * group: sorted_set
    */
-  void zremrangebyscore(JsonArray args, Handler<AsyncResult<Long>> handler);
+  void zremrangebyscore(String key, String min, String max, Handler<AsyncResult<Long>> handler);
 
   /**
    * Return a range of members in a sorted set, by index, with scores ordered from high to low

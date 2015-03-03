@@ -3119,7 +3119,7 @@ public class RedisServiceTestBase extends VertxTestBase {
     redis.zaddMany(key, values, reply0 -> {
       assertTrue(reply0.succeeded());
       assertEquals(3, reply0.result().longValue());
-      redis.zrank(toJsonArray(key, "three"), reply3 -> {
+      redis.zrank(key, "three", reply3 -> {
         assertTrue(reply3.succeeded());
         assertEquals(2, reply3.result().longValue());
         testComplete();
@@ -3138,7 +3138,7 @@ public class RedisServiceTestBase extends VertxTestBase {
     redis.zaddMany(key, values, reply0 -> {
       assertTrue(reply0.succeeded());
       assertEquals(3, reply0.result().longValue());
-      redis.zrem(toJsonArray(key, "two"), reply3 -> {
+      redis.zrem(key, "two", reply3 -> {
         assertTrue(reply3.succeeded());
         assertEquals(1, reply3.result().longValue());
         testComplete();
@@ -3157,7 +3157,7 @@ public class RedisServiceTestBase extends VertxTestBase {
     redis.zaddMany(key, values, reply0 -> {
       assertTrue(reply0.succeeded());
       assertEquals(3, reply0.result().longValue());
-      redis.zremrangebyrank(toJsonArray(key, 0, 1), reply3 -> {
+      redis.zremrangebyrank(key, 0, 1, reply3 -> {
         assertTrue(reply3.succeeded());
         assertEquals(2, reply3.result().longValue());
         testComplete();
@@ -3176,7 +3176,7 @@ public class RedisServiceTestBase extends VertxTestBase {
     redis.zaddMany(key, values, reply0 -> {
       assertTrue(reply0.succeeded());
       assertEquals(3, reply0.result().longValue());
-      redis.zremrangebyscore(toJsonArray(key, "-inf", "(2"), reply3 -> {
+      redis.zremrangebyscore(key, "-inf", "(2", reply3 -> {
         assertTrue(reply3.succeeded());
         assertEquals(1, reply3.result().longValue());
         testComplete();

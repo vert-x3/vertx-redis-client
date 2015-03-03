@@ -947,28 +947,33 @@ public final class RedisServiceImpl extends AbstractRedisService {
   }
 
   @Override
-  public void zrank(JsonArray args, Handler<AsyncResult<Long>> handler) {
-    sendLong("ZRANK", args, handler);
+  public void zrank(String key, String member, Handler<AsyncResult<Long>> handler) {
+    sendLong("ZRANK", toPayload(key, member), handler);
   }
 
   @Override
-  public void zrem(JsonArray args, Handler<AsyncResult<Long>> handler) {
-    sendLong("ZREM", args, handler);
+  public void zrem(String key, String member, Handler<AsyncResult<Long>> handler) {
+    sendLong("ZREM", toPayload(key, member), handler);
   }
 
   @Override
-  public void zremrangebylex(JsonArray args, Handler<AsyncResult<Long>> handler) {
-    sendLong("ZREMRANGEBYLEX", args, handler);
+  public void zremMany(String key, List<String> members, Handler<AsyncResult<Long>> handler) {
+    sendLong("ZREM", toPayload(key, members), handler);
   }
 
   @Override
-  public void zremrangebyrank(JsonArray args, Handler<AsyncResult<Long>> handler) {
-    sendLong("ZREMRANGEBYRANK", args, handler);
+  public void zremrangebylex(String key, String min, String max, Handler<AsyncResult<Long>> handler) {
+    sendLong("ZREMRANGEBYLEX", toPayload(key, min, max), handler);
   }
 
   @Override
-  public void zremrangebyscore(JsonArray args, Handler<AsyncResult<Long>> handler) {
-    sendLong("ZREMRANGEBYSCORE", args, handler);
+  public void zremrangebyrank(String key, long start, long stop, Handler<AsyncResult<Long>> handler) {
+    sendLong("ZREMRANGEBYRANK", toPayload(key, start, stop), handler);
+  }
+
+  @Override
+  public void zremrangebyscore(String key, String min, String max, Handler<AsyncResult<Long>> handler) {
+    sendLong("ZREMRANGEBYSCORE", toPayload(key, min, max), handler);
   }
 
   @Override
