@@ -1991,22 +1991,41 @@ public interface RedisService {
   /**
    * Return a range of members in a sorted set, by index, with scores ordered from high to low
    *
-   * @param args    JsonArray [{"name":"key","type":"key"},{"name":"start","type":"integer"},{"name":"stop","type":"integer"},{"name":"withscores","type":"enum","enum":["WITHSCORES"],"optional":true}]
+   * @param key     Key string
+   * @param start   Start index for the range
+   * @param stop    Stop index for the range - inclusive
+   * @param options Range options
    * @param handler Handler for the result of this call.
    * @since 1.2.0
    * group: sorted_set
    */
-  void zrevrange(JsonArray args, Handler<AsyncResult<JsonArray>> handler);
+  void zrevrange(String key, long start, long stop, RangeOptions options, Handler<AsyncResult<JsonArray>> handler);
+
+  /**
+   * Return a range of members in a sorted set, by score, between the given lexicographical range with scores ordered from high to low
+   *
+   * @param key     Key string
+   * @param max     Pattern defining a maximum value
+   * @param min     Pattern defining a minimum value
+   * @param options Limit options
+   * @param handler Handler for the result of this call.
+   * @since 2.8.9
+   * group: sorted_set
+   */
+  void zrevrangebylex(String key, String max, String min, LimitOptions options, Handler<AsyncResult<JsonArray>> handler);
 
   /**
    * Return a range of members in a sorted set, by score, with scores ordered from high to low
    *
-   * @param args    JsonArray [{"name":"key","type":"key"},{"name":"max","type":"double"},{"name":"min","type":"double"},{"name":"withscores","type":"enum","enum":["WITHSCORES"],"optional":true},{"command":"LIMIT","name":["offset","count"],"type":["integer","integer"],"optional":true}]
+   * @param key     Key string
+   * @param max     Pattern defining a maximum value
+   * @param min     Pattern defining a minimum value
+   * @param options Range and limit options
    * @param handler Handler for the result of this call.
    * @since 2.2.0
    * group: sorted_set
    */
-  void zrevrangebyscore(JsonArray args, Handler<AsyncResult<JsonArray>> handler);
+  void zrevrangebyscore(String key, String max, String min, RangeLimitOptions options, Handler<AsyncResult<JsonArray>> handler);
 
   /**
    * Determine the index of a member in a sorted set, with scores ordered from high to low

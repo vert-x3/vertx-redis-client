@@ -977,13 +977,18 @@ public final class RedisServiceImpl extends AbstractRedisService {
   }
 
   @Override
-  public void zrevrange(JsonArray args, Handler<AsyncResult<JsonArray>> handler) {
-    sendJsonArray("ZREVRANGE", args, handler);
+  public void zrevrange(String key, long start, long stop, RangeOptions options, Handler<AsyncResult<JsonArray>> handler) {
+    sendJsonArray("ZREVRANGE", toPayload(key, start, stop, options != null ? options.toJsonArray() : null), handler);
   }
 
   @Override
-  public void zrevrangebyscore(JsonArray args, Handler<AsyncResult<JsonArray>> handler) {
-    sendJsonArray("ZREVRANGEBYSCORE", args, handler);
+  public void zrevrangebylex(String key, String max, String min, LimitOptions options, Handler<AsyncResult<JsonArray>> handler) {
+    sendJsonArray("ZREVRANGEBYLEX", toPayload(key, max, min, options != null ? options.toJsonArray() : null), handler);
+  }
+
+  @Override
+  public void zrevrangebyscore(String key, String max, String min, RangeLimitOptions options, Handler<AsyncResult<JsonArray>> handler) {
+    sendJsonArray("ZREVRANGEBYSCORE", toPayload(key, max, min, options != null ? options.toJsonArray() : null), handler);
   }
 
   @Override
