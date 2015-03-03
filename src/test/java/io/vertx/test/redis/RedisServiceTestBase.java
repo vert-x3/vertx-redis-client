@@ -3233,7 +3233,7 @@ public class RedisServiceTestBase extends VertxTestBase {
     redis.zaddMany(key, values, reply0 -> {
       assertTrue(reply0.succeeded());
       assertEquals(3, reply0.result().longValue());
-      redis.zrevrank(toJsonArray(key, "one"), reply3 -> {
+      redis.zrevrank(key, "one", reply3 -> {
         assertTrue(reply3.succeeded());
         assertEquals(2, reply3.result().longValue());
         testComplete();
@@ -3248,7 +3248,7 @@ public class RedisServiceTestBase extends VertxTestBase {
     redis.zadd(key, 1, "one", reply0 -> {
       assertTrue(reply0.succeeded());
       assertEquals(1, reply0.result().longValue());
-      redis.zscore(toJsonArray(key, "one"), reply1 -> {
+      redis.zscore(key, "one", reply1 -> {
         assertTrue(reply1.succeeded());
         assertEquals("1", reply1.result());
         testComplete();

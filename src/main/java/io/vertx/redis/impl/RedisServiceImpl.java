@@ -992,13 +992,13 @@ public final class RedisServiceImpl extends AbstractRedisService {
   }
 
   @Override
-  public void zrevrank(JsonArray args, Handler<AsyncResult<Long>> handler) {
-    sendLong("ZREVRANK", args, handler);
+  public void zrevrank(String key, String member, Handler<AsyncResult<Long>> handler) {
+    sendLong("ZREVRANK", toPayload(key, member), handler);
   }
 
   @Override
-  public void zscore(JsonArray args, Handler<AsyncResult<String>> handler) {
-    sendString("ZSCORE", args, handler);
+  public void zscore(String key, String member, Handler<AsyncResult<String>> handler) {
+    sendString("ZSCORE", toPayload(key, member), handler);
   }
 
   @Override
@@ -1013,8 +1013,8 @@ public final class RedisServiceImpl extends AbstractRedisService {
   }
 
   @Override
-  public void scan(JsonArray args, Handler<AsyncResult<Void>> handler) {
-    sendVoid("SCAN", args, handler);
+  public void scan(String cursor, ScanOptions options, Handler<AsyncResult<Void>> handler) {
+    sendVoid("SCAN", toPayload(cursor, options != null ? options.toJsonArray() : null), handler);
   }
 
   @Override
@@ -1028,8 +1028,8 @@ public final class RedisServiceImpl extends AbstractRedisService {
   }
 
   @Override
-  public void zscan(JsonArray args, Handler<AsyncResult<Void>> handler) {
-    sendVoid("ZSCAN", args, handler);
+  public void zscan(String key, String cursor, ScanOptions options, Handler<AsyncResult<Void>> handler) {
+    sendVoid("ZSCAN", toPayload(key, cursor, options != null ? options.toJsonArray() : null), handler);
   }
 
   /**

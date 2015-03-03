@@ -2030,22 +2030,24 @@ public interface RedisService {
   /**
    * Determine the index of a member in a sorted set, with scores ordered from high to low
    *
-   * @param args    JsonArray [{"name":"key","type":"key"},{"name":"member","type":"string"}]
+   * @param key     Key string
+   * @param member  Member in the sorted set identified by key
    * @param handler Handler for the result of this call.
    * @since 2.0.0
    * group: sorted_set
    */
-  void zrevrank(JsonArray args, Handler<AsyncResult<Long>> handler);
+  void zrevrank(String key, String member, Handler<AsyncResult<Long>> handler);
 
   /**
    * Get the score associated with the given member in a sorted set
    *
-   * @param args    JsonArray [{"name":"key","type":"key"},{"name":"member","type":"string"}]
+   * @param key     Key string
+   * @param member  Member in the sorted set identified by key
    * @param handler Handler for the result of this call.
    * @since 1.2.0
    * group: sorted_set
    */
-  void zscore(JsonArray args, Handler<AsyncResult<String>> handler);
+  void zscore(String key, String member, Handler<AsyncResult<String>> handler);
 
   /**
    * Add multiple sorted sets and store the resulting sorted set in a new key
@@ -2074,12 +2076,13 @@ public interface RedisService {
   /**
    * Incrementally iterate the keys space
    *
-   * @param args    JsonArray [{"name":"cursor","type":"integer"},{"command":"MATCH","name":"pattern","type":"pattern","optional":true},{"command":"COUNT","name":"count","type":"integer","optional":true}]
+   * @param cursor  Cursor id
+   * @param options Scan options
    * @param handler Handler for the result of this call.
    * @since 2.8.0
    * group: generic
    */
-  void scan(JsonArray args, Handler<AsyncResult<Void>> handler);
+  void scan(String cursor, ScanOptions options, Handler<AsyncResult<Void>> handler);
 
   /**
    * Incrementally iterate Set elements
@@ -2108,11 +2111,13 @@ public interface RedisService {
   /**
    * Incrementally iterate sorted sets elements and associated scores
    *
-   * @param args    JsonArray [{"name":"key","type":"key"},{"name":"cursor","type":"integer"},{"command":"MATCH","name":"pattern","type":"pattern","optional":true},{"command":"COUNT","name":"count","type":"integer","optional":true}]
+   * @param key     Key string
+   * @param cursor  Cursor id
+   * @param options Scan options
    * @param handler Handler for the result of this call.
    * @since 2.8.0
    * group: sorted_set
    */
-  void zscan(JsonArray args, Handler<AsyncResult<Void>> handler);
+  void zscan(String key, String cursor, ScanOptions options, Handler<AsyncResult<Void>> handler);
 
 }
