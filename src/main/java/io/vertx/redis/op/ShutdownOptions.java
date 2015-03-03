@@ -1,4 +1,4 @@
-package io.vertx.redis;
+package io.vertx.redis.op;
 
 import io.vertx.core.json.JsonArray;
 
