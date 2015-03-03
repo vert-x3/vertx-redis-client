@@ -1980,7 +1980,7 @@ public interface RedisService {
   /**
    * Remove all members in a sorted set within the given scores
    *
-   * @param key     JsonArray [{"name":"key","type":"key"},{"name":"min","type":"double"},{"name":"max","type":"double"}]
+   * @param key     Key string
    * @param min     Pattern defining a minimum value
    * @param max     Pattern defining a maximum value
    * @since 1.2.0
