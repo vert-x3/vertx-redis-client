@@ -382,30 +382,18 @@ public class RedisServiceTestBase extends VertxTestBase {
   @Test
   public void testClientSetAndGetName() throws Exception{
 
-    CountDownLatch clientLatch = new CountDownLatch(1);
-
     redis.clientGetname(result -> {
+      assertTrue(String.valueOf(result.cause()), result.succeeded());
+      assertNull(result.result());
+      redis.clientSetname("test-connection", result1 -> {
+        assertTrue(result1.succeeded());
+        redis.clientGetname(result2 -> {
+          assertTrue(result2.succeeded());
+          assertEquals("test-connection", result2.result());
 
-      if(result.succeeded()) {
-        assertNull(result.result());
-      }
-      clientLatch.countDown();
-    });
-
-    awaitLatch(clientLatch);
-
-    CountDownLatch setLatch = new CountDownLatch(1);
-    redis.clientSetname("test-connection", result -> {
-      assertTrue(result.succeeded());
-      setLatch.countDown();
-    });
-
-    awaitLatch(setLatch);
-
-    redis.clientGetname(result -> {
-      assertTrue(result.succeeded());
-      assertEquals("test-connection", result.result());
-      testComplete();
+          testComplete();
+        });
+      });
     });
 
     await();
@@ -1895,18 +1883,28 @@ public class RedisServiceTestBase extends VertxTestBase {
   }
 
   @Test
+  public void testQuit() throws InterruptedException {
 
-  public void testQuit() {
+    redis.clientSetname("connection-1", reply -> {
+      assertTrue(String.valueOf(reply.cause()), reply.succeeded());
+      redis.quit(reply1 -> {
+        assertTrue(String.valueOf(reply1.cause()), reply1.succeeded());
 
-    redis.quit(reply -> {
-      if(reply.succeeded()){
-        redis.ping(reply2 ->{
-          if(reply2.succeeded()){
-            fail("Connection is closed.");
+        redis.ping(reply2 -> {
+          if(reply2.succeeded()) {
+            redis.clientGetname(reply3 -> {
+              assertTrue(String.valueOf(reply3.cause()), reply3.succeeded());
+              assertNotSame("Connection is still alive", "connection-1", reply3.result());
+
+              testComplete();
+            });
+          } else {
+            assertFalse("Connection is still alive", reply2.succeeded());
+            assertTrue(reply2.cause().getMessage().indexOf("Connection closed") != -1);
+            testComplete();
           }
-          testComplete();
         });
-      }
+      });
     });
     await();
   }
