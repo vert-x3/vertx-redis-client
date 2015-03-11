@@ -35,6 +35,7 @@ import org.junit.BeforeClass;
 import org.junit.Ignore;
 import org.junit.Test;
 
+import org.junit.experimental.categories.Category;
 import redis.embedded.RedisServer;
 
 /**
@@ -354,14 +355,24 @@ public class RedisServiceTestBase extends VertxTestBase {
   }
 
   @Test
+  @Category(RedisPost28Tests.class)
   public void testClientKill() {
 
     redis.clientList(reply -> {
       assertTrue(reply.succeeded());
       String clients = reply.result();
-      String add = clients.split("\\s")[0].split("=")[1];
-      redis.clientKill(new KillFilter().setAddr(add).setType(KillFilter.Type.NORMAL), reply2 ->{
-        assertTrue(reply2.succeeded());
+      String [] keyvals = clients.split("\\s");
+      String addr = null;
+      for (String keyval: keyvals) {
+        String [] pair = keyval.split("=");
+        if ("addr".equals(pair[0])) {
+          addr = pair[1];
+          break;
+        }
+      }
+      assertNotNull("No addr in CLIENT LIST", addr);
+      redis.clientKill(new KillFilter().setAddr(addr).setType(KillFilter.Type.NORMAL), reply2 -> {
+        assertTrue(String.valueOf(reply2.cause()), reply2.succeeded());
         testComplete();
       });
     });
@@ -1755,7 +1766,7 @@ public class RedisServiceTestBase extends VertxTestBase {
       assertTrue(reply0.succeeded());
       redis.pexpire(mykey, 1000, reply1 -> {
         assertTrue(reply1.succeeded());
-        assertEquals(1, reply1.result().longValue());                
+        assertEquals(1, reply1.result().longValue());
         redis.get(mykey, reply2 -> {
             assertTrue(reply2.succeeded());
             testComplete();
@@ -1825,7 +1836,7 @@ public class RedisServiceTestBase extends VertxTestBase {
   @Test
   @Ignore
   public void testPubSubNumsub() {
-
+    // TODO
     redis.subscribe(toList("rustic"), sub->{
 
     });
@@ -1834,7 +1845,7 @@ public class RedisServiceTestBase extends VertxTestBase {
   @Test
   @Ignore
   public void testPubSubNumpat() {
-
+    // TODO
     redis.subscribe(toList("rustic"), sub->{
 
     });
@@ -1843,6 +1854,7 @@ public class RedisServiceTestBase extends VertxTestBase {
   @Test
   @Ignore
   public void testPsubscribe() {
+    // TODO
   }
 
   @Test
@@ -1880,6 +1892,7 @@ public class RedisServiceTestBase extends VertxTestBase {
   @Test
   @Ignore
   public void testPunsubscribe() {
+    // TODO
   }
 
   @Test
@@ -2186,7 +2199,7 @@ public class RedisServiceTestBase extends VertxTestBase {
     await();
   }
 
-  //@Test
+  @Test
   public void testScriptkill() throws Exception {
 
     String inline = "while true do end";
@@ -2314,7 +2327,7 @@ public class RedisServiceTestBase extends VertxTestBase {
       assertTrue(reply0.succeeded());
       redis.get(mykey, reply1 -> {
         assertTrue(reply1.succeeded());
-        assertEquals("Hello", reply1.result());        
+        assertEquals("Hello", reply1.result());
             testComplete();
           });
         });
@@ -2514,6 +2527,7 @@ public class RedisServiceTestBase extends VertxTestBase {
   @Test
   @Ignore
   public void testSlaveof() {
+    // TODO
   }
 
   @Test
@@ -2791,6 +2805,7 @@ public class RedisServiceTestBase extends VertxTestBase {
   @Test
   @Ignore
   public void testSync() {
+    // TODO
   }
 
   @Test
@@ -2870,12 +2885,13 @@ public class RedisServiceTestBase extends VertxTestBase {
   @Test
   @Ignore
   public void testUnwatch() {
+    // TODO
   }
 
   @Test
   @Ignore
   public void testWatch() throws Exception {
-
+    // TODO
     String key = makeKey();
     
     RedisService rdx = RedisService.create(vertx, getConfig());
@@ -3286,8 +3302,9 @@ public class RedisServiceTestBase extends VertxTestBase {
     await();
   }
 
-  // TODO redis-embedded version of redis does not support HSCAN
+  // redis-embedded version of redis does not support HSCAN
   @Test
+  @Category(RedisPost28Tests.class)
   public void testHscan() {
     final String key = makeKey();
     Map<String, String> obj = new HashMap<>();
@@ -3312,6 +3329,7 @@ public class RedisServiceTestBase extends VertxTestBase {
   }
 
   @Test
+  @Category(RedisPost28Tests.class)
   public void testBitpos() {
     final String key = makeKey();
     final byte[] value = new byte[] {(byte) 0xff, (byte) 0xf0, (byte) 0x00};
@@ -3338,6 +3356,7 @@ public class RedisServiceTestBase extends VertxTestBase {
   }
 
   @Test
+  @Category(RedisPost28Tests.class)
   public void testBitposFrom() {
     final String key = makeKey();
     final byte[] value = new byte[] {(byte) 0x00, (byte) 0xff, (byte) 0xf0};
