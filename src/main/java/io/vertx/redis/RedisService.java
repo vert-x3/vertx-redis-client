@@ -14,6 +14,9 @@ import io.vertx.serviceproxy.ProxyHelper;
 
 @VertxGen
 @ProxyGen
+/**
+ * TODO we should provide a richer, more intuitive interface that doesn't rely on JsonArray args
+ */
 public interface RedisService {
 
   static RedisService create(Vertx vertx, JsonObject config) {

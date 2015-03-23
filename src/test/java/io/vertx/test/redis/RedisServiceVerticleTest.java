@@ -30,7 +30,7 @@ public class RedisServiceVerticleTest extends RedisServiceTestBase {
   public void setUp() throws Exception {
     super.setUp();
     CountDownLatch latch = new CountDownLatch(1);
-    vertx.deployVerticle("service:io.vertx:redis-service", new DeploymentOptions().setConfig(getConfig()), onSuccess(res -> {
+    vertx.deployVerticle("service:io.vertx:vertx-redis-service", new DeploymentOptions().setConfig(getConfig()), onSuccess(res -> {
       latch.countDown();
     }));
     awaitLatch(latch);

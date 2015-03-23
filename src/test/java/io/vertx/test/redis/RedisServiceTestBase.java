@@ -4,20 +4,17 @@ import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;
 import io.vertx.redis.RedisService;
 import io.vertx.test.core.VertxTestBase;
+import org.junit.AfterClass;
+import org.junit.BeforeClass;
+import org.junit.Ignore;
+import org.junit.Test;
+import redis.embedded.RedisServer;
 
 import java.util.Arrays;
 import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CountDownLatch;
-import java.util.concurrent.TimeUnit;
-
-import org.junit.AfterClass;
-import org.junit.BeforeClass;
-import org.junit.Ignore;
-import org.junit.Test;
-
-import redis.embedded.RedisServer;
 
 /**
  * This test relies on a Redis server, by default it will start and stop a Redis server unless
@@ -454,6 +451,7 @@ public class RedisServiceTestBase extends VertxTestBase {
   }
 
   @Test
+  @Ignore
   public void testDebugSegfault() throws Exception {
 
     RedisServer server = RedisServer.builder().port(6381).build();
