@@ -37,7 +37,7 @@ var RedisService = function(j_val) {
   this.start = function(handler) {
     var __args = arguments;
     if (__args.length === 1 && typeof __args[0] === 'function') {
-      j_redisService.start(function(ar) {
+      j_redisService["start(io.vertx.core.Handler)"](function(ar) {
       if (ar.succeeded()) {
         handler(null, null);
       } else {
@@ -55,7 +55,7 @@ var RedisService = function(j_val) {
   this.stop = function(handler) {
     var __args = arguments;
     if (__args.length === 1 && typeof __args[0] === 'function') {
-      j_redisService.stop(function(ar) {
+      j_redisService["stop(io.vertx.core.Handler)"](function(ar) {
       if (ar.succeeded()) {
         handler(null, null);
       } else {
@@ -76,7 +76,7 @@ var RedisService = function(j_val) {
   this.append = function(args, handler) {
     var __args = arguments;
     if (__args.length === 2 && typeof __args[0] === 'object' && __args[0] instanceof Array && typeof __args[1] === 'function') {
-      j_redisService.append(utils.convParamJsonArray(args), function(ar) {
+      j_redisService["append(io.vertx.core.json.JsonArray,io.vertx.core.Handler)"](utils.convParamJsonArray(args), function(ar) {
       if (ar.succeeded()) {
         handler(ar.result(), null);
       } else {
@@ -98,7 +98,7 @@ var RedisService = function(j_val) {
   this.auth = function(args, handler) {
     var __args = arguments;
     if (__args.length === 2 && typeof __args[0] === 'object' && __args[0] instanceof Array && typeof __args[1] === 'function') {
-      j_redisService.auth(utils.convParamJsonArray(args), function(ar) {
+      j_redisService["auth(io.vertx.core.json.JsonArray,io.vertx.core.Handler)"](utils.convParamJsonArray(args), function(ar) {
       if (ar.succeeded()) {
         handler(ar.result(), null);
       } else {
@@ -119,7 +119,7 @@ var RedisService = function(j_val) {
   this.bgrewriteaof = function(handler) {
     var __args = arguments;
     if (__args.length === 1 && typeof __args[0] === 'function') {
-      j_redisService.bgrewriteaof(function(ar) {
+      j_redisService["bgrewriteaof(io.vertx.core.Handler)"](function(ar) {
       if (ar.succeeded()) {
         handler(ar.result(), null);
       } else {
@@ -140,7 +140,7 @@ var RedisService = function(j_val) {
   this.bgsave = function(handler) {
     var __args = arguments;
     if (__args.length === 1 && typeof __args[0] === 'function') {
-      j_redisService.bgsave(function(ar) {
+      j_redisService["bgsave(io.vertx.core.Handler)"](function(ar) {
       if (ar.succeeded()) {
         handler(ar.result(), null);
       } else {
@@ -162,7 +162,7 @@ var RedisService = function(j_val) {
   this.bitcount = function(args, handler) {
     var __args = arguments;
     if (__args.length === 2 && typeof __args[0] === 'object' && __args[0] instanceof Array && typeof __args[1] === 'function') {
-      j_redisService.bitcount(utils.convParamJsonArray(args), function(ar) {
+      j_redisService["bitcount(io.vertx.core.json.JsonArray,io.vertx.core.Handler)"](utils.convParamJsonArray(args), function(ar) {
       if (ar.succeeded()) {
         handler(ar.result(), null);
       } else {
@@ -184,7 +184,7 @@ var RedisService = function(j_val) {
   this.bitop = function(args, handler) {
     var __args = arguments;
     if (__args.length === 2 && typeof __args[0] === 'object' && __args[0] instanceof Array && typeof __args[1] === 'function') {
-      j_redisService.bitop(utils.convParamJsonArray(args), function(ar) {
+      j_redisService["bitop(io.vertx.core.json.JsonArray,io.vertx.core.Handler)"](utils.convParamJsonArray(args), function(ar) {
       if (ar.succeeded()) {
         handler(ar.result(), null);
       } else {
@@ -206,7 +206,7 @@ var RedisService = function(j_val) {
   this.bitpos = function(args, handler) {
     var __args = arguments;
     if (__args.length === 2 && typeof __args[0] === 'object' && __args[0] instanceof Array && typeof __args[1] === 'function') {
-      j_redisService.bitpos(utils.convParamJsonArray(args), function(ar) {
+      j_redisService["bitpos(io.vertx.core.json.JsonArray,io.vertx.core.Handler)"](utils.convParamJsonArray(args), function(ar) {
       if (ar.succeeded()) {
         handler(ar.result(), null);
       } else {
@@ -228,7 +228,7 @@ var RedisService = function(j_val) {
   this.blpop = function(args, handler) {
     var __args = arguments;
     if (__args.length === 2 && typeof __args[0] === 'object' && __args[0] instanceof Array && typeof __args[1] === 'function') {
-      j_redisService.blpop(utils.convParamJsonArray(args), function(ar) {
+      j_redisService["blpop(io.vertx.core.json.JsonArray,io.vertx.core.Handler)"](utils.convParamJsonArray(args), function(ar) {
       if (ar.succeeded()) {
         handler(utils.convReturnJson(ar.result()), null);
       } else {
@@ -250,7 +250,7 @@ var RedisService = function(j_val) {
   this.brpop = function(args, handler) {
     var __args = arguments;
     if (__args.length === 2 && typeof __args[0] === 'object' && __args[0] instanceof Array && typeof __args[1] === 'function') {
-      j_redisService.brpop(utils.convParamJsonArray(args), function(ar) {
+      j_redisService["brpop(io.vertx.core.json.JsonArray,io.vertx.core.Handler)"](utils.convParamJsonArray(args), function(ar) {
       if (ar.succeeded()) {
         handler(utils.convReturnJson(ar.result()), null);
       } else {
@@ -272,7 +272,7 @@ var RedisService = function(j_val) {
   this.brpoplpush = function(args, handler) {
     var __args = arguments;
     if (__args.length === 2 && typeof __args[0] === 'object' && __args[0] instanceof Array && typeof __args[1] === 'function') {
-      j_redisService.brpoplpush(utils.convParamJsonArray(args), function(ar) {
+      j_redisService["brpoplpush(io.vertx.core.json.JsonArray,io.vertx.core.Handler)"](utils.convParamJsonArray(args), function(ar) {
       if (ar.succeeded()) {
         handler(null, null);
       } else {
@@ -294,7 +294,7 @@ var RedisService = function(j_val) {
   this.clientKill = function(args, handler) {
     var __args = arguments;
     if (__args.length === 2 && typeof __args[0] === 'object' && __args[0] instanceof Array && typeof __args[1] === 'function') {
-      j_redisService.clientKill(utils.convParamJsonArray(args), function(ar) {
+      j_redisService["clientKill(io.vertx.core.json.JsonArray,io.vertx.core.Handler)"](utils.convParamJsonArray(args), function(ar) {
       if (ar.succeeded()) {
         handler(ar.result(), null);
       } else {
@@ -315,7 +315,7 @@ var RedisService = function(j_val) {
   this.clientList = function(handler) {
     var __args = arguments;
     if (__args.length === 1 && typeof __args[0] === 'function') {
-      j_redisService.clientList(function(ar) {
+      j_redisService["clientList(io.vertx.core.Handler)"](function(ar) {
       if (ar.succeeded()) {
         handler(ar.result(), null);
       } else {
@@ -336,7 +336,7 @@ var RedisService = function(j_val) {
   this.clientGetname = function(handler) {
     var __args = arguments;
     if (__args.length === 1 && typeof __args[0] === 'function') {
-      j_redisService.clientGetname(function(ar) {
+      j_redisService["clientGetname(io.vertx.core.Handler)"](function(ar) {
       if (ar.succeeded()) {
         handler(ar.result(), null);
       } else {
@@ -358,7 +358,7 @@ var RedisService = function(j_val) {
   this.clientPause = function(args, handler) {
     var __args = arguments;
     if (__args.length === 2 && typeof __args[0] === 'object' && __args[0] instanceof Array && typeof __args[1] === 'function') {
-      j_redisService.clientPause(utils.convParamJsonArray(args), function(ar) {
+      j_redisService["clientPause(io.vertx.core.json.JsonArray,io.vertx.core.Handler)"](utils.convParamJsonArray(args), function(ar) {
       if (ar.succeeded()) {
         handler(ar.result(), null);
       } else {
@@ -380,7 +380,7 @@ var RedisService = function(j_val) {
   this.clientSetname = function(args, handler) {
     var __args = arguments;
     if (__args.length === 2 && typeof __args[0] === 'object' && __args[0] instanceof Array && typeof __args[1] === 'function') {
-      j_redisService.clientSetname(utils.convParamJsonArray(args), function(ar) {
+      j_redisService["clientSetname(io.vertx.core.json.JsonArray,io.vertx.core.Handler)"](utils.convParamJsonArray(args), function(ar) {
       if (ar.succeeded()) {
         handler(ar.result(), null);
       } else {
@@ -401,7 +401,7 @@ var RedisService = function(j_val) {
   this.clusterSlots = function(handler) {
     var __args = arguments;
     if (__args.length === 1 && typeof __args[0] === 'function') {
-      j_redisService.clusterSlots(function(ar) {
+      j_redisService["clusterSlots(io.vertx.core.Handler)"](function(ar) {
       if (ar.succeeded()) {
         handler(utils.convReturnJson(ar.result()), null);
       } else {
@@ -422,7 +422,7 @@ var RedisService = function(j_val) {
   this.command = function(handler) {
     var __args = arguments;
     if (__args.length === 1 && typeof __args[0] === 'function') {
-      j_redisService.command(function(ar) {
+      j_redisService["command(io.vertx.core.Handler)"](function(ar) {
       if (ar.succeeded()) {
         handler(utils.convReturnJson(ar.result()), null);
       } else {
@@ -443,7 +443,7 @@ var RedisService = function(j_val) {
   this.commandCount = function(handler) {
     var __args = arguments;
     if (__args.length === 1 && typeof __args[0] === 'function') {
-      j_redisService.commandCount(function(ar) {
+      j_redisService["commandCount(io.vertx.core.Handler)"](function(ar) {
       if (ar.succeeded()) {
         handler(ar.result(), null);
       } else {
@@ -464,7 +464,7 @@ var RedisService = function(j_val) {
   this.commandGetkeys = function(handler) {
     var __args = arguments;
     if (__args.length === 1 && typeof __args[0] === 'function') {
-      j_redisService.commandGetkeys(function(ar) {
+      j_redisService["commandGetkeys(io.vertx.core.Handler)"](function(ar) {
       if (ar.succeeded()) {
         handler(utils.convReturnJson(ar.result()), null);
       } else {
@@ -486,7 +486,7 @@ var RedisService = function(j_val) {
   this.commandInfo = function(args, handler) {
     var __args = arguments;
     if (__args.length === 2 && typeof __args[0] === 'object' && __args[0] instanceof Array && typeof __args[1] === 'function') {
-      j_redisService.commandInfo(utils.convParamJsonArray(args), function(ar) {
+      j_redisService["commandInfo(io.vertx.core.json.JsonArray,io.vertx.core.Handler)"](utils.convParamJsonArray(args), function(ar) {
       if (ar.succeeded()) {
         handler(utils.convReturnJson(ar.result()), null);
       } else {
@@ -508,7 +508,7 @@ var RedisService = function(j_val) {
   this.configGet = function(args, handler) {
     var __args = arguments;
     if (__args.length === 2 && typeof __args[0] === 'object' && __args[0] instanceof Array && typeof __args[1] === 'function') {
-      j_redisService.configGet(utils.convParamJsonArray(args), function(ar) {
+      j_redisService["configGet(io.vertx.core.json.JsonArray,io.vertx.core.Handler)"](utils.convParamJsonArray(args), function(ar) {
       if (ar.succeeded()) {
         handler(utils.convReturnJson(ar.result()), null);
       } else {
@@ -529,7 +529,7 @@ var RedisService = function(j_val) {
   this.configRewrite = function(handler) {
     var __args = arguments;
     if (__args.length === 1 && typeof __args[0] === 'function') {
-      j_redisService.configRewrite(function(ar) {
+      j_redisService["configRewrite(io.vertx.core.Handler)"](function(ar) {
       if (ar.succeeded()) {
         handler(ar.result(), null);
       } else {
@@ -551,7 +551,7 @@ var RedisService = function(j_val) {
   this.configSet = function(args, handler) {
     var __args = arguments;
     if (__args.length === 2 && typeof __args[0] === 'object' && __args[0] instanceof Array && typeof __args[1] === 'function') {
-      j_redisService.configSet(utils.convParamJsonArray(args), function(ar) {
+      j_redisService["configSet(io.vertx.core.json.JsonArray,io.vertx.core.Handler)"](utils.convParamJsonArray(args), function(ar) {
       if (ar.succeeded()) {
         handler(ar.result(), null);
       } else {
@@ -572,7 +572,7 @@ var RedisService = function(j_val) {
   this.configResetstat = function(handler) {
     var __args = arguments;
     if (__args.length === 1 && typeof __args[0] === 'function') {
-      j_redisService.configResetstat(function(ar) {
+      j_redisService["configResetstat(io.vertx.core.Handler)"](function(ar) {
       if (ar.succeeded()) {
         handler(ar.result(), null);
       } else {
@@ -593,7 +593,7 @@ var RedisService = function(j_val) {
   this.dbsize = function(handler) {
     var __args = arguments;
     if (__args.length === 1 && typeof __args[0] === 'function') {
-      j_redisService.dbsize(function(ar) {
+      j_redisService["dbsize(io.vertx.core.Handler)"](function(ar) {
       if (ar.succeeded()) {
         handler(ar.result(), null);
       } else {
@@ -615,7 +615,7 @@ var RedisService = function(j_val) {
   this.debugObject = function(args, handler) {
     var __args = arguments;
     if (__args.length === 2 && typeof __args[0] === 'object' && __args[0] instanceof Array && typeof __args[1] === 'function') {
-      j_redisService.debugObject(utils.convParamJsonArray(args), function(ar) {
+      j_redisService["debugObject(io.vertx.core.json.JsonArray,io.vertx.core.Handler)"](utils.convParamJsonArray(args), function(ar) {
       if (ar.succeeded()) {
         handler(ar.result(), null);
       } else {
@@ -636,7 +636,7 @@ var RedisService = function(j_val) {
   this.debugSegfault = function(handler) {
     var __args = arguments;
     if (__args.length === 1 && typeof __args[0] === 'function') {
-      j_redisService.debugSegfault(function(ar) {
+      j_redisService["debugSegfault(io.vertx.core.Handler)"](function(ar) {
       if (ar.succeeded()) {
         handler(ar.result(), null);
       } else {
@@ -658,7 +658,7 @@ var RedisService = function(j_val) {
   this.decr = function(args, handler) {
     var __args = arguments;
     if (__args.length === 2 && typeof __args[0] === 'object' && __args[0] instanceof Array && typeof __args[1] === 'function') {
-      j_redisService.decr(utils.convParamJsonArray(args), function(ar) {
+      j_redisService["decr(io.vertx.core.json.JsonArray,io.vertx.core.Handler)"](utils.convParamJsonArray(args), function(ar) {
       if (ar.succeeded()) {
         handler(ar.result(), null);
       } else {
@@ -680,7 +680,7 @@ var RedisService = function(j_val) {
   this.decrby = function(args, handler) {
     var __args = arguments;
     if (__args.length === 2 && typeof __args[0] === 'object' && __args[0] instanceof Array && typeof __args[1] === 'function') {
-      j_redisService.decrby(utils.convParamJsonArray(args), function(ar) {
+      j_redisService["decrby(io.vertx.core.json.JsonArray,io.vertx.core.Handler)"](utils.convParamJsonArray(args), function(ar) {
       if (ar.succeeded()) {
         handler(ar.result(), null);
       } else {
@@ -702,7 +702,7 @@ var RedisService = function(j_val) {
   this.del = function(args, handler) {
     var __args = arguments;
     if (__args.length === 2 && typeof __args[0] === 'object' && __args[0] instanceof Array && typeof __args[1] === 'function') {
-      j_redisService.del(utils.convParamJsonArray(args), function(ar) {
+      j_redisService["del(io.vertx.core.json.JsonArray,io.vertx.core.Handler)"](utils.convParamJsonArray(args), function(ar) {
       if (ar.succeeded()) {
         handler(ar.result(), null);
       } else {
@@ -723,7 +723,7 @@ var RedisService = function(j_val) {
   this.discard = function(handler) {
     var __args = arguments;
     if (__args.length === 1 && typeof __args[0] === 'function') {
-      j_redisService.discard(function(ar) {
+      j_redisService["discard(io.vertx.core.Handler)"](function(ar) {
       if (ar.succeeded()) {
         handler(ar.result(), null);
       } else {
@@ -745,7 +745,7 @@ var RedisService = function(j_val) {
   this.dump = function(args, handler) {
     var __args = arguments;
     if (__args.length === 2 && typeof __args[0] === 'object' && __args[0] instanceof Array && typeof __args[1] === 'function') {
-      j_redisService.dump(utils.convParamJsonArray(args), function(ar) {
+      j_redisService["dump(io.vertx.core.json.JsonArray,io.vertx.core.Handler)"](utils.convParamJsonArray(args), function(ar) {
       if (ar.succeeded()) {
         handler(ar.result(), null);
       } else {
@@ -767,7 +767,7 @@ var RedisService = function(j_val) {
   this.echo = function(args, handler) {
     var __args = arguments;
     if (__args.length === 2 && typeof __args[0] === 'object' && __args[0] instanceof Array && typeof __args[1] === 'function') {
-      j_redisService.echo(utils.convParamJsonArray(args), function(ar) {
+      j_redisService["echo(io.vertx.core.json.JsonArray,io.vertx.core.Handler)"](utils.convParamJsonArray(args), function(ar) {
       if (ar.succeeded()) {
         handler(ar.result(), null);
       } else {
@@ -789,7 +789,7 @@ var RedisService = function(j_val) {
   this.eval = function(args, handler) {
     var __args = arguments;
     if (__args.length === 2 && typeof __args[0] === 'object' && __args[0] instanceof Array && typeof __args[1] === 'function') {
-      j_redisService.eval(utils.convParamJsonArray(args), function(ar) {
+      j_redisService["eval(io.vertx.core.json.JsonArray,io.vertx.core.Handler)"](utils.convParamJsonArray(args), function(ar) {
       if (ar.succeeded()) {
         handler(null, null);
       } else {
@@ -811,7 +811,7 @@ var RedisService = function(j_val) {
   this.evalsha = function(args, handler) {
     var __args = arguments;
     if (__args.length === 2 && typeof __args[0] === 'object' && __args[0] instanceof Array && typeof __args[1] === 'function') {
-      j_redisService.evalsha(utils.convParamJsonArray(args), function(ar) {
+      j_redisService["evalsha(io.vertx.core.json.JsonArray,io.vertx.core.Handler)"](utils.convParamJsonArray(args), function(ar) {
       if (ar.succeeded()) {
         handler(null, null);
       } else {
@@ -832,7 +832,7 @@ var RedisService = function(j_val) {
   this.exec = function(handler) {
     var __args = arguments;
     if (__args.length === 1 && typeof __args[0] === 'function') {
-      j_redisService.exec(function(ar) {
+      j_redisService["exec(io.vertx.core.Handler)"](function(ar) {
       if (ar.succeeded()) {
         handler(null, null);
       } else {
@@ -854,7 +854,7 @@ var RedisService = function(j_val) {
   this.exists = function(args, handler) {
     var __args = arguments;
     if (__args.length === 2 && typeof __args[0] === 'object' && __args[0] instanceof Array && typeof __args[1] === 'function') {
-      j_redisService.exists(utils.convParamJsonArray(args), function(ar) {
+      j_redisService["exists(io.vertx.core.json.JsonArray,io.vertx.core.Handler)"](utils.convParamJsonArray(args), function(ar) {
       if (ar.succeeded()) {
         handler(ar.result(), null);
       } else {
@@ -876,7 +876,7 @@ var RedisService = function(j_val) {
   this.expire = function(args, handler) {
     var __args = arguments;
     if (__args.length === 2 && typeof __args[0] === 'object' && __args[0] instanceof Array && typeof __args[1] === 'function') {
-      j_redisService.expire(utils.convParamJsonArray(args), function(ar) {
+      j_redisService["expire(io.vertx.core.json.JsonArray,io.vertx.core.Handler)"](utils.convParamJsonArray(args), function(ar) {
       if (ar.succeeded()) {
         handler(ar.result(), null);
       } else {
@@ -898,7 +898,7 @@ var RedisService = function(j_val) {
   this.expireat = function(args, handler) {
     var __args = arguments;
     if (__args.length === 2 && typeof __args[0] === 'object' && __args[0] instanceof Array && typeof __args[1] === 'function') {
-      j_redisService.expireat(utils.convParamJsonArray(args), function(ar) {
+      j_redisService["expireat(io.vertx.core.json.JsonArray,io.vertx.core.Handler)"](utils.convParamJsonArray(args), function(ar) {
       if (ar.succeeded()) {
         handler(ar.result(), null);
       } else {
@@ -919,7 +919,7 @@ var RedisService = function(j_val) {
   this.flushall = function(handler) {
     var __args = arguments;
     if (__args.length === 1 && typeof __args[0] === 'function') {
-      j_redisService.flushall(function(ar) {
+      j_redisService["flushall(io.vertx.core.Handler)"](function(ar) {
       if (ar.succeeded()) {
         handler(ar.result(), null);
       } else {
@@ -940,7 +940,7 @@ var RedisService = function(j_val) {
   this.flushdb = function(handler) {
     var __args = arguments;
     if (__args.length === 1 && typeof __args[0] === 'function') {
-      j_redisService.flushdb(function(ar) {
+      j_redisService["flushdb(io.vertx.core.Handler)"](function(ar) {
       if (ar.succeeded()) {
         handler(ar.result(), null);
       } else {
@@ -962,7 +962,7 @@ var RedisService = function(j_val) {
   this.get = function(args, handler) {
     var __args = arguments;
     if (__args.length === 2 && typeof __args[0] === 'object' && __args[0] instanceof Array && typeof __args[1] === 'function') {
-      j_redisService.get(utils.convParamJsonArray(args), function(ar) {
+      j_redisService["get(io.vertx.core.json.JsonArray,io.vertx.core.Handler)"](utils.convParamJsonArray(args), function(ar) {
       if (ar.succeeded()) {
         handler(ar.result(), null);
       } else {
@@ -984,7 +984,7 @@ var RedisService = function(j_val) {
   this.getbit = function(args, handler) {
     var __args = arguments;
     if (__args.length === 2 && typeof __args[0] === 'object' && __args[0] instanceof Array && typeof __args[1] === 'function') {
-      j_redisService.getbit(utils.convParamJsonArray(args), function(ar) {
+      j_redisService["getbit(io.vertx.core.json.JsonArray,io.vertx.core.Handler)"](utils.convParamJsonArray(args), function(ar) {
       if (ar.succeeded()) {
         handler(ar.result(), null);
       } else {
@@ -1006,7 +1006,7 @@ var RedisService = function(j_val) {
   this.getrange = function(args, handler) {
     var __args = arguments;
     if (__args.length === 2 && typeof __args[0] === 'object' && __args[0] instanceof Array && typeof __args[1] === 'function') {
-      j_redisService.getrange(utils.convParamJsonArray(args), function(ar) {
+      j_redisService["getrange(io.vertx.core.json.JsonArray,io.vertx.core.Handler)"](utils.convParamJsonArray(args), function(ar) {
       if (ar.succeeded()) {
         handler(ar.result(), null);
       } else {
@@ -1028,7 +1028,7 @@ var RedisService = function(j_val) {
   this.getset = function(args, handler) {
     var __args = arguments;
     if (__args.length === 2 && typeof __args[0] === 'object' && __args[0] instanceof Array && typeof __args[1] === 'function') {
-      j_redisService.getset(utils.convParamJsonArray(args), function(ar) {
+      j_redisService["getset(io.vertx.core.json.JsonArray,io.vertx.core.Handler)"](utils.convParamJsonArray(args), function(ar) {
       if (ar.succeeded()) {
         handler(ar.result(), null);
       } else {
@@ -1050,7 +1050,7 @@ var RedisService = function(j_val) {
   this.hdel = function(args, handler) {
     var __args = arguments;
     if (__args.length === 2 && typeof __args[0] === 'object' && __args[0] instanceof Array && typeof __args[1] === 'function') {
-      j_redisService.hdel(utils.convParamJsonArray(args), function(ar) {
+      j_redisService["hdel(io.vertx.core.json.JsonArray,io.vertx.core.Handler)"](utils.convParamJsonArray(args), function(ar) {
       if (ar.succeeded()) {
         handler(ar.result(), null);
       } else {
@@ -1072,7 +1072,7 @@ var RedisService = function(j_val) {
   this.hexists = function(args, handler) {
     var __args = arguments;
     if (__args.length === 2 && typeof __args[0] === 'object' && __args[0] instanceof Array && typeof __args[1] === 'function') {
-      j_redisService.hexists(utils.convParamJsonArray(args), function(ar) {
+      j_redisService["hexists(io.vertx.core.json.JsonArray,io.vertx.core.Handler)"](utils.convParamJsonArray(args), function(ar) {
       if (ar.succeeded()) {
         handler(ar.result(), null);
       } else {
@@ -1094,7 +1094,7 @@ var RedisService = function(j_val) {
   this.hget = function(args, handler) {
     var __args = arguments;
     if (__args.length === 2 && typeof __args[0] === 'object' && __args[0] instanceof Array && typeof __args[1] === 'function') {
-      j_redisService.hget(utils.convParamJsonArray(args), function(ar) {
+      j_redisService["hget(io.vertx.core.json.JsonArray,io.vertx.core.Handler)"](utils.convParamJsonArray(args), function(ar) {
       if (ar.succeeded()) {
         handler(ar.result(), null);
       } else {
@@ -1116,7 +1116,7 @@ var RedisService = function(j_val) {
   this.hgetall = function(args, handler) {
     var __args = arguments;
     if (__args.length === 2 && typeof __args[0] === 'object' && __args[0] instanceof Array && typeof __args[1] === 'function') {
-      j_redisService.hgetall(utils.convParamJsonArray(args), function(ar) {
+      j_redisService["hgetall(io.vertx.core.json.JsonArray,io.vertx.core.Handler)"](utils.convParamJsonArray(args), function(ar) {
       if (ar.succeeded()) {
         handler(utils.convReturnJson(ar.result()), null);
       } else {
@@ -1138,7 +1138,7 @@ var RedisService = function(j_val) {
   this.hincrby = function(args, handler) {
     var __args = arguments;
     if (__args.length === 2 && typeof __args[0] === 'object' && __args[0] instanceof Array && typeof __args[1] === 'function') {
-      j_redisService.hincrby(utils.convParamJsonArray(args), function(ar) {
+      j_redisService["hincrby(io.vertx.core.json.JsonArray,io.vertx.core.Handler)"](utils.convParamJsonArray(args), function(ar) {
       if (ar.succeeded()) {
         handler(ar.result(), null);
       } else {
@@ -1160,7 +1160,7 @@ var RedisService = function(j_val) {
   this.hincrbyfloat = function(args, handler) {
     var __args = arguments;
     if (__args.length === 2 && typeof __args[0] === 'object' && __args[0] instanceof Array && typeof __args[1] === 'function') {
-      j_redisService.hincrbyfloat(utils.convParamJsonArray(args), function(ar) {
+      j_redisService["hincrbyfloat(io.vertx.core.json.JsonArray,io.vertx.core.Handler)"](utils.convParamJsonArray(args), function(ar) {
       if (ar.succeeded()) {
         handler(ar.result(), null);
       } else {
@@ -1182,7 +1182,7 @@ var RedisService = function(j_val) {
   this.hkeys = function(args, handler) {
     var __args = arguments;
     if (__args.length === 2 && typeof __args[0] === 'object' && __args[0] instanceof Array && typeof __args[1] === 'function') {
-      j_redisService.hkeys(utils.convParamJsonArray(args), function(ar) {
+      j_redisService["hkeys(io.vertx.core.json.JsonArray,io.vertx.core.Handler)"](utils.convParamJsonArray(args), function(ar) {
       if (ar.succeeded()) {
         handler(utils.convReturnJson(ar.result()), null);
       } else {
@@ -1204,7 +1204,7 @@ var RedisService = function(j_val) {
   this.hlen = function(args, handler) {
     var __args = arguments;
     if (__args.length === 2 && typeof __args[0] === 'object' && __args[0] instanceof Array && typeof __args[1] === 'function') {
-      j_redisService.hlen(utils.convParamJsonArray(args), function(ar) {
+      j_redisService["hlen(io.vertx.core.json.JsonArray,io.vertx.core.Handler)"](utils.convParamJsonArray(args), function(ar) {
       if (ar.succeeded()) {
         handler(ar.result(), null);
       } else {
@@ -1226,7 +1226,7 @@ var RedisService = function(j_val) {
   this.hmget = function(args, handler) {
     var __args = arguments;
     if (__args.length === 2 && typeof __args[0] === 'object' && __args[0] instanceof Array && typeof __args[1] === 'function') {
-      j_redisService.hmget(utils.convParamJsonArray(args), function(ar) {
+      j_redisService["hmget(io.vertx.core.json.JsonArray,io.vertx.core.Handler)"](utils.convParamJsonArray(args), function(ar) {
       if (ar.succeeded()) {
         handler(utils.convReturnJson(ar.result()), null);
       } else {
@@ -1248,7 +1248,7 @@ var RedisService = function(j_val) {
   this.hmset = function(args, handler) {
     var __args = arguments;
     if (__args.length === 2 && typeof __args[0] === 'object' && __args[0] instanceof Array && typeof __args[1] === 'function') {
-      j_redisService.hmset(utils.convParamJsonArray(args), function(ar) {
+      j_redisService["hmset(io.vertx.core.json.JsonArray,io.vertx.core.Handler)"](utils.convParamJsonArray(args), function(ar) {
       if (ar.succeeded()) {
         handler(ar.result(), null);
       } else {
@@ -1270,7 +1270,7 @@ var RedisService = function(j_val) {
   this.hset = function(args, handler) {
     var __args = arguments;
     if (__args.length === 2 && typeof __args[0] === 'object' && __args[0] instanceof Array && typeof __args[1] === 'function') {
-      j_redisService.hset(utils.convParamJsonArray(args), function(ar) {
+      j_redisService["hset(io.vertx.core.json.JsonArray,io.vertx.core.Handler)"](utils.convParamJsonArray(args), function(ar) {
       if (ar.succeeded()) {
         handler(ar.result(), null);
       } else {
@@ -1292,7 +1292,7 @@ var RedisService = function(j_val) {
   this.hsetnx = function(args, handler) {
     var __args = arguments;
     if (__args.length === 2 && typeof __args[0] === 'object' && __args[0] instanceof Array && typeof __args[1] === 'function') {
-      j_redisService.hsetnx(utils.convParamJsonArray(args), function(ar) {
+      j_redisService["hsetnx(io.vertx.core.json.JsonArray,io.vertx.core.Handler)"](utils.convParamJsonArray(args), function(ar) {
       if (ar.succeeded()) {
         handler(ar.result(), null);
       } else {
@@ -1314,7 +1314,7 @@ var RedisService = function(j_val) {
   this.hvals = function(args, handler) {
     var __args = arguments;
     if (__args.length === 2 && typeof __args[0] === 'object' && __args[0] instanceof Array && typeof __args[1] === 'function') {
-      j_redisService.hvals(utils.convParamJsonArray(args), function(ar) {
+      j_redisService["hvals(io.vertx.core.json.JsonArray,io.vertx.core.Handler)"](utils.convParamJsonArray(args), function(ar) {
       if (ar.succeeded()) {
         handler(utils.convReturnJson(ar.result()), null);
       } else {
@@ -1336,7 +1336,7 @@ var RedisService = function(j_val) {
   this.incr = function(args, handler) {
     var __args = arguments;
     if (__args.length === 2 && typeof __args[0] === 'object' && __args[0] instanceof Array && typeof __args[1] === 'function') {
-      j_redisService.incr(utils.convParamJsonArray(args), function(ar) {
+      j_redisService["incr(io.vertx.core.json.JsonArray,io.vertx.core.Handler)"](utils.convParamJsonArray(args), function(ar) {
       if (ar.succeeded()) {
         handler(ar.result(), null);
       } else {
@@ -1358,7 +1358,7 @@ var RedisService = function(j_val) {
   this.incrby = function(args, handler) {
     var __args = arguments;
     if (__args.length === 2 && typeof __args[0] === 'object' && __args[0] instanceof Array && typeof __args[1] === 'function') {
-      j_redisService.incrby(utils.convParamJsonArray(args), function(ar) {
+      j_redisService["incrby(io.vertx.core.json.JsonArray,io.vertx.core.Handler)"](utils.convParamJsonArray(args), function(ar) {
       if (ar.succeeded()) {
         handler(ar.result(), null);
       } else {
@@ -1380,7 +1380,7 @@ var RedisService = function(j_val) {
   this.incrbyfloat = function(args, handler) {
     var __args = arguments;
     if (__args.length === 2 && typeof __args[0] === 'object' && __args[0] instanceof Array && typeof __args[1] === 'function') {
-      j_redisService.incrbyfloat(utils.convParamJsonArray(args), function(ar) {
+      j_redisService["incrbyfloat(io.vertx.core.json.JsonArray,io.vertx.core.Handler)"](utils.convParamJsonArray(args), function(ar) {
       if (ar.succeeded()) {
         handler(ar.result(), null);
       } else {
@@ -1402,7 +1402,7 @@ var RedisService = function(j_val) {
   this.info = function(args, handler) {
     var __args = arguments;
     if (__args.length === 2 && typeof __args[0] === 'object' && __args[0] instanceof Array && typeof __args[1] === 'function') {
-      j_redisService.info(utils.convParamJsonArray(args), function(ar) {
+      j_redisService["info(io.vertx.core.json.JsonArray,io.vertx.core.Handler)"](utils.convParamJsonArray(args), function(ar) {
       if (ar.succeeded()) {
         handler(utils.convReturnJson(ar.result()), null);
       } else {
@@ -1424,7 +1424,7 @@ var RedisService = function(j_val) {
   this.keys = function(args, handler) {
     var __args = arguments;
     if (__args.length === 2 && typeof __args[0] === 'object' && __args[0] instanceof Array && typeof __args[1] === 'function') {
-      j_redisService.keys(utils.convParamJsonArray(args), function(ar) {
+      j_redisService["keys(io.vertx.core.json.JsonArray,io.vertx.core.Handler)"](utils.convParamJsonArray(args), function(ar) {
       if (ar.succeeded()) {
         handler(utils.convReturnJson(ar.result()), null);
       } else {
@@ -1445,7 +1445,7 @@ var RedisService = function(j_val) {
   this.lastsave = function(handler) {
     var __args = arguments;
     if (__args.length === 1 && typeof __args[0] === 'function') {
-      j_redisService.lastsave(function(ar) {
+      j_redisService["lastsave(io.vertx.core.Handler)"](function(ar) {
       if (ar.succeeded()) {
         handler(ar.result(), null);
       } else {
@@ -1467,7 +1467,7 @@ var RedisService = function(j_val) {
   this.lindex = function(args, handler) {
     var __args = arguments;
     if (__args.length === 2 && typeof __args[0] === 'object' && __args[0] instanceof Array && typeof __args[1] === 'function') {
-      j_redisService.lindex(utils.convParamJsonArray(args), function(ar) {
+      j_redisService["lindex(io.vertx.core.json.JsonArray,io.vertx.core.Handler)"](utils.convParamJsonArray(args), function(ar) {
       if (ar.succeeded()) {
         handler(ar.result(), null);
       } else {
@@ -1489,7 +1489,7 @@ var RedisService = function(j_val) {
   this.linsert = function(args, handler) {
     var __args = arguments;
     if (__args.length === 2 && typeof __args[0] === 'object' && __args[0] instanceof Array && typeof __args[1] === 'function') {
-      j_redisService.linsert(utils.convParamJsonArray(args), function(ar) {
+      j_redisService["linsert(io.vertx.core.json.JsonArray,io.vertx.core.Handler)"](utils.convParamJsonArray(args), function(ar) {
       if (ar.succeeded()) {
         handler(ar.result(), null);
       } else {
@@ -1511,7 +1511,7 @@ var RedisService = function(j_val) {
   this.llen = function(args, handler) {
     var __args = arguments;
     if (__args.length === 2 && typeof __args[0] === 'object' && __args[0] instanceof Array && typeof __args[1] === 'function') {
-      j_redisService.llen(utils.convParamJsonArray(args), function(ar) {
+      j_redisService["llen(io.vertx.core.json.JsonArray,io.vertx.core.Handler)"](utils.convParamJsonArray(args), function(ar) {
       if (ar.succeeded()) {
         handler(ar.result(), null);
       } else {
@@ -1533,7 +1533,7 @@ var RedisService = function(j_val) {
   this.lpop = function(args, handler) {
     var __args = arguments;
     if (__args.length === 2 && typeof __args[0] === 'object' && __args[0] instanceof Array && typeof __args[1] === 'function') {
-      j_redisService.lpop(utils.convParamJsonArray(args), function(ar) {
+      j_redisService["lpop(io.vertx.core.json.JsonArray,io.vertx.core.Handler)"](utils.convParamJsonArray(args), function(ar) {
       if (ar.succeeded()) {
         handler(ar.result(), null);
       } else {
@@ -1555,7 +1555,7 @@ var RedisService = function(j_val) {
   this.lpush = function(args, handler) {
     var __args = arguments;
     if (__args.length === 2 && typeof __args[0] === 'object' && __args[0] instanceof Array && typeof __args[1] === 'function') {
-      j_redisService.lpush(utils.convParamJsonArray(args), function(ar) {
+      j_redisService["lpush(io.vertx.core.json.JsonArray,io.vertx.core.Handler)"](utils.convParamJsonArray(args), function(ar) {
       if (ar.succeeded()) {
         handler(ar.result(), null);
       } else {
@@ -1577,7 +1577,7 @@ var RedisService = function(j_val) {
   this.lpushx = function(args, handler) {
     var __args = arguments;
     if (__args.length === 2 && typeof __args[0] === 'object' && __args[0] instanceof Array && typeof __args[1] === 'function') {
-      j_redisService.lpushx(utils.convParamJsonArray(args), function(ar) {
+      j_redisService["lpushx(io.vertx.core.json.JsonArray,io.vertx.core.Handler)"](utils.convParamJsonArray(args), function(ar) {
       if (ar.succeeded()) {
         handler(ar.result(), null);
       } else {
@@ -1599,7 +1599,7 @@ var RedisService = function(j_val) {
   this.lrange = function(args, handler) {
     var __args = arguments;
     if (__args.length === 2 && typeof __args[0] === 'object' && __args[0] instanceof Array && typeof __args[1] === 'function') {
-      j_redisService.lrange(utils.convParamJsonArray(args), function(ar) {
+      j_redisService["lrange(io.vertx.core.json.JsonArray,io.vertx.core.Handler)"](utils.convParamJsonArray(args), function(ar) {
       if (ar.succeeded()) {
         handler(utils.convReturnJson(ar.result()), null);
       } else {
@@ -1621,7 +1621,7 @@ var RedisService = function(j_val) {
   this.lrem = function(args, handler) {
     var __args = arguments;
     if (__args.length === 2 && typeof __args[0] === 'object' && __args[0] instanceof Array && typeof __args[1] === 'function') {
-      j_redisService.lrem(utils.convParamJsonArray(args), function(ar) {
+      j_redisService["lrem(io.vertx.core.json.JsonArray,io.vertx.core.Handler)"](utils.convParamJsonArray(args), function(ar) {
       if (ar.succeeded()) {
         handler(ar.result(), null);
       } else {
@@ -1643,7 +1643,7 @@ var RedisService = function(j_val) {
   this.lset = function(args, handler) {
     var __args = arguments;
     if (__args.length === 2 && typeof __args[0] === 'object' && __args[0] instanceof Array && typeof __args[1] === 'function') {
-      j_redisService.lset(utils.convParamJsonArray(args), function(ar) {
+      j_redisService["lset(io.vertx.core.json.JsonArray,io.vertx.core.Handler)"](utils.convParamJsonArray(args), function(ar) {
       if (ar.succeeded()) {
         handler(ar.result(), null);
       } else {
@@ -1665,7 +1665,7 @@ var RedisService = function(j_val) {
   this.ltrim = function(args, handler) {
     var __args = arguments;
     if (__args.length === 2 && typeof __args[0] === 'object' && __args[0] instanceof Array && typeof __args[1] === 'function') {
-      j_redisService.ltrim(utils.convParamJsonArray(args), function(ar) {
+      j_redisService["ltrim(io.vertx.core.json.JsonArray,io.vertx.core.Handler)"](utils.convParamJsonArray(args), function(ar) {
       if (ar.succeeded()) {
         handler(ar.result(), null);
       } else {
@@ -1687,7 +1687,7 @@ var RedisService = function(j_val) {
   this.mget = function(args, handler) {
     var __args = arguments;
     if (__args.length === 2 && typeof __args[0] === 'object' && __args[0] instanceof Array && typeof __args[1] === 'function') {
-      j_redisService.mget(utils.convParamJsonArray(args), function(ar) {
+      j_redisService["mget(io.vertx.core.json.JsonArray,io.vertx.core.Handler)"](utils.convParamJsonArray(args), function(ar) {
       if (ar.succeeded()) {
         handler(utils.convReturnJson(ar.result()), null);
       } else {
@@ -1709,7 +1709,7 @@ var RedisService = function(j_val) {
   this.migrate = function(args, handler) {
     var __args = arguments;
     if (__args.length === 2 && typeof __args[0] === 'object' && __args[0] instanceof Array && typeof __args[1] === 'function') {
-      j_redisService.migrate(utils.convParamJsonArray(args), function(ar) {
+      j_redisService["migrate(io.vertx.core.json.JsonArray,io.vertx.core.Handler)"](utils.convParamJsonArray(args), function(ar) {
       if (ar.succeeded()) {
         handler(ar.result(), null);
       } else {
@@ -1730,7 +1730,7 @@ var RedisService = function(j_val) {
   this.monitor = function(handler) {
     var __args = arguments;
     if (__args.length === 1 && typeof __args[0] === 'function') {
-      j_redisService.monitor(function(ar) {
+      j_redisService["monitor(io.vertx.core.Handler)"](function(ar) {
       if (ar.succeeded()) {
         handler(null, null);
       } else {
@@ -1752,7 +1752,7 @@ var RedisService = function(j_val) {
   this.move = function(args, handler) {
     var __args = arguments;
     if (__args.length === 2 && typeof __args[0] === 'object' && __args[0] instanceof Array && typeof __args[1] === 'function') {
-      j_redisService.move(utils.convParamJsonArray(args), function(ar) {
+      j_redisService["move(io.vertx.core.json.JsonArray,io.vertx.core.Handler)"](utils.convParamJsonArray(args), function(ar) {
       if (ar.succeeded()) {
         handler(ar.result(), null);
       } else {
@@ -1774,7 +1774,7 @@ var RedisService = function(j_val) {
   this.mset = function(args, handler) {
     var __args = arguments;
     if (__args.length === 2 && typeof __args[0] === 'object' && __args[0] instanceof Array && typeof __args[1] === 'function') {
-      j_redisService.mset(utils.convParamJsonArray(args), function(ar) {
+      j_redisService["mset(io.vertx.core.json.JsonArray,io.vertx.core.Handler)"](utils.convParamJsonArray(args), function(ar) {
       if (ar.succeeded()) {
         handler(ar.result(), null);
       } else {
@@ -1796,7 +1796,7 @@ var RedisService = function(j_val) {
   this.msetnx = function(args, handler) {
     var __args = arguments;
     if (__args.length === 2 && typeof __args[0] === 'object' && __args[0] instanceof Array && typeof __args[1] === 'function') {
-      j_redisService.msetnx(utils.convParamJsonArray(args), function(ar) {
+      j_redisService["msetnx(io.vertx.core.json.JsonArray,io.vertx.core.Handler)"](utils.convParamJsonArray(args), function(ar) {
       if (ar.succeeded()) {
         handler(ar.result(), null);
       } else {
@@ -1817,7 +1817,7 @@ var RedisService = function(j_val) {
   this.multi = function(handler) {
     var __args = arguments;
     if (__args.length === 1 && typeof __args[0] === 'function') {
-      j_redisService.multi(function(ar) {
+      j_redisService["multi(io.vertx.core.Handler)"](function(ar) {
       if (ar.succeeded()) {
         handler(ar.result(), null);
       } else {
@@ -1839,7 +1839,7 @@ var RedisService = function(j_val) {
   this.object = function(args, handler) {
     var __args = arguments;
     if (__args.length === 2 && typeof __args[0] === 'object' && __args[0] instanceof Array && typeof __args[1] === 'function') {
-      j_redisService.object(utils.convParamJsonArray(args), function(ar) {
+      j_redisService["object(io.vertx.core.json.JsonArray,io.vertx.core.Handler)"](utils.convParamJsonArray(args), function(ar) {
       if (ar.succeeded()) {
         handler(null, null);
       } else {
@@ -1861,7 +1861,7 @@ var RedisService = function(j_val) {
   this.persist = function(args, handler) {
     var __args = arguments;
     if (__args.length === 2 && typeof __args[0] === 'object' && __args[0] instanceof Array && typeof __args[1] === 'function') {
-      j_redisService.persist(utils.convParamJsonArray(args), function(ar) {
+      j_redisService["persist(io.vertx.core.json.JsonArray,io.vertx.core.Handler)"](utils.convParamJsonArray(args), function(ar) {
       if (ar.succeeded()) {
         handler(ar.result(), null);
       } else {
@@ -1883,7 +1883,7 @@ var RedisService = function(j_val) {
   this.pexpire = function(args, handler) {
     var __args = arguments;
     if (__args.length === 2 && typeof __args[0] === 'object' && __args[0] instanceof Array && typeof __args[1] === 'function') {
-      j_redisService.pexpire(utils.convParamJsonArray(args), function(ar) {
+      j_redisService["pexpire(io.vertx.core.json.JsonArray,io.vertx.core.Handler)"](utils.convParamJsonArray(args), function(ar) {
       if (ar.succeeded()) {
         handler(ar.result(), null);
       } else {
@@ -1905,7 +1905,7 @@ var RedisService = function(j_val) {
   this.pexpireat = function(args, handler) {
     var __args = arguments;
     if (__args.length === 2 && typeof __args[0] === 'object' && __args[0] instanceof Array && typeof __args[1] === 'function') {
-      j_redisService.pexpireat(utils.convParamJsonArray(args), function(ar) {
+      j_redisService["pexpireat(io.vertx.core.json.JsonArray,io.vertx.core.Handler)"](utils.convParamJsonArray(args), function(ar) {
       if (ar.succeeded()) {
         handler(ar.result(), null);
       } else {
@@ -1927,7 +1927,7 @@ var RedisService = function(j_val) {
   this.pfadd = function(args, handler) {
     var __args = arguments;
     if (__args.length === 2 && typeof __args[0] === 'object' && __args[0] instanceof Array && typeof __args[1] === 'function') {
-      j_redisService.pfadd(utils.convParamJsonArray(args), function(ar) {
+      j_redisService["pfadd(io.vertx.core.json.JsonArray,io.vertx.core.Handler)"](utils.convParamJsonArray(args), function(ar) {
       if (ar.succeeded()) {
         handler(ar.result(), null);
       } else {
@@ -1949,7 +1949,7 @@ var RedisService = function(j_val) {
   this.pfcount = function(args, handler) {
     var __args = arguments;
     if (__args.length === 2 && typeof __args[0] === 'object' && __args[0] instanceof Array && typeof __args[1] === 'function') {
-      j_redisService.pfcount(utils.convParamJsonArray(args), function(ar) {
+      j_redisService["pfcount(io.vertx.core.json.JsonArray,io.vertx.core.Handler)"](utils.convParamJsonArray(args), function(ar) {
       if (ar.succeeded()) {
         handler(ar.result(), null);
       } else {
@@ -1971,7 +1971,7 @@ var RedisService = function(j_val) {
   this.pfmerge = function(args, handler) {
     var __args = arguments;
     if (__args.length === 2 && typeof __args[0] === 'object' && __args[0] instanceof Array && typeof __args[1] === 'function') {
-      j_redisService.pfmerge(utils.convParamJsonArray(args), function(ar) {
+      j_redisService["pfmerge(io.vertx.core.json.JsonArray,io.vertx.core.Handler)"](utils.convParamJsonArray(args), function(ar) {
       if (ar.succeeded()) {
         handler(ar.result(), null);
       } else {
@@ -1992,7 +1992,7 @@ var RedisService = function(j_val) {
   this.ping = function(handler) {
     var __args = arguments;
     if (__args.length === 1 && typeof __args[0] === 'function') {
-      j_redisService.ping(function(ar) {
+      j_redisService["ping(io.vertx.core.Handler)"](function(ar) {
       if (ar.succeeded()) {
         handler(ar.result(), null);
       } else {
@@ -2014,7 +2014,7 @@ var RedisService = function(j_val) {
   this.psetex = function(args, handler) {
     var __args = arguments;
     if (__args.length === 2 && typeof __args[0] === 'object' && __args[0] instanceof Array && typeof __args[1] === 'function') {
-      j_redisService.psetex(utils.convParamJsonArray(args), function(ar) {
+      j_redisService["psetex(io.vertx.core.json.JsonArray,io.vertx.core.Handler)"](utils.convParamJsonArray(args), function(ar) {
       if (ar.succeeded()) {
         handler(null, null);
       } else {
@@ -2036,7 +2036,7 @@ var RedisService = function(j_val) {
   this.psubscribe = function(args, handler) {
     var __args = arguments;
     if (__args.length === 2 && typeof __args[0] === 'object' && __args[0] instanceof Array && typeof __args[1] === 'function') {
-      j_redisService.psubscribe(utils.convParamJsonArray(args), function(ar) {
+      j_redisService["psubscribe(io.vertx.core.json.JsonArray,io.vertx.core.Handler)"](utils.convParamJsonArray(args), function(ar) {
       if (ar.succeeded()) {
         handler(null, null);
       } else {
@@ -2058,7 +2058,7 @@ var RedisService = function(j_val) {
   this.pubsub = function(args, handler) {
     var __args = arguments;
     if (__args.length === 2 && typeof __args[0] === 'object' && __args[0] instanceof Array && typeof __args[1] === 'function') {
-      j_redisService.pubsub(utils.convParamJsonArray(args), function(ar) {
+      j_redisService["pubsub(io.vertx.core.json.JsonArray,io.vertx.core.Handler)"](utils.convParamJsonArray(args), function(ar) {
       if (ar.succeeded()) {
         handler(ar.result(), null);
       } else {
@@ -2080,7 +2080,7 @@ var RedisService = function(j_val) {
   this.pttl = function(args, handler) {
     var __args = arguments;
     if (__args.length === 2 && typeof __args[0] === 'object' && __args[0] instanceof Array && typeof __args[1] === 'function') {
-      j_redisService.pttl(utils.convParamJsonArray(args), function(ar) {
+      j_redisService["pttl(io.vertx.core.json.JsonArray,io.vertx.core.Handler)"](utils.convParamJsonArray(args), function(ar) {
       if (ar.succeeded()) {
         handler(ar.result(), null);
       } else {
@@ -2102,7 +2102,7 @@ var RedisService = function(j_val) {
   this.publish = function(args, handler) {
     var __args = arguments;
     if (__args.length === 2 && typeof __args[0] === 'object' && __args[0] instanceof Array && typeof __args[1] === 'function') {
-      j_redisService.publish(utils.convParamJsonArray(args), function(ar) {
+      j_redisService["publish(io.vertx.core.json.JsonArray,io.vertx.core.Handler)"](utils.convParamJsonArray(args), function(ar) {
       if (ar.succeeded()) {
         handler(ar.result(), null);
       } else {
@@ -2124,7 +2124,7 @@ var RedisService = function(j_val) {
   this.punsubscribe = function(args, handler) {
     var __args = arguments;
     if (__args.length === 2 && typeof __args[0] === 'object' && __args[0] instanceof Array && typeof __args[1] === 'function') {
-      j_redisService.punsubscribe(utils.convParamJsonArray(args), function(ar) {
+      j_redisService["punsubscribe(io.vertx.core.json.JsonArray,io.vertx.core.Handler)"](utils.convParamJsonArray(args), function(ar) {
       if (ar.succeeded()) {
         handler(null, null);
       } else {
@@ -2145,7 +2145,7 @@ var RedisService = function(j_val) {
   this.quit = function(handler) {
     var __args = arguments;
     if (__args.length === 1 && typeof __args[0] === 'function') {
-      j_redisService.quit(function(ar) {
+      j_redisService["quit(io.vertx.core.Handler)"](function(ar) {
       if (ar.succeeded()) {
         handler(ar.result(), null);
       } else {
@@ -2166,7 +2166,7 @@ var RedisService = function(j_val) {
   this.randomkey = function(handler) {
     var __args = arguments;
     if (__args.length === 1 && typeof __args[0] === 'function') {
-      j_redisService.randomkey(function(ar) {
+      j_redisService["randomkey(io.vertx.core.Handler)"](function(ar) {
       if (ar.succeeded()) {
         handler(ar.result(), null);
       } else {
@@ -2188,7 +2188,7 @@ var RedisService = function(j_val) {
   this.rename = function(args, handler) {
     var __args = arguments;
     if (__args.length === 2 && typeof __args[0] === 'object' && __args[0] instanceof Array && typeof __args[1] === 'function') {
-      j_redisService.rename(utils.convParamJsonArray(args), function(ar) {
+      j_redisService["rename(io.vertx.core.json.JsonArray,io.vertx.core.Handler)"](utils.convParamJsonArray(args), function(ar) {
       if (ar.succeeded()) {
         handler(ar.result(), null);
       } else {
@@ -2210,7 +2210,7 @@ var RedisService = function(j_val) {
   this.renamenx = function(args, handler) {
     var __args = arguments;
     if (__args.length === 2 && typeof __args[0] === 'object' && __args[0] instanceof Array && typeof __args[1] === 'function') {
-      j_redisService.renamenx(utils.convParamJsonArray(args), function(ar) {
+      j_redisService["renamenx(io.vertx.core.json.JsonArray,io.vertx.core.Handler)"](utils.convParamJsonArray(args), function(ar) {
       if (ar.succeeded()) {
         handler(ar.result(), null);
       } else {
@@ -2232,7 +2232,7 @@ var RedisService = function(j_val) {
   this.restore = function(args, handler) {
     var __args = arguments;
     if (__args.length === 2 && typeof __args[0] === 'object' && __args[0] instanceof Array && typeof __args[1] === 'function') {
-      j_redisService.restore(utils.convParamJsonArray(args), function(ar) {
+      j_redisService["restore(io.vertx.core.json.JsonArray,io.vertx.core.Handler)"](utils.convParamJsonArray(args), function(ar) {
       if (ar.succeeded()) {
         handler(ar.result(), null);
       } else {
@@ -2253,7 +2253,7 @@ var RedisService = function(j_val) {
   this.role = function(handler) {
     var __args = arguments;
     if (__args.length === 1 && typeof __args[0] === 'function') {
-      j_redisService.role(function(ar) {
+      j_redisService["role(io.vertx.core.Handler)"](function(ar) {
       if (ar.succeeded()) {
         handler(utils.convReturnJson(ar.result()), null);
       } else {
@@ -2275,7 +2275,7 @@ var RedisService = function(j_val) {
   this.rpop = function(args, handler) {
     var __args = arguments;
     if (__args.length === 2 && typeof __args[0] === 'object' && __args[0] instanceof Array && typeof __args[1] === 'function') {
-      j_redisService.rpop(utils.convParamJsonArray(args), function(ar) {
+      j_redisService["rpop(io.vertx.core.json.JsonArray,io.vertx.core.Handler)"](utils.convParamJsonArray(args), function(ar) {
       if (ar.succeeded()) {
         handler(ar.result(), null);
       } else {
@@ -2297,7 +2297,7 @@ var RedisService = function(j_val) {
   this.rpoplpush = function(args, handler) {
     var __args = arguments;
     if (__args.length === 2 && typeof __args[0] === 'object' && __args[0] instanceof Array && typeof __args[1] === 'function') {
-      j_redisService.rpoplpush(utils.convParamJsonArray(args), function(ar) {
+      j_redisService["rpoplpush(io.vertx.core.json.JsonArray,io.vertx.core.Handler)"](utils.convParamJsonArray(args), function(ar) {
       if (ar.succeeded()) {
         handler(ar.result(), null);
       } else {
@@ -2319,7 +2319,7 @@ var RedisService = function(j_val) {
   this.rpush = function(args, handler) {
     var __args = arguments;
     if (__args.length === 2 && typeof __args[0] === 'object' && __args[0] instanceof Array && typeof __args[1] === 'function') {
-      j_redisService.rpush(utils.convParamJsonArray(args), function(ar) {
+      j_redisService["rpush(io.vertx.core.json.JsonArray,io.vertx.core.Handler)"](utils.convParamJsonArray(args), function(ar) {
       if (ar.succeeded()) {
         handler(ar.result(), null);
       } else {
@@ -2341,7 +2341,7 @@ var RedisService = function(j_val) {
   this.rpushx = function(args, handler) {
     var __args = arguments;
     if (__args.length === 2 && typeof __args[0] === 'object' && __args[0] instanceof Array && typeof __args[1] === 'function') {
-      j_redisService.rpushx(utils.convParamJsonArray(args), function(ar) {
+      j_redisService["rpushx(io.vertx.core.json.JsonArray,io.vertx.core.Handler)"](utils.convParamJsonArray(args), function(ar) {
       if (ar.succeeded()) {
         handler(ar.result(), null);
       } else {
@@ -2363,7 +2363,7 @@ var RedisService = function(j_val) {
   this.sadd = function(args, handler) {
     var __args = arguments;
     if (__args.length === 2 && typeof __args[0] === 'object' && __args[0] instanceof Array && typeof __args[1] === 'function') {
-      j_redisService.sadd(utils.convParamJsonArray(args), function(ar) {
+      j_redisService["sadd(io.vertx.core.json.JsonArray,io.vertx.core.Handler)"](utils.convParamJsonArray(args), function(ar) {
       if (ar.succeeded()) {
         handler(ar.result(), null);
       } else {
@@ -2384,7 +2384,7 @@ var RedisService = function(j_val) {
   this.save = function(handler) {
     var __args = arguments;
     if (__args.length === 1 && typeof __args[0] === 'function') {
-      j_redisService.save(function(ar) {
+      j_redisService["save(io.vertx.core.Handler)"](function(ar) {
       if (ar.succeeded()) {
         handler(ar.result(), null);
       } else {
@@ -2406,7 +2406,7 @@ var RedisService = function(j_val) {
   this.scard = function(args, handler) {
     var __args = arguments;
     if (__args.length === 2 && typeof __args[0] === 'object' && __args[0] instanceof Array && typeof __args[1] === 'function') {
-      j_redisService.scard(utils.convParamJsonArray(args), function(ar) {
+      j_redisService["scard(io.vertx.core.json.JsonArray,io.vertx.core.Handler)"](utils.convParamJsonArray(args), function(ar) {
       if (ar.succeeded()) {
         handler(ar.result(), null);
       } else {
@@ -2428,7 +2428,7 @@ var RedisService = function(j_val) {
   this.scriptExists = function(args, handler) {
     var __args = arguments;
     if (__args.length === 2 && typeof __args[0] === 'object' && __args[0] instanceof Array && typeof __args[1] === 'function') {
-      j_redisService.scriptExists(utils.convParamJsonArray(args), function(ar) {
+      j_redisService["scriptExists(io.vertx.core.json.JsonArray,io.vertx.core.Handler)"](utils.convParamJsonArray(args), function(ar) {
       if (ar.succeeded()) {
         handler(utils.convReturnJson(ar.result()), null);
       } else {
@@ -2449,7 +2449,7 @@ var RedisService = function(j_val) {
   this.scriptFlush = function(handler) {
     var __args = arguments;
     if (__args.length === 1 && typeof __args[0] === 'function') {
-      j_redisService.scriptFlush(function(ar) {
+      j_redisService["scriptFlush(io.vertx.core.Handler)"](function(ar) {
       if (ar.succeeded()) {
         handler(ar.result(), null);
       } else {
@@ -2470,7 +2470,7 @@ var RedisService = function(j_val) {
   this.scriptKill = function(handler) {
     var __args = arguments;
     if (__args.length === 1 && typeof __args[0] === 'function') {
-      j_redisService.scriptKill(function(ar) {
+      j_redisService["scriptKill(io.vertx.core.Handler)"](function(ar) {
       if (ar.succeeded()) {
         handler(ar.result(), null);
       } else {
@@ -2492,7 +2492,7 @@ var RedisService = function(j_val) {
   this.scriptLoad = function(args, handler) {
     var __args = arguments;
     if (__args.length === 2 && typeof __args[0] === 'object' && __args[0] instanceof Array && typeof __args[1] === 'function') {
-      j_redisService.scriptLoad(utils.convParamJsonArray(args), function(ar) {
+      j_redisService["scriptLoad(io.vertx.core.json.JsonArray,io.vertx.core.Handler)"](utils.convParamJsonArray(args), function(ar) {
       if (ar.succeeded()) {
         handler(ar.result(), null);
       } else {
@@ -2514,7 +2514,7 @@ var RedisService = function(j_val) {
   this.sdiff = function(args, handler) {
     var __args = arguments;
     if (__args.length === 2 && typeof __args[0] === 'object' && __args[0] instanceof Array && typeof __args[1] === 'function') {
-      j_redisService.sdiff(utils.convParamJsonArray(args), function(ar) {
+      j_redisService["sdiff(io.vertx.core.json.JsonArray,io.vertx.core.Handler)"](utils.convParamJsonArray(args), function(ar) {
       if (ar.succeeded()) {
         handler(utils.convReturnJson(ar.result()), null);
       } else {
@@ -2536,7 +2536,7 @@ var RedisService = function(j_val) {
   this.sdiffstore = function(args, handler) {
     var __args = arguments;
     if (__args.length === 2 && typeof __args[0] === 'object' && __args[0] instanceof Array && typeof __args[1] === 'function') {
-      j_redisService.sdiffstore(utils.convParamJsonArray(args), function(ar) {
+      j_redisService["sdiffstore(io.vertx.core.json.JsonArray,io.vertx.core.Handler)"](utils.convParamJsonArray(args), function(ar) {
       if (ar.succeeded()) {
         handler(ar.result(), null);
       } else {
@@ -2558,7 +2558,7 @@ var RedisService = function(j_val) {
   this.select = function(args, handler) {
     var __args = arguments;
     if (__args.length === 2 && typeof __args[0] === 'object' && __args[0] instanceof Array && typeof __args[1] === 'function') {
-      j_redisService.select(utils.convParamJsonArray(args), function(ar) {
+      j_redisService["select(io.vertx.core.json.JsonArray,io.vertx.core.Handler)"](utils.convParamJsonArray(args), function(ar) {
       if (ar.succeeded()) {
         handler(ar.result(), null);
       } else {
@@ -2580,7 +2580,7 @@ var RedisService = function(j_val) {
   this.set = function(args, handler) {
     var __args = arguments;
     if (__args.length === 2 && typeof __args[0] === 'object' && __args[0] instanceof Array && typeof __args[1] === 'function') {
-      j_redisService.set(utils.convParamJsonArray(args), function(ar) {
+      j_redisService["set(io.vertx.core.json.JsonArray,io.vertx.core.Handler)"](utils.convParamJsonArray(args), function(ar) {
       if (ar.succeeded()) {
         handler(null, null);
       } else {
@@ -2602,7 +2602,7 @@ var RedisService = function(j_val) {
   this.setbit = function(args, handler) {
     var __args = arguments;
     if (__args.length === 2 && typeof __args[0] === 'object' && __args[0] instanceof Array && typeof __args[1] === 'function') {
-      j_redisService.setbit(utils.convParamJsonArray(args), function(ar) {
+      j_redisService["setbit(io.vertx.core.json.JsonArray,io.vertx.core.Handler)"](utils.convParamJsonArray(args), function(ar) {
       if (ar.succeeded()) {
         handler(ar.result(), null);
       } else {
@@ -2624,7 +2624,7 @@ var RedisService = function(j_val) {
   this.setex = function(args, handler) {
     var __args = arguments;
     if (__args.length === 2 && typeof __args[0] === 'object' && __args[0] instanceof Array && typeof __args[1] === 'function') {
-      j_redisService.setex(utils.convParamJsonArray(args), function(ar) {
+      j_redisService["setex(io.vertx.core.json.JsonArray,io.vertx.core.Handler)"](utils.convParamJsonArray(args), function(ar) {
       if (ar.succeeded()) {
         handler(ar.result(), null);
       } else {
@@ -2646,7 +2646,7 @@ var RedisService = function(j_val) {
   this.setnx = function(args, handler) {
     var __args = arguments;
     if (__args.length === 2 && typeof __args[0] === 'object' && __args[0] instanceof Array && typeof __args[1] === 'function') {
-      j_redisService.setnx(utils.convParamJsonArray(args), function(ar) {
+      j_redisService["setnx(io.vertx.core.json.JsonArray,io.vertx.core.Handler)"](utils.convParamJsonArray(args), function(ar) {
       if (ar.succeeded()) {
         handler(ar.result(), null);
       } else {
@@ -2668,7 +2668,7 @@ var RedisService = function(j_val) {
   this.setrange = function(args, handler) {
     var __args = arguments;
     if (__args.length === 2 && typeof __args[0] === 'object' && __args[0] instanceof Array && typeof __args[1] === 'function') {
-      j_redisService.setrange(utils.convParamJsonArray(args), function(ar) {
+      j_redisService["setrange(io.vertx.core.json.JsonArray,io.vertx.core.Handler)"](utils.convParamJsonArray(args), function(ar) {
       if (ar.succeeded()) {
         handler(ar.result(), null);
       } else {
@@ -2690,7 +2690,7 @@ var RedisService = function(j_val) {
   this.shutdown = function(args, handler) {
     var __args = arguments;
     if (__args.length === 2 && typeof __args[0] === 'object' && __args[0] instanceof Array && typeof __args[1] === 'function') {
-      j_redisService.shutdown(utils.convParamJsonArray(args), function(ar) {
+      j_redisService["shutdown(io.vertx.core.json.JsonArray,io.vertx.core.Handler)"](utils.convParamJsonArray(args), function(ar) {
       if (ar.succeeded()) {
         handler(ar.result(), null);
       } else {
@@ -2712,7 +2712,7 @@ var RedisService = function(j_val) {
   this.sinter = function(args, handler) {
     var __args = arguments;
     if (__args.length === 2 && typeof __args[0] === 'object' && __args[0] instanceof Array && typeof __args[1] === 'function') {
-      j_redisService.sinter(utils.convParamJsonArray(args), function(ar) {
+      j_redisService["sinter(io.vertx.core.json.JsonArray,io.vertx.core.Handler)"](utils.convParamJsonArray(args), function(ar) {
       if (ar.succeeded()) {
         handler(utils.convReturnJson(ar.result()), null);
       } else {
@@ -2734,7 +2734,7 @@ var RedisService = function(j_val) {
   this.sinterstore = function(args, handler) {
     var __args = arguments;
     if (__args.length === 2 && typeof __args[0] === 'object' && __args[0] instanceof Array && typeof __args[1] === 'function') {
-      j_redisService.sinterstore(utils.convParamJsonArray(args), function(ar) {
+      j_redisService["sinterstore(io.vertx.core.json.JsonArray,io.vertx.core.Handler)"](utils.convParamJsonArray(args), function(ar) {
       if (ar.succeeded()) {
         handler(ar.result(), null);
       } else {
@@ -2756,7 +2756,7 @@ var RedisService = function(j_val) {
   this.sismember = function(args, handler) {
     var __args = arguments;
     if (__args.length === 2 && typeof __args[0] === 'object' && __args[0] instanceof Array && typeof __args[1] === 'function') {
-      j_redisService.sismember(utils.convParamJsonArray(args), function(ar) {
+      j_redisService["sismember(io.vertx.core.json.JsonArray,io.vertx.core.Handler)"](utils.convParamJsonArray(args), function(ar) {
       if (ar.succeeded()) {
         handler(ar.result(), null);
       } else {
@@ -2778,7 +2778,7 @@ var RedisService = function(j_val) {
   this.slaveof = function(args, handler) {
     var __args = arguments;
     if (__args.length === 2 && typeof __args[0] === 'object' && __args[0] instanceof Array && typeof __args[1] === 'function') {
-      j_redisService.slaveof(utils.convParamJsonArray(args), function(ar) {
+      j_redisService["slaveof(io.vertx.core.json.JsonArray,io.vertx.core.Handler)"](utils.convParamJsonArray(args), function(ar) {
       if (ar.succeeded()) {
         handler(ar.result(), null);
       } else {
@@ -2800,7 +2800,7 @@ var RedisService = function(j_val) {
   this.slowlog = function(args, handler) {
     var __args = arguments;
     if (__args.length === 2 && typeof __args[0] === 'object' && __args[0] instanceof Array && typeof __args[1] === 'function') {
-      j_redisService.slowlog(utils.convParamJsonArray(args), function(ar) {
+      j_redisService["slowlog(io.vertx.core.json.JsonArray,io.vertx.core.Handler)"](utils.convParamJsonArray(args), function(ar) {
       if (ar.succeeded()) {
         handler(null, null);
       } else {
@@ -2822,7 +2822,7 @@ var RedisService = function(j_val) {
   this.smembers = function(args, handler) {
     var __args = arguments;
     if (__args.length === 2 && typeof __args[0] === 'object' && __args[0] instanceof Array && typeof __args[1] === 'function') {
-      j_redisService.smembers(utils.convParamJsonArray(args), function(ar) {
+      j_redisService["smembers(io.vertx.core.json.JsonArray,io.vertx.core.Handler)"](utils.convParamJsonArray(args), function(ar) {
       if (ar.succeeded()) {
         handler(utils.convReturnJson(ar.result()), null);
       } else {
@@ -2844,7 +2844,7 @@ var RedisService = function(j_val) {
   this.smove = function(args, handler) {
     var __args = arguments;
     if (__args.length === 2 && typeof __args[0] === 'object' && __args[0] instanceof Array && typeof __args[1] === 'function') {
-      j_redisService.smove(utils.convParamJsonArray(args), function(ar) {
+      j_redisService["smove(io.vertx.core.json.JsonArray,io.vertx.core.Handler)"](utils.convParamJsonArray(args), function(ar) {
       if (ar.succeeded()) {
         handler(ar.result(), null);
       } else {
@@ -2866,7 +2866,7 @@ var RedisService = function(j_val) {
   this.sort = function(args, handler) {
     var __args = arguments;
     if (__args.length === 2 && typeof __args[0] === 'object' && __args[0] instanceof Array && typeof __args[1] === 'function') {
-      j_redisService.sort(utils.convParamJsonArray(args), function(ar) {
+      j_redisService["sort(io.vertx.core.json.JsonArray,io.vertx.core.Handler)"](utils.convParamJsonArray(args), function(ar) {
       if (ar.succeeded()) {
         handler(utils.convReturnJson(ar.result()), null);
       } else {
@@ -2888,7 +2888,7 @@ var RedisService = function(j_val) {
   this.spop = function(args, handler) {
     var __args = arguments;
     if (__args.length === 2 && typeof __args[0] === 'object' && __args[0] instanceof Array && typeof __args[1] === 'function') {
-      j_redisService.spop(utils.convParamJsonArray(args), function(ar) {
+      j_redisService["spop(io.vertx.core.json.JsonArray,io.vertx.core.Handler)"](utils.convParamJsonArray(args), function(ar) {
       if (ar.succeeded()) {
         handler(ar.result(), null);
       } else {
@@ -2910,7 +2910,7 @@ var RedisService = function(j_val) {
   this.srandmember = function(args, handler) {
     var __args = arguments;
     if (__args.length === 2 && typeof __args[0] === 'object' && __args[0] instanceof Array && typeof __args[1] === 'function') {
-      j_redisService.srandmember(utils.convParamJsonArray(args), function(ar) {
+      j_redisService["srandmember(io.vertx.core.json.JsonArray,io.vertx.core.Handler)"](utils.convParamJsonArray(args), function(ar) {
       if (ar.succeeded()) {
         handler(utils.convReturnJson(ar.result()), null);
       } else {
@@ -2932,7 +2932,7 @@ var RedisService = function(j_val) {
   this.srem = function(args, handler) {
     var __args = arguments;
     if (__args.length === 2 && typeof __args[0] === 'object' && __args[0] instanceof Array && typeof __args[1] === 'function') {
-      j_redisService.srem(utils.convParamJsonArray(args), function(ar) {
+      j_redisService["srem(io.vertx.core.json.JsonArray,io.vertx.core.Handler)"](utils.convParamJsonArray(args), function(ar) {
       if (ar.succeeded()) {
         handler(ar.result(), null);
       } else {
@@ -2954,7 +2954,7 @@ var RedisService = function(j_val) {
   this.strlen = function(args, handler) {
     var __args = arguments;
     if (__args.length === 2 && typeof __args[0] === 'object' && __args[0] instanceof Array && typeof __args[1] === 'function') {
-      j_redisService.strlen(utils.convParamJsonArray(args), function(ar) {
+      j_redisService["strlen(io.vertx.core.json.JsonArray,io.vertx.core.Handler)"](utils.convParamJsonArray(args), function(ar) {
       if (ar.succeeded()) {
         handler(ar.result(), null);
       } else {
@@ -2976,7 +2976,7 @@ var RedisService = function(j_val) {
   this.subscribe = function(args, handler) {
     var __args = arguments;
     if (__args.length === 2 && typeof __args[0] === 'object' && __args[0] instanceof Array && typeof __args[1] === 'function') {
-      j_redisService.subscribe(utils.convParamJsonArray(args), function(ar) {
+      j_redisService["subscribe(io.vertx.core.json.JsonArray,io.vertx.core.Handler)"](utils.convParamJsonArray(args), function(ar) {
       if (ar.succeeded()) {
         handler(null, null);
       } else {
@@ -2998,7 +2998,7 @@ var RedisService = function(j_val) {
   this.sunion = function(args, handler) {
     var __args = arguments;
     if (__args.length === 2 && typeof __args[0] === 'object' && __args[0] instanceof Array && typeof __args[1] === 'function') {
-      j_redisService.sunion(utils.convParamJsonArray(args), function(ar) {
+      j_redisService["sunion(io.vertx.core.json.JsonArray,io.vertx.core.Handler)"](utils.convParamJsonArray(args), function(ar) {
       if (ar.succeeded()) {
         handler(utils.convReturnJson(ar.result()), null);
       } else {
@@ -3020,7 +3020,7 @@ var RedisService = function(j_val) {
   this.sunionstore = function(args, handler) {
     var __args = arguments;
     if (__args.length === 2 && typeof __args[0] === 'object' && __args[0] instanceof Array && typeof __args[1] === 'function') {
-      j_redisService.sunionstore(utils.convParamJsonArray(args), function(ar) {
+      j_redisService["sunionstore(io.vertx.core.json.JsonArray,io.vertx.core.Handler)"](utils.convParamJsonArray(args), function(ar) {
       if (ar.succeeded()) {
         handler(ar.result(), null);
       } else {
@@ -3041,7 +3041,7 @@ var RedisService = function(j_val) {
   this.sync = function(handler) {
     var __args = arguments;
     if (__args.length === 1 && typeof __args[0] === 'function') {
-      j_redisService.sync(function(ar) {
+      j_redisService["sync(io.vertx.core.Handler)"](function(ar) {
       if (ar.succeeded()) {
         handler(null, null);
       } else {
@@ -3062,7 +3062,7 @@ var RedisService = function(j_val) {
   this.time = function(handler) {
     var __args = arguments;
     if (__args.length === 1 && typeof __args[0] === 'function') {
-      j_redisService.time(function(ar) {
+      j_redisService["time(io.vertx.core.Handler)"](function(ar) {
       if (ar.succeeded()) {
         handler(utils.convReturnJson(ar.result()), null);
       } else {
@@ -3084,7 +3084,7 @@ var RedisService = function(j_val) {
   this.ttl = function(args, handler) {
     var __args = arguments;
     if (__args.length === 2 && typeof __args[0] === 'object' && __args[0] instanceof Array && typeof __args[1] === 'function') {
-      j_redisService.ttl(utils.convParamJsonArray(args), function(ar) {
+      j_redisService["ttl(io.vertx.core.json.JsonArray,io.vertx.core.Handler)"](utils.convParamJsonArray(args), function(ar) {
       if (ar.succeeded()) {
         handler(ar.result(), null);
       } else {
@@ -3106,7 +3106,7 @@ var RedisService = function(j_val) {
   this.type = function(args, handler) {
     var __args = arguments;
     if (__args.length === 2 && typeof __args[0] === 'object' && __args[0] instanceof Array && typeof __args[1] === 'function') {
-      j_redisService.type(utils.convParamJsonArray(args), function(ar) {
+      j_redisService["type(io.vertx.core.json.JsonArray,io.vertx.core.Handler)"](utils.convParamJsonArray(args), function(ar) {
       if (ar.succeeded()) {
         handler(ar.result(), null);
       } else {
@@ -3128,7 +3128,7 @@ var RedisService = function(j_val) {
   this.unsubscribe = function(args, handler) {
     var __args = arguments;
     if (__args.length === 2 && typeof __args[0] === 'object' && __args[0] instanceof Array && typeof __args[1] === 'function') {
-      j_redisService.unsubscribe(utils.convParamJsonArray(args), function(ar) {
+      j_redisService["unsubscribe(io.vertx.core.json.JsonArray,io.vertx.core.Handler)"](utils.convParamJsonArray(args), function(ar) {
       if (ar.succeeded()) {
         handler(null, null);
       } else {
@@ -3149,7 +3149,7 @@ var RedisService = function(j_val) {
   this.unwatch = function(handler) {
     var __args = arguments;
     if (__args.length === 1 && typeof __args[0] === 'function') {
-      j_redisService.unwatch(function(ar) {
+      j_redisService["unwatch(io.vertx.core.Handler)"](function(ar) {
       if (ar.succeeded()) {
         handler(ar.result(), null);
       } else {
@@ -3171,7 +3171,7 @@ var RedisService = function(j_val) {
   this.watch = function(args, handler) {
     var __args = arguments;
     if (__args.length === 2 && typeof __args[0] === 'object' && __args[0] instanceof Array && typeof __args[1] === 'function') {
-      j_redisService.watch(utils.convParamJsonArray(args), function(ar) {
+      j_redisService["watch(io.vertx.core.json.JsonArray,io.vertx.core.Handler)"](utils.convParamJsonArray(args), function(ar) {
       if (ar.succeeded()) {
         handler(ar.result(), null);
       } else {
@@ -3193,7 +3193,7 @@ var RedisService = function(j_val) {
   this.zadd = function(args, handler) {
     var __args = arguments;
     if (__args.length === 2 && typeof __args[0] === 'object' && __args[0] instanceof Array && typeof __args[1] === 'function') {
-      j_redisService.zadd(utils.convParamJsonArray(args), function(ar) {
+      j_redisService["zadd(io.vertx.core.json.JsonArray,io.vertx.core.Handler)"](utils.convParamJsonArray(args), function(ar) {
       if (ar.succeeded()) {
         handler(ar.result(), null);
       } else {
@@ -3215,7 +3215,7 @@ var RedisService = function(j_val) {
   this.zcard = function(args, handler) {
     var __args = arguments;
     if (__args.length === 2 && typeof __args[0] === 'object' && __args[0] instanceof Array && typeof __args[1] === 'function') {
-      j_redisService.zcard(utils.convParamJsonArray(args), function(ar) {
+      j_redisService["zcard(io.vertx.core.json.JsonArray,io.vertx.core.Handler)"](utils.convParamJsonArray(args), function(ar) {
       if (ar.succeeded()) {
         handler(ar.result(), null);
       } else {
@@ -3237,7 +3237,7 @@ var RedisService = function(j_val) {
   this.zcount = function(args, handler) {
     var __args = arguments;
     if (__args.length === 2 && typeof __args[0] === 'object' && __args[0] instanceof Array && typeof __args[1] === 'function') {
-      j_redisService.zcount(utils.convParamJsonArray(args), function(ar) {
+      j_redisService["zcount(io.vertx.core.json.JsonArray,io.vertx.core.Handler)"](utils.convParamJsonArray(args), function(ar) {
       if (ar.succeeded()) {
         handler(ar.result(), null);
       } else {
@@ -3259,7 +3259,7 @@ var RedisService = function(j_val) {
   this.zincrby = function(args, handler) {
     var __args = arguments;
     if (__args.length === 2 && typeof __args[0] === 'object' && __args[0] instanceof Array && typeof __args[1] === 'function') {
-      j_redisService.zincrby(utils.convParamJsonArray(args), function(ar) {
+      j_redisService["zincrby(io.vertx.core.json.JsonArray,io.vertx.core.Handler)"](utils.convParamJsonArray(args), function(ar) {
       if (ar.succeeded()) {
         handler(ar.result(), null);
       } else {
@@ -3281,7 +3281,7 @@ var RedisService = function(j_val) {
   this.zinterstore = function(args, handler) {
     var __args = arguments;
     if (__args.length === 2 && typeof __args[0] === 'object' && __args[0] instanceof Array && typeof __args[1] === 'function') {
-      j_redisService.zinterstore(utils.convParamJsonArray(args), function(ar) {
+      j_redisService["zinterstore(io.vertx.core.json.JsonArray,io.vertx.core.Handler)"](utils.convParamJsonArray(args), function(ar) {
       if (ar.succeeded()) {
         handler(ar.result(), null);
       } else {
@@ -3303,7 +3303,7 @@ var RedisService = function(j_val) {
   this.zlexcount = function(args, handler) {
     var __args = arguments;
     if (__args.length === 2 && typeof __args[0] === 'object' && __args[0] instanceof Array && typeof __args[1] === 'function') {
-      j_redisService.zlexcount(utils.convParamJsonArray(args), function(ar) {
+      j_redisService["zlexcount(io.vertx.core.json.JsonArray,io.vertx.core.Handler)"](utils.convParamJsonArray(args), function(ar) {
       if (ar.succeeded()) {
         handler(ar.result(), null);
       } else {
@@ -3325,7 +3325,7 @@ var RedisService = function(j_val) {
   this.zrange = function(args, handler) {
     var __args = arguments;
     if (__args.length === 2 && typeof __args[0] === 'object' && __args[0] instanceof Array && typeof __args[1] === 'function') {
-      j_redisService.zrange(utils.convParamJsonArray(args), function(ar) {
+      j_redisService["zrange(io.vertx.core.json.JsonArray,io.vertx.core.Handler)"](utils.convParamJsonArray(args), function(ar) {
       if (ar.succeeded()) {
         handler(utils.convReturnJson(ar.result()), null);
       } else {
@@ -3347,7 +3347,7 @@ var RedisService = function(j_val) {
   this.zrangebylex = function(args, handler) {
     var __args = arguments;
     if (__args.length === 2 && typeof __args[0] === 'object' && __args[0] instanceof Array && typeof __args[1] === 'function') {
-      j_redisService.zrangebylex(utils.convParamJsonArray(args), function(ar) {
+      j_redisService["zrangebylex(io.vertx.core.json.JsonArray,io.vertx.core.Handler)"](utils.convParamJsonArray(args), function(ar) {
       if (ar.succeeded()) {
         handler(utils.convReturnJson(ar.result()), null);
       } else {
@@ -3369,7 +3369,7 @@ var RedisService = function(j_val) {
   this.zrangebyscore = function(args, handler) {
     var __args = arguments;
     if (__args.length === 2 && typeof __args[0] === 'object' && __args[0] instanceof Array && typeof __args[1] === 'function') {
-      j_redisService.zrangebyscore(utils.convParamJsonArray(args), function(ar) {
+      j_redisService["zrangebyscore(io.vertx.core.json.JsonArray,io.vertx.core.Handler)"](utils.convParamJsonArray(args), function(ar) {
       if (ar.succeeded()) {
         handler(utils.convReturnJson(ar.result()), null);
       } else {
@@ -3391,7 +3391,7 @@ var RedisService = function(j_val) {
   this.zrank = function(args, handler) {
     var __args = arguments;
     if (__args.length === 2 && typeof __args[0] === 'object' && __args[0] instanceof Array && typeof __args[1] === 'function') {
-      j_redisService.zrank(utils.convParamJsonArray(args), function(ar) {
+      j_redisService["zrank(io.vertx.core.json.JsonArray,io.vertx.core.Handler)"](utils.convParamJsonArray(args), function(ar) {
       if (ar.succeeded()) {
         handler(ar.result(), null);
       } else {
@@ -3413,7 +3413,7 @@ var RedisService = function(j_val) {
   this.zrem = function(args, handler) {
     var __args = arguments;
     if (__args.length === 2 && typeof __args[0] === 'object' && __args[0] instanceof Array && typeof __args[1] === 'function') {
-      j_redisService.zrem(utils.convParamJsonArray(args), function(ar) {
+      j_redisService["zrem(io.vertx.core.json.JsonArray,io.vertx.core.Handler)"](utils.convParamJsonArray(args), function(ar) {
       if (ar.succeeded()) {
         handler(ar.result(), null);
       } else {
@@ -3435,7 +3435,7 @@ var RedisService = function(j_val) {
   this.zremrangebylex = function(args, handler) {
     var __args = arguments;
     if (__args.length === 2 && typeof __args[0] === 'object' && __args[0] instanceof Array && typeof __args[1] === 'function') {
-      j_redisService.zremrangebylex(utils.convParamJsonArray(args), function(ar) {
+      j_redisService["zremrangebylex(io.vertx.core.json.JsonArray,io.vertx.core.Handler)"](utils.convParamJsonArray(args), function(ar) {
       if (ar.succeeded()) {
         handler(ar.result(), null);
       } else {
@@ -3457,7 +3457,7 @@ var RedisService = function(j_val) {
   this.zremrangebyrank = function(args, handler) {
     var __args = arguments;
     if (__args.length === 2 && typeof __args[0] === 'object' && __args[0] instanceof Array && typeof __args[1] === 'function') {
-      j_redisService.zremrangebyrank(utils.convParamJsonArray(args), function(ar) {
+      j_redisService["zremrangebyrank(io.vertx.core.json.JsonArray,io.vertx.core.Handler)"](utils.convParamJsonArray(args), function(ar) {
       if (ar.succeeded()) {
         handler(ar.result(), null);
       } else {
@@ -3479,7 +3479,7 @@ var RedisService = function(j_val) {
   this.zremrangebyscore = function(args, handler) {
     var __args = arguments;
     if (__args.length === 2 && typeof __args[0] === 'object' && __args[0] instanceof Array && typeof __args[1] === 'function') {
-      j_redisService.zremrangebyscore(utils.convParamJsonArray(args), function(ar) {
+      j_redisService["zremrangebyscore(io.vertx.core.json.JsonArray,io.vertx.core.Handler)"](utils.convParamJsonArray(args), function(ar) {
       if (ar.succeeded()) {
         handler(ar.result(), null);
       } else {
@@ -3501,7 +3501,7 @@ var RedisService = function(j_val) {
   this.zrevrange = function(args, handler) {
     var __args = arguments;
     if (__args.length === 2 && typeof __args[0] === 'object' && __args[0] instanceof Array && typeof __args[1] === 'function') {
-      j_redisService.zrevrange(utils.convParamJsonArray(args), function(ar) {
+      j_redisService["zrevrange(io.vertx.core.json.JsonArray,io.vertx.core.Handler)"](utils.convParamJsonArray(args), function(ar) {
       if (ar.succeeded()) {
         handler(utils.convReturnJson(ar.result()), null);
       } else {
@@ -3523,7 +3523,7 @@ var RedisService = function(j_val) {
   this.zrevrangebyscore = function(args, handler) {
     var __args = arguments;
     if (__args.length === 2 && typeof __args[0] === 'object' && __args[0] instanceof Array && typeof __args[1] === 'function') {
-      j_redisService.zrevrangebyscore(utils.convParamJsonArray(args), function(ar) {
+      j_redisService["zrevrangebyscore(io.vertx.core.json.JsonArray,io.vertx.core.Handler)"](utils.convParamJsonArray(args), function(ar) {
       if (ar.succeeded()) {
         handler(utils.convReturnJson(ar.result()), null);
       } else {
@@ -3545,7 +3545,7 @@ var RedisService = function(j_val) {
   this.zrevrank = function(args, handler) {
     var __args = arguments;
     if (__args.length === 2 && typeof __args[0] === 'object' && __args[0] instanceof Array && typeof __args[1] === 'function') {
-      j_redisService.zrevrank(utils.convParamJsonArray(args), function(ar) {
+      j_redisService["zrevrank(io.vertx.core.json.JsonArray,io.vertx.core.Handler)"](utils.convParamJsonArray(args), function(ar) {
       if (ar.succeeded()) {
         handler(ar.result(), null);
       } else {
@@ -3567,7 +3567,7 @@ var RedisService = function(j_val) {
   this.zscore = function(args, handler) {
     var __args = arguments;
     if (__args.length === 2 && typeof __args[0] === 'object' && __args[0] instanceof Array && typeof __args[1] === 'function') {
-      j_redisService.zscore(utils.convParamJsonArray(args), function(ar) {
+      j_redisService["zscore(io.vertx.core.json.JsonArray,io.vertx.core.Handler)"](utils.convParamJsonArray(args), function(ar) {
       if (ar.succeeded()) {
         handler(ar.result(), null);
       } else {
@@ -3589,7 +3589,7 @@ var RedisService = function(j_val) {
   this.zunionstore = function(args, handler) {
     var __args = arguments;
     if (__args.length === 2 && typeof __args[0] === 'object' && __args[0] instanceof Array && typeof __args[1] === 'function') {
-      j_redisService.zunionstore(utils.convParamJsonArray(args), function(ar) {
+      j_redisService["zunionstore(io.vertx.core.json.JsonArray,io.vertx.core.Handler)"](utils.convParamJsonArray(args), function(ar) {
       if (ar.succeeded()) {
         handler(ar.result(), null);
       } else {
@@ -3611,7 +3611,7 @@ var RedisService = function(j_val) {
   this.scan = function(args, handler) {
     var __args = arguments;
     if (__args.length === 2 && typeof __args[0] === 'object' && __args[0] instanceof Array && typeof __args[1] === 'function') {
-      j_redisService.scan(utils.convParamJsonArray(args), function(ar) {
+      j_redisService["scan(io.vertx.core.json.JsonArray,io.vertx.core.Handler)"](utils.convParamJsonArray(args), function(ar) {
       if (ar.succeeded()) {
         handler(null, null);
       } else {
@@ -3633,7 +3633,7 @@ var RedisService = function(j_val) {
   this.sscan = function(args, handler) {
     var __args = arguments;
     if (__args.length === 2 && typeof __args[0] === 'object' && __args[0] instanceof Array && typeof __args[1] === 'function') {
-      j_redisService.sscan(utils.convParamJsonArray(args), function(ar) {
+      j_redisService["sscan(io.vertx.core.json.JsonArray,io.vertx.core.Handler)"](utils.convParamJsonArray(args), function(ar) {
       if (ar.succeeded()) {
         handler(null, null);
       } else {
@@ -3655,7 +3655,7 @@ var RedisService = function(j_val) {
   this.hscan = function(args, handler) {
     var __args = arguments;
     if (__args.length === 2 && typeof __args[0] === 'object' && __args[0] instanceof Array && typeof __args[1] === 'function') {
-      j_redisService.hscan(utils.convParamJsonArray(args), function(ar) {
+      j_redisService["hscan(io.vertx.core.json.JsonArray,io.vertx.core.Handler)"](utils.convParamJsonArray(args), function(ar) {
       if (ar.succeeded()) {
         handler(null, null);
       } else {
@@ -3677,7 +3677,7 @@ var RedisService = function(j_val) {
   this.zscan = function(args, handler) {
     var __args = arguments;
     if (__args.length === 2 && typeof __args[0] === 'object' && __args[0] instanceof Array && typeof __args[1] === 'function') {
-      j_redisService.zscan(utils.convParamJsonArray(args), function(ar) {
+      j_redisService["zscan(io.vertx.core.json.JsonArray,io.vertx.core.Handler)"](utils.convParamJsonArray(args), function(ar) {
       if (ar.succeeded()) {
         handler(null, null);
       } else {
@@ -3704,7 +3704,7 @@ var RedisService = function(j_val) {
 RedisService.create = function(vertx, config) {
   var __args = arguments;
   if (__args.length === 2 && typeof __args[0] === 'object' && __args[0]._jdel && typeof __args[1] === 'object') {
-    return new RedisService(JRedisService.create(vertx._jdel, utils.convParamJsonObject(config)));
+    return new RedisService(JRedisService["create(io.vertx.core.Vertx,io.vertx.core.json.JsonObject)"](vertx._jdel, utils.convParamJsonObject(config)));
   } else utils.invalidArgs();
 };
 
@@ -3718,7 +3718,7 @@ RedisService.create = function(vertx, config) {
 RedisService.createEventBusProxy = function(vertx, address) {
   var __args = arguments;
   if (__args.length === 2 && typeof __args[0] === 'object' && __args[0]._jdel && typeof __args[1] === 'string') {
-    return new RedisService(JRedisService.createEventBusProxy(vertx._jdel, address));
+    return new RedisService(JRedisService["createEventBusProxy(io.vertx.core.Vertx,java.lang.String)"](vertx._jdel, address));
   } else utils.invalidArgs();
 };
 
