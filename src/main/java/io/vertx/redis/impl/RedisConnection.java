@@ -54,11 +54,34 @@ public class RedisConnection implements ReplyHandler {
       // reset the connection parser
       replyParser.reset();
 
-      client.connect(port, host, new Handler<AsyncResult<NetSocket>>() {
-        @Override
-        public void handle(final AsyncResult<NetSocket> asyncResult) {
-          if (asyncResult.failed()) {
-            log.error("Net client error", asyncResult.cause());
+      client.connect(port, host, asyncResult -> {
+        if (asyncResult.failed()) {
+          log.error("Net client error", asyncResult.cause());
+          // clean the reply queue
+          while (!repliesQueue.isEmpty()) {
+            repliesQueue.poll().handle(new Reply('-', "Connection closed"));
+          }
+          // clean waiting for connection queue
+          while (!connectingQueue.isEmpty()) {
+            connectingQueue.poll().getHandler().handle(new Reply('-', "Connection closed"));
+          }
+          if (resultHandler != null) {
+            resultHandler.handle(new RedisAsyncResult<>(asyncResult.cause()));
+          }
+          // make sure the socket is closed
+          if (netSocket != null) {
+            netSocket.close();
+          }
+          // update state
+          state = State.DISCONNECTED;
+        } else {
+          state = State.CONNECTED;
+          netSocket = asyncResult.result();
+          // set the data handler (the reply parser)
+          netSocket.handler(replyParser);
+          // set the exception handler
+          netSocket.exceptionHandler(e -> {
+            log.error("Socket client error", e);
             // clean the reply queue
             while (!repliesQueue.isEmpty()) {
               repliesQueue.poll().handle(new Reply('-', "Connection closed"));
@@ -67,57 +90,31 @@ public class RedisConnection implements ReplyHandler {
             while (!connectingQueue.isEmpty()) {
               connectingQueue.poll().getHandler().handle(new Reply('-', "Connection closed"));
             }
-            if (resultHandler != null) {
-              resultHandler.handle(new RedisAsyncResult<>(asyncResult.cause()));
+            // update state
+            state = State.DISCONNECTED;
+          });
+          // set the close handler
+          netSocket.closeHandler(v -> {
+            log.info("Socket closed");
+            // clean the reply queue
+            while (!repliesQueue.isEmpty()) {
+              repliesQueue.poll().handle(new Reply('-', "Connection closed"));
             }
-            // make sure the socket is closed
-            if (netSocket != null) {
-              netSocket.close();
+            // clean waiting for connection queue
+            while (!connectingQueue.isEmpty()) {
+              connectingQueue.poll().getHandler().handle(new Reply('-', "Connection closed"));
             }
             // update state
             state = State.DISCONNECTED;
-          } else {
-            state = State.CONNECTED;
-            netSocket = asyncResult.result();
-            // set the data handler (the reply parser)
-            netSocket.handler(replyParser);
-            // set the exception handler
-            netSocket.exceptionHandler(e -> {
-              log.error("Socket client error", e);
-              // clean the reply queue
-              while (!repliesQueue.isEmpty()) {
-                repliesQueue.poll().handle(new Reply('-', "Connection closed"));
-              }
-              // clean waiting for connection queue
-              while (!connectingQueue.isEmpty()) {
-                connectingQueue.poll().getHandler().handle(new Reply('-', "Connection closed"));
-              }
-              // update state
-              state = State.DISCONNECTED;
-            });
-            // set the close handler
-            netSocket.closeHandler(arg0 -> {
-              log.info("Socket closed");
-              // clean the reply queue
-              while (!repliesQueue.isEmpty()) {
-                repliesQueue.poll().handle(new Reply('-', "Connection closed"));
-              }
-              // clean waiting for connection queue
-              while (!connectingQueue.isEmpty()) {
-                connectingQueue.poll().getHandler().handle(new Reply('-', "Connection closed"));
-              }
-              // update state
-              state = State.DISCONNECTED;
-            });
+          });
 
-            // process waiting queue (for messages that have been requested while the connection was not totally established)
-            while (!connectingQueue.isEmpty()) {
-              send(connectingQueue.poll());
-            }
-            // emit ready!
-            if (resultHandler != null) {
-              resultHandler.handle(new RedisAsyncResult<>(null, null));
-            }
+          // process waiting queue (for messages that have been requested while the connection was not totally established)
+          while (!connectingQueue.isEmpty()) {
+            send(connectingQueue.poll());
+          }
+          // emit ready!
+          if (resultHandler != null) {
+            resultHandler.handle(new RedisAsyncResult<>(null, null));
           }
         }
       });
@@ -152,13 +149,11 @@ public class RedisConnection implements ReplyHandler {
         break;
       case DISCONNECTED:
         log.info("Got request when disconnected. Trying to connect.");
-        connect(new Handler<AsyncResult<Void>>() {
-          public void handle(AsyncResult<Void> connection) {
-            if (connection.succeeded()) {
-              send(command);
-            } else {
-              command.getHandler().handle(new Reply('-', "Unable to connect"));
-            }
+        connect(res -> {
+          if (res.succeeded()) {
+            send(command);
+          } else {
+            command.getHandler().handle(new Reply('-', "Unable to connect"));
           }
         });
         break;

@@ -22,11 +22,11 @@ public abstract class AbstractRedisService implements RedisService {
     INFO
   }
 
-  final Vertx vertx;
-  final JsonObject config;
-  final EventBus eb;
+  private final Vertx vertx;
+  private final JsonObject config;
+  private final EventBus eb;
 
-  private RedisConnection redisClient;
+  private RedisConnection redisConnection;
   private RedisSubscriptions subscriptions = new RedisSubscriptions();
 
   private String encoding;
@@ -58,13 +58,13 @@ public abstract class AbstractRedisService implements RedisService {
     binaryCharset = Charset.forName(binaryEnc);
     baseAddress = config.getString("address", "io.vertx.mod-redis");
 
-    redisClient = new RedisConnection(vertx, host, port, subscriptions);
-    redisClient.connect(handler);
+    redisConnection = new RedisConnection(vertx, host, port, subscriptions);
+    redisConnection.connect(handler);
   }
 
   @Override
   public void stop(final Handler<AsyncResult<Void>> handler) {
-    redisClient.disconnect(handler);
+    redisConnection.disconnect(handler);
   }
 
   private ResponseTransform getResponseTransformFor(String command) {
@@ -197,7 +197,7 @@ public abstract class AbstractRedisService implements RedisService {
         break;
     }
 
-    redisClient.send(new Command(command, redisArgs, binary ? binaryCharset : charset).setExpectedReplies(expectedReplies).setHandler(reply -> {
+    redisConnection.send(new Command(command, redisArgs, binary ? binaryCharset : charset).setExpectedReplies(expectedReplies).setHandler(reply -> {
       switch (reply.type()) {
         case '-': // Error
           resultHandler.handle(new RedisAsyncResult<>(reply.asType(String.class)));
