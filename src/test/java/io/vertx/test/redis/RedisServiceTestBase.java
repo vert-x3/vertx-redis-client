@@ -2,41 +2,21 @@ package io.vertx.test.redis;
 
 import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;
-import io.vertx.redis.op.AggregateOptions;
-import io.vertx.redis.op.BitOperation;
-import io.vertx.redis.op.InsertOptions;
-import io.vertx.redis.op.KillFilter;
-import io.vertx.redis.op.MigrateOptions;
-import io.vertx.redis.op.ObjectCmd;
-import io.vertx.redis.op.RangeLimitOptions;
-import io.vertx.redis.op.RangeOptions;
 import io.vertx.redis.RedisService;
-import io.vertx.redis.op.ScanOptions;
-import io.vertx.redis.op.SetOptions;
-import io.vertx.redis.op.ShutdownOptions;
-import io.vertx.redis.op.SortOptions;
+import io.vertx.redis.op.*;
 import io.vertx.test.core.VertxTestBase;
-
-import java.nio.charset.Charset;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.UUID;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.CountDownLatch;
-import java.util.concurrent.TimeUnit;
-
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Ignore;
 import org.junit.Test;
-
 import org.junit.experimental.categories.Category;
 import redis.embedded.RedisServer;
+
+import java.nio.charset.Charset;
+import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.TimeUnit;
 
 /**
  * This test relies on a Redis server, by default it will start and stop a Redis server unless
@@ -46,8 +26,6 @@ import redis.embedded.RedisServer;
 public class RedisServiceTestBase extends VertxTestBase {
 
   private static final Integer DEFAULT_PORT = 6379;
-
-  static RedisServer redisServer;
 
   private static final Map<Integer, RedisServer> instances = new ConcurrentHashMap<>();
 
@@ -71,6 +49,9 @@ public class RedisServiceTestBase extends VertxTestBase {
     if (getHost() == null && getPort() == null) {
       createRedisInstance(DEFAULT_PORT);
       instances.get(DEFAULT_PORT).start();
+      System.out.println("** Using embedded redis");
+    } else {
+      System.out.println("** Using standalone redis");
     }
   }
 
@@ -2451,14 +2432,18 @@ public class RedisServiceTestBase extends VertxTestBase {
 
     awaitLatch(latch);
 
-    rdx.shutdown(ShutdownOptions.NOSAVE, reply ->{
-      fail("server has been terminated. No reply expected");
+    rdx.shutdown(ShutdownOptions.NOSAVE);
+
+    // Wait a bit then ping
+
+    vertx.setTimer(500, tid -> {
+      rdx.ping(reply ->{
+        assertFalse(reply.succeeded());
+        testComplete();
+      });
     });
 
-    rdx.ping(reply ->{
-      assertFalse(reply.succeeded());
-      testComplete();
-    });
+    await();
 
   }
 

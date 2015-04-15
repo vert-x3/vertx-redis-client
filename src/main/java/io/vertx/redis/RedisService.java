@@ -9,19 +9,7 @@ import io.vertx.core.Vertx;
 import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;
 import io.vertx.redis.impl.RedisServiceImpl;
-import io.vertx.redis.op.AggregateOptions;
-import io.vertx.redis.op.BitOperation;
-import io.vertx.redis.op.InsertOptions;
-import io.vertx.redis.op.KillFilter;
-import io.vertx.redis.op.LimitOptions;
-import io.vertx.redis.op.MigrateOptions;
-import io.vertx.redis.op.ObjectCmd;
-import io.vertx.redis.op.RangeLimitOptions;
-import io.vertx.redis.op.RangeOptions;
-import io.vertx.redis.op.ScanOptions;
-import io.vertx.redis.op.SetOptions;
-import io.vertx.redis.op.ShutdownOptions;
-import io.vertx.redis.op.SortOptions;
+import io.vertx.redis.op.*;
 import io.vertx.serviceproxy.ProxyHelper;
 
 import java.util.List;
@@ -1498,11 +1486,10 @@ public interface RedisService {
    * Synchronously save the dataset to disk and then shut down the server
    *
    * @param options Shutdown options
-   * @param handler Handler for the result of this call.
    * @since 1.0.0
    * group: server
    */
-  void shutdown(ShutdownOptions options, Handler<AsyncResult<String>> handler);
+  void shutdown(ShutdownOptions options);
 
   /**
    * Intersect multiple sets

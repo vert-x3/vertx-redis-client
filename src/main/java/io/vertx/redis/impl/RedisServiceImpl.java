@@ -742,8 +742,9 @@ public final class RedisServiceImpl extends AbstractRedisService {
   }
 
   @Override
-  public void shutdown(ShutdownOptions options, Handler<AsyncResult<String>> handler) {
-    sendString("SHUTDOWN", toPayload(options.toJsonArray()), handler);
+  public void shutdown(ShutdownOptions options) {
+    // Empty handler as no reply expected
+    sendString("SHUTDOWN", toPayload(options.toJsonArray()), res -> {});
   }
 
   @Override
