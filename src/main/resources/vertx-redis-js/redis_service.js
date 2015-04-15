@@ -20,6 +20,18 @@ var utils = require('vertx-js/util/utils');
 var io = Packages.io;
 var JsonObject = io.vertx.core.json.JsonObject;
 var JRedisService = io.vertx.redis.RedisService;
+var KillFilter = io.vertx.redis.op.KillFilter;
+var MigrateOptions = io.vertx.redis.op.MigrateOptions;
+var SetOptions = io.vertx.redis.op.SetOptions;
+var SortOptions = io.vertx.redis.op.SortOptions;
+var LimitOptions = io.vertx.redis.op.LimitOptions;
+var RangeLimitOptions = io.vertx.redis.op.RangeLimitOptions;
+var LimitOptions = io.vertx.redis.op.LimitOptions;
+var RangeLimitOptions = io.vertx.redis.op.RangeLimitOptions;
+var ScanOptions = io.vertx.redis.op.ScanOptions;
+var ScanOptions = io.vertx.redis.op.ScanOptions;
+var ScanOptions = io.vertx.redis.op.ScanOptions;
+var ScanOptions = io.vertx.redis.op.ScanOptions;
 
 /**
  @class
@@ -37,7 +49,7 @@ var RedisService = function(j_val) {
   this.start = function(handler) {
     var __args = arguments;
     if (__args.length === 1 && typeof __args[0] === 'function') {
-      j_redisService.start(function(ar) {
+      j_redisService["start(io.vertx.core.Handler)"](function(ar) {
       if (ar.succeeded()) {
         handler(null, null);
       } else {
@@ -55,7 +67,7 @@ var RedisService = function(j_val) {
   this.stop = function(handler) {
     var __args = arguments;
     if (__args.length === 1 && typeof __args[0] === 'function') {
-      j_redisService.stop(function(ar) {
+      j_redisService["stop(io.vertx.core.Handler)"](function(ar) {
       if (ar.succeeded()) {
         handler(null, null);
       } else {
@@ -69,13 +81,14 @@ var RedisService = function(j_val) {
    Append a value to a key
 
    @public
-   @param args {todo} JsonArray [{"name":"key","type":"key"},{"name":"value","type":"string"}] 
+   @param key {string} Key string 
+   @param value {string} Value to append 
    @param handler {function} Handler for the result of this call. 
    */
-  this.append = function(args, handler) {
+  this.append = function(key, value, handler) {
     var __args = arguments;
-    if (__args.length === 2 && typeof __args[0] === 'object' && __args[0] instanceof Array && typeof __args[1] === 'function') {
-      j_redisService.append(utils.convParamJsonArray(args), function(ar) {
+    if (__args.length === 3 && typeof __args[0] === 'string' && typeof __args[1] === 'string' && typeof __args[2] === 'function') {
+      j_redisService["append(java.lang.String,java.lang.String,io.vertx.core.Handler)"](key, value, function(ar) {
       if (ar.succeeded()) {
         handler(ar.result(), null);
       } else {
@@ -89,13 +102,13 @@ var RedisService = function(j_val) {
    Authenticate to the server
 
    @public
-   @param args {todo} JsonArray [{"name":"password","type":"string"}] 
+   @param password {string} Password for authentication 
    @param handler {function} Handler for the result of this call. 
    */
-  this.auth = function(args, handler) {
+  this.auth = function(password, handler) {
     var __args = arguments;
-    if (__args.length === 2 && typeof __args[0] === 'object' && __args[0] instanceof Array && typeof __args[1] === 'function') {
-      j_redisService.auth(utils.convParamJsonArray(args), function(ar) {
+    if (__args.length === 2 && typeof __args[0] === 'string' && typeof __args[1] === 'function') {
+      j_redisService["auth(java.lang.String,io.vertx.core.Handler)"](password, function(ar) {
       if (ar.succeeded()) {
         handler(ar.result(), null);
       } else {
@@ -114,7 +127,7 @@ var RedisService = function(j_val) {
   this.bgrewriteaof = function(handler) {
     var __args = arguments;
     if (__args.length === 1 && typeof __args[0] === 'function') {
-      j_redisService.bgrewriteaof(function(ar) {
+      j_redisService["bgrewriteaof(io.vertx.core.Handler)"](function(ar) {
       if (ar.succeeded()) {
         handler(ar.result(), null);
       } else {
@@ -133,7 +146,7 @@ var RedisService = function(j_val) {
   this.bgsave = function(handler) {
     var __args = arguments;
     if (__args.length === 1 && typeof __args[0] === 'function') {
-      j_redisService.bgsave(function(ar) {
+      j_redisService["bgsave(io.vertx.core.Handler)"](function(ar) {
       if (ar.succeeded()) {
         handler(ar.result(), null);
       } else {
@@ -147,13 +160,35 @@ var RedisService = function(j_val) {
    Count set bits in a string
 
    @public
-   @param args {todo} JsonArray [{"name":"key","type":"key"},{"name":["start","end"],"type":["integer","integer"],"multiple":true}] 
+   @param key {string} Key string 
    @param handler {function} Handler for the result of this call. 
    */
-  this.bitcount = function(args, handler) {
+  this.bitcount = function(key, handler) {
     var __args = arguments;
-    if (__args.length === 2 && typeof __args[0] === 'object' && __args[0] instanceof Array && typeof __args[1] === 'function') {
-      j_redisService.bitcount(utils.convParamJsonArray(args), function(ar) {
+    if (__args.length === 2 && typeof __args[0] === 'string' && typeof __args[1] === 'function') {
+      j_redisService["bitcount(java.lang.String,io.vertx.core.Handler)"](key, function(ar) {
+      if (ar.succeeded()) {
+        handler(ar.result(), null);
+      } else {
+        handler(null, ar.cause());
+      }
+    });
+    } else utils.invalidArgs();
+  };
+
+  /**
+   Count set bits in a string
+
+   @public
+   @param key {string} Key string 
+   @param start {number} Start index 
+   @param end {number} End index 
+   @param handler {function} Handler for the result of this call. 
+   */
+  this.bitcountRange = function(key, start, end, handler) {
+    var __args = arguments;
+    if (__args.length === 4 && typeof __args[0] === 'string' && typeof __args[1] ==='number' && typeof __args[2] ==='number' && typeof __args[3] === 'function') {
+      j_redisService["bitcountRange(java.lang.String,long,long,io.vertx.core.Handler)"](key, start, end, function(ar) {
       if (ar.succeeded()) {
         handler(ar.result(), null);
       } else {
@@ -167,13 +202,15 @@ var RedisService = function(j_val) {
    Perform bitwise operations between strings
 
    @public
-   @param args {todo} JsonArray [{"name":"operation","type":"string"},{"name":"destkey","type":"key"},{"name":"key","type":"key","multiple":true}] 
+   @param operation {Object} Bitwise operation to perform 
+   @param destkey {string} Destination key where result is stored 
+   @param keys {Array.<string>} List of keys on which to perform the operation 
    @param handler {function} Handler for the result of this call. 
    */
-  this.bitop = function(args, handler) {
+  this.bitop = function(operation, destkey, keys, handler) {
     var __args = arguments;
-    if (__args.length === 2 && typeof __args[0] === 'object' && __args[0] instanceof Array && typeof __args[1] === 'function') {
-      j_redisService.bitop(utils.convParamJsonArray(args), function(ar) {
+    if (__args.length === 4 && typeof __args[0] === 'string' && typeof __args[1] === 'string' && typeof __args[2] === 'object' && __args[2] instanceof Array && typeof __args[3] === 'function') {
+      j_redisService["bitop(io.vertx.redis.op.BitOperation,java.lang.String,java.util.List,io.vertx.core.Handler)"](io.vertx.redis.op.BitOperation.valueOf(__args[0]), destkey, keys, function(ar) {
       if (ar.succeeded()) {
         handler(ar.result(), null);
       } else {
@@ -187,13 +224,64 @@ var RedisService = function(j_val) {
    Find first bit set or clear in a string
 
    @public
-   @param args {todo} JsonArray [{"name":"key","type":"key"},{"name":"bit","type":"integer"},{"name":"start","type":"integer","optional":true},{"name":"end","type":"integer","optional":true}] 
+   @param key {string} Key string 
+   @param bit {number} What bit value to look for - must be 1, or 0 
    @param handler {function} Handler for the result of this call. 
    */
-  this.bitpos = function(args, handler) {
+  this.bitpos = function(key, bit, handler) {
     var __args = arguments;
-    if (__args.length === 2 && typeof __args[0] === 'object' && __args[0] instanceof Array && typeof __args[1] === 'function') {
-      j_redisService.bitpos(utils.convParamJsonArray(args), function(ar) {
+    if (__args.length === 3 && typeof __args[0] === 'string' && typeof __args[1] ==='number' && typeof __args[2] === 'function') {
+      j_redisService["bitpos(java.lang.String,int,io.vertx.core.Handler)"](key, bit, function(ar) {
+      if (ar.succeeded()) {
+        handler(ar.result(), null);
+      } else {
+        handler(null, ar.cause());
+      }
+    });
+    } else utils.invalidArgs();
+  };
+
+  /**
+   Find first bit set or clear in a string
+  
+   See also bitposRange() method, which takes start, and stop offset.
+
+   @public
+   @param key {string} Key string 
+   @param bit {number} What bit value to look for - must be 1, or 0 
+   @param start {number} Start offset 
+   @param handler {function} Handler for the result of this call. 
+   */
+  this.bitposFrom = function(key, bit, start, handler) {
+    var __args = arguments;
+    if (__args.length === 4 && typeof __args[0] === 'string' && typeof __args[1] ==='number' && typeof __args[2] ==='number' && typeof __args[3] === 'function') {
+      j_redisService["bitposFrom(java.lang.String,int,int,io.vertx.core.Handler)"](key, bit, start, function(ar) {
+      if (ar.succeeded()) {
+        handler(ar.result(), null);
+      } else {
+        handler(null, ar.cause());
+      }
+    });
+    } else utils.invalidArgs();
+  };
+
+  /**
+   Find first bit set or clear in a string
+  
+   Note: when both start, and stop offsets are specified,
+   behaviour is slightly different than if only start is specified
+
+   @public
+   @param key {string} Key string 
+   @param bit {number} What bit value to look for - must be 1, or 0 
+   @param start {number} Start offset 
+   @param stop {number} End offset - inclusive 
+   @param handler {function} Handler for the result of this call. 
+   */
+  this.bitposRange = function(key, bit, start, stop, handler) {
+    var __args = arguments;
+    if (__args.length === 5 && typeof __args[0] === 'string' && typeof __args[1] ==='number' && typeof __args[2] ==='number' && typeof __args[3] ==='number' && typeof __args[4] === 'function') {
+      j_redisService["bitposRange(java.lang.String,int,int,int,io.vertx.core.Handler)"](key, bit, start, stop, function(ar) {
       if (ar.succeeded()) {
         handler(ar.result(), null);
       } else {
@@ -207,13 +295,35 @@ var RedisService = function(j_val) {
    Remove and get the first element in a list, or block until one is available
 
    @public
-   @param args {todo} JsonArray [{"name":"key","type":"key","multiple":true},{"name":"timeout","type":"integer"}] 
+   @param key {string} Key string identifying a list to watch 
+   @param seconds {number} Timeout in seconds 
    @param handler {function} Handler for the result of this call. 
    */
-  this.blpop = function(args, handler) {
+  this.blpop = function(key, seconds, handler) {
     var __args = arguments;
-    if (__args.length === 2 && typeof __args[0] === 'object' && __args[0] instanceof Array && typeof __args[1] === 'function') {
-      j_redisService.blpop(utils.convParamJsonArray(args), function(ar) {
+    if (__args.length === 3 && typeof __args[0] === 'string' && typeof __args[1] ==='number' && typeof __args[2] === 'function') {
+      j_redisService["blpop(java.lang.String,int,io.vertx.core.Handler)"](key, seconds, function(ar) {
+      if (ar.succeeded()) {
+        handler(utils.convReturnJson(ar.result()), null);
+      } else {
+        handler(null, ar.cause());
+      }
+    });
+    } else utils.invalidArgs();
+  };
+
+  /**
+   Remove and get the first element in any of the lists, or block until one is available
+
+   @public
+   @param keys {Array.<string>} List of key strings identifying lists to watch 
+   @param seconds {number} Timeout in seconds 
+   @param handler {function} Handler for the result of this call. 
+   */
+  this.blpopMany = function(keys, seconds, handler) {
+    var __args = arguments;
+    if (__args.length === 3 && typeof __args[0] === 'object' && __args[0] instanceof Array && typeof __args[1] ==='number' && typeof __args[2] === 'function') {
+      j_redisService["blpopMany(java.util.List,int,io.vertx.core.Handler)"](keys, seconds, function(ar) {
       if (ar.succeeded()) {
         handler(utils.convReturnJson(ar.result()), null);
       } else {
@@ -227,13 +337,35 @@ var RedisService = function(j_val) {
    Remove and get the last element in a list, or block until one is available
 
    @public
-   @param args {todo} JsonArray [{"name":"key","type":"key","multiple":true},{"name":"timeout","type":"integer"}] 
+   @param key {string} Key string identifying a list to watch 
+   @param seconds {number} Timeout in seconds 
    @param handler {function} Handler for the result of this call. 
    */
-  this.brpop = function(args, handler) {
+  this.brpop = function(key, seconds, handler) {
     var __args = arguments;
-    if (__args.length === 2 && typeof __args[0] === 'object' && __args[0] instanceof Array && typeof __args[1] === 'function') {
-      j_redisService.brpop(utils.convParamJsonArray(args), function(ar) {
+    if (__args.length === 3 && typeof __args[0] === 'string' && typeof __args[1] ==='number' && typeof __args[2] === 'function') {
+      j_redisService["brpop(java.lang.String,int,io.vertx.core.Handler)"](key, seconds, function(ar) {
+      if (ar.succeeded()) {
+        handler(utils.convReturnJson(ar.result()), null);
+      } else {
+        handler(null, ar.cause());
+      }
+    });
+    } else utils.invalidArgs();
+  };
+
+  /**
+   Remove and get the last element in any of the lists, or block until one is available
+
+   @public
+   @param keys {Array.<string>} List of key strings identifying lists to watch 
+   @param seconds {number} Timeout in seconds 
+   @param handler {function} Handler for the result of this call. 
+   */
+  this.brpopMany = function(keys, seconds, handler) {
+    var __args = arguments;
+    if (__args.length === 3 && typeof __args[0] === 'object' && __args[0] instanceof Array && typeof __args[1] ==='number' && typeof __args[2] === 'function') {
+      j_redisService["brpopMany(java.util.List,int,io.vertx.core.Handler)"](keys, seconds, function(ar) {
       if (ar.succeeded()) {
         handler(utils.convReturnJson(ar.result()), null);
       } else {
@@ -247,13 +379,15 @@ var RedisService = function(j_val) {
    Pop a value from a list, push it to another list and return it; or block until one is available
 
    @public
-   @param args {todo} JsonArray [{"name":"source","type":"key"},{"name":"destination","type":"key"},{"name":"timeout","type":"integer"}] 
+   @param key {string} Key string identifying the source list 
+   @param destkey {string} Key string identifying the destination list 
+   @param seconds {number} Timeout in seconds 
    @param handler {function} Handler for the result of this call. 
    */
-  this.brpoplpush = function(args, handler) {
+  this.brpoplpush = function(key, destkey, seconds, handler) {
     var __args = arguments;
-    if (__args.length === 2 && typeof __args[0] === 'object' && __args[0] instanceof Array && typeof __args[1] === 'function') {
-      j_redisService.brpoplpush(utils.convParamJsonArray(args), function(ar) {
+    if (__args.length === 4 && typeof __args[0] === 'string' && typeof __args[1] === 'string' && typeof __args[2] ==='number' && typeof __args[3] === 'function') {
+      j_redisService["brpoplpush(java.lang.String,java.lang.String,int,io.vertx.core.Handler)"](key, destkey, seconds, function(ar) {
       if (ar.succeeded()) {
         handler(null, null);
       } else {
@@ -267,13 +401,13 @@ var RedisService = function(j_val) {
    Kill the connection of a client
 
    @public
-   @param args {todo} JsonArray [{"name":"ip:port","type":"string","optional":true},{"command":"ID","name":"client-id","type":"integer","optional":true},{"command":"TYPE","type":"enum","enum":["normal","slave","pubsub"],"optional":true},{"command":"ADDR","name":"ip:port","type":"string","optional":true},{"command":"SKIPME","name":"yes/no","type":"string","optional":true}] 
+   @param filter {Object} Filter options 
    @param handler {function} Handler for the result of this call. 
    */
-  this.clientKill = function(args, handler) {
+  this.clientKill = function(filter, handler) {
     var __args = arguments;
-    if (__args.length === 2 && typeof __args[0] === 'object' && __args[0] instanceof Array && typeof __args[1] === 'function') {
-      j_redisService.clientKill(utils.convParamJsonArray(args), function(ar) {
+    if (__args.length === 2 && typeof __args[0] === 'object' && typeof __args[1] === 'function') {
+      j_redisService["clientKill(io.vertx.redis.op.KillFilter,io.vertx.core.Handler)"](filter != null ? new KillFilter(new JsonObject(JSON.stringify(filter))) : null, function(ar) {
       if (ar.succeeded()) {
         handler(ar.result(), null);
       } else {
@@ -292,7 +426,7 @@ var RedisService = function(j_val) {
   this.clientList = function(handler) {
     var __args = arguments;
     if (__args.length === 1 && typeof __args[0] === 'function') {
-      j_redisService.clientList(function(ar) {
+      j_redisService["clientList(io.vertx.core.Handler)"](function(ar) {
       if (ar.succeeded()) {
         handler(ar.result(), null);
       } else {
@@ -311,7 +445,7 @@ var RedisService = function(j_val) {
   this.clientGetname = function(handler) {
     var __args = arguments;
     if (__args.length === 1 && typeof __args[0] === 'function') {
-      j_redisService.clientGetname(function(ar) {
+      j_redisService["clientGetname(io.vertx.core.Handler)"](function(ar) {
       if (ar.succeeded()) {
         handler(ar.result(), null);
       } else {
@@ -325,13 +459,13 @@ var RedisService = function(j_val) {
    Stop processing commands from clients for some time
 
    @public
-   @param args {todo} JsonArray [{"name":"timeout","type":"integer"}] 
+   @param millis {number} Pause time in milliseconds 
    @param handler {function} Handler for the result of this call. 
    */
-  this.clientPause = function(args, handler) {
+  this.clientPause = function(millis, handler) {
     var __args = arguments;
-    if (__args.length === 2 && typeof __args[0] === 'object' && __args[0] instanceof Array && typeof __args[1] === 'function') {
-      j_redisService.clientPause(utils.convParamJsonArray(args), function(ar) {
+    if (__args.length === 2 && typeof __args[0] ==='number' && typeof __args[1] === 'function') {
+      j_redisService["clientPause(long,io.vertx.core.Handler)"](millis, function(ar) {
       if (ar.succeeded()) {
         handler(ar.result(), null);
       } else {
@@ -345,13 +479,13 @@ var RedisService = function(j_val) {
    Set the current connection name
 
    @public
-   @param args {todo} JsonArray [{"name":"connection-name","type":"string"}] 
+   @param name {string} New name for current connection 
    @param handler {function} Handler for the result of this call. 
    */
-  this.clientSetname = function(args, handler) {
+  this.clientSetname = function(name, handler) {
     var __args = arguments;
-    if (__args.length === 2 && typeof __args[0] === 'object' && __args[0] instanceof Array && typeof __args[1] === 'function') {
-      j_redisService.clientSetname(utils.convParamJsonArray(args), function(ar) {
+    if (__args.length === 2 && typeof __args[0] === 'string' && typeof __args[1] === 'function') {
+      j_redisService["clientSetname(java.lang.String,io.vertx.core.Handler)"](name, function(ar) {
       if (ar.succeeded()) {
         handler(ar.result(), null);
       } else {
@@ -370,7 +504,7 @@ var RedisService = function(j_val) {
   this.clusterSlots = function(handler) {
     var __args = arguments;
     if (__args.length === 1 && typeof __args[0] === 'function') {
-      j_redisService.clusterSlots(function(ar) {
+      j_redisService["clusterSlots(io.vertx.core.Handler)"](function(ar) {
       if (ar.succeeded()) {
         handler(utils.convReturnJson(ar.result()), null);
       } else {
@@ -389,7 +523,7 @@ var RedisService = function(j_val) {
   this.command = function(handler) {
     var __args = arguments;
     if (__args.length === 1 && typeof __args[0] === 'function') {
-      j_redisService.command(function(ar) {
+      j_redisService["command(io.vertx.core.Handler)"](function(ar) {
       if (ar.succeeded()) {
         handler(utils.convReturnJson(ar.result()), null);
       } else {
@@ -408,7 +542,7 @@ var RedisService = function(j_val) {
   this.commandCount = function(handler) {
     var __args = arguments;
     if (__args.length === 1 && typeof __args[0] === 'function') {
-      j_redisService.commandCount(function(ar) {
+      j_redisService["commandCount(io.vertx.core.Handler)"](function(ar) {
       if (ar.succeeded()) {
         handler(ar.result(), null);
       } else {
@@ -427,7 +561,7 @@ var RedisService = function(j_val) {
   this.commandGetkeys = function(handler) {
     var __args = arguments;
     if (__args.length === 1 && typeof __args[0] === 'function') {
-      j_redisService.commandGetkeys(function(ar) {
+      j_redisService["commandGetkeys(io.vertx.core.Handler)"](function(ar) {
       if (ar.succeeded()) {
         handler(utils.convReturnJson(ar.result()), null);
       } else {
@@ -441,13 +575,13 @@ var RedisService = function(j_val) {
    Get array of specific Redis command details
 
    @public
-   @param args {todo} JsonArray [{"name":"command-name","type":"string","multiple":true}] 
+   @param commands {Array.<string>} List of commands to get info for 
    @param handler {function} Handler for the result of this call. 
    */
-  this.commandInfo = function(args, handler) {
+  this.commandInfo = function(commands, handler) {
     var __args = arguments;
     if (__args.length === 2 && typeof __args[0] === 'object' && __args[0] instanceof Array && typeof __args[1] === 'function') {
-      j_redisService.commandInfo(utils.convParamJsonArray(args), function(ar) {
+      j_redisService["commandInfo(java.util.List,io.vertx.core.Handler)"](commands, function(ar) {
       if (ar.succeeded()) {
         handler(utils.convReturnJson(ar.result()), null);
       } else {
@@ -461,13 +595,13 @@ var RedisService = function(j_val) {
    Get the value of a configuration parameter
 
    @public
-   @param args {todo} JsonArray [{"name":"parameter","type":"string"}] 
+   @param parameter {string} Configuration parameter 
    @param handler {function} Handler for the result of this call. 
    */
-  this.configGet = function(args, handler) {
+  this.configGet = function(parameter, handler) {
     var __args = arguments;
-    if (__args.length === 2 && typeof __args[0] === 'object' && __args[0] instanceof Array && typeof __args[1] === 'function') {
-      j_redisService.configGet(utils.convParamJsonArray(args), function(ar) {
+    if (__args.length === 2 && typeof __args[0] === 'string' && typeof __args[1] === 'function') {
+      j_redisService["configGet(java.lang.String,io.vertx.core.Handler)"](parameter, function(ar) {
       if (ar.succeeded()) {
         handler(utils.convReturnJson(ar.result()), null);
       } else {
@@ -486,7 +620,7 @@ var RedisService = function(j_val) {
   this.configRewrite = function(handler) {
     var __args = arguments;
     if (__args.length === 1 && typeof __args[0] === 'function') {
-      j_redisService.configRewrite(function(ar) {
+      j_redisService["configRewrite(io.vertx.core.Handler)"](function(ar) {
       if (ar.succeeded()) {
         handler(ar.result(), null);
       } else {
@@ -500,13 +634,14 @@ var RedisService = function(j_val) {
    Set a configuration parameter to the given value
 
    @public
-   @param args {todo} JsonArray [{"name":"parameter","type":"string"},{"name":"value","type":"string"}] 
+   @param parameter {string} Configuration parameter 
+   @param value {string} New value 
    @param handler {function} Handler for the result of this call. 
    */
-  this.configSet = function(args, handler) {
+  this.configSet = function(parameter, value, handler) {
     var __args = arguments;
-    if (__args.length === 2 && typeof __args[0] === 'object' && __args[0] instanceof Array && typeof __args[1] === 'function') {
-      j_redisService.configSet(utils.convParamJsonArray(args), function(ar) {
+    if (__args.length === 3 && typeof __args[0] === 'string' && typeof __args[1] === 'string' && typeof __args[2] === 'function') {
+      j_redisService["configSet(java.lang.String,java.lang.String,io.vertx.core.Handler)"](parameter, value, function(ar) {
       if (ar.succeeded()) {
         handler(ar.result(), null);
       } else {
@@ -525,7 +660,7 @@ var RedisService = function(j_val) {
   this.configResetstat = function(handler) {
     var __args = arguments;
     if (__args.length === 1 && typeof __args[0] === 'function') {
-      j_redisService.configResetstat(function(ar) {
+      j_redisService["configResetstat(io.vertx.core.Handler)"](function(ar) {
       if (ar.succeeded()) {
         handler(ar.result(), null);
       } else {
@@ -544,7 +679,7 @@ var RedisService = function(j_val) {
   this.dbsize = function(handler) {
     var __args = arguments;
     if (__args.length === 1 && typeof __args[0] === 'function') {
-      j_redisService.dbsize(function(ar) {
+      j_redisService["dbsize(io.vertx.core.Handler)"](function(ar) {
       if (ar.succeeded()) {
         handler(ar.result(), null);
       } else {
@@ -558,13 +693,13 @@ var RedisService = function(j_val) {
    Get debugging information about a key
 
    @public
-   @param args {todo} JsonArray [{"name":"key","type":"key"}] 
+   @param key {string} Key string 
    @param handler {function} Handler for the result of this call. 
    */
-  this.debugObject = function(args, handler) {
+  this.debugObject = function(key, handler) {
     var __args = arguments;
-    if (__args.length === 2 && typeof __args[0] === 'object' && __args[0] instanceof Array && typeof __args[1] === 'function') {
-      j_redisService.debugObject(utils.convParamJsonArray(args), function(ar) {
+    if (__args.length === 2 && typeof __args[0] === 'string' && typeof __args[1] === 'function') {
+      j_redisService["debugObject(java.lang.String,io.vertx.core.Handler)"](key, function(ar) {
       if (ar.succeeded()) {
         handler(ar.result(), null);
       } else {
@@ -583,7 +718,7 @@ var RedisService = function(j_val) {
   this.debugSegfault = function(handler) {
     var __args = arguments;
     if (__args.length === 1 && typeof __args[0] === 'function') {
-      j_redisService.debugSegfault(function(ar) {
+      j_redisService["debugSegfault(io.vertx.core.Handler)"](function(ar) {
       if (ar.succeeded()) {
         handler(ar.result(), null);
       } else {
@@ -597,13 +732,13 @@ var RedisService = function(j_val) {
    Decrement the integer value of a key by one
 
    @public
-   @param args {todo} JsonArray [{"name":"key","type":"key"}] 
+   @param key {string} Key string 
    @param handler {function} Handler for the result of this call. 
    */
-  this.decr = function(args, handler) {
+  this.decr = function(key, handler) {
     var __args = arguments;
-    if (__args.length === 2 && typeof __args[0] === 'object' && __args[0] instanceof Array && typeof __args[1] === 'function') {
-      j_redisService.decr(utils.convParamJsonArray(args), function(ar) {
+    if (__args.length === 2 && typeof __args[0] === 'string' && typeof __args[1] === 'function') {
+      j_redisService["decr(java.lang.String,io.vertx.core.Handler)"](key, function(ar) {
       if (ar.succeeded()) {
         handler(ar.result(), null);
       } else {
@@ -617,13 +752,14 @@ var RedisService = function(j_val) {
    Decrement the integer value of a key by the given number
 
    @public
-   @param args {todo} JsonArray [{"name":"key","type":"key"},{"name":"decrement","type":"integer"}] 
+   @param key {string} Key string 
+   @param decrement {number} Value by which to decrement 
    @param handler {function} Handler for the result of this call. 
    */
-  this.decrby = function(args, handler) {
+  this.decrby = function(key, decrement, handler) {
     var __args = arguments;
-    if (__args.length === 2 && typeof __args[0] === 'object' && __args[0] instanceof Array && typeof __args[1] === 'function') {
-      j_redisService.decrby(utils.convParamJsonArray(args), function(ar) {
+    if (__args.length === 3 && typeof __args[0] === 'string' && typeof __args[1] ==='number' && typeof __args[2] === 'function') {
+      j_redisService["decrby(java.lang.String,long,io.vertx.core.Handler)"](key, decrement, function(ar) {
       if (ar.succeeded()) {
         handler(ar.result(), null);
       } else {
@@ -637,13 +773,13 @@ var RedisService = function(j_val) {
    Delete a key
 
    @public
-   @param args {todo} JsonArray [{"name":"key","type":"key","multiple":true}] 
+   @param keys {Array.<string>} List of keys to delete 
    @param handler {function} Handler for the result of this call. 
    */
-  this.del = function(args, handler) {
+  this.del = function(keys, handler) {
     var __args = arguments;
     if (__args.length === 2 && typeof __args[0] === 'object' && __args[0] instanceof Array && typeof __args[1] === 'function') {
-      j_redisService.del(utils.convParamJsonArray(args), function(ar) {
+      j_redisService["del(java.util.List,io.vertx.core.Handler)"](keys, function(ar) {
       if (ar.succeeded()) {
         handler(ar.result(), null);
       } else {
@@ -662,7 +798,7 @@ var RedisService = function(j_val) {
   this.discard = function(handler) {
     var __args = arguments;
     if (__args.length === 1 && typeof __args[0] === 'function') {
-      j_redisService.discard(function(ar) {
+      j_redisService["discard(io.vertx.core.Handler)"](function(ar) {
       if (ar.succeeded()) {
         handler(ar.result(), null);
       } else {
@@ -676,13 +812,13 @@ var RedisService = function(j_val) {
    Return a serialized version of the value stored at the specified key.
 
    @public
-   @param args {todo} JsonArray [{"name":"key","type":"key"}] 
+   @param key {string} Key string 
    @param handler {function} Handler for the result of this call. 
    */
-  this.dump = function(args, handler) {
+  this.dump = function(key, handler) {
     var __args = arguments;
-    if (__args.length === 2 && typeof __args[0] === 'object' && __args[0] instanceof Array && typeof __args[1] === 'function') {
-      j_redisService.dump(utils.convParamJsonArray(args), function(ar) {
+    if (__args.length === 2 && typeof __args[0] === 'string' && typeof __args[1] === 'function') {
+      j_redisService["dump(java.lang.String,io.vertx.core.Handler)"](key, function(ar) {
       if (ar.succeeded()) {
         handler(ar.result(), null);
       } else {
@@ -696,13 +832,13 @@ var RedisService = function(j_val) {
    Echo the given string
 
    @public
-   @param args {todo} JsonArray [{"name":"message","type":"string"}] 
+   @param message {string} String to echo 
    @param handler {function} Handler for the result of this call. 
    */
-  this.echo = function(args, handler) {
+  this.echo = function(message, handler) {
     var __args = arguments;
-    if (__args.length === 2 && typeof __args[0] === 'object' && __args[0] instanceof Array && typeof __args[1] === 'function') {
-      j_redisService.echo(utils.convParamJsonArray(args), function(ar) {
+    if (__args.length === 2 && typeof __args[0] === 'string' && typeof __args[1] === 'function') {
+      j_redisService["echo(java.lang.String,io.vertx.core.Handler)"](message, function(ar) {
       if (ar.succeeded()) {
         handler(ar.result(), null);
       } else {
@@ -716,13 +852,15 @@ var RedisService = function(j_val) {
    Execute a Lua script server side
 
    @public
-   @param args {todo} JsonArray [{"name":"script","type":"string"},{"name":"numkeys","type":"integer"},{"name":"key","type":"key","multiple":true},{"name":"arg","type":"string","multiple":true}] 
+   @param script {string} Lua script to evaluate 
+   @param keys {Array.<string>} List of keys 
+   @param args {Array.<string>} List of argument values 
    @param handler {function} Handler for the result of this call. 
    */
-  this.eval = function(args, handler) {
+  this.eval = function(script, keys, args, handler) {
     var __args = arguments;
-    if (__args.length === 2 && typeof __args[0] === 'object' && __args[0] instanceof Array && typeof __args[1] === 'function') {
-      j_redisService.eval(utils.convParamJsonArray(args), function(ar) {
+    if (__args.length === 4 && typeof __args[0] === 'string' && typeof __args[1] === 'object' && __args[1] instanceof Array && typeof __args[2] === 'object' && __args[2] instanceof Array && typeof __args[3] === 'function') {
+      j_redisService["eval(java.lang.String,java.util.List,java.util.List,io.vertx.core.Handler)"](script, keys, args, function(ar) {
       if (ar.succeeded()) {
         handler(null, null);
       } else {
@@ -736,13 +874,15 @@ var RedisService = function(j_val) {
    Execute a Lua script server side
 
    @public
-   @param args {todo} JsonArray [{"name":"sha1","type":"string"},{"name":"numkeys","type":"integer"},{"name":"key","type":"key","multiple":true},{"name":"arg","type":"string","multiple":true}] 
+   @param sha1 {string} SHA1 digest of the script cached on the server 
+   @param keys {Array.<string>} List of keys 
+   @param values {Array.<string>} List of values 
    @param handler {function} Handler for the result of this call. 
    */
-  this.evalsha = function(args, handler) {
+  this.evalsha = function(sha1, keys, values, handler) {
     var __args = arguments;
-    if (__args.length === 2 && typeof __args[0] === 'object' && __args[0] instanceof Array && typeof __args[1] === 'function') {
-      j_redisService.evalsha(utils.convParamJsonArray(args), function(ar) {
+    if (__args.length === 4 && typeof __args[0] === 'string' && typeof __args[1] === 'object' && __args[1] instanceof Array && typeof __args[2] === 'object' && __args[2] instanceof Array && typeof __args[3] === 'function') {
+      j_redisService["evalsha(java.lang.String,java.util.List,java.util.List,io.vertx.core.Handler)"](sha1, keys, values, function(ar) {
       if (ar.succeeded()) {
         handler(null, null);
       } else {
@@ -761,7 +901,7 @@ var RedisService = function(j_val) {
   this.exec = function(handler) {
     var __args = arguments;
     if (__args.length === 1 && typeof __args[0] === 'function') {
-      j_redisService.exec(function(ar) {
+      j_redisService["exec(io.vertx.core.Handler)"](function(ar) {
       if (ar.succeeded()) {
         handler(null, null);
       } else {
@@ -775,13 +915,13 @@ var RedisService = function(j_val) {
    Determine if a key exists
 
    @public
-   @param args {todo} JsonArray [{"name":"key","type":"key"}] 
+   @param key {string} Key string 
    @param handler {function} Handler for the result of this call. 
    */
-  this.exists = function(args, handler) {
+  this.exists = function(key, handler) {
     var __args = arguments;
-    if (__args.length === 2 && typeof __args[0] === 'object' && __args[0] instanceof Array && typeof __args[1] === 'function') {
-      j_redisService.exists(utils.convParamJsonArray(args), function(ar) {
+    if (__args.length === 2 && typeof __args[0] === 'string' && typeof __args[1] === 'function') {
+      j_redisService["exists(java.lang.String,io.vertx.core.Handler)"](key, function(ar) {
       if (ar.succeeded()) {
         handler(ar.result(), null);
       } else {
@@ -795,13 +935,14 @@ var RedisService = function(j_val) {
    Set a key's time to live in seconds
 
    @public
-   @param args {todo} JsonArray [{"name":"key","type":"key"},{"name":"seconds","type":"integer"}] 
+   @param key {string} Key string 
+   @param seconds {number} Time to live in seconds 
    @param handler {function} Handler for the result of this call. 
    */
-  this.expire = function(args, handler) {
+  this.expire = function(key, seconds, handler) {
     var __args = arguments;
-    if (__args.length === 2 && typeof __args[0] === 'object' && __args[0] instanceof Array && typeof __args[1] === 'function') {
-      j_redisService.expire(utils.convParamJsonArray(args), function(ar) {
+    if (__args.length === 3 && typeof __args[0] === 'string' && typeof __args[1] ==='number' && typeof __args[2] === 'function') {
+      j_redisService["expire(java.lang.String,int,io.vertx.core.Handler)"](key, seconds, function(ar) {
       if (ar.succeeded()) {
         handler(ar.result(), null);
       } else {
@@ -815,13 +956,14 @@ var RedisService = function(j_val) {
    Set the expiration for a key as a UNIX timestamp
 
    @public
-   @param args {todo} JsonArray [{"name":"key","type":"key"},{"name":"timestamp","type":"posix time"}] 
+   @param key {string} Key string 
+   @param seconds {number} Expiry time as Unix timestamp in seconds 
    @param handler {function} Handler for the result of this call. 
    */
-  this.expireat = function(args, handler) {
+  this.expireat = function(key, seconds, handler) {
     var __args = arguments;
-    if (__args.length === 2 && typeof __args[0] === 'object' && __args[0] instanceof Array && typeof __args[1] === 'function') {
-      j_redisService.expireat(utils.convParamJsonArray(args), function(ar) {
+    if (__args.length === 3 && typeof __args[0] === 'string' && typeof __args[1] ==='number' && typeof __args[2] === 'function') {
+      j_redisService["expireat(java.lang.String,long,io.vertx.core.Handler)"](key, seconds, function(ar) {
       if (ar.succeeded()) {
         handler(ar.result(), null);
       } else {
@@ -840,7 +982,7 @@ var RedisService = function(j_val) {
   this.flushall = function(handler) {
     var __args = arguments;
     if (__args.length === 1 && typeof __args[0] === 'function') {
-      j_redisService.flushall(function(ar) {
+      j_redisService["flushall(io.vertx.core.Handler)"](function(ar) {
       if (ar.succeeded()) {
         handler(ar.result(), null);
       } else {
@@ -859,7 +1001,7 @@ var RedisService = function(j_val) {
   this.flushdb = function(handler) {
     var __args = arguments;
     if (__args.length === 1 && typeof __args[0] === 'function') {
-      j_redisService.flushdb(function(ar) {
+      j_redisService["flushdb(io.vertx.core.Handler)"](function(ar) {
       if (ar.succeeded()) {
         handler(ar.result(), null);
       } else {
@@ -873,13 +1015,33 @@ var RedisService = function(j_val) {
    Get the value of a key
 
    @public
-   @param args {todo} JsonArray [{"name":"key","type":"key"}] 
+   @param key {string} Key string 
    @param handler {function} Handler for the result of this call. 
    */
-  this.get = function(args, handler) {
+  this.get = function(key, handler) {
     var __args = arguments;
-    if (__args.length === 2 && typeof __args[0] === 'object' && __args[0] instanceof Array && typeof __args[1] === 'function') {
-      j_redisService.get(utils.convParamJsonArray(args), function(ar) {
+    if (__args.length === 2 && typeof __args[0] === 'string' && typeof __args[1] === 'function') {
+      j_redisService["get(java.lang.String,io.vertx.core.Handler)"](key, function(ar) {
+      if (ar.succeeded()) {
+        handler(ar.result(), null);
+      } else {
+        handler(null, ar.cause());
+      }
+    });
+    } else utils.invalidArgs();
+  };
+
+  /**
+   Get the value of a key - without decoding as utf-8
+
+   @public
+   @param key {string} Key string 
+   @param handler {function} Handler for the result of this call. 
+   */
+  this.getBinary = function(key, handler) {
+    var __args = arguments;
+    if (__args.length === 2 && typeof __args[0] === 'string' && typeof __args[1] === 'function') {
+      j_redisService["getBinary(java.lang.String,io.vertx.core.Handler)"](key, function(ar) {
       if (ar.succeeded()) {
         handler(ar.result(), null);
       } else {
@@ -893,13 +1055,14 @@ var RedisService = function(j_val) {
    Returns the bit value at offset in the string value stored at key
 
    @public
-   @param args {todo} JsonArray [{"name":"key","type":"key"},{"name":"offset","type":"integer"}] 
+   @param key {string} Key string 
+   @param offset {number} Offset in bits 
    @param handler {function} Handler for the result of this call. 
    */
-  this.getbit = function(args, handler) {
+  this.getbit = function(key, offset, handler) {
     var __args = arguments;
-    if (__args.length === 2 && typeof __args[0] === 'object' && __args[0] instanceof Array && typeof __args[1] === 'function') {
-      j_redisService.getbit(utils.convParamJsonArray(args), function(ar) {
+    if (__args.length === 3 && typeof __args[0] === 'string' && typeof __args[1] ==='number' && typeof __args[2] === 'function') {
+      j_redisService["getbit(java.lang.String,long,io.vertx.core.Handler)"](key, offset, function(ar) {
       if (ar.succeeded()) {
         handler(ar.result(), null);
       } else {
@@ -913,13 +1076,15 @@ var RedisService = function(j_val) {
    Get a substring of the string stored at a key
 
    @public
-   @param args {todo} JsonArray [{"name":"key","type":"key"},{"name":"start","type":"integer"},{"name":"end","type":"integer"}] 
+   @param key {string} Key string 
+   @param start {number} Start offset 
+   @param end {number} End offset - inclusive 
    @param handler {function} Handler for the result of this call. 
    */
-  this.getrange = function(args, handler) {
+  this.getrange = function(key, start, end, handler) {
     var __args = arguments;
-    if (__args.length === 2 && typeof __args[0] === 'object' && __args[0] instanceof Array && typeof __args[1] === 'function') {
-      j_redisService.getrange(utils.convParamJsonArray(args), function(ar) {
+    if (__args.length === 4 && typeof __args[0] === 'string' && typeof __args[1] ==='number' && typeof __args[2] ==='number' && typeof __args[3] === 'function') {
+      j_redisService["getrange(java.lang.String,long,long,io.vertx.core.Handler)"](key, start, end, function(ar) {
       if (ar.succeeded()) {
         handler(ar.result(), null);
       } else {
@@ -933,13 +1098,14 @@ var RedisService = function(j_val) {
    Set the string value of a key and return its old value
 
    @public
-   @param args {todo} JsonArray [{"name":"key","type":"key"},{"name":"value","type":"string"}] 
+   @param key {string} Key of which value to set 
+   @param value {string} New value for the key 
    @param handler {function} Handler for the result of this call. 
    */
-  this.getset = function(args, handler) {
+  this.getset = function(key, value, handler) {
     var __args = arguments;
-    if (__args.length === 2 && typeof __args[0] === 'object' && __args[0] instanceof Array && typeof __args[1] === 'function') {
-      j_redisService.getset(utils.convParamJsonArray(args), function(ar) {
+    if (__args.length === 3 && typeof __args[0] === 'string' && typeof __args[1] === 'string' && typeof __args[2] === 'function') {
+      j_redisService["getset(java.lang.String,java.lang.String,io.vertx.core.Handler)"](key, value, function(ar) {
       if (ar.succeeded()) {
         handler(ar.result(), null);
       } else {
@@ -953,13 +1119,35 @@ var RedisService = function(j_val) {
    Delete one or more hash fields
 
    @public
-   @param args {todo} JsonArray [{"name":"key","type":"key"},{"name":"field","type":"string","multiple":true}] 
+   @param key {string} Key string 
+   @param field {string} Field name 
    @param handler {function} Handler for the result of this call. 
    */
-  this.hdel = function(args, handler) {
+  this.hdel = function(key, field, handler) {
     var __args = arguments;
-    if (__args.length === 2 && typeof __args[0] === 'object' && __args[0] instanceof Array && typeof __args[1] === 'function') {
-      j_redisService.hdel(utils.convParamJsonArray(args), function(ar) {
+    if (__args.length === 3 && typeof __args[0] === 'string' && typeof __args[1] === 'string' && typeof __args[2] === 'function') {
+      j_redisService["hdel(java.lang.String,java.lang.String,io.vertx.core.Handler)"](key, field, function(ar) {
+      if (ar.succeeded()) {
+        handler(ar.result(), null);
+      } else {
+        handler(null, ar.cause());
+      }
+    });
+    } else utils.invalidArgs();
+  };
+
+  /**
+   Delete one or more hash fields
+
+   @public
+   @param key {string} Key string 
+   @param fields {Array.<string>} Field names 
+   @param handler {function} Handler for the result of this call. 
+   */
+  this.hdelMany = function(key, fields, handler) {
+    var __args = arguments;
+    if (__args.length === 3 && typeof __args[0] === 'string' && typeof __args[1] === 'object' && __args[1] instanceof Array && typeof __args[2] === 'function') {
+      j_redisService["hdelMany(java.lang.String,java.util.List,io.vertx.core.Handler)"](key, fields, function(ar) {
       if (ar.succeeded()) {
         handler(ar.result(), null);
       } else {
@@ -973,13 +1161,14 @@ var RedisService = function(j_val) {
    Determine if a hash field exists
 
    @public
-   @param args {todo} JsonArray [{"name":"key","type":"key"},{"name":"field","type":"string"}] 
+   @param key {string} Key string 
+   @param field {string} Field name 
    @param handler {function} Handler for the result of this call. 
    */
-  this.hexists = function(args, handler) {
+  this.hexists = function(key, field, handler) {
     var __args = arguments;
-    if (__args.length === 2 && typeof __args[0] === 'object' && __args[0] instanceof Array && typeof __args[1] === 'function') {
-      j_redisService.hexists(utils.convParamJsonArray(args), function(ar) {
+    if (__args.length === 3 && typeof __args[0] === 'string' && typeof __args[1] === 'string' && typeof __args[2] === 'function') {
+      j_redisService["hexists(java.lang.String,java.lang.String,io.vertx.core.Handler)"](key, field, function(ar) {
       if (ar.succeeded()) {
         handler(ar.result(), null);
       } else {
@@ -993,13 +1182,14 @@ var RedisService = function(j_val) {
    Get the value of a hash field
 
    @public
-   @param args {todo} JsonArray [{"name":"key","type":"key"},{"name":"field","type":"string"}] 
+   @param key {string} Key string 
+   @param field {string} Field name 
    @param handler {function} Handler for the result of this call. 
    */
-  this.hget = function(args, handler) {
+  this.hget = function(key, field, handler) {
     var __args = arguments;
-    if (__args.length === 2 && typeof __args[0] === 'object' && __args[0] instanceof Array && typeof __args[1] === 'function') {
-      j_redisService.hget(utils.convParamJsonArray(args), function(ar) {
+    if (__args.length === 3 && typeof __args[0] === 'string' && typeof __args[1] === 'string' && typeof __args[2] === 'function') {
+      j_redisService["hget(java.lang.String,java.lang.String,io.vertx.core.Handler)"](key, field, function(ar) {
       if (ar.succeeded()) {
         handler(ar.result(), null);
       } else {
@@ -1013,13 +1203,13 @@ var RedisService = function(j_val) {
    Get all the fields and values in a hash
 
    @public
-   @param args {todo} JsonArray [{"name":"key","type":"key"}] 
+   @param key {string} Key string 
    @param handler {function} Handler for the result of this call. 
    */
-  this.hgetall = function(args, handler) {
+  this.hgetall = function(key, handler) {
     var __args = arguments;
-    if (__args.length === 2 && typeof __args[0] === 'object' && __args[0] instanceof Array && typeof __args[1] === 'function') {
-      j_redisService.hgetall(utils.convParamJsonArray(args), function(ar) {
+    if (__args.length === 2 && typeof __args[0] === 'string' && typeof __args[1] === 'function') {
+      j_redisService["hgetall(java.lang.String,io.vertx.core.Handler)"](key, function(ar) {
       if (ar.succeeded()) {
         handler(utils.convReturnJson(ar.result()), null);
       } else {
@@ -1033,13 +1223,15 @@ var RedisService = function(j_val) {
    Increment the integer value of a hash field by the given number
 
    @public
-   @param args {todo} JsonArray [{"name":"key","type":"key"},{"name":"field","type":"string"},{"name":"increment","type":"integer"}] 
+   @param key {string} Key string 
+   @param field {string} Field name 
+   @param increment {number} Value by which to increment 
    @param handler {function} Handler for the result of this call. 
    */
-  this.hincrby = function(args, handler) {
+  this.hincrby = function(key, field, increment, handler) {
     var __args = arguments;
-    if (__args.length === 2 && typeof __args[0] === 'object' && __args[0] instanceof Array && typeof __args[1] === 'function') {
-      j_redisService.hincrby(utils.convParamJsonArray(args), function(ar) {
+    if (__args.length === 4 && typeof __args[0] === 'string' && typeof __args[1] === 'string' && typeof __args[2] ==='number' && typeof __args[3] === 'function') {
+      j_redisService["hincrby(java.lang.String,java.lang.String,long,io.vertx.core.Handler)"](key, field, increment, function(ar) {
       if (ar.succeeded()) {
         handler(ar.result(), null);
       } else {
@@ -1053,13 +1245,15 @@ var RedisService = function(j_val) {
    Increment the float value of a hash field by the given amount
 
    @public
-   @param args {todo} JsonArray [{"name":"key","type":"key"},{"name":"field","type":"string"},{"name":"increment","type":"double"}] 
+   @param key {string} Key string 
+   @param field {string} Field name 
+   @param increment {number} Value by which to increment 
    @param handler {function} Handler for the result of this call. 
    */
-  this.hincrbyfloat = function(args, handler) {
+  this.hincrbyfloat = function(key, field, increment, handler) {
     var __args = arguments;
-    if (__args.length === 2 && typeof __args[0] === 'object' && __args[0] instanceof Array && typeof __args[1] === 'function') {
-      j_redisService.hincrbyfloat(utils.convParamJsonArray(args), function(ar) {
+    if (__args.length === 4 && typeof __args[0] === 'string' && typeof __args[1] === 'string' && typeof __args[2] ==='number' && typeof __args[3] === 'function') {
+      j_redisService["hincrbyfloat(java.lang.String,java.lang.String,double,io.vertx.core.Handler)"](key, field, increment, function(ar) {
       if (ar.succeeded()) {
         handler(ar.result(), null);
       } else {
@@ -1073,13 +1267,13 @@ var RedisService = function(j_val) {
    Get all the fields in a hash
 
    @public
-   @param args {todo} JsonArray [{"name":"key","type":"key"}] 
+   @param key {string} Key string 
    @param handler {function} Handler for the result of this call. 
    */
-  this.hkeys = function(args, handler) {
+  this.hkeys = function(key, handler) {
     var __args = arguments;
-    if (__args.length === 2 && typeof __args[0] === 'object' && __args[0] instanceof Array && typeof __args[1] === 'function') {
-      j_redisService.hkeys(utils.convParamJsonArray(args), function(ar) {
+    if (__args.length === 2 && typeof __args[0] === 'string' && typeof __args[1] === 'function') {
+      j_redisService["hkeys(java.lang.String,io.vertx.core.Handler)"](key, function(ar) {
       if (ar.succeeded()) {
         handler(utils.convReturnJson(ar.result()), null);
       } else {
@@ -1093,13 +1287,13 @@ var RedisService = function(j_val) {
    Get the number of fields in a hash
 
    @public
-   @param args {todo} JsonArray [{"name":"key","type":"key"}] 
+   @param key {string} Key string 
    @param handler {function} Handler for the result of this call. 
    */
-  this.hlen = function(args, handler) {
+  this.hlen = function(key, handler) {
     var __args = arguments;
-    if (__args.length === 2 && typeof __args[0] === 'object' && __args[0] instanceof Array && typeof __args[1] === 'function') {
-      j_redisService.hlen(utils.convParamJsonArray(args), function(ar) {
+    if (__args.length === 2 && typeof __args[0] === 'string' && typeof __args[1] === 'function') {
+      j_redisService["hlen(java.lang.String,io.vertx.core.Handler)"](key, function(ar) {
       if (ar.succeeded()) {
         handler(ar.result(), null);
       } else {
@@ -1113,13 +1307,14 @@ var RedisService = function(j_val) {
    Get the values of all the given hash fields
 
    @public
-   @param args {todo} JsonArray [{"name":"key","type":"key"},{"name":"field","type":"string","multiple":true}] 
+   @param key {string} Key string 
+   @param fields {Array.<string>} Field names 
    @param handler {function} Handler for the result of this call. 
    */
-  this.hmget = function(args, handler) {
+  this.hmget = function(key, fields, handler) {
     var __args = arguments;
-    if (__args.length === 2 && typeof __args[0] === 'object' && __args[0] instanceof Array && typeof __args[1] === 'function') {
-      j_redisService.hmget(utils.convParamJsonArray(args), function(ar) {
+    if (__args.length === 3 && typeof __args[0] === 'string' && typeof __args[1] === 'object' && __args[1] instanceof Array && typeof __args[2] === 'function') {
+      j_redisService["hmget(java.lang.String,java.util.List,io.vertx.core.Handler)"](key, fields, function(ar) {
       if (ar.succeeded()) {
         handler(utils.convReturnJson(ar.result()), null);
       } else {
@@ -1133,13 +1328,14 @@ var RedisService = function(j_val) {
    Set multiple hash fields to multiple values
 
    @public
-   @param args {todo} JsonArray [{"name":"key","type":"key"},{"name":["field","value"],"type":["string","string"],"multiple":true}] 
+   @param key {string} Key string 
+   @param values {Array.<string>} Map of field:value pairs 
    @param handler {function} Handler for the result of this call. 
    */
-  this.hmset = function(args, handler) {
+  this.hmset = function(key, values, handler) {
     var __args = arguments;
-    if (__args.length === 2 && typeof __args[0] === 'object' && __args[0] instanceof Array && typeof __args[1] === 'function') {
-      j_redisService.hmset(utils.convParamJsonArray(args), function(ar) {
+    if (__args.length === 3 && typeof __args[0] === 'string' && typeof __args[1] === 'object' && typeof __args[2] === 'function') {
+      j_redisService["hmset(java.lang.String,java.util.Map,io.vertx.core.Handler)"](key, values, function(ar) {
       if (ar.succeeded()) {
         handler(ar.result(), null);
       } else {
@@ -1153,13 +1349,15 @@ var RedisService = function(j_val) {
    Set the string value of a hash field
 
    @public
-   @param args {todo} JsonArray [{"name":"key","type":"key"},{"name":"field","type":"string"},{"name":"value","type":"string"}] 
+   @param key {string} Key string 
+   @param field {string} Field name 
+   @param value {string} New value 
    @param handler {function} Handler for the result of this call. 
    */
-  this.hset = function(args, handler) {
+  this.hset = function(key, field, value, handler) {
     var __args = arguments;
-    if (__args.length === 2 && typeof __args[0] === 'object' && __args[0] instanceof Array && typeof __args[1] === 'function') {
-      j_redisService.hset(utils.convParamJsonArray(args), function(ar) {
+    if (__args.length === 4 && typeof __args[0] === 'string' && typeof __args[1] === 'string' && typeof __args[2] === 'string' && typeof __args[3] === 'function') {
+      j_redisService["hset(java.lang.String,java.lang.String,java.lang.String,io.vertx.core.Handler)"](key, field, value, function(ar) {
       if (ar.succeeded()) {
         handler(ar.result(), null);
       } else {
@@ -1173,13 +1371,15 @@ var RedisService = function(j_val) {
    Set the value of a hash field, only if the field does not exist
 
    @public
-   @param args {todo} JsonArray [{"name":"key","type":"key"},{"name":"field","type":"string"},{"name":"value","type":"string"}] 
+   @param key {string} Key string 
+   @param field {string} Field name 
+   @param value {string} New value 
    @param handler {function} Handler for the result of this call. 
    */
-  this.hsetnx = function(args, handler) {
+  this.hsetnx = function(key, field, value, handler) {
     var __args = arguments;
-    if (__args.length === 2 && typeof __args[0] === 'object' && __args[0] instanceof Array && typeof __args[1] === 'function') {
-      j_redisService.hsetnx(utils.convParamJsonArray(args), function(ar) {
+    if (__args.length === 4 && typeof __args[0] === 'string' && typeof __args[1] === 'string' && typeof __args[2] === 'string' && typeof __args[3] === 'function') {
+      j_redisService["hsetnx(java.lang.String,java.lang.String,java.lang.String,io.vertx.core.Handler)"](key, field, value, function(ar) {
       if (ar.succeeded()) {
         handler(ar.result(), null);
       } else {
@@ -1193,13 +1393,13 @@ var RedisService = function(j_val) {
    Get all the values in a hash
 
    @public
-   @param args {todo} JsonArray [{"name":"key","type":"key"}] 
+   @param key {string} Key string 
    @param handler {function} Handler for the result of this call. 
    */
-  this.hvals = function(args, handler) {
+  this.hvals = function(key, handler) {
     var __args = arguments;
-    if (__args.length === 2 && typeof __args[0] === 'object' && __args[0] instanceof Array && typeof __args[1] === 'function') {
-      j_redisService.hvals(utils.convParamJsonArray(args), function(ar) {
+    if (__args.length === 2 && typeof __args[0] === 'string' && typeof __args[1] === 'function') {
+      j_redisService["hvals(java.lang.String,io.vertx.core.Handler)"](key, function(ar) {
       if (ar.succeeded()) {
         handler(utils.convReturnJson(ar.result()), null);
       } else {
@@ -1213,13 +1413,13 @@ var RedisService = function(j_val) {
    Increment the integer value of a key by one
 
    @public
-   @param args {todo} JsonArray [{"name":"key","type":"key"}] 
+   @param key {string} Key string 
    @param handler {function} Handler for the result of this call. 
    */
-  this.incr = function(args, handler) {
+  this.incr = function(key, handler) {
     var __args = arguments;
-    if (__args.length === 2 && typeof __args[0] === 'object' && __args[0] instanceof Array && typeof __args[1] === 'function') {
-      j_redisService.incr(utils.convParamJsonArray(args), function(ar) {
+    if (__args.length === 2 && typeof __args[0] === 'string' && typeof __args[1] === 'function') {
+      j_redisService["incr(java.lang.String,io.vertx.core.Handler)"](key, function(ar) {
       if (ar.succeeded()) {
         handler(ar.result(), null);
       } else {
@@ -1233,13 +1433,14 @@ var RedisService = function(j_val) {
    Increment the integer value of a key by the given amount
 
    @public
-   @param args {todo} JsonArray [{"name":"key","type":"key"},{"name":"increment","type":"integer"}] 
+   @param key {string} Key string 
+   @param increment {number} Value by which to increment 
    @param handler {function} Handler for the result of this call. 
    */
-  this.incrby = function(args, handler) {
+  this.incrby = function(key, increment, handler) {
     var __args = arguments;
-    if (__args.length === 2 && typeof __args[0] === 'object' && __args[0] instanceof Array && typeof __args[1] === 'function') {
-      j_redisService.incrby(utils.convParamJsonArray(args), function(ar) {
+    if (__args.length === 3 && typeof __args[0] === 'string' && typeof __args[1] ==='number' && typeof __args[2] === 'function') {
+      j_redisService["incrby(java.lang.String,long,io.vertx.core.Handler)"](key, increment, function(ar) {
       if (ar.succeeded()) {
         handler(ar.result(), null);
       } else {
@@ -1253,13 +1454,14 @@ var RedisService = function(j_val) {
    Increment the float value of a key by the given amount
 
    @public
-   @param args {todo} JsonArray [{"name":"key","type":"key"},{"name":"increment","type":"double"}] 
+   @param key {string} Key string 
+   @param increment {number} Value by which to increment 
    @param handler {function} Handler for the result of this call. 
    */
-  this.incrbyfloat = function(args, handler) {
+  this.incrbyfloat = function(key, increment, handler) {
     var __args = arguments;
-    if (__args.length === 2 && typeof __args[0] === 'object' && __args[0] instanceof Array && typeof __args[1] === 'function') {
-      j_redisService.incrbyfloat(utils.convParamJsonArray(args), function(ar) {
+    if (__args.length === 3 && typeof __args[0] === 'string' && typeof __args[1] ==='number' && typeof __args[2] === 'function') {
+      j_redisService["incrbyfloat(java.lang.String,double,io.vertx.core.Handler)"](key, increment, function(ar) {
       if (ar.succeeded()) {
         handler(ar.result(), null);
       } else {
@@ -1273,13 +1475,32 @@ var RedisService = function(j_val) {
    Get information and statistics about the server
 
    @public
-   @param args {todo} JsonArray [{"name":"section","type":"string","optional":true}] 
    @param handler {function} Handler for the result of this call. 
    */
-  this.info = function(args, handler) {
+  this.info = function(handler) {
     var __args = arguments;
-    if (__args.length === 2 && typeof __args[0] === 'object' && __args[0] instanceof Array && typeof __args[1] === 'function') {
-      j_redisService.info(utils.convParamJsonArray(args), function(ar) {
+    if (__args.length === 1 && typeof __args[0] === 'function') {
+      j_redisService["info(io.vertx.core.Handler)"](function(ar) {
+      if (ar.succeeded()) {
+        handler(utils.convReturnJson(ar.result()), null);
+      } else {
+        handler(null, ar.cause());
+      }
+    });
+    } else utils.invalidArgs();
+  };
+
+  /**
+   Get information and statistics about the server
+
+   @public
+   @param section {string} Specific section of information to return 
+   @param handler {function} Handler for the result of this call. 
+   */
+  this.infoSection = function(section, handler) {
+    var __args = arguments;
+    if (__args.length === 2 && typeof __args[0] === 'string' && typeof __args[1] === 'function') {
+      j_redisService["infoSection(java.lang.String,io.vertx.core.Handler)"](section, function(ar) {
       if (ar.succeeded()) {
         handler(utils.convReturnJson(ar.result()), null);
       } else {
@@ -1293,13 +1514,13 @@ var RedisService = function(j_val) {
    Find all keys matching the given pattern
 
    @public
-   @param args {todo} JsonArray [{"name":"pattern","type":"pattern"}] 
+   @param pattern {string} Pattern to limit the keys returned 
    @param handler {function} Handler for the result of this call. 
    */
-  this.keys = function(args, handler) {
+  this.keys = function(pattern, handler) {
     var __args = arguments;
-    if (__args.length === 2 && typeof __args[0] === 'object' && __args[0] instanceof Array && typeof __args[1] === 'function') {
-      j_redisService.keys(utils.convParamJsonArray(args), function(ar) {
+    if (__args.length === 2 && typeof __args[0] === 'string' && typeof __args[1] === 'function') {
+      j_redisService["keys(java.lang.String,io.vertx.core.Handler)"](pattern, function(ar) {
       if (ar.succeeded()) {
         handler(utils.convReturnJson(ar.result()), null);
       } else {
@@ -1318,7 +1539,7 @@ var RedisService = function(j_val) {
   this.lastsave = function(handler) {
     var __args = arguments;
     if (__args.length === 1 && typeof __args[0] === 'function') {
-      j_redisService.lastsave(function(ar) {
+      j_redisService["lastsave(io.vertx.core.Handler)"](function(ar) {
       if (ar.succeeded()) {
         handler(ar.result(), null);
       } else {
@@ -1332,13 +1553,14 @@ var RedisService = function(j_val) {
    Get an element from a list by its index
 
    @public
-   @param args {todo} JsonArray [{"name":"key","type":"key"},{"name":"index","type":"integer"}] 
+   @param key {string} Key string 
+   @param index {number} Index of list element to get 
    @param handler {function} Handler for the result of this call. 
    */
-  this.lindex = function(args, handler) {
+  this.lindex = function(key, index, handler) {
     var __args = arguments;
-    if (__args.length === 2 && typeof __args[0] === 'object' && __args[0] instanceof Array && typeof __args[1] === 'function') {
-      j_redisService.lindex(utils.convParamJsonArray(args), function(ar) {
+    if (__args.length === 3 && typeof __args[0] === 'string' && typeof __args[1] ==='number' && typeof __args[2] === 'function') {
+      j_redisService["lindex(java.lang.String,int,io.vertx.core.Handler)"](key, index, function(ar) {
       if (ar.succeeded()) {
         handler(ar.result(), null);
       } else {
@@ -1352,13 +1574,16 @@ var RedisService = function(j_val) {
    Insert an element before or after another element in a list
 
    @public
-   @param args {todo} JsonArray [{"name":"key","type":"key"},{"name":"where","type":"enum","enum":["BEFORE","AFTER"]},{"name":"pivot","type":"string"},{"name":"value","type":"string"}] 
+   @param key {string} Key string 
+   @param option {Object} BEFORE or AFTER 
+   @param pivot {string} Key to use as a pivot 
+   @param value {string} Value to be inserted before or after the pivot 
    @param handler {function} Handler for the result of this call. 
    */
-  this.linsert = function(args, handler) {
+  this.linsert = function(key, option, pivot, value, handler) {
     var __args = arguments;
-    if (__args.length === 2 && typeof __args[0] === 'object' && __args[0] instanceof Array && typeof __args[1] === 'function') {
-      j_redisService.linsert(utils.convParamJsonArray(args), function(ar) {
+    if (__args.length === 5 && typeof __args[0] === 'string' && typeof __args[1] === 'string' && typeof __args[2] === 'string' && typeof __args[3] === 'string' && typeof __args[4] === 'function') {
+      j_redisService["linsert(java.lang.String,io.vertx.redis.op.InsertOptions,java.lang.String,java.lang.String,io.vertx.core.Handler)"](key, io.vertx.redis.op.InsertOptions.valueOf(__args[1]), pivot, value, function(ar) {
       if (ar.succeeded()) {
         handler(ar.result(), null);
       } else {
@@ -1372,13 +1597,13 @@ var RedisService = function(j_val) {
    Get the length of a list
 
    @public
-   @param args {todo} JsonArray [{"name":"key","type":"key"}] 
+   @param key {string} String key 
    @param handler {function} Handler for the result of this call. 
    */
-  this.llen = function(args, handler) {
+  this.llen = function(key, handler) {
     var __args = arguments;
-    if (__args.length === 2 && typeof __args[0] === 'object' && __args[0] instanceof Array && typeof __args[1] === 'function') {
-      j_redisService.llen(utils.convParamJsonArray(args), function(ar) {
+    if (__args.length === 2 && typeof __args[0] === 'string' && typeof __args[1] === 'function') {
+      j_redisService["llen(java.lang.String,io.vertx.core.Handler)"](key, function(ar) {
       if (ar.succeeded()) {
         handler(ar.result(), null);
       } else {
@@ -1392,13 +1617,13 @@ var RedisService = function(j_val) {
    Remove and get the first element in a list
 
    @public
-   @param args {todo} JsonArray [{"name":"key","type":"key"}] 
+   @param key {string} String key 
    @param handler {function} Handler for the result of this call. 
    */
-  this.lpop = function(args, handler) {
+  this.lpop = function(key, handler) {
     var __args = arguments;
-    if (__args.length === 2 && typeof __args[0] === 'object' && __args[0] instanceof Array && typeof __args[1] === 'function') {
-      j_redisService.lpop(utils.convParamJsonArray(args), function(ar) {
+    if (__args.length === 2 && typeof __args[0] === 'string' && typeof __args[1] === 'function') {
+      j_redisService["lpop(java.lang.String,io.vertx.core.Handler)"](key, function(ar) {
       if (ar.succeeded()) {
         handler(ar.result(), null);
       } else {
@@ -1412,13 +1637,35 @@ var RedisService = function(j_val) {
    Prepend one or multiple values to a list
 
    @public
-   @param args {todo} JsonArray [{"name":"key","type":"key"},{"name":"value","type":"string","multiple":true}] 
+   @param key {string} Key string 
+   @param values {Array.<string>} Values to be added at the beginning of the list, one by one 
    @param handler {function} Handler for the result of this call. 
    */
-  this.lpush = function(args, handler) {
+  this.lpushMany = function(key, values, handler) {
     var __args = arguments;
-    if (__args.length === 2 && typeof __args[0] === 'object' && __args[0] instanceof Array && typeof __args[1] === 'function') {
-      j_redisService.lpush(utils.convParamJsonArray(args), function(ar) {
+    if (__args.length === 3 && typeof __args[0] === 'string' && typeof __args[1] === 'object' && __args[1] instanceof Array && typeof __args[2] === 'function') {
+      j_redisService["lpushMany(java.lang.String,java.util.List,io.vertx.core.Handler)"](key, values, function(ar) {
+      if (ar.succeeded()) {
+        handler(ar.result(), null);
+      } else {
+        handler(null, ar.cause());
+      }
+    });
+    } else utils.invalidArgs();
+  };
+
+  /**
+   Prepend one value to a list
+
+   @public
+   @param key {string} Key string 
+   @param value {string} Value to be added at the beginning of the list 
+   @param handler {function} Handler for the result of this call. 
+   */
+  this.lpush = function(key, value, handler) {
+    var __args = arguments;
+    if (__args.length === 3 && typeof __args[0] === 'string' && typeof __args[1] === 'string' && typeof __args[2] === 'function') {
+      j_redisService["lpush(java.lang.String,java.lang.String,io.vertx.core.Handler)"](key, value, function(ar) {
       if (ar.succeeded()) {
         handler(ar.result(), null);
       } else {
@@ -1432,13 +1679,14 @@ var RedisService = function(j_val) {
    Prepend a value to a list, only if the list exists
 
    @public
-   @param args {todo} JsonArray [{"name":"key","type":"key"},{"name":"value","type":"string"}] 
+   @param key {string} Key string 
+   @param value {string} Value to add at the beginning of the list 
    @param handler {function} Handler for the result of this call. 
    */
-  this.lpushx = function(args, handler) {
+  this.lpushx = function(key, value, handler) {
     var __args = arguments;
-    if (__args.length === 2 && typeof __args[0] === 'object' && __args[0] instanceof Array && typeof __args[1] === 'function') {
-      j_redisService.lpushx(utils.convParamJsonArray(args), function(ar) {
+    if (__args.length === 3 && typeof __args[0] === 'string' && typeof __args[1] === 'string' && typeof __args[2] === 'function') {
+      j_redisService["lpushx(java.lang.String,java.lang.String,io.vertx.core.Handler)"](key, value, function(ar) {
       if (ar.succeeded()) {
         handler(ar.result(), null);
       } else {
@@ -1452,13 +1700,15 @@ var RedisService = function(j_val) {
    Get a range of elements from a list
 
    @public
-   @param args {todo} JsonArray [{"name":"key","type":"key"},{"name":"start","type":"integer"},{"name":"stop","type":"integer"}] 
+   @param key {string} Key string 
+   @param from {number} Start index 
+   @param to {number} Stop index 
    @param handler {function} Handler for the result of this call. 
    */
-  this.lrange = function(args, handler) {
+  this.lrange = function(key, from, to, handler) {
     var __args = arguments;
-    if (__args.length === 2 && typeof __args[0] === 'object' && __args[0] instanceof Array && typeof __args[1] === 'function') {
-      j_redisService.lrange(utils.convParamJsonArray(args), function(ar) {
+    if (__args.length === 4 && typeof __args[0] === 'string' && typeof __args[1] ==='number' && typeof __args[2] ==='number' && typeof __args[3] === 'function') {
+      j_redisService["lrange(java.lang.String,long,long,io.vertx.core.Handler)"](key, from, to, function(ar) {
       if (ar.succeeded()) {
         handler(utils.convReturnJson(ar.result()), null);
       } else {
@@ -1472,13 +1722,15 @@ var RedisService = function(j_val) {
    Remove elements from a list
 
    @public
-   @param args {todo} JsonArray [{"name":"key","type":"key"},{"name":"count","type":"integer"},{"name":"value","type":"string"}] 
+   @param key {string} Key string 
+   @param count {number} Number of first found occurrences equal to $value to remove from the list 
+   @param value {string} Value to be removed 
    @param handler {function} Handler for the result of this call. 
    */
-  this.lrem = function(args, handler) {
+  this.lrem = function(key, count, value, handler) {
     var __args = arguments;
-    if (__args.length === 2 && typeof __args[0] === 'object' && __args[0] instanceof Array && typeof __args[1] === 'function') {
-      j_redisService.lrem(utils.convParamJsonArray(args), function(ar) {
+    if (__args.length === 4 && typeof __args[0] === 'string' && typeof __args[1] ==='number' && typeof __args[2] === 'string' && typeof __args[3] === 'function') {
+      j_redisService["lrem(java.lang.String,long,java.lang.String,io.vertx.core.Handler)"](key, count, value, function(ar) {
       if (ar.succeeded()) {
         handler(ar.result(), null);
       } else {
@@ -1492,13 +1744,15 @@ var RedisService = function(j_val) {
    Set the value of an element in a list by its index
 
    @public
-   @param args {todo} JsonArray [{"name":"key","type":"key"},{"name":"index","type":"integer"},{"name":"value","type":"string"}] 
+   @param key {string} Key string 
+   @param index {number} Position within list 
+   @param value {string} New value 
    @param handler {function} Handler for the result of this call. 
    */
-  this.lset = function(args, handler) {
+  this.lset = function(key, index, value, handler) {
     var __args = arguments;
-    if (__args.length === 2 && typeof __args[0] === 'object' && __args[0] instanceof Array && typeof __args[1] === 'function') {
-      j_redisService.lset(utils.convParamJsonArray(args), function(ar) {
+    if (__args.length === 4 && typeof __args[0] === 'string' && typeof __args[1] ==='number' && typeof __args[2] === 'string' && typeof __args[3] === 'function') {
+      j_redisService["lset(java.lang.String,long,java.lang.String,io.vertx.core.Handler)"](key, index, value, function(ar) {
       if (ar.succeeded()) {
         handler(ar.result(), null);
       } else {
@@ -1512,15 +1766,37 @@ var RedisService = function(j_val) {
    Trim a list to the specified range
 
    @public
-   @param args {todo} JsonArray [{"name":"key","type":"key"},{"name":"start","type":"integer"},{"name":"stop","type":"integer"}] 
+   @param key {string} Key string 
+   @param from {number} Start index 
+   @param to {number} Stop index 
    @param handler {function} Handler for the result of this call. 
    */
-  this.ltrim = function(args, handler) {
+  this.ltrim = function(key, from, to, handler) {
     var __args = arguments;
-    if (__args.length === 2 && typeof __args[0] === 'object' && __args[0] instanceof Array && typeof __args[1] === 'function') {
-      j_redisService.ltrim(utils.convParamJsonArray(args), function(ar) {
+    if (__args.length === 4 && typeof __args[0] === 'string' && typeof __args[1] ==='number' && typeof __args[2] ==='number' && typeof __args[3] === 'function') {
+      j_redisService["ltrim(java.lang.String,long,long,io.vertx.core.Handler)"](key, from, to, function(ar) {
       if (ar.succeeded()) {
         handler(ar.result(), null);
+      } else {
+        handler(null, ar.cause());
+      }
+    });
+    } else utils.invalidArgs();
+  };
+
+  /**
+   Get the value of the given key
+
+   @public
+   @param key {string} Key string 
+   @param handler {function} Handler for the result of this call. 
+   */
+  this.mget = function(key, handler) {
+    var __args = arguments;
+    if (__args.length === 2 && typeof __args[0] === 'string' && typeof __args[1] === 'function') {
+      j_redisService["mget(java.lang.String,io.vertx.core.Handler)"](key, function(ar) {
+      if (ar.succeeded()) {
+        handler(utils.convReturnJson(ar.result()), null);
       } else {
         handler(null, ar.cause());
       }
@@ -1532,13 +1808,13 @@ var RedisService = function(j_val) {
    Get the values of all the given keys
 
    @public
-   @param args {todo} JsonArray [{"name":"key","type":"key","multiple":true}] 
+   @param keys {Array.<string>} List of keys to get 
    @param handler {function} Handler for the result of this call. 
    */
-  this.mget = function(args, handler) {
+  this.mgetMany = function(keys, handler) {
     var __args = arguments;
     if (__args.length === 2 && typeof __args[0] === 'object' && __args[0] instanceof Array && typeof __args[1] === 'function') {
-      j_redisService.mget(utils.convParamJsonArray(args), function(ar) {
+      j_redisService["mgetMany(java.util.List,io.vertx.core.Handler)"](keys, function(ar) {
       if (ar.succeeded()) {
         handler(utils.convReturnJson(ar.result()), null);
       } else {
@@ -1552,13 +1828,18 @@ var RedisService = function(j_val) {
    Atomically transfer a key from a Redis instance to another one.
 
    @public
-   @param args {todo} JsonArray [{"name":"host","type":"string"},{"name":"port","type":"string"},{"name":"key","type":"key"},{"name":"destination-db","type":"integer"},{"name":"timeout","type":"integer"},{"name":"copy","type":"enum","enum":["COPY"],"optional":true},{"name":"replace","type":"enum","enum":["REPLACE"],"optional":true}] 
+   @param host {string} Destination host 
+   @param port {number} Destination port 
+   @param key {string} Key to migrate 
+   @param destdb {number} Destination database index 
+   @param timeout {number} 
+   @param options {Object} Migrate options 
    @param handler {function} Handler for the result of this call. 
    */
-  this.migrate = function(args, handler) {
+  this.migrate = function(host, port, key, destdb, timeout, options, handler) {
     var __args = arguments;
-    if (__args.length === 2 && typeof __args[0] === 'object' && __args[0] instanceof Array && typeof __args[1] === 'function') {
-      j_redisService.migrate(utils.convParamJsonArray(args), function(ar) {
+    if (__args.length === 7 && typeof __args[0] === 'string' && typeof __args[1] ==='number' && typeof __args[2] === 'string' && typeof __args[3] ==='number' && typeof __args[4] ==='number' && typeof __args[5] === 'object' && typeof __args[6] === 'function') {
+      j_redisService["migrate(java.lang.String,int,java.lang.String,int,long,io.vertx.redis.op.MigrateOptions,io.vertx.core.Handler)"](host, port, key, destdb, timeout, options != null ? new MigrateOptions(new JsonObject(JSON.stringify(options))) : null, function(ar) {
       if (ar.succeeded()) {
         handler(ar.result(), null);
       } else {
@@ -1577,7 +1858,7 @@ var RedisService = function(j_val) {
   this.monitor = function(handler) {
     var __args = arguments;
     if (__args.length === 1 && typeof __args[0] === 'function') {
-      j_redisService.monitor(function(ar) {
+      j_redisService["monitor(io.vertx.core.Handler)"](function(ar) {
       if (ar.succeeded()) {
         handler(null, null);
       } else {
@@ -1591,13 +1872,14 @@ var RedisService = function(j_val) {
    Move a key to another database
 
    @public
-   @param args {todo} JsonArray [{"name":"key","type":"key"},{"name":"db","type":"integer"}] 
+   @param key {string} Key to migrate 
+   @param destdb {number} Destination database index 
    @param handler {function} Handler for the result of this call. 
    */
-  this.move = function(args, handler) {
+  this.move = function(key, destdb, handler) {
     var __args = arguments;
-    if (__args.length === 2 && typeof __args[0] === 'object' && __args[0] instanceof Array && typeof __args[1] === 'function') {
-      j_redisService.move(utils.convParamJsonArray(args), function(ar) {
+    if (__args.length === 3 && typeof __args[0] === 'string' && typeof __args[1] ==='number' && typeof __args[2] === 'function') {
+      j_redisService["move(java.lang.String,int,io.vertx.core.Handler)"](key, destdb, function(ar) {
       if (ar.succeeded()) {
         handler(ar.result(), null);
       } else {
@@ -1611,13 +1893,13 @@ var RedisService = function(j_val) {
    Set multiple keys to multiple values
 
    @public
-   @param args {todo} JsonArray [{"name":["key","value"],"type":["key","string"],"multiple":true}] 
+   @param keyvals {Array.<string>} Key value pairs to set 
    @param handler {function} Handler for the result of this call. 
    */
-  this.mset = function(args, handler) {
+  this.mset = function(keyvals, handler) {
     var __args = arguments;
-    if (__args.length === 2 && typeof __args[0] === 'object' && __args[0] instanceof Array && typeof __args[1] === 'function') {
-      j_redisService.mset(utils.convParamJsonArray(args), function(ar) {
+    if (__args.length === 2 && typeof __args[0] === 'object' && typeof __args[1] === 'function') {
+      j_redisService["mset(java.util.Map,io.vertx.core.Handler)"](keyvals, function(ar) {
       if (ar.succeeded()) {
         handler(ar.result(), null);
       } else {
@@ -1631,13 +1913,13 @@ var RedisService = function(j_val) {
    Set multiple keys to multiple values, only if none of the keys exist
 
    @public
-   @param args {todo} JsonArray [{"name":["key","value"],"type":["key","string"],"multiple":true}] 
+   @param keyvals {Array.<string>} Key value pairs to set 
    @param handler {function} Handler for the result of this call. 
    */
-  this.msetnx = function(args, handler) {
+  this.msetnx = function(keyvals, handler) {
     var __args = arguments;
-    if (__args.length === 2 && typeof __args[0] === 'object' && __args[0] instanceof Array && typeof __args[1] === 'function') {
-      j_redisService.msetnx(utils.convParamJsonArray(args), function(ar) {
+    if (__args.length === 2 && typeof __args[0] === 'object' && typeof __args[1] === 'function') {
+      j_redisService["msetnx(java.util.Map,io.vertx.core.Handler)"](keyvals, function(ar) {
       if (ar.succeeded()) {
         handler(ar.result(), null);
       } else {
@@ -1656,7 +1938,7 @@ var RedisService = function(j_val) {
   this.multi = function(handler) {
     var __args = arguments;
     if (__args.length === 1 && typeof __args[0] === 'function') {
-      j_redisService.multi(function(ar) {
+      j_redisService["multi(io.vertx.core.Handler)"](function(ar) {
       if (ar.succeeded()) {
         handler(ar.result(), null);
       } else {
@@ -1670,13 +1952,14 @@ var RedisService = function(j_val) {
    Inspect the internals of Redis objects
 
    @public
-   @param args {todo} JsonArray [{"name":"subcommand","type":"string"},{"name":"arguments","type":"string","optional":true,"multiple":true}] 
+   @param key {string} Key string 
+   @param cmd {Object} Object sub command 
    @param handler {function} Handler for the result of this call. 
    */
-  this.object = function(args, handler) {
+  this.object = function(key, cmd, handler) {
     var __args = arguments;
-    if (__args.length === 2 && typeof __args[0] === 'object' && __args[0] instanceof Array && typeof __args[1] === 'function') {
-      j_redisService.object(utils.convParamJsonArray(args), function(ar) {
+    if (__args.length === 3 && typeof __args[0] === 'string' && typeof __args[1] === 'string' && typeof __args[2] === 'function') {
+      j_redisService["object(java.lang.String,io.vertx.redis.op.ObjectCmd,io.vertx.core.Handler)"](key, io.vertx.redis.op.ObjectCmd.valueOf(__args[1]), function(ar) {
       if (ar.succeeded()) {
         handler(null, null);
       } else {
@@ -1690,13 +1973,13 @@ var RedisService = function(j_val) {
    Remove the expiration from a key
 
    @public
-   @param args {todo} JsonArray [{"name":"key","type":"key"}] 
+   @param key {string} Key string 
    @param handler {function} Handler for the result of this call. 
    */
-  this.persist = function(args, handler) {
+  this.persist = function(key, handler) {
     var __args = arguments;
-    if (__args.length === 2 && typeof __args[0] === 'object' && __args[0] instanceof Array && typeof __args[1] === 'function') {
-      j_redisService.persist(utils.convParamJsonArray(args), function(ar) {
+    if (__args.length === 2 && typeof __args[0] === 'string' && typeof __args[1] === 'function') {
+      j_redisService["persist(java.lang.String,io.vertx.core.Handler)"](key, function(ar) {
       if (ar.succeeded()) {
         handler(ar.result(), null);
       } else {
@@ -1710,13 +1993,14 @@ var RedisService = function(j_val) {
    Set a key's time to live in milliseconds
 
    @public
-   @param args {todo} JsonArray [{"name":"key","type":"key"},{"name":"milliseconds","type":"integer"}] 
+   @param key {string} String key 
+   @param millis {number} Time to live in milliseconds 
    @param handler {function} Handler for the result of this call. 
    */
-  this.pexpire = function(args, handler) {
+  this.pexpire = function(key, millis, handler) {
     var __args = arguments;
-    if (__args.length === 2 && typeof __args[0] === 'object' && __args[0] instanceof Array && typeof __args[1] === 'function') {
-      j_redisService.pexpire(utils.convParamJsonArray(args), function(ar) {
+    if (__args.length === 3 && typeof __args[0] === 'string' && typeof __args[1] ==='number' && typeof __args[2] === 'function') {
+      j_redisService["pexpire(java.lang.String,long,io.vertx.core.Handler)"](key, millis, function(ar) {
       if (ar.succeeded()) {
         handler(ar.result(), null);
       } else {
@@ -1730,13 +2014,35 @@ var RedisService = function(j_val) {
    Set the expiration for a key as a UNIX timestamp specified in milliseconds
 
    @public
-   @param args {todo} JsonArray [{"name":"key","type":"key"},{"name":"milliseconds-timestamp","type":"posix time"}] 
+   @param key {string} Key string 
+   @param millis {number} Expiry time as Unix timestamp in milliseconds 
    @param handler {function} Handler for the result of this call. 
    */
-  this.pexpireat = function(args, handler) {
+  this.pexpireat = function(key, millis, handler) {
     var __args = arguments;
-    if (__args.length === 2 && typeof __args[0] === 'object' && __args[0] instanceof Array && typeof __args[1] === 'function') {
-      j_redisService.pexpireat(utils.convParamJsonArray(args), function(ar) {
+    if (__args.length === 3 && typeof __args[0] === 'string' && typeof __args[1] ==='number' && typeof __args[2] === 'function') {
+      j_redisService["pexpireat(java.lang.String,long,io.vertx.core.Handler)"](key, millis, function(ar) {
+      if (ar.succeeded()) {
+        handler(ar.result(), null);
+      } else {
+        handler(null, ar.cause());
+      }
+    });
+    } else utils.invalidArgs();
+  };
+
+  /**
+   Adds the specified element to the specified HyperLogLog.
+
+   @public
+   @param key {string} Key string 
+   @param element {string} Element to add 
+   @param handler {function} Handler for the result of this call. 
+   */
+  this.pfadd = function(key, element, handler) {
+    var __args = arguments;
+    if (__args.length === 3 && typeof __args[0] === 'string' && typeof __args[1] === 'string' && typeof __args[2] === 'function') {
+      j_redisService["pfadd(java.lang.String,java.lang.String,io.vertx.core.Handler)"](key, element, function(ar) {
       if (ar.succeeded()) {
         handler(ar.result(), null);
       } else {
@@ -1750,13 +2056,34 @@ var RedisService = function(j_val) {
    Adds the specified elements to the specified HyperLogLog.
 
    @public
-   @param args {todo} JsonArray [{"name":"key","type":"key"},{"name":"element","type":"string","multiple":true}] 
+   @param key {string} Key string 
+   @param elements {Array.<string>} Elementa to add 
    @param handler {function} Handler for the result of this call. 
    */
-  this.pfadd = function(args, handler) {
+  this.pfaddMany = function(key, elements, handler) {
     var __args = arguments;
-    if (__args.length === 2 && typeof __args[0] === 'object' && __args[0] instanceof Array && typeof __args[1] === 'function') {
-      j_redisService.pfadd(utils.convParamJsonArray(args), function(ar) {
+    if (__args.length === 3 && typeof __args[0] === 'string' && typeof __args[1] === 'object' && __args[1] instanceof Array && typeof __args[2] === 'function') {
+      j_redisService["pfaddMany(java.lang.String,java.util.List,io.vertx.core.Handler)"](key, elements, function(ar) {
+      if (ar.succeeded()) {
+        handler(ar.result(), null);
+      } else {
+        handler(null, ar.cause());
+      }
+    });
+    } else utils.invalidArgs();
+  };
+
+  /**
+   Return the approximated cardinality of the set observed by the HyperLogLog at key.
+
+   @public
+   @param key {string} Key string 
+   @param handler {function} Handler for the result of this call. 
+   */
+  this.pfcount = function(key, handler) {
+    var __args = arguments;
+    if (__args.length === 2 && typeof __args[0] === 'string' && typeof __args[1] === 'function') {
+      j_redisService["pfcount(java.lang.String,io.vertx.core.Handler)"](key, function(ar) {
       if (ar.succeeded()) {
         handler(ar.result(), null);
       } else {
@@ -1770,13 +2097,13 @@ var RedisService = function(j_val) {
    Return the approximated cardinality of the set(s) observed by the HyperLogLog at key(s).
 
    @public
-   @param args {todo} JsonArray [{"name":"key","type":"key","multiple":true}] 
+   @param keys {Array.<string>} List of keys 
    @param handler {function} Handler for the result of this call. 
    */
-  this.pfcount = function(args, handler) {
+  this.pfcountMany = function(keys, handler) {
     var __args = arguments;
     if (__args.length === 2 && typeof __args[0] === 'object' && __args[0] instanceof Array && typeof __args[1] === 'function') {
-      j_redisService.pfcount(utils.convParamJsonArray(args), function(ar) {
+      j_redisService["pfcountMany(java.util.List,io.vertx.core.Handler)"](keys, function(ar) {
       if (ar.succeeded()) {
         handler(ar.result(), null);
       } else {
@@ -1790,13 +2117,14 @@ var RedisService = function(j_val) {
    Merge N different HyperLogLogs into a single one.
 
    @public
-   @param args {todo} JsonArray [{"name":"destkey","type":"key"},{"name":"sourcekey","type":"key","multiple":true}] 
+   @param destkey {string} Destination key 
+   @param keys {Array.<string>} List of source keys 
    @param handler {function} Handler for the result of this call. 
    */
-  this.pfmerge = function(args, handler) {
+  this.pfmerge = function(destkey, keys, handler) {
     var __args = arguments;
-    if (__args.length === 2 && typeof __args[0] === 'object' && __args[0] instanceof Array && typeof __args[1] === 'function') {
-      j_redisService.pfmerge(utils.convParamJsonArray(args), function(ar) {
+    if (__args.length === 3 && typeof __args[0] === 'string' && typeof __args[1] === 'object' && __args[1] instanceof Array && typeof __args[2] === 'function') {
+      j_redisService["pfmerge(java.lang.String,java.util.List,io.vertx.core.Handler)"](destkey, keys, function(ar) {
       if (ar.succeeded()) {
         handler(ar.result(), null);
       } else {
@@ -1815,7 +2143,7 @@ var RedisService = function(j_val) {
   this.ping = function(handler) {
     var __args = arguments;
     if (__args.length === 1 && typeof __args[0] === 'function') {
-      j_redisService.ping(function(ar) {
+      j_redisService["ping(io.vertx.core.Handler)"](function(ar) {
       if (ar.succeeded()) {
         handler(ar.result(), null);
       } else {
@@ -1829,13 +2157,35 @@ var RedisService = function(j_val) {
    Set the value and expiration in milliseconds of a key
 
    @public
-   @param args {todo} JsonArray [{"name":"key","type":"key"},{"name":"milliseconds","type":"integer"},{"name":"value","type":"string"}] 
+   @param key {string} Key string 
+   @param millis {number} Number of milliseconds until the key expires 
+   @param value {string} New value for key 
    @param handler {function} Handler for the result of this call. 
    */
-  this.psetex = function(args, handler) {
+  this.psetex = function(key, millis, value, handler) {
     var __args = arguments;
-    if (__args.length === 2 && typeof __args[0] === 'object' && __args[0] instanceof Array && typeof __args[1] === 'function') {
-      j_redisService.psetex(utils.convParamJsonArray(args), function(ar) {
+    if (__args.length === 4 && typeof __args[0] === 'string' && typeof __args[1] ==='number' && typeof __args[2] === 'string' && typeof __args[3] === 'function') {
+      j_redisService["psetex(java.lang.String,long,java.lang.String,io.vertx.core.Handler)"](key, millis, value, function(ar) {
+      if (ar.succeeded()) {
+        handler(null, null);
+      } else {
+        handler(null, ar.cause());
+      }
+    });
+    } else utils.invalidArgs();
+  };
+
+  /**
+   Listen for messages published to channels matching the given pattern
+
+   @public
+   @param pattern {string} Pattern string 
+   @param handler {function} Handler for the result of this call. 
+   */
+  this.psubscribe = function(pattern, handler) {
+    var __args = arguments;
+    if (__args.length === 2 && typeof __args[0] === 'string' && typeof __args[1] === 'function') {
+      j_redisService["psubscribe(java.lang.String,io.vertx.core.Handler)"](pattern, function(ar) {
       if (ar.succeeded()) {
         handler(null, null);
       } else {
@@ -1849,13 +2199,13 @@ var RedisService = function(j_val) {
    Listen for messages published to channels matching the given patterns
 
    @public
-   @param args {todo} JsonArray [{"name":["pattern"],"type":["pattern"],"multiple":true}] 
+   @param patterns {Array.<string>} List of patterns 
    @param handler {function} Handler for the result of this call. 
    */
-  this.psubscribe = function(args, handler) {
+  this.psubscribeMany = function(patterns, handler) {
     var __args = arguments;
     if (__args.length === 2 && typeof __args[0] === 'object' && __args[0] instanceof Array && typeof __args[1] === 'function') {
-      j_redisService.psubscribe(utils.convParamJsonArray(args), function(ar) {
+      j_redisService["psubscribeMany(java.util.List,io.vertx.core.Handler)"](patterns, function(ar) {
       if (ar.succeeded()) {
         handler(null, null);
       } else {
@@ -1866,16 +2216,55 @@ var RedisService = function(j_val) {
   };
 
   /**
-   Inspect the state of the Pub/Sub subsystem
+   Lists the currently active channels - only those matching the pattern
 
    @public
-   @param args {todo} JsonArray [{"name":"subcommand","type":"string"},{"name":"argument","type":"string","optional":true,"multiple":true}] 
+   @param pattern {string} A glob-style pattern - an empty string means no pattern 
    @param handler {function} Handler for the result of this call. 
    */
-  this.pubsub = function(args, handler) {
+  this.pubsubChannels = function(pattern, handler) {
+    var __args = arguments;
+    if (__args.length === 2 && typeof __args[0] === 'string' && typeof __args[1] === 'function') {
+      j_redisService["pubsubChannels(java.lang.String,io.vertx.core.Handler)"](pattern, function(ar) {
+      if (ar.succeeded()) {
+        handler(utils.convReturnJson(ar.result()), null);
+      } else {
+        handler(null, ar.cause());
+      }
+    });
+    } else utils.invalidArgs();
+  };
+
+  /**
+   Returns the number of subscribers (not counting clients subscribed to patterns) for the specified channels
+
+   @public
+   @param channels {Array.<string>} List of channels 
+   @param handler {function} Handler for the result of this call. 
+   */
+  this.pubsubNumsub = function(channels, handler) {
     var __args = arguments;
     if (__args.length === 2 && typeof __args[0] === 'object' && __args[0] instanceof Array && typeof __args[1] === 'function') {
-      j_redisService.pubsub(utils.convParamJsonArray(args), function(ar) {
+      j_redisService["pubsubNumsub(java.util.List,io.vertx.core.Handler)"](channels, function(ar) {
+      if (ar.succeeded()) {
+        handler(utils.convReturnJson(ar.result()), null);
+      } else {
+        handler(null, ar.cause());
+      }
+    });
+    } else utils.invalidArgs();
+  };
+
+  /**
+   Returns the number of subscriptions to patterns (that are performed using the PSUBSCRIBE command)
+
+   @public
+   @param handler {function} Handler for the result of this call. 
+   */
+  this.pubsubNumpat = function(handler) {
+    var __args = arguments;
+    if (__args.length === 1 && typeof __args[0] === 'function') {
+      j_redisService["pubsubNumpat(io.vertx.core.Handler)"](function(ar) {
       if (ar.succeeded()) {
         handler(ar.result(), null);
       } else {
@@ -1889,13 +2278,13 @@ var RedisService = function(j_val) {
    Get the time to live for a key in milliseconds
 
    @public
-   @param args {todo} JsonArray [{"name":"key","type":"key"}] 
+   @param key {string} Key string 
    @param handler {function} Handler for the result of this call. 
    */
-  this.pttl = function(args, handler) {
+  this.pttl = function(key, handler) {
     var __args = arguments;
-    if (__args.length === 2 && typeof __args[0] === 'object' && __args[0] instanceof Array && typeof __args[1] === 'function') {
-      j_redisService.pttl(utils.convParamJsonArray(args), function(ar) {
+    if (__args.length === 2 && typeof __args[0] === 'string' && typeof __args[1] === 'function') {
+      j_redisService["pttl(java.lang.String,io.vertx.core.Handler)"](key, function(ar) {
       if (ar.succeeded()) {
         handler(ar.result(), null);
       } else {
@@ -1909,13 +2298,14 @@ var RedisService = function(j_val) {
    Post a message to a channel
 
    @public
-   @param args {todo} JsonArray [{"name":"channel","type":"string"},{"name":"message","type":"string"}] 
+   @param channel {string} Channel key 
+   @param message {string} Message to send to channel 
    @param handler {function} Handler for the result of this call. 
    */
-  this.publish = function(args, handler) {
+  this.publish = function(channel, message, handler) {
     var __args = arguments;
-    if (__args.length === 2 && typeof __args[0] === 'object' && __args[0] instanceof Array && typeof __args[1] === 'function') {
-      j_redisService.publish(utils.convParamJsonArray(args), function(ar) {
+    if (__args.length === 3 && typeof __args[0] === 'string' && typeof __args[1] === 'string' && typeof __args[2] === 'function') {
+      j_redisService["publish(java.lang.String,java.lang.String,io.vertx.core.Handler)"](channel, message, function(ar) {
       if (ar.succeeded()) {
         handler(ar.result(), null);
       } else {
@@ -1929,13 +2319,13 @@ var RedisService = function(j_val) {
    Stop listening for messages posted to channels matching the given patterns
 
    @public
-   @param args {todo} JsonArray [{"name":"pattern","type":"pattern","optional":true,"multiple":true}] 
+   @param patterns {Array.<string>} List of patterns to match against 
    @param handler {function} Handler for the result of this call. 
    */
-  this.punsubscribe = function(args, handler) {
+  this.punsubscribe = function(patterns, handler) {
     var __args = arguments;
     if (__args.length === 2 && typeof __args[0] === 'object' && __args[0] instanceof Array && typeof __args[1] === 'function') {
-      j_redisService.punsubscribe(utils.convParamJsonArray(args), function(ar) {
+      j_redisService["punsubscribe(java.util.List,io.vertx.core.Handler)"](patterns, function(ar) {
       if (ar.succeeded()) {
         handler(null, null);
       } else {
@@ -1954,7 +2344,7 @@ var RedisService = function(j_val) {
   this.quit = function(handler) {
     var __args = arguments;
     if (__args.length === 1 && typeof __args[0] === 'function') {
-      j_redisService.quit(function(ar) {
+      j_redisService["quit(io.vertx.core.Handler)"](function(ar) {
       if (ar.succeeded()) {
         handler(ar.result(), null);
       } else {
@@ -1973,7 +2363,7 @@ var RedisService = function(j_val) {
   this.randomkey = function(handler) {
     var __args = arguments;
     if (__args.length === 1 && typeof __args[0] === 'function') {
-      j_redisService.randomkey(function(ar) {
+      j_redisService["randomkey(io.vertx.core.Handler)"](function(ar) {
       if (ar.succeeded()) {
         handler(ar.result(), null);
       } else {
@@ -1987,13 +2377,14 @@ var RedisService = function(j_val) {
    Rename a key
 
    @public
-   @param args {todo} JsonArray [{"name":"key","type":"key"},{"name":"newkey","type":"key"}] 
+   @param key {string} Key string to be renamed 
+   @param newkey {string} New key string 
    @param handler {function} Handler for the result of this call. 
    */
-  this.rename = function(args, handler) {
+  this.rename = function(key, newkey, handler) {
     var __args = arguments;
-    if (__args.length === 2 && typeof __args[0] === 'object' && __args[0] instanceof Array && typeof __args[1] === 'function') {
-      j_redisService.rename(utils.convParamJsonArray(args), function(ar) {
+    if (__args.length === 3 && typeof __args[0] === 'string' && typeof __args[1] === 'string' && typeof __args[2] === 'function') {
+      j_redisService["rename(java.lang.String,java.lang.String,io.vertx.core.Handler)"](key, newkey, function(ar) {
       if (ar.succeeded()) {
         handler(ar.result(), null);
       } else {
@@ -2007,13 +2398,14 @@ var RedisService = function(j_val) {
    Rename a key, only if the new key does not exist
 
    @public
-   @param args {todo} JsonArray [{"name":"key","type":"key"},{"name":"newkey","type":"key"}] 
+   @param key {string} Key string to be renamed 
+   @param newkey {string} New key string 
    @param handler {function} Handler for the result of this call. 
    */
-  this.renamenx = function(args, handler) {
+  this.renamenx = function(key, newkey, handler) {
     var __args = arguments;
-    if (__args.length === 2 && typeof __args[0] === 'object' && __args[0] instanceof Array && typeof __args[1] === 'function') {
-      j_redisService.renamenx(utils.convParamJsonArray(args), function(ar) {
+    if (__args.length === 3 && typeof __args[0] === 'string' && typeof __args[1] === 'string' && typeof __args[2] === 'function') {
+      j_redisService["renamenx(java.lang.String,java.lang.String,io.vertx.core.Handler)"](key, newkey, function(ar) {
       if (ar.succeeded()) {
         handler(ar.result(), null);
       } else {
@@ -2027,13 +2419,15 @@ var RedisService = function(j_val) {
    Create a key using the provided serialized value, previously obtained using DUMP.
 
    @public
-   @param args {todo} JsonArray [{"name":"key","type":"key"},{"name":"ttl","type":"integer"},{"name":"serialized-value","type":"string"}] 
+   @param key {string} Key string 
+   @param millis {number} Expiry time in milliseconds to set on the key 
+   @param serialized {string} Serialized form of the key value as obtained using DUMP 
    @param handler {function} Handler for the result of this call. 
    */
-  this.restore = function(args, handler) {
+  this.restore = function(key, millis, serialized, handler) {
     var __args = arguments;
-    if (__args.length === 2 && typeof __args[0] === 'object' && __args[0] instanceof Array && typeof __args[1] === 'function') {
-      j_redisService.restore(utils.convParamJsonArray(args), function(ar) {
+    if (__args.length === 4 && typeof __args[0] === 'string' && typeof __args[1] ==='number' && typeof __args[2] === 'string' && typeof __args[3] === 'function') {
+      j_redisService["restore(java.lang.String,long,java.lang.String,io.vertx.core.Handler)"](key, millis, serialized, function(ar) {
       if (ar.succeeded()) {
         handler(ar.result(), null);
       } else {
@@ -2052,7 +2446,7 @@ var RedisService = function(j_val) {
   this.role = function(handler) {
     var __args = arguments;
     if (__args.length === 1 && typeof __args[0] === 'function') {
-      j_redisService.role(function(ar) {
+      j_redisService["role(io.vertx.core.Handler)"](function(ar) {
       if (ar.succeeded()) {
         handler(utils.convReturnJson(ar.result()), null);
       } else {
@@ -2066,13 +2460,13 @@ var RedisService = function(j_val) {
    Remove and get the last element in a list
 
    @public
-   @param args {todo} JsonArray [{"name":"key","type":"key"}] 
+   @param key {string} Key string 
    @param handler {function} Handler for the result of this call. 
    */
-  this.rpop = function(args, handler) {
+  this.rpop = function(key, handler) {
     var __args = arguments;
-    if (__args.length === 2 && typeof __args[0] === 'object' && __args[0] instanceof Array && typeof __args[1] === 'function') {
-      j_redisService.rpop(utils.convParamJsonArray(args), function(ar) {
+    if (__args.length === 2 && typeof __args[0] === 'string' && typeof __args[1] === 'function') {
+      j_redisService["rpop(java.lang.String,io.vertx.core.Handler)"](key, function(ar) {
       if (ar.succeeded()) {
         handler(ar.result(), null);
       } else {
@@ -2086,13 +2480,14 @@ var RedisService = function(j_val) {
    Remove the last element in a list, append it to another list and return it
 
    @public
-   @param args {todo} JsonArray [{"name":"source","type":"key"},{"name":"destination","type":"key"}] 
+   @param key {string} Key string identifying source list 
+   @param destkey {string} Key string identifying destination list 
    @param handler {function} Handler for the result of this call. 
    */
-  this.rpoplpush = function(args, handler) {
+  this.rpoplpush = function(key, destkey, handler) {
     var __args = arguments;
-    if (__args.length === 2 && typeof __args[0] === 'object' && __args[0] instanceof Array && typeof __args[1] === 'function') {
-      j_redisService.rpoplpush(utils.convParamJsonArray(args), function(ar) {
+    if (__args.length === 3 && typeof __args[0] === 'string' && typeof __args[1] === 'string' && typeof __args[2] === 'function') {
+      j_redisService["rpoplpush(java.lang.String,java.lang.String,io.vertx.core.Handler)"](key, destkey, function(ar) {
       if (ar.succeeded()) {
         handler(ar.result(), null);
       } else {
@@ -2106,13 +2501,35 @@ var RedisService = function(j_val) {
    Append one or multiple values to a list
 
    @public
-   @param args {todo} JsonArray [{"name":"key","type":"key"},{"name":"value","type":"string","multiple":true}] 
+   @param key {string} Key string 
+   @param values {Array.<string>} List of values to add to the end of the list 
    @param handler {function} Handler for the result of this call. 
    */
-  this.rpush = function(args, handler) {
+  this.rpushMany = function(key, values, handler) {
     var __args = arguments;
-    if (__args.length === 2 && typeof __args[0] === 'object' && __args[0] instanceof Array && typeof __args[1] === 'function') {
-      j_redisService.rpush(utils.convParamJsonArray(args), function(ar) {
+    if (__args.length === 3 && typeof __args[0] === 'string' && typeof __args[1] === 'object' && __args[1] instanceof Array && typeof __args[2] === 'function') {
+      j_redisService["rpushMany(java.lang.String,java.util.List,io.vertx.core.Handler)"](key, values, function(ar) {
+      if (ar.succeeded()) {
+        handler(ar.result(), null);
+      } else {
+        handler(null, ar.cause());
+      }
+    });
+    } else utils.invalidArgs();
+  };
+
+  /**
+   Append one or multiple values to a list
+
+   @public
+   @param key {string} Key string 
+   @param value {string} Value to be added to the end of the list 
+   @param handler {function} Handler for the result of this call. 
+   */
+  this.rpush = function(key, value, handler) {
+    var __args = arguments;
+    if (__args.length === 3 && typeof __args[0] === 'string' && typeof __args[1] === 'string' && typeof __args[2] === 'function') {
+      j_redisService["rpush(java.lang.String,java.lang.String,io.vertx.core.Handler)"](key, value, function(ar) {
       if (ar.succeeded()) {
         handler(ar.result(), null);
       } else {
@@ -2126,13 +2543,35 @@ var RedisService = function(j_val) {
    Append a value to a list, only if the list exists
 
    @public
-   @param args {todo} JsonArray [{"name":"key","type":"key"},{"name":"value","type":"string"}] 
+   @param key {string} Key string 
+   @param value {string} Value to be added to the end of the list 
    @param handler {function} Handler for the result of this call. 
    */
-  this.rpushx = function(args, handler) {
+  this.rpushx = function(key, value, handler) {
     var __args = arguments;
-    if (__args.length === 2 && typeof __args[0] === 'object' && __args[0] instanceof Array && typeof __args[1] === 'function') {
-      j_redisService.rpushx(utils.convParamJsonArray(args), function(ar) {
+    if (__args.length === 3 && typeof __args[0] === 'string' && typeof __args[1] === 'string' && typeof __args[2] === 'function') {
+      j_redisService["rpushx(java.lang.String,java.lang.String,io.vertx.core.Handler)"](key, value, function(ar) {
+      if (ar.succeeded()) {
+        handler(ar.result(), null);
+      } else {
+        handler(null, ar.cause());
+      }
+    });
+    } else utils.invalidArgs();
+  };
+
+  /**
+   Add a member to a set
+
+   @public
+   @param key {string} Key string 
+   @param member {string} Value to be added to the set 
+   @param handler {function} Handler for the result of this call. 
+   */
+  this.sadd = function(key, member, handler) {
+    var __args = arguments;
+    if (__args.length === 3 && typeof __args[0] === 'string' && typeof __args[1] === 'string' && typeof __args[2] === 'function') {
+      j_redisService["sadd(java.lang.String,java.lang.String,io.vertx.core.Handler)"](key, member, function(ar) {
       if (ar.succeeded()) {
         handler(ar.result(), null);
       } else {
@@ -2146,13 +2585,14 @@ var RedisService = function(j_val) {
    Add one or more members to a set
 
    @public
-   @param args {todo} JsonArray [{"name":"key","type":"key"},{"name":"member","type":"string","multiple":true}] 
+   @param key {string} Key string 
+   @param members {Array.<string>} Values to be added to the set 
    @param handler {function} Handler for the result of this call. 
    */
-  this.sadd = function(args, handler) {
+  this.saddMany = function(key, members, handler) {
     var __args = arguments;
-    if (__args.length === 2 && typeof __args[0] === 'object' && __args[0] instanceof Array && typeof __args[1] === 'function') {
-      j_redisService.sadd(utils.convParamJsonArray(args), function(ar) {
+    if (__args.length === 3 && typeof __args[0] === 'string' && typeof __args[1] === 'object' && __args[1] instanceof Array && typeof __args[2] === 'function') {
+      j_redisService["saddMany(java.lang.String,java.util.List,io.vertx.core.Handler)"](key, members, function(ar) {
       if (ar.succeeded()) {
         handler(ar.result(), null);
       } else {
@@ -2171,7 +2611,7 @@ var RedisService = function(j_val) {
   this.save = function(handler) {
     var __args = arguments;
     if (__args.length === 1 && typeof __args[0] === 'function') {
-      j_redisService.save(function(ar) {
+      j_redisService["save(io.vertx.core.Handler)"](function(ar) {
       if (ar.succeeded()) {
         handler(ar.result(), null);
       } else {
@@ -2185,15 +2625,35 @@ var RedisService = function(j_val) {
    Get the number of members in a set
 
    @public
-   @param args {todo} JsonArray [{"name":"key","type":"key"}] 
+   @param key {string} Key string 
    @param handler {function} Handler for the result of this call. 
    */
-  this.scard = function(args, handler) {
+  this.scard = function(key, handler) {
     var __args = arguments;
-    if (__args.length === 2 && typeof __args[0] === 'object' && __args[0] instanceof Array && typeof __args[1] === 'function') {
-      j_redisService.scard(utils.convParamJsonArray(args), function(ar) {
+    if (__args.length === 2 && typeof __args[0] === 'string' && typeof __args[1] === 'function') {
+      j_redisService["scard(java.lang.String,io.vertx.core.Handler)"](key, function(ar) {
       if (ar.succeeded()) {
         handler(ar.result(), null);
+      } else {
+        handler(null, ar.cause());
+      }
+    });
+    } else utils.invalidArgs();
+  };
+
+  /**
+   Check existence of script in the script cache.
+
+   @public
+   @param script {string} SHA1 digest identifying a script in the script cache 
+   @param handler {function} Handler for the result of this call. 
+   */
+  this.scriptExists = function(script, handler) {
+    var __args = arguments;
+    if (__args.length === 2 && typeof __args[0] === 'string' && typeof __args[1] === 'function') {
+      j_redisService["scriptExists(java.lang.String,io.vertx.core.Handler)"](script, function(ar) {
+      if (ar.succeeded()) {
+        handler(utils.convReturnJson(ar.result()), null);
       } else {
         handler(null, ar.cause());
       }
@@ -2205,13 +2665,13 @@ var RedisService = function(j_val) {
    Check existence of scripts in the script cache.
 
    @public
-   @param args {todo} JsonArray [{"name":"script","type":"string","multiple":true}] 
+   @param scripts {Array.<string>} List of SHA1 digests identifying scripts in the script cache 
    @param handler {function} Handler for the result of this call. 
    */
-  this.scriptExists = function(args, handler) {
+  this.scriptExistsMany = function(scripts, handler) {
     var __args = arguments;
     if (__args.length === 2 && typeof __args[0] === 'object' && __args[0] instanceof Array && typeof __args[1] === 'function') {
-      j_redisService.scriptExists(utils.convParamJsonArray(args), function(ar) {
+      j_redisService["scriptExistsMany(java.util.List,io.vertx.core.Handler)"](scripts, function(ar) {
       if (ar.succeeded()) {
         handler(utils.convReturnJson(ar.result()), null);
       } else {
@@ -2230,7 +2690,7 @@ var RedisService = function(j_val) {
   this.scriptFlush = function(handler) {
     var __args = arguments;
     if (__args.length === 1 && typeof __args[0] === 'function') {
-      j_redisService.scriptFlush(function(ar) {
+      j_redisService["scriptFlush(io.vertx.core.Handler)"](function(ar) {
       if (ar.succeeded()) {
         handler(ar.result(), null);
       } else {
@@ -2249,7 +2709,7 @@ var RedisService = function(j_val) {
   this.scriptKill = function(handler) {
     var __args = arguments;
     if (__args.length === 1 && typeof __args[0] === 'function') {
-      j_redisService.scriptKill(function(ar) {
+      j_redisService["scriptKill(io.vertx.core.Handler)"](function(ar) {
       if (ar.succeeded()) {
         handler(ar.result(), null);
       } else {
@@ -2263,13 +2723,13 @@ var RedisService = function(j_val) {
    Load the specified Lua script into the script cache.
 
    @public
-   @param args {todo} JsonArray [{"name":"script","type":"string"}] 
+   @param script {string} Lua script 
    @param handler {function} Handler for the result of this call. 
    */
-  this.scriptLoad = function(args, handler) {
+  this.scriptLoad = function(script, handler) {
     var __args = arguments;
-    if (__args.length === 2 && typeof __args[0] === 'object' && __args[0] instanceof Array && typeof __args[1] === 'function') {
-      j_redisService.scriptLoad(utils.convParamJsonArray(args), function(ar) {
+    if (__args.length === 2 && typeof __args[0] === 'string' && typeof __args[1] === 'function') {
+      j_redisService["scriptLoad(java.lang.String,io.vertx.core.Handler)"](script, function(ar) {
       if (ar.succeeded()) {
         handler(ar.result(), null);
       } else {
@@ -2283,13 +2743,14 @@ var RedisService = function(j_val) {
    Subtract multiple sets
 
    @public
-   @param args {todo} JsonArray [{"name":"key","type":"key","multiple":true}] 
+   @param key {string} Key identifying the set to compare with all other sets combined 
+   @param cmpkeys {Array.<string>} List of keys identifying sets to subtract from the key set 
    @param handler {function} Handler for the result of this call. 
    */
-  this.sdiff = function(args, handler) {
+  this.sdiff = function(key, cmpkeys, handler) {
     var __args = arguments;
-    if (__args.length === 2 && typeof __args[0] === 'object' && __args[0] instanceof Array && typeof __args[1] === 'function') {
-      j_redisService.sdiff(utils.convParamJsonArray(args), function(ar) {
+    if (__args.length === 3 && typeof __args[0] === 'string' && typeof __args[1] === 'object' && __args[1] instanceof Array && typeof __args[2] === 'function') {
+      j_redisService["sdiff(java.lang.String,java.util.List,io.vertx.core.Handler)"](key, cmpkeys, function(ar) {
       if (ar.succeeded()) {
         handler(utils.convReturnJson(ar.result()), null);
       } else {
@@ -2303,13 +2764,15 @@ var RedisService = function(j_val) {
    Subtract multiple sets and store the resulting set in a key
 
    @public
-   @param args {todo} JsonArray [{"name":"destination","type":"key"},{"name":"key","type":"key","multiple":true}] 
+   @param destkey {string} Destination key where the result should be stored 
+   @param key {string} Key identifying the set to compare with all other sets combined 
+   @param cmpkeys {Array.<string>} List of keys identifying sets to subtract from the key set 
    @param handler {function} Handler for the result of this call. 
    */
-  this.sdiffstore = function(args, handler) {
+  this.sdiffstore = function(destkey, key, cmpkeys, handler) {
     var __args = arguments;
-    if (__args.length === 2 && typeof __args[0] === 'object' && __args[0] instanceof Array && typeof __args[1] === 'function') {
-      j_redisService.sdiffstore(utils.convParamJsonArray(args), function(ar) {
+    if (__args.length === 4 && typeof __args[0] === 'string' && typeof __args[1] === 'string' && typeof __args[2] === 'object' && __args[2] instanceof Array && typeof __args[3] === 'function') {
+      j_redisService["sdiffstore(java.lang.String,java.lang.String,java.util.List,io.vertx.core.Handler)"](destkey, key, cmpkeys, function(ar) {
       if (ar.succeeded()) {
         handler(ar.result(), null);
       } else {
@@ -2323,13 +2786,13 @@ var RedisService = function(j_val) {
    Change the selected database for the current connection
 
    @public
-   @param args {todo} JsonArray [{"name":"index","type":"integer"}] 
+   @param dbindex {number} Index identifying the new active database 
    @param handler {function} Handler for the result of this call. 
    */
-  this.select = function(args, handler) {
+  this.select = function(dbindex, handler) {
     var __args = arguments;
-    if (__args.length === 2 && typeof __args[0] === 'object' && __args[0] instanceof Array && typeof __args[1] === 'function') {
-      j_redisService.select(utils.convParamJsonArray(args), function(ar) {
+    if (__args.length === 2 && typeof __args[0] ==='number' && typeof __args[1] === 'function') {
+      j_redisService["select(int,io.vertx.core.Handler)"](dbindex, function(ar) {
       if (ar.succeeded()) {
         handler(ar.result(), null);
       } else {
@@ -2343,13 +2806,57 @@ var RedisService = function(j_val) {
    Set the string value of a key
 
    @public
-   @param args {todo} JsonArray [{"name":"key","type":"key"},{"name":"value","type":"string"},{"command":"EX","name":"seconds","type":"integer","optional":true},{"command":"PX","name":"milliseconds","type":"integer","optional":true},{"name":"condition","type":"enum","enum":["NX","XX"],"optional":true}] 
+   @param key {string} Key of which value to set 
+   @param value {string} New value for the key 
    @param handler {function} Handler for the result of this call. 
    */
-  this.set = function(args, handler) {
+  this.set = function(key, value, handler) {
     var __args = arguments;
-    if (__args.length === 2 && typeof __args[0] === 'object' && __args[0] instanceof Array && typeof __args[1] === 'function') {
-      j_redisService.set(utils.convParamJsonArray(args), function(ar) {
+    if (__args.length === 3 && typeof __args[0] === 'string' && typeof __args[1] === 'string' && typeof __args[2] === 'function') {
+      j_redisService["set(java.lang.String,java.lang.String,io.vertx.core.Handler)"](key, value, function(ar) {
+      if (ar.succeeded()) {
+        handler(null, null);
+      } else {
+        handler(null, ar.cause());
+      }
+    });
+    } else utils.invalidArgs();
+  };
+
+  /**
+   Set the string value of a key
+
+   @public
+   @param key {string} Key of which value to set 
+   @param value {string} New value for the key 
+   @param options {Object} Set options 
+   @param handler {function} Handler for the result of this call. 
+   */
+  this.setWithOptions = function(key, value, options, handler) {
+    var __args = arguments;
+    if (__args.length === 4 && typeof __args[0] === 'string' && typeof __args[1] === 'string' && typeof __args[2] === 'object' && typeof __args[3] === 'function') {
+      j_redisService["setWithOptions(java.lang.String,java.lang.String,io.vertx.redis.op.SetOptions,io.vertx.core.Handler)"](key, value, options != null ? new SetOptions(new JsonObject(JSON.stringify(options))) : null, function(ar) {
+      if (ar.succeeded()) {
+        handler(null, null);
+      } else {
+        handler(null, ar.cause());
+      }
+    });
+    } else utils.invalidArgs();
+  };
+
+  /**
+   Set the binary string value of a key - without encoding as utf-8
+
+   @public
+   @param key {string} Key of which value to set 
+   @param value {string} New value for the key 
+   @param handler {function} Handler for the result of this call. 
+   */
+  this.setBinary = function(key, value, handler) {
+    var __args = arguments;
+    if (__args.length === 3 && typeof __args[0] === 'string' && typeof __args[1] === 'string' && typeof __args[2] === 'function') {
+      j_redisService["setBinary(java.lang.String,java.lang.String,io.vertx.core.Handler)"](key, value, function(ar) {
       if (ar.succeeded()) {
         handler(null, null);
       } else {
@@ -2363,13 +2870,15 @@ var RedisService = function(j_val) {
    Sets or clears the bit at offset in the string value stored at key
 
    @public
-   @param args {todo} JsonArray [{"name":"key","type":"key"},{"name":"offset","type":"integer"},{"name":"value","type":"string"}] 
+   @param key {string} Key string 
+   @param offset {number} Bit offset 
+   @param bit {number} New value - must be 1 or 0 
    @param handler {function} Handler for the result of this call. 
    */
-  this.setbit = function(args, handler) {
+  this.setbit = function(key, offset, bit, handler) {
     var __args = arguments;
-    if (__args.length === 2 && typeof __args[0] === 'object' && __args[0] instanceof Array && typeof __args[1] === 'function') {
-      j_redisService.setbit(utils.convParamJsonArray(args), function(ar) {
+    if (__args.length === 4 && typeof __args[0] === 'string' && typeof __args[1] ==='number' && typeof __args[2] ==='number' && typeof __args[3] === 'function') {
+      j_redisService["setbit(java.lang.String,long,int,io.vertx.core.Handler)"](key, offset, bit, function(ar) {
       if (ar.succeeded()) {
         handler(ar.result(), null);
       } else {
@@ -2383,13 +2892,15 @@ var RedisService = function(j_val) {
    Set the value and expiration of a key
 
    @public
-   @param args {todo} JsonArray [{"name":"key","type":"key"},{"name":"seconds","type":"integer"},{"name":"value","type":"string"}] 
+   @param key {string} Key string 
+   @param seconds {number} Number of seconds until the key expires 
+   @param value {string} New value for key 
    @param handler {function} Handler for the result of this call. 
    */
-  this.setex = function(args, handler) {
+  this.setex = function(key, seconds, value, handler) {
     var __args = arguments;
-    if (__args.length === 2 && typeof __args[0] === 'object' && __args[0] instanceof Array && typeof __args[1] === 'function') {
-      j_redisService.setex(utils.convParamJsonArray(args), function(ar) {
+    if (__args.length === 4 && typeof __args[0] === 'string' && typeof __args[1] ==='number' && typeof __args[2] === 'string' && typeof __args[3] === 'function') {
+      j_redisService["setex(java.lang.String,long,java.lang.String,io.vertx.core.Handler)"](key, seconds, value, function(ar) {
       if (ar.succeeded()) {
         handler(ar.result(), null);
       } else {
@@ -2403,13 +2914,14 @@ var RedisService = function(j_val) {
    Set the value of a key, only if the key does not exist
 
    @public
-   @param args {todo} JsonArray [{"name":"key","type":"key"},{"name":"value","type":"string"}] 
+   @param key {string} Key of which value to set 
+   @param value {string} New value for the key 
    @param handler {function} Handler for the result of this call. 
    */
-  this.setnx = function(args, handler) {
+  this.setnx = function(key, value, handler) {
     var __args = arguments;
-    if (__args.length === 2 && typeof __args[0] === 'object' && __args[0] instanceof Array && typeof __args[1] === 'function') {
-      j_redisService.setnx(utils.convParamJsonArray(args), function(ar) {
+    if (__args.length === 3 && typeof __args[0] === 'string' && typeof __args[1] === 'string' && typeof __args[2] === 'function') {
+      j_redisService["setnx(java.lang.String,java.lang.String,io.vertx.core.Handler)"](key, value, function(ar) {
       if (ar.succeeded()) {
         handler(ar.result(), null);
       } else {
@@ -2423,13 +2935,15 @@ var RedisService = function(j_val) {
    Overwrite part of a string at key starting at the specified offset
 
    @public
-   @param args {todo} JsonArray [{"name":"key","type":"key"},{"name":"offset","type":"integer"},{"name":"value","type":"string"}] 
+   @param key {string} Key string 
+   @param offset {number} Offset - the maximum offset that you can set is 2^29 -1 (536870911), as Redis Strings are limited to 512 megabytes 
+   @param value {string} Value to overwrite with 
    @param handler {function} Handler for the result of this call. 
    */
-  this.setrange = function(args, handler) {
+  this.setrange = function(key, offset, value, handler) {
     var __args = arguments;
-    if (__args.length === 2 && typeof __args[0] === 'object' && __args[0] instanceof Array && typeof __args[1] === 'function') {
-      j_redisService.setrange(utils.convParamJsonArray(args), function(ar) {
+    if (__args.length === 4 && typeof __args[0] === 'string' && typeof __args[1] ==='number' && typeof __args[2] === 'string' && typeof __args[3] === 'function') {
+      j_redisService["setrange(java.lang.String,int,java.lang.String,io.vertx.core.Handler)"](key, offset, value, function(ar) {
       if (ar.succeeded()) {
         handler(ar.result(), null);
       } else {
@@ -2443,19 +2957,12 @@ var RedisService = function(j_val) {
    Synchronously save the dataset to disk and then shut down the server
 
    @public
-   @param args {todo} JsonArray [{"name":"NOSAVE","type":"enum","enum":["NOSAVE"],"optional":true},{"name":"SAVE","type":"enum","enum":["SAVE"],"optional":true}] 
-   @param handler {function} Handler for the result of this call. 
+   @param options {Object} Shutdown options 
    */
-  this.shutdown = function(args, handler) {
+  this.shutdown = function(options) {
     var __args = arguments;
-    if (__args.length === 2 && typeof __args[0] === 'object' && __args[0] instanceof Array && typeof __args[1] === 'function') {
-      j_redisService.shutdown(utils.convParamJsonArray(args), function(ar) {
-      if (ar.succeeded()) {
-        handler(ar.result(), null);
-      } else {
-        handler(null, ar.cause());
-      }
-    });
+    if (__args.length === 1 && typeof __args[0] === 'string') {
+      j_redisService["shutdown(io.vertx.redis.op.ShutdownOptions)"](io.vertx.redis.op.ShutdownOptions.valueOf(__args[0]));
     } else utils.invalidArgs();
   };
 
@@ -2463,13 +2970,13 @@ var RedisService = function(j_val) {
    Intersect multiple sets
 
    @public
-   @param args {todo} JsonArray [{"name":"key","type":"key","multiple":true}] 
+   @param keys {Array.<string>} List of keys to perform intersection on 
    @param handler {function} Handler for the result of this call. 
    */
-  this.sinter = function(args, handler) {
+  this.sinter = function(keys, handler) {
     var __args = arguments;
     if (__args.length === 2 && typeof __args[0] === 'object' && __args[0] instanceof Array && typeof __args[1] === 'function') {
-      j_redisService.sinter(utils.convParamJsonArray(args), function(ar) {
+      j_redisService["sinter(java.util.List,io.vertx.core.Handler)"](keys, function(ar) {
       if (ar.succeeded()) {
         handler(utils.convReturnJson(ar.result()), null);
       } else {
@@ -2483,13 +2990,14 @@ var RedisService = function(j_val) {
    Intersect multiple sets and store the resulting set in a key
 
    @public
-   @param args {todo} JsonArray [{"name":"destination","type":"key"},{"name":"key","type":"key","multiple":true}] 
+   @param destkey {string} Key where to store the results 
+   @param keys {Array.<string>} List of keys to perform intersection on 
    @param handler {function} Handler for the result of this call. 
    */
-  this.sinterstore = function(args, handler) {
+  this.sinterstore = function(destkey, keys, handler) {
     var __args = arguments;
-    if (__args.length === 2 && typeof __args[0] === 'object' && __args[0] instanceof Array && typeof __args[1] === 'function') {
-      j_redisService.sinterstore(utils.convParamJsonArray(args), function(ar) {
+    if (__args.length === 3 && typeof __args[0] === 'string' && typeof __args[1] === 'object' && __args[1] instanceof Array && typeof __args[2] === 'function') {
+      j_redisService["sinterstore(java.lang.String,java.util.List,io.vertx.core.Handler)"](destkey, keys, function(ar) {
       if (ar.succeeded()) {
         handler(ar.result(), null);
       } else {
@@ -2503,13 +3011,14 @@ var RedisService = function(j_val) {
    Determine if a given value is a member of a set
 
    @public
-   @param args {todo} JsonArray [{"name":"key","type":"key"},{"name":"member","type":"string"}] 
+   @param key {string} Key string 
+   @param member {string} Member to look for 
    @param handler {function} Handler for the result of this call. 
    */
-  this.sismember = function(args, handler) {
+  this.sismember = function(key, member, handler) {
     var __args = arguments;
-    if (__args.length === 2 && typeof __args[0] === 'object' && __args[0] instanceof Array && typeof __args[1] === 'function') {
-      j_redisService.sismember(utils.convParamJsonArray(args), function(ar) {
+    if (__args.length === 3 && typeof __args[0] === 'string' && typeof __args[1] === 'string' && typeof __args[2] === 'function') {
+      j_redisService["sismember(java.lang.String,java.lang.String,io.vertx.core.Handler)"](key, member, function(ar) {
       if (ar.succeeded()) {
         handler(ar.result(), null);
       } else {
@@ -2520,16 +3029,17 @@ var RedisService = function(j_val) {
   };
 
   /**
-   Make the server a slave of another instance, or promote it as master
+   Make the server a slave of another instance
 
    @public
-   @param args {todo} JsonArray [{"name":"host","type":"string"},{"name":"port","type":"string"}] 
+   @param host {string} Host to become this server's master 
+   @param port {number} Port of our new master 
    @param handler {function} Handler for the result of this call. 
    */
-  this.slaveof = function(args, handler) {
+  this.slaveof = function(host, port, handler) {
     var __args = arguments;
-    if (__args.length === 2 && typeof __args[0] === 'object' && __args[0] instanceof Array && typeof __args[1] === 'function') {
-      j_redisService.slaveof(utils.convParamJsonArray(args), function(ar) {
+    if (__args.length === 3 && typeof __args[0] === 'string' && typeof __args[1] ==='number' && typeof __args[2] === 'function') {
+      j_redisService["slaveof(java.lang.String,int,io.vertx.core.Handler)"](host, port, function(ar) {
       if (ar.succeeded()) {
         handler(ar.result(), null);
       } else {
@@ -2540,16 +3050,73 @@ var RedisService = function(j_val) {
   };
 
   /**
-   Manages the Redis slow queries log
+   Make this server a master
 
    @public
-   @param args {todo} JsonArray [{"name":"subcommand","type":"string"},{"name":"argument","type":"string","optional":true}] 
    @param handler {function} Handler for the result of this call. 
    */
-  this.slowlog = function(args, handler) {
+  this.slaveofNoone = function(handler) {
     var __args = arguments;
-    if (__args.length === 2 && typeof __args[0] === 'object' && __args[0] instanceof Array && typeof __args[1] === 'function') {
-      j_redisService.slowlog(utils.convParamJsonArray(args), function(ar) {
+    if (__args.length === 1 && typeof __args[0] === 'function') {
+      j_redisService["slaveofNoone(io.vertx.core.Handler)"](function(ar) {
+      if (ar.succeeded()) {
+        handler(ar.result(), null);
+      } else {
+        handler(null, ar.cause());
+      }
+    });
+    } else utils.invalidArgs();
+  };
+
+  /**
+   Read the Redis slow queries log
+
+   @public
+   @param limit {number} Number of log entries to return. If value is less than zero all entries are returned 
+   @param handler {function} Handler for the result of this call. 
+   */
+  this.slowlogGet = function(limit, handler) {
+    var __args = arguments;
+    if (__args.length === 2 && typeof __args[0] ==='number' && typeof __args[1] === 'function') {
+      j_redisService["slowlogGet(int,io.vertx.core.Handler)"](limit, function(ar) {
+      if (ar.succeeded()) {
+        handler(utils.convReturnJson(ar.result()), null);
+      } else {
+        handler(null, ar.cause());
+      }
+    });
+    } else utils.invalidArgs();
+  };
+
+  /**
+   Get the length of the Redis slow queries log
+
+   @public
+   @param handler {function} Handler for the result of this call. 
+   */
+  this.slowlogLen = function(handler) {
+    var __args = arguments;
+    if (__args.length === 1 && typeof __args[0] === 'function') {
+      j_redisService["slowlogLen(io.vertx.core.Handler)"](function(ar) {
+      if (ar.succeeded()) {
+        handler(ar.result(), null);
+      } else {
+        handler(null, ar.cause());
+      }
+    });
+    } else utils.invalidArgs();
+  };
+
+  /**
+   Reset the Redis slow queries log
+
+   @public
+   @param handler {function} Handler for the result of this call. 
+   */
+  this.slowlogReset = function(handler) {
+    var __args = arguments;
+    if (__args.length === 1 && typeof __args[0] === 'function') {
+      j_redisService["slowlogReset(io.vertx.core.Handler)"](function(ar) {
       if (ar.succeeded()) {
         handler(null, null);
       } else {
@@ -2563,13 +3130,13 @@ var RedisService = function(j_val) {
    Get all the members in a set
 
    @public
-   @param args {todo} JsonArray [{"name":"key","type":"key"}] 
+   @param key {string} Key string 
    @param handler {function} Handler for the result of this call. 
    */
-  this.smembers = function(args, handler) {
+  this.smembers = function(key, handler) {
     var __args = arguments;
-    if (__args.length === 2 && typeof __args[0] === 'object' && __args[0] instanceof Array && typeof __args[1] === 'function') {
-      j_redisService.smembers(utils.convParamJsonArray(args), function(ar) {
+    if (__args.length === 2 && typeof __args[0] === 'string' && typeof __args[1] === 'function') {
+      j_redisService["smembers(java.lang.String,io.vertx.core.Handler)"](key, function(ar) {
       if (ar.succeeded()) {
         handler(utils.convReturnJson(ar.result()), null);
       } else {
@@ -2583,13 +3150,15 @@ var RedisService = function(j_val) {
    Move a member from one set to another
 
    @public
-   @param args {todo} JsonArray [{"name":"source","type":"key"},{"name":"destination","type":"key"},{"name":"member","type":"string"}] 
+   @param key {string} Key of source set currently containing the member 
+   @param destkey {string} Key identifying the destination set 
+   @param member {string} Member to move 
    @param handler {function} Handler for the result of this call. 
    */
-  this.smove = function(args, handler) {
+  this.smove = function(key, destkey, member, handler) {
     var __args = arguments;
-    if (__args.length === 2 && typeof __args[0] === 'object' && __args[0] instanceof Array && typeof __args[1] === 'function') {
-      j_redisService.smove(utils.convParamJsonArray(args), function(ar) {
+    if (__args.length === 4 && typeof __args[0] === 'string' && typeof __args[1] === 'string' && typeof __args[2] === 'string' && typeof __args[3] === 'function') {
+      j_redisService["smove(java.lang.String,java.lang.String,java.lang.String,io.vertx.core.Handler)"](key, destkey, member, function(ar) {
       if (ar.succeeded()) {
         handler(ar.result(), null);
       } else {
@@ -2603,13 +3172,14 @@ var RedisService = function(j_val) {
    Sort the elements in a list, set or sorted set
 
    @public
-   @param args {todo} JsonArray [{"name":"key","type":"key"},{"command":"BY","name":"pattern","type":"pattern","optional":true},{"command":"LIMIT","name":["offset","count"],"type":["integer","integer"],"optional":true},{"command":"GET","name":"pattern","type":"string","optional":true,"multiple":true},{"name":"order","type":"enum","enum":["ASC","DESC"],"optional":true},{"name":"sorting","type":"enum","enum":["ALPHA"],"optional":true},{"command":"STORE","name":"destination","type":"key","optional":true}] 
+   @param key {string} Key string 
+   @param options {Object} Sort options 
    @param handler {function} Handler for the result of this call. 
    */
-  this.sort = function(args, handler) {
+  this.sort = function(key, options, handler) {
     var __args = arguments;
-    if (__args.length === 2 && typeof __args[0] === 'object' && __args[0] instanceof Array && typeof __args[1] === 'function') {
-      j_redisService.sort(utils.convParamJsonArray(args), function(ar) {
+    if (__args.length === 3 && typeof __args[0] === 'string' && typeof __args[1] === 'object' && typeof __args[2] === 'function') {
+      j_redisService["sort(java.lang.String,io.vertx.redis.op.SortOptions,io.vertx.core.Handler)"](key, options != null ? new SortOptions(new JsonObject(JSON.stringify(options))) : null, function(ar) {
       if (ar.succeeded()) {
         handler(utils.convReturnJson(ar.result()), null);
       } else {
@@ -2623,13 +3193,34 @@ var RedisService = function(j_val) {
    Remove and return a random member from a set
 
    @public
-   @param args {todo} JsonArray [{"name":"key","type":"key"}] 
+   @param key {string} Key string 
    @param handler {function} Handler for the result of this call. 
    */
-  this.spop = function(args, handler) {
+  this.spop = function(key, handler) {
     var __args = arguments;
-    if (__args.length === 2 && typeof __args[0] === 'object' && __args[0] instanceof Array && typeof __args[1] === 'function') {
-      j_redisService.spop(utils.convParamJsonArray(args), function(ar) {
+    if (__args.length === 2 && typeof __args[0] === 'string' && typeof __args[1] === 'function') {
+      j_redisService["spop(java.lang.String,io.vertx.core.Handler)"](key, function(ar) {
+      if (ar.succeeded()) {
+        handler(ar.result(), null);
+      } else {
+        handler(null, ar.cause());
+      }
+    });
+    } else utils.invalidArgs();
+  };
+
+  /**
+   Remove and return random members from a set
+
+   @public
+   @param key {string} Key string 
+   @param count {number} Number of members to remove 
+   @param handler {function} Handler for the result of this call. 
+   */
+  this.spopMany = function(key, count, handler) {
+    var __args = arguments;
+    if (__args.length === 3 && typeof __args[0] === 'string' && typeof __args[1] ==='number' && typeof __args[2] === 'function') {
+      j_redisService["spopMany(java.lang.String,int,io.vertx.core.Handler)"](key, count, function(ar) {
       if (ar.succeeded()) {
         handler(ar.result(), null);
       } else {
@@ -2643,15 +3234,37 @@ var RedisService = function(j_val) {
    Get one or multiple random members from a set
 
    @public
-   @param args {todo} JsonArray [{"name":"key","type":"key"},{"name":"count","type":"integer","optional":true}] 
+   @param key {string} Key string 
+   @param count {number} Number of members to get 
    @param handler {function} Handler for the result of this call. 
    */
-  this.srandmember = function(args, handler) {
+  this.srandmember = function(key, count, handler) {
     var __args = arguments;
-    if (__args.length === 2 && typeof __args[0] === 'object' && __args[0] instanceof Array && typeof __args[1] === 'function') {
-      j_redisService.srandmember(utils.convParamJsonArray(args), function(ar) {
+    if (__args.length === 3 && typeof __args[0] === 'string' && typeof __args[1] ==='number' && typeof __args[2] === 'function') {
+      j_redisService["srandmember(java.lang.String,int,io.vertx.core.Handler)"](key, count, function(ar) {
       if (ar.succeeded()) {
         handler(utils.convReturnJson(ar.result()), null);
+      } else {
+        handler(null, ar.cause());
+      }
+    });
+    } else utils.invalidArgs();
+  };
+
+  /**
+   Remove one member from a set
+
+   @public
+   @param key {string} Key string 
+   @param member {string} Member to remove 
+   @param handler {function} Handler for the result of this call. 
+   */
+  this.srem = function(key, member, handler) {
+    var __args = arguments;
+    if (__args.length === 3 && typeof __args[0] === 'string' && typeof __args[1] === 'string' && typeof __args[2] === 'function') {
+      j_redisService["srem(java.lang.String,java.lang.String,io.vertx.core.Handler)"](key, member, function(ar) {
+      if (ar.succeeded()) {
+        handler(ar.result(), null);
       } else {
         handler(null, ar.cause());
       }
@@ -2663,13 +3276,14 @@ var RedisService = function(j_val) {
    Remove one or more members from a set
 
    @public
-   @param args {todo} JsonArray [{"name":"key","type":"key"},{"name":"member","type":"string","multiple":true}] 
+   @param key {string} Key string 
+   @param members {Array.<string>} Members to remove 
    @param handler {function} Handler for the result of this call. 
    */
-  this.srem = function(args, handler) {
+  this.sremMany = function(key, members, handler) {
     var __args = arguments;
-    if (__args.length === 2 && typeof __args[0] === 'object' && __args[0] instanceof Array && typeof __args[1] === 'function') {
-      j_redisService.srem(utils.convParamJsonArray(args), function(ar) {
+    if (__args.length === 3 && typeof __args[0] === 'string' && typeof __args[1] === 'object' && __args[1] instanceof Array && typeof __args[2] === 'function') {
+      j_redisService["sremMany(java.lang.String,java.util.List,io.vertx.core.Handler)"](key, members, function(ar) {
       if (ar.succeeded()) {
         handler(ar.result(), null);
       } else {
@@ -2683,13 +3297,13 @@ var RedisService = function(j_val) {
    Get the length of the value stored in a key
 
    @public
-   @param args {todo} JsonArray [{"name":"key","type":"key"}] 
+   @param key {string} Key string 
    @param handler {function} Handler for the result of this call. 
    */
-  this.strlen = function(args, handler) {
+  this.strlen = function(key, handler) {
     var __args = arguments;
-    if (__args.length === 2 && typeof __args[0] === 'object' && __args[0] instanceof Array && typeof __args[1] === 'function') {
-      j_redisService.strlen(utils.convParamJsonArray(args), function(ar) {
+    if (__args.length === 2 && typeof __args[0] === 'string' && typeof __args[1] === 'function') {
+      j_redisService["strlen(java.lang.String,io.vertx.core.Handler)"](key, function(ar) {
       if (ar.succeeded()) {
         handler(ar.result(), null);
       } else {
@@ -2703,13 +3317,13 @@ var RedisService = function(j_val) {
    Listen for messages published to the given channels
 
    @public
-   @param args {todo} JsonArray [{"name":["channel"],"type":["string"],"multiple":true}] 
+   @param channels {Array.<string>} List of channels to subscribe to 
    @param handler {function} Handler for the result of this call. 
    */
-  this.subscribe = function(args, handler) {
+  this.subscribe = function(channels, handler) {
     var __args = arguments;
     if (__args.length === 2 && typeof __args[0] === 'object' && __args[0] instanceof Array && typeof __args[1] === 'function') {
-      j_redisService.subscribe(utils.convParamJsonArray(args), function(ar) {
+      j_redisService["subscribe(java.util.List,io.vertx.core.Handler)"](channels, function(ar) {
       if (ar.succeeded()) {
         handler(null, null);
       } else {
@@ -2723,13 +3337,13 @@ var RedisService = function(j_val) {
    Add multiple sets
 
    @public
-   @param args {todo} JsonArray [{"name":"key","type":"key","multiple":true}] 
+   @param keys {Array.<string>} List of keys identifying sets to add up 
    @param handler {function} Handler for the result of this call. 
    */
-  this.sunion = function(args, handler) {
+  this.sunion = function(keys, handler) {
     var __args = arguments;
     if (__args.length === 2 && typeof __args[0] === 'object' && __args[0] instanceof Array && typeof __args[1] === 'function') {
-      j_redisService.sunion(utils.convParamJsonArray(args), function(ar) {
+      j_redisService["sunion(java.util.List,io.vertx.core.Handler)"](keys, function(ar) {
       if (ar.succeeded()) {
         handler(utils.convReturnJson(ar.result()), null);
       } else {
@@ -2743,13 +3357,14 @@ var RedisService = function(j_val) {
    Add multiple sets and store the resulting set in a key
 
    @public
-   @param args {todo} JsonArray [{"name":"destination","type":"key"},{"name":"key","type":"key","multiple":true}] 
+   @param destkey {string} Destination key 
+   @param keys {Array.<string>} List of keys identifying sets to add up 
    @param handler {function} Handler for the result of this call. 
    */
-  this.sunionstore = function(args, handler) {
+  this.sunionstore = function(destkey, keys, handler) {
     var __args = arguments;
-    if (__args.length === 2 && typeof __args[0] === 'object' && __args[0] instanceof Array && typeof __args[1] === 'function') {
-      j_redisService.sunionstore(utils.convParamJsonArray(args), function(ar) {
+    if (__args.length === 3 && typeof __args[0] === 'string' && typeof __args[1] === 'object' && __args[1] instanceof Array && typeof __args[2] === 'function') {
+      j_redisService["sunionstore(java.lang.String,java.util.List,io.vertx.core.Handler)"](destkey, keys, function(ar) {
       if (ar.succeeded()) {
         handler(ar.result(), null);
       } else {
@@ -2768,7 +3383,7 @@ var RedisService = function(j_val) {
   this.sync = function(handler) {
     var __args = arguments;
     if (__args.length === 1 && typeof __args[0] === 'function') {
-      j_redisService.sync(function(ar) {
+      j_redisService["sync(io.vertx.core.Handler)"](function(ar) {
       if (ar.succeeded()) {
         handler(null, null);
       } else {
@@ -2787,7 +3402,7 @@ var RedisService = function(j_val) {
   this.time = function(handler) {
     var __args = arguments;
     if (__args.length === 1 && typeof __args[0] === 'function') {
-      j_redisService.time(function(ar) {
+      j_redisService["time(io.vertx.core.Handler)"](function(ar) {
       if (ar.succeeded()) {
         handler(utils.convReturnJson(ar.result()), null);
       } else {
@@ -2801,13 +3416,13 @@ var RedisService = function(j_val) {
    Get the time to live for a key
 
    @public
-   @param args {todo} JsonArray [{"name":"key","type":"key"}] 
+   @param key {string} Key string 
    @param handler {function} Handler for the result of this call. 
    */
-  this.ttl = function(args, handler) {
+  this.ttl = function(key, handler) {
     var __args = arguments;
-    if (__args.length === 2 && typeof __args[0] === 'object' && __args[0] instanceof Array && typeof __args[1] === 'function') {
-      j_redisService.ttl(utils.convParamJsonArray(args), function(ar) {
+    if (__args.length === 2 && typeof __args[0] === 'string' && typeof __args[1] === 'function') {
+      j_redisService["ttl(java.lang.String,io.vertx.core.Handler)"](key, function(ar) {
       if (ar.succeeded()) {
         handler(ar.result(), null);
       } else {
@@ -2821,13 +3436,13 @@ var RedisService = function(j_val) {
    Determine the type stored at key
 
    @public
-   @param args {todo} JsonArray [{"name":"key","type":"key"}] 
+   @param key {string} Key string 
    @param handler {function} Handler for the result of this call. 
    */
-  this.type = function(args, handler) {
+  this.type = function(key, handler) {
     var __args = arguments;
-    if (__args.length === 2 && typeof __args[0] === 'object' && __args[0] instanceof Array && typeof __args[1] === 'function') {
-      j_redisService.type(utils.convParamJsonArray(args), function(ar) {
+    if (__args.length === 2 && typeof __args[0] === 'string' && typeof __args[1] === 'function') {
+      j_redisService["type(java.lang.String,io.vertx.core.Handler)"](key, function(ar) {
       if (ar.succeeded()) {
         handler(ar.result(), null);
       } else {
@@ -2841,13 +3456,13 @@ var RedisService = function(j_val) {
    Stop listening for messages posted to the given channels
 
    @public
-   @param args {todo} JsonArray [{"name":"channel","type":"string","optional":true,"multiple":true}] 
+   @param channels {Array.<string>} List of channels to subscribe to 
    @param handler {function} Handler for the result of this call. 
    */
-  this.unsubscribe = function(args, handler) {
+  this.unsubscribe = function(channels, handler) {
     var __args = arguments;
     if (__args.length === 2 && typeof __args[0] === 'object' && __args[0] instanceof Array && typeof __args[1] === 'function') {
-      j_redisService.unsubscribe(utils.convParamJsonArray(args), function(ar) {
+      j_redisService["unsubscribe(java.util.List,io.vertx.core.Handler)"](channels, function(ar) {
       if (ar.succeeded()) {
         handler(null, null);
       } else {
@@ -2866,7 +3481,7 @@ var RedisService = function(j_val) {
   this.unwatch = function(handler) {
     var __args = arguments;
     if (__args.length === 1 && typeof __args[0] === 'function') {
-      j_redisService.unwatch(function(ar) {
+      j_redisService["unwatch(io.vertx.core.Handler)"](function(ar) {
       if (ar.succeeded()) {
         handler(ar.result(), null);
       } else {
@@ -2880,13 +3495,13 @@ var RedisService = function(j_val) {
    Watch the given keys to determine execution of the MULTI/EXEC block
 
    @public
-   @param args {todo} JsonArray [{"name":"key","type":"key","multiple":true}] 
+   @param keys {Array.<string>} List of keys to watch 
    @param handler {function} Handler for the result of this call. 
    */
-  this.watch = function(args, handler) {
+  this.watch = function(keys, handler) {
     var __args = arguments;
     if (__args.length === 2 && typeof __args[0] === 'object' && __args[0] instanceof Array && typeof __args[1] === 'function') {
-      j_redisService.watch(utils.convParamJsonArray(args), function(ar) {
+      j_redisService["watch(java.util.List,io.vertx.core.Handler)"](keys, function(ar) {
       if (ar.succeeded()) {
         handler(ar.result(), null);
       } else {
@@ -2900,13 +3515,36 @@ var RedisService = function(j_val) {
    Add one or more members to a sorted set, or update its score if it already exists
 
    @public
-   @param args {todo} JsonArray [{"name":"key","type":"key"},{"name":["score","member"],"type":["double","string"],"multiple":true}] 
+   @param key {string} Key string 
+   @param score {number} Score used for sorting 
+   @param member {string} New member key 
    @param handler {function} Handler for the result of this call. 
    */
-  this.zadd = function(args, handler) {
+  this.zadd = function(key, score, member, handler) {
     var __args = arguments;
-    if (__args.length === 2 && typeof __args[0] === 'object' && __args[0] instanceof Array && typeof __args[1] === 'function') {
-      j_redisService.zadd(utils.convParamJsonArray(args), function(ar) {
+    if (__args.length === 4 && typeof __args[0] === 'string' && typeof __args[1] ==='number' && typeof __args[2] === 'string' && typeof __args[3] === 'function') {
+      j_redisService["zadd(java.lang.String,double,java.lang.String,io.vertx.core.Handler)"](key, score, member, function(ar) {
+      if (ar.succeeded()) {
+        handler(ar.result(), null);
+      } else {
+        handler(null, ar.cause());
+      }
+    });
+    } else utils.invalidArgs();
+  };
+
+  /**
+   Add one or more members to a sorted set, or update its score if it already exists
+
+   @public
+   @param key {string} Key string 
+   @param members {Array.<string>} New member keys and their scores 
+   @param handler {function} Handler for the result of this call. 
+   */
+  this.zaddMany = function(key, members, handler) {
+    var __args = arguments;
+    if (__args.length === 3 && typeof __args[0] === 'string' && typeof __args[1] === 'object' && typeof __args[2] === 'function') {
+      j_redisService["zaddMany(java.lang.String,java.util.Map,io.vertx.core.Handler)"](key, members, function(ar) {
       if (ar.succeeded()) {
         handler(ar.result(), null);
       } else {
@@ -2920,13 +3558,13 @@ var RedisService = function(j_val) {
    Get the number of members in a sorted set
 
    @public
-   @param args {todo} JsonArray [{"name":"key","type":"key"}] 
+   @param key {string} Key string 
    @param handler {function} Handler for the result of this call. 
    */
-  this.zcard = function(args, handler) {
+  this.zcard = function(key, handler) {
     var __args = arguments;
-    if (__args.length === 2 && typeof __args[0] === 'object' && __args[0] instanceof Array && typeof __args[1] === 'function') {
-      j_redisService.zcard(utils.convParamJsonArray(args), function(ar) {
+    if (__args.length === 2 && typeof __args[0] === 'string' && typeof __args[1] === 'function') {
+      j_redisService["zcard(java.lang.String,io.vertx.core.Handler)"](key, function(ar) {
       if (ar.succeeded()) {
         handler(ar.result(), null);
       } else {
@@ -2940,13 +3578,15 @@ var RedisService = function(j_val) {
    Count the members in a sorted set with scores within the given values
 
    @public
-   @param args {todo} JsonArray [{"name":"key","type":"key"},{"name":"min","type":"double"},{"name":"max","type":"double"}] 
+   @param key {string} Key string 
+   @param min {number} Minimum score 
+   @param max {number} Maximum score 
    @param handler {function} Handler for the result of this call. 
    */
-  this.zcount = function(args, handler) {
+  this.zcount = function(key, min, max, handler) {
     var __args = arguments;
-    if (__args.length === 2 && typeof __args[0] === 'object' && __args[0] instanceof Array && typeof __args[1] === 'function') {
-      j_redisService.zcount(utils.convParamJsonArray(args), function(ar) {
+    if (__args.length === 4 && typeof __args[0] === 'string' && typeof __args[1] ==='number' && typeof __args[2] ==='number' && typeof __args[3] === 'function') {
+      j_redisService["zcount(java.lang.String,double,double,io.vertx.core.Handler)"](key, min, max, function(ar) {
       if (ar.succeeded()) {
         handler(ar.result(), null);
       } else {
@@ -2960,13 +3600,15 @@ var RedisService = function(j_val) {
    Increment the score of a member in a sorted set
 
    @public
-   @param args {todo} JsonArray [{"name":"key","type":"key"},{"name":"increment","type":"integer"},{"name":"member","type":"string"}] 
+   @param key {string} Key string 
+   @param increment {number} Increment amount 
+   @param member {string} Member key 
    @param handler {function} Handler for the result of this call. 
    */
-  this.zincrby = function(args, handler) {
+  this.zincrby = function(key, increment, member, handler) {
     var __args = arguments;
-    if (__args.length === 2 && typeof __args[0] === 'object' && __args[0] instanceof Array && typeof __args[1] === 'function') {
-      j_redisService.zincrby(utils.convParamJsonArray(args), function(ar) {
+    if (__args.length === 4 && typeof __args[0] === 'string' && typeof __args[1] ==='number' && typeof __args[2] === 'string' && typeof __args[3] === 'function') {
+      j_redisService["zincrby(java.lang.String,double,java.lang.String,io.vertx.core.Handler)"](key, increment, member, function(ar) {
       if (ar.succeeded()) {
         handler(ar.result(), null);
       } else {
@@ -2980,13 +3622,37 @@ var RedisService = function(j_val) {
    Intersect multiple sorted sets and store the resulting sorted set in a new key
 
    @public
-   @param args {todo} JsonArray [{"name":"destination","type":"key"},{"name":"numkeys","type":"integer"},{"name":"key","type":"key","multiple":true},{"command":"WEIGHTS","name":"weight","type":"integer","variadic":true,"optional":true},{"command":"AGGREGATE","name":"aggregate","type":"enum","enum":["SUM","MIN","MAX"],"optional":true}] 
+   @param destkey {string} Destination key 
+   @param sets {Array.<string>} List of keys identifying sorted sets to intersect 
+   @param options {Object} Aggregation options 
    @param handler {function} Handler for the result of this call. 
    */
-  this.zinterstore = function(args, handler) {
+  this.zinterstore = function(destkey, sets, options, handler) {
     var __args = arguments;
-    if (__args.length === 2 && typeof __args[0] === 'object' && __args[0] instanceof Array && typeof __args[1] === 'function') {
-      j_redisService.zinterstore(utils.convParamJsonArray(args), function(ar) {
+    if (__args.length === 4 && typeof __args[0] === 'string' && typeof __args[1] === 'object' && __args[1] instanceof Array && typeof __args[2] === 'string' && typeof __args[3] === 'function') {
+      j_redisService["zinterstore(java.lang.String,java.util.List,io.vertx.redis.op.AggregateOptions,io.vertx.core.Handler)"](destkey, sets, io.vertx.redis.op.AggregateOptions.valueOf(__args[2]), function(ar) {
+      if (ar.succeeded()) {
+        handler(ar.result(), null);
+      } else {
+        handler(null, ar.cause());
+      }
+    });
+    } else utils.invalidArgs();
+  };
+
+  /**
+   Intersect multiple sorted sets and store the resulting sorted set in a new key using weights for scoring
+
+   @public
+   @param destkey {string} Destination key 
+   @param sets {Array.<string>} List of keys identifying sorted sets to intersect 
+   @param options {Object} Aggregation options 
+   @param handler {function} Handler for the result of this call. 
+   */
+  this.zinterstoreWeighed = function(destkey, sets, options, handler) {
+    var __args = arguments;
+    if (__args.length === 4 && typeof __args[0] === 'string' && typeof __args[1] === 'object' && typeof __args[2] === 'string' && typeof __args[3] === 'function') {
+      j_redisService["zinterstoreWeighed(java.lang.String,java.util.Map,io.vertx.redis.op.AggregateOptions,io.vertx.core.Handler)"](destkey, sets, io.vertx.redis.op.AggregateOptions.valueOf(__args[2]), function(ar) {
       if (ar.succeeded()) {
         handler(ar.result(), null);
       } else {
@@ -3000,13 +3666,15 @@ var RedisService = function(j_val) {
    Count the number of members in a sorted set between a given lexicographical range
 
    @public
-   @param args {todo} JsonArray [{"name":"key","type":"key"},{"name":"min","type":"string"},{"name":"max","type":"string"}] 
+   @param key {string} Key string 
+   @param min {string} Pattern to compare against for minimum value 
+   @param max {string} Pattern to compare against for maximum value 
    @param handler {function} Handler for the result of this call. 
    */
-  this.zlexcount = function(args, handler) {
+  this.zlexcount = function(key, min, max, handler) {
     var __args = arguments;
-    if (__args.length === 2 && typeof __args[0] === 'object' && __args[0] instanceof Array && typeof __args[1] === 'function') {
-      j_redisService.zlexcount(utils.convParamJsonArray(args), function(ar) {
+    if (__args.length === 4 && typeof __args[0] === 'string' && typeof __args[1] === 'string' && typeof __args[2] === 'string' && typeof __args[3] === 'function') {
+      j_redisService["zlexcount(java.lang.String,java.lang.String,java.lang.String,io.vertx.core.Handler)"](key, min, max, function(ar) {
       if (ar.succeeded()) {
         handler(ar.result(), null);
       } else {
@@ -3020,13 +3688,38 @@ var RedisService = function(j_val) {
    Return a range of members in a sorted set, by index
 
    @public
-   @param args {todo} JsonArray [{"name":"key","type":"key"},{"name":"start","type":"integer"},{"name":"stop","type":"integer"},{"name":"withscores","type":"enum","enum":["WITHSCORES"],"optional":true}] 
+   @param key {string} Key string 
+   @param start {number} Start index for the range 
+   @param stop {number} Stop index for the range - inclusive 
    @param handler {function} Handler for the result of this call. 
    */
-  this.zrange = function(args, handler) {
+  this.zrange = function(key, start, stop, handler) {
     var __args = arguments;
-    if (__args.length === 2 && typeof __args[0] === 'object' && __args[0] instanceof Array && typeof __args[1] === 'function') {
-      j_redisService.zrange(utils.convParamJsonArray(args), function(ar) {
+    if (__args.length === 4 && typeof __args[0] === 'string' && typeof __args[1] ==='number' && typeof __args[2] ==='number' && typeof __args[3] === 'function') {
+      j_redisService["zrange(java.lang.String,long,long,io.vertx.core.Handler)"](key, start, stop, function(ar) {
+      if (ar.succeeded()) {
+        handler(utils.convReturnJson(ar.result()), null);
+      } else {
+        handler(null, ar.cause());
+      }
+    });
+    } else utils.invalidArgs();
+  };
+
+  /**
+   Return a range of members in a sorted set, by index
+
+   @public
+   @param key {string} Key string 
+   @param start {number} Start index for the range 
+   @param stop {number} Stop index for the range - inclusive 
+   @param options {Object} Range options 
+   @param handler {function} Handler for the result of this call. 
+   */
+  this.zrangeWithOptions = function(key, start, stop, options, handler) {
+    var __args = arguments;
+    if (__args.length === 5 && typeof __args[0] === 'string' && typeof __args[1] ==='number' && typeof __args[2] ==='number' && typeof __args[3] === 'string' && typeof __args[4] === 'function') {
+      j_redisService["zrangeWithOptions(java.lang.String,long,long,io.vertx.redis.op.RangeOptions,io.vertx.core.Handler)"](key, start, stop, io.vertx.redis.op.RangeOptions.valueOf(__args[3]), function(ar) {
       if (ar.succeeded()) {
         handler(utils.convReturnJson(ar.result()), null);
       } else {
@@ -3040,13 +3733,16 @@ var RedisService = function(j_val) {
    Return a range of members in a sorted set, by lexicographical range
 
    @public
-   @param args {todo} JsonArray [{"name":"key","type":"key"},{"name":"min","type":"string"},{"name":"max","type":"string"},{"command":"LIMIT","name":["offset","count"],"type":["integer","integer"],"optional":true}] 
+   @param key {string} Key string 
+   @param min {string} Pattern representing a minimum allowed value 
+   @param max {string} Pattern representing a maximum allowed value 
+   @param options {Object} Limit options where limit can be specified 
    @param handler {function} Handler for the result of this call. 
    */
-  this.zrangebylex = function(args, handler) {
+  this.zrangebylex = function(key, min, max, options, handler) {
     var __args = arguments;
-    if (__args.length === 2 && typeof __args[0] === 'object' && __args[0] instanceof Array && typeof __args[1] === 'function') {
-      j_redisService.zrangebylex(utils.convParamJsonArray(args), function(ar) {
+    if (__args.length === 5 && typeof __args[0] === 'string' && typeof __args[1] === 'string' && typeof __args[2] === 'string' && typeof __args[3] === 'object' && typeof __args[4] === 'function') {
+      j_redisService["zrangebylex(java.lang.String,java.lang.String,java.lang.String,io.vertx.redis.op.LimitOptions,io.vertx.core.Handler)"](key, min, max, options != null ? new LimitOptions(new JsonObject(JSON.stringify(options))) : null, function(ar) {
       if (ar.succeeded()) {
         handler(utils.convReturnJson(ar.result()), null);
       } else {
@@ -3060,13 +3756,16 @@ var RedisService = function(j_val) {
    Return a range of members in a sorted set, by score
 
    @public
-   @param args {todo} JsonArray [{"name":"key","type":"key"},{"name":"min","type":"double"},{"name":"max","type":"double"},{"name":"withscores","type":"enum","enum":["WITHSCORES"],"optional":true},{"command":"LIMIT","name":["offset","count"],"type":["integer","integer"],"optional":true}] 
+   @param key {string} Key string 
+   @param min {string} Pattern defining a minimum value 
+   @param max {string} Pattern defining a maximum value 
+   @param options {Object} Range and limit options 
    @param handler {function} Handler for the result of this call. 
    */
-  this.zrangebyscore = function(args, handler) {
+  this.zrangebyscore = function(key, min, max, options, handler) {
     var __args = arguments;
-    if (__args.length === 2 && typeof __args[0] === 'object' && __args[0] instanceof Array && typeof __args[1] === 'function') {
-      j_redisService.zrangebyscore(utils.convParamJsonArray(args), function(ar) {
+    if (__args.length === 5 && typeof __args[0] === 'string' && typeof __args[1] === 'string' && typeof __args[2] === 'string' && typeof __args[3] === 'object' && typeof __args[4] === 'function') {
+      j_redisService["zrangebyscore(java.lang.String,java.lang.String,java.lang.String,io.vertx.redis.op.RangeLimitOptions,io.vertx.core.Handler)"](key, min, max, options != null ? new RangeLimitOptions(new JsonObject(JSON.stringify(options))) : null, function(ar) {
       if (ar.succeeded()) {
         handler(utils.convReturnJson(ar.result()), null);
       } else {
@@ -3080,13 +3779,35 @@ var RedisService = function(j_val) {
    Determine the index of a member in a sorted set
 
    @public
-   @param args {todo} JsonArray [{"name":"key","type":"key"},{"name":"member","type":"string"}] 
+   @param key {string} Key string 
+   @param member {string} Member in the sorted set identified by key 
    @param handler {function} Handler for the result of this call. 
    */
-  this.zrank = function(args, handler) {
+  this.zrank = function(key, member, handler) {
     var __args = arguments;
-    if (__args.length === 2 && typeof __args[0] === 'object' && __args[0] instanceof Array && typeof __args[1] === 'function') {
-      j_redisService.zrank(utils.convParamJsonArray(args), function(ar) {
+    if (__args.length === 3 && typeof __args[0] === 'string' && typeof __args[1] === 'string' && typeof __args[2] === 'function') {
+      j_redisService["zrank(java.lang.String,java.lang.String,io.vertx.core.Handler)"](key, member, function(ar) {
+      if (ar.succeeded()) {
+        handler(ar.result(), null);
+      } else {
+        handler(null, ar.cause());
+      }
+    });
+    } else utils.invalidArgs();
+  };
+
+  /**
+   Remove one member from a sorted set
+
+   @public
+   @param key {string} Key string 
+   @param member {string} Member in the sorted set identified by key 
+   @param handler {function} Handler for the result of this call. 
+   */
+  this.zrem = function(key, member, handler) {
+    var __args = arguments;
+    if (__args.length === 3 && typeof __args[0] === 'string' && typeof __args[1] === 'string' && typeof __args[2] === 'function') {
+      j_redisService["zrem(java.lang.String,java.lang.String,io.vertx.core.Handler)"](key, member, function(ar) {
       if (ar.succeeded()) {
         handler(ar.result(), null);
       } else {
@@ -3100,13 +3821,14 @@ var RedisService = function(j_val) {
    Remove one or more members from a sorted set
 
    @public
-   @param args {todo} JsonArray [{"name":"key","type":"key"},{"name":"member","type":"string","multiple":true}] 
+   @param key {string} Key string 
+   @param members {Array.<string>} Members in the sorted set identified by key 
    @param handler {function} Handler for the result of this call. 
    */
-  this.zrem = function(args, handler) {
+  this.zremMany = function(key, members, handler) {
     var __args = arguments;
-    if (__args.length === 2 && typeof __args[0] === 'object' && __args[0] instanceof Array && typeof __args[1] === 'function') {
-      j_redisService.zrem(utils.convParamJsonArray(args), function(ar) {
+    if (__args.length === 3 && typeof __args[0] === 'string' && typeof __args[1] === 'object' && __args[1] instanceof Array && typeof __args[2] === 'function') {
+      j_redisService["zremMany(java.lang.String,java.util.List,io.vertx.core.Handler)"](key, members, function(ar) {
       if (ar.succeeded()) {
         handler(ar.result(), null);
       } else {
@@ -3120,13 +3842,15 @@ var RedisService = function(j_val) {
    Remove all members in a sorted set between the given lexicographical range
 
    @public
-   @param args {todo} JsonArray [{"name":"key","type":"key"},{"name":"min","type":"string"},{"name":"max","type":"string"}] 
+   @param key {string} Key string 
+   @param min {string} Pattern defining a minimum value 
+   @param max {string} Pattern defining a maximum value 
    @param handler {function} Handler for the result of this call. 
    */
-  this.zremrangebylex = function(args, handler) {
+  this.zremrangebylex = function(key, min, max, handler) {
     var __args = arguments;
-    if (__args.length === 2 && typeof __args[0] === 'object' && __args[0] instanceof Array && typeof __args[1] === 'function') {
-      j_redisService.zremrangebylex(utils.convParamJsonArray(args), function(ar) {
+    if (__args.length === 4 && typeof __args[0] === 'string' && typeof __args[1] === 'string' && typeof __args[2] === 'string' && typeof __args[3] === 'function') {
+      j_redisService["zremrangebylex(java.lang.String,java.lang.String,java.lang.String,io.vertx.core.Handler)"](key, min, max, function(ar) {
       if (ar.succeeded()) {
         handler(ar.result(), null);
       } else {
@@ -3140,13 +3864,15 @@ var RedisService = function(j_val) {
    Remove all members in a sorted set within the given indexes
 
    @public
-   @param args {todo} JsonArray [{"name":"key","type":"key"},{"name":"start","type":"integer"},{"name":"stop","type":"integer"}] 
+   @param key {string} Key string 
+   @param start {number} Start index 
+   @param stop {number} Stop index 
    @param handler {function} Handler for the result of this call. 
    */
-  this.zremrangebyrank = function(args, handler) {
+  this.zremrangebyrank = function(key, start, stop, handler) {
     var __args = arguments;
-    if (__args.length === 2 && typeof __args[0] === 'object' && __args[0] instanceof Array && typeof __args[1] === 'function') {
-      j_redisService.zremrangebyrank(utils.convParamJsonArray(args), function(ar) {
+    if (__args.length === 4 && typeof __args[0] === 'string' && typeof __args[1] ==='number' && typeof __args[2] ==='number' && typeof __args[3] === 'function') {
+      j_redisService["zremrangebyrank(java.lang.String,long,long,io.vertx.core.Handler)"](key, start, stop, function(ar) {
       if (ar.succeeded()) {
         handler(ar.result(), null);
       } else {
@@ -3160,13 +3886,15 @@ var RedisService = function(j_val) {
    Remove all members in a sorted set within the given scores
 
    @public
-   @param args {todo} JsonArray [{"name":"key","type":"key"},{"name":"min","type":"double"},{"name":"max","type":"double"}] 
-   @param handler {function} Handler for the result of this call. 
+   @param key {string} Key string 
+   @param min {string} Pattern defining a minimum value 
+   @param max {string} Pattern defining a maximum value 
+   @param handler {function} 
    */
-  this.zremrangebyscore = function(args, handler) {
+  this.zremrangebyscore = function(key, min, max, handler) {
     var __args = arguments;
-    if (__args.length === 2 && typeof __args[0] === 'object' && __args[0] instanceof Array && typeof __args[1] === 'function') {
-      j_redisService.zremrangebyscore(utils.convParamJsonArray(args), function(ar) {
+    if (__args.length === 4 && typeof __args[0] === 'string' && typeof __args[1] === 'string' && typeof __args[2] === 'string' && typeof __args[3] === 'function') {
+      j_redisService["zremrangebyscore(java.lang.String,java.lang.String,java.lang.String,io.vertx.core.Handler)"](key, min, max, function(ar) {
       if (ar.succeeded()) {
         handler(ar.result(), null);
       } else {
@@ -3180,13 +3908,39 @@ var RedisService = function(j_val) {
    Return a range of members in a sorted set, by index, with scores ordered from high to low
 
    @public
-   @param args {todo} JsonArray [{"name":"key","type":"key"},{"name":"start","type":"integer"},{"name":"stop","type":"integer"},{"name":"withscores","type":"enum","enum":["WITHSCORES"],"optional":true}] 
+   @param key {string} Key string 
+   @param start {number} Start index for the range 
+   @param stop {number} Stop index for the range - inclusive 
+   @param options {Object} Range options 
    @param handler {function} Handler for the result of this call. 
    */
-  this.zrevrange = function(args, handler) {
+  this.zrevrange = function(key, start, stop, options, handler) {
     var __args = arguments;
-    if (__args.length === 2 && typeof __args[0] === 'object' && __args[0] instanceof Array && typeof __args[1] === 'function') {
-      j_redisService.zrevrange(utils.convParamJsonArray(args), function(ar) {
+    if (__args.length === 5 && typeof __args[0] === 'string' && typeof __args[1] ==='number' && typeof __args[2] ==='number' && typeof __args[3] === 'string' && typeof __args[4] === 'function') {
+      j_redisService["zrevrange(java.lang.String,long,long,io.vertx.redis.op.RangeOptions,io.vertx.core.Handler)"](key, start, stop, io.vertx.redis.op.RangeOptions.valueOf(__args[3]), function(ar) {
+      if (ar.succeeded()) {
+        handler(utils.convReturnJson(ar.result()), null);
+      } else {
+        handler(null, ar.cause());
+      }
+    });
+    } else utils.invalidArgs();
+  };
+
+  /**
+   Return a range of members in a sorted set, by score, between the given lexicographical range with scores ordered from high to low
+
+   @public
+   @param key {string} Key string 
+   @param max {string} Pattern defining a maximum value 
+   @param min {string} Pattern defining a minimum value 
+   @param options {Object} Limit options 
+   @param handler {function} Handler for the result of this call. 
+   */
+  this.zrevrangebylex = function(key, max, min, options, handler) {
+    var __args = arguments;
+    if (__args.length === 5 && typeof __args[0] === 'string' && typeof __args[1] === 'string' && typeof __args[2] === 'string' && typeof __args[3] === 'object' && typeof __args[4] === 'function') {
+      j_redisService["zrevrangebylex(java.lang.String,java.lang.String,java.lang.String,io.vertx.redis.op.LimitOptions,io.vertx.core.Handler)"](key, max, min, options != null ? new LimitOptions(new JsonObject(JSON.stringify(options))) : null, function(ar) {
       if (ar.succeeded()) {
         handler(utils.convReturnJson(ar.result()), null);
       } else {
@@ -3200,13 +3954,16 @@ var RedisService = function(j_val) {
    Return a range of members in a sorted set, by score, with scores ordered from high to low
 
    @public
-   @param args {todo} JsonArray [{"name":"key","type":"key"},{"name":"max","type":"double"},{"name":"min","type":"double"},{"name":"withscores","type":"enum","enum":["WITHSCORES"],"optional":true},{"command":"LIMIT","name":["offset","count"],"type":["integer","integer"],"optional":true}] 
+   @param key {string} Key string 
+   @param max {string} Pattern defining a maximum value 
+   @param min {string} Pattern defining a minimum value 
+   @param options {Object} Range and limit options 
    @param handler {function} Handler for the result of this call. 
    */
-  this.zrevrangebyscore = function(args, handler) {
+  this.zrevrangebyscore = function(key, max, min, options, handler) {
     var __args = arguments;
-    if (__args.length === 2 && typeof __args[0] === 'object' && __args[0] instanceof Array && typeof __args[1] === 'function') {
-      j_redisService.zrevrangebyscore(utils.convParamJsonArray(args), function(ar) {
+    if (__args.length === 5 && typeof __args[0] === 'string' && typeof __args[1] === 'string' && typeof __args[2] === 'string' && typeof __args[3] === 'object' && typeof __args[4] === 'function') {
+      j_redisService["zrevrangebyscore(java.lang.String,java.lang.String,java.lang.String,io.vertx.redis.op.RangeLimitOptions,io.vertx.core.Handler)"](key, max, min, options != null ? new RangeLimitOptions(new JsonObject(JSON.stringify(options))) : null, function(ar) {
       if (ar.succeeded()) {
         handler(utils.convReturnJson(ar.result()), null);
       } else {
@@ -3220,13 +3977,14 @@ var RedisService = function(j_val) {
    Determine the index of a member in a sorted set, with scores ordered from high to low
 
    @public
-   @param args {todo} JsonArray [{"name":"key","type":"key"},{"name":"member","type":"string"}] 
+   @param key {string} Key string 
+   @param member {string} Member in the sorted set identified by key 
    @param handler {function} Handler for the result of this call. 
    */
-  this.zrevrank = function(args, handler) {
+  this.zrevrank = function(key, member, handler) {
     var __args = arguments;
-    if (__args.length === 2 && typeof __args[0] === 'object' && __args[0] instanceof Array && typeof __args[1] === 'function') {
-      j_redisService.zrevrank(utils.convParamJsonArray(args), function(ar) {
+    if (__args.length === 3 && typeof __args[0] === 'string' && typeof __args[1] === 'string' && typeof __args[2] === 'function') {
+      j_redisService["zrevrank(java.lang.String,java.lang.String,io.vertx.core.Handler)"](key, member, function(ar) {
       if (ar.succeeded()) {
         handler(ar.result(), null);
       } else {
@@ -3240,13 +3998,14 @@ var RedisService = function(j_val) {
    Get the score associated with the given member in a sorted set
 
    @public
-   @param args {todo} JsonArray [{"name":"key","type":"key"},{"name":"member","type":"string"}] 
+   @param key {string} Key string 
+   @param member {string} Member in the sorted set identified by key 
    @param handler {function} Handler for the result of this call. 
    */
-  this.zscore = function(args, handler) {
+  this.zscore = function(key, member, handler) {
     var __args = arguments;
-    if (__args.length === 2 && typeof __args[0] === 'object' && __args[0] instanceof Array && typeof __args[1] === 'function') {
-      j_redisService.zscore(utils.convParamJsonArray(args), function(ar) {
+    if (__args.length === 3 && typeof __args[0] === 'string' && typeof __args[1] === 'string' && typeof __args[2] === 'function') {
+      j_redisService["zscore(java.lang.String,java.lang.String,io.vertx.core.Handler)"](key, member, function(ar) {
       if (ar.succeeded()) {
         handler(ar.result(), null);
       } else {
@@ -3260,13 +4019,37 @@ var RedisService = function(j_val) {
    Add multiple sorted sets and store the resulting sorted set in a new key
 
    @public
-   @param args {todo} JsonArray [{"name":"destination","type":"key"},{"name":"numkeys","type":"integer"},{"name":"key","type":"key","multiple":true},{"command":"WEIGHTS","name":"weight","type":"integer","variadic":true,"optional":true},{"command":"AGGREGATE","name":"aggregate","type":"enum","enum":["SUM","MIN","MAX"],"optional":true}] 
+   @param destkey {string} Destination key 
+   @param sets {Array.<string>} List of keys identifying sorted sets 
+   @param options {Object} Aggregation options 
    @param handler {function} Handler for the result of this call. 
    */
-  this.zunionstore = function(args, handler) {
+  this.zunionstore = function(destkey, sets, options, handler) {
     var __args = arguments;
-    if (__args.length === 2 && typeof __args[0] === 'object' && __args[0] instanceof Array && typeof __args[1] === 'function') {
-      j_redisService.zunionstore(utils.convParamJsonArray(args), function(ar) {
+    if (__args.length === 4 && typeof __args[0] === 'string' && typeof __args[1] === 'object' && __args[1] instanceof Array && typeof __args[2] === 'string' && typeof __args[3] === 'function') {
+      j_redisService["zunionstore(java.lang.String,java.util.List,io.vertx.redis.op.AggregateOptions,io.vertx.core.Handler)"](destkey, sets, io.vertx.redis.op.AggregateOptions.valueOf(__args[2]), function(ar) {
+      if (ar.succeeded()) {
+        handler(ar.result(), null);
+      } else {
+        handler(null, ar.cause());
+      }
+    });
+    } else utils.invalidArgs();
+  };
+
+  /**
+   Add multiple sorted sets using weights, and store the resulting sorted set in a new key
+
+   @public
+   @param key {string} Destination key 
+   @param sets {Array.<string>} Map containing set-key:weight pairs 
+   @param options {Object} Aggregation options 
+   @param handler {function} Handler for the result of this call. 
+   */
+  this.zunionstoreWeighed = function(key, sets, options, handler) {
+    var __args = arguments;
+    if (__args.length === 4 && typeof __args[0] === 'string' && typeof __args[1] === 'object' && typeof __args[2] === 'string' && typeof __args[3] === 'function') {
+      j_redisService["zunionstoreWeighed(java.lang.String,java.util.Map,io.vertx.redis.op.AggregateOptions,io.vertx.core.Handler)"](key, sets, io.vertx.redis.op.AggregateOptions.valueOf(__args[2]), function(ar) {
       if (ar.succeeded()) {
         handler(ar.result(), null);
       } else {
@@ -3280,13 +4063,14 @@ var RedisService = function(j_val) {
    Incrementally iterate the keys space
 
    @public
-   @param args {todo} JsonArray [{"name":"cursor","type":"integer"},{"command":"MATCH","name":"pattern","type":"pattern","optional":true},{"command":"COUNT","name":"count","type":"integer","optional":true}] 
+   @param cursor {string} Cursor id 
+   @param options {Object} Scan options 
    @param handler {function} Handler for the result of this call. 
    */
-  this.scan = function(args, handler) {
+  this.scan = function(cursor, options, handler) {
     var __args = arguments;
-    if (__args.length === 2 && typeof __args[0] === 'object' && __args[0] instanceof Array && typeof __args[1] === 'function') {
-      j_redisService.scan(utils.convParamJsonArray(args), function(ar) {
+    if (__args.length === 3 && typeof __args[0] === 'string' && typeof __args[1] === 'object' && typeof __args[2] === 'function') {
+      j_redisService["scan(java.lang.String,io.vertx.redis.op.ScanOptions,io.vertx.core.Handler)"](cursor, options != null ? new ScanOptions(new JsonObject(JSON.stringify(options))) : null, function(ar) {
       if (ar.succeeded()) {
         handler(null, null);
       } else {
@@ -3300,13 +4084,15 @@ var RedisService = function(j_val) {
    Incrementally iterate Set elements
 
    @public
-   @param args {todo} JsonArray [{"name":"key","type":"key"},{"name":"cursor","type":"integer"},{"command":"MATCH","name":"pattern","type":"pattern","optional":true},{"command":"COUNT","name":"count","type":"integer","optional":true}] 
+   @param key {string} Key string 
+   @param cursor {string} Cursor id 
+   @param options {Object} Scan options 
    @param handler {function} Handler for the result of this call. 
    */
-  this.sscan = function(args, handler) {
+  this.sscan = function(key, cursor, options, handler) {
     var __args = arguments;
-    if (__args.length === 2 && typeof __args[0] === 'object' && __args[0] instanceof Array && typeof __args[1] === 'function') {
-      j_redisService.sscan(utils.convParamJsonArray(args), function(ar) {
+    if (__args.length === 4 && typeof __args[0] === 'string' && typeof __args[1] === 'string' && typeof __args[2] === 'object' && typeof __args[3] === 'function') {
+      j_redisService["sscan(java.lang.String,java.lang.String,io.vertx.redis.op.ScanOptions,io.vertx.core.Handler)"](key, cursor, options != null ? new ScanOptions(new JsonObject(JSON.stringify(options))) : null, function(ar) {
       if (ar.succeeded()) {
         handler(null, null);
       } else {
@@ -3320,15 +4106,17 @@ var RedisService = function(j_val) {
    Incrementally iterate hash fields and associated values
 
    @public
-   @param args {todo} JsonArray [{"name":"key","type":"key"},{"name":"cursor","type":"integer"},{"command":"MATCH","name":"pattern","type":"pattern","optional":true},{"command":"COUNT","name":"count","type":"integer","optional":true}] 
+   @param key {string} Key string 
+   @param cursor {string} Cursor id 
+   @param options {Object} Scan options 
    @param handler {function} Handler for the result of this call. 
    */
-  this.hscan = function(args, handler) {
+  this.hscan = function(key, cursor, options, handler) {
     var __args = arguments;
-    if (__args.length === 2 && typeof __args[0] === 'object' && __args[0] instanceof Array && typeof __args[1] === 'function') {
-      j_redisService.hscan(utils.convParamJsonArray(args), function(ar) {
+    if (__args.length === 4 && typeof __args[0] === 'string' && typeof __args[1] === 'string' && typeof __args[2] === 'object' && typeof __args[3] === 'function') {
+      j_redisService["hscan(java.lang.String,java.lang.String,io.vertx.redis.op.ScanOptions,io.vertx.core.Handler)"](key, cursor, options != null ? new ScanOptions(new JsonObject(JSON.stringify(options))) : null, function(ar) {
       if (ar.succeeded()) {
-        handler(null, null);
+        handler(utils.convReturnJson(ar.result()), null);
       } else {
         handler(null, ar.cause());
       }
@@ -3340,13 +4128,15 @@ var RedisService = function(j_val) {
    Incrementally iterate sorted sets elements and associated scores
 
    @public
-   @param args {todo} JsonArray [{"name":"key","type":"key"},{"name":"cursor","type":"integer"},{"command":"MATCH","name":"pattern","type":"pattern","optional":true},{"command":"COUNT","name":"count","type":"integer","optional":true}] 
+   @param key {string} Key string 
+   @param cursor {string} Cursor id 
+   @param options {Object} Scan options 
    @param handler {function} Handler for the result of this call. 
    */
-  this.zscan = function(args, handler) {
+  this.zscan = function(key, cursor, options, handler) {
     var __args = arguments;
-    if (__args.length === 2 && typeof __args[0] === 'object' && __args[0] instanceof Array && typeof __args[1] === 'function') {
-      j_redisService.zscan(utils.convParamJsonArray(args), function(ar) {
+    if (__args.length === 4 && typeof __args[0] === 'string' && typeof __args[1] === 'string' && typeof __args[2] === 'object' && typeof __args[3] === 'function') {
+      j_redisService["zscan(java.lang.String,java.lang.String,io.vertx.redis.op.ScanOptions,io.vertx.core.Handler)"](key, cursor, options != null ? new ScanOptions(new JsonObject(JSON.stringify(options))) : null, function(ar) {
       if (ar.succeeded()) {
         handler(null, null);
       } else {
@@ -3372,7 +4162,7 @@ var RedisService = function(j_val) {
 RedisService.create = function(vertx, config) {
   var __args = arguments;
   if (__args.length === 2 && typeof __args[0] === 'object' && __args[0]._jdel && typeof __args[1] === 'object') {
-    return new RedisService(JRedisService.create(vertx._jdel, utils.convParamJsonObject(config)));
+    return new RedisService(JRedisService["create(io.vertx.core.Vertx,io.vertx.core.json.JsonObject)"](vertx._jdel, utils.convParamJsonObject(config)));
   } else utils.invalidArgs();
 };
 
@@ -3386,7 +4176,7 @@ RedisService.create = function(vertx, config) {
 RedisService.createEventBusProxy = function(vertx, address) {
   var __args = arguments;
   if (__args.length === 2 && typeof __args[0] === 'object' && __args[0]._jdel && typeof __args[1] === 'string') {
-    return new RedisService(JRedisService.createEventBusProxy(vertx._jdel, address));
+    return new RedisService(JRedisService["createEventBusProxy(io.vertx.core.Vertx,java.lang.String)"](vertx._jdel, address));
   } else utils.invalidArgs();
 };
 

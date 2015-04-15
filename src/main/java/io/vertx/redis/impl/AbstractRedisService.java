@@ -22,15 +22,17 @@ public abstract class AbstractRedisService implements RedisService {
     INFO
   }
 
-  final Vertx vertx;
-  final JsonObject config;
-  final EventBus eb;
+  private final Vertx vertx;
+  private final JsonObject config;
+  private final EventBus eb;
 
-  private RedisConnection redisClient;
+  private RedisConnection redisConnection;
   private RedisSubscriptions subscriptions = new RedisSubscriptions();
 
   private String encoding;
   private Charset charset;
+  private String binaryEnc;
+  private Charset binaryCharset;
   private String baseAddress;
 
   AbstractRedisService(Vertx vertx, JsonObject config) {
@@ -52,15 +54,17 @@ public abstract class AbstractRedisService implements RedisService {
 
     encoding = enc;
     charset = Charset.forName(enc);
+    binaryEnc = "iso-8859-1";
+    binaryCharset = Charset.forName(binaryEnc);
     baseAddress = config.getString("address", "io.vertx.mod-redis");
 
-    redisClient = new RedisConnection(vertx, host, port, subscriptions);
-    redisClient.connect(handler);
+    redisConnection = new RedisConnection(vertx, host, port, subscriptions);
+    redisConnection.connect(handler);
   }
 
   @Override
   public void stop(final Handler<AsyncResult<Void>> handler) {
-    redisClient.disconnect(handler);
+    redisConnection.disconnect(handler);
   }
 
   private ResponseTransform getResponseTransformFor(String command) {
@@ -93,10 +97,19 @@ public abstract class AbstractRedisService implements RedisService {
   final void sendJsonObject(final String command, final JsonArray args, final Handler<AsyncResult<JsonObject>> resultHandler) {
     send(command, args, JsonObject.class, resultHandler);
   }
-  
+
   @SuppressWarnings("unchecked")
   final <T> void send(final String command, final JsonArray redisArgs,
                       final Class<T> returnType,
+                      final Handler<AsyncResult<T>> resultHandler) {
+
+    send(command, redisArgs, returnType, false, resultHandler);
+  }
+
+  @SuppressWarnings("unchecked")
+  final <T> void send(final String command, final JsonArray redisArgs,
+                      final Class<T> returnType,
+                      final boolean binary,
                       final Handler<AsyncResult<T>> resultHandler) {
 
     final ResponseTransform transform = getResponseTransformFor(command);
@@ -184,7 +197,7 @@ public abstract class AbstractRedisService implements RedisService {
         break;
     }
 
-    redisClient.send(new Command(command, redisArgs, charset).setExpectedReplies(expectedReplies).setHandler(reply -> {
+    redisConnection.send(new Command(command, redisArgs, binary ? binaryCharset : charset).setExpectedReplies(expectedReplies).setHandler(reply -> {
       switch (reply.type()) {
         case '-': // Error
           resultHandler.handle(new RedisAsyncResult<>(reply.asType(String.class)));
@@ -222,7 +235,7 @@ public abstract class AbstractRedisService implements RedisService {
             }
             resultHandler.handle(new RedisAsyncResult<>(null, (T) value));
           } else {
-            resultHandler.handle(new RedisAsyncResult<>(null, reply.asType(returnType, encoding)));
+            resultHandler.handle(new RedisAsyncResult<>(null, reply.asType(returnType, binary ? binaryEnc : encoding)));
           }
           return;
         case '*': // Multi

@@ -23,7 +23,7 @@
   <parent>
     <groupId>io.vertx</groupId>
     <artifactId>vertx-ext-parent</artifactId>
-    <version>5</version>
+    <version>9</version>
   </parent>
 
   <artifactId>vertx-redis-service</artifactId>
@@ -38,7 +38,7 @@
   <!--
   Tests uses embedded Redis by default in the test framework, however it is possible to use
   an existing Redis server by specifying the host and/or port system properties, for instance:
-  % mvn test -host=.... -port=....
+  % mvn test -Dhost=.... -Dport=....
   -->
 
   <dependencyManagement>
@@ -59,20 +59,20 @@
       <groupId>io.vertx</groupId>
       <artifactId>vertx-core</artifactId>
     </dependency>
+
+    <dependency>
+      <groupId>io.vertx</groupId>
+      <artifactId>vertx-codegen</artifactId>
+      <optional>true</optional>
+    </dependency>
     <dependency>
       <groupId>io.vertx</groupId>
       <artifactId>vertx-service-proxy</artifactId>
     </dependency>
-
     <dependency>
       <groupId>io.vertx</groupId>
-      <artifactId>vertx-docgen</artifactId>
-      <scope>provided</scope>
-    </dependency>
-    <dependency>
-      <groupId>io.vertx</groupId>
-      <artifactId>vertx-codegen</artifactId>
-      <scope>provided</scope>
+      <artifactId>vertx-lang-groovy</artifactId>
+      <optional>true</optional>
     </dependency>
     <dependency>
       <groupId>io.vertx</groupId>
@@ -81,10 +81,19 @@
     </dependency>
     <dependency>
       <groupId>io.vertx</groupId>
-      <artifactId>vertx-lang-groovy</artifactId>
+      <artifactId>vertx-docgen</artifactId>
       <optional>true</optional>
     </dependency>
-
+    <dependency>
+      <groupId>io.vertx</groupId>
+      <artifactId>vertx-rx-java</artifactId>
+      <optional>true</optional>
+    </dependency>
+    <dependency>
+      <groupId>io.vertx</groupId>
+      <artifactId>vertx-codetrans</artifactId>
+      <optional>true</optional>
+    </dependency>
     <dependency>
       <groupId>io.vertx</groupId>
       <artifactId>vertx-core</artifactId>
@@ -102,12 +111,14 @@
       <scope>test</scope>
       <version>4.11</version>
     </dependency>
+
     <dependency>
-      <groupId>redis.embedded</groupId>
+      <groupId>com.github.kstyrc</groupId>
       <artifactId>embedded-redis</artifactId>
-      <version>0.3</version>
+      <version>0.6</version>
       <scope>test</scope>
     </dependency>
+
   </dependencies>
 
   <build>
@@ -126,21 +137,33 @@
     </plugins>
   </build>
 
-  <!-- Trick to have Nexus not complaint with validation rules -->
   <profiles>
     <profile>
-      <id>clojars</id>
+      <!-- Use this profile with latest redis already running on localhost:6379 -->
+      <id>server</id>
       <activation>
         <property>
-          <name>!clojars</name>
+          <name>server</name>
         </property>
       </activation>
-      <repositories>
-        <repository>
-          <id>clojars.org</id>
-          <url>http://clojars.org/repo</url>
-        </repository>
-      </repositories>
+    </profile>
+    <profile>
+      <id>redis-embedded</id>
+      <activation>
+        <property>
+          <name>!server</name>
+        </property>
+      </activation>
+      <build>
+        <plugins>
+          <plugin>
+            <artifactId>maven-surefire-plugin</artifactId>
+            <configuration>
+              <excludedGroups>io.vertx.test.redis.RedisPost28Tests</excludedGroups>
+            </configuration>
+          </plugin>
+        </plugins>
+      </build>
     </profile>
   </profiles>
 

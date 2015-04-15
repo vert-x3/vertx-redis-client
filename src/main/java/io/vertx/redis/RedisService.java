@@ -9,7 +9,11 @@ import io.vertx.core.Vertx;
 import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;
 import io.vertx.redis.impl.RedisServiceImpl;
+import io.vertx.redis.op.*;
 import io.vertx.serviceproxy.ProxyHelper;
+
+import java.util.List;
+import java.util.Map;
 
 @VertxGen
 @ProxyGen
@@ -32,22 +36,23 @@ public interface RedisService {
   /**
    * Append a value to a key
    *
-   * @param args    JsonArray [{"name":"key","type":"key"},{"name":"value","type":"string"}]
+   * @param key     Key string
+   * @param value   Value to append
    * @param handler Handler for the result of this call.
    * @since 2.0.0
    * group: string
    */
-  void append(JsonArray args, Handler<AsyncResult<Long>> handler);
+  void append(String key, String value, Handler<AsyncResult<Long>> handler);
 
   /**
    * Authenticate to the server
    *
-   * @param args    JsonArray [{"name":"password","type":"string"}]
-   * @param handler Handler for the result of this call.
+   * @param password Password for authentication
+   * @param handler  Handler for the result of this call.
    * @since 1.0.0
    * group: connection
    */
-  void auth(JsonArray args, Handler<AsyncResult<String>> handler);
+  void auth(String password, Handler<AsyncResult<String>> handler);
 
   /**
    * Asynchronously rewrite the append-only file
@@ -68,72 +73,143 @@ public interface RedisService {
   /**
    * Count set bits in a string
    *
-   * @param args    JsonArray [{"name":"key","type":"key"},{"name":["start","end"],"type":["integer","integer"],"multiple":true}]
+   * @param key     Key string
    * @param handler Handler for the result of this call.
    * @since 2.6.0
    * group: string
    */
-  void bitcount(JsonArray args, Handler<AsyncResult<Long>> handler);
+  void bitcount(String key, Handler<AsyncResult<Long>> handler);
+
+  /**
+   * Count set bits in a string
+   *
+   * @param key     Key string
+   * @param start   Start index
+   * @param end     End index
+   * @param handler Handler for the result of this call.
+   * @since 2.6.0
+   * group: string
+   */
+  void bitcountRange(String key, long start, long end, Handler<AsyncResult<Long>> handler);
 
   /**
    * Perform bitwise operations between strings
    *
-   * @param args    JsonArray [{"name":"operation","type":"string"},{"name":"destkey","type":"key"},{"name":"key","type":"key","multiple":true}]
-   * @param handler Handler for the result of this call.
+   * @param operation Bitwise operation to perform
+   * @param destkey   Destination key where result is stored
+   * @param keys      List of keys on which to perform the operation
+   * @param handler   Handler for the result of this call.
    * @since 2.6.0
    * group: string
    */
-  void bitop(JsonArray args, Handler<AsyncResult<Long>> handler);
+  void bitop(BitOperation operation, String destkey, List<String> keys, Handler<AsyncResult<Long>> handler);
 
   /**
    * Find first bit set or clear in a string
    *
-   * @param args    JsonArray [{"name":"key","type":"key"},{"name":"bit","type":"integer"},{"name":"start","type":"integer","optional":true},{"name":"end","type":"integer","optional":true}]
+   * @param key     Key string
+   * @param bit     What bit value to look for - must be 1, or 0
    * @param handler Handler for the result of this call.
    * @since 2.8.7
    * group: string
    */
-  void bitpos(JsonArray args, Handler<AsyncResult<Long>> handler);
+  void bitpos(String key, int bit, Handler<AsyncResult<Long>> handler);
+
+  /**
+   * Find first bit set or clear in a string
+   *
+   * See also bitposRange() method, which takes start, and stop offset.
+   *
+   * @param key     Key string
+   * @param bit     What bit value to look for - must be 1, or 0
+   * @param start   Start offset
+   * @param handler Handler for the result of this call.
+   * @since 2.8.7
+   * group: string
+   */
+  void bitposFrom(String key, int bit, int start, Handler<AsyncResult<Long>> handler);
+
+  /**
+   * Find first bit set or clear in a string
+   *
+   * Note: when both start, and stop offsets are specified,
+   * behaviour is slightly different than if only start is specified
+   *
+   * @param key     Key string
+   * @param bit     What bit value to look for - must be 1, or 0
+   * @param start   Start offset
+   * @param stop    End offset - inclusive
+   * @param handler Handler for the result of this call.
+   * @since 2.8.7
+   * group: string
+   */
+  void bitposRange(String key, int bit, int start, int stop, Handler<AsyncResult<Long>> handler);
 
   /**
    * Remove and get the first element in a list, or block until one is available
    *
-   * @param args    JsonArray [{"name":"key","type":"key","multiple":true},{"name":"timeout","type":"integer"}]
+   * @param key     Key string identifying a list to watch
+   * @param seconds Timeout in seconds
    * @param handler Handler for the result of this call.
    * @since 2.0.0
    * group: list
    */
-  void blpop(JsonArray args, Handler<AsyncResult<JsonArray>> handler);
+  void blpop(String key, int seconds, Handler<AsyncResult<JsonArray>> handler);
+
+  /**
+   * Remove and get the first element in any of the lists, or block until one is available
+   *
+   * @param keys    List of key strings identifying lists to watch
+   * @param seconds Timeout in seconds
+   * @param handler Handler for the result of this call.
+   * @since 2.0.0
+   * group: list
+   */
+  void blpopMany(List<String> keys, int seconds, Handler<AsyncResult<JsonArray>> handler);
 
   /**
    * Remove and get the last element in a list, or block until one is available
    *
-   * @param args    JsonArray [{"name":"key","type":"key","multiple":true},{"name":"timeout","type":"integer"}]
+   * @param key     Key string identifying a list to watch
+   * @param seconds Timeout in seconds
    * @param handler Handler for the result of this call.
    * @since 2.0.0
    * group: list
    */
-  void brpop(JsonArray args, Handler<AsyncResult<JsonArray>> handler);
+  void brpop(String key, int seconds, Handler<AsyncResult<JsonArray>> handler);
+
+  /**
+   * Remove and get the last element in any of the lists, or block until one is available
+   *
+   * @param keys    List of key strings identifying lists to watch
+   * @param seconds Timeout in seconds
+   * @param handler Handler for the result of this call.
+   * @since 2.0.0
+   * group: list
+   */
+  void brpopMany(List<String> keys, int seconds, Handler<AsyncResult<JsonArray>> handler);
 
   /**
    * Pop a value from a list, push it to another list and return it; or block until one is available
    *
-   * @param args    JsonArray [{"name":"source","type":"key"},{"name":"destination","type":"key"},{"name":"timeout","type":"integer"}]
+   * @param key     Key string identifying the source list
+   * @param destkey Key string identifying the destination list
+   * @param seconds Timeout in seconds
    * @param handler Handler for the result of this call.
    * @since 2.2.0
    * group: list
    */
-  void brpoplpush(JsonArray args, Handler<AsyncResult<Void>> handler);
+  void brpoplpush(String key, String destkey, int seconds, Handler<AsyncResult<Void>> handler);
 
   /**
    * Kill the connection of a client
    *
-   * @param args    JsonArray [{"name":"ip:port","type":"string","optional":true},{"command":"ID","name":"client-id","type":"integer","optional":true},{"command":"TYPE","type":"enum","enum":["normal","slave","pubsub"],"optional":true},{"command":"ADDR","name":"ip:port","type":"string","optional":true},{"command":"SKIPME","name":"yes/no","type":"string","optional":true}]
+   * @param filter  Filter options
    * @param handler Handler for the result of this call.
    * @since 2.4.0
    * group: server
    */
-  void clientKill(JsonArray args, Handler<AsyncResult<Long>> handler);
+  void clientKill(KillFilter filter, Handler<AsyncResult<Long>> handler);
 
   /**
    * Get the list of client connections
@@ -154,22 +230,22 @@ public interface RedisService {
   /**
    * Stop processing commands from clients for some time
    *
-   * @param args    JsonArray [{"name":"timeout","type":"integer"}]
+   * @param millis  Pause time in milliseconds
    * @param handler Handler for the result of this call.
    * @since 2.9.50
    * group: server
    */
-  void clientPause(JsonArray args, Handler<AsyncResult<String>> handler);
+  void clientPause(long millis, Handler<AsyncResult<String>> handler);
 
   /**
    * Set the current connection name
    *
-   * @param args    JsonArray [{"name":"connection-name","type":"string"}]
+   * @param name    New name for current connection
    * @param handler Handler for the result of this call.
    * @since 2.6.9
    * group: server
    */
-  void clientSetname(JsonArray args, Handler<AsyncResult<String>> handler);
+  void clientSetname(String name, Handler<AsyncResult<String>> handler);
 
   /**
    * Get array of Cluster slot to node mappings
@@ -206,22 +282,22 @@ public interface RedisService {
   /**
    * Get array of specific Redis command details
    *
-   * @param args    JsonArray [{"name":"command-name","type":"string","multiple":true}]
-   * @param handler Handler for the result of this call.
+   * @param commands List of commands to get info for
+   * @param handler  Handler for the result of this call.
    * @since 2.8.13
    * group: server
    */
-  void commandInfo(JsonArray args, Handler<AsyncResult<JsonArray>> handler);
+  void commandInfo(List<String> commands, Handler<AsyncResult<JsonArray>> handler);
 
   /**
    * Get the value of a configuration parameter
    *
-   * @param args    JsonArray [{"name":"parameter","type":"string"}]
-   * @param handler Handler for the result of this call.
+   * @param parameter Configuration parameter
+   * @param handler   Handler for the result of this call.
    * @since 2.0.0
    * group: server
    */
-  void configGet(JsonArray args, Handler<AsyncResult<JsonArray>> handler);
+  void configGet(String parameter, Handler<AsyncResult<JsonArray>> handler);
 
   /**
    * Rewrite the configuration file with the in memory configuration
@@ -234,12 +310,13 @@ public interface RedisService {
   /**
    * Set a configuration parameter to the given value
    *
-   * @param args    JsonArray [{"name":"parameter","type":"string"},{"name":"value","type":"string"}]
-   * @param handler Handler for the result of this call.
+   * @param parameter Configuration parameter
+   * @param value     New value
+   * @param handler   Handler for the result of this call.
    * @since 2.0.0
    * group: server
    */
-  void configSet(JsonArray args, Handler<AsyncResult<String>> handler);
+  void configSet(String parameter, String value, Handler<AsyncResult<String>> handler);
 
   /**
    * Reset the stats returned by INFO
@@ -260,12 +337,12 @@ public interface RedisService {
   /**
    * Get debugging information about a key
    *
-   * @param args    JsonArray [{"name":"key","type":"key"}]
+   * @param key     Key string
    * @param handler Handler for the result of this call.
    * @since 1.0.0
    * group: server
    */
-  void debugObject(JsonArray args, Handler<AsyncResult<String>> handler);
+  void debugObject(String key, Handler<AsyncResult<String>> handler);
 
   /**
    * Make the server crash
@@ -278,32 +355,33 @@ public interface RedisService {
   /**
    * Decrement the integer value of a key by one
    *
-   * @param args    JsonArray [{"name":"key","type":"key"}]
+   * @param key     Key string
    * @param handler Handler for the result of this call.
    * @since 1.0.0
    * group: string
    */
-  void decr(JsonArray args, Handler<AsyncResult<Long>> handler);
+  void decr(String key, Handler<AsyncResult<Long>> handler);
 
   /**
    * Decrement the integer value of a key by the given number
    *
-   * @param args    JsonArray [{"name":"key","type":"key"},{"name":"decrement","type":"integer"}]
-   * @param handler Handler for the result of this call.
+   * @param key       Key string
+   * @param decrement Value by which to decrement
+   * @param handler   Handler for the result of this call.
    * @since 1.0.0
    * group: string
    */
-  void decrby(JsonArray args, Handler<AsyncResult<Long>> handler);
+  void decrby(String key, long decrement, Handler<AsyncResult<Long>> handler);
 
   /**
    * Delete a key
    *
-   * @param args    JsonArray [{"name":"key","type":"key","multiple":true}]
+   * @param keys    List of keys to delete
    * @param handler Handler for the result of this call.
    * @since 1.0.0
    * group: generic
    */
-  void del(JsonArray args, Handler<AsyncResult<Long>> handler);
+  void del(List<String> keys, Handler<AsyncResult<Long>> handler);
 
   /**
    * Discard all commands issued after MULTI
@@ -316,42 +394,46 @@ public interface RedisService {
   /**
    * Return a serialized version of the value stored at the specified key.
    *
-   * @param args    JsonArray [{"name":"key","type":"key"}]
+   * @param key     Key string
    * @param handler Handler for the result of this call.
    * @since 2.6.0
    * group: generic
    */
-  void dump(JsonArray args, Handler<AsyncResult<String>> handler);
+  void dump(String key, Handler<AsyncResult<String>> handler);
 
   /**
    * Echo the given string
    *
-   * @param args    JsonArray [{"name":"message","type":"string"}]
+   * @param message String to echo
    * @param handler Handler for the result of this call.
    * @since 1.0.0
    * group: connection
    */
-  void echo(JsonArray args, Handler<AsyncResult<String>> handler);
+  void echo(String message, Handler<AsyncResult<String>> handler);
 
   /**
    * Execute a Lua script server side
    *
-   * @param args    JsonArray [{"name":"script","type":"string"},{"name":"numkeys","type":"integer"},{"name":"key","type":"key","multiple":true},{"name":"arg","type":"string","multiple":true}]
+   * @param script  Lua script to evaluate
+   * @param keys    List of keys
+   * @param args    List of argument values
    * @param handler Handler for the result of this call.
    * @since 2.6.0
    * group: scripting
    */
-  void eval(JsonArray args, Handler<AsyncResult<Void>> handler);
+  void eval(String script, List<String> keys, List<String> args, Handler<AsyncResult<Void>> handler);
 
   /**
    * Execute a Lua script server side
    *
-   * @param args    JsonArray [{"name":"sha1","type":"string"},{"name":"numkeys","type":"integer"},{"name":"key","type":"key","multiple":true},{"name":"arg","type":"string","multiple":true}]
+   * @param sha1    SHA1 digest of the script cached on the server
+   * @param keys    List of keys
+   * @param values  List of values
    * @param handler Handler for the result of this call.
    * @since 2.6.0
    * group: scripting
    */
-  void evalsha(JsonArray args, Handler<AsyncResult<Void>> handler);
+  void evalsha(String sha1, List<String> keys, List<String> values, Handler<AsyncResult<Void>> handler);
 
   /**
    * Execute all commands issued after MULTI
@@ -364,32 +446,34 @@ public interface RedisService {
   /**
    * Determine if a key exists
    *
-   * @param args    JsonArray [{"name":"key","type":"key"}]
+   * @param key     Key string
    * @param handler Handler for the result of this call.
    * @since 1.0.0
    * group: generic
    */
-  void exists(JsonArray args, Handler<AsyncResult<Long>> handler);
+  void exists(String key, Handler<AsyncResult<Long>> handler);
 
   /**
    * Set a key's time to live in seconds
    *
-   * @param args    JsonArray [{"name":"key","type":"key"},{"name":"seconds","type":"integer"}]
+   * @param key     Key string
+   * @param seconds Time to live in seconds
    * @param handler Handler for the result of this call.
    * @since 1.0.0
    * group: generic
    */
-  void expire(JsonArray args, Handler<AsyncResult<Long>> handler);
+  void expire(String key, int seconds, Handler<AsyncResult<Long>> handler);
 
   /**
    * Set the expiration for a key as a UNIX timestamp
    *
-   * @param args    JsonArray [{"name":"key","type":"key"},{"name":"timestamp","type":"posix time"}]
-   * @param handler Handler for the result of this call.
+   * @param key       Key string
+   * @param seconds   Expiry time as Unix timestamp in seconds
+   * @param handler   Handler for the result of this call.
    * @since 1.2.0
    * group: generic
    */
-  void expireat(JsonArray args, Handler<AsyncResult<Long>> handler);
+  void expireat(String key, long seconds, Handler<AsyncResult<Long>> handler);
 
   /**
    * Remove all keys from all databases
@@ -410,222 +494,271 @@ public interface RedisService {
   /**
    * Get the value of a key
    *
-   * @param args    JsonArray [{"name":"key","type":"key"}]
+   * @param key     Key string
    * @param handler Handler for the result of this call.
    * @since 1.0.0
    * group: string
    */
-  void get(JsonArray args, Handler<AsyncResult<String>> handler);
+  void get(String key, Handler<AsyncResult<String>> handler);
+
+  /**
+   * Get the value of a key - without decoding as utf-8
+   *
+   * @param key     Key string
+   * @param handler Handler for the result of this call.
+   * @since 1.0.0
+   * group: string
+   */
+  void getBinary(String key, Handler<AsyncResult<String>> handler);
 
   /**
    * Returns the bit value at offset in the string value stored at key
    *
-   * @param args    JsonArray [{"name":"key","type":"key"},{"name":"offset","type":"integer"}]
+   * @param key     Key string
+   * @param offset  Offset in bits
    * @param handler Handler for the result of this call.
    * @since 2.2.0
    * group: string
    */
-  void getbit(JsonArray args, Handler<AsyncResult<Long>> handler);
+  void getbit(String key, long offset, Handler<AsyncResult<Long>> handler);
 
   /**
    * Get a substring of the string stored at a key
    *
-   * @param args    JsonArray [{"name":"key","type":"key"},{"name":"start","type":"integer"},{"name":"end","type":"integer"}]
+   * @param key     Key string
+   * @param start   Start offset
+   * @param end     End offset - inclusive
    * @param handler Handler for the result of this call.
    * @since 2.4.0
    * group: string
    */
-  void getrange(JsonArray args, Handler<AsyncResult<String>> handler);
+  void getrange(String key, long start, long end, Handler<AsyncResult<String>> handler);
 
   /**
    * Set the string value of a key and return its old value
    *
-   * @param args    JsonArray [{"name":"key","type":"key"},{"name":"value","type":"string"}]
+   * @param key     Key of which value to set
+   * @param value   New value for the key
    * @param handler Handler for the result of this call.
    * @since 1.0.0
    * group: string
    */
-  void getset(JsonArray args, Handler<AsyncResult<String>> handler);
+  void getset(String key, String value, Handler<AsyncResult<String>> handler);
 
   /**
    * Delete one or more hash fields
    *
-   * @param args    JsonArray [{"name":"key","type":"key"},{"name":"field","type":"string","multiple":true}]
+   * @param key     Key string
+   * @param field   Field name
    * @param handler Handler for the result of this call.
    * @since 2.0.0
    * group: hash
    */
-  void hdel(JsonArray args, Handler<AsyncResult<Long>> handler);
+  void hdel(String key, String field, Handler<AsyncResult<Long>> handler);
+
+  /**
+   * Delete one or more hash fields
+   *
+   * @param key     Key string
+   * @param fields  Field names
+   * @param handler Handler for the result of this call.
+   * @since 2.0.0
+   * group: hash
+   */
+  void hdelMany(String key, List<String> fields, Handler<AsyncResult<Long>> handler);
 
   /**
    * Determine if a hash field exists
    *
-   * @param args    JsonArray [{"name":"key","type":"key"},{"name":"field","type":"string"}]
+   * @param key     Key string
+   * @param field   Field name
    * @param handler Handler for the result of this call.
    * @since 2.0.0
    * group: hash
    */
-  void hexists(JsonArray args, Handler<AsyncResult<Long>> handler);
+  void hexists(String key, String field, Handler<AsyncResult<Long>> handler);
 
   /**
    * Get the value of a hash field
    *
-   * @param args    JsonArray [{"name":"key","type":"key"},{"name":"field","type":"string"}]
+   * @param key     Key string
+   * @param field   Field name
    * @param handler Handler for the result of this call.
    * @since 2.0.0
    * group: hash
    */
-  void hget(JsonArray args, Handler<AsyncResult<String>> handler);
+  void hget(String key, String field, Handler<AsyncResult<String>> handler);
 
   /**
    * Get all the fields and values in a hash
    *
-   * @param args    JsonArray [{"name":"key","type":"key"}]
+   * @param key     Key string
    * @param handler Handler for the result of this call.
    * @since 2.0.0
    * group: hash
    */
-  void hgetall(JsonArray args, Handler<AsyncResult<JsonObject>> handler);
+  void hgetall(String key, Handler<AsyncResult<JsonObject>> handler);
 
   /**
    * Increment the integer value of a hash field by the given number
    *
-   * @param args    JsonArray [{"name":"key","type":"key"},{"name":"field","type":"string"},{"name":"increment","type":"integer"}]
-   * @param handler Handler for the result of this call.
+   * @param key       Key string
+   * @param field     Field name
+   * @param increment Value by which to increment
+   * @param handler   Handler for the result of this call.
    * @since 2.0.0
    * group: hash
    */
-  void hincrby(JsonArray args, Handler<AsyncResult<Long>> handler);
+  void hincrby(String key, String field, long increment, Handler<AsyncResult<Long>> handler);
 
   /**
    * Increment the float value of a hash field by the given amount
    *
-   * @param args    JsonArray [{"name":"key","type":"key"},{"name":"field","type":"string"},{"name":"increment","type":"double"}]
-   * @param handler Handler for the result of this call.
+   * @param key       Key string
+   * @param field     Field name
+   * @param increment Value by which to increment
+   * @param handler   Handler for the result of this call.
    * @since 2.6.0
    * group: hash
    */
-  void hincrbyfloat(JsonArray args, Handler<AsyncResult<String>> handler);
+  void hincrbyfloat(String key, String field, double increment, Handler<AsyncResult<String>> handler);
 
   /**
    * Get all the fields in a hash
    *
-   * @param args    JsonArray [{"name":"key","type":"key"}]
+   * @param key     Key string
    * @param handler Handler for the result of this call.
    * @since 2.0.0
    * group: hash
    */
-  void hkeys(JsonArray args, Handler<AsyncResult<JsonArray>> handler);
+  void hkeys(String key, Handler<AsyncResult<JsonArray>> handler);
 
   /**
    * Get the number of fields in a hash
    *
-   * @param args    JsonArray [{"name":"key","type":"key"}]
+   * @param key     Key string
    * @param handler Handler for the result of this call.
    * @since 2.0.0
    * group: hash
    */
-  void hlen(JsonArray args, Handler<AsyncResult<Long>> handler);
+  void hlen(String key, Handler<AsyncResult<Long>> handler);
 
   /**
    * Get the values of all the given hash fields
    *
-   * @param args    JsonArray [{"name":"key","type":"key"},{"name":"field","type":"string","multiple":true}]
+   * @param key     Key string
+   * @param fields  Field names
    * @param handler Handler for the result of this call.
    * @since 2.0.0
    * group: hash
    */
-  void hmget(JsonArray args, Handler<AsyncResult<JsonArray>> handler);
+  void hmget(String key, List<String> fields, Handler<AsyncResult<JsonArray>> handler);
 
   /**
    * Set multiple hash fields to multiple values
    *
-   * @param args    JsonArray [{"name":"key","type":"key"},{"name":["field","value"],"type":["string","string"],"multiple":true}]
+   * @param key     Key string
+   * @param values  Map of field:value pairs
    * @param handler Handler for the result of this call.
    * @since 2.0.0
    * group: hash
    */
-  void hmset(JsonArray args, Handler<AsyncResult<String>> handler);
+  void hmset(String key, Map<String, String> values, Handler<AsyncResult<String>> handler);
 
   /**
    * Set the string value of a hash field
    *
-   * @param args    JsonArray [{"name":"key","type":"key"},{"name":"field","type":"string"},{"name":"value","type":"string"}]
+   * @param key     Key string
+   * @param field   Field name
+   * @param value   New value
    * @param handler Handler for the result of this call.
    * @since 2.0.0
    * group: hash
    */
-  void hset(JsonArray args, Handler<AsyncResult<Long>> handler);
+  void hset(String key, String field, String value, Handler<AsyncResult<Long>> handler);
 
   /**
    * Set the value of a hash field, only if the field does not exist
    *
-   * @param args    JsonArray [{"name":"key","type":"key"},{"name":"field","type":"string"},{"name":"value","type":"string"}]
+   * @param key     Key string
+   * @param field   Field name
+   * @param value   New value
    * @param handler Handler for the result of this call.
    * @since 2.0.0
    * group: hash
    */
-  void hsetnx(JsonArray args, Handler<AsyncResult<Long>> handler);
+  void hsetnx(String key, String field, String value, Handler<AsyncResult<Long>> handler);
 
   /**
    * Get all the values in a hash
    *
-   * @param args    JsonArray [{"name":"key","type":"key"}]
+   * @param key     Key string
    * @param handler Handler for the result of this call.
    * @since 2.0.0
    * group: hash
    */
-  void hvals(JsonArray args, Handler<AsyncResult<JsonArray>> handler);
+  void hvals(String key, Handler<AsyncResult<JsonArray>> handler);
 
   /**
    * Increment the integer value of a key by one
    *
-   * @param args    JsonArray [{"name":"key","type":"key"}]
+   * @param key     Key string
    * @param handler Handler for the result of this call.
    * @since 1.0.0
    * group: string
    */
-  void incr(JsonArray args, Handler<AsyncResult<Long>> handler);
+  void incr(String key, Handler<AsyncResult<Long>> handler);
 
   /**
    * Increment the integer value of a key by the given amount
    *
-   * @param args    JsonArray [{"name":"key","type":"key"},{"name":"increment","type":"integer"}]
-   * @param handler Handler for the result of this call.
+   * @param key       Key string
+   * @param increment Value by which to increment
+   * @param handler   Handler for the result of this call.
    * @since 1.0.0
    * group: string
    */
-  void incrby(JsonArray args, Handler<AsyncResult<Long>> handler);
+  void incrby(String key, long increment, Handler<AsyncResult<Long>> handler);
 
   /**
    * Increment the float value of a key by the given amount
    *
-   * @param args    JsonArray [{"name":"key","type":"key"},{"name":"increment","type":"double"}]
-   * @param handler Handler for the result of this call.
+   * @param key       Key string
+   * @param increment Value by which to increment
+   * @param handler   Handler for the result of this call.
    * @since 2.6.0
    * group: string
    */
-  void incrbyfloat(JsonArray args, Handler<AsyncResult<String>> handler);
+  void incrbyfloat(String key, double increment, Handler<AsyncResult<String>> handler);
 
   /**
    * Get information and statistics about the server
    *
-   * @param args    JsonArray [{"name":"section","type":"string","optional":true}]
    * @param handler Handler for the result of this call.
    * @since 1.0.0
    * group: server
    */
-  void info(JsonArray args, Handler<AsyncResult<JsonObject>> handler);
+  void info(Handler<AsyncResult<JsonObject>> handler);
+
+  /**
+   * Get information and statistics about the server
+   *
+   * @param section Specific section of information to return
+   * @param handler Handler for the result of this call.
+   * @since 1.0.0
+   * group: server
+   */
+  void infoSection(String section, Handler<AsyncResult<JsonObject>> handler);
 
   /**
    * Find all keys matching the given pattern
    *
-   * @param args    JsonArray [{"name":"pattern","type":"pattern"}]
+   * @param pattern Pattern to limit the keys returned
    * @param handler Handler for the result of this call.
    * @since 1.0.0
    * group: generic
    */
-  void keys(JsonArray args, Handler<AsyncResult<JsonArray>> handler);
+  void keys(String pattern, Handler<AsyncResult<JsonArray>> handler);
 
   /**
    * Get the UNIX time stamp of the last successful save to disk
@@ -638,122 +771,161 @@ public interface RedisService {
   /**
    * Get an element from a list by its index
    *
-   * @param args    JsonArray [{"name":"key","type":"key"},{"name":"index","type":"integer"}]
+   * @param key     Key string
+   * @param index   Index of list element to get
    * @param handler Handler for the result of this call.
    * @since 1.0.0
    * group: list
    */
-  void lindex(JsonArray args, Handler<AsyncResult<String>> handler);
+  void lindex(String key, int index, Handler<AsyncResult<String>> handler);
 
   /**
    * Insert an element before or after another element in a list
    *
-   * @param args    JsonArray [{"name":"key","type":"key"},{"name":"where","type":"enum","enum":["BEFORE","AFTER"]},{"name":"pivot","type":"string"},{"name":"value","type":"string"}]
+   * @param key     Key string
+   * @param option  BEFORE or AFTER
+   * @param pivot   Key to use as a pivot
+   * @param value   Value to be inserted before or after the pivot
    * @param handler Handler for the result of this call.
    * @since 2.2.0
    * group: list
    */
-  void linsert(JsonArray args, Handler<AsyncResult<Long>> handler);
+  void linsert(String key, InsertOptions option, String pivot, String value, Handler<AsyncResult<Long>> handler);
 
   /**
    * Get the length of a list
    *
-   * @param args    JsonArray [{"name":"key","type":"key"}]
+   * @param key     String key
    * @param handler Handler for the result of this call.
    * @since 1.0.0
    * group: list
    */
-  void llen(JsonArray args, Handler<AsyncResult<Long>> handler);
+  void llen(String key, Handler<AsyncResult<Long>> handler);
 
   /**
    * Remove and get the first element in a list
    *
-   * @param args    JsonArray [{"name":"key","type":"key"}]
+   * @param key     String key
    * @param handler Handler for the result of this call.
    * @since 1.0.0
    * group: list
    */
-  void lpop(JsonArray args, Handler<AsyncResult<String>> handler);
+  void lpop(String key, Handler<AsyncResult<String>> handler);
 
   /**
    * Prepend one or multiple values to a list
    *
-   * @param args    JsonArray [{"name":"key","type":"key"},{"name":"value","type":"string","multiple":true}]
+   * @param key     Key string
+   * @param values  Values to be added at the beginning of the list, one by one
    * @param handler Handler for the result of this call.
    * @since 1.0.0
    * group: list
    */
-  void lpush(JsonArray args, Handler<AsyncResult<Long>> handler);
+  void lpushMany(String key, List<String> values, Handler<AsyncResult<Long>> handler);
+
+  /**
+   * Prepend one value to a list
+   *
+   * @param key     Key string
+   * @param value   Value to be added at the beginning of the list
+   * @param handler Handler for the result of this call.
+   * @since 1.0.0
+   * group: list
+   */
+  void lpush(String key, String value, Handler<AsyncResult<Long>> handler);
 
   /**
    * Prepend a value to a list, only if the list exists
    *
-   * @param args    JsonArray [{"name":"key","type":"key"},{"name":"value","type":"string"}]
+   * @param key     Key string
+   * @param value   Value to add at the beginning of the list
    * @param handler Handler for the result of this call.
    * @since 2.2.0
    * group: list
    */
-  void lpushx(JsonArray args, Handler<AsyncResult<Long>> handler);
+  void lpushx(String key, String value, Handler<AsyncResult<Long>> handler);
 
   /**
    * Get a range of elements from a list
    *
-   * @param args    JsonArray [{"name":"key","type":"key"},{"name":"start","type":"integer"},{"name":"stop","type":"integer"}]
+   * @param key     Key string
+   * @param from    Start index
+   * @param to      Stop index
    * @param handler Handler for the result of this call.
    * @since 1.0.0
    * group: list
    */
-  void lrange(JsonArray args, Handler<AsyncResult<JsonArray>> handler);
+  void lrange(String key, long from, long to, Handler<AsyncResult<JsonArray>> handler);
 
   /**
    * Remove elements from a list
    *
-   * @param args    JsonArray [{"name":"key","type":"key"},{"name":"count","type":"integer"},{"name":"value","type":"string"}]
+   * @param key     Key string
+   * @param count   Number of first found occurrences equal to $value to remove from the list
+   * @param value   Value to be removed
    * @param handler Handler for the result of this call.
    * @since 1.0.0
    * group: list
    */
-  void lrem(JsonArray args, Handler<AsyncResult<Long>> handler);
+  void lrem(String key, long count, String value, Handler<AsyncResult<Long>> handler);
 
   /**
    * Set the value of an element in a list by its index
    *
-   * @param args    JsonArray [{"name":"key","type":"key"},{"name":"index","type":"integer"},{"name":"value","type":"string"}]
+   * @param key     Key string
+   * @param index   Position within list
+   * @param value   New value
    * @param handler Handler for the result of this call.
    * @since 1.0.0
    * group: list
    */
-  void lset(JsonArray args, Handler<AsyncResult<String>> handler);
+  void lset(String key, long index, String value, Handler<AsyncResult<String>> handler);
 
   /**
    * Trim a list to the specified range
    *
-   * @param args    JsonArray [{"name":"key","type":"key"},{"name":"start","type":"integer"},{"name":"stop","type":"integer"}]
+   * @param key     Key string
+   * @param from    Start index
+   * @param to      Stop index
    * @param handler Handler for the result of this call.
    * @since 1.0.0
    * group: list
    */
-  void ltrim(JsonArray args, Handler<AsyncResult<String>> handler);
+  void ltrim(String key, long from, long to, Handler<AsyncResult<String>> handler);
 
   /**
-   * Get the values of all the given keys
+   * Get the value of the given key
    *
-   * @param args    JsonArray [{"name":"key","type":"key","multiple":true}]
+   * @param key     Key string
    * @param handler Handler for the result of this call.
    * @since 1.0.0
    * group: string
    */
-  void mget(JsonArray args, Handler<AsyncResult<JsonArray>> handler);
+  void mget(String key, Handler<AsyncResult<JsonArray>> handler);
+
+  /**
+   * Get the values of all the given keys
+   *
+   * @param keys    List of keys to get
+   * @param handler Handler for the result of this call.
+   * @since 1.0.0
+   * group: string
+   */
+  void mgetMany(List<String> keys, Handler<AsyncResult<JsonArray>> handler);
 
   /**
    * Atomically transfer a key from a Redis instance to another one.
    *
-   * @param args    JsonArray [{"name":"host","type":"string"},{"name":"port","type":"string"},{"name":"key","type":"key"},{"name":"destination-db","type":"integer"},{"name":"timeout","type":"integer"},{"name":"copy","type":"enum","enum":["COPY"],"optional":true},{"name":"replace","type":"enum","enum":["REPLACE"],"optional":true}]
+   * @param host    Destination host
+   * @param port    Destination port
+   * @param key     Key to migrate
+   * @param destdb  Destination database index
+   * @param options Migrate options
    * @param handler Handler for the result of this call.
    * @since 2.6.0
    * group: generic
    */
-  void migrate(JsonArray args, Handler<AsyncResult<String>> handler);
+  void migrate(String host, int port, String key, int destdb, long timeout, MigrateOptions options, Handler<AsyncResult<String>> handler);
 
   /**
    * Listen for all requests received by the server in real time
@@ -766,32 +938,33 @@ public interface RedisService {
   /**
    * Move a key to another database
    *
-   * @param args    JsonArray [{"name":"key","type":"key"},{"name":"db","type":"integer"}]
+   * @param key     Key to migrate
+   * @param destdb  Destination database index
    * @param handler Handler for the result of this call.
    * @since 1.0.0
    * group: generic
    */
-  void move(JsonArray args, Handler<AsyncResult<Long>> handler);
+  void move(String key, int destdb, Handler<AsyncResult<Long>> handler);
 
   /**
    * Set multiple keys to multiple values
    *
-   * @param args    JsonArray [{"name":["key","value"],"type":["key","string"],"multiple":true}]
+   * @param keyvals Key value pairs to set
    * @param handler Handler for the result of this call.
    * @since 1.0.1
    * group: string
    */
-  void mset(JsonArray args, Handler<AsyncResult<String>> handler);
+  void mset(Map<String, String> keyvals, Handler<AsyncResult<String>> handler);
 
   /**
    * Set multiple keys to multiple values, only if none of the keys exist
    *
-   * @param args    JsonArray [{"name":["key","value"],"type":["key","string"],"multiple":true}]
+   * @param keyvals Key value pairs to set
    * @param handler Handler for the result of this call.
    * @since 1.0.1
    * group: string
    */
-  void msetnx(JsonArray args, Handler<AsyncResult<Long>> handler);
+  void msetnx(Map<String, String> keyvals, Handler<AsyncResult<Long>> handler);
 
   /**
    * Mark the start of a transaction block
@@ -804,72 +977,98 @@ public interface RedisService {
   /**
    * Inspect the internals of Redis objects
    *
-   * @param args    JsonArray [{"name":"subcommand","type":"string"},{"name":"arguments","type":"string","optional":true,"multiple":true}]
+   * @param key     Key string
+   * @param cmd     Object sub command
    * @param handler Handler for the result of this call.
    * @since 2.2.3
    * group: generic
    */
-  void object(JsonArray args, Handler<AsyncResult<Void>> handler);
+  void object(String key, ObjectCmd cmd, Handler<AsyncResult<Void>> handler);
 
   /**
    * Remove the expiration from a key
    *
-   * @param args    JsonArray [{"name":"key","type":"key"}]
+   * @param key     Key string
    * @param handler Handler for the result of this call.
    * @since 2.2.0
    * group: generic
    */
-  void persist(JsonArray args, Handler<AsyncResult<Long>> handler);
+  void persist(String key, Handler<AsyncResult<Long>> handler);
 
   /**
    * Set a key's time to live in milliseconds
    *
-   * @param args    JsonArray [{"name":"key","type":"key"},{"name":"milliseconds","type":"integer"}]
+   * @param key     String key
+   * @param millis  Time to live in milliseconds
    * @param handler Handler for the result of this call.
    * @since 2.6.0
    * group: generic
    */
-  void pexpire(JsonArray args, Handler<AsyncResult<Long>> handler);
+  void pexpire(String key, long millis, Handler<AsyncResult<Long>> handler);
 
   /**
    * Set the expiration for a key as a UNIX timestamp specified in milliseconds
    *
-   * @param args    JsonArray [{"name":"key","type":"key"},{"name":"milliseconds-timestamp","type":"posix time"}]
+   * @param key     Key string
+   * @param millis  Expiry time as Unix timestamp in milliseconds
    * @param handler Handler for the result of this call.
    * @since 2.6.0
    * group: generic
    */
-  void pexpireat(JsonArray args, Handler<AsyncResult<Long>> handler);
+  void pexpireat(String key, long millis, Handler<AsyncResult<Long>> handler);
+
+  /**
+   * Adds the specified element to the specified HyperLogLog.
+   *
+   * @param key     Key string
+   * @param element Element to add
+   * @param handler Handler for the result of this call.
+   * @since 2.8.9
+   * group: hyperloglog
+   */
+  void pfadd(String key, String element, Handler<AsyncResult<Long>> handler);
 
   /**
    * Adds the specified elements to the specified HyperLogLog.
    *
-   * @param args    JsonArray [{"name":"key","type":"key"},{"name":"element","type":"string","multiple":true}]
+   * @param key      Key string
+   * @param elements Elementa to add
+   * @param handler  Handler for the result of this call.
+   * @since 2.8.9
+   * group: hyperloglog
+   */
+  void pfaddMany(String key, List<String> elements, Handler<AsyncResult<Long>> handler);
+
+  /**
+   * Return the approximated cardinality of the set observed by the HyperLogLog at key.
+   *
+   * @param key     Key string
    * @param handler Handler for the result of this call.
    * @since 2.8.9
    * group: hyperloglog
    */
-  void pfadd(JsonArray args, Handler<AsyncResult<Long>> handler);
+  void pfcount(String key, Handler<AsyncResult<Long>> handler);
 
   /**
    * Return the approximated cardinality of the set(s) observed by the HyperLogLog at key(s).
    *
-   * @param args    JsonArray [{"name":"key","type":"key","multiple":true}]
+   * @param keys    List of keys
    * @param handler Handler for the result of this call.
    * @since 2.8.9
    * group: hyperloglog
    */
-  void pfcount(JsonArray args, Handler<AsyncResult<Long>> handler);
+  void pfcountMany(List<String> keys, Handler<AsyncResult<Long>> handler);
 
   /**
    * Merge N different HyperLogLogs into a single one.
    *
-   * @param args    JsonArray [{"name":"destkey","type":"key"},{"name":"sourcekey","type":"key","multiple":true}]
+   * @param destkey Destination key
+   * @param keys    List of source keys
    * @param handler Handler for the result of this call.
    * @since 2.8.9
    * group: hyperloglog
    */
-  void pfmerge(JsonArray args, Handler<AsyncResult<String>> handler);
+  void pfmerge(String destkey, List<String> keys, Handler<AsyncResult<String>> handler);
 
   /**
    * Ping the server
@@ -882,62 +1081,94 @@ public interface RedisService {
   /**
    * Set the value and expiration in milliseconds of a key
    *
-   * @param args    JsonArray [{"name":"key","type":"key"},{"name":"milliseconds","type":"integer"},{"name":"value","type":"string"}]
+   * @param key     Key string
+   * @param millis  Number of milliseconds until the key expires
+   * @param value   New value for key
    * @param handler Handler for the result of this call.
    * @since 2.6.0
    * group: string
    */
-  void psetex(JsonArray args, Handler<AsyncResult<Void>> handler);
+  void psetex(String key, long millis, String value, Handler<AsyncResult<Void>> handler);
+
+  /**
+   * Listen for messages published to channels matching the given pattern
+   *
+   * @param pattern Pattern string
+   * @param handler Handler for the result of this call.
+   * @since 2.0.0
+   * group: pubsub
+   */
+  void psubscribe(String pattern, Handler<AsyncResult<Void>> handler);
 
   /**
    * Listen for messages published to channels matching the given patterns
    *
-   * @param args    JsonArray [{"name":["pattern"],"type":["pattern"],"multiple":true}]
-   * @param handler Handler for the result of this call.
+   * @param patterns List of patterns
+   * @param handler  Handler for the result of this call.
    * @since 2.0.0
    * group: pubsub
    */
-  void psubscribe(JsonArray args, Handler<AsyncResult<Void>> handler);
+  void psubscribeMany(List<String> patterns, Handler<AsyncResult<Void>> handler);
 
   /**
-   * Inspect the state of the Pub/Sub subsystem
+   * Lists the currently active channels - only those matching the pattern
    *
-   * @param args    JsonArray [{"name":"subcommand","type":"string"},{"name":"argument","type":"string","optional":true,"multiple":true}]
+   * @param pattern A glob-style pattern - an empty string means no pattern
    * @param handler Handler for the result of this call.
    * @since 2.8.0
    * group: pubsub
    */
-  void pubsub(JsonArray args, Handler<AsyncResult<Long>> handler);
+  void pubsubChannels(String pattern, Handler<AsyncResult<JsonArray>> handler);
+
+  /**
+   * Returns the number of subscribers (not counting clients subscribed to patterns) for the specified channels
+   *
+   * @param channels List of channels
+   * @param handler  Handler for the result of this call.
+   * @since 2.8.0
+   * group: pubsub
+   */
+  void pubsubNumsub(List<String> channels, Handler<AsyncResult<JsonArray>> handler);
+
+  /**
+   * Returns the number of subscriptions to patterns (that are performed using the PSUBSCRIBE command)
+   *
+   * @param handler Handler for the result of this call.
+   * @since 2.8.0
+   * group: pubsub
+   */
+  void pubsubNumpat(Handler<AsyncResult<Long>> handler);
 
   /**
    * Get the time to live for a key in milliseconds
    *
-   * @param args    JsonArray [{"name":"key","type":"key"}]
+   * @param key     Key string
    * @param handler Handler for the result of this call.
    * @since 2.6.0
    * group: generic
    */
-  void pttl(JsonArray args, Handler<AsyncResult<Long>> handler);
+  void pttl(String key, Handler<AsyncResult<Long>> handler);
 
   /**
    * Post a message to a channel
    *
-   * @param args    JsonArray [{"name":"channel","type":"string"},{"name":"message","type":"string"}]
+   * @param channel Channel key
+   * @param message Message to send to channel
    * @param handler Handler for the result of this call.
    * @since 2.0.0
    * group: pubsub
    */
-  void publish(JsonArray args, Handler<AsyncResult<Long>> handler);
+  void publish(String channel, String message, Handler<AsyncResult<Long>> handler);
 
   /**
    * Stop listening for messages posted to channels matching the given patterns
    *
-   * @param args    JsonArray [{"name":"pattern","type":"pattern","optional":true,"multiple":true}]
-   * @param handler Handler for the result of this call.
+   * @param patterns List of patterns to match against
+   * @param handler  Handler for the result of this call.
    * @since 2.0.0
    * group: pubsub
    */
-  void punsubscribe(JsonArray args, Handler<AsyncResult<Void>> handler);
+  void punsubscribe(List<String> patterns, Handler<AsyncResult<Void>> handler);
 
   /**
    * Close the connection
@@ -958,32 +1189,36 @@ public interface RedisService {
   /**
    * Rename a key
    *
-   * @param args    JsonArray [{"name":"key","type":"key"},{"name":"newkey","type":"key"}]
+   * @param key  Key string to be renamed
+   * @param newkey  New key string
    * @param handler Handler for the result of this call.
    * @since 1.0.0
    * group: generic
    */
-  void rename(JsonArray args, Handler<AsyncResult<String>> handler);
+  void rename(String key, String newkey, Handler<AsyncResult<String>> handler);
 
   /**
    * Rename a key, only if the new key does not exist
    *
-   * @param args    JsonArray [{"name":"key","type":"key"},{"name":"newkey","type":"key"}]
+   * @param key  Key string to be renamed
+   * @param newkey  New key string
    * @param handler Handler for the result of this call.
    * @since 1.0.0
    * group: generic
    */
-  void renamenx(JsonArray args, Handler<AsyncResult<Long>> handler);
+  void renamenx(String key, String newkey, Handler<AsyncResult<Long>> handler);
 
   /**
    * Create a key using the provided serialized value, previously obtained using DUMP.
    *
-   * @param args    JsonArray [{"name":"key","type":"key"},{"name":"ttl","type":"integer"},{"name":"serialized-value","type":"string"}]
-   * @param handler Handler for the result of this call.
+   * @param key        Key string
+   * @param millis     Expiry time in milliseconds to set on the key
+   * @param serialized Serialized form of the key value as obtained using DUMP
+   * @param handler    Handler for the result of this call.
    * @since 2.6.0
    * group: generic
    */
-  void restore(JsonArray args, Handler<AsyncResult<String>> handler);
+  void restore(String key, long millis, String serialized, Handler<AsyncResult<String>> handler);
 
   /**
    * Return the role of the instance in the context of replication
@@ -996,52 +1231,78 @@ public interface RedisService {
   /**
    * Remove and get the last element in a list
    *
-   * @param args    JsonArray [{"name":"key","type":"key"}]
+   * @param key     Key string
    * @param handler Handler for the result of this call.
    * @since 1.0.0
    * group: list
    */
-  void rpop(JsonArray args, Handler<AsyncResult<String>> handler);
+  void rpop(String key, Handler<AsyncResult<String>> handler);
 
   /**
    * Remove the last element in a list, append it to another list and return it
    *
-   * @param args    JsonArray [{"name":"source","type":"key"},{"name":"destination","type":"key"}]
+   * @param key     Key string identifying source list
+   * @param destkey Key string identifying destination list
    * @param handler Handler for the result of this call.
    * @since 1.2.0
    * group: list
    */
-  void rpoplpush(JsonArray args, Handler<AsyncResult<String>> handler);
+  void rpoplpush(String key, String destkey, Handler<AsyncResult<String>> handler);
 
   /**
    * Append one or multiple values to a list
    *
-   * @param args    JsonArray [{"name":"key","type":"key"},{"name":"value","type":"string","multiple":true}]
+   * @param key     Key string
+   * @param values  List of values to add to the end of the list
    * @param handler Handler for the result of this call.
    * @since 1.0.0
    * group: list
    */
-  void rpush(JsonArray args, Handler<AsyncResult<Long>> handler);
+  void rpushMany(String key, List<String> values, Handler<AsyncResult<Long>> handler);
+
+  /**
+   * Append one or multiple values to a list
+   *
+   * @param key     Key string
+   * @param value   Value to be added to the end of the list
+   * @param handler Handler for the result of this call.
+   * @since 1.0.0
+   * group: list
+   */
+  void rpush(String key, String value, Handler<AsyncResult<Long>> handler);
 
   /**
    * Append a value to a list, only if the list exists
    *
-   * @param args    JsonArray [{"name":"key","type":"key"},{"name":"value","type":"string"}]
+   * @param key     Key string
+   * @param value   Value to be added to the end of the list
    * @param handler Handler for the result of this call.
    * @since 2.2.0
    * group: list
    */
-  void rpushx(JsonArray args, Handler<AsyncResult<Long>> handler);
+  void rpushx(String key, String value, Handler<AsyncResult<Long>> handler);
 
   /**
-   * Add one or more members to a set
+   * Add a member to a set
    *
-   * @param args    JsonArray [{"name":"key","type":"key"},{"name":"member","type":"string","multiple":true}]
+   * @param key     Key string
+   * @param member  Value to be added to the set
    * @param handler Handler for the result of this call.
    * @since 1.0.0
    * group: set
    */
-  void sadd(JsonArray args, Handler<AsyncResult<Long>> handler);
+  void sadd(String key, String member, Handler<AsyncResult<Long>> handler);
+
+  /**
+   * Add one or more members to a set
+   *
+   * @param key     Key string
+   * @param members Values to be added to the set
+   * @param handler Handler for the result of this call.
+   * @since 1.0.0
+   * group: set
+   */
+  void saddMany(String key, List<String> members, Handler<AsyncResult<Long>> handler);
 
   /**
    * Synchronously save the dataset to disk
@@ -1054,22 +1315,32 @@ public interface RedisService {
   /**
    * Get the number of members in a set
    *
-   * @param args    JsonArray [{"name":"key","type":"key"}]
+   * @param key     Key string
    * @param handler Handler for the result of this call.
    * @since 1.0.0
    * group: set
    */
-  void scard(JsonArray args, Handler<AsyncResult<Long>> handler);
+  void scard(String key, Handler<AsyncResult<Long>> handler);
 
   /**
-   * Check existence of scripts in the script cache.
+   * Check existence of script in the script cache.
    *
-   * @param args    JsonArray [{"name":"script","type":"string","multiple":true}]
+   * @param script  SHA1 digest identifying a script in the script cache
    * @param handler Handler for the result of this call.
    * @since 2.6.0
    * group: scripting
    */
-  void scriptExists(JsonArray args, Handler<AsyncResult<JsonArray>> handler);
+  void scriptExists(String script, Handler<AsyncResult<JsonArray>> handler);
+
+  /**
+   * Check existence of scripts in the script cache.
+   *
+   * @param scripts List of SHA1 digests identifying scripts in the script cache
+   * @param handler Handler for the result of this call.
+   * @since 2.6.0
+   * group: scripting
+   */
+  void scriptExistsMany(List<String> scripts, Handler<AsyncResult<JsonArray>> handler);
 
   /**
    * Remove all the scripts from the script cache.
@@ -1090,252 +1361,343 @@ public interface RedisService {
   /**
    * Load the specified Lua script into the script cache.
    *
-   * @param args    JsonArray [{"name":"script","type":"string"}]
+   * @param script  Lua script
    * @param handler Handler for the result of this call.
    * @since 2.6.0
    * group: scripting
    */
-  void scriptLoad(JsonArray args, Handler<AsyncResult<String>> handler);
+  void scriptLoad(String script, Handler<AsyncResult<String>> handler);
 
   /**
    * Subtract multiple sets
    *
-   * @param args    JsonArray [{"name":"key","type":"key","multiple":true}]
+   * @param key     Key identifying the set to compare with all other sets combined
+   * @param cmpkeys List of keys identifying sets to subtract from the key set
    * @param handler Handler for the result of this call.
    * @since 1.0.0
    * group: set
    */
-  void sdiff(JsonArray args, Handler<AsyncResult<JsonArray>> handler);
+  void sdiff(String key, List<String> cmpkeys, Handler<AsyncResult<JsonArray>> handler);
 
   /**
    * Subtract multiple sets and store the resulting set in a key
    *
-   * @param args    JsonArray [{"name":"destination","type":"key"},{"name":"key","type":"key","multiple":true}]
+   * @param destkey Destination key where the result should be stored
+   * @param key     Key identifying the set to compare with all other sets combined
+   * @param cmpkeys List of keys identifying sets to subtract from the key set
    * @param handler Handler for the result of this call.
    * @since 1.0.0
    * group: set
    */
-  void sdiffstore(JsonArray args, Handler<AsyncResult<Long>> handler);
+  void sdiffstore(String destkey, String key, List<String> cmpkeys, Handler<AsyncResult<Long>> handler);
 
   /**
    * Change the selected database for the current connection
    *
-   * @param args    JsonArray [{"name":"index","type":"integer"}]
+   * @param dbindex Index identifying the new active database
    * @param handler Handler for the result of this call.
    * @since 1.0.0
    * group: connection
    */
-  void select(JsonArray args, Handler<AsyncResult<String>> handler);
+  void select(int dbindex, Handler<AsyncResult<String>> handler);
 
   /**
    * Set the string value of a key
    *
-   * @param args    JsonArray [{"name":"key","type":"key"},{"name":"value","type":"string"},{"command":"EX","name":"seconds","type":"integer","optional":true},{"command":"PX","name":"milliseconds","type":"integer","optional":true},{"name":"condition","type":"enum","enum":["NX","XX"],"optional":true}]
+   * @param key     Key of which value to set
+   * @param value   New value for the key
    * @param handler Handler for the result of this call.
    * @since 1.0.0
    * group: string
    */
-  void set(JsonArray args, Handler<AsyncResult<Void>> handler);
+  void set(String key, String value, Handler<AsyncResult<Void>> handler);
+
+  /**
+   * Set the string value of a key
+   *
+   * @param key     Key of which value to set
+   * @param value   New value for the key
+   * @param options Set options
+   * @param handler Handler for the result of this call.
+   * @since 1.0.0
+   * group: string
+   */
+  void setWithOptions(String key, String value, SetOptions options, Handler<AsyncResult<Void>> handler);
+
+  /**
+   * Set the binary string value of a key - without encoding as utf-8
+   *
+   * @param key     Key of which value to set
+   * @param value   New value for the key
+   * @param handler Handler for the result of this call.
+   * @since 1.0.0
+   * group: string
+   */
+  void setBinary(String key, String value, Handler<AsyncResult<Void>> handler);
 
   /**
    * Sets or clears the bit at offset in the string value stored at key
    *
-   * @param args    JsonArray [{"name":"key","type":"key"},{"name":"offset","type":"integer"},{"name":"value","type":"string"}]
+   * @param key     Key string
+   * @param offset  Bit offset
+   * @param bit     New value - must be 1 or 0
    * @param handler Handler for the result of this call.
    * @since 2.2.0
    * group: string
    */
-  void setbit(JsonArray args, Handler<AsyncResult<Long>> handler);
+  void setbit(String key, long offset, int bit, Handler<AsyncResult<Long>> handler);
 
   /**
    * Set the value and expiration of a key
    *
-   * @param args    JsonArray [{"name":"key","type":"key"},{"name":"seconds","type":"integer"},{"name":"value","type":"string"}]
+   * @param key     Key string
+   * @param seconds Number of seconds until the key expires
+   * @param value   New value for key
    * @param handler Handler for the result of this call.
    * @since 2.0.0
    * group: string
    */
-  void setex(JsonArray args, Handler<AsyncResult<String>> handler);
+  void setex(String key, long seconds, String value, Handler<AsyncResult<String>> handler);
 
   /**
    * Set the value of a key, only if the key does not exist
    *
-   * @param args    JsonArray [{"name":"key","type":"key"},{"name":"value","type":"string"}]
+   * @param key     Key of which value to set
+   * @param value   New value for the key
    * @param handler Handler for the result of this call.
    * @since 1.0.0
    * group: string
    */
-  void setnx(JsonArray args, Handler<AsyncResult<Long>> handler);
+  void setnx(String key, String value, Handler<AsyncResult<Long>> handler);
 
   /**
    * Overwrite part of a string at key starting at the specified offset
    *
-   * @param args    JsonArray [{"name":"key","type":"key"},{"name":"offset","type":"integer"},{"name":"value","type":"string"}]
+   * @param key     Key string
+   * @param offset  Offset - the maximum offset that you can set is 2^29 -1 (536870911), as Redis Strings are limited to 512 megabytes
+   * @param value   Value to overwrite with
    * @param handler Handler for the result of this call.
    * @since 2.2.0
    * group: string
    */
-  void setrange(JsonArray args, Handler<AsyncResult<Long>> handler);
+  void setrange(String key, int offset, String value, Handler<AsyncResult<Long>> handler);
 
   /**
    * Synchronously save the dataset to disk and then shut down the server
    *
-   * @param args    JsonArray [{"name":"NOSAVE","type":"enum","enum":["NOSAVE"],"optional":true},{"name":"SAVE","type":"enum","enum":["SAVE"],"optional":true}]
-   * @param handler Handler for the result of this call.
+   * @param options Shutdown options
    * @since 1.0.0
    * group: server
    */
-  void shutdown(JsonArray args, Handler<AsyncResult<String>> handler);
+  void shutdown(ShutdownOptions options);
 
   /**
    * Intersect multiple sets
    *
-   * @param args    JsonArray [{"name":"key","type":"key","multiple":true}]
+   * @param keys    List of keys to perform intersection on
    * @param handler Handler for the result of this call.
    * @since 1.0.0
    * group: set
    */
-  void sinter(JsonArray args, Handler<AsyncResult<JsonArray>> handler);
+  void sinter(List<String> keys, Handler<AsyncResult<JsonArray>> handler);
 
   /**
    * Intersect multiple sets and store the resulting set in a key
    *
-   * @param args    JsonArray [{"name":"destination","type":"key"},{"name":"key","type":"key","multiple":true}]
+   * @param destkey Key where to store the results
+   * @param keys    List of keys to perform intersection on
    * @param handler Handler for the result of this call.
    * @since 1.0.0
    * group: set
    */
-  void sinterstore(JsonArray args, Handler<AsyncResult<Long>> handler);
+  void sinterstore(String destkey, List<String> keys, Handler<AsyncResult<Long>> handler);
 
   /**
    * Determine if a given value is a member of a set
    *
-   * @param args    JsonArray [{"name":"key","type":"key"},{"name":"member","type":"string"}]
+   * @param key     Key string
+   * @param member  Member to look for
    * @param handler Handler for the result of this call.
    * @since 1.0.0
    * group: set
    */
-  void sismember(JsonArray args, Handler<AsyncResult<Long>> handler);
+  void sismember(String key, String member, Handler<AsyncResult<Long>> handler);
 
   /**
-   * Make the server a slave of another instance, or promote it as master
+   * Make the server a slave of another instance
    *
-   * @param args    JsonArray [{"name":"host","type":"string"},{"name":"port","type":"string"}]
+   * @param host    Host to become this server's master
+   * @param port    Port of our new master
    * @param handler Handler for the result of this call.
    * @since 1.0.0
    * group: server
    */
-  void slaveof(JsonArray args, Handler<AsyncResult<String>> handler);
+  void slaveof(String host, int port, Handler<AsyncResult<String>> handler);
 
   /**
-   * Manages the Redis slow queries log
+   * Make this server a master
    *
-   * @param args    JsonArray [{"name":"subcommand","type":"string"},{"name":"argument","type":"string","optional":true}]
+   * @param handler Handler for the result of this call.
+   * @since 1.0.0
+   * group: server
+   */
+  void slaveofNoone(Handler<AsyncResult<String>> handler);
+
+  /**
+   * Read the Redis slow queries log
+   *
+   * @param limit   Number of log entries to return. If value is less than zero all entries are returned
    * @param handler Handler for the result of this call.
    * @since 2.2.12
    * group: server
    */
-  void slowlog(JsonArray args, Handler<AsyncResult<Void>> handler);
+  void slowlogGet(int limit, Handler<AsyncResult<JsonArray>> handler);
+
+  /**
+   * Get the length of the Redis slow queries log
+   *
+   * @param handler Handler for the result of this call.
+   * @since 2.2.12
+   * group: server
+   */
+  void slowlogLen(Handler<AsyncResult<Long>> handler);
+
+  /**
+   * Reset the Redis slow queries log
+   *
+   * @param handler Handler for the result of this call.
+   * @since 2.2.12
+   * group: server
+   */
+  void slowlogReset(Handler<AsyncResult<Void>> handler);
 
   /**
    * Get all the members in a set
    *
-   * @param args    JsonArray [{"name":"key","type":"key"}]
+   * @param key     Key string
    * @param handler Handler for the result of this call.
    * @since 1.0.0
    * group: set
    */
-  void smembers(JsonArray args, Handler<AsyncResult<JsonArray>> handler);
+  void smembers(String key, Handler<AsyncResult<JsonArray>> handler);
 
   /**
    * Move a member from one set to another
    *
-   * @param args    JsonArray [{"name":"source","type":"key"},{"name":"destination","type":"key"},{"name":"member","type":"string"}]
+   * @param key     Key of source set currently containing the member
+   * @param destkey Key identifying the destination set
+   * @param member   Member to move
    * @param handler Handler for the result of this call.
    * @since 1.0.0
    * group: set
    */
-  void smove(JsonArray args, Handler<AsyncResult<Long>> handler);
+  void smove(String key, String destkey, String member, Handler<AsyncResult<Long>> handler);
 
   /**
    * Sort the elements in a list, set or sorted set
    *
-   * @param args    JsonArray [{"name":"key","type":"key"},{"command":"BY","name":"pattern","type":"pattern","optional":true},{"command":"LIMIT","name":["offset","count"],"type":["integer","integer"],"optional":true},{"command":"GET","name":"pattern","type":"string","optional":true,"multiple":true},{"name":"order","type":"enum","enum":["ASC","DESC"],"optional":true},{"name":"sorting","type":"enum","enum":["ALPHA"],"optional":true},{"command":"STORE","name":"destination","type":"key","optional":true}]
+   * @param key     Key string
+   * @param options Sort options
    * @param handler Handler for the result of this call.
    * @since 1.0.0
    * group: generic
    */
-  void sort(JsonArray args, Handler<AsyncResult<JsonArray>> handler);
+  void sort(String key, SortOptions options, Handler<AsyncResult<JsonArray>> handler);
 
   /**
    * Remove and return a random member from a set
    *
-   * @param args    JsonArray [{"name":"key","type":"key"}]
+   * @param key     Key string
    * @param handler Handler for the result of this call.
    * @since 1.0.0
    * group: set
    */
-  void spop(JsonArray args, Handler<AsyncResult<String>> handler);
+  void spop(String key, Handler<AsyncResult<String>> handler);
+
+  /**
+   * Remove and return random members from a set
+   *
+   * @param key     Key string
+   * @param count   Number of members to remove
+   * @param handler Handler for the result of this call.
+   * @since 1.0.0
+   * group: set
+   */
+  void spopMany(String key, int count, Handler<AsyncResult<String>> handler);
 
   /**
    * Get one or multiple random members from a set
    *
-   * @param args    JsonArray [{"name":"key","type":"key"},{"name":"count","type":"integer","optional":true}]
+   * @param key     Key string
+   * @param count   Number of members to get
    * @param handler Handler for the result of this call.
    * @since 1.0.0
    * group: set
    */
-  void srandmember(JsonArray args, Handler<AsyncResult<JsonArray>> handler);
+  void srandmember(String key, int count, Handler<AsyncResult<JsonArray>> handler);
+
+  /**
+   * Remove one member from a set
+   *
+   * @param key     Key string
+   * @param member  Member to remove
+   * @param handler Handler for the result of this call.
+   * @since 1.0.0
+   * group: set
+   */
+  void srem(String key, String member, Handler<AsyncResult<Long>> handler);
 
   /**
    * Remove one or more members from a set
    *
-   * @param args    JsonArray [{"name":"key","type":"key"},{"name":"member","type":"string","multiple":true}]
+   * @param key     Key string
+   * @param members Members to remove
    * @param handler Handler for the result of this call.
    * @since 1.0.0
    * group: set
    */
-  void srem(JsonArray args, Handler<AsyncResult<Long>> handler);
+  void sremMany(String key, List<String> members, Handler<AsyncResult<Long>> handler);
 
   /**
    * Get the length of the value stored in a key
    *
-   * @param args    JsonArray [{"name":"key","type":"key"}]
+   * @param key     Key string
    * @param handler Handler for the result of this call.
    * @since 2.2.0
    * group: string
    */
-  void strlen(JsonArray args, Handler<AsyncResult<Long>> handler);
+  void strlen(String key, Handler<AsyncResult<Long>> handler);
 
   /**
    * Listen for messages published to the given channels
    *
-   * @param args    JsonArray [{"name":["channel"],"type":["string"],"multiple":true}]
-   * @param handler Handler for the result of this call.
+   * @param channels List of channels to subscribe to
+   * @param handler  Handler for the result of this call.
    * @since 2.0.0
    * group: pubsub
    */
-  void subscribe(JsonArray args, Handler<AsyncResult<Void>> handler);
+  void subscribe(List<String> channels, Handler<AsyncResult<Void>> handler);
 
   /**
    * Add multiple sets
    *
-   * @param args    JsonArray [{"name":"key","type":"key","multiple":true}]
+   * @param keys    List of keys identifying sets to add up
    * @param handler Handler for the result of this call.
    * @since 1.0.0
    * group: set
    */
-  void sunion(JsonArray args, Handler<AsyncResult<JsonArray>> handler);
+  void sunion(List<String> keys, Handler<AsyncResult<JsonArray>> handler);
 
   /**
    * Add multiple sets and store the resulting set in a key
    *
-   * @param args    JsonArray [{"name":"destination","type":"key"},{"name":"key","type":"key","multiple":true}]
+   * @param destkey Destination key
+   * @param keys    List of keys identifying sets to add up
    * @param handler Handler for the result of this call.
    * @since 1.0.0
    * group: set
    */
-  void sunionstore(JsonArray args, Handler<AsyncResult<Long>> handler);
+  void sunionstore(String destkey, List<String> keys, Handler<AsyncResult<Long>> handler);
 
   /**
    * Internal command used for replication
@@ -1356,32 +1718,32 @@ public interface RedisService {
   /**
    * Get the time to live for a key
    *
-   * @param args    JsonArray [{"name":"key","type":"key"}]
+   * @param key     Key string
    * @param handler Handler for the result of this call.
    * @since 1.0.0
    * group: generic
    */
-  void ttl(JsonArray args, Handler<AsyncResult<Long>> handler);
+  void ttl(String key, Handler<AsyncResult<Long>> handler);
 
   /**
    * Determine the type stored at key
    *
-   * @param args    JsonArray [{"name":"key","type":"key"}]
+   * @param key     Key string
    * @param handler Handler for the result of this call.
    * @since 1.0.0
    * group: generic
    */
-  void type(JsonArray args, Handler<AsyncResult<String>> handler);
+  void type(String key, Handler<AsyncResult<String>> handler);
 
   /**
    * Stop listening for messages posted to the given channels
    *
-   * @param args    JsonArray [{"name":"channel","type":"string","optional":true,"multiple":true}]
-   * @param handler Handler for the result of this call.
+   * @param channels List of channels to subscribe to
+   * @param handler  Handler for the result of this call.
    * @since 2.0.0
    * group: pubsub
    */
-  void unsubscribe(JsonArray args, Handler<AsyncResult<Void>> handler);
+  void unsubscribe(List<String> channels, Handler<AsyncResult<Void>> handler);
 
   /**
    * Forget about all watched keys
@@ -1394,241 +1756,355 @@ public interface RedisService {
   /**
    * Watch the given keys to determine execution of the MULTI/EXEC block
    *
-   * @param args    JsonArray [{"name":"key","type":"key","multiple":true}]
+   * @param keys    List of keys to watch
    * @param handler Handler for the result of this call.
    * @since 2.2.0
    * group: transactions
    */
-  void watch(JsonArray args, Handler<AsyncResult<String>> handler);
+  void watch(List<String> keys, Handler<AsyncResult<String>> handler);
 
   /**
    * Add one or more members to a sorted set, or update its score if it already exists
    *
-   * @param args    JsonArray [{"name":"key","type":"key"},{"name":["score","member"],"type":["double","string"],"multiple":true}]
+   * @param key     Key string
+   * @param score   Score used for sorting
+   * @param member  New member key
    * @param handler Handler for the result of this call.
    * @since 1.2.0
    * group: sorted_set
    */
-  void zadd(JsonArray args, Handler<AsyncResult<Long>> handler);
+  void zadd(String key, double score, String member, Handler<AsyncResult<Long>> handler);
+
+  /**
+   * Add one or more members to a sorted set, or update its score if it already exists
+   *
+   * @param key     Key string
+   * @param members New member keys and their scores
+   * @param handler Handler for the result of this call.
+   * @since 1.2.0
+   * group: sorted_set
+   */
+  void zaddMany(String key, Map<String, Double> members, Handler<AsyncResult<Long>> handler);
 
   /**
    * Get the number of members in a sorted set
    *
-   * @param args    JsonArray [{"name":"key","type":"key"}]
+   * @param key     Key string
    * @param handler Handler for the result of this call.
    * @since 1.2.0
    * group: sorted_set
    */
-  void zcard(JsonArray args, Handler<AsyncResult<Long>> handler);
+  void zcard(String key, Handler<AsyncResult<Long>> handler);
 
   /**
    * Count the members in a sorted set with scores within the given values
    *
-   * @param args    JsonArray [{"name":"key","type":"key"},{"name":"min","type":"double"},{"name":"max","type":"double"}]
+   * @param key     Key string
+   * @param min     Minimum score
+   * @param max     Maximum score
    * @param handler Handler for the result of this call.
    * @since 2.0.0
    * group: sorted_set
    */
-  void zcount(JsonArray args, Handler<AsyncResult<Long>> handler);
+  void zcount(String key, double min, double max, Handler<AsyncResult<Long>> handler);
 
   /**
    * Increment the score of a member in a sorted set
    *
-   * @param args    JsonArray [{"name":"key","type":"key"},{"name":"increment","type":"integer"},{"name":"member","type":"string"}]
-   * @param handler Handler for the result of this call.
+   * @param key       Key string
+   * @param increment Increment amount
+   * @param member    Member key
+   * @param handler   Handler for the result of this call.
    * @since 1.2.0
    * group: sorted_set
    */
-  void zincrby(JsonArray args, Handler<AsyncResult<String>> handler);
+  void zincrby(String key, double increment, String member, Handler<AsyncResult<String>> handler);
 
   /**
    * Intersect multiple sorted sets and store the resulting sorted set in a new key
    *
-   * @param args    JsonArray [{"name":"destination","type":"key"},{"name":"numkeys","type":"integer"},{"name":"key","type":"key","multiple":true},{"command":"WEIGHTS","name":"weight","type":"integer","variadic":true,"optional":true},{"command":"AGGREGATE","name":"aggregate","type":"enum","enum":["SUM","MIN","MAX"],"optional":true}]
+   * @param destkey Destination key
+   * @param sets    List of keys identifying sorted sets to intersect
+   * @param options Aggregation options
    * @param handler Handler for the result of this call.
    * @since 2.0.0
    * group: sorted_set
    */
-  void zinterstore(JsonArray args, Handler<AsyncResult<Long>> handler);
+  void zinterstore(String destkey, List<String> sets, AggregateOptions options, Handler<AsyncResult<Long>> handler);
+
+  /**
+   * Intersect multiple sorted sets and store the resulting sorted set in a new key using weights for scoring
+   *
+   * @param destkey Destination key
+   * @param sets    List of keys identifying sorted sets to intersect
+   * @param options Aggregation options
+   * @param handler Handler for the result of this call.
+   * @since 2.0.0
+   * group: sorted_set
+   */
+  void zinterstoreWeighed(String destkey, Map<String, Double> sets, AggregateOptions options, Handler<AsyncResult<Long>> handler);
 
   /**
    * Count the number of members in a sorted set between a given lexicographical range
    *
-   * @param args    JsonArray [{"name":"key","type":"key"},{"name":"min","type":"string"},{"name":"max","type":"string"}]
+   * @param key     Key string
+   * @param min     Pattern to compare against for minimum value
+   * @param max     Pattern to compare against for maximum value
    * @param handler Handler for the result of this call.
    * @since 2.8.9
    * group: sorted_set
    */
-  void zlexcount(JsonArray args, Handler<AsyncResult<Long>> handler);
+  void zlexcount(String key, String min, String max, Handler<AsyncResult<Long>> handler);
 
   /**
    * Return a range of members in a sorted set, by index
    *
-   * @param args    JsonArray [{"name":"key","type":"key"},{"name":"start","type":"integer"},{"name":"stop","type":"integer"},{"name":"withscores","type":"enum","enum":["WITHSCORES"],"optional":true}]
+   * @param key     Key string
+   * @param start   Start index for the range
+   * @param stop    Stop index for the range - inclusive
    * @param handler Handler for the result of this call.
    * @since 1.2.0
    * group: sorted_set
    */
-  void zrange(JsonArray args, Handler<AsyncResult<JsonArray>> handler);
+  void zrange(String key, long start, long stop, Handler<AsyncResult<JsonArray>> handler);
+
+  /**
+   * Return a range of members in a sorted set, by index
+   *
+   * @param key     Key string
+   * @param start   Start index for the range
+   * @param stop    Stop index for the range - inclusive
+   * @param options Range options
+   * @param handler Handler for the result of this call.
+   * @since 1.2.0
+   * group: sorted_set
+   */
+  void zrangeWithOptions(String key, long start, long stop, RangeOptions options, Handler<AsyncResult<JsonArray>> handler);
 
   /**
    * Return a range of members in a sorted set, by lexicographical range
    *
-   * @param args    JsonArray [{"name":"key","type":"key"},{"name":"min","type":"string"},{"name":"max","type":"string"},{"command":"LIMIT","name":["offset","count"],"type":["integer","integer"],"optional":true}]
+   * @param key     Key string
+   * @param min     Pattern representing a minimum allowed value
+   * @param max     Pattern representing a maximum allowed value
+   * @param options Limit options where limit can be specified
    * @param handler Handler for the result of this call.
    * @since 2.8.9
    * group: sorted_set
    */
-  void zrangebylex(JsonArray args, Handler<AsyncResult<JsonArray>> handler);
+  void zrangebylex(String key, String min, String max, LimitOptions options, Handler<AsyncResult<JsonArray>> handler);
 
   /**
    * Return a range of members in a sorted set, by score
    *
-   * @param args    JsonArray [{"name":"key","type":"key"},{"name":"min","type":"double"},{"name":"max","type":"double"},{"name":"withscores","type":"enum","enum":["WITHSCORES"],"optional":true},{"command":"LIMIT","name":["offset","count"],"type":["integer","integer"],"optional":true}]
+   * @param key     Key string
+   * @param min     Pattern defining a minimum value
+   * @param max     Pattern defining a maximum value
+   * @param options Range and limit options
    * @param handler Handler for the result of this call.
    * @since 1.0.5
    * group: sorted_set
    */
-  void zrangebyscore(JsonArray args, Handler<AsyncResult<JsonArray>> handler);
+  void zrangebyscore(String key, String min, String max, RangeLimitOptions options, Handler<AsyncResult<JsonArray>> handler);
 
   /**
    * Determine the index of a member in a sorted set
    *
-   * @param args    JsonArray [{"name":"key","type":"key"},{"name":"member","type":"string"}]
+   * @param key     Key string
+   * @param member  Member in the sorted set identified by key
    * @param handler Handler for the result of this call.
    * @since 2.0.0
    * group: sorted_set
    */
-  void zrank(JsonArray args, Handler<AsyncResult<Long>> handler);
+  void zrank(String key, String member, Handler<AsyncResult<Long>> handler);
+
+  /**
+   * Remove one member from a sorted set
+   *
+   * @param key     Key string
+   * @param member  Member in the sorted set identified by key
+   * @param handler Handler for the result of this call.
+   * @since 1.2.0
+   * group: sorted_set
+   */
+  void zrem(String key, String member, Handler<AsyncResult<Long>> handler);
 
   /**
    * Remove one or more members from a sorted set
    *
-   * @param args    JsonArray [{"name":"key","type":"key"},{"name":"member","type":"string","multiple":true}]
+   * @param key     Key string
+   * @param members Members in the sorted set identified by key
    * @param handler Handler for the result of this call.
    * @since 1.2.0
    * group: sorted_set
    */
-  void zrem(JsonArray args, Handler<AsyncResult<Long>> handler);
+  void zremMany(String key, List<String> members, Handler<AsyncResult<Long>> handler);
 
   /**
    * Remove all members in a sorted set between the given lexicographical range
    *
-   * @param args    JsonArray [{"name":"key","type":"key"},{"name":"min","type":"string"},{"name":"max","type":"string"}]
+   * @param key     Key string
+   * @param min     Pattern defining a minimum value
+   * @param max     Pattern defining a maximum value
    * @param handler Handler for the result of this call.
    * @since 2.8.9
    * group: sorted_set
    */
-  void zremrangebylex(JsonArray args, Handler<AsyncResult<Long>> handler);
+  void zremrangebylex(String key, String min, String max, Handler<AsyncResult<Long>> handler);
 
   /**
    * Remove all members in a sorted set within the given indexes
    *
-   * @param args    JsonArray [{"name":"key","type":"key"},{"name":"start","type":"integer"},{"name":"stop","type":"integer"}]
+   * @param key     Key string
+   * @param start   Start index
+   * @param stop    Stop index
    * @param handler Handler for the result of this call.
    * @since 2.0.0
    * group: sorted_set
    */
-  void zremrangebyrank(JsonArray args, Handler<AsyncResult<Long>> handler);
+  void zremrangebyrank(String key, long start, long stop, Handler<AsyncResult<Long>> handler);
 
   /**
    * Remove all members in a sorted set within the given scores
    *
-   * @param args    JsonArray [{"name":"key","type":"key"},{"name":"min","type":"double"},{"name":"max","type":"double"}]
-   * @param handler Handler for the result of this call.
+   * @param key     Key string
+   * @param min     Pattern defining a minimum value
+   * @param max     Pattern defining a maximum value
    * @since 1.2.0
    * group: sorted_set
    */
-  void zremrangebyscore(JsonArray args, Handler<AsyncResult<Long>> handler);
+  void zremrangebyscore(String key, String min, String max, Handler<AsyncResult<Long>> handler);
 
   /**
    * Return a range of members in a sorted set, by index, with scores ordered from high to low
    *
-   * @param args    JsonArray [{"name":"key","type":"key"},{"name":"start","type":"integer"},{"name":"stop","type":"integer"},{"name":"withscores","type":"enum","enum":["WITHSCORES"],"optional":true}]
+   * @param key     Key string
+   * @param start   Start index for the range
+   * @param stop    Stop index for the range - inclusive
+   * @param options Range options
    * @param handler Handler for the result of this call.
    * @since 1.2.0
    * group: sorted_set
    */
-  void zrevrange(JsonArray args, Handler<AsyncResult<JsonArray>> handler);
+  void zrevrange(String key, long start, long stop, RangeOptions options, Handler<AsyncResult<JsonArray>> handler);
+
+  /**
+   * Return a range of members in a sorted set, by score, between the given lexicographical range with scores ordered from high to low
+   *
+   * @param key     Key string
+   * @param max     Pattern defining a maximum value
+   * @param min     Pattern defining a minimum value
+   * @param options Limit options
+   * @param handler Handler for the result of this call.
+   * @since 2.8.9
+   * group: sorted_set
+   */
+  void zrevrangebylex(String key, String max, String min, LimitOptions options, Handler<AsyncResult<JsonArray>> handler);
 
   /**
    * Return a range of members in a sorted set, by score, with scores ordered from high to low
    *
-   * @param args    JsonArray [{"name":"key","type":"key"},{"name":"max","type":"double"},{"name":"min","type":"double"},{"name":"withscores","type":"enum","enum":["WITHSCORES"],"optional":true},{"command":"LIMIT","name":["offset","count"],"type":["integer","integer"],"optional":true}]
+   * @param key     Key string
+   * @param max     Pattern defining a maximum value
+   * @param min     Pattern defining a minimum value
+   * @param options Range and limit options
    * @param handler Handler for the result of this call.
    * @since 2.2.0
    * group: sorted_set
    */
-  void zrevrangebyscore(JsonArray args, Handler<AsyncResult<JsonArray>> handler);
+  void zrevrangebyscore(String key, String max, String min, RangeLimitOptions options, Handler<AsyncResult<JsonArray>> handler);
 
   /**
    * Determine the index of a member in a sorted set, with scores ordered from high to low
    *
-   * @param args    JsonArray [{"name":"key","type":"key"},{"name":"member","type":"string"}]
+   * @param key     Key string
+   * @param member  Member in the sorted set identified by key
    * @param handler Handler for the result of this call.
    * @since 2.0.0
    * group: sorted_set
    */
-  void zrevrank(JsonArray args, Handler<AsyncResult<Long>> handler);
+  void zrevrank(String key, String member, Handler<AsyncResult<Long>> handler);
 
   /**
    * Get the score associated with the given member in a sorted set
    *
-   * @param args    JsonArray [{"name":"key","type":"key"},{"name":"member","type":"string"}]
+   * @param key     Key string
+   * @param member  Member in the sorted set identified by key
    * @param handler Handler for the result of this call.
    * @since 1.2.0
    * group: sorted_set
    */
-  void zscore(JsonArray args, Handler<AsyncResult<String>> handler);
+  void zscore(String key, String member, Handler<AsyncResult<String>> handler);
 
   /**
    * Add multiple sorted sets and store the resulting sorted set in a new key
    *
-   * @param args    JsonArray [{"name":"destination","type":"key"},{"name":"numkeys","type":"integer"},{"name":"key","type":"key","multiple":true},{"command":"WEIGHTS","name":"weight","type":"integer","variadic":true,"optional":true},{"command":"AGGREGATE","name":"aggregate","type":"enum","enum":["SUM","MIN","MAX"],"optional":true}]
+   * @param destkey Destination key
+   * @param sets    List of keys identifying sorted sets
+   * @param options Aggregation options
    * @param handler Handler for the result of this call.
    * @since 2.0.0
    * group: sorted_set
    */
-  void zunionstore(JsonArray args, Handler<AsyncResult<Long>> handler);
+  void zunionstore(String destkey, List<String> sets, AggregateOptions options, Handler<AsyncResult<Long>> handler);
+
+  /**
+   * Add multiple sorted sets using weights, and store the resulting sorted set in a new key
+   *
+   * @param key     Destination key
+   * @param sets    Map containing set-key:weight pairs
+   * @param options Aggregation options
+   * @param handler Handler for the result of this call.
+   * @since 2.0.0
+   * group: sorted_set
+   */
+  void zunionstoreWeighed(String key, Map<String, Double> sets, AggregateOptions options, Handler<AsyncResult<Long>> handler);
 
   /**
    * Incrementally iterate the keys space
    *
-   * @param args    JsonArray [{"name":"cursor","type":"integer"},{"command":"MATCH","name":"pattern","type":"pattern","optional":true},{"command":"COUNT","name":"count","type":"integer","optional":true}]
+   * @param cursor  Cursor id
+   * @param options Scan options
    * @param handler Handler for the result of this call.
    * @since 2.8.0
    * group: generic
    */
-  void scan(JsonArray args, Handler<AsyncResult<Void>> handler);
+  void scan(String cursor, ScanOptions options, Handler<AsyncResult<Void>> handler);
 
   /**
    * Incrementally iterate Set elements
    *
-   * @param args    JsonArray [{"name":"key","type":"key"},{"name":"cursor","type":"integer"},{"command":"MATCH","name":"pattern","type":"pattern","optional":true},{"command":"COUNT","name":"count","type":"integer","optional":true}]
+   * @param key     Key string
+   * @param cursor  Cursor id
+   * @param options Scan options
    * @param handler Handler for the result of this call.
    * @since 2.8.0
    * group: set
    */
-  void sscan(JsonArray args, Handler<AsyncResult<Void>> handler);
+  void sscan(String key, String cursor, ScanOptions options, Handler<AsyncResult<Void>> handler);
 
   /**
    * Incrementally iterate hash fields and associated values
    *
-   * @param args    JsonArray [{"name":"key","type":"key"},{"name":"cursor","type":"integer"},{"command":"MATCH","name":"pattern","type":"pattern","optional":true},{"command":"COUNT","name":"count","type":"integer","optional":true}]
+   * @param key     Key string
+   * @param cursor  Cursor id
+   * @param options Scan options
    * @param handler Handler for the result of this call.
    * @since 2.8.0
    * group: hash
    */
-  void hscan(JsonArray args, Handler<AsyncResult<Void>> handler);
+  void hscan(String key, String cursor, ScanOptions options, Handler<AsyncResult<JsonArray>> handler);
 
   /**
    * Incrementally iterate sorted sets elements and associated scores
    *
-   * @param args    JsonArray [{"name":"key","type":"key"},{"name":"cursor","type":"integer"},{"command":"MATCH","name":"pattern","type":"pattern","optional":true},{"command":"COUNT","name":"count","type":"integer","optional":true}]
+   * @param key     Key string
+   * @param cursor  Cursor id
+   * @param options Scan options
    * @param handler Handler for the result of this call.
    * @since 2.8.0
    * group: sorted_set
    */
-  void zscan(JsonArray args, Handler<AsyncResult<Void>> handler);
+  void zscan(String key, String cursor, ScanOptions options, Handler<AsyncResult<Void>> handler);
 
 }
