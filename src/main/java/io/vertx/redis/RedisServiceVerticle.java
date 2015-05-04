@@ -6,16 +6,16 @@ import io.vertx.serviceproxy.ProxyHelper;
 
 public class RedisServiceVerticle extends AbstractVerticle {
 
-  private RedisService service;
+  private RedisClient service;
 
   @Override
   public void start(Future<Void> startFuture) throws Exception {
     // Create the service
-    service = RedisService.create(vertx, config());
+    service = RedisClient.create(vertx, config());
     service.start(asyncResult -> {
       if (asyncResult.succeeded()) {
         String address = config().getString("address", "vertx.redis");
-        ProxyHelper.registerService(RedisService.class, vertx, service, address);
+        ProxyHelper.registerService(RedisClient.class, vertx, service, address);
         startFuture.complete();
       } else {
         startFuture.fail(asyncResult.cause());

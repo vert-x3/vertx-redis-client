@@ -2,7 +2,7 @@ package io.vertx.test.redis;
 
 import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;
-import io.vertx.redis.RedisService;
+import io.vertx.redis.RedisClient;
 import io.vertx.redis.op.*;
 import io.vertx.test.core.VertxTestBase;
 import org.junit.AfterClass;
@@ -23,7 +23,7 @@ import java.util.concurrent.TimeUnit;
  * the <code>host</code> or <code>port</code> system property is specified. In this case the
  * test assumes an external database will be used.
  */
-public class RedisServiceTestBase extends VertxTestBase {
+public class RedisClientTestBase extends VertxTestBase {
 
   private static final Integer DEFAULT_PORT = 6379;
 
@@ -42,7 +42,7 @@ public class RedisServiceTestBase extends VertxTestBase {
     return (s != null && s.trim().length() > 0) ?  s : null;
   }
 
-  protected RedisService redis;
+  protected RedisClient redis;
 
   @BeforeClass
   static public void startRedis() throws Exception {
@@ -165,7 +165,7 @@ public class RedisServiceTestBase extends VertxTestBase {
     RedisServer server = RedisServer.builder().port(6381).setting("requirepass foobar").build();
       server.start();
       JsonObject job = new JsonObject().put("host", "localhost").put("port", 6381);
-      RedisService rdx = RedisService.create(vertx, job);
+      RedisClient rdx = RedisClient.create(vertx, job);
 
       CountDownLatch latch = new CountDownLatch(1);
       rdx.start(asyncResult -> {
@@ -316,7 +316,7 @@ public class RedisServiceTestBase extends VertxTestBase {
       }
     });
 
-    RedisService redis2 = RedisService.create(vertx, getConfig());
+    RedisClient redis2 = RedisClient.create(vertx, getConfig());
     CountDownLatch latch = new CountDownLatch(1);
     redis2.start(asyncResult -> {
       if (asyncResult.succeeded()) {
@@ -471,7 +471,7 @@ public class RedisServiceTestBase extends VertxTestBase {
     RedisServer server = RedisServer.builder().port(6381).build();
     server.start();
     JsonObject job = new JsonObject().put("host", "localhost").put("port", 6381);
-    RedisService rdx = RedisService.create(vertx, job);
+    RedisClient rdx = RedisClient.create(vertx, job);
 
     CountDownLatch latch = new CountDownLatch(1);
     rdx.start(asyncResult -> {
@@ -1564,7 +1564,7 @@ public class RedisServiceTestBase extends VertxTestBase {
     RedisServer server = RedisServer.builder().port(6382).build();
     server.start();
     JsonObject job = new JsonObject().put("host", "localhost").put("port", 6382);
-    RedisService rdx = RedisService.create(vertx, job);
+    RedisClient rdx = RedisClient.create(vertx, job);
 
     CountDownLatch latch = new CountDownLatch(1);
     rdx.start(asyncResult -> {
@@ -1664,7 +1664,7 @@ public class RedisServiceTestBase extends VertxTestBase {
   public void testMulti() throws Exception {
 
     String key = makeKey();
-    RedisService rdx = RedisService.create(vertx, getConfig());
+    RedisClient rdx = RedisClient.create(vertx, getConfig());
     CountDownLatch latch = new CountDownLatch(1);
     rdx.start(asyncResult -> {
       assertTrue(asyncResult.succeeded());
@@ -2189,7 +2189,7 @@ public class RedisServiceTestBase extends VertxTestBase {
     });
 
     JsonObject job = new JsonObject().put("host", "localhost").put("port", 6379);
-    RedisService rdx = RedisService.create(vertx, job);
+    RedisClient rdx = RedisClient.create(vertx, job);
 
     CountDownLatch latch = new CountDownLatch(1);
     rdx.start(asyncResult -> {
@@ -2419,7 +2419,7 @@ public class RedisServiceTestBase extends VertxTestBase {
     testServer.start();
 
     JsonObject job = new JsonObject().put("host", "localhost").put("port", 6380);
-    RedisService rdx = RedisService.create(vertx, job);
+    RedisClient rdx = RedisClient.create(vertx, job);
 
     CountDownLatch latch = new CountDownLatch(1);
     rdx.start(asyncResult -> {
@@ -2879,7 +2879,7 @@ public class RedisServiceTestBase extends VertxTestBase {
     // TODO
     String key = makeKey();
     
-    RedisService rdx = RedisService.create(vertx, getConfig());
+    RedisClient rdx = RedisClient.create(vertx, getConfig());
     CountDownLatch latch = new CountDownLatch(1);
     rdx.start(asyncResult -> {
       assertTrue(asyncResult.succeeded());

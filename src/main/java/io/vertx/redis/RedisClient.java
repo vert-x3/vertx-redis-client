@@ -1,36 +1,26 @@
 package io.vertx.redis;
 
-import io.vertx.codegen.annotations.ProxyGen;
-import io.vertx.codegen.annotations.ProxyIgnore;
 import io.vertx.codegen.annotations.VertxGen;
 import io.vertx.core.AsyncResult;
 import io.vertx.core.Handler;
 import io.vertx.core.Vertx;
 import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;
-import io.vertx.redis.impl.RedisServiceImpl;
+import io.vertx.redis.impl.RedisClientImpl;
 import io.vertx.redis.op.*;
-import io.vertx.serviceproxy.ProxyHelper;
 
 import java.util.List;
 import java.util.Map;
 
 @VertxGen
-@ProxyGen
-public interface RedisService {
+public interface RedisClient {
 
-  static RedisService create(Vertx vertx, JsonObject config) {
-    return new RedisServiceImpl(vertx, config);
+  static RedisClient create(Vertx vertx, JsonObject config) {
+    return new RedisClientImpl(vertx, config);
   }
 
-  static RedisService createEventBusProxy(Vertx vertx, String address) {
-    return ProxyHelper.createProxy(RedisService.class, vertx, address);
-  }
-
-  @ProxyIgnore
   void start(Handler<AsyncResult<Void>> handler);
 
-  @ProxyIgnore
   void stop(Handler<AsyncResult<Void>> handler);
 
   /**
