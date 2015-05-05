@@ -26,9 +26,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Stream;
 
-public final class RedisServiceImpl extends AbstractRedisService {
+public final class RedisClientImpl extends AbstractRedisClient {
 
-  public RedisServiceImpl(Vertx vertx, JsonObject config) {
+  public RedisClientImpl(Vertx vertx, JsonObject config) {
     super(vertx, config);
   }
 

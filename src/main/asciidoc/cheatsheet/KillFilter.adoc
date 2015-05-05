@@ -1,0 +1,27 @@
+== KillFilter
+
+++++
+ @author <a href="mailto:marko.strukelj@gmail.com">Marko Strukelj</a>
+++++
+'''
+
+[cols=">25%,^25%,50%"]
+[frame="topbot"]
+|===
+^|Name | Type ^| Description
+
+|[[addr]]`addr`
+|`String`
+|+++
+Set ADDR filter+++
+
+|[[id]]`id`
+|`String`
+|+++
+Set ID filter+++
+
+|[[skipme]]`skipme`
+|`Boolean`
+|+++
+Set SKIPME filter+++
+|===

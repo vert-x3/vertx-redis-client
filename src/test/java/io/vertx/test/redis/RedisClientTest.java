@@ -16,19 +16,19 @@
 
 package io.vertx.test.redis;
 
-import io.vertx.redis.RedisService;
+import io.vertx.redis.RedisClient;
 
 import java.util.concurrent.CountDownLatch;
 
 /**
  * @author <a href="http://tfox.org">Tim Fox</a>
  */
-public class RedisServiceTest extends RedisServiceTestBase {
+public class RedisClientTest extends RedisClientTestBase {
 
   @Override
   public void setUp() throws Exception {
     super.setUp();
-    redis = RedisService.create(vertx, getConfig());
+    redis = RedisClient.create(vertx, getConfig());
     CountDownLatch latch = new CountDownLatch(1);
     redis.start(asyncResult -> {
       if (asyncResult.succeeded()) {

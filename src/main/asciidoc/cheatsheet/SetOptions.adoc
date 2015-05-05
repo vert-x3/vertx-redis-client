@@ -1,0 +1,24 @@
+== SetOptions
+
+++++
+ @author <a href="mailto:marko.strukelj@gmail.com">Marko Strukelj</a>
+++++
+'''
+
+[cols=">25%,^25%,50%"]
+[frame="topbot"]
+|===
+^|Name | Type ^| Description
+
+|[[ex]]`ex`
+|`Number`
+|-
+|[[px]]`px`
+|`Number`
+|-
+|[[nx]]`nx`
+|`Boolean`
+|-
+|[[xx]]`xx`
+|`Boolean`
+|-|===

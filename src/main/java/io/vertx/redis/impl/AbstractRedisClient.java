@@ -8,13 +8,13 @@ import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;
 import io.vertx.core.logging.Logger;
 import io.vertx.core.logging.impl.LoggerFactory;
-import io.vertx.redis.RedisService;
+import io.vertx.redis.RedisClient;
 
 import java.nio.charset.Charset;
 
-public abstract class AbstractRedisService implements RedisService {
+public abstract class AbstractRedisClient implements RedisClient {
 
-  private static final Logger log = LoggerFactory.getLogger(AbstractRedisService.class);
+  private static final Logger log = LoggerFactory.getLogger(AbstractRedisClient.class);
 
   private enum ResponseTransform {
     NONE,
@@ -35,7 +35,7 @@ public abstract class AbstractRedisService implements RedisService {
   private Charset binaryCharset;
   private String baseAddress;
 
-  AbstractRedisService(Vertx vertx, JsonObject config) {
+  AbstractRedisClient(Vertx vertx, JsonObject config) {
     this.vertx = vertx;
     this.config = config;
     this.eb = vertx.eventBus();
