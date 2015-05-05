@@ -1,0 +1,21 @@
+== SortOptions
+
+++++
+ @author <a href="mailto:marko.strukelj@gmail.com">Marko Strukelj</a>
+++++
+'''
+
+[cols=">25%,^25%,50%"]
+[frame="topbot"]
+|===
+^|Name | Type ^| Description
+
+|[[by]]`by`
+|`String`
+|-
+|[[gets]]`gets`
+|`Array of String`
+|-
+|[[store]]`store`
+|`String`
+|-|===
