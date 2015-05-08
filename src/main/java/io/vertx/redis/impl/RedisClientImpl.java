@@ -5,20 +5,9 @@ import io.vertx.core.Handler;
 import io.vertx.core.Vertx;
 import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;
-import io.vertx.redis.op.AggregateOptions;
-import io.vertx.redis.op.BitOperation;
-import io.vertx.redis.op.InsertOptions;
-import io.vertx.redis.op.KillFilter;
-import io.vertx.redis.op.LimitOptions;
-import io.vertx.redis.op.MigrateOptions;
-import io.vertx.redis.op.ObjectCmd;
-import io.vertx.redis.op.RangeLimitOptions;
-import io.vertx.redis.op.RangeOptions;
+import io.vertx.redis.RedisClient;
 import io.vertx.redis.RedisEncoding;
-import io.vertx.redis.op.ScanOptions;
-import io.vertx.redis.op.SetOptions;
-import io.vertx.redis.op.ShutdownOptions;
-import io.vertx.redis.op.SortOptions;
+import io.vertx.redis.op.*;
 
 import java.util.Collection;
 import java.util.Collections;
@@ -33,1005 +22,1190 @@ public final class RedisClientImpl extends AbstractRedisClient {
   }
 
   @Override
-  public void append(String key, String value, Handler<AsyncResult<Long>> handler) {
+  public RedisClient append(String key, String value, Handler<AsyncResult<Long>> handler) {
     sendLong("APPEND", toPayload(key, value), handler);
-  }
+    return this;
+  } 
 
   @Override
-  public void auth(String password, Handler<AsyncResult<String>> handler) {
+  public RedisClient auth(String password, Handler<AsyncResult<String>> handler) {
     sendString("AUTH", toPayload(password), handler);
-  }
+    return this;
+  } 
 
   @Override
-  public void bgrewriteaof(Handler<AsyncResult<String>> handler) {
+  public RedisClient bgrewriteaof(Handler<AsyncResult<String>> handler) {
     sendString("BGREWRITEAOF", null, handler);
-  }
+    return this;
+  } 
 
   @Override
-  public void bgsave(Handler<AsyncResult<String>> handler) {
+  public RedisClient bgsave(Handler<AsyncResult<String>> handler) {
     sendString("BGSAVE", null, handler);
-  }
+    return this;
+  } 
 
   @Override
-  public void bitcount(String key, Handler<AsyncResult<Long>> handler) {
+  public RedisClient bitcount(String key, Handler<AsyncResult<Long>> handler) {
     sendLong("BITCOUNT", toPayload(key), handler);
-  }
+    return this;
+  } 
 
-  public void bitcountRange(String key, long start, long end, Handler<AsyncResult<Long>> handler) {
+  public RedisClient bitcountRange(String key, long start, long end, Handler<AsyncResult<Long>> handler) {
     sendLong("BITCOUNT", toPayload(key, start, end), handler);
-  }
+    return this;
+  } 
 
   @Override
-  public void bitop(BitOperation operation, String destkey, List<String> keys, Handler<AsyncResult<Long>> handler) {
+  public RedisClient bitop(BitOperation operation, String destkey, List<String> keys, Handler<AsyncResult<Long>> handler) {
     sendLong("BITOP", toPayload(operation.name(), destkey, keys), handler);
-  }
+    return this;
+  } 
 
   @Override
-  public void bitpos(String key, int bit, Handler<AsyncResult<Long>> handler) {
+  public RedisClient bitpos(String key, int bit, Handler<AsyncResult<Long>> handler) {
     sendLong("BITPOS", toPayload(key, bit), handler);
-  }
+    return this;
+  } 
 
   @Override
-  public void bitposFrom(String key, int bit, int start, Handler<AsyncResult<Long>> handler) {
+  public RedisClient bitposFrom(String key, int bit, int start, Handler<AsyncResult<Long>> handler) {
     sendLong("BITPOS", toPayload(key, bit, start), handler);
-  }
+    return this;
+  } 
 
   @Override
-  public void bitposRange(String key, int bit, int start, int stop, Handler<AsyncResult<Long>> handler) {
+  public RedisClient bitposRange(String key, int bit, int start, int stop, Handler<AsyncResult<Long>> handler) {
     sendLong("BITPOS", toPayload(key, bit, start, stop), handler);
-  }
+    return this;
+  } 
 
   @Override
-  public void blpop(String key, int seconds, Handler<AsyncResult<JsonArray>> handler) {
+  public RedisClient blpop(String key, int seconds, Handler<AsyncResult<JsonArray>> handler) {
     sendJsonArray("BLPOP", toPayload(key, seconds), handler);
-  }
+    return this;
+  } 
 
   @Override
-  public void blpopMany(List<String> keys, int seconds, Handler<AsyncResult<JsonArray>> handler) {
+  public RedisClient blpopMany(List<String> keys, int seconds, Handler<AsyncResult<JsonArray>> handler) {
     sendJsonArray("BLPOP", toPayload(keys, seconds), handler);
-  }
+    return this;
+  } 
 
   @Override
-  public void brpop(String key, int seconds, Handler<AsyncResult<JsonArray>> handler) {
+  public RedisClient brpop(String key, int seconds, Handler<AsyncResult<JsonArray>> handler) {
     sendJsonArray("BRPOP", toPayload(key, seconds), handler);
-  }
+    return this;
+  } 
 
   @Override
-  public void brpopMany(List<String> keys, int seconds, Handler<AsyncResult<JsonArray>> handler) {
+  public RedisClient brpopMany(List<String> keys, int seconds, Handler<AsyncResult<JsonArray>> handler) {
     sendJsonArray("BRPOP", toPayload(keys, seconds), handler);
-  }
+    return this;
+  } 
 
   @Override
-  public void brpoplpush(String key, String destkey, int seconds, Handler<AsyncResult<Void>> handler) {
+  public RedisClient brpoplpush(String key, String destkey, int seconds, Handler<AsyncResult<Void>> handler) {
     sendVoid("BRPOPLPUSH", toPayload(key, destkey, seconds), handler);
-  }
+    return this;
+  } 
 
   @Override
-  public void clientKill(KillFilter filter, Handler<AsyncResult<Long>> handler) {
+  public RedisClient clientKill(KillFilter filter, Handler<AsyncResult<Long>> handler) {
     sendLong("CLIENT KILL", filter.toJsonArray(), handler);
-  }
+    return this;
+  } 
 
   @Override
-  public void clientList(Handler<AsyncResult<String>> handler) {
+  public RedisClient clientList(Handler<AsyncResult<String>> handler) {
     sendString("CLIENT LIST", null, handler);
-  }
+    return this;
+  } 
 
   @Override
-  public void clientGetname(Handler<AsyncResult<String>> handler) {
+  public RedisClient clientGetname(Handler<AsyncResult<String>> handler) {
     sendString("CLIENT GETNAME", null, handler);
-  }
+    return this;
+  } 
 
   @Override
-  public void clientPause(long millis, Handler<AsyncResult<String>> handler) {
+  public RedisClient clientPause(long millis, Handler<AsyncResult<String>> handler) {
     sendString("CLIENT PAUSE", toPayload(millis), handler);
-  }
+    return this;
+  } 
 
   @Override
-  public void clientSetname(String name, Handler<AsyncResult<String>> handler) {
+  public RedisClient clientSetname(String name, Handler<AsyncResult<String>> handler) {
     sendString("CLIENT SETNAME", toPayload(name), handler);
-  }
+    return this;
+  } 
 
   @Override
-  public void clusterSlots(Handler<AsyncResult<JsonArray>> handler) {
+  public RedisClient clusterSlots(Handler<AsyncResult<JsonArray>> handler) {
     sendJsonArray("CLUSTER SLOTS", null, handler);
-  }
+    return this;
+  } 
 
   @Override
-  public void command(Handler<AsyncResult<JsonArray>> handler) {
+  public RedisClient command(Handler<AsyncResult<JsonArray>> handler) {
     sendJsonArray("COMMAND", null, handler);
-  }
+    return this;
+  } 
 
   @Override
-  public void commandCount(Handler<AsyncResult<Long>> handler) {
+  public RedisClient commandCount(Handler<AsyncResult<Long>> handler) {
     sendLong("COMMAND COUNT", null, handler);
-  }
+    return this;
+  } 
 
   @Override
-  public void commandGetkeys(Handler<AsyncResult<JsonArray>> handler) {
+  public RedisClient commandGetkeys(Handler<AsyncResult<JsonArray>> handler) {
     sendJsonArray("COMMAND GETKEYS", null, handler);
-  }
+    return this;
+  } 
 
   @Override
-  public void commandInfo(List<String> commands, Handler<AsyncResult<JsonArray>> handler) {
+  public RedisClient commandInfo(List<String> commands, Handler<AsyncResult<JsonArray>> handler) {
     sendJsonArray("COMMAND INFO", toPayload(commands), handler);
-  }
+    return this;
+  } 
 
   @Override
-  public void configGet(String parameter, Handler<AsyncResult<JsonArray>> handler) {
+  public RedisClient configGet(String parameter, Handler<AsyncResult<JsonArray>> handler) {
     sendJsonArray("CONFIG GET", toPayload(parameter), handler);
-  }
+    return this;
+  } 
 
   @Override
-  public void configRewrite(Handler<AsyncResult<String>> handler) {
+  public RedisClient configRewrite(Handler<AsyncResult<String>> handler) {
     sendString("CONFIG REWRITE", null, handler);
-  }
+    return this;
+  } 
 
   @Override
-  public void configSet(String parameter, String value, Handler<AsyncResult<String>> handler) {
+  public RedisClient configSet(String parameter, String value, Handler<AsyncResult<String>> handler) {
     sendString("CONFIG SET", toPayload(parameter, value), handler);
-  }
+    return this;
+  } 
 
   @Override
-  public void configResetstat(Handler<AsyncResult<String>> handler) {
+  public RedisClient configResetstat(Handler<AsyncResult<String>> handler) {
     sendString("CONFIG RESETSTAT", null, handler);
-  }
+    return this;
+  } 
 
   @Override
-  public void dbsize(Handler<AsyncResult<Long>> handler) {
+  public RedisClient dbsize(Handler<AsyncResult<Long>> handler) {
     sendLong("DBSIZE", null, handler);
-  }
+    return this;
+  } 
 
   @Override
-  public void debugObject(String key, Handler<AsyncResult<String>> handler) {
+  public RedisClient debugObject(String key, Handler<AsyncResult<String>> handler) {
     sendString("DEBUG OBJECT", toPayload(key), handler);
-  }
+    return this;
+  } 
 
   @Override
-  public void debugSegfault(Handler<AsyncResult<String>> handler) {
+  public RedisClient debugSegfault(Handler<AsyncResult<String>> handler) {
     sendString("DEBUG SEGFAULT", null, handler);
-  }
+    return this;
+  } 
 
   @Override
-  public void decr(String key, Handler<AsyncResult<Long>> handler) {
+  public RedisClient decr(String key, Handler<AsyncResult<Long>> handler) {
     sendLong("DECR", toPayload(key), handler);
-  }
+    return this;
+  } 
 
   @Override
-  public void decrby(String key, long decrement, Handler<AsyncResult<Long>> handler) {
+  public RedisClient decrby(String key, long decrement, Handler<AsyncResult<Long>> handler) {
     sendLong("DECRBY", toPayload(key, decrement), handler);
-  }
+    return this;
+  } 
 
   @Override
-  public void del(List<String> keys, Handler<AsyncResult<Long>> handler) {
+  public RedisClient del(List<String> keys, Handler<AsyncResult<Long>> handler) {
     sendLong("DEL", toPayload(keys), handler);
-  }
+    return this;
+  } 
 
   @Override
-  public void discard(Handler<AsyncResult<String>> handler) {
+  public RedisClient discard(Handler<AsyncResult<String>> handler) {
     sendString("DISCARD", null, handler);
-  }
+    return this;
+  } 
 
   @Override
-  public void dump(String key, Handler<AsyncResult<String>> handler) {
+  public RedisClient dump(String key, Handler<AsyncResult<String>> handler) {
     send("DUMP", toPayload(key), String.class, true, new DumpHandler(handler));
-  }
+    return this;
+  } 
 
   @Override
-  public void echo(String message, Handler<AsyncResult<String>> handler) {
+  public RedisClient echo(String message, Handler<AsyncResult<String>> handler) {
     sendString("ECHO", toPayload(message), handler);
-  }
+    return this;
+  } 
 
   @Override
-  public void eval(String script, List<String> keys, List<String> args, Handler<AsyncResult<Void>> handler) {
+  public RedisClient eval(String script, List<String> keys, List<String> args, Handler<AsyncResult<Void>> handler) {
     keys = (keys != null) ? keys : Collections.emptyList();
     args = (args != null) ? args : Collections.emptyList();
     if (keys.size() != args.size()) {
-      handler.handle(new RedisAsyncResult<Void>(new IllegalArgumentException("Key list, and argument list are not the same size")));
-      return;
+      handler.handle(new RedisAsyncResult<>(new IllegalArgumentException("Key list, and argument list are not the same size")));
+    } else {
+      sendVoid("EVAL", toPayload(script, keys.size(), keys, args), handler);
     }
-    sendVoid("EVAL", toPayload(script, keys.size(), keys, args), handler);
-  }
+    return this;
+  } 
 
   @Override
-  public void evalsha(String sha1, List<String> keys, List<String> args, Handler<AsyncResult<Void>> handler) {
+  public RedisClient evalsha(String sha1, List<String> keys, List<String> args, Handler<AsyncResult<Void>> handler) {
     keys = (keys != null) ? keys : Collections.emptyList();
     args = (args != null) ? args : Collections.emptyList();
     if (keys.size() != args.size()) {
-      handler.handle(new RedisAsyncResult<Void>(new IllegalArgumentException("Key list, and argument list are not the same size")));
-      return;
+      handler.handle(new RedisAsyncResult<>(new IllegalArgumentException("Key list, and argument list are not the same size")));
+    } else {
+      sendVoid("EVALSHA", toPayload(sha1, keys.size(), keys, args), handler);
     }
-    sendVoid("EVALSHA", toPayload(sha1, keys.size(), keys, args), handler);
-  }
+    return this;
+  } 
 
   @Override
-  public void exec(Handler<AsyncResult<Void>> handler) {
+  public RedisClient exec(Handler<AsyncResult<Void>> handler) {
     sendVoid("EXEC", null, handler);
-  }
+    return this;
+  } 
 
   @Override
-  public void exists(String key, Handler<AsyncResult<Long>> handler) {
+  public RedisClient exists(String key, Handler<AsyncResult<Long>> handler) {
     sendLong("EXISTS", toPayload(key), handler);
-  }
+    return this;
+  } 
 
   @Override
-  public void expire(String key, int seconds, Handler<AsyncResult<Long>> handler) {
+  public RedisClient expire(String key, int seconds, Handler<AsyncResult<Long>> handler) {
     sendLong("EXPIRE", toPayload(key, seconds), handler);
-  }
+    return this;
+  } 
 
   @Override
-  public void expireat(String key, long seconds, Handler<AsyncResult<Long>> handler) {
+  public RedisClient expireat(String key, long seconds, Handler<AsyncResult<Long>> handler) {
     sendLong("EXPIREAT", toPayload(key, seconds), handler);
-  }
+    return this;
+  } 
 
   @Override
-  public void flushall(Handler<AsyncResult<String>> handler) {
+  public RedisClient flushall(Handler<AsyncResult<String>> handler) {
     sendString("FLUSHALL", null, handler);
-  }
+    return this;
+  } 
 
   @Override
-  public void flushdb(Handler<AsyncResult<String>> handler) {
+  public RedisClient flushdb(Handler<AsyncResult<String>> handler) {
     sendString("FLUSHDB", null, handler);
-  }
+    return this;
+  } 
 
   @Override
-  public void get(String key, Handler<AsyncResult<String>> handler) {
+  public RedisClient get(String key, Handler<AsyncResult<String>> handler) {
     sendString("GET", toPayload(key), handler);
-  }
+    return this;
+  } 
 
   @Override
-  public void getBinary(String key, Handler<AsyncResult<String>> handler) {
+  public RedisClient getBinary(String key, Handler<AsyncResult<String>> handler) {
     send("GET", toPayload(key), String.class, true, handler);
-  }
+    return this;
+  } 
 
   @Override
-  public void getbit(String key, long offset, Handler<AsyncResult<Long>> handler) {
+  public RedisClient getbit(String key, long offset, Handler<AsyncResult<Long>> handler) {
     sendLong("GETBIT", toPayload(key, offset), handler);
-  }
+    return this;
+  } 
 
   @Override
-  public void getrange(String key, long start, long end, Handler<AsyncResult<String>> handler) {
+  public RedisClient getrange(String key, long start, long end, Handler<AsyncResult<String>> handler) {
     sendString("GETRANGE", toPayload(key, start, end), handler);
-  }
+    return this;
+  } 
 
   @Override
-  public void getset(String key, String value, Handler<AsyncResult<String>> handler) {
+  public RedisClient getset(String key, String value, Handler<AsyncResult<String>> handler) {
     sendString("GETSET", toPayload(key, value), handler);
-  }
+    return this;
+  } 
 
   @Override
-  public void hdel(String key, String field, Handler<AsyncResult<Long>> handler) {
+  public RedisClient hdel(String key, String field, Handler<AsyncResult<Long>> handler) {
     sendLong("HDEL", toPayload(key, field), handler);
-  }
+    return this;
+  } 
 
   @Override
-  public void hdelMany(String key, List<String> fields, Handler<AsyncResult<Long>> handler) {
+  public RedisClient hdelMany(String key, List<String> fields, Handler<AsyncResult<Long>> handler) {
     sendLong("HDEL", toPayload(key, fields), handler);
-  }
+    return this;
+  } 
 
   @Override
-  public void hexists(String key, String field, Handler<AsyncResult<Long>> handler) {
+  public RedisClient hexists(String key, String field, Handler<AsyncResult<Long>> handler) {
     sendLong("HEXISTS", toPayload(key, field), handler);
-  }
+    return this;
+  } 
 
   @Override
-  public void hget(String key, String field, Handler<AsyncResult<String>> handler) {
+  public RedisClient hget(String key, String field, Handler<AsyncResult<String>> handler) {
     sendString("HGET", toPayload(key, field), handler);
-  }
+    return this;
+  } 
 
   @Override
-  public void hgetall(String key, Handler<AsyncResult<JsonObject>> handler) {
+  public RedisClient hgetall(String key, Handler<AsyncResult<JsonObject>> handler) {
     sendJsonObject("HGETALL", toPayload(key), handler);
-  }
+    return this;
+  } 
 
   @Override
-  public void hincrby(String key, String field, long increment, Handler<AsyncResult<Long>> handler) {
+  public RedisClient hincrby(String key, String field, long increment, Handler<AsyncResult<Long>> handler) {
     sendLong("HINCRBY", toPayload(key, field, increment), handler);
-  }
+    return this;
+  } 
 
   @Override
-  public void hincrbyfloat(String key, String field, double increment, Handler<AsyncResult<String>> handler) {
+  public RedisClient hincrbyfloat(String key, String field, double increment, Handler<AsyncResult<String>> handler) {
     sendString("HINCRBYFLOAT", toPayload(key, field, increment), handler);
-  }
+    return this;
+  } 
 
   @Override
-  public void hkeys(String key, Handler<AsyncResult<JsonArray>> handler) {
+  public RedisClient hkeys(String key, Handler<AsyncResult<JsonArray>> handler) {
     sendJsonArray("HKEYS", toPayload(key), handler);
-  }
+    return this;
+  } 
 
   @Override
-  public void hlen(String key, Handler<AsyncResult<Long>> handler) {
+  public RedisClient hlen(String key, Handler<AsyncResult<Long>> handler) {
     sendLong("HLEN", toPayload(key), handler);
-  }
+    return this;
+  } 
 
   @Override
-  public void hmget(String key, List<String> fields, Handler<AsyncResult<JsonArray>> handler) {
+  public RedisClient hmget(String key, List<String> fields, Handler<AsyncResult<JsonArray>> handler) {
     sendJsonArray("HMGET", toPayload(key, fields), handler);
-  }
+    return this;
+  } 
 
   @Override
-  public void hmset(String key, Map<String, String> values, Handler<AsyncResult<String>> handler) {
+  public RedisClient hmset(String key, Map<String, String> values, Handler<AsyncResult<String>> handler) {
     sendString("HMSET", toPayload(key, values), handler);
-  }
+    return this;
+  } 
 
   @Override
-  public void hset(String key, String field, String value, Handler<AsyncResult<Long>> handler) {
+  public RedisClient hset(String key, String field, String value, Handler<AsyncResult<Long>> handler) {
     sendLong("HSET", toPayload(key, field, value), handler);
-  }
+    return this;
+  } 
 
   @Override
-  public void hsetnx(String key, String field, String value, Handler<AsyncResult<Long>> handler) {
+  public RedisClient hsetnx(String key, String field, String value, Handler<AsyncResult<Long>> handler) {
     sendLong("HSETNX", toPayload(key, field, value), handler);
-  }
+    return this;
+  } 
 
   @Override
-  public void hvals(String key, Handler<AsyncResult<JsonArray>> handler) {
+  public RedisClient hvals(String key, Handler<AsyncResult<JsonArray>> handler) {
     sendJsonArray("HVALS", toPayload(key), handler);
-  }
+    return this;
+  } 
 
   @Override
-  public void incr(String key, Handler<AsyncResult<Long>> handler) {
+  public RedisClient incr(String key, Handler<AsyncResult<Long>> handler) {
     sendLong("INCR", toPayload(key), handler);
-  }
+    return this;
+  } 
 
   @Override
-  public void incrby(String key, long increment, Handler<AsyncResult<Long>> handler) {
+  public RedisClient incrby(String key, long increment, Handler<AsyncResult<Long>> handler) {
     sendLong("INCRBY", toPayload(key, increment), handler);
-  }
+    return this;
+  } 
 
   @Override
-  public void incrbyfloat(String key, double increment, Handler<AsyncResult<String>> handler) {
+  public RedisClient incrbyfloat(String key, double increment, Handler<AsyncResult<String>> handler) {
     sendString("INCRBYFLOAT", toPayload(key, increment), handler);
-  }
+    return this;
+  } 
 
   @Override
-  public void info(Handler<AsyncResult<JsonObject>> handler) {
+  public RedisClient info(Handler<AsyncResult<JsonObject>> handler) {
     sendJsonObject("INFO", new JsonArray(), handler);
-  }
+    return this;
+  } 
 
   @Override
-  public void infoSection(String section, Handler<AsyncResult<JsonObject>> handler) {
+  public RedisClient infoSection(String section, Handler<AsyncResult<JsonObject>> handler) {
     sendJsonObject("INFO", toPayload(section), handler);
-  }
+    return this;
+  } 
 
   @Override
-  public void keys(String pattern, Handler<AsyncResult<JsonArray>> handler) {
+  public RedisClient keys(String pattern, Handler<AsyncResult<JsonArray>> handler) {
     sendJsonArray("KEYS", toPayload(pattern), handler);
-  }
+    return this;
+  } 
 
   @Override
-  public void lastsave(Handler<AsyncResult<Long>> handler) {
+  public RedisClient lastsave(Handler<AsyncResult<Long>> handler) {
     sendLong("LASTSAVE", null, handler);
-  }
+    return this;
+  } 
 
   @Override
-  public void lindex(String key, int index, Handler<AsyncResult<String>> handler) {
+  public RedisClient lindex(String key, int index, Handler<AsyncResult<String>> handler) {
     sendString("LINDEX", toPayload(key, index), handler);
-  }
+    return this;
+  } 
 
   @Override
-  public void linsert(String key, InsertOptions option, String pivot, String value, Handler<AsyncResult<Long>> handler) {
+  public RedisClient linsert(String key, InsertOptions option, String pivot, String value, Handler<AsyncResult<Long>> handler) {
     sendLong("LINSERT", toPayload(key, option.name(), pivot, value), handler);
-  }
+    return this;
+  } 
 
   @Override
-  public void llen(String key, Handler<AsyncResult<Long>> handler) {
+  public RedisClient llen(String key, Handler<AsyncResult<Long>> handler) {
     sendLong("LLEN", toPayload(key), handler);
-  }
+    return this;
+  } 
 
   @Override
-  public void lpop(String key, Handler<AsyncResult<String>> handler) {
+  public RedisClient lpop(String key, Handler<AsyncResult<String>> handler) {
     sendString("LPOP", toPayload(key), handler);
-  }
+    return this;
+  } 
 
   @Override
-  public void lpushMany(String key, List<String> values, Handler<AsyncResult<Long>> handler) {
+  public RedisClient lpushMany(String key, List<String> values, Handler<AsyncResult<Long>> handler) {
     sendLong("LPUSH", toPayload(key, values), handler);
-  }
+    return this;
+  } 
 
   @Override
-  public void lpush(String key, String value, Handler<AsyncResult<Long>> handler) {
+  public RedisClient lpush(String key, String value, Handler<AsyncResult<Long>> handler) {
     sendLong("LPUSH", toPayload(key, value), handler);
-  }
+    return this;
+  } 
 
   @Override
-  public void lpushx(String key, String value, Handler<AsyncResult<Long>> handler) {
+  public RedisClient lpushx(String key, String value, Handler<AsyncResult<Long>> handler) {
     sendLong("LPUSHX", toPayload(key, value), handler);
-  }
+    return this;
+  } 
 
   @Override
-  public void lrange(String key, long from, long to, Handler<AsyncResult<JsonArray>> handler) {
+  public RedisClient lrange(String key, long from, long to, Handler<AsyncResult<JsonArray>> handler) {
     sendJsonArray("LRANGE", toPayload(key, from, to), handler);
-  }
+    return this;
+  } 
 
   @Override
-  public void lrem(String key, long count, String value, Handler<AsyncResult<Long>> handler) {
+  public RedisClient lrem(String key, long count, String value, Handler<AsyncResult<Long>> handler) {
     sendLong("LREM", toPayload(key, count, value), handler);
-  }
+    return this;
+  } 
 
   @Override
-  public void lset(String key, long index, String value, Handler<AsyncResult<String>> handler) {
+  public RedisClient lset(String key, long index, String value, Handler<AsyncResult<String>> handler) {
     sendString("LSET", toPayload(key, index, value), handler);
-  }
+    return this;
+  } 
 
   @Override
-  public void ltrim(String key, long from, long to, Handler<AsyncResult<String>> handler) {
+  public RedisClient ltrim(String key, long from, long to, Handler<AsyncResult<String>> handler) {
     sendString("LTRIM", toPayload(key, from, to), handler);
-  }
+    return this;
+  } 
 
   @Override
-  public void mget(String key, Handler<AsyncResult<JsonArray>> handler) {
+  public RedisClient mget(String key, Handler<AsyncResult<JsonArray>> handler) {
     sendJsonArray("MGET", toPayload(key), handler);
-  }
+    return this;
+  } 
 
   @Override
-  public void mgetMany(List<String> keys, Handler<AsyncResult<JsonArray>> handler) {
+  public RedisClient mgetMany(List<String> keys, Handler<AsyncResult<JsonArray>> handler) {
     sendJsonArray("MGET", toPayload(keys), handler);
-  }
+    return this;
+  } 
 
   @Override
-  public void migrate(String host, int port, String key, int destdb, long timeout, MigrateOptions options, Handler<AsyncResult<String>> handler) {
+  public RedisClient migrate(String host, int port, String key, int destdb, long timeout, MigrateOptions options, Handler<AsyncResult<String>> handler) {
     sendString("MIGRATE", toPayload(host, port, key, destdb, timeout, options != null ? options.toJsonArray() : null), handler);
-  }
+    return this;
+  } 
 
   @Override
-  public void monitor(Handler<AsyncResult<Void>> handler) {
+  public RedisClient monitor(Handler<AsyncResult<Void>> handler) {
     sendVoid("MONITOR", null, handler);
-  }
+    return this;
+  } 
 
   @Override
-  public void move(String key, int destdb, Handler<AsyncResult<Long>> handler) {
+  public RedisClient move(String key, int destdb, Handler<AsyncResult<Long>> handler) {
     sendLong("MOVE", toPayload(key, destdb), handler);
-  }
+    return this;
+  } 
 
   @Override
-  public void mset(Map<String, String> keyvals, Handler<AsyncResult<String>> handler) {
+  public RedisClient mset(Map<String, String> keyvals, Handler<AsyncResult<String>> handler) {
     sendString("MSET", toPayload(keyvals), handler);
-  }
+    return this;
+  } 
 
   @Override
-  public void msetnx(Map<String, String> keyvals, Handler<AsyncResult<Long>> handler) {
+  public RedisClient msetnx(Map<String, String> keyvals, Handler<AsyncResult<Long>> handler) {
     sendLong("MSETNX", toPayload(keyvals), handler);
-  }
+    return this;
+  } 
 
   @Override
-  public void multi(Handler<AsyncResult<String>> handler) {
+  public RedisClient multi(Handler<AsyncResult<String>> handler) {
     sendString("MULTI", null, handler);
-  }
+    return this;
+  } 
 
   @Override
-  public void object(String key, ObjectCmd cmd, Handler<AsyncResult<Void>> handler) {
+  public RedisClient object(String key, ObjectCmd cmd, Handler<AsyncResult<Void>> handler) {
     sendVoid("OBJECT", toPayload(cmd.name(), key), handler);
-  }
+    return this;
+  } 
 
   @Override
-  public void persist(String key, Handler<AsyncResult<Long>> handler) {
+  public RedisClient persist(String key, Handler<AsyncResult<Long>> handler) {
     sendLong("PERSIST", toPayload(key), handler);
-  }
+    return this;
+  } 
 
   @Override
-  public void pexpire(String key, long millis, Handler<AsyncResult<Long>> handler) {
+  public RedisClient pexpire(String key, long millis, Handler<AsyncResult<Long>> handler) {
     sendLong("PEXPIRE", toPayload(key, millis), handler);
-  }
+    return this;
+  } 
 
   @Override
-  public void pexpireat(String key, long millis, Handler<AsyncResult<Long>> handler) {
+  public RedisClient pexpireat(String key, long millis, Handler<AsyncResult<Long>> handler) {
     sendLong("PEXPIREAT", toPayload(key, millis), handler);
-  }
+    return this;
+  } 
 
   @Override
-  public void pfadd(String key, String element, Handler<AsyncResult<Long>> handler) {
+  public RedisClient pfadd(String key, String element, Handler<AsyncResult<Long>> handler) {
     sendLong("PFADD", toPayload(key, element), handler);
-  }
+    return this;
+  } 
 
   @Override
-  public void pfaddMany(String key, List<String> elements, Handler<AsyncResult<Long>> handler) {
+  public RedisClient pfaddMany(String key, List<String> elements, Handler<AsyncResult<Long>> handler) {
     sendLong("PFADD", toPayload(key, elements), handler);
-  }
+    return this;
+  } 
 
   @Override
-  public void pfcount(String key, Handler<AsyncResult<Long>> handler) {
+  public RedisClient pfcount(String key, Handler<AsyncResult<Long>> handler) {
     sendLong("PFCOUNT", toPayload(key), handler);
-  }
+    return this;
+  } 
 
   @Override
-  public void pfcountMany(List<String> key, Handler<AsyncResult<Long>> handler) {
+  public RedisClient pfcountMany(List<String> key, Handler<AsyncResult<Long>> handler) {
     sendLong("PFCOUNT", toPayload(key), handler);
-  }
+    return this;
+  } 
 
   @Override
-  public void pfmerge(String destkey, List<String> keys, Handler<AsyncResult<String>> handler) {
+  public RedisClient pfmerge(String destkey, List<String> keys, Handler<AsyncResult<String>> handler) {
     sendString("PFMERGE", toPayload(destkey, keys), handler);
-  }
+    return this;
+  } 
 
   @Override
-  public void ping(Handler<AsyncResult<String>> handler) {
+  public RedisClient ping(Handler<AsyncResult<String>> handler) {
     sendString("PING", null, handler);
-  }
+    return this;
+  } 
 
   @Override
-  public void psetex(String key, long millis, String value, Handler<AsyncResult<Void>> handler) {
+  public RedisClient psetex(String key, long millis, String value, Handler<AsyncResult<Void>> handler) {
     sendVoid("PSETEX", toPayload(key, millis, value), handler);
-  }
+    return this;
+  } 
 
   @Override
-  public void psubscribe(String pattern, Handler<AsyncResult<Void>> handler) {
+  public RedisClient psubscribe(String pattern, Handler<AsyncResult<Void>> handler) {
     sendVoid("PSUBSCRIBE", toPayload(pattern), handler);
-  }
+    return this;
+  } 
 
   @Override
-  public void psubscribeMany(List<String> patterns, Handler<AsyncResult<Void>> handler) {
+  public RedisClient psubscribeMany(List<String> patterns, Handler<AsyncResult<Void>> handler) {
     sendVoid("PSUBSCRIBE", toPayload(patterns), handler);
-  }
+    return this;
+  } 
 
   @Override
-  public void pubsubChannels(String pattern, Handler<AsyncResult<JsonArray>> handler) {
+  public RedisClient pubsubChannels(String pattern, Handler<AsyncResult<JsonArray>> handler) {
     sendJsonArray("PUBSUB", toPayload("CHANNELS", pattern == null || "".equals(pattern) ? null : pattern), handler);
-  }
+    return this;
+  } 
 
-  public void pubsubNumsub(List<String> channels, Handler<AsyncResult<JsonArray>> handler) {
+  public RedisClient pubsubNumsub(List<String> channels, Handler<AsyncResult<JsonArray>> handler) {
     sendJsonArray("PUBSUB", toPayload("NUMSUB", channels), handler);
-  }
+    return this;
+  } 
 
-  public void pubsubNumpat(Handler<AsyncResult<Long>> handler) {
+  public RedisClient pubsubNumpat(Handler<AsyncResult<Long>> handler) {
     sendLong("PUBSUB", toPayload("NUMPAT"), handler);
-  }
+    return this;
+  } 
 
   @Override
-  public void pttl(String key, Handler<AsyncResult<Long>> handler) {
+  public RedisClient pttl(String key, Handler<AsyncResult<Long>> handler) {
     sendLong("PTTL", toPayload(key), handler);
-  }
+    return this;
+  } 
 
   @Override
-  public void publish(String channel, String message, Handler<AsyncResult<Long>> handler) {
+  public RedisClient publish(String channel, String message, Handler<AsyncResult<Long>> handler) {
     sendLong("PUBLISH", toPayload(channel, message), handler);
-  }
+    return this;
+  } 
 
   @Override
-  public void punsubscribe(List<String> patterns, Handler<AsyncResult<Void>> handler) {
+  public RedisClient punsubscribe(List<String> patterns, Handler<AsyncResult<Void>> handler) {
     sendVoid("PUNSUBSCRIBE", toPayload(patterns), handler);
-  }
+    return this;
+  } 
+
 
   @Override
-  public void quit(Handler<AsyncResult<String>> handler) {
-    sendString("QUIT", null, handler);
-  }
-
-  @Override
-  public void randomkey(Handler<AsyncResult<String>> handler) {
+  public RedisClient randomkey(Handler<AsyncResult<String>> handler) {
     sendString("RANDOMKEY", null, handler);
-  }
+    return this;
+  } 
 
   @Override
-  public void rename(String key, String newkey, Handler<AsyncResult<String>> handler) {
+  public RedisClient rename(String key, String newkey, Handler<AsyncResult<String>> handler) {
     sendString("RENAME", toPayload(key, newkey), handler);
-  }
+    return this;
+  } 
 
   @Override
-  public void renamenx(String key, String newkey, Handler<AsyncResult<Long>> handler) {
+  public RedisClient renamenx(String key, String newkey, Handler<AsyncResult<Long>> handler) {
     sendLong("RENAMENX", toPayload(key, newkey), handler);
-  }
+    return this;
+  } 
 
   @Override
-  public void restore(String key, long millis, String serialized, Handler<AsyncResult<String>> handler) {
+  public RedisClient restore(String key, long millis, String serialized, Handler<AsyncResult<String>> handler) {
     send("RESTORE", toPayload(key, millis, RedisEncoding.decode(serialized)), String.class, true, handler);
-  }
+    return this;
+  } 
 
   @Override
-  public void role(Handler<AsyncResult<JsonArray>> handler) {
+  public RedisClient role(Handler<AsyncResult<JsonArray>> handler) {
     sendJsonArray("ROLE", null, handler);
-  }
+    return this;
+  } 
 
   @Override
-  public void rpop(String key, Handler<AsyncResult<String>> handler) {
+  public RedisClient rpop(String key, Handler<AsyncResult<String>> handler) {
     sendString("RPOP", toPayload(key), handler);
-  }
+    return this;
+  } 
 
   @Override
-  public void rpoplpush(String key, String destkey, Handler<AsyncResult<String>> handler) {
+  public RedisClient rpoplpush(String key, String destkey, Handler<AsyncResult<String>> handler) {
     sendString("RPOPLPUSH", toPayload(key, destkey), handler);
-  }
+    return this;
+  } 
 
   @Override
-  public void rpushMany(String key, List<String> values, Handler<AsyncResult<Long>> handler) {
+  public RedisClient rpushMany(String key, List<String> values, Handler<AsyncResult<Long>> handler) {
     sendLong("RPUSH", toPayload(key, values), handler);
-  }
+    return this;
+  } 
 
   @Override
-  public void rpush(String key, String value, Handler<AsyncResult<Long>> handler) {
+  public RedisClient rpush(String key, String value, Handler<AsyncResult<Long>> handler) {
     sendLong("RPUSH", toPayload(key, value), handler);
-  }
+    return this;
+  } 
 
   @Override
-  public void rpushx(String key, String value, Handler<AsyncResult<Long>> handler) {
+  public RedisClient rpushx(String key, String value, Handler<AsyncResult<Long>> handler) {
     sendLong("RPUSHX", toPayload(key, value), handler);
-  }
+    return this;
+  } 
 
   @Override
-  public void sadd(String key, String member, Handler<AsyncResult<Long>> handler) {
+  public RedisClient sadd(String key, String member, Handler<AsyncResult<Long>> handler) {
     sendLong("SADD", toPayload(key, member), handler);
-  }
+    return this;
+  } 
 
   @Override
-  public void saddMany(String key, List<String> members, Handler<AsyncResult<Long>> handler) {
+  public RedisClient saddMany(String key, List<String> members, Handler<AsyncResult<Long>> handler) {
     sendLong("SADD", toPayload(key, members), handler);
-  }
+    return this;
+  } 
 
   @Override
-  public void save(Handler<AsyncResult<String>> handler) {
+  public RedisClient save(Handler<AsyncResult<String>> handler) {
     sendString("SAVE", null, handler);
-  }
+    return this;
+  } 
 
   @Override
-  public void scard(String key, Handler<AsyncResult<Long>> handler) {
+  public RedisClient scard(String key, Handler<AsyncResult<Long>> handler) {
     sendLong("SCARD", toPayload(key), handler);
-  }
+    return this;
+  } 
 
   @Override
-  public void scriptExists(String script, Handler<AsyncResult<JsonArray>> handler) {
+  public RedisClient scriptExists(String script, Handler<AsyncResult<JsonArray>> handler) {
     sendJsonArray("SCRIPT EXISTS", toPayload(script), handler);
-  }
+    return this;
+  } 
 
   @Override
-  public void scriptExistsMany(List<String> scripts, Handler<AsyncResult<JsonArray>> handler) {
+  public RedisClient scriptExistsMany(List<String> scripts, Handler<AsyncResult<JsonArray>> handler) {
     sendJsonArray("SCRIPT EXISTS", toPayload(scripts), handler);
-  }
+    return this;
+  } 
 
   @Override
-  public void scriptFlush(Handler<AsyncResult<String>> handler) {
+  public RedisClient scriptFlush(Handler<AsyncResult<String>> handler) {
     sendString("SCRIPT FLUSH", null, handler);
-  }
+    return this;
+  } 
 
   @Override
-  public void scriptKill(Handler<AsyncResult<String>> handler) {
+  public RedisClient scriptKill(Handler<AsyncResult<String>> handler) {
     sendString("SCRIPT KILL", null, handler);
-  }
+    return this;
+  } 
 
   @Override
-  public void scriptLoad(String script, Handler<AsyncResult<String>> handler) {
+  public RedisClient scriptLoad(String script, Handler<AsyncResult<String>> handler) {
     sendString("SCRIPT LOAD", toPayload(script), handler);
-  }
+    return this;
+  } 
 
   @Override
-  public void sdiff(String key, List<String> cmpkeys, Handler<AsyncResult<JsonArray>> handler) {
+  public RedisClient sdiff(String key, List<String> cmpkeys, Handler<AsyncResult<JsonArray>> handler) {
     sendJsonArray("SDIFF", toPayload(key, cmpkeys), handler);
-  }
+    return this;
+  } 
 
   @Override
-  public void sdiffstore(String destkey, String key, List<String> cmpkeys, Handler<AsyncResult<Long>> handler) {
+  public RedisClient sdiffstore(String destkey, String key, List<String> cmpkeys, Handler<AsyncResult<Long>> handler) {
     sendLong("SDIFFSTORE", toPayload(destkey, key, cmpkeys), handler);
-  }
+    return this;
+  } 
 
   @Override
-  public void select(int dbindex, Handler<AsyncResult<String>> handler) {
+  public RedisClient select(int dbindex, Handler<AsyncResult<String>> handler) {
     sendString("SELECT", toPayload(dbindex), handler);
-  }
+    return this;
+  } 
 
   @Override
-  public void set(String key, String value, Handler<AsyncResult<Void>> handler) {
+  public RedisClient set(String key, String value, Handler<AsyncResult<Void>> handler) {
     sendVoid("SET", toPayload(key, value), handler);
-  }
+    return this;
+  } 
 
   @Override
-  public void setWithOptions(String key, String value, SetOptions options, Handler<AsyncResult<Void>> handler) {
+  public RedisClient setWithOptions(String key, String value, SetOptions options, Handler<AsyncResult<Void>> handler) {
     sendVoid("SET", toPayload(key, value, options != null ? options.toJsonArray() : null), handler);
-  }
+    return this;
+  } 
 
   @Override
-  public void setBinary(String key, String value, Handler<AsyncResult<Void>> handler) {
+  public RedisClient setBinary(String key, String value, Handler<AsyncResult<Void>> handler) {
     send("SET", toPayload(key, value), Void.class, true, handler);
-  }
+    return this;
+  } 
 
   @Override
-  public void setbit(String key, long offset, int bit, Handler<AsyncResult<Long>> handler) {
+  public RedisClient setbit(String key, long offset, int bit, Handler<AsyncResult<Long>> handler) {
     sendLong("SETBIT", toPayload(key, offset, bit), handler);
-  }
+    return this;
+  } 
 
   @Override
-  public void setex(String key, long seconds, String value, Handler<AsyncResult<String>> handler) {
+  public RedisClient setex(String key, long seconds, String value, Handler<AsyncResult<String>> handler) {
     sendString("SETEX", toPayload(key, seconds, value), handler);
-  }
+    return this;
+  } 
 
   @Override
-  public void setnx(String key, String value, Handler<AsyncResult<Long>> handler) {
+  public RedisClient setnx(String key, String value, Handler<AsyncResult<Long>> handler) {
     sendLong("SETNX", toPayload(key, value), handler);
-  }
+    return this;
+  } 
 
   @Override
-  public void setrange(String key, int offset, String value, Handler<AsyncResult<Long>> handler) {
+  public RedisClient setrange(String key, int offset, String value, Handler<AsyncResult<Long>> handler) {
     sendLong("SETRANGE", toPayload(key, offset, value), handler);
-  }
+    return this;
+  } 
 
   @Override
-  public void shutdown(ShutdownOptions options) {
-    // Empty handler as no reply expected
-    sendString("SHUTDOWN", toPayload(options.toJsonArray()), res -> {});
-  }
-
-  @Override
-  public void sinter(List<String> keys, Handler<AsyncResult<JsonArray>> handler) {
+  public RedisClient sinter(List<String> keys, Handler<AsyncResult<JsonArray>> handler) {
     sendJsonArray("SINTER", toPayload(keys), handler);
-  }
+    return this;
+  } 
 
   @Override
-  public void sinterstore(String destkey, List<String> keys, Handler<AsyncResult<Long>> handler) {
+  public RedisClient sinterstore(String destkey, List<String> keys, Handler<AsyncResult<Long>> handler) {
     sendLong("SINTERSTORE", toPayload(destkey, keys), handler);
-  }
+    return this;
+  } 
 
   @Override
-  public void sismember(String key, String member, Handler<AsyncResult<Long>> handler) {
+  public RedisClient sismember(String key, String member, Handler<AsyncResult<Long>> handler) {
     sendLong("SISMEMBER", toPayload(key, member), handler);
-  }
+    return this;
+  } 
 
   @Override
-  public void slaveof(String host, int port, Handler<AsyncResult<String>> handler) {
+  public RedisClient slaveof(String host, int port, Handler<AsyncResult<String>> handler) {
     sendString("SLAVEOF", toPayload(host, port), handler);
-  }
+    return this;
+  } 
 
   @Override
-  public void slaveofNoone(Handler<AsyncResult<String>> handler) {
+  public RedisClient slaveofNoone(Handler<AsyncResult<String>> handler) {
     sendString("SLAVEOF", toPayload("NO", "ONE"), handler);
-  }
+    return this;
+  } 
 
   @Override
-  public void slowlogGet(int limit, Handler<AsyncResult<JsonArray>> handler) {
+  public RedisClient slowlogGet(int limit, Handler<AsyncResult<JsonArray>> handler) {
     sendJsonArray("SLOWLOG GET", toPayload(limit < 0 ? null : limit), handler);
-  }
+    return this;
+  } 
 
   @Override
-  public void slowlogLen(Handler<AsyncResult<Long>> handler) {
+  public RedisClient slowlogLen(Handler<AsyncResult<Long>> handler) {
     sendLong("SLOWLOG LEN", null, handler);
-  }
+    return this;
+  } 
 
   @Override
-  public void slowlogReset(Handler<AsyncResult<Void>> handler) {
+  public RedisClient slowlogReset(Handler<AsyncResult<Void>> handler) {
     sendVoid("SLOWLOG RESET", null, handler);
-  }
+    return this;
+  } 
 
   @Override
-  public void smembers(String key, Handler<AsyncResult<JsonArray>> handler) {
+  public RedisClient smembers(String key, Handler<AsyncResult<JsonArray>> handler) {
     sendJsonArray("SMEMBERS", toPayload(key), handler);
-  }
+    return this;
+  } 
 
   @Override
-  public void smove(String key, String destkey, String member, Handler<AsyncResult<Long>> handler) {
+  public RedisClient smove(String key, String destkey, String member, Handler<AsyncResult<Long>> handler) {
     sendLong("SMOVE", toPayload(key, destkey, member), handler);
-  }
+    return this;
+  } 
 
   @Override
-  public void sort(String key, SortOptions options, Handler<AsyncResult<JsonArray>> handler) {
+  public RedisClient sort(String key, SortOptions options, Handler<AsyncResult<JsonArray>> handler) {
     sendJsonArray("SORT", toPayload(key, options != null ? options.toJsonArray() : null), handler);
-  }
+    return this;
+  } 
 
   @Override
-  public void spop(String key, Handler<AsyncResult<String>> handler) {
+  public RedisClient spop(String key, Handler<AsyncResult<String>> handler) {
     sendString("SPOP", toPayload(key), handler);
-  }
+    return this;
+  } 
 
   @Override
-  public void spopMany(String key, int count, Handler<AsyncResult<String>> handler) {
+  public RedisClient spopMany(String key, int count, Handler<AsyncResult<String>> handler) {
     sendString("SPOP", toPayload(key, count), handler);
-  }
+    return this;
+  } 
 
   @Override
-  public void srandmember(String key, int count, Handler<AsyncResult<JsonArray>> handler) {
+  public RedisClient srandmember(String key, int count, Handler<AsyncResult<JsonArray>> handler) {
     sendJsonArray("SRANDMEMBER", toPayload(key, count), handler);
-  }
+    return this;
+  } 
 
   @Override
-  public void srem(String key, String member, Handler<AsyncResult<Long>> handler) {
+  public RedisClient srem(String key, String member, Handler<AsyncResult<Long>> handler) {
     sendLong("SREM", toPayload(key, member), handler);
-  }
+    return this;
+  } 
 
   @Override
-  public void sremMany(String key, List<String> members, Handler<AsyncResult<Long>> handler) {
+  public RedisClient sremMany(String key, List<String> members, Handler<AsyncResult<Long>> handler) {
     sendLong("SREM", toPayload(key, members), handler);
-  }
+    return this;
+  } 
 
   @Override
-  public void strlen(String key, Handler<AsyncResult<Long>> handler) {
+  public RedisClient strlen(String key, Handler<AsyncResult<Long>> handler) {
     sendLong("STRLEN", toPayload(key), handler);
-  }
+    return this;
+  } 
 
   @Override
-  public void subscribe(List<String> channels, Handler<AsyncResult<Void>> handler) {
+  public RedisClient subscribe(List<String> channels, Handler<AsyncResult<Void>> handler) {
     sendVoid("SUBSCRIBE", toPayload(channels), handler);
-  }
+    return this;
+  } 
 
   @Override
-  public void sunion(List<String> keys, Handler<AsyncResult<JsonArray>> handler) {
+  public RedisClient sunion(List<String> keys, Handler<AsyncResult<JsonArray>> handler) {
     sendJsonArray("SUNION", toPayload(keys), handler);
-  }
+    return this;
+  } 
 
   @Override
-  public void sunionstore(String destkey, List<String> keys, Handler<AsyncResult<Long>> handler) {
+  public RedisClient sunionstore(String destkey, List<String> keys, Handler<AsyncResult<Long>> handler) {
     sendLong("SUNIONSTORE", toPayload(destkey, keys), handler);
-  }
+    return this;
+  } 
 
   @Override
-  public void sync(Handler<AsyncResult<Void>> handler) {
+  public RedisClient sync(Handler<AsyncResult<Void>> handler) {
     sendVoid("SYNC", null, handler);
-  }
+    return this;
+  } 
 
   @Override
-  public void time(Handler<AsyncResult<JsonArray>> handler) {
+  public RedisClient time(Handler<AsyncResult<JsonArray>> handler) {
     sendJsonArray("TIME", null, handler);
-  }
+    return this;
+  } 
 
   @Override
-  public void ttl(String key, Handler<AsyncResult<Long>> handler) {
+  public RedisClient ttl(String key, Handler<AsyncResult<Long>> handler) {
     sendLong("TTL", toPayload(key), handler);
-  }
+    return this;
+  } 
 
   @Override
-  public void type(String key, Handler<AsyncResult<String>> handler) {
+  public RedisClient type(String key, Handler<AsyncResult<String>> handler) {
     sendString("TYPE", toPayload(key), handler);
-  }
+    return this;
+  } 
 
   @Override
-  public void unsubscribe(List<String> channels, Handler<AsyncResult<Void>> handler) {
+  public RedisClient unsubscribe(List<String> channels, Handler<AsyncResult<Void>> handler) {
     sendVoid("UNSUBSCRIBE", toPayload(channels), handler);
-  }
+    return this;
+  } 
 
   @Override
-  public void unwatch(Handler<AsyncResult<String>> handler) {
+  public RedisClient unwatch(Handler<AsyncResult<String>> handler) {
     sendString("UNWATCH", null, handler);
-  }
+    return this;
+  } 
 
   @Override
-  public void watch(List<String> keys, Handler<AsyncResult<String>> handler) {
+  public RedisClient watch(List<String> keys, Handler<AsyncResult<String>> handler) {
     sendString("WATCH", toPayload(keys), handler);
-  }
+    return this;
+  } 
 
   @Override
-  public void zadd(String key, double score, String member, Handler<AsyncResult<Long>> handler) {
+  public RedisClient zadd(String key, double score, String member, Handler<AsyncResult<Long>> handler) {
     sendLong("ZADD", toPayload(key, score, member), handler);
-  }
+    return this;
+  } 
 
   @Override
-  public void zaddMany(String key, Map<String, Double> members, Handler<AsyncResult<Long>> handler) {
+  public RedisClient zaddMany(String key, Map<String, Double> members, Handler<AsyncResult<Long>> handler) {
     // flip from <String, Double> to <Double, String> when wrapping
     Stream flipped = members.entrySet().stream().map(e -> new Object[] { e.getValue(), e.getKey() });
     sendLong("ZADD", toPayload(key, flipped), handler);
-  }
+    return this;
+  } 
 
   @Override
-  public void zcard(String key, Handler<AsyncResult<Long>> handler) {
+  public RedisClient zcard(String key, Handler<AsyncResult<Long>> handler) {
     sendLong("ZCARD", toPayload(key), handler);
-  }
+    return this;
+  } 
 
   @Override
-  public void zcount(String key, double min, double max, Handler<AsyncResult<Long>> handler) {
+  public RedisClient zcount(String key, double min, double max, Handler<AsyncResult<Long>> handler) {
     String minVal = (min == Double.NEGATIVE_INFINITY) ? "-inf" : String.valueOf(min);
     String maxVal = (max == Double.POSITIVE_INFINITY) ? "+inf" : String.valueOf(max);
     sendLong("ZCOUNT", toPayload(key, minVal, maxVal), handler);
-  }
+    return this;
+  } 
 
   @Override
-  public void zincrby(String key, double increment, String member, Handler<AsyncResult<String>> handler) {
+  public RedisClient zincrby(String key, double increment, String member, Handler<AsyncResult<String>> handler) {
     sendString("ZINCRBY", toPayload(key, increment, member), handler);
-  }
+    return this;
+  } 
 
   @Override
-  public void zinterstore(String destkey, List<String> sets, AggregateOptions options, Handler<AsyncResult<Long>> handler) {
+  public RedisClient zinterstore(String destkey, List<String> sets, AggregateOptions options, Handler<AsyncResult<Long>> handler) {
     sendLong("ZINTERSTORE", toPayload(destkey, sets.size(), sets, options != null ? options.name() : null), handler);
-  }
+    return this;
+  } 
 
   @Override
-  public void zinterstoreWeighed(String destkey, Map<String, Double> sets, AggregateOptions options, Handler<AsyncResult<Long>> handler) {
+  public RedisClient zinterstoreWeighed(String destkey, Map<String, Double> sets, AggregateOptions options, Handler<AsyncResult<Long>> handler) {
     sendLong("ZINTERSTORE", toPayload(destkey, sets.size(), sets.keySet(), "WEIGHTS", sets.values(),
       options != null ? options.toJsonArray() : null), handler);
-  }
+    return this;
+  } 
 
   @Override
-  public void zlexcount(String key, String min, String max, Handler<AsyncResult<Long>> handler) {
+  public RedisClient zlexcount(String key, String min, String max, Handler<AsyncResult<Long>> handler) {
     sendLong("ZLEXCOUNT", toPayload(key, min, max), handler);
-  }
+    return this;
+  } 
 
   @Override
-  public void zrange(String key, long start, long stop, Handler<AsyncResult<JsonArray>> handler) {
+  public RedisClient zrange(String key, long start, long stop, Handler<AsyncResult<JsonArray>> handler) {
     sendJsonArray("ZRANGE", toPayload(key, start, stop), handler);
-  }
+    return this;
+  } 
 
   @Override
-  public void zrangeWithOptions(String key, long start, long stop, RangeOptions options, Handler<AsyncResult<JsonArray>> handler) {
+  public RedisClient zrangeWithOptions(String key, long start, long stop, RangeOptions options, Handler<AsyncResult<JsonArray>> handler) {
     sendJsonArray("ZRANGE", toPayload(key, start, stop, options != null ? options.toJsonArray() : null), handler);
-  }
+    return this;
+  } 
 
   @Override
-  public void zrangebylex(String key, String min, String max, LimitOptions options, Handler<AsyncResult<JsonArray>> handler) {
+  public RedisClient zrangebylex(String key, String min, String max, LimitOptions options, Handler<AsyncResult<JsonArray>> handler) {
     sendJsonArray("ZRANGEBYLEX", toPayload(key, min, max, options != null ? options.toJsonArray() : null), handler);
-  }
+    return this;
+  } 
 
   @Override
-  public void zrangebyscore(String key, String min, String max, RangeLimitOptions options, Handler<AsyncResult<JsonArray>> handler) {
+  public RedisClient zrangebyscore(String key, String min, String max, RangeLimitOptions options, Handler<AsyncResult<JsonArray>> handler) {
     sendJsonArray("ZRANGEBYSCORE", toPayload(key, min, max, options != null ? options.toJsonArray() : null), handler);
-  }
+    return this;
+  } 
 
   @Override
-  public void zrank(String key, String member, Handler<AsyncResult<Long>> handler) {
+  public RedisClient zrank(String key, String member, Handler<AsyncResult<Long>> handler) {
     sendLong("ZRANK", toPayload(key, member), handler);
-  }
+    return this;
+  } 
 
   @Override
-  public void zrem(String key, String member, Handler<AsyncResult<Long>> handler) {
+  public RedisClient zrem(String key, String member, Handler<AsyncResult<Long>> handler) {
     sendLong("ZREM", toPayload(key, member), handler);
-  }
+    return this;
+  } 
 
   @Override
-  public void zremMany(String key, List<String> members, Handler<AsyncResult<Long>> handler) {
+  public RedisClient zremMany(String key, List<String> members, Handler<AsyncResult<Long>> handler) {
     sendLong("ZREM", toPayload(key, members), handler);
-  }
+    return this;
+  } 
 
   @Override
-  public void zremrangebylex(String key, String min, String max, Handler<AsyncResult<Long>> handler) {
+  public RedisClient zremrangebylex(String key, String min, String max, Handler<AsyncResult<Long>> handler) {
     sendLong("ZREMRANGEBYLEX", toPayload(key, min, max), handler);
-  }
+    return this;
+  } 
 
   @Override
-  public void zremrangebyrank(String key, long start, long stop, Handler<AsyncResult<Long>> handler) {
+  public RedisClient zremrangebyrank(String key, long start, long stop, Handler<AsyncResult<Long>> handler) {
     sendLong("ZREMRANGEBYRANK", toPayload(key, start, stop), handler);
-  }
+    return this;
+  } 
 
   @Override
-  public void zremrangebyscore(String key, String min, String max, Handler<AsyncResult<Long>> handler) {
+  public RedisClient zremrangebyscore(String key, String min, String max, Handler<AsyncResult<Long>> handler) {
     sendLong("ZREMRANGEBYSCORE", toPayload(key, min, max), handler);
-  }
+    return this;
+  } 
 
   @Override
-  public void zrevrange(String key, long start, long stop, RangeOptions options, Handler<AsyncResult<JsonArray>> handler) {
+  public RedisClient zrevrange(String key, long start, long stop, RangeOptions options, Handler<AsyncResult<JsonArray>> handler) {
     sendJsonArray("ZREVRANGE", toPayload(key, start, stop, options != null ? options.toJsonArray() : null), handler);
-  }
+    return this;
+  } 
 
   @Override
-  public void zrevrangebylex(String key, String max, String min, LimitOptions options, Handler<AsyncResult<JsonArray>> handler) {
+  public RedisClient zrevrangebylex(String key, String max, String min, LimitOptions options, Handler<AsyncResult<JsonArray>> handler) {
     sendJsonArray("ZREVRANGEBYLEX", toPayload(key, max, min, options != null ? options.toJsonArray() : null), handler);
-  }
+    return this;
+  } 
 
   @Override
-  public void zrevrangebyscore(String key, String max, String min, RangeLimitOptions options, Handler<AsyncResult<JsonArray>> handler) {
+  public RedisClient zrevrangebyscore(String key, String max, String min, RangeLimitOptions options, Handler<AsyncResult<JsonArray>> handler) {
     sendJsonArray("ZREVRANGEBYSCORE", toPayload(key, max, min, options != null ? options.toJsonArray() : null), handler);
-  }
+    return this;
+  } 
 
   @Override
-  public void zrevrank(String key, String member, Handler<AsyncResult<Long>> handler) {
+  public RedisClient zrevrank(String key, String member, Handler<AsyncResult<Long>> handler) {
     sendLong("ZREVRANK", toPayload(key, member), handler);
-  }
+    return this;
+  } 
 
   @Override
-  public void zscore(String key, String member, Handler<AsyncResult<String>> handler) {
+  public RedisClient zscore(String key, String member, Handler<AsyncResult<String>> handler) {
     sendString("ZSCORE", toPayload(key, member), handler);
-  }
+    return this;
+  } 
 
   @Override
-  public void zunionstore(String destkey, List<String> sets, AggregateOptions options, Handler<AsyncResult<Long>> handler) {
+  public RedisClient zunionstore(String destkey, List<String> sets, AggregateOptions options, Handler<AsyncResult<Long>> handler) {
     sendLong("ZUNIONSTORE", toPayload(destkey, sets.size(), sets, options != null ? options.name() : null), handler);
-  }
+    return this;
+  } 
 
   @Override
-  public void zunionstoreWeighed(String destkey, Map<String, Double> sets, AggregateOptions options, Handler<AsyncResult<Long>> handler) {
+  public RedisClient zunionstoreWeighed(String destkey, Map<String, Double> sets, AggregateOptions options, Handler<AsyncResult<Long>> handler) {
     sendLong("ZUNIONSTORE", toPayload(destkey, sets.size(), sets.keySet(), "WEIGHTS", sets.values(),
       options != null ? options.toJsonArray() : null), handler);
-  }
+    return this;
+  } 
 
   @Override
-  public void scan(String cursor, ScanOptions options, Handler<AsyncResult<Void>> handler) {
+  public RedisClient scan(String cursor, ScanOptions options, Handler<AsyncResult<Void>> handler) {
     sendVoid("SCAN", toPayload(cursor, options != null ? options.toJsonArray() : null), handler);
-  }
+    return this;
+  } 
 
   @Override
-  public void sscan(String key, String cursor, ScanOptions options, Handler<AsyncResult<Void>> handler) {
+  public RedisClient sscan(String key, String cursor, ScanOptions options, Handler<AsyncResult<Void>> handler) {
     sendVoid("SSCAN", toPayload(key, cursor, options != null ? options.toJsonArray() : null), handler);
-  }
+    return this;
+  } 
 
   @Override
-  public void hscan(String key, String cursor, ScanOptions options, Handler<AsyncResult<JsonArray>> handler) {
+  public RedisClient hscan(String key, String cursor, ScanOptions options, Handler<AsyncResult<JsonArray>> handler) {
     sendJsonArray("HSCAN", toPayload(key, cursor, options != null ? options.toJsonArray() : null), handler);
-  }
+    return this;
+  } 
 
   @Override
-  public void zscan(String key, String cursor, ScanOptions options, Handler<AsyncResult<Void>> handler) {
+  public RedisClient zscan(String key, String cursor, ScanOptions options, Handler<AsyncResult<Void>> handler) {
     sendVoid("ZSCAN", toPayload(key, cursor, options != null ? options.toJsonArray() : null), handler);
-  }
+    return this;
+  } 
 
   /**
    * A helper method to package method parameters into JsonArray payload.
@@ -1073,5 +1247,5 @@ public final class RedisClientImpl extends AbstractRedisClient {
       }
     }
     return result;
-  }
+  } 
 }

@@ -29,21 +29,12 @@ public class RedisClientTest extends RedisClientTestBase {
   public void setUp() throws Exception {
     super.setUp();
     redis = RedisClient.create(vertx, getConfig());
-    CountDownLatch latch = new CountDownLatch(1);
-    redis.start(asyncResult -> {
-      if (asyncResult.succeeded()) {
-        latch.countDown();
-      } else {
-        throw new RuntimeException("failed to setup", asyncResult.cause());
-      }
-    });
-    awaitLatch(latch);
   }
 
   @Override
   public void tearDown() throws Exception {
     CountDownLatch latch = new CountDownLatch(1);
-    redis.stop(asyncResult -> {
+    redis.close(asyncResult -> {
       if (asyncResult.succeeded()) {
         latch.countDown();
       } else {
@@ -53,4 +44,5 @@ public class RedisClientTest extends RedisClientTestBase {
     awaitLatch(latch);
     super.tearDown();
   }
+
 }

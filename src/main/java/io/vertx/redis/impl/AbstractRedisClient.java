@@ -1,8 +1,6 @@
 package io.vertx.redis.impl;
 
-import io.vertx.core.AsyncResult;
-import io.vertx.core.Handler;
-import io.vertx.core.Vertx;
+import io.vertx.core.*;
 import io.vertx.core.eventbus.EventBus;
 import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;
@@ -11,12 +9,14 @@ import io.vertx.core.logging.impl.LoggerFactory;
 import io.vertx.redis.RedisClient;
 
 import java.nio.charset.Charset;
+import java.util.LinkedList;
+import java.util.Queue;
 
 public abstract class AbstractRedisClient implements RedisClient {
 
   private static final Logger log = LoggerFactory.getLogger(AbstractRedisClient.class);
 
-  private enum ResponseTransform {
+  private static enum ResponseTransform {
     NONE,
     ARRAY_TO_OBJECT,
     INFO
@@ -25,46 +25,39 @@ public abstract class AbstractRedisClient implements RedisClient {
   private final Vertx vertx;
   private final JsonObject config;
   private final EventBus eb;
+  private final RedisSubscriptions subscriptions = new RedisSubscriptions();
+  private final Queue<Command> pending = new LinkedList<>();
+  private final String encoding;
+  private final Charset charset;
+  private final String binaryEnc;
+  private final Charset binaryCharset;
+  private final String baseAddress;
 
   private RedisConnection redisConnection;
-  private RedisSubscriptions subscriptions = new RedisSubscriptions();
-
-  private String encoding;
-  private Charset charset;
-  private String binaryEnc;
-  private Charset binaryCharset;
-  private String baseAddress;
 
   AbstractRedisClient(Vertx vertx, JsonObject config) {
     this.vertx = vertx;
     this.config = config;
     this.eb = vertx.eventBus();
-  }
-
-  @Override
-  public void start(final Handler<AsyncResult<Void>> handler) {
-    final String host = config.getString("host", "localhost");
-    final int port = config.getInteger("port", 6379);
-    final String enc = config.getString("encoding", "UTF-8");
-    final boolean binary = config.getBoolean("binary", false);
-
+    this.encoding = config.getString("encoding", "UTF-8");;
+    this.charset = Charset.forName(encoding);
+    this.binaryEnc = "iso-8859-1";
+    this.binaryCharset = Charset.forName(binaryEnc);
+    this.baseAddress = config.getString("address", "io.vertx.mod-redis");
+    boolean binary = config.getBoolean("binary", false);
     if (binary) {
       log.warn("Binary mode is not implemented yet!!!");
     }
-
-    encoding = enc;
-    charset = Charset.forName(enc);
-    binaryEnc = "iso-8859-1";
-    binaryCharset = Charset.forName(binaryEnc);
-    baseAddress = config.getString("address", "io.vertx.mod-redis");
-
-    redisConnection = new RedisConnection(vertx, host, port, subscriptions);
-    redisConnection.connect(handler);
   }
 
   @Override
-  public void stop(final Handler<AsyncResult<Void>> handler) {
-    redisConnection.disconnect(handler);
+  public synchronized void close(Handler<AsyncResult<Void>> handler) {
+    if (redisConnection != null) {
+      redisConnection.disconnect(handler);
+      redisConnection = null;
+    } else if (handler != null) {
+      vertx.getOrCreateContext().runOnContext(v -> handler.handle(Future.succeededFuture()));
+    }
   }
 
   private ResponseTransform getResponseTransformFor(String command) {
@@ -197,61 +190,123 @@ public abstract class AbstractRedisClient implements RedisClient {
         break;
     }
 
-    redisConnection.send(new Command(command, redisArgs, binary ? binaryCharset : charset).setExpectedReplies(expectedReplies).setHandler(reply -> {
-      switch (reply.type()) {
-        case '-': // Error
-          resultHandler.handle(new RedisAsyncResult<>(reply.asType(String.class)));
-          return;
-        case '+':   // Status
-          resultHandler.handle(new RedisAsyncResult<>(null, reply.asType(returnType)));
-          return;
-        case '$':  // Bulk
-          if (transform == ResponseTransform.INFO) {
-            String info = reply.asType(String.class, encoding);
-            String lines[] = info.split("\\r?\\n");
-            JsonObject value = new JsonObject();
-            JsonObject section = null;
-            for (String line : lines) {
-              if (line.length() == 0) {
-                // end of section
-                section = null;
-                continue;
-              }
+    Context context = vertx.getOrCreateContext();
 
-              if (line.charAt(0) == '#') {
-                // begin section
-                section = new JsonObject();
-                // create a sub key with the section name
-                value.put(line.substring(2).toLowerCase(), section);
-              } else {
-                // entry in section
-                int split = line.indexOf(':');
-                if (section == null) {
-                  value.put(line.substring(0, split), line.substring(split + 1));
+    Command<T> comm = new Command<T>(context, command, redisArgs, binary ? binaryCharset : charset)
+                     .setExpectedReplies(expectedReplies).setHandler((Reply reply) -> {
+        switch (reply.type()) {
+          case '-': // Error
+            resultHandler.handle(new RedisAsyncResult<>(reply.asType(String.class)));
+            return;
+          case '+':   // Status
+            resultHandler.handle(new RedisAsyncResult<>(null, reply.asType(returnType)));
+            return;
+          case '$':  // Bulk
+            if (transform == ResponseTransform.INFO) {
+              String info = reply.asType(String.class, encoding);
+              String lines[] = info.split("\\r?\\n");
+              JsonObject value = new JsonObject();
+              JsonObject section = null;
+              for (String line : lines) {
+                if (line.length() == 0) {
+                  // end of section
+                  section = null;
+                  continue;
+                }
+
+                if (line.charAt(0) == '#') {
+                  // begin section
+                  section = new JsonObject();
+                  // create a sub key with the section name
+                  value.put(line.substring(2).toLowerCase(), section);
                 } else {
-                  section.put(line.substring(0, split), line.substring(split + 1));
+                  // entry in section
+                  int split = line.indexOf(':');
+                  if (section == null) {
+                    value.put(line.substring(0, split), line.substring(split + 1));
+                  } else {
+                    section.put(line.substring(0, split), line.substring(split + 1));
+                  }
                 }
               }
+              resultHandler.handle(new RedisAsyncResult<>(null, (T) value));
+            } else {
+              resultHandler.handle(new RedisAsyncResult<>(null, reply.asType(returnType, binary ? binaryEnc : encoding)));
             }
-            resultHandler.handle(new RedisAsyncResult<>(null, (T) value));
-          } else {
-            resultHandler.handle(new RedisAsyncResult<>(null, reply.asType(returnType, binary ? binaryEnc : encoding)));
-          }
-          return;
-        case '*': // Multi
-          if (transform == ResponseTransform.ARRAY_TO_OBJECT) {
-            resultHandler.handle(new RedisAsyncResult<>(null, (T) reply.asType(JsonObject.class, encoding)));
-          } else {
-            resultHandler.handle(new RedisAsyncResult<>(null, (T) reply.asType(JsonArray.class, encoding)));
-          }
-          return;
-        case ':':   // Integer
-          resultHandler.handle(new RedisAsyncResult<>(null, reply.asType(returnType)));
-          return;
-        default:
-          resultHandler.handle(new RedisAsyncResult<>("Unknown message type"));
+            return;
+          case '*': // Multi
+            if (transform == ResponseTransform.ARRAY_TO_OBJECT) {
+              resultHandler.handle(new RedisAsyncResult<>(null, (T) reply.asType(JsonObject.class, encoding)));
+            } else {
+              resultHandler.handle(new RedisAsyncResult<>(null, (T) reply.asType(JsonArray.class, encoding)));
+            }
+            return;
+          case ':':   // Integer
+            resultHandler.handle(new RedisAsyncResult<>(null, reply.asType(returnType)));
+            return;
+          default:
+            resultHandler.handle(new RedisAsyncResult<>("Unknown message type"));
+        }
+      });
+    comm.setUserHandler(resultHandler);
+
+    doSend(comm);
+  }
+
+  private synchronized <T> void doSend(Command command) {
+    if (redisConnection == null) {
+      pending.add(command);
+      connect();
+    } else {
+      sendOnConnection(command);
+    }
+  }
+
+  private void connect() {
+    final String host = config.getString("host", "localhost");
+    final int port = config.getInteger("port", 6379);
+    RedisConnection conn = new RedisConnection(vertx, host, port, subscriptions, v -> connectionClosed());
+    conn.connect(res -> {
+      if (res.succeeded()) {
+        connected(conn);
+      } else {
+        sendPendingFailed(res.cause());
       }
-    }));
+    });
+  }
+
+  private synchronized void connectionClosed() {
+    if (redisConnection != null) {
+      redisConnection = null;
+      log.warn("Connection has been closed by peer");
+    }
+  }
+
+  private synchronized void connected(RedisConnection conn) {
+    this.redisConnection = conn;
+    Command command;
+    while ((command = pending.poll()) != null) {
+      sendOnConnection(command);
+    }
+  }
+
+  private synchronized void sendPendingFailed(Throwable cause) {
+    Command command;
+    while ((command = pending.poll()) != null) {
+      Handler<AsyncResult> userHandler = command.getUserHandler();
+      if (userHandler != null) {
+        // FIXME - send this on correct context
+        try {
+          userHandler.handle(Future.failedFuture(cause));
+        } catch (Throwable t) {
+          log.error("Failure in user handler", t);
+        }
+      }
+    }
+  }
+
+  private void sendOnConnection(Command command) {
+    redisConnection.send(command);
   }
 
 }
