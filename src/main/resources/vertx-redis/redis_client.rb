@@ -12,8 +12,8 @@ module VertxRedis
     def j_del
       @j_del
     end
-    # @param [::Vertx::Vertx] vertx
-    # @param [Hash{String => Object}] config
+    # @param [::Vertx::Vertx] vertx 
+    # @param [Hash{String => Object}] config 
     # @return [::VertxRedis::RedisClient]
     def self.create(vertx=nil,config=nil)
       if vertx.class.method_defined?(:j_del) && config.class == Hash && !block_given?
@@ -939,7 +939,7 @@ module VertxRedis
     # @param [Fixnum] port Destination port
     # @param [String] key Key to migrate
     # @param [Fixnum] destdb Destination database index
-    # @param [Fixnum] timeout
+    # @param [Fixnum] timeout 
     # @param [Hash] options Migrate options
     # @yield Handler for the result of this call.
     # @return [void]

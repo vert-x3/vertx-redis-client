@@ -40,13 +40,9 @@ public class RangeLimitOptions extends LimitOptions {
   }
 
   public JsonArray toJsonArray() {
-    JsonArray json = new JsonArray();
+    JsonArray json = super.toJsonArray();
     if (withscores != null && withscores) {
       json.add("WITHSCORES");
-    }
-
-    for (Object item: super.toJsonArray()) {
-      json.add((String) item);
     }
     return json;
   }

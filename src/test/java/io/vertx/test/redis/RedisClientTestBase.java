@@ -3109,6 +3109,18 @@ public class RedisClientTestBase extends VertxTestBase {
   }
 
   @Test
+  public void testZrangebyscoreWithLimits() {
+    RangeLimitOptions options = new RangeLimitOptions();
+    options.setLimit(0,1);
+    redis.zrangebyscore("yourkey", "-inf", "+inf", options, result -> {
+      // whatever
+      assertTrue(result.succeeded());
+      testComplete();
+    });
+    await();
+  }
+
+  @Test
   public void testZrank() {
     final String key = makeKey();
     Map<String, Double> values = new HashMap<>();
