@@ -264,11 +264,7 @@ public final class RedisClientImpl extends AbstractRedisClient {
   public RedisClient evalsha(String sha1, List<String> keys, List<String> args, Handler<AsyncResult<Void>> handler) {
     keys = (keys != null) ? keys : Collections.emptyList();
     args = (args != null) ? args : Collections.emptyList();
-    if (keys.size() != args.size()) {
-      handler.handle(new RedisAsyncResult<>(new IllegalArgumentException("Key list, and argument list are not the same size")));
-    } else {
-      sendVoid("EVALSHA", toPayload(sha1, keys.size(), keys, args), handler);
-    }
+    sendVoid("EVALSHA", toPayload(sha1, keys.size(), keys, args), handler);
     return this;
   } 
 

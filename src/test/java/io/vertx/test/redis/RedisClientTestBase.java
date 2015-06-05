@@ -596,13 +596,35 @@ public abstract class RedisClientTestBase extends VertxTestBase {
     final String key1 = makeKey();
     final String key2 = makeKey();
     redis.eval("return {KEYS[1],KEYS[2],ARGV[1],ARGV[2]}", toList(key1, key2), toList("first", "second"),
-        reply -> {
-          assertTrue(reply.succeeded());
-          Object r = reply.result();
-          assertNotNull(r);
-          testComplete();
-        });
+      reply -> {
+        assertTrue(reply.succeeded());
+        Object r = reply.result();
+        assertNotNull(r);
+        testComplete();
+      });
     await();
+  }
+
+  @Test
+  public void testEvalshaNumKeysAndValuesDifferent() {
+    String inline = "return 1";
+    redis.scriptLoad(inline, reply->{
+      assertTrue(reply.succeeded());
+      assertNotNull(reply.result());
+
+      List<String> keys = new ArrayList<>(2);
+      List<String> values = new ArrayList<>(1);
+      keys.add("key1");
+      keys.add("key2");
+      values.add("value1");
+
+      redis.evalsha(reply.result(), keys, values, reply2 ->{
+        assertTrue(reply2.succeeded());
+        testComplete();
+      });
+    });
+    await();
+
   }
 
   @Test
@@ -722,11 +744,11 @@ public abstract class RedisClientTestBase extends VertxTestBase {
 
     String key = makeKey();
     //As per the doc, this never fails
-    redis.set(key, "blah", reply ->{
+    redis.set(key, "blah", reply -> {
       assertTrue(reply.succeeded());
-      redis.flushall(reply2 ->{
+      redis.flushall(reply2 -> {
         assertTrue(reply.succeeded());
-        redis.get(key, reply3 ->{
+        redis.get(key, reply3 -> {
           assertTrue(reply3.succeeded());
           assertNull(reply3.result());
           testComplete();
@@ -740,11 +762,11 @@ public abstract class RedisClientTestBase extends VertxTestBase {
   public void testFlushdb() {
     String key = makeKey();
     //As per the doc, this never fails
-    redis.set(key, "blah", reply ->{
+    redis.set(key, "blah", reply -> {
       assertTrue(reply.succeeded());
-      redis.flushall(reply2 ->{
+      redis.flushall(reply2 -> {
         assertTrue(reply.succeeded());
-        redis.get(key, reply3 ->{
+        redis.get(key, reply3 -> {
           assertTrue(reply3.succeeded());
           assertNull(reply3.result());
           testComplete();
@@ -1570,7 +1592,7 @@ public abstract class RedisClientTestBase extends VertxTestBase {
   @Test
   public void testMonitor() {
 
-    redis.monitor(reply ->{
+    redis.monitor(reply -> {
       assertTrue(reply.succeeded());
       testComplete();
     });
@@ -1581,9 +1603,9 @@ public abstract class RedisClientTestBase extends VertxTestBase {
   public void testMove() {
 
     String key = makeKey();
-    redis.set(key, "moved_key", reply ->{
+    redis.set(key, "moved_key", reply -> {
       assertTrue(reply.succeeded());
-      redis.move(key, 1, reply2 ->{
+      redis.move(key, 1, reply2 -> {
         assertTrue(reply2.succeeded());
         assertTrue(new Long(1).equals(reply2.result()));
         testComplete();
@@ -1665,11 +1687,11 @@ public abstract class RedisClientTestBase extends VertxTestBase {
     String mykey = makeKey();
     redis.set(mykey, "test", reply ->{
       assertTrue(reply.succeeded());
-      redis.object(mykey, ObjectCmd.REFCOUNT, reply2 ->{
+      redis.object(mykey, ObjectCmd.REFCOUNT, reply2 -> {
         assertTrue(reply2.succeeded());
-        redis.object(mykey, ObjectCmd.ENCODING, reply3 ->{
+        redis.object(mykey, ObjectCmd.ENCODING, reply3 -> {
           assertTrue(reply3.succeeded());
-          redis.object(mykey, ObjectCmd.IDLETIME, reply4 ->{
+          redis.object(mykey, ObjectCmd.IDLETIME, reply4 -> {
             assertTrue(reply4.succeeded());
             testComplete();
           });
@@ -1714,11 +1736,11 @@ public abstract class RedisClientTestBase extends VertxTestBase {
         assertTrue(reply1.succeeded());
         assertEquals(1, reply1.result().longValue());
         redis.get(mykey, reply2 -> {
-            assertTrue(reply2.succeeded());
-            testComplete();
-          });
+          assertTrue(reply2.succeeded());
+          testComplete();
         });
       });
+    });
     await();
   }
 
@@ -1774,7 +1796,7 @@ public abstract class RedisClientTestBase extends VertxTestBase {
   @Test
   public void testPubSubChannels() {
 
-    redis.subscribe(toList("rustic"), sub->{
+    redis.subscribe(toList("rustic"), sub -> {
 
     });
   }
@@ -1792,7 +1814,7 @@ public abstract class RedisClientTestBase extends VertxTestBase {
   @Ignore
   public void testPubSubNumpat() {
     // TODO
-    redis.subscribe(toList("rustic"), sub->{
+    redis.subscribe(toList("rustic"), sub -> {
 
     });
   }
@@ -1824,9 +1846,9 @@ public abstract class RedisClientTestBase extends VertxTestBase {
   @Test
   public void testPublish() {
     String key = makeKey();
-    redis.set(key, "0", reply ->{
+    redis.set(key, "0", reply -> {
       assertTrue(reply.succeeded());
-      redis.publish(key,"1", reply2 ->{
+      redis.publish(key, "1", reply2 -> {
         assertTrue(reply2.succeeded());
         assertTrue(reply2.result() == 0);
         testComplete();
@@ -2058,7 +2080,7 @@ public abstract class RedisClientTestBase extends VertxTestBase {
 
   @Test
   public void testSave() {
-    redis.save(reply ->{
+    redis.save(reply -> {
       assertTrue(reply.succeeded());
       //Note, there's really not much else to do
       testComplete();
@@ -2084,10 +2106,10 @@ public abstract class RedisClientTestBase extends VertxTestBase {
   @Test
   public void testScriptexists() {
     String inline = "return 1";
-    redis.scriptLoad(inline, reply ->{
+    redis.scriptLoad(inline, reply -> {
       assertTrue(reply.succeeded());
       String hash = reply.result();
-      redis.scriptExists(hash, reply2 ->{
+      redis.scriptExists(hash, reply2 -> {
         assertTrue(reply2.succeeded());
         assertTrue(reply2.result().getInteger(0) > 0);
         testComplete();
@@ -2099,15 +2121,15 @@ public abstract class RedisClientTestBase extends VertxTestBase {
   @Test
   public void testScriptflush() {
     String inline = "return 1";
-    redis.scriptLoad(inline, reply ->{
+    redis.scriptLoad(inline, reply -> {
       assertTrue(reply.succeeded());
       String hash = reply.result();
-      redis.scriptExists(hash, reply2 ->{
+      redis.scriptExists(hash, reply2 -> {
         assertTrue(reply2.succeeded());
         assertTrue(reply2.result().getInteger(0) > 0);
-        redis.scriptFlush(reply3 ->{
+        redis.scriptFlush(reply3 -> {
           assertTrue(reply3.succeeded());
-          redis.scriptExists(hash, reply4 ->{
+          redis.scriptExists(hash, reply4 -> {
             assertTrue(reply4.succeeded());
             assertTrue(reply4.result().getInteger(0) == 0);
             testComplete();
@@ -2129,9 +2151,9 @@ public abstract class RedisClientTestBase extends VertxTestBase {
     JsonObject job = new JsonObject().put("host", "localhost").put("port", 6379);
     RedisClient rdx = RedisClient.create(vertx, job);
 
-    rdx.scriptKill(reply ->{
+    rdx.scriptKill(reply -> {
       assertTrue(reply.succeeded());
-      rdx.info(reply2 ->{
+      rdx.info(reply2 -> {
         assertTrue(reply2.succeeded());
         testComplete();
       });
@@ -2142,7 +2164,7 @@ public abstract class RedisClientTestBase extends VertxTestBase {
   @Test
   public void testScriptload() {
     String inline = "return 1";
-    redis.scriptLoad(inline, reply->{
+    redis.scriptLoad(inline, reply -> {
       assertTrue(reply.succeeded());
       assertNotNull(reply.result());
       testComplete();
@@ -2190,7 +2212,7 @@ public abstract class RedisClientTestBase extends VertxTestBase {
           assertTrue(reply2.succeeded());
           Long diff = reply2.result().longValue();
           assertTrue(diff == 2);
-          redis.smembers(mykey, reply3 ->{
+          redis.smembers(mykey, reply3 -> {
             Set<String> expected = new HashSet(toList("a", "b"));
             JsonArray members = reply3.result();
             Set<String> result = new HashSet(members.getList());
@@ -2207,15 +2229,15 @@ public abstract class RedisClientTestBase extends VertxTestBase {
   public void testSelect() {
     //Gee, think redis should have a get current DB command?
     redis.select(1, reply -> {
-      if(reply.succeeded()){
-        redis.set("first", "value", reply2->{
-          if(reply2.succeeded()){
-            redis.select(0, reply3 ->{
-              if(reply3.succeeded()){
+      if (reply.succeeded()) {
+        redis.set("first", "value", reply2 -> {
+          if (reply2.succeeded()) {
+            redis.select(0, reply3 -> {
+              if (reply3.succeeded()) {
                 redis.select(1, reply4 -> {
-                  if(reply4.succeeded()){
-                    redis.get("first",reply5->{
-                      if(reply5.succeeded()){
+                  if (reply4.succeeded()) {
+                    redis.get("first", reply5 -> {
+                      if (reply5.succeeded()) {
                         assertTrue("value".equals(reply5.result()));
                         testComplete();
                       }
@@ -2239,9 +2261,9 @@ public abstract class RedisClientTestBase extends VertxTestBase {
       redis.get(mykey, reply1 -> {
         assertTrue(reply1.succeeded());
         assertEquals("Hello", reply1.result());
-            testComplete();
-          });
-        });
+        testComplete();
+      });
+    });
     await();
   }
 
@@ -2589,9 +2611,9 @@ public abstract class RedisClientTestBase extends VertxTestBase {
   public void testSubscribe() {
     
     String key = makeKey();
-    redis.subscribe(toList(key), reply ->{
+    redis.subscribe(toList(key), reply -> {
       assertTrue(reply.succeeded());
-      redis.unsubscribe(toList(key), reply2 ->{
+      redis.unsubscribe(toList(key), reply2 -> {
         assertTrue(reply2.succeeded());
         testComplete();
       });
@@ -2752,9 +2774,9 @@ public abstract class RedisClientTestBase extends VertxTestBase {
   @Test
   public void testUnsubscribe() {
     String key = makeKey();
-    redis.subscribe(toList(key), reply ->{
+    redis.subscribe(toList(key), reply -> {
       assertTrue(reply.succeeded());
-      redis.unsubscribe(toList(key), reply2 ->{
+      redis.unsubscribe(toList(key), reply2 -> {
         assertTrue(reply2.succeeded());
         testComplete();
       });
