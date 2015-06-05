@@ -21,6 +21,7 @@ module VertxRedis
       end
       raise ArgumentError, "Invalid arguments when calling create(vertx,config)"
     end
+    #  Close the client - when it is fully closed the handler will be called.
     # @yield 
     # @return [void]
     def close

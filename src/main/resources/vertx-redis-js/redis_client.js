@@ -42,6 +42,7 @@ var RedisClient = function(j_val) {
   var that = this;
 
   /**
+   Close the client - when it is fully closed the handler will be called.
 
    @public
    @param handler {function} 
