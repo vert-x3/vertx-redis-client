@@ -1,5 +1,7 @@
 package io.vertx.redis.impl;
 
+import io.vertx.core.AsyncResult;
+import io.vertx.core.Context;
 import io.vertx.core.Handler;
 import io.vertx.core.buffer.Buffer;
 import io.vertx.core.json.JsonArray;
@@ -7,7 +9,7 @@ import io.vertx.core.streams.WriteStream;
 
 import java.nio.charset.Charset;
 
-public class Command {
+public class Command<T> {
 
   private static final byte ARGS_PREFIX = '*';
   private static final byte[] CRLF = "\r\n".getBytes();
@@ -56,47 +58,15 @@ public class Command {
     return bytes;
   }
 
-  private void appendToBuffer(final Object value, final Charset encoding, final Buffer buffer) {
-    buffer.appendByte(BYTES_PREFIX);
-    if (value == null) {
-      buffer.appendByte((byte) '0');
-      buffer.appendBytes(CRLF);
-      buffer.appendBytes(CRLF);
-    } else {
-      byte[] bytes;
-      // Possible types are: String, JsonObject, JsonArray, JsonElement, Number, Boolean, byte[]
-
-      if (value instanceof byte[]) {
-        bytes = (byte[]) value;
-      } else if (value instanceof Buffer) {
-        bytes = ((Buffer) value).getBytes();
-      } else if (value instanceof String) {
-        bytes = ((String) value).getBytes(encoding);
-      } else if (value instanceof Byte) {
-        bytes = numToBytes((Byte) value);
-      } else if (value instanceof Short) {
-        bytes = numToBytes((Short) value);
-      } else if (value instanceof Integer) {
-        bytes = numToBytes((Integer) value);
-      } else if (value instanceof Long) {
-        bytes = numToBytes((Long) value);
-      } else {
-        bytes = value.toString().getBytes(encoding);
-      }
-
-      buffer.appendBytes(numToBytes(bytes.length));
-
-      buffer.appendBytes(CRLF);
-      buffer.appendBytes(bytes);
-      buffer.appendBytes(CRLF);
-    }
-  }
-
+  private final Context context;
   private final Buffer buffer;
   private int expectedReplies = 1;
   private Handler<Reply> handler;
+  private Handler<AsyncResult<T>> userHandler;
 
-  public Command(String command, final JsonArray args, Charset encoding) {
+  public Command(Context context, String command, final JsonArray args, Charset encoding) {
+
+    this.context = context;
 
     int totalArgs;
     if (args == null) {
@@ -134,14 +104,23 @@ public class Command {
     }
   }
 
-  public Command setExpectedReplies(int expectedReplies) {
+  public Command<T> setExpectedReplies(int expectedReplies) {
     this.expectedReplies = expectedReplies;
     return this;
   }
 
-  public Command setHandler(Handler<Reply> handler) {
+  public Command<T> setHandler(Handler<Reply> handler) {
     this.handler = handler;
     return this;
+  }
+
+  public Command setUserHandler(Handler<AsyncResult<T>> handler) {
+    this.userHandler = handler;
+    return this;
+  }
+
+  public Handler<AsyncResult<T>> getUserHandler() {
+    return userHandler;
   }
 
   public void writeTo(WriteStream<Buffer> writeStream) {
@@ -155,5 +134,42 @@ public class Command {
   public Handler<Reply> getHandler() {
     return handler;
   }
+
+  private void appendToBuffer(final Object value, final Charset encoding, final Buffer buffer) {
+    buffer.appendByte(BYTES_PREFIX);
+    if (value == null) {
+      buffer.appendByte((byte) '0');
+      buffer.appendBytes(CRLF);
+      buffer.appendBytes(CRLF);
+    } else {
+      byte[] bytes;
+      // Possible types are: String, JsonObject, JsonArray, JsonElement, Number, Boolean, byte[]
+
+      if (value instanceof byte[]) {
+        bytes = (byte[]) value;
+      } else if (value instanceof Buffer) {
+        bytes = ((Buffer) value).getBytes();
+      } else if (value instanceof String) {
+        bytes = ((String) value).getBytes(encoding);
+      } else if (value instanceof Byte) {
+        bytes = numToBytes((Byte) value);
+      } else if (value instanceof Short) {
+        bytes = numToBytes((Short) value);
+      } else if (value instanceof Integer) {
+        bytes = numToBytes((Integer) value);
+      } else if (value instanceof Long) {
+        bytes = numToBytes((Long) value);
+      } else {
+        bytes = value.toString().getBytes(encoding);
+      }
+
+      buffer.appendBytes(numToBytes(bytes.length));
+
+      buffer.appendBytes(CRLF);
+      buffer.appendBytes(bytes);
+      buffer.appendBytes(CRLF);
+    }
+  }
+
 
 }

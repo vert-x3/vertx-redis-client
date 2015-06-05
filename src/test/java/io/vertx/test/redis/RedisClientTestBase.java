@@ -23,7 +23,7 @@ import java.util.concurrent.TimeUnit;
  * the <code>host</code> or <code>port</code> system property is specified. In this case the
  * test assumes an external database will be used.
  */
-public class RedisClientTestBase extends VertxTestBase {
+public abstract class RedisClientTestBase extends VertxTestBase {
 
   private static final Integer DEFAULT_PORT = 6379;
 
@@ -75,7 +75,9 @@ public class RedisClientTestBase extends VertxTestBase {
 
   public static void createRedisInstance(final Integer... ports) throws Exception {
     for(Integer port: ports) {
+      System.out.println("Creating redis server on port: " + port);
       instances.put(port, new RedisServer(port));
+      System.out.println("Created embedded redis server on port " + port);
     }
   }
 
@@ -166,14 +168,6 @@ public class RedisClientTestBase extends VertxTestBase {
       server.start();
       JsonObject job = new JsonObject().put("host", "localhost").put("port", 6381);
       RedisClient rdx = RedisClient.create(vertx, job);
-
-      CountDownLatch latch = new CountDownLatch(1);
-      rdx.start(asyncResult -> {
-        assertTrue(asyncResult.succeeded());
-        latch.countDown();
-      });
-
-      awaitLatch(latch);
 
       rdx.auth("barfoo", reply -> {
         assertFalse(reply.succeeded());
@@ -305,7 +299,7 @@ public class RedisClientTestBase extends VertxTestBase {
 
     redis.brpoplpush("list1", "list2", 100, result ->{
 
-      if(result.succeeded()){
+      if (result.succeeded()){
         redis.lpop("list2", result2 ->{
           if(result2.succeeded()){
             System.out.println(result2.result());
@@ -313,20 +307,13 @@ public class RedisClientTestBase extends VertxTestBase {
           }
           testComplete();
         });
+      } else {
+        result.cause().printStackTrace();
+        fail();
       }
     });
 
     RedisClient redis2 = RedisClient.create(vertx, getConfig());
-    CountDownLatch latch = new CountDownLatch(1);
-    redis2.start(asyncResult -> {
-      if (asyncResult.succeeded()) {
-        latch.countDown();
-      } else {
-        throw new RuntimeException("failed to setup", asyncResult.cause());
-      }
-    });
-
-    awaitLatch(latch);
 
     redis2.lpush("list1", "hello", result -> {
     });
@@ -472,14 +459,6 @@ public class RedisClientTestBase extends VertxTestBase {
     server.start();
     JsonObject job = new JsonObject().put("host", "localhost").put("port", 6381);
     RedisClient rdx = RedisClient.create(vertx, job);
-
-    CountDownLatch latch = new CountDownLatch(1);
-    rdx.start(asyncResult -> {
-      assertTrue(asyncResult.succeeded());
-      latch.countDown();
-    });
-
-    awaitLatch(latch);
 
     rdx.debugSegfault(reply ->{
       assertTrue(reply.succeeded());
@@ -777,7 +756,8 @@ public class RedisClientTestBase extends VertxTestBase {
   }
 
   @Test
-  public void testGet() {
+  public void testGet() throws Exception {
+
     final String nonexisting = makeKey();
     final String mykey = makeKey();
 
@@ -1566,13 +1546,6 @@ public class RedisClientTestBase extends VertxTestBase {
     JsonObject job = new JsonObject().put("host", "localhost").put("port", 6382);
     RedisClient rdx = RedisClient.create(vertx, job);
 
-    CountDownLatch latch = new CountDownLatch(1);
-    rdx.start(asyncResult -> {
-      assertTrue(asyncResult.succeeded());
-      latch.countDown();
-    });
-
-    awaitLatch(latch);
     String key = makeKey();
     redis.set(key, "migrate", reply ->{
       assertTrue(reply.succeeded());
@@ -1589,7 +1562,7 @@ public class RedisClientTestBase extends VertxTestBase {
       });
     });
     await();
-    rdx.stop(reply ->{
+    rdx.close(reply -> {
       assertTrue(reply.succeeded());
     });
   }
@@ -1664,33 +1637,25 @@ public class RedisClientTestBase extends VertxTestBase {
   public void testMulti() throws Exception {
 
     String key = makeKey();
-    RedisClient rdx = RedisClient.create(vertx, getConfig());
-    CountDownLatch latch = new CountDownLatch(1);
-    rdx.start(asyncResult -> {
-      assertTrue(asyncResult.succeeded());
-      latch.countDown();
-    });
 
-    awaitLatch(latch);
-    
-    redis.set(key, "0", reply ->{
-      assertTrue(reply.succeeded());
-      
-    });
-    
-    redis.multi(reply -> {
-      assertTrue(reply.succeeded());
-      redis.set(makeKey(), "0", reply2 -> {
-        assertTrue(reply2.succeeded());
-        redis.set(makeKey(), "0", reply3 ->{
-          assertTrue(reply3.succeeded());
-        });
-        redis.exec(reply4 ->{
-          assertTrue(reply4.succeeded());
-          testComplete();
+    redis.set(key, "0", rep ->{
+      assertTrue(rep.succeeded());
+      redis.multi(reply -> {
+        assertTrue(reply.succeeded());
+        redis.set(makeKey(), "0", reply2 -> {
+          assertTrue(reply2.succeeded());
+          redis.set(makeKey(), "0", reply3 ->{
+            assertTrue(reply3.succeeded());
+          });
+          redis.exec(reply4 ->{
+            assertTrue(reply4.succeeded());
+            testComplete();
+          });
         });
       });
     });
+    
+
     await();
   }
 
@@ -1874,33 +1839,6 @@ public class RedisClientTestBase extends VertxTestBase {
   @Ignore
   public void testPunsubscribe() {
     // TODO
-  }
-
-  @Test
-  public void testQuit() throws InterruptedException {
-
-    redis.clientSetname("connection-1", reply -> {
-      assertTrue(String.valueOf(reply.cause()), reply.succeeded());
-      redis.quit(reply1 -> {
-        assertTrue(String.valueOf(reply1.cause()), reply1.succeeded());
-
-        redis.ping(reply2 -> {
-          if(reply2.succeeded()) {
-            redis.clientGetname(reply3 -> {
-              assertTrue(String.valueOf(reply3.cause()), reply3.succeeded());
-              assertNotSame("Connection is still alive", "connection-1", reply3.result());
-
-              testComplete();
-            });
-          } else {
-            assertFalse("Connection is still alive", reply2.succeeded());
-            assertTrue(reply2.cause().getMessage().indexOf("Connection closed") != -1);
-            testComplete();
-          }
-        });
-      });
-    });
-    await();
   }
 
   @Test
@@ -2191,14 +2129,6 @@ public class RedisClientTestBase extends VertxTestBase {
     JsonObject job = new JsonObject().put("host", "localhost").put("port", 6379);
     RedisClient rdx = RedisClient.create(vertx, job);
 
-    CountDownLatch latch = new CountDownLatch(1);
-    rdx.start(asyncResult -> {
-      assertTrue(asyncResult.succeeded());
-      latch.countDown();
-    });
-
-    awaitLatch(latch);
-
     rdx.scriptKill(reply ->{
       assertTrue(reply.succeeded());
       rdx.info(reply2 ->{
@@ -2410,41 +2340,6 @@ public class RedisClientTestBase extends VertxTestBase {
       });
     });
     await();
-  }
-
-  @Test
-  public void testShutdown() throws Exception {
-
-    RedisServer testServer = new RedisServer(6380);
-    testServer.start();
-
-    JsonObject job = new JsonObject().put("host", "localhost").put("port", 6380);
-    RedisClient rdx = RedisClient.create(vertx, job);
-
-    CountDownLatch latch = new CountDownLatch(1);
-    rdx.start(asyncResult -> {
-      if (asyncResult.succeeded()) {
-        latch.countDown();
-      } else {
-        throw new RuntimeException("failed to setup", asyncResult.cause());
-      }
-    });
-
-    awaitLatch(latch);
-
-    rdx.shutdown(ShutdownOptions.NOSAVE);
-
-    // Wait a bit then ping
-
-    vertx.setTimer(500, tid -> {
-      rdx.ping(reply ->{
-        assertFalse(reply.succeeded());
-        testComplete();
-      });
-    });
-
-    await();
-
   }
 
   @Test
@@ -2880,14 +2775,7 @@ public class RedisClientTestBase extends VertxTestBase {
     String key = makeKey();
     
     RedisClient rdx = RedisClient.create(vertx, getConfig());
-    CountDownLatch latch = new CountDownLatch(1);
-    rdx.start(asyncResult -> {
-      assertTrue(asyncResult.succeeded());
-      latch.countDown();
-    });
 
-    awaitLatch(latch);
-    
     CountDownLatch clientLatch = new CountDownLatch(1);
     
     redis.set(key, "0", reply ->{

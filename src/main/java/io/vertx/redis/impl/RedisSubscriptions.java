@@ -1,12 +1,12 @@
 package io.vertx.redis.impl;
 
-import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 public class RedisSubscriptions {
 
-  private final Map<String, MessageHandler> channelSubscribers = new HashMap<>();
-  private final Map<String, MessageHandler> patternSubscribers = new HashMap<>();
+  private final Map<String, MessageHandler> channelSubscribers = new ConcurrentHashMap<>();
+  private final Map<String, MessageHandler> patternSubscribers = new ConcurrentHashMap<>();
 
   public void registerChannelSubscribeHandler(String channel, MessageHandler messageHandler) {
     channelSubscribers.put(channel, messageHandler);

@@ -46,28 +46,10 @@ var RedisClient = function(j_val) {
    @public
    @param handler {function} 
    */
-  this.start = function(handler) {
+  this.close = function(handler) {
     var __args = arguments;
     if (__args.length === 1 && typeof __args[0] === 'function') {
-      j_redisClient["start(io.vertx.core.Handler)"](function(ar) {
-      if (ar.succeeded()) {
-        handler(null, null);
-      } else {
-        handler(null, ar.cause());
-      }
-    });
-    } else utils.invalidArgs();
-  };
-
-  /**
-
-   @public
-   @param handler {function} 
-   */
-  this.stop = function(handler) {
-    var __args = arguments;
-    if (__args.length === 1 && typeof __args[0] === 'function') {
-      j_redisClient["stop(io.vertx.core.Handler)"](function(ar) {
+      j_redisClient["close(io.vertx.core.Handler)"](function(ar) {
       if (ar.succeeded()) {
         handler(null, null);
       } else {
@@ -84,17 +66,18 @@ var RedisClient = function(j_val) {
    @param key {string} Key string 
    @param value {string} Value to append 
    @param handler {function} Handler for the result of this call. 
+   @return {RedisClient}
    */
   this.append = function(key, value, handler) {
     var __args = arguments;
     if (__args.length === 3 && typeof __args[0] === 'string' && typeof __args[1] === 'string' && typeof __args[2] === 'function') {
-      j_redisClient["append(java.lang.String,java.lang.String,io.vertx.core.Handler)"](key, value, function(ar) {
+      return new RedisClient(j_redisClient["append(java.lang.String,java.lang.String,io.vertx.core.Handler)"](key, value, function(ar) {
       if (ar.succeeded()) {
         handler(ar.result(), null);
       } else {
         handler(null, ar.cause());
       }
-    });
+    }));
     } else utils.invalidArgs();
   };
 
@@ -104,17 +87,18 @@ var RedisClient = function(j_val) {
    @public
    @param password {string} Password for authentication 
    @param handler {function} Handler for the result of this call. 
+   @return {RedisClient}
    */
   this.auth = function(password, handler) {
     var __args = arguments;
     if (__args.length === 2 && typeof __args[0] === 'string' && typeof __args[1] === 'function') {
-      j_redisClient["auth(java.lang.String,io.vertx.core.Handler)"](password, function(ar) {
+      return new RedisClient(j_redisClient["auth(java.lang.String,io.vertx.core.Handler)"](password, function(ar) {
       if (ar.succeeded()) {
         handler(ar.result(), null);
       } else {
         handler(null, ar.cause());
       }
-    });
+    }));
     } else utils.invalidArgs();
   };
 
@@ -123,17 +107,18 @@ var RedisClient = function(j_val) {
 
    @public
    @param handler {function} 
+   @return {RedisClient}
    */
   this.bgrewriteaof = function(handler) {
     var __args = arguments;
     if (__args.length === 1 && typeof __args[0] === 'function') {
-      j_redisClient["bgrewriteaof(io.vertx.core.Handler)"](function(ar) {
+      return new RedisClient(j_redisClient["bgrewriteaof(io.vertx.core.Handler)"](function(ar) {
       if (ar.succeeded()) {
         handler(ar.result(), null);
       } else {
         handler(null, ar.cause());
       }
-    });
+    }));
     } else utils.invalidArgs();
   };
 
@@ -142,17 +127,18 @@ var RedisClient = function(j_val) {
 
    @public
    @param handler {function} 
+   @return {RedisClient}
    */
   this.bgsave = function(handler) {
     var __args = arguments;
     if (__args.length === 1 && typeof __args[0] === 'function') {
-      j_redisClient["bgsave(io.vertx.core.Handler)"](function(ar) {
+      return new RedisClient(j_redisClient["bgsave(io.vertx.core.Handler)"](function(ar) {
       if (ar.succeeded()) {
         handler(ar.result(), null);
       } else {
         handler(null, ar.cause());
       }
-    });
+    }));
     } else utils.invalidArgs();
   };
 
@@ -162,17 +148,18 @@ var RedisClient = function(j_val) {
    @public
    @param key {string} Key string 
    @param handler {function} Handler for the result of this call. 
+   @return {RedisClient}
    */
   this.bitcount = function(key, handler) {
     var __args = arguments;
     if (__args.length === 2 && typeof __args[0] === 'string' && typeof __args[1] === 'function') {
-      j_redisClient["bitcount(java.lang.String,io.vertx.core.Handler)"](key, function(ar) {
+      return new RedisClient(j_redisClient["bitcount(java.lang.String,io.vertx.core.Handler)"](key, function(ar) {
       if (ar.succeeded()) {
         handler(ar.result(), null);
       } else {
         handler(null, ar.cause());
       }
-    });
+    }));
     } else utils.invalidArgs();
   };
 
@@ -184,17 +171,18 @@ var RedisClient = function(j_val) {
    @param start {number} Start index 
    @param end {number} End index 
    @param handler {function} Handler for the result of this call. 
+   @return {RedisClient}
    */
   this.bitcountRange = function(key, start, end, handler) {
     var __args = arguments;
     if (__args.length === 4 && typeof __args[0] === 'string' && typeof __args[1] ==='number' && typeof __args[2] ==='number' && typeof __args[3] === 'function') {
-      j_redisClient["bitcountRange(java.lang.String,long,long,io.vertx.core.Handler)"](key, start, end, function(ar) {
+      return new RedisClient(j_redisClient["bitcountRange(java.lang.String,long,long,io.vertx.core.Handler)"](key, start, end, function(ar) {
       if (ar.succeeded()) {
         handler(ar.result(), null);
       } else {
         handler(null, ar.cause());
       }
-    });
+    }));
     } else utils.invalidArgs();
   };
 
@@ -206,17 +194,18 @@ var RedisClient = function(j_val) {
    @param destkey {string} Destination key where result is stored 
    @param keys {Array.<string>} List of keys on which to perform the operation 
    @param handler {function} Handler for the result of this call. 
+   @return {RedisClient}
    */
   this.bitop = function(operation, destkey, keys, handler) {
     var __args = arguments;
     if (__args.length === 4 && typeof __args[0] === 'string' && typeof __args[1] === 'string' && typeof __args[2] === 'object' && __args[2] instanceof Array && typeof __args[3] === 'function') {
-      j_redisClient["bitop(io.vertx.redis.op.BitOperation,java.lang.String,java.util.List,io.vertx.core.Handler)"](io.vertx.redis.op.BitOperation.valueOf(__args[0]), destkey, keys, function(ar) {
+      return new RedisClient(j_redisClient["bitop(io.vertx.redis.op.BitOperation,java.lang.String,java.util.List,io.vertx.core.Handler)"](io.vertx.redis.op.BitOperation.valueOf(__args[0]), destkey, keys, function(ar) {
       if (ar.succeeded()) {
         handler(ar.result(), null);
       } else {
         handler(null, ar.cause());
       }
-    });
+    }));
     } else utils.invalidArgs();
   };
 
@@ -227,17 +216,18 @@ var RedisClient = function(j_val) {
    @param key {string} Key string 
    @param bit {number} What bit value to look for - must be 1, or 0 
    @param handler {function} Handler for the result of this call. 
+   @return {RedisClient}
    */
   this.bitpos = function(key, bit, handler) {
     var __args = arguments;
     if (__args.length === 3 && typeof __args[0] === 'string' && typeof __args[1] ==='number' && typeof __args[2] === 'function') {
-      j_redisClient["bitpos(java.lang.String,int,io.vertx.core.Handler)"](key, bit, function(ar) {
+      return new RedisClient(j_redisClient["bitpos(java.lang.String,int,io.vertx.core.Handler)"](key, bit, function(ar) {
       if (ar.succeeded()) {
         handler(ar.result(), null);
       } else {
         handler(null, ar.cause());
       }
-    });
+    }));
     } else utils.invalidArgs();
   };
 
@@ -251,17 +241,18 @@ var RedisClient = function(j_val) {
    @param bit {number} What bit value to look for - must be 1, or 0 
    @param start {number} Start offset 
    @param handler {function} Handler for the result of this call. 
+   @return {RedisClient}
    */
   this.bitposFrom = function(key, bit, start, handler) {
     var __args = arguments;
     if (__args.length === 4 && typeof __args[0] === 'string' && typeof __args[1] ==='number' && typeof __args[2] ==='number' && typeof __args[3] === 'function') {
-      j_redisClient["bitposFrom(java.lang.String,int,int,io.vertx.core.Handler)"](key, bit, start, function(ar) {
+      return new RedisClient(j_redisClient["bitposFrom(java.lang.String,int,int,io.vertx.core.Handler)"](key, bit, start, function(ar) {
       if (ar.succeeded()) {
         handler(ar.result(), null);
       } else {
         handler(null, ar.cause());
       }
-    });
+    }));
     } else utils.invalidArgs();
   };
 
@@ -277,17 +268,18 @@ var RedisClient = function(j_val) {
    @param start {number} Start offset 
    @param stop {number} End offset - inclusive 
    @param handler {function} Handler for the result of this call. 
+   @return {RedisClient}
    */
   this.bitposRange = function(key, bit, start, stop, handler) {
     var __args = arguments;
     if (__args.length === 5 && typeof __args[0] === 'string' && typeof __args[1] ==='number' && typeof __args[2] ==='number' && typeof __args[3] ==='number' && typeof __args[4] === 'function') {
-      j_redisClient["bitposRange(java.lang.String,int,int,int,io.vertx.core.Handler)"](key, bit, start, stop, function(ar) {
+      return new RedisClient(j_redisClient["bitposRange(java.lang.String,int,int,int,io.vertx.core.Handler)"](key, bit, start, stop, function(ar) {
       if (ar.succeeded()) {
         handler(ar.result(), null);
       } else {
         handler(null, ar.cause());
       }
-    });
+    }));
     } else utils.invalidArgs();
   };
 
@@ -298,17 +290,18 @@ var RedisClient = function(j_val) {
    @param key {string} Key string identifying a list to watch 
    @param seconds {number} Timeout in seconds 
    @param handler {function} Handler for the result of this call. 
+   @return {RedisClient}
    */
   this.blpop = function(key, seconds, handler) {
     var __args = arguments;
     if (__args.length === 3 && typeof __args[0] === 'string' && typeof __args[1] ==='number' && typeof __args[2] === 'function') {
-      j_redisClient["blpop(java.lang.String,int,io.vertx.core.Handler)"](key, seconds, function(ar) {
+      return new RedisClient(j_redisClient["blpop(java.lang.String,int,io.vertx.core.Handler)"](key, seconds, function(ar) {
       if (ar.succeeded()) {
         handler(utils.convReturnJson(ar.result()), null);
       } else {
         handler(null, ar.cause());
       }
-    });
+    }));
     } else utils.invalidArgs();
   };
 
@@ -319,17 +312,18 @@ var RedisClient = function(j_val) {
    @param keys {Array.<string>} List of key strings identifying lists to watch 
    @param seconds {number} Timeout in seconds 
    @param handler {function} Handler for the result of this call. 
+   @return {RedisClient}
    */
   this.blpopMany = function(keys, seconds, handler) {
     var __args = arguments;
     if (__args.length === 3 && typeof __args[0] === 'object' && __args[0] instanceof Array && typeof __args[1] ==='number' && typeof __args[2] === 'function') {
-      j_redisClient["blpopMany(java.util.List,int,io.vertx.core.Handler)"](keys, seconds, function(ar) {
+      return new RedisClient(j_redisClient["blpopMany(java.util.List,int,io.vertx.core.Handler)"](keys, seconds, function(ar) {
       if (ar.succeeded()) {
         handler(utils.convReturnJson(ar.result()), null);
       } else {
         handler(null, ar.cause());
       }
-    });
+    }));
     } else utils.invalidArgs();
   };
 
@@ -340,17 +334,18 @@ var RedisClient = function(j_val) {
    @param key {string} Key string identifying a list to watch 
    @param seconds {number} Timeout in seconds 
    @param handler {function} Handler for the result of this call. 
+   @return {RedisClient}
    */
   this.brpop = function(key, seconds, handler) {
     var __args = arguments;
     if (__args.length === 3 && typeof __args[0] === 'string' && typeof __args[1] ==='number' && typeof __args[2] === 'function') {
-      j_redisClient["brpop(java.lang.String,int,io.vertx.core.Handler)"](key, seconds, function(ar) {
+      return new RedisClient(j_redisClient["brpop(java.lang.String,int,io.vertx.core.Handler)"](key, seconds, function(ar) {
       if (ar.succeeded()) {
         handler(utils.convReturnJson(ar.result()), null);
       } else {
         handler(null, ar.cause());
       }
-    });
+    }));
     } else utils.invalidArgs();
   };
 
@@ -361,17 +356,18 @@ var RedisClient = function(j_val) {
    @param keys {Array.<string>} List of key strings identifying lists to watch 
    @param seconds {number} Timeout in seconds 
    @param handler {function} Handler for the result of this call. 
+   @return {RedisClient}
    */
   this.brpopMany = function(keys, seconds, handler) {
     var __args = arguments;
     if (__args.length === 3 && typeof __args[0] === 'object' && __args[0] instanceof Array && typeof __args[1] ==='number' && typeof __args[2] === 'function') {
-      j_redisClient["brpopMany(java.util.List,int,io.vertx.core.Handler)"](keys, seconds, function(ar) {
+      return new RedisClient(j_redisClient["brpopMany(java.util.List,int,io.vertx.core.Handler)"](keys, seconds, function(ar) {
       if (ar.succeeded()) {
         handler(utils.convReturnJson(ar.result()), null);
       } else {
         handler(null, ar.cause());
       }
-    });
+    }));
     } else utils.invalidArgs();
   };
 
@@ -383,17 +379,18 @@ var RedisClient = function(j_val) {
    @param destkey {string} Key string identifying the destination list 
    @param seconds {number} Timeout in seconds 
    @param handler {function} Handler for the result of this call. 
+   @return {RedisClient}
    */
   this.brpoplpush = function(key, destkey, seconds, handler) {
     var __args = arguments;
     if (__args.length === 4 && typeof __args[0] === 'string' && typeof __args[1] === 'string' && typeof __args[2] ==='number' && typeof __args[3] === 'function') {
-      j_redisClient["brpoplpush(java.lang.String,java.lang.String,int,io.vertx.core.Handler)"](key, destkey, seconds, function(ar) {
+      return new RedisClient(j_redisClient["brpoplpush(java.lang.String,java.lang.String,int,io.vertx.core.Handler)"](key, destkey, seconds, function(ar) {
       if (ar.succeeded()) {
         handler(null, null);
       } else {
         handler(null, ar.cause());
       }
-    });
+    }));
     } else utils.invalidArgs();
   };
 
@@ -403,17 +400,18 @@ var RedisClient = function(j_val) {
    @public
    @param filter {Object} Filter options 
    @param handler {function} Handler for the result of this call. 
+   @return {RedisClient}
    */
   this.clientKill = function(filter, handler) {
     var __args = arguments;
     if (__args.length === 2 && typeof __args[0] === 'object' && typeof __args[1] === 'function') {
-      j_redisClient["clientKill(io.vertx.redis.op.KillFilter,io.vertx.core.Handler)"](filter != null ? new KillFilter(new JsonObject(JSON.stringify(filter))) : null, function(ar) {
+      return new RedisClient(j_redisClient["clientKill(io.vertx.redis.op.KillFilter,io.vertx.core.Handler)"](filter != null ? new KillFilter(new JsonObject(JSON.stringify(filter))) : null, function(ar) {
       if (ar.succeeded()) {
         handler(ar.result(), null);
       } else {
         handler(null, ar.cause());
       }
-    });
+    }));
     } else utils.invalidArgs();
   };
 
@@ -422,17 +420,18 @@ var RedisClient = function(j_val) {
 
    @public
    @param handler {function} 
+   @return {RedisClient}
    */
   this.clientList = function(handler) {
     var __args = arguments;
     if (__args.length === 1 && typeof __args[0] === 'function') {
-      j_redisClient["clientList(io.vertx.core.Handler)"](function(ar) {
+      return new RedisClient(j_redisClient["clientList(io.vertx.core.Handler)"](function(ar) {
       if (ar.succeeded()) {
         handler(ar.result(), null);
       } else {
         handler(null, ar.cause());
       }
-    });
+    }));
     } else utils.invalidArgs();
   };
 
@@ -441,17 +440,18 @@ var RedisClient = function(j_val) {
 
    @public
    @param handler {function} 
+   @return {RedisClient}
    */
   this.clientGetname = function(handler) {
     var __args = arguments;
     if (__args.length === 1 && typeof __args[0] === 'function') {
-      j_redisClient["clientGetname(io.vertx.core.Handler)"](function(ar) {
+      return new RedisClient(j_redisClient["clientGetname(io.vertx.core.Handler)"](function(ar) {
       if (ar.succeeded()) {
         handler(ar.result(), null);
       } else {
         handler(null, ar.cause());
       }
-    });
+    }));
     } else utils.invalidArgs();
   };
 
@@ -461,17 +461,18 @@ var RedisClient = function(j_val) {
    @public
    @param millis {number} Pause time in milliseconds 
    @param handler {function} Handler for the result of this call. 
+   @return {RedisClient}
    */
   this.clientPause = function(millis, handler) {
     var __args = arguments;
     if (__args.length === 2 && typeof __args[0] ==='number' && typeof __args[1] === 'function') {
-      j_redisClient["clientPause(long,io.vertx.core.Handler)"](millis, function(ar) {
+      return new RedisClient(j_redisClient["clientPause(long,io.vertx.core.Handler)"](millis, function(ar) {
       if (ar.succeeded()) {
         handler(ar.result(), null);
       } else {
         handler(null, ar.cause());
       }
-    });
+    }));
     } else utils.invalidArgs();
   };
 
@@ -481,17 +482,18 @@ var RedisClient = function(j_val) {
    @public
    @param name {string} New name for current connection 
    @param handler {function} Handler for the result of this call. 
+   @return {RedisClient}
    */
   this.clientSetname = function(name, handler) {
     var __args = arguments;
     if (__args.length === 2 && typeof __args[0] === 'string' && typeof __args[1] === 'function') {
-      j_redisClient["clientSetname(java.lang.String,io.vertx.core.Handler)"](name, function(ar) {
+      return new RedisClient(j_redisClient["clientSetname(java.lang.String,io.vertx.core.Handler)"](name, function(ar) {
       if (ar.succeeded()) {
         handler(ar.result(), null);
       } else {
         handler(null, ar.cause());
       }
-    });
+    }));
     } else utils.invalidArgs();
   };
 
@@ -500,17 +502,18 @@ var RedisClient = function(j_val) {
 
    @public
    @param handler {function} 
+   @return {RedisClient}
    */
   this.clusterSlots = function(handler) {
     var __args = arguments;
     if (__args.length === 1 && typeof __args[0] === 'function') {
-      j_redisClient["clusterSlots(io.vertx.core.Handler)"](function(ar) {
+      return new RedisClient(j_redisClient["clusterSlots(io.vertx.core.Handler)"](function(ar) {
       if (ar.succeeded()) {
         handler(utils.convReturnJson(ar.result()), null);
       } else {
         handler(null, ar.cause());
       }
-    });
+    }));
     } else utils.invalidArgs();
   };
 
@@ -519,17 +522,18 @@ var RedisClient = function(j_val) {
 
    @public
    @param handler {function} 
+   @return {RedisClient}
    */
   this.command = function(handler) {
     var __args = arguments;
     if (__args.length === 1 && typeof __args[0] === 'function') {
-      j_redisClient["command(io.vertx.core.Handler)"](function(ar) {
+      return new RedisClient(j_redisClient["command(io.vertx.core.Handler)"](function(ar) {
       if (ar.succeeded()) {
         handler(utils.convReturnJson(ar.result()), null);
       } else {
         handler(null, ar.cause());
       }
-    });
+    }));
     } else utils.invalidArgs();
   };
 
@@ -538,17 +542,18 @@ var RedisClient = function(j_val) {
 
    @public
    @param handler {function} 
+   @return {RedisClient}
    */
   this.commandCount = function(handler) {
     var __args = arguments;
     if (__args.length === 1 && typeof __args[0] === 'function') {
-      j_redisClient["commandCount(io.vertx.core.Handler)"](function(ar) {
+      return new RedisClient(j_redisClient["commandCount(io.vertx.core.Handler)"](function(ar) {
       if (ar.succeeded()) {
         handler(ar.result(), null);
       } else {
         handler(null, ar.cause());
       }
-    });
+    }));
     } else utils.invalidArgs();
   };
 
@@ -557,17 +562,18 @@ var RedisClient = function(j_val) {
 
    @public
    @param handler {function} 
+   @return {RedisClient}
    */
   this.commandGetkeys = function(handler) {
     var __args = arguments;
     if (__args.length === 1 && typeof __args[0] === 'function') {
-      j_redisClient["commandGetkeys(io.vertx.core.Handler)"](function(ar) {
+      return new RedisClient(j_redisClient["commandGetkeys(io.vertx.core.Handler)"](function(ar) {
       if (ar.succeeded()) {
         handler(utils.convReturnJson(ar.result()), null);
       } else {
         handler(null, ar.cause());
       }
-    });
+    }));
     } else utils.invalidArgs();
   };
 
@@ -577,17 +583,18 @@ var RedisClient = function(j_val) {
    @public
    @param commands {Array.<string>} List of commands to get info for 
    @param handler {function} Handler for the result of this call. 
+   @return {RedisClient}
    */
   this.commandInfo = function(commands, handler) {
     var __args = arguments;
     if (__args.length === 2 && typeof __args[0] === 'object' && __args[0] instanceof Array && typeof __args[1] === 'function') {
-      j_redisClient["commandInfo(java.util.List,io.vertx.core.Handler)"](commands, function(ar) {
+      return new RedisClient(j_redisClient["commandInfo(java.util.List,io.vertx.core.Handler)"](commands, function(ar) {
       if (ar.succeeded()) {
         handler(utils.convReturnJson(ar.result()), null);
       } else {
         handler(null, ar.cause());
       }
-    });
+    }));
     } else utils.invalidArgs();
   };
 
@@ -597,17 +604,18 @@ var RedisClient = function(j_val) {
    @public
    @param parameter {string} Configuration parameter 
    @param handler {function} Handler for the result of this call. 
+   @return {RedisClient}
    */
   this.configGet = function(parameter, handler) {
     var __args = arguments;
     if (__args.length === 2 && typeof __args[0] === 'string' && typeof __args[1] === 'function') {
-      j_redisClient["configGet(java.lang.String,io.vertx.core.Handler)"](parameter, function(ar) {
+      return new RedisClient(j_redisClient["configGet(java.lang.String,io.vertx.core.Handler)"](parameter, function(ar) {
       if (ar.succeeded()) {
         handler(utils.convReturnJson(ar.result()), null);
       } else {
         handler(null, ar.cause());
       }
-    });
+    }));
     } else utils.invalidArgs();
   };
 
@@ -616,17 +624,18 @@ var RedisClient = function(j_val) {
 
    @public
    @param handler {function} 
+   @return {RedisClient}
    */
   this.configRewrite = function(handler) {
     var __args = arguments;
     if (__args.length === 1 && typeof __args[0] === 'function') {
-      j_redisClient["configRewrite(io.vertx.core.Handler)"](function(ar) {
+      return new RedisClient(j_redisClient["configRewrite(io.vertx.core.Handler)"](function(ar) {
       if (ar.succeeded()) {
         handler(ar.result(), null);
       } else {
         handler(null, ar.cause());
       }
-    });
+    }));
     } else utils.invalidArgs();
   };
 
@@ -637,17 +646,18 @@ var RedisClient = function(j_val) {
    @param parameter {string} Configuration parameter 
    @param value {string} New value 
    @param handler {function} Handler for the result of this call. 
+   @return {RedisClient}
    */
   this.configSet = function(parameter, value, handler) {
     var __args = arguments;
     if (__args.length === 3 && typeof __args[0] === 'string' && typeof __args[1] === 'string' && typeof __args[2] === 'function') {
-      j_redisClient["configSet(java.lang.String,java.lang.String,io.vertx.core.Handler)"](parameter, value, function(ar) {
+      return new RedisClient(j_redisClient["configSet(java.lang.String,java.lang.String,io.vertx.core.Handler)"](parameter, value, function(ar) {
       if (ar.succeeded()) {
         handler(ar.result(), null);
       } else {
         handler(null, ar.cause());
       }
-    });
+    }));
     } else utils.invalidArgs();
   };
 
@@ -656,17 +666,18 @@ var RedisClient = function(j_val) {
 
    @public
    @param handler {function} 
+   @return {RedisClient}
    */
   this.configResetstat = function(handler) {
     var __args = arguments;
     if (__args.length === 1 && typeof __args[0] === 'function') {
-      j_redisClient["configResetstat(io.vertx.core.Handler)"](function(ar) {
+      return new RedisClient(j_redisClient["configResetstat(io.vertx.core.Handler)"](function(ar) {
       if (ar.succeeded()) {
         handler(ar.result(), null);
       } else {
         handler(null, ar.cause());
       }
-    });
+    }));
     } else utils.invalidArgs();
   };
 
@@ -675,17 +686,18 @@ var RedisClient = function(j_val) {
 
    @public
    @param handler {function} 
+   @return {RedisClient}
    */
   this.dbsize = function(handler) {
     var __args = arguments;
     if (__args.length === 1 && typeof __args[0] === 'function') {
-      j_redisClient["dbsize(io.vertx.core.Handler)"](function(ar) {
+      return new RedisClient(j_redisClient["dbsize(io.vertx.core.Handler)"](function(ar) {
       if (ar.succeeded()) {
         handler(ar.result(), null);
       } else {
         handler(null, ar.cause());
       }
-    });
+    }));
     } else utils.invalidArgs();
   };
 
@@ -695,17 +707,18 @@ var RedisClient = function(j_val) {
    @public
    @param key {string} Key string 
    @param handler {function} Handler for the result of this call. 
+   @return {RedisClient}
    */
   this.debugObject = function(key, handler) {
     var __args = arguments;
     if (__args.length === 2 && typeof __args[0] === 'string' && typeof __args[1] === 'function') {
-      j_redisClient["debugObject(java.lang.String,io.vertx.core.Handler)"](key, function(ar) {
+      return new RedisClient(j_redisClient["debugObject(java.lang.String,io.vertx.core.Handler)"](key, function(ar) {
       if (ar.succeeded()) {
         handler(ar.result(), null);
       } else {
         handler(null, ar.cause());
       }
-    });
+    }));
     } else utils.invalidArgs();
   };
 
@@ -714,17 +727,18 @@ var RedisClient = function(j_val) {
 
    @public
    @param handler {function} 
+   @return {RedisClient}
    */
   this.debugSegfault = function(handler) {
     var __args = arguments;
     if (__args.length === 1 && typeof __args[0] === 'function') {
-      j_redisClient["debugSegfault(io.vertx.core.Handler)"](function(ar) {
+      return new RedisClient(j_redisClient["debugSegfault(io.vertx.core.Handler)"](function(ar) {
       if (ar.succeeded()) {
         handler(ar.result(), null);
       } else {
         handler(null, ar.cause());
       }
-    });
+    }));
     } else utils.invalidArgs();
   };
 
@@ -734,17 +748,18 @@ var RedisClient = function(j_val) {
    @public
    @param key {string} Key string 
    @param handler {function} Handler for the result of this call. 
+   @return {RedisClient}
    */
   this.decr = function(key, handler) {
     var __args = arguments;
     if (__args.length === 2 && typeof __args[0] === 'string' && typeof __args[1] === 'function') {
-      j_redisClient["decr(java.lang.String,io.vertx.core.Handler)"](key, function(ar) {
+      return new RedisClient(j_redisClient["decr(java.lang.String,io.vertx.core.Handler)"](key, function(ar) {
       if (ar.succeeded()) {
         handler(ar.result(), null);
       } else {
         handler(null, ar.cause());
       }
-    });
+    }));
     } else utils.invalidArgs();
   };
 
@@ -755,17 +770,18 @@ var RedisClient = function(j_val) {
    @param key {string} Key string 
    @param decrement {number} Value by which to decrement 
    @param handler {function} Handler for the result of this call. 
+   @return {RedisClient}
    */
   this.decrby = function(key, decrement, handler) {
     var __args = arguments;
     if (__args.length === 3 && typeof __args[0] === 'string' && typeof __args[1] ==='number' && typeof __args[2] === 'function') {
-      j_redisClient["decrby(java.lang.String,long,io.vertx.core.Handler)"](key, decrement, function(ar) {
+      return new RedisClient(j_redisClient["decrby(java.lang.String,long,io.vertx.core.Handler)"](key, decrement, function(ar) {
       if (ar.succeeded()) {
         handler(ar.result(), null);
       } else {
         handler(null, ar.cause());
       }
-    });
+    }));
     } else utils.invalidArgs();
   };
 
@@ -775,17 +791,18 @@ var RedisClient = function(j_val) {
    @public
    @param keys {Array.<string>} List of keys to delete 
    @param handler {function} Handler for the result of this call. 
+   @return {RedisClient}
    */
   this.del = function(keys, handler) {
     var __args = arguments;
     if (__args.length === 2 && typeof __args[0] === 'object' && __args[0] instanceof Array && typeof __args[1] === 'function') {
-      j_redisClient["del(java.util.List,io.vertx.core.Handler)"](keys, function(ar) {
+      return new RedisClient(j_redisClient["del(java.util.List,io.vertx.core.Handler)"](keys, function(ar) {
       if (ar.succeeded()) {
         handler(ar.result(), null);
       } else {
         handler(null, ar.cause());
       }
-    });
+    }));
     } else utils.invalidArgs();
   };
 
@@ -794,17 +811,18 @@ var RedisClient = function(j_val) {
 
    @public
    @param handler {function} 
+   @return {RedisClient}
    */
   this.discard = function(handler) {
     var __args = arguments;
     if (__args.length === 1 && typeof __args[0] === 'function') {
-      j_redisClient["discard(io.vertx.core.Handler)"](function(ar) {
+      return new RedisClient(j_redisClient["discard(io.vertx.core.Handler)"](function(ar) {
       if (ar.succeeded()) {
         handler(ar.result(), null);
       } else {
         handler(null, ar.cause());
       }
-    });
+    }));
     } else utils.invalidArgs();
   };
 
@@ -814,17 +832,18 @@ var RedisClient = function(j_val) {
    @public
    @param key {string} Key string 
    @param handler {function} Handler for the result of this call. 
+   @return {RedisClient}
    */
   this.dump = function(key, handler) {
     var __args = arguments;
     if (__args.length === 2 && typeof __args[0] === 'string' && typeof __args[1] === 'function') {
-      j_redisClient["dump(java.lang.String,io.vertx.core.Handler)"](key, function(ar) {
+      return new RedisClient(j_redisClient["dump(java.lang.String,io.vertx.core.Handler)"](key, function(ar) {
       if (ar.succeeded()) {
         handler(ar.result(), null);
       } else {
         handler(null, ar.cause());
       }
-    });
+    }));
     } else utils.invalidArgs();
   };
 
@@ -834,17 +853,18 @@ var RedisClient = function(j_val) {
    @public
    @param message {string} String to echo 
    @param handler {function} Handler for the result of this call. 
+   @return {RedisClient}
    */
   this.echo = function(message, handler) {
     var __args = arguments;
     if (__args.length === 2 && typeof __args[0] === 'string' && typeof __args[1] === 'function') {
-      j_redisClient["echo(java.lang.String,io.vertx.core.Handler)"](message, function(ar) {
+      return new RedisClient(j_redisClient["echo(java.lang.String,io.vertx.core.Handler)"](message, function(ar) {
       if (ar.succeeded()) {
         handler(ar.result(), null);
       } else {
         handler(null, ar.cause());
       }
-    });
+    }));
     } else utils.invalidArgs();
   };
 
@@ -856,17 +876,18 @@ var RedisClient = function(j_val) {
    @param keys {Array.<string>} List of keys 
    @param args {Array.<string>} List of argument values 
    @param handler {function} Handler for the result of this call. 
+   @return {RedisClient}
    */
   this.eval = function(script, keys, args, handler) {
     var __args = arguments;
     if (__args.length === 4 && typeof __args[0] === 'string' && typeof __args[1] === 'object' && __args[1] instanceof Array && typeof __args[2] === 'object' && __args[2] instanceof Array && typeof __args[3] === 'function') {
-      j_redisClient["eval(java.lang.String,java.util.List,java.util.List,io.vertx.core.Handler)"](script, keys, args, function(ar) {
+      return new RedisClient(j_redisClient["eval(java.lang.String,java.util.List,java.util.List,io.vertx.core.Handler)"](script, keys, args, function(ar) {
       if (ar.succeeded()) {
         handler(null, null);
       } else {
         handler(null, ar.cause());
       }
-    });
+    }));
     } else utils.invalidArgs();
   };
 
@@ -878,17 +899,18 @@ var RedisClient = function(j_val) {
    @param keys {Array.<string>} List of keys 
    @param values {Array.<string>} List of values 
    @param handler {function} Handler for the result of this call. 
+   @return {RedisClient}
    */
   this.evalsha = function(sha1, keys, values, handler) {
     var __args = arguments;
     if (__args.length === 4 && typeof __args[0] === 'string' && typeof __args[1] === 'object' && __args[1] instanceof Array && typeof __args[2] === 'object' && __args[2] instanceof Array && typeof __args[3] === 'function') {
-      j_redisClient["evalsha(java.lang.String,java.util.List,java.util.List,io.vertx.core.Handler)"](sha1, keys, values, function(ar) {
+      return new RedisClient(j_redisClient["evalsha(java.lang.String,java.util.List,java.util.List,io.vertx.core.Handler)"](sha1, keys, values, function(ar) {
       if (ar.succeeded()) {
         handler(null, null);
       } else {
         handler(null, ar.cause());
       }
-    });
+    }));
     } else utils.invalidArgs();
   };
 
@@ -897,17 +919,18 @@ var RedisClient = function(j_val) {
 
    @public
    @param handler {function} 
+   @return {RedisClient}
    */
   this.exec = function(handler) {
     var __args = arguments;
     if (__args.length === 1 && typeof __args[0] === 'function') {
-      j_redisClient["exec(io.vertx.core.Handler)"](function(ar) {
+      return new RedisClient(j_redisClient["exec(io.vertx.core.Handler)"](function(ar) {
       if (ar.succeeded()) {
         handler(null, null);
       } else {
         handler(null, ar.cause());
       }
-    });
+    }));
     } else utils.invalidArgs();
   };
 
@@ -917,17 +940,18 @@ var RedisClient = function(j_val) {
    @public
    @param key {string} Key string 
    @param handler {function} Handler for the result of this call. 
+   @return {RedisClient}
    */
   this.exists = function(key, handler) {
     var __args = arguments;
     if (__args.length === 2 && typeof __args[0] === 'string' && typeof __args[1] === 'function') {
-      j_redisClient["exists(java.lang.String,io.vertx.core.Handler)"](key, function(ar) {
+      return new RedisClient(j_redisClient["exists(java.lang.String,io.vertx.core.Handler)"](key, function(ar) {
       if (ar.succeeded()) {
         handler(ar.result(), null);
       } else {
         handler(null, ar.cause());
       }
-    });
+    }));
     } else utils.invalidArgs();
   };
 
@@ -938,17 +962,18 @@ var RedisClient = function(j_val) {
    @param key {string} Key string 
    @param seconds {number} Time to live in seconds 
    @param handler {function} Handler for the result of this call. 
+   @return {RedisClient}
    */
   this.expire = function(key, seconds, handler) {
     var __args = arguments;
     if (__args.length === 3 && typeof __args[0] === 'string' && typeof __args[1] ==='number' && typeof __args[2] === 'function') {
-      j_redisClient["expire(java.lang.String,int,io.vertx.core.Handler)"](key, seconds, function(ar) {
+      return new RedisClient(j_redisClient["expire(java.lang.String,int,io.vertx.core.Handler)"](key, seconds, function(ar) {
       if (ar.succeeded()) {
         handler(ar.result(), null);
       } else {
         handler(null, ar.cause());
       }
-    });
+    }));
     } else utils.invalidArgs();
   };
 
@@ -959,17 +984,18 @@ var RedisClient = function(j_val) {
    @param key {string} Key string 
    @param seconds {number} Expiry time as Unix timestamp in seconds 
    @param handler {function} Handler for the result of this call. 
+   @return {RedisClient}
    */
   this.expireat = function(key, seconds, handler) {
     var __args = arguments;
     if (__args.length === 3 && typeof __args[0] === 'string' && typeof __args[1] ==='number' && typeof __args[2] === 'function') {
-      j_redisClient["expireat(java.lang.String,long,io.vertx.core.Handler)"](key, seconds, function(ar) {
+      return new RedisClient(j_redisClient["expireat(java.lang.String,long,io.vertx.core.Handler)"](key, seconds, function(ar) {
       if (ar.succeeded()) {
         handler(ar.result(), null);
       } else {
         handler(null, ar.cause());
       }
-    });
+    }));
     } else utils.invalidArgs();
   };
 
@@ -978,17 +1004,18 @@ var RedisClient = function(j_val) {
 
    @public
    @param handler {function} 
+   @return {RedisClient}
    */
   this.flushall = function(handler) {
     var __args = arguments;
     if (__args.length === 1 && typeof __args[0] === 'function') {
-      j_redisClient["flushall(io.vertx.core.Handler)"](function(ar) {
+      return new RedisClient(j_redisClient["flushall(io.vertx.core.Handler)"](function(ar) {
       if (ar.succeeded()) {
         handler(ar.result(), null);
       } else {
         handler(null, ar.cause());
       }
-    });
+    }));
     } else utils.invalidArgs();
   };
 
@@ -997,17 +1024,18 @@ var RedisClient = function(j_val) {
 
    @public
    @param handler {function} 
+   @return {RedisClient}
    */
   this.flushdb = function(handler) {
     var __args = arguments;
     if (__args.length === 1 && typeof __args[0] === 'function') {
-      j_redisClient["flushdb(io.vertx.core.Handler)"](function(ar) {
+      return new RedisClient(j_redisClient["flushdb(io.vertx.core.Handler)"](function(ar) {
       if (ar.succeeded()) {
         handler(ar.result(), null);
       } else {
         handler(null, ar.cause());
       }
-    });
+    }));
     } else utils.invalidArgs();
   };
 
@@ -1017,17 +1045,18 @@ var RedisClient = function(j_val) {
    @public
    @param key {string} Key string 
    @param handler {function} Handler for the result of this call. 
+   @return {RedisClient}
    */
   this.get = function(key, handler) {
     var __args = arguments;
     if (__args.length === 2 && typeof __args[0] === 'string' && typeof __args[1] === 'function') {
-      j_redisClient["get(java.lang.String,io.vertx.core.Handler)"](key, function(ar) {
+      return new RedisClient(j_redisClient["get(java.lang.String,io.vertx.core.Handler)"](key, function(ar) {
       if (ar.succeeded()) {
         handler(ar.result(), null);
       } else {
         handler(null, ar.cause());
       }
-    });
+    }));
     } else utils.invalidArgs();
   };
 
@@ -1037,17 +1066,18 @@ var RedisClient = function(j_val) {
    @public
    @param key {string} Key string 
    @param handler {function} Handler for the result of this call. 
+   @return {RedisClient}
    */
   this.getBinary = function(key, handler) {
     var __args = arguments;
     if (__args.length === 2 && typeof __args[0] === 'string' && typeof __args[1] === 'function') {
-      j_redisClient["getBinary(java.lang.String,io.vertx.core.Handler)"](key, function(ar) {
+      return new RedisClient(j_redisClient["getBinary(java.lang.String,io.vertx.core.Handler)"](key, function(ar) {
       if (ar.succeeded()) {
         handler(ar.result(), null);
       } else {
         handler(null, ar.cause());
       }
-    });
+    }));
     } else utils.invalidArgs();
   };
 
@@ -1058,17 +1088,18 @@ var RedisClient = function(j_val) {
    @param key {string} Key string 
    @param offset {number} Offset in bits 
    @param handler {function} Handler for the result of this call. 
+   @return {RedisClient}
    */
   this.getbit = function(key, offset, handler) {
     var __args = arguments;
     if (__args.length === 3 && typeof __args[0] === 'string' && typeof __args[1] ==='number' && typeof __args[2] === 'function') {
-      j_redisClient["getbit(java.lang.String,long,io.vertx.core.Handler)"](key, offset, function(ar) {
+      return new RedisClient(j_redisClient["getbit(java.lang.String,long,io.vertx.core.Handler)"](key, offset, function(ar) {
       if (ar.succeeded()) {
         handler(ar.result(), null);
       } else {
         handler(null, ar.cause());
       }
-    });
+    }));
     } else utils.invalidArgs();
   };
 
@@ -1080,17 +1111,18 @@ var RedisClient = function(j_val) {
    @param start {number} Start offset 
    @param end {number} End offset - inclusive 
    @param handler {function} Handler for the result of this call. 
+   @return {RedisClient}
    */
   this.getrange = function(key, start, end, handler) {
     var __args = arguments;
     if (__args.length === 4 && typeof __args[0] === 'string' && typeof __args[1] ==='number' && typeof __args[2] ==='number' && typeof __args[3] === 'function') {
-      j_redisClient["getrange(java.lang.String,long,long,io.vertx.core.Handler)"](key, start, end, function(ar) {
+      return new RedisClient(j_redisClient["getrange(java.lang.String,long,long,io.vertx.core.Handler)"](key, start, end, function(ar) {
       if (ar.succeeded()) {
         handler(ar.result(), null);
       } else {
         handler(null, ar.cause());
       }
-    });
+    }));
     } else utils.invalidArgs();
   };
 
@@ -1101,17 +1133,18 @@ var RedisClient = function(j_val) {
    @param key {string} Key of which value to set 
    @param value {string} New value for the key 
    @param handler {function} Handler for the result of this call. 
+   @return {RedisClient}
    */
   this.getset = function(key, value, handler) {
     var __args = arguments;
     if (__args.length === 3 && typeof __args[0] === 'string' && typeof __args[1] === 'string' && typeof __args[2] === 'function') {
-      j_redisClient["getset(java.lang.String,java.lang.String,io.vertx.core.Handler)"](key, value, function(ar) {
+      return new RedisClient(j_redisClient["getset(java.lang.String,java.lang.String,io.vertx.core.Handler)"](key, value, function(ar) {
       if (ar.succeeded()) {
         handler(ar.result(), null);
       } else {
         handler(null, ar.cause());
       }
-    });
+    }));
     } else utils.invalidArgs();
   };
 
@@ -1122,17 +1155,18 @@ var RedisClient = function(j_val) {
    @param key {string} Key string 
    @param field {string} Field name 
    @param handler {function} Handler for the result of this call. 
+   @return {RedisClient}
    */
   this.hdel = function(key, field, handler) {
     var __args = arguments;
     if (__args.length === 3 && typeof __args[0] === 'string' && typeof __args[1] === 'string' && typeof __args[2] === 'function') {
-      j_redisClient["hdel(java.lang.String,java.lang.String,io.vertx.core.Handler)"](key, field, function(ar) {
+      return new RedisClient(j_redisClient["hdel(java.lang.String,java.lang.String,io.vertx.core.Handler)"](key, field, function(ar) {
       if (ar.succeeded()) {
         handler(ar.result(), null);
       } else {
         handler(null, ar.cause());
       }
-    });
+    }));
     } else utils.invalidArgs();
   };
 
@@ -1143,17 +1177,18 @@ var RedisClient = function(j_val) {
    @param key {string} Key string 
    @param fields {Array.<string>} Field names 
    @param handler {function} Handler for the result of this call. 
+   @return {RedisClient}
    */
   this.hdelMany = function(key, fields, handler) {
     var __args = arguments;
     if (__args.length === 3 && typeof __args[0] === 'string' && typeof __args[1] === 'object' && __args[1] instanceof Array && typeof __args[2] === 'function') {
-      j_redisClient["hdelMany(java.lang.String,java.util.List,io.vertx.core.Handler)"](key, fields, function(ar) {
+      return new RedisClient(j_redisClient["hdelMany(java.lang.String,java.util.List,io.vertx.core.Handler)"](key, fields, function(ar) {
       if (ar.succeeded()) {
         handler(ar.result(), null);
       } else {
         handler(null, ar.cause());
       }
-    });
+    }));
     } else utils.invalidArgs();
   };
 
@@ -1164,17 +1199,18 @@ var RedisClient = function(j_val) {
    @param key {string} Key string 
    @param field {string} Field name 
    @param handler {function} Handler for the result of this call. 
+   @return {RedisClient}
    */
   this.hexists = function(key, field, handler) {
     var __args = arguments;
     if (__args.length === 3 && typeof __args[0] === 'string' && typeof __args[1] === 'string' && typeof __args[2] === 'function') {
-      j_redisClient["hexists(java.lang.String,java.lang.String,io.vertx.core.Handler)"](key, field, function(ar) {
+      return new RedisClient(j_redisClient["hexists(java.lang.String,java.lang.String,io.vertx.core.Handler)"](key, field, function(ar) {
       if (ar.succeeded()) {
         handler(ar.result(), null);
       } else {
         handler(null, ar.cause());
       }
-    });
+    }));
     } else utils.invalidArgs();
   };
 
@@ -1185,17 +1221,18 @@ var RedisClient = function(j_val) {
    @param key {string} Key string 
    @param field {string} Field name 
    @param handler {function} Handler for the result of this call. 
+   @return {RedisClient}
    */
   this.hget = function(key, field, handler) {
     var __args = arguments;
     if (__args.length === 3 && typeof __args[0] === 'string' && typeof __args[1] === 'string' && typeof __args[2] === 'function') {
-      j_redisClient["hget(java.lang.String,java.lang.String,io.vertx.core.Handler)"](key, field, function(ar) {
+      return new RedisClient(j_redisClient["hget(java.lang.String,java.lang.String,io.vertx.core.Handler)"](key, field, function(ar) {
       if (ar.succeeded()) {
         handler(ar.result(), null);
       } else {
         handler(null, ar.cause());
       }
-    });
+    }));
     } else utils.invalidArgs();
   };
 
@@ -1205,17 +1242,18 @@ var RedisClient = function(j_val) {
    @public
    @param key {string} Key string 
    @param handler {function} Handler for the result of this call. 
+   @return {RedisClient}
    */
   this.hgetall = function(key, handler) {
     var __args = arguments;
     if (__args.length === 2 && typeof __args[0] === 'string' && typeof __args[1] === 'function') {
-      j_redisClient["hgetall(java.lang.String,io.vertx.core.Handler)"](key, function(ar) {
+      return new RedisClient(j_redisClient["hgetall(java.lang.String,io.vertx.core.Handler)"](key, function(ar) {
       if (ar.succeeded()) {
         handler(utils.convReturnJson(ar.result()), null);
       } else {
         handler(null, ar.cause());
       }
-    });
+    }));
     } else utils.invalidArgs();
   };
 
@@ -1227,17 +1265,18 @@ var RedisClient = function(j_val) {
    @param field {string} Field name 
    @param increment {number} Value by which to increment 
    @param handler {function} Handler for the result of this call. 
+   @return {RedisClient}
    */
   this.hincrby = function(key, field, increment, handler) {
     var __args = arguments;
     if (__args.length === 4 && typeof __args[0] === 'string' && typeof __args[1] === 'string' && typeof __args[2] ==='number' && typeof __args[3] === 'function') {
-      j_redisClient["hincrby(java.lang.String,java.lang.String,long,io.vertx.core.Handler)"](key, field, increment, function(ar) {
+      return new RedisClient(j_redisClient["hincrby(java.lang.String,java.lang.String,long,io.vertx.core.Handler)"](key, field, increment, function(ar) {
       if (ar.succeeded()) {
         handler(ar.result(), null);
       } else {
         handler(null, ar.cause());
       }
-    });
+    }));
     } else utils.invalidArgs();
   };
 
@@ -1249,17 +1288,18 @@ var RedisClient = function(j_val) {
    @param field {string} Field name 
    @param increment {number} Value by which to increment 
    @param handler {function} Handler for the result of this call. 
+   @return {RedisClient}
    */
   this.hincrbyfloat = function(key, field, increment, handler) {
     var __args = arguments;
     if (__args.length === 4 && typeof __args[0] === 'string' && typeof __args[1] === 'string' && typeof __args[2] ==='number' && typeof __args[3] === 'function') {
-      j_redisClient["hincrbyfloat(java.lang.String,java.lang.String,double,io.vertx.core.Handler)"](key, field, increment, function(ar) {
+      return new RedisClient(j_redisClient["hincrbyfloat(java.lang.String,java.lang.String,double,io.vertx.core.Handler)"](key, field, increment, function(ar) {
       if (ar.succeeded()) {
         handler(ar.result(), null);
       } else {
         handler(null, ar.cause());
       }
-    });
+    }));
     } else utils.invalidArgs();
   };
 
@@ -1269,17 +1309,18 @@ var RedisClient = function(j_val) {
    @public
    @param key {string} Key string 
    @param handler {function} Handler for the result of this call. 
+   @return {RedisClient}
    */
   this.hkeys = function(key, handler) {
     var __args = arguments;
     if (__args.length === 2 && typeof __args[0] === 'string' && typeof __args[1] === 'function') {
-      j_redisClient["hkeys(java.lang.String,io.vertx.core.Handler)"](key, function(ar) {
+      return new RedisClient(j_redisClient["hkeys(java.lang.String,io.vertx.core.Handler)"](key, function(ar) {
       if (ar.succeeded()) {
         handler(utils.convReturnJson(ar.result()), null);
       } else {
         handler(null, ar.cause());
       }
-    });
+    }));
     } else utils.invalidArgs();
   };
 
@@ -1289,17 +1330,18 @@ var RedisClient = function(j_val) {
    @public
    @param key {string} Key string 
    @param handler {function} Handler for the result of this call. 
+   @return {RedisClient}
    */
   this.hlen = function(key, handler) {
     var __args = arguments;
     if (__args.length === 2 && typeof __args[0] === 'string' && typeof __args[1] === 'function') {
-      j_redisClient["hlen(java.lang.String,io.vertx.core.Handler)"](key, function(ar) {
+      return new RedisClient(j_redisClient["hlen(java.lang.String,io.vertx.core.Handler)"](key, function(ar) {
       if (ar.succeeded()) {
         handler(ar.result(), null);
       } else {
         handler(null, ar.cause());
       }
-    });
+    }));
     } else utils.invalidArgs();
   };
 
@@ -1310,17 +1352,18 @@ var RedisClient = function(j_val) {
    @param key {string} Key string 
    @param fields {Array.<string>} Field names 
    @param handler {function} Handler for the result of this call. 
+   @return {RedisClient}
    */
   this.hmget = function(key, fields, handler) {
     var __args = arguments;
     if (__args.length === 3 && typeof __args[0] === 'string' && typeof __args[1] === 'object' && __args[1] instanceof Array && typeof __args[2] === 'function') {
-      j_redisClient["hmget(java.lang.String,java.util.List,io.vertx.core.Handler)"](key, fields, function(ar) {
+      return new RedisClient(j_redisClient["hmget(java.lang.String,java.util.List,io.vertx.core.Handler)"](key, fields, function(ar) {
       if (ar.succeeded()) {
         handler(utils.convReturnJson(ar.result()), null);
       } else {
         handler(null, ar.cause());
       }
-    });
+    }));
     } else utils.invalidArgs();
   };
 
@@ -1331,17 +1374,18 @@ var RedisClient = function(j_val) {
    @param key {string} Key string 
    @param values {Array.<string>} Map of field:value pairs 
    @param handler {function} Handler for the result of this call. 
+   @return {RedisClient}
    */
   this.hmset = function(key, values, handler) {
     var __args = arguments;
     if (__args.length === 3 && typeof __args[0] === 'string' && typeof __args[1] === 'object' && typeof __args[2] === 'function') {
-      j_redisClient["hmset(java.lang.String,java.util.Map,io.vertx.core.Handler)"](key, values, function(ar) {
+      return new RedisClient(j_redisClient["hmset(java.lang.String,java.util.Map,io.vertx.core.Handler)"](key, values, function(ar) {
       if (ar.succeeded()) {
         handler(ar.result(), null);
       } else {
         handler(null, ar.cause());
       }
-    });
+    }));
     } else utils.invalidArgs();
   };
 
@@ -1353,17 +1397,18 @@ var RedisClient = function(j_val) {
    @param field {string} Field name 
    @param value {string} New value 
    @param handler {function} Handler for the result of this call. 
+   @return {RedisClient}
    */
   this.hset = function(key, field, value, handler) {
     var __args = arguments;
     if (__args.length === 4 && typeof __args[0] === 'string' && typeof __args[1] === 'string' && typeof __args[2] === 'string' && typeof __args[3] === 'function') {
-      j_redisClient["hset(java.lang.String,java.lang.String,java.lang.String,io.vertx.core.Handler)"](key, field, value, function(ar) {
+      return new RedisClient(j_redisClient["hset(java.lang.String,java.lang.String,java.lang.String,io.vertx.core.Handler)"](key, field, value, function(ar) {
       if (ar.succeeded()) {
         handler(ar.result(), null);
       } else {
         handler(null, ar.cause());
       }
-    });
+    }));
     } else utils.invalidArgs();
   };
 
@@ -1375,17 +1420,18 @@ var RedisClient = function(j_val) {
    @param field {string} Field name 
    @param value {string} New value 
    @param handler {function} Handler for the result of this call. 
+   @return {RedisClient}
    */
   this.hsetnx = function(key, field, value, handler) {
     var __args = arguments;
     if (__args.length === 4 && typeof __args[0] === 'string' && typeof __args[1] === 'string' && typeof __args[2] === 'string' && typeof __args[3] === 'function') {
-      j_redisClient["hsetnx(java.lang.String,java.lang.String,java.lang.String,io.vertx.core.Handler)"](key, field, value, function(ar) {
+      return new RedisClient(j_redisClient["hsetnx(java.lang.String,java.lang.String,java.lang.String,io.vertx.core.Handler)"](key, field, value, function(ar) {
       if (ar.succeeded()) {
         handler(ar.result(), null);
       } else {
         handler(null, ar.cause());
       }
-    });
+    }));
     } else utils.invalidArgs();
   };
 
@@ -1395,17 +1441,18 @@ var RedisClient = function(j_val) {
    @public
    @param key {string} Key string 
    @param handler {function} Handler for the result of this call. 
+   @return {RedisClient}
    */
   this.hvals = function(key, handler) {
     var __args = arguments;
     if (__args.length === 2 && typeof __args[0] === 'string' && typeof __args[1] === 'function') {
-      j_redisClient["hvals(java.lang.String,io.vertx.core.Handler)"](key, function(ar) {
+      return new RedisClient(j_redisClient["hvals(java.lang.String,io.vertx.core.Handler)"](key, function(ar) {
       if (ar.succeeded()) {
         handler(utils.convReturnJson(ar.result()), null);
       } else {
         handler(null, ar.cause());
       }
-    });
+    }));
     } else utils.invalidArgs();
   };
 
@@ -1415,17 +1462,18 @@ var RedisClient = function(j_val) {
    @public
    @param key {string} Key string 
    @param handler {function} Handler for the result of this call. 
+   @return {RedisClient}
    */
   this.incr = function(key, handler) {
     var __args = arguments;
     if (__args.length === 2 && typeof __args[0] === 'string' && typeof __args[1] === 'function') {
-      j_redisClient["incr(java.lang.String,io.vertx.core.Handler)"](key, function(ar) {
+      return new RedisClient(j_redisClient["incr(java.lang.String,io.vertx.core.Handler)"](key, function(ar) {
       if (ar.succeeded()) {
         handler(ar.result(), null);
       } else {
         handler(null, ar.cause());
       }
-    });
+    }));
     } else utils.invalidArgs();
   };
 
@@ -1436,17 +1484,18 @@ var RedisClient = function(j_val) {
    @param key {string} Key string 
    @param increment {number} Value by which to increment 
    @param handler {function} Handler for the result of this call. 
+   @return {RedisClient}
    */
   this.incrby = function(key, increment, handler) {
     var __args = arguments;
     if (__args.length === 3 && typeof __args[0] === 'string' && typeof __args[1] ==='number' && typeof __args[2] === 'function') {
-      j_redisClient["incrby(java.lang.String,long,io.vertx.core.Handler)"](key, increment, function(ar) {
+      return new RedisClient(j_redisClient["incrby(java.lang.String,long,io.vertx.core.Handler)"](key, increment, function(ar) {
       if (ar.succeeded()) {
         handler(ar.result(), null);
       } else {
         handler(null, ar.cause());
       }
-    });
+    }));
     } else utils.invalidArgs();
   };
 
@@ -1457,17 +1506,18 @@ var RedisClient = function(j_val) {
    @param key {string} Key string 
    @param increment {number} Value by which to increment 
    @param handler {function} Handler for the result of this call. 
+   @return {RedisClient}
    */
   this.incrbyfloat = function(key, increment, handler) {
     var __args = arguments;
     if (__args.length === 3 && typeof __args[0] === 'string' && typeof __args[1] ==='number' && typeof __args[2] === 'function') {
-      j_redisClient["incrbyfloat(java.lang.String,double,io.vertx.core.Handler)"](key, increment, function(ar) {
+      return new RedisClient(j_redisClient["incrbyfloat(java.lang.String,double,io.vertx.core.Handler)"](key, increment, function(ar) {
       if (ar.succeeded()) {
         handler(ar.result(), null);
       } else {
         handler(null, ar.cause());
       }
-    });
+    }));
     } else utils.invalidArgs();
   };
 
@@ -1476,17 +1526,18 @@ var RedisClient = function(j_val) {
 
    @public
    @param handler {function} Handler for the result of this call. 
+   @return {RedisClient}
    */
   this.info = function(handler) {
     var __args = arguments;
     if (__args.length === 1 && typeof __args[0] === 'function') {
-      j_redisClient["info(io.vertx.core.Handler)"](function(ar) {
+      return new RedisClient(j_redisClient["info(io.vertx.core.Handler)"](function(ar) {
       if (ar.succeeded()) {
         handler(utils.convReturnJson(ar.result()), null);
       } else {
         handler(null, ar.cause());
       }
-    });
+    }));
     } else utils.invalidArgs();
   };
 
@@ -1496,17 +1547,18 @@ var RedisClient = function(j_val) {
    @public
    @param section {string} Specific section of information to return 
    @param handler {function} Handler for the result of this call. 
+   @return {RedisClient}
    */
   this.infoSection = function(section, handler) {
     var __args = arguments;
     if (__args.length === 2 && typeof __args[0] === 'string' && typeof __args[1] === 'function') {
-      j_redisClient["infoSection(java.lang.String,io.vertx.core.Handler)"](section, function(ar) {
+      return new RedisClient(j_redisClient["infoSection(java.lang.String,io.vertx.core.Handler)"](section, function(ar) {
       if (ar.succeeded()) {
         handler(utils.convReturnJson(ar.result()), null);
       } else {
         handler(null, ar.cause());
       }
-    });
+    }));
     } else utils.invalidArgs();
   };
 
@@ -1516,17 +1568,18 @@ var RedisClient = function(j_val) {
    @public
    @param pattern {string} Pattern to limit the keys returned 
    @param handler {function} Handler for the result of this call. 
+   @return {RedisClient}
    */
   this.keys = function(pattern, handler) {
     var __args = arguments;
     if (__args.length === 2 && typeof __args[0] === 'string' && typeof __args[1] === 'function') {
-      j_redisClient["keys(java.lang.String,io.vertx.core.Handler)"](pattern, function(ar) {
+      return new RedisClient(j_redisClient["keys(java.lang.String,io.vertx.core.Handler)"](pattern, function(ar) {
       if (ar.succeeded()) {
         handler(utils.convReturnJson(ar.result()), null);
       } else {
         handler(null, ar.cause());
       }
-    });
+    }));
     } else utils.invalidArgs();
   };
 
@@ -1535,17 +1588,18 @@ var RedisClient = function(j_val) {
 
    @public
    @param handler {function} 
+   @return {RedisClient}
    */
   this.lastsave = function(handler) {
     var __args = arguments;
     if (__args.length === 1 && typeof __args[0] === 'function') {
-      j_redisClient["lastsave(io.vertx.core.Handler)"](function(ar) {
+      return new RedisClient(j_redisClient["lastsave(io.vertx.core.Handler)"](function(ar) {
       if (ar.succeeded()) {
         handler(ar.result(), null);
       } else {
         handler(null, ar.cause());
       }
-    });
+    }));
     } else utils.invalidArgs();
   };
 
@@ -1556,17 +1610,18 @@ var RedisClient = function(j_val) {
    @param key {string} Key string 
    @param index {number} Index of list element to get 
    @param handler {function} Handler for the result of this call. 
+   @return {RedisClient}
    */
   this.lindex = function(key, index, handler) {
     var __args = arguments;
     if (__args.length === 3 && typeof __args[0] === 'string' && typeof __args[1] ==='number' && typeof __args[2] === 'function') {
-      j_redisClient["lindex(java.lang.String,int,io.vertx.core.Handler)"](key, index, function(ar) {
+      return new RedisClient(j_redisClient["lindex(java.lang.String,int,io.vertx.core.Handler)"](key, index, function(ar) {
       if (ar.succeeded()) {
         handler(ar.result(), null);
       } else {
         handler(null, ar.cause());
       }
-    });
+    }));
     } else utils.invalidArgs();
   };
 
@@ -1579,17 +1634,18 @@ var RedisClient = function(j_val) {
    @param pivot {string} Key to use as a pivot 
    @param value {string} Value to be inserted before or after the pivot 
    @param handler {function} Handler for the result of this call. 
+   @return {RedisClient}
    */
   this.linsert = function(key, option, pivot, value, handler) {
     var __args = arguments;
     if (__args.length === 5 && typeof __args[0] === 'string' && typeof __args[1] === 'string' && typeof __args[2] === 'string' && typeof __args[3] === 'string' && typeof __args[4] === 'function') {
-      j_redisClient["linsert(java.lang.String,io.vertx.redis.op.InsertOptions,java.lang.String,java.lang.String,io.vertx.core.Handler)"](key, io.vertx.redis.op.InsertOptions.valueOf(__args[1]), pivot, value, function(ar) {
+      return new RedisClient(j_redisClient["linsert(java.lang.String,io.vertx.redis.op.InsertOptions,java.lang.String,java.lang.String,io.vertx.core.Handler)"](key, io.vertx.redis.op.InsertOptions.valueOf(__args[1]), pivot, value, function(ar) {
       if (ar.succeeded()) {
         handler(ar.result(), null);
       } else {
         handler(null, ar.cause());
       }
-    });
+    }));
     } else utils.invalidArgs();
   };
 
@@ -1599,17 +1655,18 @@ var RedisClient = function(j_val) {
    @public
    @param key {string} String key 
    @param handler {function} Handler for the result of this call. 
+   @return {RedisClient}
    */
   this.llen = function(key, handler) {
     var __args = arguments;
     if (__args.length === 2 && typeof __args[0] === 'string' && typeof __args[1] === 'function') {
-      j_redisClient["llen(java.lang.String,io.vertx.core.Handler)"](key, function(ar) {
+      return new RedisClient(j_redisClient["llen(java.lang.String,io.vertx.core.Handler)"](key, function(ar) {
       if (ar.succeeded()) {
         handler(ar.result(), null);
       } else {
         handler(null, ar.cause());
       }
-    });
+    }));
     } else utils.invalidArgs();
   };
 
@@ -1619,17 +1676,18 @@ var RedisClient = function(j_val) {
    @public
    @param key {string} String key 
    @param handler {function} Handler for the result of this call. 
+   @return {RedisClient}
    */
   this.lpop = function(key, handler) {
     var __args = arguments;
     if (__args.length === 2 && typeof __args[0] === 'string' && typeof __args[1] === 'function') {
-      j_redisClient["lpop(java.lang.String,io.vertx.core.Handler)"](key, function(ar) {
+      return new RedisClient(j_redisClient["lpop(java.lang.String,io.vertx.core.Handler)"](key, function(ar) {
       if (ar.succeeded()) {
         handler(ar.result(), null);
       } else {
         handler(null, ar.cause());
       }
-    });
+    }));
     } else utils.invalidArgs();
   };
 
@@ -1640,17 +1698,18 @@ var RedisClient = function(j_val) {
    @param key {string} Key string 
    @param values {Array.<string>} Values to be added at the beginning of the list, one by one 
    @param handler {function} Handler for the result of this call. 
+   @return {RedisClient}
    */
   this.lpushMany = function(key, values, handler) {
     var __args = arguments;
     if (__args.length === 3 && typeof __args[0] === 'string' && typeof __args[1] === 'object' && __args[1] instanceof Array && typeof __args[2] === 'function') {
-      j_redisClient["lpushMany(java.lang.String,java.util.List,io.vertx.core.Handler)"](key, values, function(ar) {
+      return new RedisClient(j_redisClient["lpushMany(java.lang.String,java.util.List,io.vertx.core.Handler)"](key, values, function(ar) {
       if (ar.succeeded()) {
         handler(ar.result(), null);
       } else {
         handler(null, ar.cause());
       }
-    });
+    }));
     } else utils.invalidArgs();
   };
 
@@ -1661,17 +1720,18 @@ var RedisClient = function(j_val) {
    @param key {string} Key string 
    @param value {string} Value to be added at the beginning of the list 
    @param handler {function} Handler for the result of this call. 
+   @return {RedisClient}
    */
   this.lpush = function(key, value, handler) {
     var __args = arguments;
     if (__args.length === 3 && typeof __args[0] === 'string' && typeof __args[1] === 'string' && typeof __args[2] === 'function') {
-      j_redisClient["lpush(java.lang.String,java.lang.String,io.vertx.core.Handler)"](key, value, function(ar) {
+      return new RedisClient(j_redisClient["lpush(java.lang.String,java.lang.String,io.vertx.core.Handler)"](key, value, function(ar) {
       if (ar.succeeded()) {
         handler(ar.result(), null);
       } else {
         handler(null, ar.cause());
       }
-    });
+    }));
     } else utils.invalidArgs();
   };
 
@@ -1682,17 +1742,18 @@ var RedisClient = function(j_val) {
    @param key {string} Key string 
    @param value {string} Value to add at the beginning of the list 
    @param handler {function} Handler for the result of this call. 
+   @return {RedisClient}
    */
   this.lpushx = function(key, value, handler) {
     var __args = arguments;
     if (__args.length === 3 && typeof __args[0] === 'string' && typeof __args[1] === 'string' && typeof __args[2] === 'function') {
-      j_redisClient["lpushx(java.lang.String,java.lang.String,io.vertx.core.Handler)"](key, value, function(ar) {
+      return new RedisClient(j_redisClient["lpushx(java.lang.String,java.lang.String,io.vertx.core.Handler)"](key, value, function(ar) {
       if (ar.succeeded()) {
         handler(ar.result(), null);
       } else {
         handler(null, ar.cause());
       }
-    });
+    }));
     } else utils.invalidArgs();
   };
 
@@ -1704,17 +1765,18 @@ var RedisClient = function(j_val) {
    @param from {number} Start index 
    @param to {number} Stop index 
    @param handler {function} Handler for the result of this call. 
+   @return {RedisClient}
    */
   this.lrange = function(key, from, to, handler) {
     var __args = arguments;
     if (__args.length === 4 && typeof __args[0] === 'string' && typeof __args[1] ==='number' && typeof __args[2] ==='number' && typeof __args[3] === 'function') {
-      j_redisClient["lrange(java.lang.String,long,long,io.vertx.core.Handler)"](key, from, to, function(ar) {
+      return new RedisClient(j_redisClient["lrange(java.lang.String,long,long,io.vertx.core.Handler)"](key, from, to, function(ar) {
       if (ar.succeeded()) {
         handler(utils.convReturnJson(ar.result()), null);
       } else {
         handler(null, ar.cause());
       }
-    });
+    }));
     } else utils.invalidArgs();
   };
 
@@ -1726,17 +1788,18 @@ var RedisClient = function(j_val) {
    @param count {number} Number of first found occurrences equal to $value to remove from the list 
    @param value {string} Value to be removed 
    @param handler {function} Handler for the result of this call. 
+   @return {RedisClient}
    */
   this.lrem = function(key, count, value, handler) {
     var __args = arguments;
     if (__args.length === 4 && typeof __args[0] === 'string' && typeof __args[1] ==='number' && typeof __args[2] === 'string' && typeof __args[3] === 'function') {
-      j_redisClient["lrem(java.lang.String,long,java.lang.String,io.vertx.core.Handler)"](key, count, value, function(ar) {
+      return new RedisClient(j_redisClient["lrem(java.lang.String,long,java.lang.String,io.vertx.core.Handler)"](key, count, value, function(ar) {
       if (ar.succeeded()) {
         handler(ar.result(), null);
       } else {
         handler(null, ar.cause());
       }
-    });
+    }));
     } else utils.invalidArgs();
   };
 
@@ -1748,17 +1811,18 @@ var RedisClient = function(j_val) {
    @param index {number} Position within list 
    @param value {string} New value 
    @param handler {function} Handler for the result of this call. 
+   @return {RedisClient}
    */
   this.lset = function(key, index, value, handler) {
     var __args = arguments;
     if (__args.length === 4 && typeof __args[0] === 'string' && typeof __args[1] ==='number' && typeof __args[2] === 'string' && typeof __args[3] === 'function') {
-      j_redisClient["lset(java.lang.String,long,java.lang.String,io.vertx.core.Handler)"](key, index, value, function(ar) {
+      return new RedisClient(j_redisClient["lset(java.lang.String,long,java.lang.String,io.vertx.core.Handler)"](key, index, value, function(ar) {
       if (ar.succeeded()) {
         handler(ar.result(), null);
       } else {
         handler(null, ar.cause());
       }
-    });
+    }));
     } else utils.invalidArgs();
   };
 
@@ -1770,17 +1834,18 @@ var RedisClient = function(j_val) {
    @param from {number} Start index 
    @param to {number} Stop index 
    @param handler {function} Handler for the result of this call. 
+   @return {RedisClient}
    */
   this.ltrim = function(key, from, to, handler) {
     var __args = arguments;
     if (__args.length === 4 && typeof __args[0] === 'string' && typeof __args[1] ==='number' && typeof __args[2] ==='number' && typeof __args[3] === 'function') {
-      j_redisClient["ltrim(java.lang.String,long,long,io.vertx.core.Handler)"](key, from, to, function(ar) {
+      return new RedisClient(j_redisClient["ltrim(java.lang.String,long,long,io.vertx.core.Handler)"](key, from, to, function(ar) {
       if (ar.succeeded()) {
         handler(ar.result(), null);
       } else {
         handler(null, ar.cause());
       }
-    });
+    }));
     } else utils.invalidArgs();
   };
 
@@ -1790,17 +1855,18 @@ var RedisClient = function(j_val) {
    @public
    @param key {string} Key string 
    @param handler {function} Handler for the result of this call. 
+   @return {RedisClient}
    */
   this.mget = function(key, handler) {
     var __args = arguments;
     if (__args.length === 2 && typeof __args[0] === 'string' && typeof __args[1] === 'function') {
-      j_redisClient["mget(java.lang.String,io.vertx.core.Handler)"](key, function(ar) {
+      return new RedisClient(j_redisClient["mget(java.lang.String,io.vertx.core.Handler)"](key, function(ar) {
       if (ar.succeeded()) {
         handler(utils.convReturnJson(ar.result()), null);
       } else {
         handler(null, ar.cause());
       }
-    });
+    }));
     } else utils.invalidArgs();
   };
 
@@ -1810,17 +1876,18 @@ var RedisClient = function(j_val) {
    @public
    @param keys {Array.<string>} List of keys to get 
    @param handler {function} Handler for the result of this call. 
+   @return {RedisClient}
    */
   this.mgetMany = function(keys, handler) {
     var __args = arguments;
     if (__args.length === 2 && typeof __args[0] === 'object' && __args[0] instanceof Array && typeof __args[1] === 'function') {
-      j_redisClient["mgetMany(java.util.List,io.vertx.core.Handler)"](keys, function(ar) {
+      return new RedisClient(j_redisClient["mgetMany(java.util.List,io.vertx.core.Handler)"](keys, function(ar) {
       if (ar.succeeded()) {
         handler(utils.convReturnJson(ar.result()), null);
       } else {
         handler(null, ar.cause());
       }
-    });
+    }));
     } else utils.invalidArgs();
   };
 
@@ -1835,17 +1902,18 @@ var RedisClient = function(j_val) {
    @param timeout {number} 
    @param options {Object} Migrate options 
    @param handler {function} Handler for the result of this call. 
+   @return {RedisClient}
    */
   this.migrate = function(host, port, key, destdb, timeout, options, handler) {
     var __args = arguments;
     if (__args.length === 7 && typeof __args[0] === 'string' && typeof __args[1] ==='number' && typeof __args[2] === 'string' && typeof __args[3] ==='number' && typeof __args[4] ==='number' && typeof __args[5] === 'object' && typeof __args[6] === 'function') {
-      j_redisClient["migrate(java.lang.String,int,java.lang.String,int,long,io.vertx.redis.op.MigrateOptions,io.vertx.core.Handler)"](host, port, key, destdb, timeout, options != null ? new MigrateOptions(new JsonObject(JSON.stringify(options))) : null, function(ar) {
+      return new RedisClient(j_redisClient["migrate(java.lang.String,int,java.lang.String,int,long,io.vertx.redis.op.MigrateOptions,io.vertx.core.Handler)"](host, port, key, destdb, timeout, options != null ? new MigrateOptions(new JsonObject(JSON.stringify(options))) : null, function(ar) {
       if (ar.succeeded()) {
         handler(ar.result(), null);
       } else {
         handler(null, ar.cause());
       }
-    });
+    }));
     } else utils.invalidArgs();
   };
 
@@ -1854,17 +1922,18 @@ var RedisClient = function(j_val) {
 
    @public
    @param handler {function} 
+   @return {RedisClient}
    */
   this.monitor = function(handler) {
     var __args = arguments;
     if (__args.length === 1 && typeof __args[0] === 'function') {
-      j_redisClient["monitor(io.vertx.core.Handler)"](function(ar) {
+      return new RedisClient(j_redisClient["monitor(io.vertx.core.Handler)"](function(ar) {
       if (ar.succeeded()) {
         handler(null, null);
       } else {
         handler(null, ar.cause());
       }
-    });
+    }));
     } else utils.invalidArgs();
   };
 
@@ -1875,17 +1944,18 @@ var RedisClient = function(j_val) {
    @param key {string} Key to migrate 
    @param destdb {number} Destination database index 
    @param handler {function} Handler for the result of this call. 
+   @return {RedisClient}
    */
   this.move = function(key, destdb, handler) {
     var __args = arguments;
     if (__args.length === 3 && typeof __args[0] === 'string' && typeof __args[1] ==='number' && typeof __args[2] === 'function') {
-      j_redisClient["move(java.lang.String,int,io.vertx.core.Handler)"](key, destdb, function(ar) {
+      return new RedisClient(j_redisClient["move(java.lang.String,int,io.vertx.core.Handler)"](key, destdb, function(ar) {
       if (ar.succeeded()) {
         handler(ar.result(), null);
       } else {
         handler(null, ar.cause());
       }
-    });
+    }));
     } else utils.invalidArgs();
   };
 
@@ -1895,17 +1965,18 @@ var RedisClient = function(j_val) {
    @public
    @param keyvals {Array.<string>} Key value pairs to set 
    @param handler {function} Handler for the result of this call. 
+   @return {RedisClient}
    */
   this.mset = function(keyvals, handler) {
     var __args = arguments;
     if (__args.length === 2 && typeof __args[0] === 'object' && typeof __args[1] === 'function') {
-      j_redisClient["mset(java.util.Map,io.vertx.core.Handler)"](keyvals, function(ar) {
+      return new RedisClient(j_redisClient["mset(java.util.Map,io.vertx.core.Handler)"](keyvals, function(ar) {
       if (ar.succeeded()) {
         handler(ar.result(), null);
       } else {
         handler(null, ar.cause());
       }
-    });
+    }));
     } else utils.invalidArgs();
   };
 
@@ -1915,17 +1986,18 @@ var RedisClient = function(j_val) {
    @public
    @param keyvals {Array.<string>} Key value pairs to set 
    @param handler {function} Handler for the result of this call. 
+   @return {RedisClient}
    */
   this.msetnx = function(keyvals, handler) {
     var __args = arguments;
     if (__args.length === 2 && typeof __args[0] === 'object' && typeof __args[1] === 'function') {
-      j_redisClient["msetnx(java.util.Map,io.vertx.core.Handler)"](keyvals, function(ar) {
+      return new RedisClient(j_redisClient["msetnx(java.util.Map,io.vertx.core.Handler)"](keyvals, function(ar) {
       if (ar.succeeded()) {
         handler(ar.result(), null);
       } else {
         handler(null, ar.cause());
       }
-    });
+    }));
     } else utils.invalidArgs();
   };
 
@@ -1934,17 +2006,18 @@ var RedisClient = function(j_val) {
 
    @public
    @param handler {function} 
+   @return {RedisClient}
    */
   this.multi = function(handler) {
     var __args = arguments;
     if (__args.length === 1 && typeof __args[0] === 'function') {
-      j_redisClient["multi(io.vertx.core.Handler)"](function(ar) {
+      return new RedisClient(j_redisClient["multi(io.vertx.core.Handler)"](function(ar) {
       if (ar.succeeded()) {
         handler(ar.result(), null);
       } else {
         handler(null, ar.cause());
       }
-    });
+    }));
     } else utils.invalidArgs();
   };
 
@@ -1955,17 +2028,18 @@ var RedisClient = function(j_val) {
    @param key {string} Key string 
    @param cmd {Object} Object sub command 
    @param handler {function} Handler for the result of this call. 
+   @return {RedisClient}
    */
   this.object = function(key, cmd, handler) {
     var __args = arguments;
     if (__args.length === 3 && typeof __args[0] === 'string' && typeof __args[1] === 'string' && typeof __args[2] === 'function') {
-      j_redisClient["object(java.lang.String,io.vertx.redis.op.ObjectCmd,io.vertx.core.Handler)"](key, io.vertx.redis.op.ObjectCmd.valueOf(__args[1]), function(ar) {
+      return new RedisClient(j_redisClient["object(java.lang.String,io.vertx.redis.op.ObjectCmd,io.vertx.core.Handler)"](key, io.vertx.redis.op.ObjectCmd.valueOf(__args[1]), function(ar) {
       if (ar.succeeded()) {
         handler(null, null);
       } else {
         handler(null, ar.cause());
       }
-    });
+    }));
     } else utils.invalidArgs();
   };
 
@@ -1975,17 +2049,18 @@ var RedisClient = function(j_val) {
    @public
    @param key {string} Key string 
    @param handler {function} Handler for the result of this call. 
+   @return {RedisClient}
    */
   this.persist = function(key, handler) {
     var __args = arguments;
     if (__args.length === 2 && typeof __args[0] === 'string' && typeof __args[1] === 'function') {
-      j_redisClient["persist(java.lang.String,io.vertx.core.Handler)"](key, function(ar) {
+      return new RedisClient(j_redisClient["persist(java.lang.String,io.vertx.core.Handler)"](key, function(ar) {
       if (ar.succeeded()) {
         handler(ar.result(), null);
       } else {
         handler(null, ar.cause());
       }
-    });
+    }));
     } else utils.invalidArgs();
   };
 
@@ -1996,17 +2071,18 @@ var RedisClient = function(j_val) {
    @param key {string} String key 
    @param millis {number} Time to live in milliseconds 
    @param handler {function} Handler for the result of this call. 
+   @return {RedisClient}
    */
   this.pexpire = function(key, millis, handler) {
     var __args = arguments;
     if (__args.length === 3 && typeof __args[0] === 'string' && typeof __args[1] ==='number' && typeof __args[2] === 'function') {
-      j_redisClient["pexpire(java.lang.String,long,io.vertx.core.Handler)"](key, millis, function(ar) {
+      return new RedisClient(j_redisClient["pexpire(java.lang.String,long,io.vertx.core.Handler)"](key, millis, function(ar) {
       if (ar.succeeded()) {
         handler(ar.result(), null);
       } else {
         handler(null, ar.cause());
       }
-    });
+    }));
     } else utils.invalidArgs();
   };
 
@@ -2017,17 +2093,18 @@ var RedisClient = function(j_val) {
    @param key {string} Key string 
    @param millis {number} Expiry time as Unix timestamp in milliseconds 
    @param handler {function} Handler for the result of this call. 
+   @return {RedisClient}
    */
   this.pexpireat = function(key, millis, handler) {
     var __args = arguments;
     if (__args.length === 3 && typeof __args[0] === 'string' && typeof __args[1] ==='number' && typeof __args[2] === 'function') {
-      j_redisClient["pexpireat(java.lang.String,long,io.vertx.core.Handler)"](key, millis, function(ar) {
+      return new RedisClient(j_redisClient["pexpireat(java.lang.String,long,io.vertx.core.Handler)"](key, millis, function(ar) {
       if (ar.succeeded()) {
         handler(ar.result(), null);
       } else {
         handler(null, ar.cause());
       }
-    });
+    }));
     } else utils.invalidArgs();
   };
 
@@ -2038,17 +2115,18 @@ var RedisClient = function(j_val) {
    @param key {string} Key string 
    @param element {string} Element to add 
    @param handler {function} Handler for the result of this call. 
+   @return {RedisClient}
    */
   this.pfadd = function(key, element, handler) {
     var __args = arguments;
     if (__args.length === 3 && typeof __args[0] === 'string' && typeof __args[1] === 'string' && typeof __args[2] === 'function') {
-      j_redisClient["pfadd(java.lang.String,java.lang.String,io.vertx.core.Handler)"](key, element, function(ar) {
+      return new RedisClient(j_redisClient["pfadd(java.lang.String,java.lang.String,io.vertx.core.Handler)"](key, element, function(ar) {
       if (ar.succeeded()) {
         handler(ar.result(), null);
       } else {
         handler(null, ar.cause());
       }
-    });
+    }));
     } else utils.invalidArgs();
   };
 
@@ -2059,17 +2137,18 @@ var RedisClient = function(j_val) {
    @param key {string} Key string 
    @param elements {Array.<string>} Elementa to add 
    @param handler {function} Handler for the result of this call. 
+   @return {RedisClient}
    */
   this.pfaddMany = function(key, elements, handler) {
     var __args = arguments;
     if (__args.length === 3 && typeof __args[0] === 'string' && typeof __args[1] === 'object' && __args[1] instanceof Array && typeof __args[2] === 'function') {
-      j_redisClient["pfaddMany(java.lang.String,java.util.List,io.vertx.core.Handler)"](key, elements, function(ar) {
+      return new RedisClient(j_redisClient["pfaddMany(java.lang.String,java.util.List,io.vertx.core.Handler)"](key, elements, function(ar) {
       if (ar.succeeded()) {
         handler(ar.result(), null);
       } else {
         handler(null, ar.cause());
       }
-    });
+    }));
     } else utils.invalidArgs();
   };
 
@@ -2079,17 +2158,18 @@ var RedisClient = function(j_val) {
    @public
    @param key {string} Key string 
    @param handler {function} Handler for the result of this call. 
+   @return {RedisClient}
    */
   this.pfcount = function(key, handler) {
     var __args = arguments;
     if (__args.length === 2 && typeof __args[0] === 'string' && typeof __args[1] === 'function') {
-      j_redisClient["pfcount(java.lang.String,io.vertx.core.Handler)"](key, function(ar) {
+      return new RedisClient(j_redisClient["pfcount(java.lang.String,io.vertx.core.Handler)"](key, function(ar) {
       if (ar.succeeded()) {
         handler(ar.result(), null);
       } else {
         handler(null, ar.cause());
       }
-    });
+    }));
     } else utils.invalidArgs();
   };
 
@@ -2099,17 +2179,18 @@ var RedisClient = function(j_val) {
    @public
    @param keys {Array.<string>} List of keys 
    @param handler {function} Handler for the result of this call. 
+   @return {RedisClient}
    */
   this.pfcountMany = function(keys, handler) {
     var __args = arguments;
     if (__args.length === 2 && typeof __args[0] === 'object' && __args[0] instanceof Array && typeof __args[1] === 'function') {
-      j_redisClient["pfcountMany(java.util.List,io.vertx.core.Handler)"](keys, function(ar) {
+      return new RedisClient(j_redisClient["pfcountMany(java.util.List,io.vertx.core.Handler)"](keys, function(ar) {
       if (ar.succeeded()) {
         handler(ar.result(), null);
       } else {
         handler(null, ar.cause());
       }
-    });
+    }));
     } else utils.invalidArgs();
   };
 
@@ -2120,17 +2201,18 @@ var RedisClient = function(j_val) {
    @param destkey {string} Destination key 
    @param keys {Array.<string>} List of source keys 
    @param handler {function} Handler for the result of this call. 
+   @return {RedisClient}
    */
   this.pfmerge = function(destkey, keys, handler) {
     var __args = arguments;
     if (__args.length === 3 && typeof __args[0] === 'string' && typeof __args[1] === 'object' && __args[1] instanceof Array && typeof __args[2] === 'function') {
-      j_redisClient["pfmerge(java.lang.String,java.util.List,io.vertx.core.Handler)"](destkey, keys, function(ar) {
+      return new RedisClient(j_redisClient["pfmerge(java.lang.String,java.util.List,io.vertx.core.Handler)"](destkey, keys, function(ar) {
       if (ar.succeeded()) {
         handler(ar.result(), null);
       } else {
         handler(null, ar.cause());
       }
-    });
+    }));
     } else utils.invalidArgs();
   };
 
@@ -2139,17 +2221,18 @@ var RedisClient = function(j_val) {
 
    @public
    @param handler {function} 
+   @return {RedisClient}
    */
   this.ping = function(handler) {
     var __args = arguments;
     if (__args.length === 1 && typeof __args[0] === 'function') {
-      j_redisClient["ping(io.vertx.core.Handler)"](function(ar) {
+      return new RedisClient(j_redisClient["ping(io.vertx.core.Handler)"](function(ar) {
       if (ar.succeeded()) {
         handler(ar.result(), null);
       } else {
         handler(null, ar.cause());
       }
-    });
+    }));
     } else utils.invalidArgs();
   };
 
@@ -2161,17 +2244,18 @@ var RedisClient = function(j_val) {
    @param millis {number} Number of milliseconds until the key expires 
    @param value {string} New value for key 
    @param handler {function} Handler for the result of this call. 
+   @return {RedisClient}
    */
   this.psetex = function(key, millis, value, handler) {
     var __args = arguments;
     if (__args.length === 4 && typeof __args[0] === 'string' && typeof __args[1] ==='number' && typeof __args[2] === 'string' && typeof __args[3] === 'function') {
-      j_redisClient["psetex(java.lang.String,long,java.lang.String,io.vertx.core.Handler)"](key, millis, value, function(ar) {
+      return new RedisClient(j_redisClient["psetex(java.lang.String,long,java.lang.String,io.vertx.core.Handler)"](key, millis, value, function(ar) {
       if (ar.succeeded()) {
         handler(null, null);
       } else {
         handler(null, ar.cause());
       }
-    });
+    }));
     } else utils.invalidArgs();
   };
 
@@ -2181,17 +2265,18 @@ var RedisClient = function(j_val) {
    @public
    @param pattern {string} Pattern string 
    @param handler {function} Handler for the result of this call. 
+   @return {RedisClient}
    */
   this.psubscribe = function(pattern, handler) {
     var __args = arguments;
     if (__args.length === 2 && typeof __args[0] === 'string' && typeof __args[1] === 'function') {
-      j_redisClient["psubscribe(java.lang.String,io.vertx.core.Handler)"](pattern, function(ar) {
+      return new RedisClient(j_redisClient["psubscribe(java.lang.String,io.vertx.core.Handler)"](pattern, function(ar) {
       if (ar.succeeded()) {
         handler(null, null);
       } else {
         handler(null, ar.cause());
       }
-    });
+    }));
     } else utils.invalidArgs();
   };
 
@@ -2201,17 +2286,18 @@ var RedisClient = function(j_val) {
    @public
    @param patterns {Array.<string>} List of patterns 
    @param handler {function} Handler for the result of this call. 
+   @return {RedisClient}
    */
   this.psubscribeMany = function(patterns, handler) {
     var __args = arguments;
     if (__args.length === 2 && typeof __args[0] === 'object' && __args[0] instanceof Array && typeof __args[1] === 'function') {
-      j_redisClient["psubscribeMany(java.util.List,io.vertx.core.Handler)"](patterns, function(ar) {
+      return new RedisClient(j_redisClient["psubscribeMany(java.util.List,io.vertx.core.Handler)"](patterns, function(ar) {
       if (ar.succeeded()) {
         handler(null, null);
       } else {
         handler(null, ar.cause());
       }
-    });
+    }));
     } else utils.invalidArgs();
   };
 
@@ -2221,17 +2307,18 @@ var RedisClient = function(j_val) {
    @public
    @param pattern {string} A glob-style pattern - an empty string means no pattern 
    @param handler {function} Handler for the result of this call. 
+   @return {RedisClient}
    */
   this.pubsubChannels = function(pattern, handler) {
     var __args = arguments;
     if (__args.length === 2 && typeof __args[0] === 'string' && typeof __args[1] === 'function') {
-      j_redisClient["pubsubChannels(java.lang.String,io.vertx.core.Handler)"](pattern, function(ar) {
+      return new RedisClient(j_redisClient["pubsubChannels(java.lang.String,io.vertx.core.Handler)"](pattern, function(ar) {
       if (ar.succeeded()) {
         handler(utils.convReturnJson(ar.result()), null);
       } else {
         handler(null, ar.cause());
       }
-    });
+    }));
     } else utils.invalidArgs();
   };
 
@@ -2241,17 +2328,18 @@ var RedisClient = function(j_val) {
    @public
    @param channels {Array.<string>} List of channels 
    @param handler {function} Handler for the result of this call. 
+   @return {RedisClient}
    */
   this.pubsubNumsub = function(channels, handler) {
     var __args = arguments;
     if (__args.length === 2 && typeof __args[0] === 'object' && __args[0] instanceof Array && typeof __args[1] === 'function') {
-      j_redisClient["pubsubNumsub(java.util.List,io.vertx.core.Handler)"](channels, function(ar) {
+      return new RedisClient(j_redisClient["pubsubNumsub(java.util.List,io.vertx.core.Handler)"](channels, function(ar) {
       if (ar.succeeded()) {
         handler(utils.convReturnJson(ar.result()), null);
       } else {
         handler(null, ar.cause());
       }
-    });
+    }));
     } else utils.invalidArgs();
   };
 
@@ -2260,17 +2348,18 @@ var RedisClient = function(j_val) {
 
    @public
    @param handler {function} Handler for the result of this call. 
+   @return {RedisClient}
    */
   this.pubsubNumpat = function(handler) {
     var __args = arguments;
     if (__args.length === 1 && typeof __args[0] === 'function') {
-      j_redisClient["pubsubNumpat(io.vertx.core.Handler)"](function(ar) {
+      return new RedisClient(j_redisClient["pubsubNumpat(io.vertx.core.Handler)"](function(ar) {
       if (ar.succeeded()) {
         handler(ar.result(), null);
       } else {
         handler(null, ar.cause());
       }
-    });
+    }));
     } else utils.invalidArgs();
   };
 
@@ -2280,17 +2369,18 @@ var RedisClient = function(j_val) {
    @public
    @param key {string} Key string 
    @param handler {function} Handler for the result of this call. 
+   @return {RedisClient}
    */
   this.pttl = function(key, handler) {
     var __args = arguments;
     if (__args.length === 2 && typeof __args[0] === 'string' && typeof __args[1] === 'function') {
-      j_redisClient["pttl(java.lang.String,io.vertx.core.Handler)"](key, function(ar) {
+      return new RedisClient(j_redisClient["pttl(java.lang.String,io.vertx.core.Handler)"](key, function(ar) {
       if (ar.succeeded()) {
         handler(ar.result(), null);
       } else {
         handler(null, ar.cause());
       }
-    });
+    }));
     } else utils.invalidArgs();
   };
 
@@ -2301,17 +2391,18 @@ var RedisClient = function(j_val) {
    @param channel {string} Channel key 
    @param message {string} Message to send to channel 
    @param handler {function} Handler for the result of this call. 
+   @return {RedisClient}
    */
   this.publish = function(channel, message, handler) {
     var __args = arguments;
     if (__args.length === 3 && typeof __args[0] === 'string' && typeof __args[1] === 'string' && typeof __args[2] === 'function') {
-      j_redisClient["publish(java.lang.String,java.lang.String,io.vertx.core.Handler)"](channel, message, function(ar) {
+      return new RedisClient(j_redisClient["publish(java.lang.String,java.lang.String,io.vertx.core.Handler)"](channel, message, function(ar) {
       if (ar.succeeded()) {
         handler(ar.result(), null);
       } else {
         handler(null, ar.cause());
       }
-    });
+    }));
     } else utils.invalidArgs();
   };
 
@@ -2321,36 +2412,18 @@ var RedisClient = function(j_val) {
    @public
    @param patterns {Array.<string>} List of patterns to match against 
    @param handler {function} Handler for the result of this call. 
+   @return {RedisClient}
    */
   this.punsubscribe = function(patterns, handler) {
     var __args = arguments;
     if (__args.length === 2 && typeof __args[0] === 'object' && __args[0] instanceof Array && typeof __args[1] === 'function') {
-      j_redisClient["punsubscribe(java.util.List,io.vertx.core.Handler)"](patterns, function(ar) {
+      return new RedisClient(j_redisClient["punsubscribe(java.util.List,io.vertx.core.Handler)"](patterns, function(ar) {
       if (ar.succeeded()) {
         handler(null, null);
       } else {
         handler(null, ar.cause());
       }
-    });
-    } else utils.invalidArgs();
-  };
-
-  /**
-   Close the connection
-
-   @public
-   @param handler {function} 
-   */
-  this.quit = function(handler) {
-    var __args = arguments;
-    if (__args.length === 1 && typeof __args[0] === 'function') {
-      j_redisClient["quit(io.vertx.core.Handler)"](function(ar) {
-      if (ar.succeeded()) {
-        handler(ar.result(), null);
-      } else {
-        handler(null, ar.cause());
-      }
-    });
+    }));
     } else utils.invalidArgs();
   };
 
@@ -2359,17 +2432,18 @@ var RedisClient = function(j_val) {
 
    @public
    @param handler {function} 
+   @return {RedisClient}
    */
   this.randomkey = function(handler) {
     var __args = arguments;
     if (__args.length === 1 && typeof __args[0] === 'function') {
-      j_redisClient["randomkey(io.vertx.core.Handler)"](function(ar) {
+      return new RedisClient(j_redisClient["randomkey(io.vertx.core.Handler)"](function(ar) {
       if (ar.succeeded()) {
         handler(ar.result(), null);
       } else {
         handler(null, ar.cause());
       }
-    });
+    }));
     } else utils.invalidArgs();
   };
 
@@ -2380,17 +2454,18 @@ var RedisClient = function(j_val) {
    @param key {string} Key string to be renamed 
    @param newkey {string} New key string 
    @param handler {function} Handler for the result of this call. 
+   @return {RedisClient}
    */
   this.rename = function(key, newkey, handler) {
     var __args = arguments;
     if (__args.length === 3 && typeof __args[0] === 'string' && typeof __args[1] === 'string' && typeof __args[2] === 'function') {
-      j_redisClient["rename(java.lang.String,java.lang.String,io.vertx.core.Handler)"](key, newkey, function(ar) {
+      return new RedisClient(j_redisClient["rename(java.lang.String,java.lang.String,io.vertx.core.Handler)"](key, newkey, function(ar) {
       if (ar.succeeded()) {
         handler(ar.result(), null);
       } else {
         handler(null, ar.cause());
       }
-    });
+    }));
     } else utils.invalidArgs();
   };
 
@@ -2401,17 +2476,18 @@ var RedisClient = function(j_val) {
    @param key {string} Key string to be renamed 
    @param newkey {string} New key string 
    @param handler {function} Handler for the result of this call. 
+   @return {RedisClient}
    */
   this.renamenx = function(key, newkey, handler) {
     var __args = arguments;
     if (__args.length === 3 && typeof __args[0] === 'string' && typeof __args[1] === 'string' && typeof __args[2] === 'function') {
-      j_redisClient["renamenx(java.lang.String,java.lang.String,io.vertx.core.Handler)"](key, newkey, function(ar) {
+      return new RedisClient(j_redisClient["renamenx(java.lang.String,java.lang.String,io.vertx.core.Handler)"](key, newkey, function(ar) {
       if (ar.succeeded()) {
         handler(ar.result(), null);
       } else {
         handler(null, ar.cause());
       }
-    });
+    }));
     } else utils.invalidArgs();
   };
 
@@ -2423,17 +2499,18 @@ var RedisClient = function(j_val) {
    @param millis {number} Expiry time in milliseconds to set on the key 
    @param serialized {string} Serialized form of the key value as obtained using DUMP 
    @param handler {function} Handler for the result of this call. 
+   @return {RedisClient}
    */
   this.restore = function(key, millis, serialized, handler) {
     var __args = arguments;
     if (__args.length === 4 && typeof __args[0] === 'string' && typeof __args[1] ==='number' && typeof __args[2] === 'string' && typeof __args[3] === 'function') {
-      j_redisClient["restore(java.lang.String,long,java.lang.String,io.vertx.core.Handler)"](key, millis, serialized, function(ar) {
+      return new RedisClient(j_redisClient["restore(java.lang.String,long,java.lang.String,io.vertx.core.Handler)"](key, millis, serialized, function(ar) {
       if (ar.succeeded()) {
         handler(ar.result(), null);
       } else {
         handler(null, ar.cause());
       }
-    });
+    }));
     } else utils.invalidArgs();
   };
 
@@ -2442,17 +2519,18 @@ var RedisClient = function(j_val) {
 
    @public
    @param handler {function} 
+   @return {RedisClient}
    */
   this.role = function(handler) {
     var __args = arguments;
     if (__args.length === 1 && typeof __args[0] === 'function') {
-      j_redisClient["role(io.vertx.core.Handler)"](function(ar) {
+      return new RedisClient(j_redisClient["role(io.vertx.core.Handler)"](function(ar) {
       if (ar.succeeded()) {
         handler(utils.convReturnJson(ar.result()), null);
       } else {
         handler(null, ar.cause());
       }
-    });
+    }));
     } else utils.invalidArgs();
   };
 
@@ -2462,17 +2540,18 @@ var RedisClient = function(j_val) {
    @public
    @param key {string} Key string 
    @param handler {function} Handler for the result of this call. 
+   @return {RedisClient}
    */
   this.rpop = function(key, handler) {
     var __args = arguments;
     if (__args.length === 2 && typeof __args[0] === 'string' && typeof __args[1] === 'function') {
-      j_redisClient["rpop(java.lang.String,io.vertx.core.Handler)"](key, function(ar) {
+      return new RedisClient(j_redisClient["rpop(java.lang.String,io.vertx.core.Handler)"](key, function(ar) {
       if (ar.succeeded()) {
         handler(ar.result(), null);
       } else {
         handler(null, ar.cause());
       }
-    });
+    }));
     } else utils.invalidArgs();
   };
 
@@ -2483,17 +2562,18 @@ var RedisClient = function(j_val) {
    @param key {string} Key string identifying source list 
    @param destkey {string} Key string identifying destination list 
    @param handler {function} Handler for the result of this call. 
+   @return {RedisClient}
    */
   this.rpoplpush = function(key, destkey, handler) {
     var __args = arguments;
     if (__args.length === 3 && typeof __args[0] === 'string' && typeof __args[1] === 'string' && typeof __args[2] === 'function') {
-      j_redisClient["rpoplpush(java.lang.String,java.lang.String,io.vertx.core.Handler)"](key, destkey, function(ar) {
+      return new RedisClient(j_redisClient["rpoplpush(java.lang.String,java.lang.String,io.vertx.core.Handler)"](key, destkey, function(ar) {
       if (ar.succeeded()) {
         handler(ar.result(), null);
       } else {
         handler(null, ar.cause());
       }
-    });
+    }));
     } else utils.invalidArgs();
   };
 
@@ -2504,17 +2584,18 @@ var RedisClient = function(j_val) {
    @param key {string} Key string 
    @param values {Array.<string>} List of values to add to the end of the list 
    @param handler {function} Handler for the result of this call. 
+   @return {RedisClient}
    */
   this.rpushMany = function(key, values, handler) {
     var __args = arguments;
     if (__args.length === 3 && typeof __args[0] === 'string' && typeof __args[1] === 'object' && __args[1] instanceof Array && typeof __args[2] === 'function') {
-      j_redisClient["rpushMany(java.lang.String,java.util.List,io.vertx.core.Handler)"](key, values, function(ar) {
+      return new RedisClient(j_redisClient["rpushMany(java.lang.String,java.util.List,io.vertx.core.Handler)"](key, values, function(ar) {
       if (ar.succeeded()) {
         handler(ar.result(), null);
       } else {
         handler(null, ar.cause());
       }
-    });
+    }));
     } else utils.invalidArgs();
   };
 
@@ -2525,17 +2606,18 @@ var RedisClient = function(j_val) {
    @param key {string} Key string 
    @param value {string} Value to be added to the end of the list 
    @param handler {function} Handler for the result of this call. 
+   @return {RedisClient}
    */
   this.rpush = function(key, value, handler) {
     var __args = arguments;
     if (__args.length === 3 && typeof __args[0] === 'string' && typeof __args[1] === 'string' && typeof __args[2] === 'function') {
-      j_redisClient["rpush(java.lang.String,java.lang.String,io.vertx.core.Handler)"](key, value, function(ar) {
+      return new RedisClient(j_redisClient["rpush(java.lang.String,java.lang.String,io.vertx.core.Handler)"](key, value, function(ar) {
       if (ar.succeeded()) {
         handler(ar.result(), null);
       } else {
         handler(null, ar.cause());
       }
-    });
+    }));
     } else utils.invalidArgs();
   };
 
@@ -2546,17 +2628,18 @@ var RedisClient = function(j_val) {
    @param key {string} Key string 
    @param value {string} Value to be added to the end of the list 
    @param handler {function} Handler for the result of this call. 
+   @return {RedisClient}
    */
   this.rpushx = function(key, value, handler) {
     var __args = arguments;
     if (__args.length === 3 && typeof __args[0] === 'string' && typeof __args[1] === 'string' && typeof __args[2] === 'function') {
-      j_redisClient["rpushx(java.lang.String,java.lang.String,io.vertx.core.Handler)"](key, value, function(ar) {
+      return new RedisClient(j_redisClient["rpushx(java.lang.String,java.lang.String,io.vertx.core.Handler)"](key, value, function(ar) {
       if (ar.succeeded()) {
         handler(ar.result(), null);
       } else {
         handler(null, ar.cause());
       }
-    });
+    }));
     } else utils.invalidArgs();
   };
 
@@ -2567,17 +2650,18 @@ var RedisClient = function(j_val) {
    @param key {string} Key string 
    @param member {string} Value to be added to the set 
    @param handler {function} Handler for the result of this call. 
+   @return {RedisClient}
    */
   this.sadd = function(key, member, handler) {
     var __args = arguments;
     if (__args.length === 3 && typeof __args[0] === 'string' && typeof __args[1] === 'string' && typeof __args[2] === 'function') {
-      j_redisClient["sadd(java.lang.String,java.lang.String,io.vertx.core.Handler)"](key, member, function(ar) {
+      return new RedisClient(j_redisClient["sadd(java.lang.String,java.lang.String,io.vertx.core.Handler)"](key, member, function(ar) {
       if (ar.succeeded()) {
         handler(ar.result(), null);
       } else {
         handler(null, ar.cause());
       }
-    });
+    }));
     } else utils.invalidArgs();
   };
 
@@ -2588,17 +2672,18 @@ var RedisClient = function(j_val) {
    @param key {string} Key string 
    @param members {Array.<string>} Values to be added to the set 
    @param handler {function} Handler for the result of this call. 
+   @return {RedisClient}
    */
   this.saddMany = function(key, members, handler) {
     var __args = arguments;
     if (__args.length === 3 && typeof __args[0] === 'string' && typeof __args[1] === 'object' && __args[1] instanceof Array && typeof __args[2] === 'function') {
-      j_redisClient["saddMany(java.lang.String,java.util.List,io.vertx.core.Handler)"](key, members, function(ar) {
+      return new RedisClient(j_redisClient["saddMany(java.lang.String,java.util.List,io.vertx.core.Handler)"](key, members, function(ar) {
       if (ar.succeeded()) {
         handler(ar.result(), null);
       } else {
         handler(null, ar.cause());
       }
-    });
+    }));
     } else utils.invalidArgs();
   };
 
@@ -2607,17 +2692,18 @@ var RedisClient = function(j_val) {
 
    @public
    @param handler {function} 
+   @return {RedisClient}
    */
   this.save = function(handler) {
     var __args = arguments;
     if (__args.length === 1 && typeof __args[0] === 'function') {
-      j_redisClient["save(io.vertx.core.Handler)"](function(ar) {
+      return new RedisClient(j_redisClient["save(io.vertx.core.Handler)"](function(ar) {
       if (ar.succeeded()) {
         handler(ar.result(), null);
       } else {
         handler(null, ar.cause());
       }
-    });
+    }));
     } else utils.invalidArgs();
   };
 
@@ -2627,17 +2713,18 @@ var RedisClient = function(j_val) {
    @public
    @param key {string} Key string 
    @param handler {function} Handler for the result of this call. 
+   @return {RedisClient}
    */
   this.scard = function(key, handler) {
     var __args = arguments;
     if (__args.length === 2 && typeof __args[0] === 'string' && typeof __args[1] === 'function') {
-      j_redisClient["scard(java.lang.String,io.vertx.core.Handler)"](key, function(ar) {
+      return new RedisClient(j_redisClient["scard(java.lang.String,io.vertx.core.Handler)"](key, function(ar) {
       if (ar.succeeded()) {
         handler(ar.result(), null);
       } else {
         handler(null, ar.cause());
       }
-    });
+    }));
     } else utils.invalidArgs();
   };
 
@@ -2647,17 +2734,18 @@ var RedisClient = function(j_val) {
    @public
    @param script {string} SHA1 digest identifying a script in the script cache 
    @param handler {function} Handler for the result of this call. 
+   @return {RedisClient}
    */
   this.scriptExists = function(script, handler) {
     var __args = arguments;
     if (__args.length === 2 && typeof __args[0] === 'string' && typeof __args[1] === 'function') {
-      j_redisClient["scriptExists(java.lang.String,io.vertx.core.Handler)"](script, function(ar) {
+      return new RedisClient(j_redisClient["scriptExists(java.lang.String,io.vertx.core.Handler)"](script, function(ar) {
       if (ar.succeeded()) {
         handler(utils.convReturnJson(ar.result()), null);
       } else {
         handler(null, ar.cause());
       }
-    });
+    }));
     } else utils.invalidArgs();
   };
 
@@ -2667,17 +2755,18 @@ var RedisClient = function(j_val) {
    @public
    @param scripts {Array.<string>} List of SHA1 digests identifying scripts in the script cache 
    @param handler {function} Handler for the result of this call. 
+   @return {RedisClient}
    */
   this.scriptExistsMany = function(scripts, handler) {
     var __args = arguments;
     if (__args.length === 2 && typeof __args[0] === 'object' && __args[0] instanceof Array && typeof __args[1] === 'function') {
-      j_redisClient["scriptExistsMany(java.util.List,io.vertx.core.Handler)"](scripts, function(ar) {
+      return new RedisClient(j_redisClient["scriptExistsMany(java.util.List,io.vertx.core.Handler)"](scripts, function(ar) {
       if (ar.succeeded()) {
         handler(utils.convReturnJson(ar.result()), null);
       } else {
         handler(null, ar.cause());
       }
-    });
+    }));
     } else utils.invalidArgs();
   };
 
@@ -2686,17 +2775,18 @@ var RedisClient = function(j_val) {
 
    @public
    @param handler {function} 
+   @return {RedisClient}
    */
   this.scriptFlush = function(handler) {
     var __args = arguments;
     if (__args.length === 1 && typeof __args[0] === 'function') {
-      j_redisClient["scriptFlush(io.vertx.core.Handler)"](function(ar) {
+      return new RedisClient(j_redisClient["scriptFlush(io.vertx.core.Handler)"](function(ar) {
       if (ar.succeeded()) {
         handler(ar.result(), null);
       } else {
         handler(null, ar.cause());
       }
-    });
+    }));
     } else utils.invalidArgs();
   };
 
@@ -2705,17 +2795,18 @@ var RedisClient = function(j_val) {
 
    @public
    @param handler {function} 
+   @return {RedisClient}
    */
   this.scriptKill = function(handler) {
     var __args = arguments;
     if (__args.length === 1 && typeof __args[0] === 'function') {
-      j_redisClient["scriptKill(io.vertx.core.Handler)"](function(ar) {
+      return new RedisClient(j_redisClient["scriptKill(io.vertx.core.Handler)"](function(ar) {
       if (ar.succeeded()) {
         handler(ar.result(), null);
       } else {
         handler(null, ar.cause());
       }
-    });
+    }));
     } else utils.invalidArgs();
   };
 
@@ -2725,17 +2816,18 @@ var RedisClient = function(j_val) {
    @public
    @param script {string} Lua script 
    @param handler {function} Handler for the result of this call. 
+   @return {RedisClient}
    */
   this.scriptLoad = function(script, handler) {
     var __args = arguments;
     if (__args.length === 2 && typeof __args[0] === 'string' && typeof __args[1] === 'function') {
-      j_redisClient["scriptLoad(java.lang.String,io.vertx.core.Handler)"](script, function(ar) {
+      return new RedisClient(j_redisClient["scriptLoad(java.lang.String,io.vertx.core.Handler)"](script, function(ar) {
       if (ar.succeeded()) {
         handler(ar.result(), null);
       } else {
         handler(null, ar.cause());
       }
-    });
+    }));
     } else utils.invalidArgs();
   };
 
@@ -2746,17 +2838,18 @@ var RedisClient = function(j_val) {
    @param key {string} Key identifying the set to compare with all other sets combined 
    @param cmpkeys {Array.<string>} List of keys identifying sets to subtract from the key set 
    @param handler {function} Handler for the result of this call. 
+   @return {RedisClient}
    */
   this.sdiff = function(key, cmpkeys, handler) {
     var __args = arguments;
     if (__args.length === 3 && typeof __args[0] === 'string' && typeof __args[1] === 'object' && __args[1] instanceof Array && typeof __args[2] === 'function') {
-      j_redisClient["sdiff(java.lang.String,java.util.List,io.vertx.core.Handler)"](key, cmpkeys, function(ar) {
+      return new RedisClient(j_redisClient["sdiff(java.lang.String,java.util.List,io.vertx.core.Handler)"](key, cmpkeys, function(ar) {
       if (ar.succeeded()) {
         handler(utils.convReturnJson(ar.result()), null);
       } else {
         handler(null, ar.cause());
       }
-    });
+    }));
     } else utils.invalidArgs();
   };
 
@@ -2768,17 +2861,18 @@ var RedisClient = function(j_val) {
    @param key {string} Key identifying the set to compare with all other sets combined 
    @param cmpkeys {Array.<string>} List of keys identifying sets to subtract from the key set 
    @param handler {function} Handler for the result of this call. 
+   @return {RedisClient}
    */
   this.sdiffstore = function(destkey, key, cmpkeys, handler) {
     var __args = arguments;
     if (__args.length === 4 && typeof __args[0] === 'string' && typeof __args[1] === 'string' && typeof __args[2] === 'object' && __args[2] instanceof Array && typeof __args[3] === 'function') {
-      j_redisClient["sdiffstore(java.lang.String,java.lang.String,java.util.List,io.vertx.core.Handler)"](destkey, key, cmpkeys, function(ar) {
+      return new RedisClient(j_redisClient["sdiffstore(java.lang.String,java.lang.String,java.util.List,io.vertx.core.Handler)"](destkey, key, cmpkeys, function(ar) {
       if (ar.succeeded()) {
         handler(ar.result(), null);
       } else {
         handler(null, ar.cause());
       }
-    });
+    }));
     } else utils.invalidArgs();
   };
 
@@ -2788,17 +2882,18 @@ var RedisClient = function(j_val) {
    @public
    @param dbindex {number} Index identifying the new active database 
    @param handler {function} Handler for the result of this call. 
+   @return {RedisClient}
    */
   this.select = function(dbindex, handler) {
     var __args = arguments;
     if (__args.length === 2 && typeof __args[0] ==='number' && typeof __args[1] === 'function') {
-      j_redisClient["select(int,io.vertx.core.Handler)"](dbindex, function(ar) {
+      return new RedisClient(j_redisClient["select(int,io.vertx.core.Handler)"](dbindex, function(ar) {
       if (ar.succeeded()) {
         handler(ar.result(), null);
       } else {
         handler(null, ar.cause());
       }
-    });
+    }));
     } else utils.invalidArgs();
   };
 
@@ -2809,17 +2904,18 @@ var RedisClient = function(j_val) {
    @param key {string} Key of which value to set 
    @param value {string} New value for the key 
    @param handler {function} Handler for the result of this call. 
+   @return {RedisClient}
    */
   this.set = function(key, value, handler) {
     var __args = arguments;
     if (__args.length === 3 && typeof __args[0] === 'string' && typeof __args[1] === 'string' && typeof __args[2] === 'function') {
-      j_redisClient["set(java.lang.String,java.lang.String,io.vertx.core.Handler)"](key, value, function(ar) {
+      return new RedisClient(j_redisClient["set(java.lang.String,java.lang.String,io.vertx.core.Handler)"](key, value, function(ar) {
       if (ar.succeeded()) {
         handler(null, null);
       } else {
         handler(null, ar.cause());
       }
-    });
+    }));
     } else utils.invalidArgs();
   };
 
@@ -2831,17 +2927,18 @@ var RedisClient = function(j_val) {
    @param value {string} New value for the key 
    @param options {Object} Set options 
    @param handler {function} Handler for the result of this call. 
+   @return {RedisClient}
    */
   this.setWithOptions = function(key, value, options, handler) {
     var __args = arguments;
     if (__args.length === 4 && typeof __args[0] === 'string' && typeof __args[1] === 'string' && typeof __args[2] === 'object' && typeof __args[3] === 'function') {
-      j_redisClient["setWithOptions(java.lang.String,java.lang.String,io.vertx.redis.op.SetOptions,io.vertx.core.Handler)"](key, value, options != null ? new SetOptions(new JsonObject(JSON.stringify(options))) : null, function(ar) {
+      return new RedisClient(j_redisClient["setWithOptions(java.lang.String,java.lang.String,io.vertx.redis.op.SetOptions,io.vertx.core.Handler)"](key, value, options != null ? new SetOptions(new JsonObject(JSON.stringify(options))) : null, function(ar) {
       if (ar.succeeded()) {
         handler(null, null);
       } else {
         handler(null, ar.cause());
       }
-    });
+    }));
     } else utils.invalidArgs();
   };
 
@@ -2852,17 +2949,18 @@ var RedisClient = function(j_val) {
    @param key {string} Key of which value to set 
    @param value {string} New value for the key 
    @param handler {function} Handler for the result of this call. 
+   @return {RedisClient}
    */
   this.setBinary = function(key, value, handler) {
     var __args = arguments;
     if (__args.length === 3 && typeof __args[0] === 'string' && typeof __args[1] === 'string' && typeof __args[2] === 'function') {
-      j_redisClient["setBinary(java.lang.String,java.lang.String,io.vertx.core.Handler)"](key, value, function(ar) {
+      return new RedisClient(j_redisClient["setBinary(java.lang.String,java.lang.String,io.vertx.core.Handler)"](key, value, function(ar) {
       if (ar.succeeded()) {
         handler(null, null);
       } else {
         handler(null, ar.cause());
       }
-    });
+    }));
     } else utils.invalidArgs();
   };
 
@@ -2874,17 +2972,18 @@ var RedisClient = function(j_val) {
    @param offset {number} Bit offset 
    @param bit {number} New value - must be 1 or 0 
    @param handler {function} Handler for the result of this call. 
+   @return {RedisClient}
    */
   this.setbit = function(key, offset, bit, handler) {
     var __args = arguments;
     if (__args.length === 4 && typeof __args[0] === 'string' && typeof __args[1] ==='number' && typeof __args[2] ==='number' && typeof __args[3] === 'function') {
-      j_redisClient["setbit(java.lang.String,long,int,io.vertx.core.Handler)"](key, offset, bit, function(ar) {
+      return new RedisClient(j_redisClient["setbit(java.lang.String,long,int,io.vertx.core.Handler)"](key, offset, bit, function(ar) {
       if (ar.succeeded()) {
         handler(ar.result(), null);
       } else {
         handler(null, ar.cause());
       }
-    });
+    }));
     } else utils.invalidArgs();
   };
 
@@ -2896,17 +2995,18 @@ var RedisClient = function(j_val) {
    @param seconds {number} Number of seconds until the key expires 
    @param value {string} New value for key 
    @param handler {function} Handler for the result of this call. 
+   @return {RedisClient}
    */
   this.setex = function(key, seconds, value, handler) {
     var __args = arguments;
     if (__args.length === 4 && typeof __args[0] === 'string' && typeof __args[1] ==='number' && typeof __args[2] === 'string' && typeof __args[3] === 'function') {
-      j_redisClient["setex(java.lang.String,long,java.lang.String,io.vertx.core.Handler)"](key, seconds, value, function(ar) {
+      return new RedisClient(j_redisClient["setex(java.lang.String,long,java.lang.String,io.vertx.core.Handler)"](key, seconds, value, function(ar) {
       if (ar.succeeded()) {
         handler(ar.result(), null);
       } else {
         handler(null, ar.cause());
       }
-    });
+    }));
     } else utils.invalidArgs();
   };
 
@@ -2917,17 +3017,18 @@ var RedisClient = function(j_val) {
    @param key {string} Key of which value to set 
    @param value {string} New value for the key 
    @param handler {function} Handler for the result of this call. 
+   @return {RedisClient}
    */
   this.setnx = function(key, value, handler) {
     var __args = arguments;
     if (__args.length === 3 && typeof __args[0] === 'string' && typeof __args[1] === 'string' && typeof __args[2] === 'function') {
-      j_redisClient["setnx(java.lang.String,java.lang.String,io.vertx.core.Handler)"](key, value, function(ar) {
+      return new RedisClient(j_redisClient["setnx(java.lang.String,java.lang.String,io.vertx.core.Handler)"](key, value, function(ar) {
       if (ar.succeeded()) {
         handler(ar.result(), null);
       } else {
         handler(null, ar.cause());
       }
-    });
+    }));
     } else utils.invalidArgs();
   };
 
@@ -2939,30 +3040,18 @@ var RedisClient = function(j_val) {
    @param offset {number} Offset - the maximum offset that you can set is 2^29 -1 (536870911), as Redis Strings are limited to 512 megabytes 
    @param value {string} Value to overwrite with 
    @param handler {function} Handler for the result of this call. 
+   @return {RedisClient}
    */
   this.setrange = function(key, offset, value, handler) {
     var __args = arguments;
     if (__args.length === 4 && typeof __args[0] === 'string' && typeof __args[1] ==='number' && typeof __args[2] === 'string' && typeof __args[3] === 'function') {
-      j_redisClient["setrange(java.lang.String,int,java.lang.String,io.vertx.core.Handler)"](key, offset, value, function(ar) {
+      return new RedisClient(j_redisClient["setrange(java.lang.String,int,java.lang.String,io.vertx.core.Handler)"](key, offset, value, function(ar) {
       if (ar.succeeded()) {
         handler(ar.result(), null);
       } else {
         handler(null, ar.cause());
       }
-    });
-    } else utils.invalidArgs();
-  };
-
-  /**
-   Synchronously save the dataset to disk and then shut down the server
-
-   @public
-   @param options {Object} Shutdown options 
-   */
-  this.shutdown = function(options) {
-    var __args = arguments;
-    if (__args.length === 1 && typeof __args[0] === 'string') {
-      j_redisClient["shutdown(io.vertx.redis.op.ShutdownOptions)"](io.vertx.redis.op.ShutdownOptions.valueOf(__args[0]));
+    }));
     } else utils.invalidArgs();
   };
 
@@ -2972,17 +3061,18 @@ var RedisClient = function(j_val) {
    @public
    @param keys {Array.<string>} List of keys to perform intersection on 
    @param handler {function} Handler for the result of this call. 
+   @return {RedisClient}
    */
   this.sinter = function(keys, handler) {
     var __args = arguments;
     if (__args.length === 2 && typeof __args[0] === 'object' && __args[0] instanceof Array && typeof __args[1] === 'function') {
-      j_redisClient["sinter(java.util.List,io.vertx.core.Handler)"](keys, function(ar) {
+      return new RedisClient(j_redisClient["sinter(java.util.List,io.vertx.core.Handler)"](keys, function(ar) {
       if (ar.succeeded()) {
         handler(utils.convReturnJson(ar.result()), null);
       } else {
         handler(null, ar.cause());
       }
-    });
+    }));
     } else utils.invalidArgs();
   };
 
@@ -2993,17 +3083,18 @@ var RedisClient = function(j_val) {
    @param destkey {string} Key where to store the results 
    @param keys {Array.<string>} List of keys to perform intersection on 
    @param handler {function} Handler for the result of this call. 
+   @return {RedisClient}
    */
   this.sinterstore = function(destkey, keys, handler) {
     var __args = arguments;
     if (__args.length === 3 && typeof __args[0] === 'string' && typeof __args[1] === 'object' && __args[1] instanceof Array && typeof __args[2] === 'function') {
-      j_redisClient["sinterstore(java.lang.String,java.util.List,io.vertx.core.Handler)"](destkey, keys, function(ar) {
+      return new RedisClient(j_redisClient["sinterstore(java.lang.String,java.util.List,io.vertx.core.Handler)"](destkey, keys, function(ar) {
       if (ar.succeeded()) {
         handler(ar.result(), null);
       } else {
         handler(null, ar.cause());
       }
-    });
+    }));
     } else utils.invalidArgs();
   };
 
@@ -3014,17 +3105,18 @@ var RedisClient = function(j_val) {
    @param key {string} Key string 
    @param member {string} Member to look for 
    @param handler {function} Handler for the result of this call. 
+   @return {RedisClient}
    */
   this.sismember = function(key, member, handler) {
     var __args = arguments;
     if (__args.length === 3 && typeof __args[0] === 'string' && typeof __args[1] === 'string' && typeof __args[2] === 'function') {
-      j_redisClient["sismember(java.lang.String,java.lang.String,io.vertx.core.Handler)"](key, member, function(ar) {
+      return new RedisClient(j_redisClient["sismember(java.lang.String,java.lang.String,io.vertx.core.Handler)"](key, member, function(ar) {
       if (ar.succeeded()) {
         handler(ar.result(), null);
       } else {
         handler(null, ar.cause());
       }
-    });
+    }));
     } else utils.invalidArgs();
   };
 
@@ -3035,17 +3127,18 @@ var RedisClient = function(j_val) {
    @param host {string} Host to become this server's master 
    @param port {number} Port of our new master 
    @param handler {function} Handler for the result of this call. 
+   @return {RedisClient}
    */
   this.slaveof = function(host, port, handler) {
     var __args = arguments;
     if (__args.length === 3 && typeof __args[0] === 'string' && typeof __args[1] ==='number' && typeof __args[2] === 'function') {
-      j_redisClient["slaveof(java.lang.String,int,io.vertx.core.Handler)"](host, port, function(ar) {
+      return new RedisClient(j_redisClient["slaveof(java.lang.String,int,io.vertx.core.Handler)"](host, port, function(ar) {
       if (ar.succeeded()) {
         handler(ar.result(), null);
       } else {
         handler(null, ar.cause());
       }
-    });
+    }));
     } else utils.invalidArgs();
   };
 
@@ -3054,17 +3147,18 @@ var RedisClient = function(j_val) {
 
    @public
    @param handler {function} Handler for the result of this call. 
+   @return {RedisClient}
    */
   this.slaveofNoone = function(handler) {
     var __args = arguments;
     if (__args.length === 1 && typeof __args[0] === 'function') {
-      j_redisClient["slaveofNoone(io.vertx.core.Handler)"](function(ar) {
+      return new RedisClient(j_redisClient["slaveofNoone(io.vertx.core.Handler)"](function(ar) {
       if (ar.succeeded()) {
         handler(ar.result(), null);
       } else {
         handler(null, ar.cause());
       }
-    });
+    }));
     } else utils.invalidArgs();
   };
 
@@ -3074,17 +3168,18 @@ var RedisClient = function(j_val) {
    @public
    @param limit {number} Number of log entries to return. If value is less than zero all entries are returned 
    @param handler {function} Handler for the result of this call. 
+   @return {RedisClient}
    */
   this.slowlogGet = function(limit, handler) {
     var __args = arguments;
     if (__args.length === 2 && typeof __args[0] ==='number' && typeof __args[1] === 'function') {
-      j_redisClient["slowlogGet(int,io.vertx.core.Handler)"](limit, function(ar) {
+      return new RedisClient(j_redisClient["slowlogGet(int,io.vertx.core.Handler)"](limit, function(ar) {
       if (ar.succeeded()) {
         handler(utils.convReturnJson(ar.result()), null);
       } else {
         handler(null, ar.cause());
       }
-    });
+    }));
     } else utils.invalidArgs();
   };
 
@@ -3093,17 +3188,18 @@ var RedisClient = function(j_val) {
 
    @public
    @param handler {function} Handler for the result of this call. 
+   @return {RedisClient}
    */
   this.slowlogLen = function(handler) {
     var __args = arguments;
     if (__args.length === 1 && typeof __args[0] === 'function') {
-      j_redisClient["slowlogLen(io.vertx.core.Handler)"](function(ar) {
+      return new RedisClient(j_redisClient["slowlogLen(io.vertx.core.Handler)"](function(ar) {
       if (ar.succeeded()) {
         handler(ar.result(), null);
       } else {
         handler(null, ar.cause());
       }
-    });
+    }));
     } else utils.invalidArgs();
   };
 
@@ -3112,17 +3208,18 @@ var RedisClient = function(j_val) {
 
    @public
    @param handler {function} Handler for the result of this call. 
+   @return {RedisClient}
    */
   this.slowlogReset = function(handler) {
     var __args = arguments;
     if (__args.length === 1 && typeof __args[0] === 'function') {
-      j_redisClient["slowlogReset(io.vertx.core.Handler)"](function(ar) {
+      return new RedisClient(j_redisClient["slowlogReset(io.vertx.core.Handler)"](function(ar) {
       if (ar.succeeded()) {
         handler(null, null);
       } else {
         handler(null, ar.cause());
       }
-    });
+    }));
     } else utils.invalidArgs();
   };
 
@@ -3132,17 +3229,18 @@ var RedisClient = function(j_val) {
    @public
    @param key {string} Key string 
    @param handler {function} Handler for the result of this call. 
+   @return {RedisClient}
    */
   this.smembers = function(key, handler) {
     var __args = arguments;
     if (__args.length === 2 && typeof __args[0] === 'string' && typeof __args[1] === 'function') {
-      j_redisClient["smembers(java.lang.String,io.vertx.core.Handler)"](key, function(ar) {
+      return new RedisClient(j_redisClient["smembers(java.lang.String,io.vertx.core.Handler)"](key, function(ar) {
       if (ar.succeeded()) {
         handler(utils.convReturnJson(ar.result()), null);
       } else {
         handler(null, ar.cause());
       }
-    });
+    }));
     } else utils.invalidArgs();
   };
 
@@ -3154,17 +3252,18 @@ var RedisClient = function(j_val) {
    @param destkey {string} Key identifying the destination set 
    @param member {string} Member to move 
    @param handler {function} Handler for the result of this call. 
+   @return {RedisClient}
    */
   this.smove = function(key, destkey, member, handler) {
     var __args = arguments;
     if (__args.length === 4 && typeof __args[0] === 'string' && typeof __args[1] === 'string' && typeof __args[2] === 'string' && typeof __args[3] === 'function') {
-      j_redisClient["smove(java.lang.String,java.lang.String,java.lang.String,io.vertx.core.Handler)"](key, destkey, member, function(ar) {
+      return new RedisClient(j_redisClient["smove(java.lang.String,java.lang.String,java.lang.String,io.vertx.core.Handler)"](key, destkey, member, function(ar) {
       if (ar.succeeded()) {
         handler(ar.result(), null);
       } else {
         handler(null, ar.cause());
       }
-    });
+    }));
     } else utils.invalidArgs();
   };
 
@@ -3175,17 +3274,18 @@ var RedisClient = function(j_val) {
    @param key {string} Key string 
    @param options {Object} Sort options 
    @param handler {function} Handler for the result of this call. 
+   @return {RedisClient}
    */
   this.sort = function(key, options, handler) {
     var __args = arguments;
     if (__args.length === 3 && typeof __args[0] === 'string' && typeof __args[1] === 'object' && typeof __args[2] === 'function') {
-      j_redisClient["sort(java.lang.String,io.vertx.redis.op.SortOptions,io.vertx.core.Handler)"](key, options != null ? new SortOptions(new JsonObject(JSON.stringify(options))) : null, function(ar) {
+      return new RedisClient(j_redisClient["sort(java.lang.String,io.vertx.redis.op.SortOptions,io.vertx.core.Handler)"](key, options != null ? new SortOptions(new JsonObject(JSON.stringify(options))) : null, function(ar) {
       if (ar.succeeded()) {
         handler(utils.convReturnJson(ar.result()), null);
       } else {
         handler(null, ar.cause());
       }
-    });
+    }));
     } else utils.invalidArgs();
   };
 
@@ -3195,17 +3295,18 @@ var RedisClient = function(j_val) {
    @public
    @param key {string} Key string 
    @param handler {function} Handler for the result of this call. 
+   @return {RedisClient}
    */
   this.spop = function(key, handler) {
     var __args = arguments;
     if (__args.length === 2 && typeof __args[0] === 'string' && typeof __args[1] === 'function') {
-      j_redisClient["spop(java.lang.String,io.vertx.core.Handler)"](key, function(ar) {
+      return new RedisClient(j_redisClient["spop(java.lang.String,io.vertx.core.Handler)"](key, function(ar) {
       if (ar.succeeded()) {
         handler(ar.result(), null);
       } else {
         handler(null, ar.cause());
       }
-    });
+    }));
     } else utils.invalidArgs();
   };
 
@@ -3216,17 +3317,18 @@ var RedisClient = function(j_val) {
    @param key {string} Key string 
    @param count {number} Number of members to remove 
    @param handler {function} Handler for the result of this call. 
+   @return {RedisClient}
    */
   this.spopMany = function(key, count, handler) {
     var __args = arguments;
     if (__args.length === 3 && typeof __args[0] === 'string' && typeof __args[1] ==='number' && typeof __args[2] === 'function') {
-      j_redisClient["spopMany(java.lang.String,int,io.vertx.core.Handler)"](key, count, function(ar) {
+      return new RedisClient(j_redisClient["spopMany(java.lang.String,int,io.vertx.core.Handler)"](key, count, function(ar) {
       if (ar.succeeded()) {
         handler(ar.result(), null);
       } else {
         handler(null, ar.cause());
       }
-    });
+    }));
     } else utils.invalidArgs();
   };
 
@@ -3237,17 +3339,18 @@ var RedisClient = function(j_val) {
    @param key {string} Key string 
    @param count {number} Number of members to get 
    @param handler {function} Handler for the result of this call. 
+   @return {RedisClient}
    */
   this.srandmember = function(key, count, handler) {
     var __args = arguments;
     if (__args.length === 3 && typeof __args[0] === 'string' && typeof __args[1] ==='number' && typeof __args[2] === 'function') {
-      j_redisClient["srandmember(java.lang.String,int,io.vertx.core.Handler)"](key, count, function(ar) {
+      return new RedisClient(j_redisClient["srandmember(java.lang.String,int,io.vertx.core.Handler)"](key, count, function(ar) {
       if (ar.succeeded()) {
         handler(utils.convReturnJson(ar.result()), null);
       } else {
         handler(null, ar.cause());
       }
-    });
+    }));
     } else utils.invalidArgs();
   };
 
@@ -3258,17 +3361,18 @@ var RedisClient = function(j_val) {
    @param key {string} Key string 
    @param member {string} Member to remove 
    @param handler {function} Handler for the result of this call. 
+   @return {RedisClient}
    */
   this.srem = function(key, member, handler) {
     var __args = arguments;
     if (__args.length === 3 && typeof __args[0] === 'string' && typeof __args[1] === 'string' && typeof __args[2] === 'function') {
-      j_redisClient["srem(java.lang.String,java.lang.String,io.vertx.core.Handler)"](key, member, function(ar) {
+      return new RedisClient(j_redisClient["srem(java.lang.String,java.lang.String,io.vertx.core.Handler)"](key, member, function(ar) {
       if (ar.succeeded()) {
         handler(ar.result(), null);
       } else {
         handler(null, ar.cause());
       }
-    });
+    }));
     } else utils.invalidArgs();
   };
 
@@ -3279,17 +3383,18 @@ var RedisClient = function(j_val) {
    @param key {string} Key string 
    @param members {Array.<string>} Members to remove 
    @param handler {function} Handler for the result of this call. 
+   @return {RedisClient}
    */
   this.sremMany = function(key, members, handler) {
     var __args = arguments;
     if (__args.length === 3 && typeof __args[0] === 'string' && typeof __args[1] === 'object' && __args[1] instanceof Array && typeof __args[2] === 'function') {
-      j_redisClient["sremMany(java.lang.String,java.util.List,io.vertx.core.Handler)"](key, members, function(ar) {
+      return new RedisClient(j_redisClient["sremMany(java.lang.String,java.util.List,io.vertx.core.Handler)"](key, members, function(ar) {
       if (ar.succeeded()) {
         handler(ar.result(), null);
       } else {
         handler(null, ar.cause());
       }
-    });
+    }));
     } else utils.invalidArgs();
   };
 
@@ -3299,17 +3404,18 @@ var RedisClient = function(j_val) {
    @public
    @param key {string} Key string 
    @param handler {function} Handler for the result of this call. 
+   @return {RedisClient}
    */
   this.strlen = function(key, handler) {
     var __args = arguments;
     if (__args.length === 2 && typeof __args[0] === 'string' && typeof __args[1] === 'function') {
-      j_redisClient["strlen(java.lang.String,io.vertx.core.Handler)"](key, function(ar) {
+      return new RedisClient(j_redisClient["strlen(java.lang.String,io.vertx.core.Handler)"](key, function(ar) {
       if (ar.succeeded()) {
         handler(ar.result(), null);
       } else {
         handler(null, ar.cause());
       }
-    });
+    }));
     } else utils.invalidArgs();
   };
 
@@ -3319,17 +3425,18 @@ var RedisClient = function(j_val) {
    @public
    @param channels {Array.<string>} List of channels to subscribe to 
    @param handler {function} Handler for the result of this call. 
+   @return {RedisClient}
    */
   this.subscribe = function(channels, handler) {
     var __args = arguments;
     if (__args.length === 2 && typeof __args[0] === 'object' && __args[0] instanceof Array && typeof __args[1] === 'function') {
-      j_redisClient["subscribe(java.util.List,io.vertx.core.Handler)"](channels, function(ar) {
+      return new RedisClient(j_redisClient["subscribe(java.util.List,io.vertx.core.Handler)"](channels, function(ar) {
       if (ar.succeeded()) {
         handler(null, null);
       } else {
         handler(null, ar.cause());
       }
-    });
+    }));
     } else utils.invalidArgs();
   };
 
@@ -3339,17 +3446,18 @@ var RedisClient = function(j_val) {
    @public
    @param keys {Array.<string>} List of keys identifying sets to add up 
    @param handler {function} Handler for the result of this call. 
+   @return {RedisClient}
    */
   this.sunion = function(keys, handler) {
     var __args = arguments;
     if (__args.length === 2 && typeof __args[0] === 'object' && __args[0] instanceof Array && typeof __args[1] === 'function') {
-      j_redisClient["sunion(java.util.List,io.vertx.core.Handler)"](keys, function(ar) {
+      return new RedisClient(j_redisClient["sunion(java.util.List,io.vertx.core.Handler)"](keys, function(ar) {
       if (ar.succeeded()) {
         handler(utils.convReturnJson(ar.result()), null);
       } else {
         handler(null, ar.cause());
       }
-    });
+    }));
     } else utils.invalidArgs();
   };
 
@@ -3360,17 +3468,18 @@ var RedisClient = function(j_val) {
    @param destkey {string} Destination key 
    @param keys {Array.<string>} List of keys identifying sets to add up 
    @param handler {function} Handler for the result of this call. 
+   @return {RedisClient}
    */
   this.sunionstore = function(destkey, keys, handler) {
     var __args = arguments;
     if (__args.length === 3 && typeof __args[0] === 'string' && typeof __args[1] === 'object' && __args[1] instanceof Array && typeof __args[2] === 'function') {
-      j_redisClient["sunionstore(java.lang.String,java.util.List,io.vertx.core.Handler)"](destkey, keys, function(ar) {
+      return new RedisClient(j_redisClient["sunionstore(java.lang.String,java.util.List,io.vertx.core.Handler)"](destkey, keys, function(ar) {
       if (ar.succeeded()) {
         handler(ar.result(), null);
       } else {
         handler(null, ar.cause());
       }
-    });
+    }));
     } else utils.invalidArgs();
   };
 
@@ -3379,17 +3488,18 @@ var RedisClient = function(j_val) {
 
    @public
    @param handler {function} 
+   @return {RedisClient}
    */
   this.sync = function(handler) {
     var __args = arguments;
     if (__args.length === 1 && typeof __args[0] === 'function') {
-      j_redisClient["sync(io.vertx.core.Handler)"](function(ar) {
+      return new RedisClient(j_redisClient["sync(io.vertx.core.Handler)"](function(ar) {
       if (ar.succeeded()) {
         handler(null, null);
       } else {
         handler(null, ar.cause());
       }
-    });
+    }));
     } else utils.invalidArgs();
   };
 
@@ -3398,17 +3508,18 @@ var RedisClient = function(j_val) {
 
    @public
    @param handler {function} 
+   @return {RedisClient}
    */
   this.time = function(handler) {
     var __args = arguments;
     if (__args.length === 1 && typeof __args[0] === 'function') {
-      j_redisClient["time(io.vertx.core.Handler)"](function(ar) {
+      return new RedisClient(j_redisClient["time(io.vertx.core.Handler)"](function(ar) {
       if (ar.succeeded()) {
         handler(utils.convReturnJson(ar.result()), null);
       } else {
         handler(null, ar.cause());
       }
-    });
+    }));
     } else utils.invalidArgs();
   };
 
@@ -3418,17 +3529,18 @@ var RedisClient = function(j_val) {
    @public
    @param key {string} Key string 
    @param handler {function} Handler for the result of this call. 
+   @return {RedisClient}
    */
   this.ttl = function(key, handler) {
     var __args = arguments;
     if (__args.length === 2 && typeof __args[0] === 'string' && typeof __args[1] === 'function') {
-      j_redisClient["ttl(java.lang.String,io.vertx.core.Handler)"](key, function(ar) {
+      return new RedisClient(j_redisClient["ttl(java.lang.String,io.vertx.core.Handler)"](key, function(ar) {
       if (ar.succeeded()) {
         handler(ar.result(), null);
       } else {
         handler(null, ar.cause());
       }
-    });
+    }));
     } else utils.invalidArgs();
   };
 
@@ -3438,17 +3550,18 @@ var RedisClient = function(j_val) {
    @public
    @param key {string} Key string 
    @param handler {function} Handler for the result of this call. 
+   @return {RedisClient}
    */
   this.type = function(key, handler) {
     var __args = arguments;
     if (__args.length === 2 && typeof __args[0] === 'string' && typeof __args[1] === 'function') {
-      j_redisClient["type(java.lang.String,io.vertx.core.Handler)"](key, function(ar) {
+      return new RedisClient(j_redisClient["type(java.lang.String,io.vertx.core.Handler)"](key, function(ar) {
       if (ar.succeeded()) {
         handler(ar.result(), null);
       } else {
         handler(null, ar.cause());
       }
-    });
+    }));
     } else utils.invalidArgs();
   };
 
@@ -3458,17 +3571,18 @@ var RedisClient = function(j_val) {
    @public
    @param channels {Array.<string>} List of channels to subscribe to 
    @param handler {function} Handler for the result of this call. 
+   @return {RedisClient}
    */
   this.unsubscribe = function(channels, handler) {
     var __args = arguments;
     if (__args.length === 2 && typeof __args[0] === 'object' && __args[0] instanceof Array && typeof __args[1] === 'function') {
-      j_redisClient["unsubscribe(java.util.List,io.vertx.core.Handler)"](channels, function(ar) {
+      return new RedisClient(j_redisClient["unsubscribe(java.util.List,io.vertx.core.Handler)"](channels, function(ar) {
       if (ar.succeeded()) {
         handler(null, null);
       } else {
         handler(null, ar.cause());
       }
-    });
+    }));
     } else utils.invalidArgs();
   };
 
@@ -3477,17 +3591,18 @@ var RedisClient = function(j_val) {
 
    @public
    @param handler {function} 
+   @return {RedisClient}
    */
   this.unwatch = function(handler) {
     var __args = arguments;
     if (__args.length === 1 && typeof __args[0] === 'function') {
-      j_redisClient["unwatch(io.vertx.core.Handler)"](function(ar) {
+      return new RedisClient(j_redisClient["unwatch(io.vertx.core.Handler)"](function(ar) {
       if (ar.succeeded()) {
         handler(ar.result(), null);
       } else {
         handler(null, ar.cause());
       }
-    });
+    }));
     } else utils.invalidArgs();
   };
 
@@ -3497,17 +3612,18 @@ var RedisClient = function(j_val) {
    @public
    @param keys {Array.<string>} List of keys to watch 
    @param handler {function} Handler for the result of this call. 
+   @return {RedisClient}
    */
   this.watch = function(keys, handler) {
     var __args = arguments;
     if (__args.length === 2 && typeof __args[0] === 'object' && __args[0] instanceof Array && typeof __args[1] === 'function') {
-      j_redisClient["watch(java.util.List,io.vertx.core.Handler)"](keys, function(ar) {
+      return new RedisClient(j_redisClient["watch(java.util.List,io.vertx.core.Handler)"](keys, function(ar) {
       if (ar.succeeded()) {
         handler(ar.result(), null);
       } else {
         handler(null, ar.cause());
       }
-    });
+    }));
     } else utils.invalidArgs();
   };
 
@@ -3519,17 +3635,18 @@ var RedisClient = function(j_val) {
    @param score {number} Score used for sorting 
    @param member {string} New member key 
    @param handler {function} Handler for the result of this call. 
+   @return {RedisClient}
    */
   this.zadd = function(key, score, member, handler) {
     var __args = arguments;
     if (__args.length === 4 && typeof __args[0] === 'string' && typeof __args[1] ==='number' && typeof __args[2] === 'string' && typeof __args[3] === 'function') {
-      j_redisClient["zadd(java.lang.String,double,java.lang.String,io.vertx.core.Handler)"](key, score, member, function(ar) {
+      return new RedisClient(j_redisClient["zadd(java.lang.String,double,java.lang.String,io.vertx.core.Handler)"](key, score, member, function(ar) {
       if (ar.succeeded()) {
         handler(ar.result(), null);
       } else {
         handler(null, ar.cause());
       }
-    });
+    }));
     } else utils.invalidArgs();
   };
 
@@ -3540,17 +3657,18 @@ var RedisClient = function(j_val) {
    @param key {string} Key string 
    @param members {Array.<string>} New member keys and their scores 
    @param handler {function} Handler for the result of this call. 
+   @return {RedisClient}
    */
   this.zaddMany = function(key, members, handler) {
     var __args = arguments;
     if (__args.length === 3 && typeof __args[0] === 'string' && typeof __args[1] === 'object' && typeof __args[2] === 'function') {
-      j_redisClient["zaddMany(java.lang.String,java.util.Map,io.vertx.core.Handler)"](key, members, function(ar) {
+      return new RedisClient(j_redisClient["zaddMany(java.lang.String,java.util.Map,io.vertx.core.Handler)"](key, members, function(ar) {
       if (ar.succeeded()) {
         handler(ar.result(), null);
       } else {
         handler(null, ar.cause());
       }
-    });
+    }));
     } else utils.invalidArgs();
   };
 
@@ -3560,17 +3678,18 @@ var RedisClient = function(j_val) {
    @public
    @param key {string} Key string 
    @param handler {function} Handler for the result of this call. 
+   @return {RedisClient}
    */
   this.zcard = function(key, handler) {
     var __args = arguments;
     if (__args.length === 2 && typeof __args[0] === 'string' && typeof __args[1] === 'function') {
-      j_redisClient["zcard(java.lang.String,io.vertx.core.Handler)"](key, function(ar) {
+      return new RedisClient(j_redisClient["zcard(java.lang.String,io.vertx.core.Handler)"](key, function(ar) {
       if (ar.succeeded()) {
         handler(ar.result(), null);
       } else {
         handler(null, ar.cause());
       }
-    });
+    }));
     } else utils.invalidArgs();
   };
 
@@ -3582,17 +3701,18 @@ var RedisClient = function(j_val) {
    @param min {number} Minimum score 
    @param max {number} Maximum score 
    @param handler {function} Handler for the result of this call. 
+   @return {RedisClient}
    */
   this.zcount = function(key, min, max, handler) {
     var __args = arguments;
     if (__args.length === 4 && typeof __args[0] === 'string' && typeof __args[1] ==='number' && typeof __args[2] ==='number' && typeof __args[3] === 'function') {
-      j_redisClient["zcount(java.lang.String,double,double,io.vertx.core.Handler)"](key, min, max, function(ar) {
+      return new RedisClient(j_redisClient["zcount(java.lang.String,double,double,io.vertx.core.Handler)"](key, min, max, function(ar) {
       if (ar.succeeded()) {
         handler(ar.result(), null);
       } else {
         handler(null, ar.cause());
       }
-    });
+    }));
     } else utils.invalidArgs();
   };
 
@@ -3604,17 +3724,18 @@ var RedisClient = function(j_val) {
    @param increment {number} Increment amount 
    @param member {string} Member key 
    @param handler {function} Handler for the result of this call. 
+   @return {RedisClient}
    */
   this.zincrby = function(key, increment, member, handler) {
     var __args = arguments;
     if (__args.length === 4 && typeof __args[0] === 'string' && typeof __args[1] ==='number' && typeof __args[2] === 'string' && typeof __args[3] === 'function') {
-      j_redisClient["zincrby(java.lang.String,double,java.lang.String,io.vertx.core.Handler)"](key, increment, member, function(ar) {
+      return new RedisClient(j_redisClient["zincrby(java.lang.String,double,java.lang.String,io.vertx.core.Handler)"](key, increment, member, function(ar) {
       if (ar.succeeded()) {
         handler(ar.result(), null);
       } else {
         handler(null, ar.cause());
       }
-    });
+    }));
     } else utils.invalidArgs();
   };
 
@@ -3626,17 +3747,18 @@ var RedisClient = function(j_val) {
    @param sets {Array.<string>} List of keys identifying sorted sets to intersect 
    @param options {Object} Aggregation options 
    @param handler {function} Handler for the result of this call. 
+   @return {RedisClient}
    */
   this.zinterstore = function(destkey, sets, options, handler) {
     var __args = arguments;
     if (__args.length === 4 && typeof __args[0] === 'string' && typeof __args[1] === 'object' && __args[1] instanceof Array && typeof __args[2] === 'string' && typeof __args[3] === 'function') {
-      j_redisClient["zinterstore(java.lang.String,java.util.List,io.vertx.redis.op.AggregateOptions,io.vertx.core.Handler)"](destkey, sets, io.vertx.redis.op.AggregateOptions.valueOf(__args[2]), function(ar) {
+      return new RedisClient(j_redisClient["zinterstore(java.lang.String,java.util.List,io.vertx.redis.op.AggregateOptions,io.vertx.core.Handler)"](destkey, sets, io.vertx.redis.op.AggregateOptions.valueOf(__args[2]), function(ar) {
       if (ar.succeeded()) {
         handler(ar.result(), null);
       } else {
         handler(null, ar.cause());
       }
-    });
+    }));
     } else utils.invalidArgs();
   };
 
@@ -3648,17 +3770,18 @@ var RedisClient = function(j_val) {
    @param sets {Array.<string>} List of keys identifying sorted sets to intersect 
    @param options {Object} Aggregation options 
    @param handler {function} Handler for the result of this call. 
+   @return {RedisClient}
    */
   this.zinterstoreWeighed = function(destkey, sets, options, handler) {
     var __args = arguments;
     if (__args.length === 4 && typeof __args[0] === 'string' && typeof __args[1] === 'object' && typeof __args[2] === 'string' && typeof __args[3] === 'function') {
-      j_redisClient["zinterstoreWeighed(java.lang.String,java.util.Map,io.vertx.redis.op.AggregateOptions,io.vertx.core.Handler)"](destkey, sets, io.vertx.redis.op.AggregateOptions.valueOf(__args[2]), function(ar) {
+      return new RedisClient(j_redisClient["zinterstoreWeighed(java.lang.String,java.util.Map,io.vertx.redis.op.AggregateOptions,io.vertx.core.Handler)"](destkey, sets, io.vertx.redis.op.AggregateOptions.valueOf(__args[2]), function(ar) {
       if (ar.succeeded()) {
         handler(ar.result(), null);
       } else {
         handler(null, ar.cause());
       }
-    });
+    }));
     } else utils.invalidArgs();
   };
 
@@ -3670,17 +3793,18 @@ var RedisClient = function(j_val) {
    @param min {string} Pattern to compare against for minimum value 
    @param max {string} Pattern to compare against for maximum value 
    @param handler {function} Handler for the result of this call. 
+   @return {RedisClient}
    */
   this.zlexcount = function(key, min, max, handler) {
     var __args = arguments;
     if (__args.length === 4 && typeof __args[0] === 'string' && typeof __args[1] === 'string' && typeof __args[2] === 'string' && typeof __args[3] === 'function') {
-      j_redisClient["zlexcount(java.lang.String,java.lang.String,java.lang.String,io.vertx.core.Handler)"](key, min, max, function(ar) {
+      return new RedisClient(j_redisClient["zlexcount(java.lang.String,java.lang.String,java.lang.String,io.vertx.core.Handler)"](key, min, max, function(ar) {
       if (ar.succeeded()) {
         handler(ar.result(), null);
       } else {
         handler(null, ar.cause());
       }
-    });
+    }));
     } else utils.invalidArgs();
   };
 
@@ -3692,17 +3816,18 @@ var RedisClient = function(j_val) {
    @param start {number} Start index for the range 
    @param stop {number} Stop index for the range - inclusive 
    @param handler {function} Handler for the result of this call. 
+   @return {RedisClient}
    */
   this.zrange = function(key, start, stop, handler) {
     var __args = arguments;
     if (__args.length === 4 && typeof __args[0] === 'string' && typeof __args[1] ==='number' && typeof __args[2] ==='number' && typeof __args[3] === 'function') {
-      j_redisClient["zrange(java.lang.String,long,long,io.vertx.core.Handler)"](key, start, stop, function(ar) {
+      return new RedisClient(j_redisClient["zrange(java.lang.String,long,long,io.vertx.core.Handler)"](key, start, stop, function(ar) {
       if (ar.succeeded()) {
         handler(utils.convReturnJson(ar.result()), null);
       } else {
         handler(null, ar.cause());
       }
-    });
+    }));
     } else utils.invalidArgs();
   };
 
@@ -3715,17 +3840,18 @@ var RedisClient = function(j_val) {
    @param stop {number} Stop index for the range - inclusive 
    @param options {Object} Range options 
    @param handler {function} Handler for the result of this call. 
+   @return {RedisClient}
    */
   this.zrangeWithOptions = function(key, start, stop, options, handler) {
     var __args = arguments;
     if (__args.length === 5 && typeof __args[0] === 'string' && typeof __args[1] ==='number' && typeof __args[2] ==='number' && typeof __args[3] === 'string' && typeof __args[4] === 'function') {
-      j_redisClient["zrangeWithOptions(java.lang.String,long,long,io.vertx.redis.op.RangeOptions,io.vertx.core.Handler)"](key, start, stop, io.vertx.redis.op.RangeOptions.valueOf(__args[3]), function(ar) {
+      return new RedisClient(j_redisClient["zrangeWithOptions(java.lang.String,long,long,io.vertx.redis.op.RangeOptions,io.vertx.core.Handler)"](key, start, stop, io.vertx.redis.op.RangeOptions.valueOf(__args[3]), function(ar) {
       if (ar.succeeded()) {
         handler(utils.convReturnJson(ar.result()), null);
       } else {
         handler(null, ar.cause());
       }
-    });
+    }));
     } else utils.invalidArgs();
   };
 
@@ -3738,17 +3864,18 @@ var RedisClient = function(j_val) {
    @param max {string} Pattern representing a maximum allowed value 
    @param options {Object} Limit options where limit can be specified 
    @param handler {function} Handler for the result of this call. 
+   @return {RedisClient}
    */
   this.zrangebylex = function(key, min, max, options, handler) {
     var __args = arguments;
     if (__args.length === 5 && typeof __args[0] === 'string' && typeof __args[1] === 'string' && typeof __args[2] === 'string' && typeof __args[3] === 'object' && typeof __args[4] === 'function') {
-      j_redisClient["zrangebylex(java.lang.String,java.lang.String,java.lang.String,io.vertx.redis.op.LimitOptions,io.vertx.core.Handler)"](key, min, max, options != null ? new LimitOptions(new JsonObject(JSON.stringify(options))) : null, function(ar) {
+      return new RedisClient(j_redisClient["zrangebylex(java.lang.String,java.lang.String,java.lang.String,io.vertx.redis.op.LimitOptions,io.vertx.core.Handler)"](key, min, max, options != null ? new LimitOptions(new JsonObject(JSON.stringify(options))) : null, function(ar) {
       if (ar.succeeded()) {
         handler(utils.convReturnJson(ar.result()), null);
       } else {
         handler(null, ar.cause());
       }
-    });
+    }));
     } else utils.invalidArgs();
   };
 
@@ -3761,17 +3888,18 @@ var RedisClient = function(j_val) {
    @param max {string} Pattern defining a maximum value 
    @param options {Object} Range and limit options 
    @param handler {function} Handler for the result of this call. 
+   @return {RedisClient}
    */
   this.zrangebyscore = function(key, min, max, options, handler) {
     var __args = arguments;
     if (__args.length === 5 && typeof __args[0] === 'string' && typeof __args[1] === 'string' && typeof __args[2] === 'string' && typeof __args[3] === 'object' && typeof __args[4] === 'function') {
-      j_redisClient["zrangebyscore(java.lang.String,java.lang.String,java.lang.String,io.vertx.redis.op.RangeLimitOptions,io.vertx.core.Handler)"](key, min, max, options != null ? new RangeLimitOptions(new JsonObject(JSON.stringify(options))) : null, function(ar) {
+      return new RedisClient(j_redisClient["zrangebyscore(java.lang.String,java.lang.String,java.lang.String,io.vertx.redis.op.RangeLimitOptions,io.vertx.core.Handler)"](key, min, max, options != null ? new RangeLimitOptions(new JsonObject(JSON.stringify(options))) : null, function(ar) {
       if (ar.succeeded()) {
         handler(utils.convReturnJson(ar.result()), null);
       } else {
         handler(null, ar.cause());
       }
-    });
+    }));
     } else utils.invalidArgs();
   };
 
@@ -3782,17 +3910,18 @@ var RedisClient = function(j_val) {
    @param key {string} Key string 
    @param member {string} Member in the sorted set identified by key 
    @param handler {function} Handler for the result of this call. 
+   @return {RedisClient}
    */
   this.zrank = function(key, member, handler) {
     var __args = arguments;
     if (__args.length === 3 && typeof __args[0] === 'string' && typeof __args[1] === 'string' && typeof __args[2] === 'function') {
-      j_redisClient["zrank(java.lang.String,java.lang.String,io.vertx.core.Handler)"](key, member, function(ar) {
+      return new RedisClient(j_redisClient["zrank(java.lang.String,java.lang.String,io.vertx.core.Handler)"](key, member, function(ar) {
       if (ar.succeeded()) {
         handler(ar.result(), null);
       } else {
         handler(null, ar.cause());
       }
-    });
+    }));
     } else utils.invalidArgs();
   };
 
@@ -3803,17 +3932,18 @@ var RedisClient = function(j_val) {
    @param key {string} Key string 
    @param member {string} Member in the sorted set identified by key 
    @param handler {function} Handler for the result of this call. 
+   @return {RedisClient}
    */
   this.zrem = function(key, member, handler) {
     var __args = arguments;
     if (__args.length === 3 && typeof __args[0] === 'string' && typeof __args[1] === 'string' && typeof __args[2] === 'function') {
-      j_redisClient["zrem(java.lang.String,java.lang.String,io.vertx.core.Handler)"](key, member, function(ar) {
+      return new RedisClient(j_redisClient["zrem(java.lang.String,java.lang.String,io.vertx.core.Handler)"](key, member, function(ar) {
       if (ar.succeeded()) {
         handler(ar.result(), null);
       } else {
         handler(null, ar.cause());
       }
-    });
+    }));
     } else utils.invalidArgs();
   };
 
@@ -3824,17 +3954,18 @@ var RedisClient = function(j_val) {
    @param key {string} Key string 
    @param members {Array.<string>} Members in the sorted set identified by key 
    @param handler {function} Handler for the result of this call. 
+   @return {RedisClient}
    */
   this.zremMany = function(key, members, handler) {
     var __args = arguments;
     if (__args.length === 3 && typeof __args[0] === 'string' && typeof __args[1] === 'object' && __args[1] instanceof Array && typeof __args[2] === 'function') {
-      j_redisClient["zremMany(java.lang.String,java.util.List,io.vertx.core.Handler)"](key, members, function(ar) {
+      return new RedisClient(j_redisClient["zremMany(java.lang.String,java.util.List,io.vertx.core.Handler)"](key, members, function(ar) {
       if (ar.succeeded()) {
         handler(ar.result(), null);
       } else {
         handler(null, ar.cause());
       }
-    });
+    }));
     } else utils.invalidArgs();
   };
 
@@ -3846,17 +3977,18 @@ var RedisClient = function(j_val) {
    @param min {string} Pattern defining a minimum value 
    @param max {string} Pattern defining a maximum value 
    @param handler {function} Handler for the result of this call. 
+   @return {RedisClient}
    */
   this.zremrangebylex = function(key, min, max, handler) {
     var __args = arguments;
     if (__args.length === 4 && typeof __args[0] === 'string' && typeof __args[1] === 'string' && typeof __args[2] === 'string' && typeof __args[3] === 'function') {
-      j_redisClient["zremrangebylex(java.lang.String,java.lang.String,java.lang.String,io.vertx.core.Handler)"](key, min, max, function(ar) {
+      return new RedisClient(j_redisClient["zremrangebylex(java.lang.String,java.lang.String,java.lang.String,io.vertx.core.Handler)"](key, min, max, function(ar) {
       if (ar.succeeded()) {
         handler(ar.result(), null);
       } else {
         handler(null, ar.cause());
       }
-    });
+    }));
     } else utils.invalidArgs();
   };
 
@@ -3868,17 +4000,18 @@ var RedisClient = function(j_val) {
    @param start {number} Start index 
    @param stop {number} Stop index 
    @param handler {function} Handler for the result of this call. 
+   @return {RedisClient}
    */
   this.zremrangebyrank = function(key, start, stop, handler) {
     var __args = arguments;
     if (__args.length === 4 && typeof __args[0] === 'string' && typeof __args[1] ==='number' && typeof __args[2] ==='number' && typeof __args[3] === 'function') {
-      j_redisClient["zremrangebyrank(java.lang.String,long,long,io.vertx.core.Handler)"](key, start, stop, function(ar) {
+      return new RedisClient(j_redisClient["zremrangebyrank(java.lang.String,long,long,io.vertx.core.Handler)"](key, start, stop, function(ar) {
       if (ar.succeeded()) {
         handler(ar.result(), null);
       } else {
         handler(null, ar.cause());
       }
-    });
+    }));
     } else utils.invalidArgs();
   };
 
@@ -3890,17 +4023,18 @@ var RedisClient = function(j_val) {
    @param min {string} Pattern defining a minimum value 
    @param max {string} Pattern defining a maximum value 
    @param handler {function} 
+   @return {RedisClient}
    */
   this.zremrangebyscore = function(key, min, max, handler) {
     var __args = arguments;
     if (__args.length === 4 && typeof __args[0] === 'string' && typeof __args[1] === 'string' && typeof __args[2] === 'string' && typeof __args[3] === 'function') {
-      j_redisClient["zremrangebyscore(java.lang.String,java.lang.String,java.lang.String,io.vertx.core.Handler)"](key, min, max, function(ar) {
+      return new RedisClient(j_redisClient["zremrangebyscore(java.lang.String,java.lang.String,java.lang.String,io.vertx.core.Handler)"](key, min, max, function(ar) {
       if (ar.succeeded()) {
         handler(ar.result(), null);
       } else {
         handler(null, ar.cause());
       }
-    });
+    }));
     } else utils.invalidArgs();
   };
 
@@ -3913,17 +4047,18 @@ var RedisClient = function(j_val) {
    @param stop {number} Stop index for the range - inclusive 
    @param options {Object} Range options 
    @param handler {function} Handler for the result of this call. 
+   @return {RedisClient}
    */
   this.zrevrange = function(key, start, stop, options, handler) {
     var __args = arguments;
     if (__args.length === 5 && typeof __args[0] === 'string' && typeof __args[1] ==='number' && typeof __args[2] ==='number' && typeof __args[3] === 'string' && typeof __args[4] === 'function') {
-      j_redisClient["zrevrange(java.lang.String,long,long,io.vertx.redis.op.RangeOptions,io.vertx.core.Handler)"](key, start, stop, io.vertx.redis.op.RangeOptions.valueOf(__args[3]), function(ar) {
+      return new RedisClient(j_redisClient["zrevrange(java.lang.String,long,long,io.vertx.redis.op.RangeOptions,io.vertx.core.Handler)"](key, start, stop, io.vertx.redis.op.RangeOptions.valueOf(__args[3]), function(ar) {
       if (ar.succeeded()) {
         handler(utils.convReturnJson(ar.result()), null);
       } else {
         handler(null, ar.cause());
       }
-    });
+    }));
     } else utils.invalidArgs();
   };
 
@@ -3936,17 +4071,18 @@ var RedisClient = function(j_val) {
    @param min {string} Pattern defining a minimum value 
    @param options {Object} Limit options 
    @param handler {function} Handler for the result of this call. 
+   @return {RedisClient}
    */
   this.zrevrangebylex = function(key, max, min, options, handler) {
     var __args = arguments;
     if (__args.length === 5 && typeof __args[0] === 'string' && typeof __args[1] === 'string' && typeof __args[2] === 'string' && typeof __args[3] === 'object' && typeof __args[4] === 'function') {
-      j_redisClient["zrevrangebylex(java.lang.String,java.lang.String,java.lang.String,io.vertx.redis.op.LimitOptions,io.vertx.core.Handler)"](key, max, min, options != null ? new LimitOptions(new JsonObject(JSON.stringify(options))) : null, function(ar) {
+      return new RedisClient(j_redisClient["zrevrangebylex(java.lang.String,java.lang.String,java.lang.String,io.vertx.redis.op.LimitOptions,io.vertx.core.Handler)"](key, max, min, options != null ? new LimitOptions(new JsonObject(JSON.stringify(options))) : null, function(ar) {
       if (ar.succeeded()) {
         handler(utils.convReturnJson(ar.result()), null);
       } else {
         handler(null, ar.cause());
       }
-    });
+    }));
     } else utils.invalidArgs();
   };
 
@@ -3959,17 +4095,18 @@ var RedisClient = function(j_val) {
    @param min {string} Pattern defining a minimum value 
    @param options {Object} Range and limit options 
    @param handler {function} Handler for the result of this call. 
+   @return {RedisClient}
    */
   this.zrevrangebyscore = function(key, max, min, options, handler) {
     var __args = arguments;
     if (__args.length === 5 && typeof __args[0] === 'string' && typeof __args[1] === 'string' && typeof __args[2] === 'string' && typeof __args[3] === 'object' && typeof __args[4] === 'function') {
-      j_redisClient["zrevrangebyscore(java.lang.String,java.lang.String,java.lang.String,io.vertx.redis.op.RangeLimitOptions,io.vertx.core.Handler)"](key, max, min, options != null ? new RangeLimitOptions(new JsonObject(JSON.stringify(options))) : null, function(ar) {
+      return new RedisClient(j_redisClient["zrevrangebyscore(java.lang.String,java.lang.String,java.lang.String,io.vertx.redis.op.RangeLimitOptions,io.vertx.core.Handler)"](key, max, min, options != null ? new RangeLimitOptions(new JsonObject(JSON.stringify(options))) : null, function(ar) {
       if (ar.succeeded()) {
         handler(utils.convReturnJson(ar.result()), null);
       } else {
         handler(null, ar.cause());
       }
-    });
+    }));
     } else utils.invalidArgs();
   };
 
@@ -3980,17 +4117,18 @@ var RedisClient = function(j_val) {
    @param key {string} Key string 
    @param member {string} Member in the sorted set identified by key 
    @param handler {function} Handler for the result of this call. 
+   @return {RedisClient}
    */
   this.zrevrank = function(key, member, handler) {
     var __args = arguments;
     if (__args.length === 3 && typeof __args[0] === 'string' && typeof __args[1] === 'string' && typeof __args[2] === 'function') {
-      j_redisClient["zrevrank(java.lang.String,java.lang.String,io.vertx.core.Handler)"](key, member, function(ar) {
+      return new RedisClient(j_redisClient["zrevrank(java.lang.String,java.lang.String,io.vertx.core.Handler)"](key, member, function(ar) {
       if (ar.succeeded()) {
         handler(ar.result(), null);
       } else {
         handler(null, ar.cause());
       }
-    });
+    }));
     } else utils.invalidArgs();
   };
 
@@ -4001,17 +4139,18 @@ var RedisClient = function(j_val) {
    @param key {string} Key string 
    @param member {string} Member in the sorted set identified by key 
    @param handler {function} Handler for the result of this call. 
+   @return {RedisClient}
    */
   this.zscore = function(key, member, handler) {
     var __args = arguments;
     if (__args.length === 3 && typeof __args[0] === 'string' && typeof __args[1] === 'string' && typeof __args[2] === 'function') {
-      j_redisClient["zscore(java.lang.String,java.lang.String,io.vertx.core.Handler)"](key, member, function(ar) {
+      return new RedisClient(j_redisClient["zscore(java.lang.String,java.lang.String,io.vertx.core.Handler)"](key, member, function(ar) {
       if (ar.succeeded()) {
         handler(ar.result(), null);
       } else {
         handler(null, ar.cause());
       }
-    });
+    }));
     } else utils.invalidArgs();
   };
 
@@ -4023,17 +4162,18 @@ var RedisClient = function(j_val) {
    @param sets {Array.<string>} List of keys identifying sorted sets 
    @param options {Object} Aggregation options 
    @param handler {function} Handler for the result of this call. 
+   @return {RedisClient}
    */
   this.zunionstore = function(destkey, sets, options, handler) {
     var __args = arguments;
     if (__args.length === 4 && typeof __args[0] === 'string' && typeof __args[1] === 'object' && __args[1] instanceof Array && typeof __args[2] === 'string' && typeof __args[3] === 'function') {
-      j_redisClient["zunionstore(java.lang.String,java.util.List,io.vertx.redis.op.AggregateOptions,io.vertx.core.Handler)"](destkey, sets, io.vertx.redis.op.AggregateOptions.valueOf(__args[2]), function(ar) {
+      return new RedisClient(j_redisClient["zunionstore(java.lang.String,java.util.List,io.vertx.redis.op.AggregateOptions,io.vertx.core.Handler)"](destkey, sets, io.vertx.redis.op.AggregateOptions.valueOf(__args[2]), function(ar) {
       if (ar.succeeded()) {
         handler(ar.result(), null);
       } else {
         handler(null, ar.cause());
       }
-    });
+    }));
     } else utils.invalidArgs();
   };
 
@@ -4045,17 +4185,18 @@ var RedisClient = function(j_val) {
    @param sets {Array.<string>} Map containing set-key:weight pairs 
    @param options {Object} Aggregation options 
    @param handler {function} Handler for the result of this call. 
+   @return {RedisClient}
    */
   this.zunionstoreWeighed = function(key, sets, options, handler) {
     var __args = arguments;
     if (__args.length === 4 && typeof __args[0] === 'string' && typeof __args[1] === 'object' && typeof __args[2] === 'string' && typeof __args[3] === 'function') {
-      j_redisClient["zunionstoreWeighed(java.lang.String,java.util.Map,io.vertx.redis.op.AggregateOptions,io.vertx.core.Handler)"](key, sets, io.vertx.redis.op.AggregateOptions.valueOf(__args[2]), function(ar) {
+      return new RedisClient(j_redisClient["zunionstoreWeighed(java.lang.String,java.util.Map,io.vertx.redis.op.AggregateOptions,io.vertx.core.Handler)"](key, sets, io.vertx.redis.op.AggregateOptions.valueOf(__args[2]), function(ar) {
       if (ar.succeeded()) {
         handler(ar.result(), null);
       } else {
         handler(null, ar.cause());
       }
-    });
+    }));
     } else utils.invalidArgs();
   };
 
@@ -4066,17 +4207,18 @@ var RedisClient = function(j_val) {
    @param cursor {string} Cursor id 
    @param options {Object} Scan options 
    @param handler {function} Handler for the result of this call. 
+   @return {RedisClient}
    */
   this.scan = function(cursor, options, handler) {
     var __args = arguments;
     if (__args.length === 3 && typeof __args[0] === 'string' && typeof __args[1] === 'object' && typeof __args[2] === 'function') {
-      j_redisClient["scan(java.lang.String,io.vertx.redis.op.ScanOptions,io.vertx.core.Handler)"](cursor, options != null ? new ScanOptions(new JsonObject(JSON.stringify(options))) : null, function(ar) {
+      return new RedisClient(j_redisClient["scan(java.lang.String,io.vertx.redis.op.ScanOptions,io.vertx.core.Handler)"](cursor, options != null ? new ScanOptions(new JsonObject(JSON.stringify(options))) : null, function(ar) {
       if (ar.succeeded()) {
         handler(null, null);
       } else {
         handler(null, ar.cause());
       }
-    });
+    }));
     } else utils.invalidArgs();
   };
 
@@ -4088,17 +4230,18 @@ var RedisClient = function(j_val) {
    @param cursor {string} Cursor id 
    @param options {Object} Scan options 
    @param handler {function} Handler for the result of this call. 
+   @return {RedisClient}
    */
   this.sscan = function(key, cursor, options, handler) {
     var __args = arguments;
     if (__args.length === 4 && typeof __args[0] === 'string' && typeof __args[1] === 'string' && typeof __args[2] === 'object' && typeof __args[3] === 'function') {
-      j_redisClient["sscan(java.lang.String,java.lang.String,io.vertx.redis.op.ScanOptions,io.vertx.core.Handler)"](key, cursor, options != null ? new ScanOptions(new JsonObject(JSON.stringify(options))) : null, function(ar) {
+      return new RedisClient(j_redisClient["sscan(java.lang.String,java.lang.String,io.vertx.redis.op.ScanOptions,io.vertx.core.Handler)"](key, cursor, options != null ? new ScanOptions(new JsonObject(JSON.stringify(options))) : null, function(ar) {
       if (ar.succeeded()) {
         handler(null, null);
       } else {
         handler(null, ar.cause());
       }
-    });
+    }));
     } else utils.invalidArgs();
   };
 
@@ -4110,17 +4253,18 @@ var RedisClient = function(j_val) {
    @param cursor {string} Cursor id 
    @param options {Object} Scan options 
    @param handler {function} Handler for the result of this call. 
+   @return {RedisClient}
    */
   this.hscan = function(key, cursor, options, handler) {
     var __args = arguments;
     if (__args.length === 4 && typeof __args[0] === 'string' && typeof __args[1] === 'string' && typeof __args[2] === 'object' && typeof __args[3] === 'function') {
-      j_redisClient["hscan(java.lang.String,java.lang.String,io.vertx.redis.op.ScanOptions,io.vertx.core.Handler)"](key, cursor, options != null ? new ScanOptions(new JsonObject(JSON.stringify(options))) : null, function(ar) {
+      return new RedisClient(j_redisClient["hscan(java.lang.String,java.lang.String,io.vertx.redis.op.ScanOptions,io.vertx.core.Handler)"](key, cursor, options != null ? new ScanOptions(new JsonObject(JSON.stringify(options))) : null, function(ar) {
       if (ar.succeeded()) {
         handler(utils.convReturnJson(ar.result()), null);
       } else {
         handler(null, ar.cause());
       }
-    });
+    }));
     } else utils.invalidArgs();
   };
 
@@ -4132,17 +4276,18 @@ var RedisClient = function(j_val) {
    @param cursor {string} Cursor id 
    @param options {Object} Scan options 
    @param handler {function} Handler for the result of this call. 
+   @return {RedisClient}
    */
   this.zscan = function(key, cursor, options, handler) {
     var __args = arguments;
     if (__args.length === 4 && typeof __args[0] === 'string' && typeof __args[1] === 'string' && typeof __args[2] === 'object' && typeof __args[3] === 'function') {
-      j_redisClient["zscan(java.lang.String,java.lang.String,io.vertx.redis.op.ScanOptions,io.vertx.core.Handler)"](key, cursor, options != null ? new ScanOptions(new JsonObject(JSON.stringify(options))) : null, function(ar) {
+      return new RedisClient(j_redisClient["zscan(java.lang.String,java.lang.String,io.vertx.redis.op.ScanOptions,io.vertx.core.Handler)"](key, cursor, options != null ? new ScanOptions(new JsonObject(JSON.stringify(options))) : null, function(ar) {
       if (ar.succeeded()) {
         handler(null, null);
       } else {
         handler(null, ar.cause());
       }
-    });
+    }));
     } else utils.invalidArgs();
   };
 
