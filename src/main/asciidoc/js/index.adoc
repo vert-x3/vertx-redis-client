@@ -77,7 +77,27 @@ To start a subscriber one would do:
 
 [source,js]
 ----
-Code not translatable
+var RedisClient = require("vertx-redis-js/redis_client");
+
+// register a handler for the incoming message the naming the Redis module will use is base address + '.' + redis channel
+vertx.eventBus().consumer("redis.sub.channel1", function (received) {
+  // do whatever you need to do with your message
+  var value = received.body().value;
+  // the value is a JSON doc with the following properties
+  // channel - The channel to which this message was sent
+  // pattern - Pattern is present if you use psubscribe command and is the pattern that matched this message channel
+  // message - The message payload
+});
+
+var redis = RedisClient.create(vertx, {
+});
+
+redis.subscribe(["channel1"], function (res, res_err) {
+  if (res_err == null) {
+    // so something...
+  }
+});
+
 ----
 
 And from another place in the code publish messages to the queue:

@@ -123,6 +123,10 @@ public class Command<T> {
     return userHandler;
   }
 
+  public Context getContext() {
+    return context;
+  }
+
   public void writeTo(WriteStream<Buffer> writeStream) {
     writeStream.write(buffer);
   }
