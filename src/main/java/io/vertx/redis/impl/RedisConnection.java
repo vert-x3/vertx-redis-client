@@ -63,7 +63,7 @@ class RedisConnection implements ReplyHandler {
   // Redis 'subscribe', 'unsubscribe', 'psubscribe' and 'punsubscribe' commands can have multiple (including zero) repliesQueue
   // See http://redis.io/topics/pubsub
   // In all cases we want to have a handler to report errors
-  void send(final Command command) {
+  void send(final Command<?> command) {
 
     // The order read must match the order written, vertx guarantees
     // that this is only called from a single thread.

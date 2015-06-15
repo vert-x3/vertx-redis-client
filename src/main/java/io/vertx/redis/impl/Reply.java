@@ -19,16 +19,6 @@ public final class Reply {
     this.data = new Reply[size];
   }
 
-  public Reply(char type, Object data) {
-    this.type = (byte) type;
-    this.data = data;
-  }
-
-  public Reply(char type, int size) {
-    this.type = (byte) type;
-    this.data = new Reply[size];
-  }
-
   void set(int pos, Reply reply) {
     ((Reply[]) data)[pos] = reply;
   }
@@ -56,8 +46,12 @@ public final class Reply {
 
   @SuppressWarnings("unchecked")
   public <T> T asType(final Class<T> type, final String encoding) throws ClassCastException {
+
+    if (data == null) {
+      return null;
+    }
+
     if (type == String.class) {
-      if (data == null) return null;
       if (data instanceof String) {
         return (T) data;
       }
@@ -66,17 +60,18 @@ public final class Reply {
       }
       return (T) data.toString();
     }
+
     if (type == Long.class) {
-      if (data == null) {
-        return null;
-      }
       return (T) data;
     }
+
     if (type == Void.class) {
       return null;
     }
+
     if (type == JsonArray.class) {
       final JsonArray multi = new JsonArray();
+
       for (Reply r : (Reply[]) data) {
         Object elem;
         switch (r.type()) {
@@ -103,6 +98,7 @@ public final class Reply {
       return (T) multi;
 
     }
+
     if (type == JsonObject.class) {
       final JsonObject multi = new JsonObject();
 

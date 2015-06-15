@@ -3303,4 +3303,40 @@ public abstract class RedisClientTestBase extends VertxTestBase {
     });
     await();
   }
+
+  @Test
+  public void testIssue5BlockingCall_shouldWork() {
+    final String list1 = makeKey();
+    final String list2 = makeKey();
+
+    redis.rpushMany(list1, toList("a", "b", "c"), reply0 -> {
+      assertTrue(reply0.succeeded());
+
+      assertEquals(3l, reply0.result().longValue());
+
+      redis.brpopMany(toList(list1, list2), 0, reply1 -> {
+        assertTrue(reply1.succeeded());
+
+        assertEquals(list1, reply1.result().getString(0));
+        assertEquals("c", reply1.result().getString(1));
+        testComplete();
+      });
+    });
+
+    await();
+  }
+
+  @Test
+  public void testIssue5BlockingCall_report() {
+    final String list = makeKey();
+
+    redis.brpop(list, 2, reply1 -> {
+      assertTrue(reply1.succeeded());
+
+      assertNull(reply1.result());
+      testComplete();
+    });
+
+    await();
+  }
 }

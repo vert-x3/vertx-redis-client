@@ -16,7 +16,7 @@ public abstract class AbstractRedisClient implements RedisClient {
 
   private static final Logger log = LoggerFactory.getLogger(AbstractRedisClient.class);
 
-  private static enum ResponseTransform {
+  private enum ResponseTransform {
     NONE,
     ARRAY_TO_OBJECT,
     INFO
@@ -26,7 +26,7 @@ public abstract class AbstractRedisClient implements RedisClient {
   private final JsonObject config;
   private final EventBus eb;
   private final RedisSubscriptions subscriptions = new RedisSubscriptions();
-  private final Queue<Command> pending = new LinkedList<>();
+  private final Queue<Command<?>> pending = new LinkedList<>();
   private final String encoding;
   private final Charset charset;
   private final String binaryEnc;
@@ -39,7 +39,7 @@ public abstract class AbstractRedisClient implements RedisClient {
     this.vertx = vertx;
     this.config = config;
     this.eb = vertx.eventBus();
-    this.encoding = config.getString("encoding", "UTF-8");;
+    this.encoding = config.getString("encoding", "UTF-8");
     this.charset = Charset.forName(encoding);
     this.binaryEnc = "iso-8859-1";
     this.binaryCharset = Charset.forName(binaryEnc);
@@ -204,32 +204,38 @@ public abstract class AbstractRedisClient implements RedisClient {
           case '$':  // Bulk
             if (transform == ResponseTransform.INFO) {
               String info = reply.asType(String.class, encoding);
-              String lines[] = info.split("\\r?\\n");
-              JsonObject value = new JsonObject();
-              JsonObject section = null;
-              for (String line : lines) {
-                if (line.length() == 0) {
-                  // end of section
-                  section = null;
-                  continue;
-                }
 
-                if (line.charAt(0) == '#') {
-                  // begin section
-                  section = new JsonObject();
-                  // create a sub key with the section name
-                  value.put(line.substring(2).toLowerCase(), section);
-                } else {
-                  // entry in section
-                  int split = line.indexOf(':');
-                  if (section == null) {
-                    value.put(line.substring(0, split), line.substring(split + 1));
+              if (info == null) {
+                resultHandler.handle(new RedisAsyncResult<>(null, null));
+              } else {
+                String lines[] = info.split("\\r?\\n");
+                JsonObject value = new JsonObject();
+
+                JsonObject section = null;
+                for (String line : lines) {
+                  if (line.length() == 0) {
+                    // end of section
+                    section = null;
+                    continue;
+                  }
+
+                  if (line.charAt(0) == '#') {
+                    // begin section
+                    section = new JsonObject();
+                    // create a sub key with the section name
+                    value.put(line.substring(2).toLowerCase(), section);
                   } else {
-                    section.put(line.substring(0, split), line.substring(split + 1));
+                    // entry in section
+                    int split = line.indexOf(':');
+                    if (section == null) {
+                      value.put(line.substring(0, split), line.substring(split + 1));
+                    } else {
+                      section.put(line.substring(0, split), line.substring(split + 1));
+                    }
                   }
                 }
+                resultHandler.handle(new RedisAsyncResult<>(null, (T) value));
               }
-              resultHandler.handle(new RedisAsyncResult<>(null, (T) value));
             } else {
               resultHandler.handle(new RedisAsyncResult<>(null, reply.asType(returnType, binary ? binaryEnc : encoding)));
             }
@@ -253,7 +259,7 @@ public abstract class AbstractRedisClient implements RedisClient {
     doSend(comm);
   }
 
-  private synchronized <T> void doSend(Command command) {
+  private synchronized void doSend(Command command) {
     if (redisConnection == null) {
       pending.add(command);
       connect();
@@ -290,17 +296,19 @@ public abstract class AbstractRedisClient implements RedisClient {
     }
   }
 
+  @SuppressWarnings("unchecked")
   private synchronized void sendPendingFailed(Throwable cause) {
     Command command;
     while ((command = pending.poll()) != null) {
-      Handler<AsyncResult> userHandler = command.getUserHandler();
+      Handler<AsyncResult<Object>> userHandler = command.getUserHandler();
       if (userHandler != null) {
-        // FIXME - send this on correct context
-        try {
-          userHandler.handle(Future.failedFuture(cause));
-        } catch (Throwable t) {
-          log.error("Failure in user handler", t);
-        }
+        command.getContext().runOnContext(aVoid -> {
+          try {
+            userHandler.handle(Future.failedFuture(cause));
+          } catch (Throwable t) {
+            log.error("Failure in user handler", t);
+          }
+        });
       }
     }
   }

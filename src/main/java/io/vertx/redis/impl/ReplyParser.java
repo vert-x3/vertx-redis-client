@@ -86,8 +86,9 @@ public class ReplyParser implements Handler<Buffer> {
       offset = _offset;
       packetSize = parsePacketSize();
 
-      if (packetSize < 0) {
-        return null;
+      // packets with a size of -1 are considered null
+      if (packetSize == -1) {
+        return new Reply(type, null);
       }
 
       if (packetSize > bytesRemaining()) {
