@@ -58,7 +58,7 @@ require 'vertx-redis/redis_client'
 redis = VertxRedis::RedisClient.create(vertx, {
 })
 
-redis.get("mykey") { |res,res_err|
+redis.get("mykey") { |res_err,res|
   if (res_err == nil)
     # so something...
   end
@@ -92,7 +92,7 @@ vertx.event_bus().consumer("redis.sub.channel1") { |received|
 redis = VertxRedis::RedisClient.create(vertx, {
 })
 
-redis.subscribe(["channel1"]) { |res,res_err|
+redis.subscribe(["channel1"]) { |res_err,res|
   if (res_err == nil)
     # so something...
   end
@@ -109,7 +109,7 @@ require 'vertx-redis/redis_client'
 redis = VertxRedis::RedisClient.create(vertx, {
 })
 
-redis.publish("channel1", "Hello World!") { |res,res_err|
+redis.publish("channel1", "Hello World!") { |res_err,res|
   if (res_err == nil)
     # so something...
   end
