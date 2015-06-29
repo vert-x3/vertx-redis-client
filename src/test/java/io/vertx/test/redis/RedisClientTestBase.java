@@ -608,7 +608,7 @@ public abstract class RedisClientTestBase extends VertxTestBase {
   @Test
   public void testEvalshaNumKeysAndValuesDifferent() {
     String inline = "return 1";
-    redis.scriptLoad(inline, reply->{
+    redis.scriptLoad(inline, reply -> {
       assertTrue(reply.succeeded());
       assertNotNull(reply.result());
 
@@ -618,7 +618,7 @@ public abstract class RedisClientTestBase extends VertxTestBase {
       keys.add("key2");
       values.add("value1");
 
-      redis.evalsha(reply.result(), keys, values, reply2 ->{
+      redis.evalsha(reply.result(), keys, values, reply2 -> {
         assertTrue(reply2.succeeded());
         testComplete();
       });
@@ -649,14 +649,14 @@ public abstract class RedisClientTestBase extends VertxTestBase {
       assertTrue(reply.succeeded());
       redis.set("multi-key", "first", reply2 -> {
         assertTrue(reply2.succeeded());
-        redis.set("multi-key2", "second", reply3 ->{
+        redis.set("multi-key2", "second", reply3 -> {
           assertTrue(reply3.succeeded());
         });
-        redis.get("multi-key", reply4 ->{
+        redis.get("multi-key", reply4 -> {
           assertTrue(reply4.succeeded());
           assertTrue("QUEUED".equalsIgnoreCase(reply4.result()));
         });
-        redis.exec(reply5 ->{
+        redis.exec(reply5 -> {
           assertTrue(reply5.succeeded());
           testComplete();
         });
@@ -1660,16 +1660,16 @@ public abstract class RedisClientTestBase extends VertxTestBase {
 
     String key = makeKey();
 
-    redis.set(key, "0", rep ->{
+    redis.set(key, "0", rep -> {
       assertTrue(rep.succeeded());
       redis.multi(reply -> {
         assertTrue(reply.succeeded());
         redis.set(makeKey(), "0", reply2 -> {
           assertTrue(reply2.succeeded());
-          redis.set(makeKey(), "0", reply3 ->{
+          redis.set(makeKey(), "0", reply3 -> {
             assertTrue(reply3.succeeded());
           });
-          redis.exec(reply4 ->{
+          redis.exec(reply4 -> {
             assertTrue(reply4.succeeded());
             testComplete();
           });
@@ -3247,7 +3247,7 @@ public abstract class RedisClientTestBase extends VertxTestBase {
         assertTrue(String.valueOf(reply1.cause()), reply1.succeeded());
         assertEquals(12, reply1.result().longValue());
 
-        final byte[] value2 = new byte[] {0, 0, 0};
+        final byte[] value2 = new byte[]{0, 0, 0};
         redis.setBinary(key, new String(value2, charset), reply2 -> {
           assertTrue(reply2.succeeded());
           redis.bitpos(key, 1, reply3 -> {
