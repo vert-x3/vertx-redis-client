@@ -1,6 +1,7 @@
 package io.vertx.redis.impl;
 
 import io.vertx.core.AsyncResult;
+import io.vertx.core.Future;
 import io.vertx.core.Handler;
 import io.vertx.core.Vertx;
 import io.vertx.core.json.JsonArray;
@@ -253,7 +254,7 @@ public final class RedisClientImpl extends AbstractRedisClient {
     keys = (keys != null) ? keys : Collections.emptyList();
     args = (args != null) ? args : Collections.emptyList();
     if (keys.size() != args.size()) {
-      handler.handle(new RedisAsyncResult<>(new IllegalArgumentException("Key list, and argument list are not the same size")));
+      handler.handle(Future.failedFuture(new IllegalArgumentException("Key list, and argument list are not the same size")));
     } else {
       sendVoid("EVAL", toPayload(script, keys.size(), keys, args), handler);
     }

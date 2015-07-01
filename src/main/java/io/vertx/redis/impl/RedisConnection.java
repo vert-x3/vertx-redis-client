@@ -57,7 +57,7 @@ class RedisConnection implements ReplyHandler {
   void disconnect(Handler<AsyncResult<Void>> handler) {
     netSocket.close();
     client.close();
-    handler.handle(new RedisAsyncResult<>(null, null));
+    handler.handle(Future.succeededFuture(null));
   }
 
   // Redis 'subscribe', 'unsubscribe', 'psubscribe' and 'punsubscribe' commands can have multiple (including zero) repliesQueue
@@ -67,10 +67,10 @@ class RedisConnection implements ReplyHandler {
 
     // The order read must match the order written, vertx guarantees
     // that this is only called from a single thread.
-    command.writeTo(netSocket);
     for (int i = 0; i < command.getExpectedReplies(); ++i) {
-      repliesQueue.offer(command.getHandler());
+      repliesQueue.add(command.getHandler());
     }
+    command.writeTo(netSocket);
   }
 
   @Override

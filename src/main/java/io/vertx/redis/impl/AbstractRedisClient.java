@@ -115,7 +115,7 @@ public abstract class AbstractRedisClient implements RedisClient {
       case "psubscribe":
         // in this case we need also to register handlers
         if (redisArgs == null) {
-          resultHandler.handle(new RedisAsyncResult<>("at least one pattern is required!"));
+          resultHandler.handle(Future.failedFuture("at least one pattern is required!"));
           return;
         }
         expectedReplies = redisArgs.size();
@@ -138,7 +138,7 @@ public abstract class AbstractRedisClient implements RedisClient {
       // argument "channel" ["channel"...]
       case "subscribe":
         if (redisArgs == null) {
-          resultHandler.handle(new RedisAsyncResult<>("at least one pattern is required!"));
+          resultHandler.handle(Future.failedFuture("at least one pattern is required!"));
           return;
         }
         // in this case we need also to register handlers
@@ -196,17 +196,17 @@ public abstract class AbstractRedisClient implements RedisClient {
                      .setExpectedReplies(expectedReplies).setHandler((Reply reply) -> {
         switch (reply.type()) {
           case '-': // Error
-            resultHandler.handle(new RedisAsyncResult<>(reply.asType(String.class)));
+            resultHandler.handle(Future.failedFuture(reply.asType(String.class)));
             return;
           case '+':   // Status
-            resultHandler.handle(new RedisAsyncResult<>(null, reply.asType(returnType)));
+            resultHandler.handle(Future.succeededFuture(reply.asType(returnType)));
             return;
           case '$':  // Bulk
             if (transform == ResponseTransform.INFO) {
               String info = reply.asType(String.class, encoding);
 
               if (info == null) {
-                resultHandler.handle(new RedisAsyncResult<>(null, null));
+                resultHandler.handle(Future.succeededFuture(null));
               } else {
                 String lines[] = info.split("\\r?\\n");
                 JsonObject value = new JsonObject();
@@ -234,24 +234,24 @@ public abstract class AbstractRedisClient implements RedisClient {
                     }
                   }
                 }
-                resultHandler.handle(new RedisAsyncResult<>(null, (T) value));
+                resultHandler.handle(Future.succeededFuture((T) value));
               }
             } else {
-              resultHandler.handle(new RedisAsyncResult<>(null, reply.asType(returnType, binary ? binaryEnc : encoding)));
+              resultHandler.handle(Future.succeededFuture(reply.asType(returnType, binary ? binaryEnc : encoding)));
             }
             return;
           case '*': // Multi
             if (transform == ResponseTransform.ARRAY_TO_OBJECT) {
-              resultHandler.handle(new RedisAsyncResult<>(null, (T) reply.asType(JsonObject.class, encoding)));
+              resultHandler.handle(Future.succeededFuture((T) reply.asType(JsonObject.class, encoding)));
             } else {
-              resultHandler.handle(new RedisAsyncResult<>(null, (T) reply.asType(JsonArray.class, encoding)));
+              resultHandler.handle(Future.succeededFuture((T) reply.asType(JsonArray.class, encoding)));
             }
             return;
           case ':':   // Integer
-            resultHandler.handle(new RedisAsyncResult<>(null, reply.asType(returnType)));
+            resultHandler.handle(Future.succeededFuture(reply.asType(returnType)));
             return;
           default:
-            resultHandler.handle(new RedisAsyncResult<>("Unknown message type"));
+            resultHandler.handle(Future.failedFuture("Unknown message type"));
         }
       });
     comm.setUserHandler(resultHandler);
