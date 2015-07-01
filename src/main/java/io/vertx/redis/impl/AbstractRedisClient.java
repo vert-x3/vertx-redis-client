@@ -110,7 +110,7 @@ public abstract class AbstractRedisClient implements RedisClient {
     // subscribe/psubscribe and unsubscribe/punsubscribe commands can have multiple (including zero) replies
     int expectedReplies = 1;
 
-    switch (command) {
+    switch (command.toLowerCase()) {
       // argument "pattern" ["pattern"...]
       case "psubscribe":
         // in this case we need also to register handlers
