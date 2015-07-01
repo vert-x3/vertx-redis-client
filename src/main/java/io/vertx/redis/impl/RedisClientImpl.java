@@ -239,7 +239,13 @@ public final class RedisClientImpl extends AbstractRedisClient {
 
   @Override
   public RedisClient dump(String key, Handler<AsyncResult<String>> handler) {
-    send("DUMP", toPayload(key), String.class, true, new DumpHandler(handler));
+    send("DUMP", toPayload(key), String.class, true, dump -> {
+      if (dump.failed()) {
+        handler.handle(dump);
+      } else {
+        handler.handle(Future.succeededFuture(RedisEncoding.encode(dump.result())));
+      }
+    });
     return this;
   } 
 

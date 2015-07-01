@@ -1,6 +1,7 @@
 package io.vertx.redis.impl;
 
 import io.vertx.core.Handler;
+import io.vertx.core.Vertx;
 import io.vertx.core.buffer.Buffer;
 
 public class ReplyParser implements Handler<Buffer> {
@@ -9,9 +10,11 @@ public class ReplyParser implements Handler<Buffer> {
   private int _offset;
   private final String _encoding = "utf-8";
 
+  private final Vertx vertx;
   private final ReplyHandler client;
 
-  public ReplyParser(ReplyHandler client) {
+  public ReplyParser(Vertx vertx, ReplyHandler client) {
+    this.vertx = vertx;
     this.client = client;
   }
 
@@ -122,7 +125,6 @@ public class ReplyParser implements Handler<Buffer> {
     append(buffer);
 
     byte type;
-    Reply ret;
     int offset;
 
     loop:
@@ -145,13 +147,14 @@ public class ReplyParser implements Handler<Buffer> {
           case '-':
           case ':':
           case '$':
-            ret = parseResult(type);
+            final Reply ret = parseResult(type);
 
             if (ret == null) {
               break loop;
             }
 
-            client.handleReply(ret);
+            vertx.getOrCreateContext().runOnContext(v ->
+                client.handleReply(ret));
             break;
         }
       } catch (ArrayIndexOutOfBoundsException err) {

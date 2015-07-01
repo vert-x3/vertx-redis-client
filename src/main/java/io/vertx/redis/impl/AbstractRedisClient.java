@@ -23,7 +23,6 @@ public abstract class AbstractRedisClient implements RedisClient {
   }
 
   private final Vertx vertx;
-  private final JsonObject config;
   private final EventBus eb;
   private final RedisSubscriptions subscriptions = new RedisSubscriptions();
   private final Queue<Command<?>> pending = new LinkedList<>();
@@ -33,11 +32,10 @@ public abstract class AbstractRedisClient implements RedisClient {
   private final Charset binaryCharset;
   private final String baseAddress;
 
-  private RedisConnection redisConnection;
+  private final RedisConnection redisConnection;
 
   AbstractRedisClient(Vertx vertx, JsonObject config) {
     this.vertx = vertx;
-    this.config = config;
     this.eb = vertx.eventBus();
     this.encoding = config.getString("encoding", "UTF-8");
     this.charset = Charset.forName(encoding);
@@ -48,16 +46,16 @@ public abstract class AbstractRedisClient implements RedisClient {
     if (binary) {
       log.warn("Binary mode is not implemented yet!!!");
     }
+
+    final String host = config.getString("host", "localhost");
+    final int port = config.getInteger("port", 6379);
+    redisConnection = new RedisConnection(vertx, host, port, subscriptions);
+
   }
 
   @Override
   public synchronized void close(Handler<AsyncResult<Void>> handler) {
-    if (redisConnection != null) {
-      redisConnection.disconnect(handler);
-      redisConnection = null;
-    } else if (handler != null) {
-      vertx.getOrCreateContext().runOnContext(v -> handler.handle(Future.succeededFuture()));
-    }
+    redisConnection.disconnect(handler);
   }
 
   private ResponseTransform getResponseTransformFor(String command) {
@@ -115,7 +113,8 @@ public abstract class AbstractRedisClient implements RedisClient {
       case "psubscribe":
         // in this case we need also to register handlers
         if (redisArgs == null) {
-          resultHandler.handle(Future.failedFuture("at least one pattern is required!"));
+          vertx.getOrCreateContext().runOnContext(v ->
+              resultHandler.handle(Future.failedFuture("at least one pattern is required!")));
           return;
         }
         expectedReplies = redisArgs.size();
@@ -138,7 +137,8 @@ public abstract class AbstractRedisClient implements RedisClient {
       // argument "channel" ["channel"...]
       case "subscribe":
         if (redisArgs == null) {
-          resultHandler.handle(Future.failedFuture("at least one pattern is required!"));
+          vertx.getOrCreateContext().runOnContext(v ->
+              resultHandler.handle(Future.failedFuture("at least one pattern is required!")));
           return;
         }
         // in this case we need also to register handlers
@@ -190,23 +190,24 @@ public abstract class AbstractRedisClient implements RedisClient {
         break;
     }
 
-    Context context = vertx.getOrCreateContext();
-
-    Command<T> comm = new Command<T>(context, command, redisArgs, binary ? binaryCharset : charset)
+    Command<T> comm = new Command<T>(command, redisArgs, binary ? binaryCharset : charset)
                      .setExpectedReplies(expectedReplies).setHandler((Reply reply) -> {
         switch (reply.type()) {
           case '-': // Error
-            resultHandler.handle(Future.failedFuture(reply.asType(String.class)));
+            vertx.getOrCreateContext().runOnContext(v ->
+                resultHandler.handle(Future.failedFuture(reply.asType(String.class))));
             return;
           case '+':   // Status
-            resultHandler.handle(Future.succeededFuture(reply.asType(returnType)));
+            vertx.getOrCreateContext().runOnContext(v ->
+                resultHandler.handle(Future.succeededFuture(reply.asType(returnType))));
             return;
           case '$':  // Bulk
             if (transform == ResponseTransform.INFO) {
               String info = reply.asType(String.class, encoding);
 
               if (info == null) {
-                resultHandler.handle(Future.succeededFuture(null));
+                vertx.getOrCreateContext().runOnContext(v ->
+                    resultHandler.handle(Future.succeededFuture(null)));
               } else {
                 String lines[] = info.split("\\r?\\n");
                 JsonObject value = new JsonObject();
@@ -234,24 +235,30 @@ public abstract class AbstractRedisClient implements RedisClient {
                     }
                   }
                 }
-                resultHandler.handle(Future.succeededFuture((T) value));
+                vertx.getOrCreateContext().runOnContext(v ->
+                    resultHandler.handle(Future.succeededFuture((T) value)));
               }
             } else {
-              resultHandler.handle(Future.succeededFuture(reply.asType(returnType, binary ? binaryEnc : encoding)));
+              vertx.getOrCreateContext().runOnContext(v ->
+                  resultHandler.handle(Future.succeededFuture(reply.asType(returnType, binary ? binaryEnc : encoding))));
             }
             return;
           case '*': // Multi
             if (transform == ResponseTransform.ARRAY_TO_OBJECT) {
-              resultHandler.handle(Future.succeededFuture((T) reply.asType(JsonObject.class, encoding)));
+              vertx.getOrCreateContext().runOnContext(v ->
+                  resultHandler.handle(Future.succeededFuture((T) reply.asType(JsonObject.class, encoding))));
             } else {
-              resultHandler.handle(Future.succeededFuture((T) reply.asType(JsonArray.class, encoding)));
+              vertx.getOrCreateContext().runOnContext(v ->
+                  resultHandler.handle(Future.succeededFuture((T) reply.asType(JsonArray.class, encoding))));
             }
             return;
           case ':':   // Integer
-            resultHandler.handle(Future.succeededFuture(reply.asType(returnType)));
+            vertx.getOrCreateContext().runOnContext(v ->
+                resultHandler.handle(Future.succeededFuture(reply.asType(returnType))));
             return;
           default:
-            resultHandler.handle(Future.failedFuture("Unknown message type"));
+            vertx.getOrCreateContext().runOnContext(v ->
+                resultHandler.handle(Future.failedFuture("Unknown message type")));
         }
       });
     comm.setUserHandler(resultHandler);
@@ -260,62 +267,46 @@ public abstract class AbstractRedisClient implements RedisClient {
   }
 
   private synchronized void doSend(Command command) {
-    if (redisConnection == null) {
-      pending.add(command);
-      connect();
-    } else {
-      sendOnConnection(command);
+    switch (redisConnection.state()) {
+      case CONNECTED:
+        // send right away
+        redisConnection.send(command);
+        break;
+      case CONNECTING:
+        // queue until client is ready
+        pending.add(command);
+        break;
+      case DISCONNECTED:
+        // queue and try to connect
+        pending.add(command);
+        connect();
+        break;
     }
   }
 
   private void connect() {
-    final String host = config.getString("host", "localhost");
-    final int port = config.getInteger("port", 6379);
-    RedisConnection conn = new RedisConnection(vertx, host, port, subscriptions, v -> connectionClosed());
-    conn.connect(res -> {
+    redisConnection.connect(res -> {
       if (res.succeeded()) {
-        connected(conn);
+        Command command;
+        while ((command = pending.poll()) != null) {
+          redisConnection.send(command);
+        }
       } else {
         sendPendingFailed(res.cause());
       }
     });
   }
 
-  private synchronized void connectionClosed() {
-    if (redisConnection != null) {
-      redisConnection = null;
-      log.warn("Connection has been closed by peer");
-    }
-  }
-
-  private synchronized void connected(RedisConnection conn) {
-    this.redisConnection = conn;
-    Command command;
-    while ((command = pending.poll()) != null) {
-      sendOnConnection(command);
-    }
-  }
-
   @SuppressWarnings("unchecked")
   private synchronized void sendPendingFailed(Throwable cause) {
     Command command;
     while ((command = pending.poll()) != null) {
-      Handler<AsyncResult<Object>> userHandler = command.getUserHandler();
+      Handler<AsyncResult<?>> userHandler = command.getUserHandler();
       if (userHandler != null) {
-        command.getContext().runOnContext(aVoid -> {
-          try {
-            userHandler.handle(Future.failedFuture(cause));
-          } catch (Throwable t) {
-            log.error("Failure in user handler", t);
-          }
-        });
+        vertx.getOrCreateContext().runOnContext(v ->
+            userHandler.handle(Future.failedFuture(cause)));
       }
     }
   }
-
-  private void sendOnConnection(Command command) {
-    redisConnection.send(command);
-  }
-
 }
 

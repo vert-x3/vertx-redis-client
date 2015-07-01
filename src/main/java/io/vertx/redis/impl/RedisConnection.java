@@ -4,8 +4,6 @@ import io.vertx.core.AsyncResult;
 import io.vertx.core.Future;
 import io.vertx.core.Handler;
 import io.vertx.core.Vertx;
-import io.vertx.core.logging.Logger;
-import io.vertx.core.logging.LoggerFactory;
 import io.vertx.core.net.NetClient;
 import io.vertx.core.net.NetClientOptions;
 import io.vertx.core.net.NetSocket;
@@ -19,45 +17,70 @@ import java.util.concurrent.ConcurrentLinkedQueue;
  */
 class RedisConnection implements ReplyHandler {
 
-  private static final Logger log = LoggerFactory.getLogger(RedisConnection.class);
-
   private final Queue<Handler<Reply>> repliesQueue = new ConcurrentLinkedQueue<>();
-  private final ReplyParser replyParser = new ReplyParser(this);
+  private final ReplyParser replyParser;
+
+  private final Vertx vertx;
   private final NetClient client;
   private final RedisSubscriptions subscriptions;
   private final String host;
   private final int port;
-  private final Handler<Void> closedHandler;
 
+  public enum State {
+    DISCONNECTED,
+    CONNECTING,
+    CONNECTED
+  }
+
+  private State state = State.DISCONNECTED;
   private volatile NetSocket netSocket;
 
-  public RedisConnection(Vertx vertx, String host, int port, RedisSubscriptions subscriptions, Handler<Void> closedHandler) {
+  public RedisConnection(Vertx vertx, String host, int port, RedisSubscriptions subscriptions) {
+    this.vertx = vertx;
     this.host = host;
     this.port = port;
     this.subscriptions = subscriptions;
-    this.closedHandler = closedHandler;
+    this.replyParser = new ReplyParser(vertx, this);
     this.client = vertx.createNetClient(new NetClientOptions());
   }
 
-  void connect(final Handler<AsyncResult<Void>> resultHandler) {
-    replyParser.reset();
+  State state() {
+    return state;
+  }
 
-    client.connect(port, host, asyncResult -> {
-      if (asyncResult.failed()) {
-        resultHandler.handle(Future.failedFuture(asyncResult.cause()));
-      } else {
-        netSocket = asyncResult.result();
-        netSocket.handler(replyParser);
-        netSocket.closeHandler(closedHandler);
-        resultHandler.handle(Future.succeededFuture());
-      }
-    });
+  void connect(final Handler<AsyncResult<Void>> resultHandler) {
+    if (state == State.DISCONNECTED) {
+      state = State.CONNECTING;
+
+      replyParser.reset();
+
+      client.connect(port, host, asyncResult -> {
+        if (asyncResult.failed()) {
+          state = State.DISCONNECTED;
+
+          vertx.getOrCreateContext().runOnContext(v ->
+              resultHandler.handle(Future.failedFuture(asyncResult.cause())));
+        } else {
+          state = State.CONNECTED;
+
+          netSocket = asyncResult.result()
+              .handler(replyParser)
+              .closeHandler(v -> state = State.DISCONNECTED)
+              .exceptionHandler(e -> state = State.DISCONNECTED);
+
+          vertx.getOrCreateContext().runOnContext(v ->
+              resultHandler.handle(Future.succeededFuture()));
+        }
+      });
+    }
   }
 
   void disconnect(Handler<AsyncResult<Void>> handler) {
-    netSocket.close();
+    state = State.DISCONNECTED;
+
     client.close();
-    handler.handle(Future.succeededFuture(null));
+    vertx.getOrCreateContext().runOnContext(v ->
+        handler.handle(Future.succeededFuture(null)));
   }
 
   // Redis 'subscribe', 'unsubscribe', 'psubscribe' and 'punsubscribe' commands can have multiple (including zero) repliesQueue
@@ -85,7 +108,8 @@ class RedisConnection implements ReplyHandler {
     Handler<Reply> handler = repliesQueue.poll();
     if (handler != null) {
       // handler waits for this response
-      handler.handle(reply);
+      vertx.getOrCreateContext().runOnContext(v ->
+          handler.handle(reply));
       return;
     }
 
@@ -106,7 +130,8 @@ class RedisConnection implements ReplyHandler {
             String channel = data[1].asType(String.class);
             MessageHandler handler = subscriptions.getChannelHandler(channel);
             if (handler != null) {
-              handler.handle(channel, data);
+              vertx.getOrCreateContext().runOnContext(v ->
+                  handler.handle(channel, data));
             }
             // It is possible to get a message after removing subscription in the client but before Redis command executes,
             // so ignoring message here (consumer already is not interested in it)
@@ -119,7 +144,8 @@ class RedisConnection implements ReplyHandler {
             String pattern = data[1].asType(String.class);
             MessageHandler handler = subscriptions.getPatternHandler(pattern);
             if (handler != null) {
-              handler.handle(pattern, data);
+              vertx.getOrCreateContext().runOnContext(v ->
+                  handler.handle(pattern, data));
             }
             // It is possible to get a message after removing subscription in the client but before Redis command executes,
             // so ignoring message here (consumer already is not interested in it)
