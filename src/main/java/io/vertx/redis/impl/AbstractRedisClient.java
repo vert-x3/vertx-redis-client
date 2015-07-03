@@ -105,19 +105,12 @@ public abstract class AbstractRedisClient implements RedisClient {
 
     final ResponseTransform transform = getResponseTransformFor(command);
 
-    // subscribe/psubscribe and unsubscribe/punsubscribe commands can have multiple (including zero) replies
-    int expectedReplies = 1;
+    final Command<T> cmd = new Command<T>(vertx.getOrCreateContext(), command, redisArgs, binary ? binaryCharset : charset);
 
-    switch (command.toLowerCase()) {
-      // argument "pattern" ["pattern"...]
-      case "psubscribe":
-        // in this case we need also to register handlers
-        if (redisArgs == null) {
-          vertx.getOrCreateContext().runOnContext(v ->
-              resultHandler.handle(Future.failedFuture("at least one pattern is required!")));
-          return;
-        }
-        expectedReplies = redisArgs.size();
+    switch (command) {
+      case "PSUBSCRIBE":
+        cmd.setExpectedReplies(redisArgs.size());
+
         for (Object obj : redisArgs) {
           String pattern = (String) obj;
           // compose the listening address as base + . + pattern
@@ -134,15 +127,10 @@ public abstract class AbstractRedisClient implements RedisClient {
           });
         }
         break;
-      // argument "channel" ["channel"...]
-      case "subscribe":
-        if (redisArgs == null) {
-          vertx.getOrCreateContext().runOnContext(v ->
-              resultHandler.handle(Future.failedFuture("at least one pattern is required!")));
-          return;
-        }
-        // in this case we need also to register handlers
-        expectedReplies = redisArgs.size();
+
+      case "SUBSCRIBE":
+        cmd.setExpectedReplies(redisArgs.size());
+
         for (Object obj : redisArgs) {
           String channel = (String) obj;
           // compose the listening address as base + . + channel
@@ -158,30 +146,32 @@ public abstract class AbstractRedisClient implements RedisClient {
           });
         }
         break;
-      // argument ["pattern" ["pattern"...]]
-      case "punsubscribe":
+
+      case "PUNSUBSCRIBE":
         // unregister all channels
         if (redisArgs == null || redisArgs.size() == 0) {
           // unsubscribe all
-          expectedReplies = subscriptions.patternSize();
+          cmd.setExpectedReplies(subscriptions.patternSize());
           subscriptions.unregisterPatternSubscribeHandler(null);
         } else {
-          expectedReplies = redisArgs.size();
+          cmd.setExpectedReplies(redisArgs.size());
+
           for (Object obj : redisArgs) {
             String pattern = (String) obj;
             subscriptions.unregisterPatternSubscribeHandler(pattern);
           }
         }
         break;
-      // argument ["channel" ["channel"...]]
-      case "unsubscribe":
+
+      case "UNSUBSCRIBE":
         // unregister all channels
         if (redisArgs == null || redisArgs.size() == 0) {
           // unsubscribe all
-          expectedReplies = subscriptions.channelSize();
+          cmd.setExpectedReplies(subscriptions.channelSize());
           subscriptions.unregisterChannelSubscribeHandler(null);
         } else {
-          expectedReplies = redisArgs.size();
+          cmd.setExpectedReplies(redisArgs.size());
+
           for (Object obj : redisArgs) {
             String channel = (String) obj;
             subscriptions.unregisterChannelSubscribeHandler(channel);
@@ -190,24 +180,20 @@ public abstract class AbstractRedisClient implements RedisClient {
         break;
     }
 
-    Command<T> comm = new Command<T>(command, redisArgs, binary ? binaryCharset : charset)
-                     .setExpectedReplies(expectedReplies).setHandler((Reply reply) -> {
+    cmd.setHandler(reply -> {
         switch (reply.type()) {
           case '-': // Error
-            vertx.getOrCreateContext().runOnContext(v ->
-                resultHandler.handle(Future.failedFuture(reply.asType(String.class))));
+            cmd.handle(Future.failedFuture(reply.asType(String.class)));
             return;
           case '+':   // Status
-            vertx.getOrCreateContext().runOnContext(v ->
-                resultHandler.handle(Future.succeededFuture(reply.asType(returnType))));
+            cmd.handle(Future.succeededFuture(reply.asType(returnType)));
             return;
           case '$':  // Bulk
             if (transform == ResponseTransform.INFO) {
               String info = reply.asType(String.class, encoding);
 
               if (info == null) {
-                vertx.getOrCreateContext().runOnContext(v ->
-                    resultHandler.handle(Future.succeededFuture(null)));
+                cmd.handle(Future.succeededFuture(null));
               } else {
                 String lines[] = info.split("\\r?\\n");
                 JsonObject value = new JsonObject();
@@ -235,35 +221,30 @@ public abstract class AbstractRedisClient implements RedisClient {
                     }
                   }
                 }
-                vertx.getOrCreateContext().runOnContext(v ->
-                    resultHandler.handle(Future.succeededFuture((T) value)));
+                cmd.handle(Future.succeededFuture((T) value));
               }
             } else {
-              vertx.getOrCreateContext().runOnContext(v ->
-                  resultHandler.handle(Future.succeededFuture(reply.asType(returnType, binary ? binaryEnc : encoding))));
+              cmd.handle(Future.succeededFuture(reply.asType(returnType, binary ? binaryEnc : encoding)));
             }
             return;
           case '*': // Multi
             if (transform == ResponseTransform.ARRAY_TO_OBJECT) {
-              vertx.getOrCreateContext().runOnContext(v ->
-                  resultHandler.handle(Future.succeededFuture((T) reply.asType(JsonObject.class, encoding))));
+              cmd.handle(Future.succeededFuture((T) reply.asType(JsonObject.class, encoding)));
             } else {
-              vertx.getOrCreateContext().runOnContext(v ->
-                  resultHandler.handle(Future.succeededFuture((T) reply.asType(JsonArray.class, encoding))));
+              cmd.handle(Future.succeededFuture((T) reply.asType(JsonArray.class, encoding)));
             }
             return;
           case ':':   // Integer
-            vertx.getOrCreateContext().runOnContext(v ->
-                resultHandler.handle(Future.succeededFuture(reply.asType(returnType))));
+            cmd.handle(Future.succeededFuture(reply.asType(returnType)));
             return;
           default:
-            vertx.getOrCreateContext().runOnContext(v ->
-                resultHandler.handle(Future.failedFuture("Unknown message type")));
+            cmd.handle(Future.failedFuture("Unknown message type"));
         }
       });
-    comm.setUserHandler(resultHandler);
 
-    doSend(comm);
+    cmd.userHandler(resultHandler);
+
+    doSend(cmd);
   }
 
   private synchronized void doSend(Command command) {
@@ -301,11 +282,7 @@ public abstract class AbstractRedisClient implements RedisClient {
   private synchronized void sendPendingFailed(Throwable cause) {
     Command command;
     while ((command = pending.poll()) != null) {
-      Handler<AsyncResult<?>> userHandler = command.getUserHandler();
-      if (userHandler != null) {
-        vertx.getOrCreateContext().runOnContext(v ->
-            userHandler.handle(Future.failedFuture(cause)));
-      }
+      command.handle(Future.failedFuture(cause));
     }
   }
 }

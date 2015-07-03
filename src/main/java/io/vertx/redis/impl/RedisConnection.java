@@ -108,8 +108,7 @@ class RedisConnection implements ReplyHandler {
     Handler<Reply> handler = repliesQueue.poll();
     if (handler != null) {
       // handler waits for this response
-      vertx.getOrCreateContext().runOnContext(v ->
-          handler.handle(reply));
+      handler.handle(reply);
       return;
     }
 

@@ -1,7 +1,9 @@
 package io.vertx.redis.impl;
 
 import io.vertx.core.AsyncResult;
+import io.vertx.core.Context;
 import io.vertx.core.Handler;
+import io.vertx.core.Vertx;
 import io.vertx.core.buffer.Buffer;
 import io.vertx.core.json.JsonArray;
 import io.vertx.core.streams.WriteStream;
@@ -57,12 +59,15 @@ public class Command<T> {
     return bytes;
   }
 
+  private final Context context;
   private final Buffer buffer;
   private int expectedReplies = 1;
   private Handler<Reply> handler;
   private Handler<AsyncResult<T>> userHandler;
 
-  public Command(String command, final JsonArray args, Charset encoding) {
+  public Command(Context context, String command, final JsonArray args, Charset encoding) {
+    this.context = context;
+
     int totalArgs;
     if (args == null) {
       totalArgs = 0;
@@ -109,13 +114,15 @@ public class Command<T> {
     return this;
   }
 
-  public Command setUserHandler(Handler<AsyncResult<T>> handler) {
+  public Command<T> userHandler(Handler<AsyncResult<T>> handler) {
     this.userHandler = handler;
     return this;
   }
 
-  public Handler<AsyncResult<T>> getUserHandler() {
-    return userHandler;
+  public void handle(AsyncResult<T> asyncResult) {
+    if (userHandler != null) {
+      context.runOnContext(v -> userHandler.handle(asyncResult));
+    }
   }
 
   public void writeTo(WriteStream<Buffer> writeStream) {
