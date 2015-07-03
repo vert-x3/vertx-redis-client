@@ -10,11 +10,9 @@ public class ReplyParser implements Handler<Buffer> {
   private int _offset;
   private final String _encoding = "utf-8";
 
-  private final Vertx vertx;
-  private final ReplyHandler client;
+  private final Handler<Reply> client;
 
-  public ReplyParser(Vertx vertx, ReplyHandler client) {
-    this.vertx = vertx;
+  public ReplyParser(Handler<Reply> client) {
     this.client = client;
   }
 
@@ -153,8 +151,7 @@ public class ReplyParser implements Handler<Buffer> {
               break loop;
             }
 
-            vertx.getOrCreateContext().runOnContext(v ->
-                client.handleReply(ret));
+            client.handle(ret);
             break;
         }
       } catch (ArrayIndexOutOfBoundsException err) {

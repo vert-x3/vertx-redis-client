@@ -5,5 +5,5 @@ package io.vertx.redis.impl;
  */
 @FunctionalInterface
 public interface MessageHandler {
-  public void handle(String channelOrPattern, Reply[] replyData);
+  void handle(String channelOrPattern, Reply[] replyData);
 }

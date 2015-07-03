@@ -4,58 +4,48 @@ import io.vertx.core.*;
 import io.vertx.core.eventbus.EventBus;
 import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;
-import io.vertx.core.logging.Logger;
-import io.vertx.core.logging.LoggerFactory;
+import io.vertx.core.net.NetClient;
+import io.vertx.core.net.NetClientOptions;
 import io.vertx.redis.RedisClient;
 
 import java.nio.charset.Charset;
-import java.util.LinkedList;
-import java.util.Queue;
 
 public abstract class AbstractRedisClient implements RedisClient {
-
-  private static final Logger log = LoggerFactory.getLogger(AbstractRedisClient.class);
-
-  private enum ResponseTransform {
-    NONE,
-    ARRAY_TO_OBJECT,
-    INFO
-  }
 
   private final Vertx vertx;
   private final EventBus eb;
   private final RedisSubscriptions subscriptions = new RedisSubscriptions();
-  private final Queue<Command<?>> pending = new LinkedList<>();
   private final String encoding;
   private final Charset charset;
-  private final String binaryEnc;
   private final Charset binaryCharset;
   private final String baseAddress;
 
-  private final RedisConnection redisConnection;
+  private final NetClient client;
+  private final RedisConnection conn;
 
   AbstractRedisClient(Vertx vertx, JsonObject config) {
     this.vertx = vertx;
     this.eb = vertx.eventBus();
     this.encoding = config.getString("encoding", "UTF-8");
     this.charset = Charset.forName(encoding);
-    this.binaryEnc = "iso-8859-1";
-    this.binaryCharset = Charset.forName(binaryEnc);
+    this.binaryCharset = Charset.forName("iso-8859-1");
     this.baseAddress = config.getString("address", "io.vertx.mod-redis");
-    boolean binary = config.getBoolean("binary", false);
-    if (binary) {
-      log.warn("Binary mode is not implemented yet!!!");
-    }
 
     final String host = config.getString("host", "localhost");
     final int port = config.getInteger("port", 6379);
-    redisConnection = new RedisConnection(vertx, host, port, subscriptions);
 
+    // create a netClient for the connection
+    this.client = vertx.createNetClient(new NetClientOptions());
+
+    conn = new RedisConnection(vertx, client, host, port, subscriptions);
   }
 
   @Override
   public synchronized void close(Handler<AsyncResult<Void>> handler) {
-    redisConnection.disconnect(handler);
+    conn.disconnect();
+    client.close();
+
+    handler.handle(Future.succeededFuture());
   }
 
   private ResponseTransform getResponseTransformFor(String command) {
@@ -89,7 +79,6 @@ public abstract class AbstractRedisClient implements RedisClient {
     send(command, args, JsonObject.class, resultHandler);
   }
 
-  @SuppressWarnings("unchecked")
   final <T> void send(final String command, final JsonArray redisArgs,
                       final Class<T> returnType,
                       final Handler<AsyncResult<T>> resultHandler) {
@@ -98,14 +87,13 @@ public abstract class AbstractRedisClient implements RedisClient {
   }
 
   @SuppressWarnings("unchecked")
-  final <T> void send(final String command, final JsonArray redisArgs,
-                      final Class<T> returnType,
+  final <T> void send(final String command, final JsonArray redisArgs, final Class<T> returnType,
                       final boolean binary,
                       final Handler<AsyncResult<T>> resultHandler) {
 
     final ResponseTransform transform = getResponseTransformFor(command);
 
-    final Command<T> cmd = new Command<T>(vertx.getOrCreateContext(), command, redisArgs, binary ? binaryCharset : charset);
+    final Command<T> cmd = new Command<T>(vertx.getOrCreateContext(), command, redisArgs, binary ? binaryCharset : charset, transform, returnType);
 
     switch (command) {
       case "PSUBSCRIBE":
@@ -180,110 +168,7 @@ public abstract class AbstractRedisClient implements RedisClient {
         break;
     }
 
-    cmd.setHandler(reply -> {
-        switch (reply.type()) {
-          case '-': // Error
-            cmd.handle(Future.failedFuture(reply.asType(String.class)));
-            return;
-          case '+':   // Status
-            cmd.handle(Future.succeededFuture(reply.asType(returnType)));
-            return;
-          case '$':  // Bulk
-            if (transform == ResponseTransform.INFO) {
-              String info = reply.asType(String.class, encoding);
-
-              if (info == null) {
-                cmd.handle(Future.succeededFuture(null));
-              } else {
-                String lines[] = info.split("\\r?\\n");
-                JsonObject value = new JsonObject();
-
-                JsonObject section = null;
-                for (String line : lines) {
-                  if (line.length() == 0) {
-                    // end of section
-                    section = null;
-                    continue;
-                  }
-
-                  if (line.charAt(0) == '#') {
-                    // begin section
-                    section = new JsonObject();
-                    // create a sub key with the section name
-                    value.put(line.substring(2).toLowerCase(), section);
-                  } else {
-                    // entry in section
-                    int split = line.indexOf(':');
-                    if (section == null) {
-                      value.put(line.substring(0, split), line.substring(split + 1));
-                    } else {
-                      section.put(line.substring(0, split), line.substring(split + 1));
-                    }
-                  }
-                }
-                cmd.handle(Future.succeededFuture((T) value));
-              }
-            } else {
-              cmd.handle(Future.succeededFuture(reply.asType(returnType, binary ? binaryEnc : encoding)));
-            }
-            return;
-          case '*': // Multi
-            if (transform == ResponseTransform.ARRAY_TO_OBJECT) {
-              cmd.handle(Future.succeededFuture((T) reply.asType(JsonObject.class, encoding)));
-            } else {
-              cmd.handle(Future.succeededFuture((T) reply.asType(JsonArray.class, encoding)));
-            }
-            return;
-          case ':':   // Integer
-            cmd.handle(Future.succeededFuture(reply.asType(returnType)));
-            return;
-          default:
-            cmd.handle(Future.failedFuture("Unknown message type"));
-        }
-      });
-
-    cmd.userHandler(resultHandler);
-
-    doSend(cmd);
-  }
-
-  private synchronized void doSend(Command command) {
-    switch (redisConnection.state()) {
-      case CONNECTED:
-        // send right away
-        redisConnection.send(command);
-        break;
-      case CONNECTING:
-        // queue until client is ready
-        pending.add(command);
-        break;
-      case DISCONNECTED:
-        // queue and try to connect
-        pending.add(command);
-        connect();
-        break;
-    }
-  }
-
-  private void connect() {
-    redisConnection.connect(res -> {
-      if (res.succeeded()) {
-        Command command;
-        while ((command = pending.poll()) != null) {
-          redisConnection.send(command);
-        }
-      } else {
-        sendPendingFailed(res.cause());
-      }
-    });
-  }
-
-  @SuppressWarnings("unchecked")
-  private synchronized void sendPendingFailed(Throwable cause) {
-    Command command;
-    while ((command = pending.poll()) != null) {
-      command.handle(Future.failedFuture(cause));
-    }
+    cmd.handler(resultHandler);
+    conn.send(cmd);
   }
 }
-

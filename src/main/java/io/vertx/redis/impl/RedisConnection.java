@@ -1,23 +1,30 @@
 package io.vertx.redis.impl;
 
-import io.vertx.core.AsyncResult;
-import io.vertx.core.Future;
-import io.vertx.core.Handler;
-import io.vertx.core.Vertx;
+import io.vertx.core.*;
+import io.vertx.core.json.JsonArray;
+import io.vertx.core.json.JsonObject;
+import io.vertx.core.logging.Logger;
+import io.vertx.core.logging.LoggerFactory;
 import io.vertx.core.net.NetClient;
-import io.vertx.core.net.NetClientOptions;
 import io.vertx.core.net.NetSocket;
 
+import java.util.LinkedList;
 import java.util.Queue;
-import java.util.concurrent.ConcurrentLinkedQueue;
 
 /**
  * Base class for Redis Vert.x client. Generated client would use the facilities
  * in this class to implement typed commands.
  */
-class RedisConnection implements ReplyHandler {
+class RedisConnection {
 
-  private final Queue<Handler<Reply>> repliesQueue = new ConcurrentLinkedQueue<>();
+  private static final Logger log = LoggerFactory.getLogger(RedisConnection.class);
+
+  // there are 2 queues:
+  // pending: commands that have not yet been sent to the server
+  private final Queue<Command<?>> pending = new LinkedList<>();
+  // waiting: commands that have been sent but not answered
+  private final Queue<Command<?>> waiting = new LinkedList<>();
+
   private final ReplyParser replyParser;
 
   private final Vertx vertx;
@@ -33,86 +40,172 @@ class RedisConnection implements ReplyHandler {
   }
 
   private State state = State.DISCONNECTED;
-  private volatile NetSocket netSocket;
 
-  public RedisConnection(Vertx vertx, String host, int port, RedisSubscriptions subscriptions) {
+  private NetSocket netSocket;
+  private Context context;
+
+  public RedisConnection(Vertx vertx, NetClient client, String host, int port, RedisSubscriptions subscriptions) {
     this.vertx = vertx;
     this.host = host;
     this.port = port;
     this.subscriptions = subscriptions;
-    this.replyParser = new ReplyParser(vertx, this);
-    this.client = vertx.createNetClient(new NetClientOptions());
+    this.replyParser = new ReplyParser(reply -> {
+      // Important to have this first - 'message' and 'pmessage' can be pushed at any moment,
+      // so they must be filtered out before checking waiting queue
+      if (handlePushedPubSubMessage(reply)) {
+        return;
+      }
+
+      Command cmd = waiting.poll();
+      if (cmd != null) {
+        switch (reply.type()) {
+          case '-': // Error
+            cmd.handle(Future.failedFuture(reply.asType(String.class)));
+            return;
+          case '+':   // Status
+            cmd.handle(Future.succeededFuture(reply.asType(cmd.returnType())));
+            return;
+          case '$':  // Bulk
+            if (cmd.responseTransform() == ResponseTransform.INFO) {
+              String info = reply.asType(String.class, cmd.encoding());
+
+              if (info == null) {
+                cmd.handle(Future.succeededFuture(null));
+              } else {
+                String lines[] = info.split("\\r?\\n");
+                JsonObject value = new JsonObject();
+
+                JsonObject section = null;
+                for (String line : lines) {
+                  if (line.length() == 0) {
+                    // end of section
+                    section = null;
+                    continue;
+                  }
+
+                  if (line.charAt(0) == '#') {
+                    // begin section
+                    section = new JsonObject();
+                    // create a sub key with the section name
+                    value.put(line.substring(2).toLowerCase(), section);
+                  } else {
+                    // entry in section
+                    int split = line.indexOf(':');
+                    if (section == null) {
+                      value.put(line.substring(0, split), line.substring(split + 1));
+                    } else {
+                      section.put(line.substring(0, split), line.substring(split + 1));
+                    }
+                  }
+                }
+                cmd.handle(Future.succeededFuture(value));
+              }
+            } else {
+              cmd.handle(Future.succeededFuture(reply.asType(cmd.returnType(), cmd.encoding())));
+            }
+            return;
+          case '*': // Multi
+            if (cmd.responseTransform() == ResponseTransform.ARRAY_TO_OBJECT) {
+              cmd.handle(Future.succeededFuture(reply.asType(JsonObject.class, cmd.encoding())));
+            } else {
+              cmd.handle(Future.succeededFuture(reply.asType(JsonArray.class, cmd.encoding())));
+            }
+            return;
+          case ':':   // Integer
+            cmd.handle(Future.succeededFuture(reply.asType(cmd.returnType())));
+            return;
+          default:
+            cmd.handle(Future.failedFuture("Unknown message type"));
+        }
+      } else {
+        log.error("No handler waiting for message:" + reply.toString());
+      }
+    });
+
+    this.client = client;
   }
 
-  State state() {
-    return state;
-  }
-
-  void connect(final Handler<AsyncResult<Void>> resultHandler) {
+  private synchronized void connect() {
     if (state == State.DISCONNECTED) {
       state = State.CONNECTING;
 
       replyParser.reset();
 
       client.connect(port, host, asyncResult -> {
+        context = vertx.getOrCreateContext();
+
         if (asyncResult.failed()) {
+          Command command;
+          // clean up any pending command
+          while ((command = pending.poll()) != null) {
+            command.handle(Future.failedFuture(asyncResult.cause()));
+          }
+          // clean up any waiting command
+          while ((command = waiting.poll()) != null) {
+            command.handle(Future.failedFuture(asyncResult.cause()));
+          }
+
           state = State.DISCONNECTED;
-
-          vertx.getOrCreateContext().runOnContext(v ->
-              resultHandler.handle(Future.failedFuture(asyncResult.cause())));
         } else {
-          state = State.CONNECTED;
-
           netSocket = asyncResult.result()
               .handler(replyParser)
               .closeHandler(v -> state = State.DISCONNECTED)
               .exceptionHandler(e -> state = State.DISCONNECTED);
 
-          vertx.getOrCreateContext().runOnContext(v ->
-              resultHandler.handle(Future.succeededFuture()));
+          Command command;
+
+          // clean up any waiting command
+          while ((command = waiting.poll()) != null) {
+            command.handle(Future.failedFuture("Connection lost"));
+          }
+
+          // we are connected so clean up the pending queue
+          while ((command = pending.poll()) != null) {
+            // The order read must match the order written, vertx guarantees
+            // that this is only called from a single thread.
+            for (int i = 0; i < command.getExpectedReplies(); ++i) {
+              waiting.add(command);
+            }
+            command.writeTo(netSocket);
+          }
+
+          state = State.CONNECTED;
         }
       });
     }
   }
 
-  void disconnect(Handler<AsyncResult<Void>> handler) {
-    state = State.DISCONNECTED;
-
-    client.close();
-    vertx.getOrCreateContext().runOnContext(v ->
-        handler.handle(Future.succeededFuture(null)));
+  synchronized void disconnect() {
+    if (state != State.DISCONNECTED) {
+      if (netSocket != null) {
+        netSocket.close();
+      }
+      state = State.DISCONNECTED;
+    }
   }
 
-  // Redis 'subscribe', 'unsubscribe', 'psubscribe' and 'punsubscribe' commands can have multiple (including zero) repliesQueue
+  // Redis 'subscribe', 'unsubscribe', 'psubscribe' and 'punsubscribe' commands can have multiple (including zero) waiting
   // See http://redis.io/topics/pubsub
   // In all cases we want to have a handler to report errors
-  void send(final Command<?> command) {
-
-    // The order read must match the order written, vertx guarantees
-    // that this is only called from a single thread.
-    for (int i = 0; i < command.getExpectedReplies(); ++i) {
-      repliesQueue.add(command.getHandler());
+  synchronized void send(final Command<?> command) {
+    switch (state) {
+      case CONNECTED:
+        // The order read must match the order written, vertx guarantees
+        // that this is only called from a single thread.
+        for (int i = 0; i < command.getExpectedReplies(); ++i) {
+          waiting.add(command);
+        }
+        // write to the socket in the netSocket context
+        context.runOnContext(v -> command.writeTo(netSocket));
+        break;
+      case CONNECTING:
+        pending.add(command);
+        break;
+      case DISCONNECTED:
+        pending.add(command);
+        connect();
+        break;
     }
-    command.writeTo(netSocket);
-  }
-
-  @Override
-  public void handleReply(Reply reply) {
-
-    // Important to have this first - 'message' and 'pmessage' can be pushed at any moment,
-    // so they must be filtered out before checking repliesQueue queue
-    if (handlePushedPubSubMessage(reply)) {
-      return;
-    }
-
-    Handler<Reply> handler = repliesQueue.poll();
-    if (handler != null) {
-      // handler waits for this response
-      handler.handle(reply);
-      return;
-    }
-
-    throw new RuntimeException("Received a non pub/sub message without reply handler waiting:" + reply.toString());
   }
 
   // Handle 'message' and 'pmessage' messages; returns true if the message was handled

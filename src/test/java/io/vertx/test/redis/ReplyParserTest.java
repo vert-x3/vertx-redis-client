@@ -24,7 +24,7 @@ public class ReplyParserTest extends VertxTestBase {
             "+Foo\r\n" +
             "-Bar\r\n");
 
-    ReplyParser parser = new ReplyParser(vertx, reply -> done());
+    ReplyParser parser = new ReplyParser(reply -> done());
 
     parser.handle(b);
     await();
@@ -37,7 +37,7 @@ public class ReplyParserTest extends VertxTestBase {
       "*1\r\n" +
         "*0\r\n");
 
-    ReplyParser parser = new ReplyParser(vertx, reply -> done());
+    ReplyParser parser = new ReplyParser(reply -> done());
 
     parser.handle(b);
     await();
