@@ -1091,7 +1091,7 @@ public interface RedisClient {
    * @since 2.0.0
    * group: pubsub
    */
-  RedisClient psubscribe(String pattern, Handler<AsyncResult<Void>> handler);
+  RedisClient psubscribe(String pattern, Handler<AsyncResult<JsonArray>> handler);
 
   /**
    * Listen for messages published to channels matching the given patterns
@@ -1101,7 +1101,7 @@ public interface RedisClient {
    * @since 2.0.0
    * group: pubsub
    */
-  RedisClient psubscribeMany(List<String> patterns, Handler<AsyncResult<Void>> handler);
+  RedisClient psubscribeMany(List<String> patterns, Handler<AsyncResult<JsonArray>> handler);
 
   /**
    * Lists the currently active channels - only those matching the pattern
@@ -1652,7 +1652,7 @@ public interface RedisClient {
    * @since 2.0.0
    * group: pubsub
    */
-  RedisClient subscribe(List<String> channels, Handler<AsyncResult<Void>> handler);
+  RedisClient subscribe(List<String> channels, Handler<AsyncResult<JsonArray>> handler);
 
   /**
    * Add multiple sets

@@ -1114,7 +1114,7 @@ module VertxRedis
     # @return [::VertxRedis::RedisClient]
     def psubscribe(pattern=nil)
       if pattern.class == String && block_given?
-        return ::Vertx::Util::Utils.safe_create(@j_del.java_method(:psubscribe, [Java::java.lang.String.java_class,Java::IoVertxCore::Handler.java_class]).call(pattern,(Proc.new { |ar| yield(ar.failed ? ar.cause : nil) })),::VertxRedis::RedisClient)
+        return ::Vertx::Util::Utils.safe_create(@j_del.java_method(:psubscribe, [Java::java.lang.String.java_class,Java::IoVertxCore::Handler.java_class]).call(pattern,(Proc.new { |ar| yield(ar.failed ? ar.cause : nil, ar.succeeded ? ar.result != nil ? JSON.parse(ar.result.encode) : nil : nil) })),::VertxRedis::RedisClient)
       end
       raise ArgumentError, "Invalid arguments when calling psubscribe(pattern)"
     end
@@ -1124,7 +1124,7 @@ module VertxRedis
     # @return [::VertxRedis::RedisClient]
     def psubscribe_many(patterns=nil)
       if patterns.class == Array && block_given?
-        return ::Vertx::Util::Utils.safe_create(@j_del.java_method(:psubscribeMany, [Java::JavaUtil::List.java_class,Java::IoVertxCore::Handler.java_class]).call(patterns.map { |element| element },(Proc.new { |ar| yield(ar.failed ? ar.cause : nil) })),::VertxRedis::RedisClient)
+        return ::Vertx::Util::Utils.safe_create(@j_del.java_method(:psubscribeMany, [Java::JavaUtil::List.java_class,Java::IoVertxCore::Handler.java_class]).call(patterns.map { |element| element },(Proc.new { |ar| yield(ar.failed ? ar.cause : nil, ar.succeeded ? ar.result != nil ? JSON.parse(ar.result.encode) : nil : nil) })),::VertxRedis::RedisClient)
       end
       raise ArgumentError, "Invalid arguments when calling psubscribe_many(patterns)"
     end
@@ -1680,7 +1680,7 @@ module VertxRedis
     # @return [::VertxRedis::RedisClient]
     def subscribe(channels=nil)
       if channels.class == Array && block_given?
-        return ::Vertx::Util::Utils.safe_create(@j_del.java_method(:subscribe, [Java::JavaUtil::List.java_class,Java::IoVertxCore::Handler.java_class]).call(channels.map { |element| element },(Proc.new { |ar| yield(ar.failed ? ar.cause : nil) })),::VertxRedis::RedisClient)
+        return ::Vertx::Util::Utils.safe_create(@j_del.java_method(:subscribe, [Java::JavaUtil::List.java_class,Java::IoVertxCore::Handler.java_class]).call(channels.map { |element| element },(Proc.new { |ar| yield(ar.failed ? ar.cause : nil, ar.succeeded ? ar.result != nil ? JSON.parse(ar.result.encode) : nil : nil) })),::VertxRedis::RedisClient)
       end
       raise ArgumentError, "Invalid arguments when calling subscribe(channels)"
     end

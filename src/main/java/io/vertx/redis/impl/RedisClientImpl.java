@@ -648,14 +648,14 @@ public final class RedisClientImpl extends AbstractRedisClient {
   } 
 
   @Override
-  public RedisClient psubscribe(String pattern, Handler<AsyncResult<Void>> handler) {
-    sendVoid("PSUBSCRIBE", toPayload(pattern), handler);
+  public RedisClient psubscribe(String pattern, Handler<AsyncResult<JsonArray>> handler) {
+    sendJsonArray("PSUBSCRIBE", toPayload(pattern), handler);
     return this;
   } 
 
   @Override
-  public RedisClient psubscribeMany(List<String> patterns, Handler<AsyncResult<Void>> handler) {
-    sendVoid("PSUBSCRIBE", toPayload(patterns), handler);
+  public RedisClient psubscribeMany(List<String> patterns, Handler<AsyncResult<JsonArray>> handler) {
+    sendJsonArray("PSUBSCRIBE", toPayload(patterns), handler);
     return this;
   } 
 

@@ -2273,7 +2273,7 @@ var RedisClient = function(j_val) {
     if (__args.length === 2 && typeof __args[0] === 'string' && typeof __args[1] === 'function') {
       return utils.convReturnVertxGen(j_redisClient["psubscribe(java.lang.String,io.vertx.core.Handler)"](pattern, function(ar) {
       if (ar.succeeded()) {
-        handler(null, null);
+        handler(utils.convReturnJson(ar.result()), null);
       } else {
         handler(null, ar.cause());
       }
@@ -2294,7 +2294,7 @@ var RedisClient = function(j_val) {
     if (__args.length === 2 && typeof __args[0] === 'object' && __args[0] instanceof Array && typeof __args[1] === 'function') {
       return utils.convReturnVertxGen(j_redisClient["psubscribeMany(java.util.List,io.vertx.core.Handler)"](patterns, function(ar) {
       if (ar.succeeded()) {
-        handler(null, null);
+        handler(utils.convReturnJson(ar.result()), null);
       } else {
         handler(null, ar.cause());
       }
@@ -3433,7 +3433,7 @@ var RedisClient = function(j_val) {
     if (__args.length === 2 && typeof __args[0] === 'object' && __args[0] instanceof Array && typeof __args[1] === 'function') {
       return utils.convReturnVertxGen(j_redisClient["subscribe(java.util.List,io.vertx.core.Handler)"](channels, function(ar) {
       if (ar.succeeded()) {
-        handler(null, null);
+        handler(utils.convReturnJson(ar.result()), null);
       } else {
         handler(null, ar.cause());
       }

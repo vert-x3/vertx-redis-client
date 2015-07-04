@@ -1,0 +1,132 @@
+package io.vertx.test.redis;
+
+import io.vertx.core.eventbus.Message;
+import io.vertx.core.json.JsonObject;
+import io.vertx.redis.RedisClient;
+import org.junit.Test;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.concurrent.atomic.AtomicInteger;
+
+public class PubSubTest extends AbstractRedisClientBase {
+
+  @Test
+  public void testPubSub() {
+    final String message = makeKey();
+
+    // register a handler for the incoming message
+    vertx.eventBus().consumer("io.vertx.redis.ch1", (Message<JsonObject> msg) -> {
+      JsonObject value = msg.body().getJsonObject("value");
+      assertEquals("ch1", value.getString("channel"));
+      assertEquals(message, value.getString("message"));
+      testComplete();
+    });
+
+    // on sub address subscribe to channel ch1
+    redis.subscribe(Arrays.asList("ch1"), subscribe -> {
+      assertTrue(subscribe.succeeded());
+
+      assertEquals("subscribe", subscribe.result().getValue(0));
+      assertEquals("ch1", subscribe.result().getValue(1));
+      assertEquals(1l, subscribe.result().getValue(2));
+
+      // on pub address publish a message
+      redis.publish("ch1", message, res -> {
+        assertTrue(res.succeeded());
+        assertEquals(Long.valueOf(1l), res.result());
+      });
+    });
+    await();
+  }
+
+  @Test
+  public void testPubSubPattern() {
+
+    final String worldNews = "hello world";
+    final String technologyNews = "hello vertx";
+    final List<JsonObject> inbox = new ArrayList<>();
+
+    // register a handler for all incoming messages
+    vertx.eventBus().consumer("io.vertx.redis.news.*", (Message<JsonObject> msg) -> {
+      inbox.add(msg.body().getJsonObject("value"));
+
+      if (inbox.size() == 2) {
+        if (
+            (worldNews.equals(inbox.get(0).getString("message")) && technologyNews.equals(inbox.get(1).getString("message"))) ||
+                (worldNews.equals(inbox.get(1).getString("message")) && technologyNews.equals(inbox.get(0).getString("message")))) {
+          testComplete();
+        }
+      }
+    });
+
+    // on sub address subscribe to channels news.*
+    redis.psubscribe("news.*", subscribe -> {
+      assertTrue(subscribe.succeeded());
+
+      assertEquals("psubscribe", subscribe.result().getValue(0));
+      assertEquals("news.*", subscribe.result().getValue(1));
+      assertEquals(1l, subscribe.result().getValue(2));
+
+      // on pub address publish a message to news.wold
+      redis.publish("news.world", worldNews, r0 -> {
+        assertTrue(r0.succeeded());
+        assertEquals(1l, r0.result().longValue());
+      });
+
+      // on pub address publish a message to news.wold
+      redis.publish("news.technology", technologyNews, r0 -> {
+        assertTrue(r0.succeeded());
+        assertEquals(1l, r0.result().longValue());
+      });
+    });
+
+    await();
+  }
+
+  @Test
+  public void testLateJoin() {
+    final String message = makeKey();
+    final AtomicInteger cnt = new AtomicInteger(0);
+
+    // register a handler for the incoming message
+    vertx.eventBus().consumer("io.vertx.redis.ch2", (Message<JsonObject> msg) -> {
+      JsonObject value = msg.body().getJsonObject("value");
+      assertEquals("ch2", value.getString("channel"));
+      assertEquals(message, value.getString("message"));
+      if (cnt.incrementAndGet() == 2) {
+        testComplete();
+      }
+    });
+
+    // on sub address subscribe to channel ch2
+    redis.subscribe(Arrays.asList("ch2"), subscribe -> {
+      assertTrue(subscribe.succeeded());
+
+      assertEquals("subscribe", subscribe.result().getValue(0));
+      assertEquals("ch2", subscribe.result().getValue(1));
+      assertEquals(1l, subscribe.result().getValue(2));
+
+      // deploy a new sub
+      RedisClient redis2 = RedisClient.create(vertx, getConfig());
+
+      // on sub address subscribe to channel ch2
+      redis2.subscribe(Arrays.asList("ch2"), subscribe2 -> {
+        assertTrue(subscribe2.succeeded());
+
+        assertEquals("subscribe", subscribe2.result().getValue(0));
+        assertEquals("ch2", subscribe2.result().getValue(1));
+        assertEquals(1l, subscribe2.result().getValue(2));
+
+        // on pub address publish a message
+        redis2.publish("ch2", message, r0 -> {
+          assertTrue(r0.succeeded());
+          assertEquals(2l, r0.result().longValue());
+        });
+      });
+    });
+
+    await();
+  }
+}
