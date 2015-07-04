@@ -14,14 +14,16 @@ public abstract class AbstractRedisClient implements RedisClient {
 
   private final Vertx vertx;
   private final EventBus eb;
-  private final RedisSubscriptions subscriptions = new RedisSubscriptions();
+  private final RedisSubscriptions subscriptions;
   private final String encoding;
   private final Charset charset;
   private final Charset binaryCharset;
   private final String baseAddress;
 
   private final NetClient client;
-  private final RedisConnection conn;
+  // we need 2 connections, one for normal commands and a second in case we do pub/sub
+  private final RedisConnection redis;
+  private final RedisConnection pubsub;
 
   AbstractRedisClient(Vertx vertx, JsonObject config) {
     this.vertx = vertx;
@@ -29,20 +31,27 @@ public abstract class AbstractRedisClient implements RedisClient {
     this.encoding = config.getString("encoding", "UTF-8");
     this.charset = Charset.forName(encoding);
     this.binaryCharset = Charset.forName("iso-8859-1");
-    this.baseAddress = config.getString("address", "io.vertx.mod-redis");
+    this.baseAddress = config.getString("address", "io.vertx.redis");
 
     final String host = config.getString("host", "localhost");
     final int port = config.getInteger("port", 6379);
 
     // create a netClient for the connection
-    this.client = vertx.createNetClient(new NetClientOptions());
+    this.client = vertx.createNetClient(new NetClientOptions()
+        .setTcpKeepAlive(config.getBoolean("tcpKeepAlive", true))
+        .setTcpNoDelay(config.getBoolean("tcpNoDelay", true)));
 
-    conn = new RedisConnection(vertx, client, host, port, subscriptions);
+    subscriptions = new RedisSubscriptions(vertx);
+
+    redis = new RedisConnection(vertx, client, host, port);
+    pubsub = new RedisConnection(vertx, client, host, port, subscriptions);
   }
 
   @Override
   public synchronized void close(Handler<AsyncResult<Void>> handler) {
-    conn.disconnect();
+    redis.disconnect();
+    pubsub.disconnect();
+
     client.close();
 
     handler.handle(Future.succeededFuture());
@@ -86,14 +95,17 @@ public abstract class AbstractRedisClient implements RedisClient {
     send(command, redisArgs, returnType, false, resultHandler);
   }
 
-  @SuppressWarnings("unchecked")
   final <T> void send(final String command, final JsonArray redisArgs, final Class<T> returnType,
                       final boolean binary,
                       final Handler<AsyncResult<T>> resultHandler) {
 
-    final ResponseTransform transform = getResponseTransformFor(command);
-
-    final Command<T> cmd = new Command<T>(vertx.getOrCreateContext(), command, redisArgs, binary ? binaryCharset : charset, transform, returnType);
+    final Command<T> cmd = new Command<>(
+        vertx.getOrCreateContext(),
+        command,
+        redisArgs,
+        binary ? binaryCharset : charset,
+        getResponseTransformFor(command),
+        returnType).handler(resultHandler);
 
     switch (command) {
       case "PSUBSCRIBE":
@@ -114,6 +126,7 @@ public abstract class AbstractRedisClient implements RedisClient {
             eb.send(vertxChannel, replyMessage);
           });
         }
+        pubsub.send(cmd);
         break;
 
       case "SUBSCRIBE":
@@ -133,6 +146,7 @@ public abstract class AbstractRedisClient implements RedisClient {
             eb.send(vertxChannel, replyMessage);
           });
         }
+        pubsub.send(cmd);
         break;
 
       case "PUNSUBSCRIBE":
@@ -149,6 +163,7 @@ public abstract class AbstractRedisClient implements RedisClient {
             subscriptions.unregisterPatternSubscribeHandler(pattern);
           }
         }
+        pubsub.send(cmd);
         break;
 
       case "UNSUBSCRIBE":
@@ -165,10 +180,12 @@ public abstract class AbstractRedisClient implements RedisClient {
             subscriptions.unregisterChannelSubscribeHandler(channel);
           }
         }
+        pubsub.send(cmd);
+        break;
+
+      default:
+        redis.send(cmd);
         break;
     }
-
-    cmd.handler(resultHandler);
-    conn.send(cmd);
   }
 }

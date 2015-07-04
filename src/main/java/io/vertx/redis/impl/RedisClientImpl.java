@@ -971,8 +971,8 @@ public final class RedisClientImpl extends AbstractRedisClient {
   } 
 
   @Override
-  public RedisClient subscribe(List<String> channels, Handler<AsyncResult<Void>> handler) {
-    sendVoid("SUBSCRIBE", toPayload(channels), handler);
+  public RedisClient subscribe(List<String> channels, Handler<AsyncResult<JsonArray>> handler) {
+    sendJsonArray("SUBSCRIBE", toPayload(channels), handler);
     return this;
   } 
 
