@@ -92,7 +92,7 @@ vertx.eventBus().consumer("redis.sub.channel1", function (received) {
 var redis = RedisClient.create(vertx, {
 });
 
-redis.subscribe(["channel1"], function (res, res_err) {
+redis.subscribe("channel1", function (res, res_err) {
   if (res_err == null) {
     // so something...
   }

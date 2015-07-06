@@ -1647,12 +1647,22 @@ public interface RedisClient {
   /**
    * Listen for messages published to the given channels
    *
+   * @param channel Channel to subscribe to
+   * @param handler  Handler for the result of this call.
+   * @since 2.0.0
+   * group: pubsub
+   */
+  RedisClient subscribe(String channel, Handler<AsyncResult<JsonArray>> handler);
+
+  /**
+   * Listen for messages published to the given channels
+   *
    * @param channels List of channels to subscribe to
    * @param handler  Handler for the result of this call.
    * @since 2.0.0
    * group: pubsub
    */
-  RedisClient subscribe(List<String> channels, Handler<AsyncResult<JsonArray>> handler);
+  RedisClient subscribeMany(List<String> channels, Handler<AsyncResult<JsonArray>> handler);
 
   /**
    * Add multiple sets

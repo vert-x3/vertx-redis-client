@@ -55,6 +55,9 @@ public abstract class AbstractRedisClient implements RedisClient {
 
     sendVoid(RedisCommand.QUIT, null, v -> {
       if (cnt.incrementAndGet() == 2) {
+        redis.disconnect();
+        pubsub.disconnect();
+
         handler.handle(Future.succeededFuture());
       }
     });

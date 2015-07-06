@@ -1797,7 +1797,7 @@ public abstract class RedisClientTestBase extends VertxTestBase {
   @Test
   public void testPubSubChannels() {
 
-    redis.subscribe(toList("rustic"), sub -> {
+    redis.subscribe("rustic", sub -> {
 
     });
   }
@@ -1806,7 +1806,7 @@ public abstract class RedisClientTestBase extends VertxTestBase {
   @Ignore
   public void testPubSubNumsub() {
     // TODO
-    redis.subscribe(toList("rustic"), sub->{
+    redis.subscribe("rustic", sub->{
 
     });
   }
@@ -1815,7 +1815,7 @@ public abstract class RedisClientTestBase extends VertxTestBase {
   @Ignore
   public void testPubSubNumpat() {
     // TODO
-    redis.subscribe(toList("rustic"), sub -> {
+    redis.subscribe("rustic", sub -> {
 
     });
   }
@@ -2612,7 +2612,7 @@ public abstract class RedisClientTestBase extends VertxTestBase {
   public void testSubscribe() {
     
     String key = makeKey();
-    redis.subscribe(toList(key), reply -> {
+    redis.subscribe(key, reply -> {
       assertTrue(reply.succeeded());
       redis.unsubscribe(toList(key), reply2 -> {
         assertTrue(reply2.succeeded());
@@ -2775,7 +2775,7 @@ public abstract class RedisClientTestBase extends VertxTestBase {
   @Test
   public void testUnsubscribe() {
     String key = makeKey();
-    redis.subscribe(toList(key), reply -> {
+    redis.subscribe(key, reply -> {
       assertTrue(reply.succeeded());
       redis.unsubscribe(toList(key), reply2 -> {
         assertTrue(reply2.succeeded());

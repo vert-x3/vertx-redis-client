@@ -1675,14 +1675,24 @@ module VertxRedis
       raise ArgumentError, "Invalid arguments when calling strlen(key)"
     end
     #  Listen for messages published to the given channels
+    # @param [String] channel Channel to subscribe to
+    # @yield Handler for the result of this call.
+    # @return [::VertxRedis::RedisClient]
+    def subscribe(channel=nil)
+      if channel.class == String && block_given?
+        return ::Vertx::Util::Utils.safe_create(@j_del.java_method(:subscribe, [Java::java.lang.String.java_class,Java::IoVertxCore::Handler.java_class]).call(channel,(Proc.new { |ar| yield(ar.failed ? ar.cause : nil, ar.succeeded ? ar.result != nil ? JSON.parse(ar.result.encode) : nil : nil) })),::VertxRedis::RedisClient)
+      end
+      raise ArgumentError, "Invalid arguments when calling subscribe(channel)"
+    end
+    #  Listen for messages published to the given channels
     # @param [Array<String>] channels List of channels to subscribe to
     # @yield Handler for the result of this call.
     # @return [::VertxRedis::RedisClient]
-    def subscribe(channels=nil)
+    def subscribe_many(channels=nil)
       if channels.class == Array && block_given?
-        return ::Vertx::Util::Utils.safe_create(@j_del.java_method(:subscribe, [Java::JavaUtil::List.java_class,Java::IoVertxCore::Handler.java_class]).call(channels.map { |element| element },(Proc.new { |ar| yield(ar.failed ? ar.cause : nil, ar.succeeded ? ar.result != nil ? JSON.parse(ar.result.encode) : nil : nil) })),::VertxRedis::RedisClient)
+        return ::Vertx::Util::Utils.safe_create(@j_del.java_method(:subscribeMany, [Java::JavaUtil::List.java_class,Java::IoVertxCore::Handler.java_class]).call(channels.map { |element| element },(Proc.new { |ar| yield(ar.failed ? ar.cause : nil, ar.succeeded ? ar.result != nil ? JSON.parse(ar.result.encode) : nil : nil) })),::VertxRedis::RedisClient)
       end
-      raise ArgumentError, "Invalid arguments when calling subscribe(channels)"
+      raise ArgumentError, "Invalid arguments when calling subscribe_many(channels)"
     end
     #  Add multiple sets
     # @param [Array<String>] keys List of keys identifying sets to add up

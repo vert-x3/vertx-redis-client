@@ -3424,14 +3424,35 @@ var RedisClient = function(j_val) {
    Listen for messages published to the given channels
 
    @public
+   @param channel {string} Channel to subscribe to 
+   @param handler {function} Handler for the result of this call. 
+   @return {RedisClient}
+   */
+  this.subscribe = function(channel, handler) {
+    var __args = arguments;
+    if (__args.length === 2 && typeof __args[0] === 'string' && typeof __args[1] === 'function') {
+      return utils.convReturnVertxGen(j_redisClient["subscribe(java.lang.String,io.vertx.core.Handler)"](channel, function(ar) {
+      if (ar.succeeded()) {
+        handler(utils.convReturnJson(ar.result()), null);
+      } else {
+        handler(null, ar.cause());
+      }
+    }), RedisClient);
+    } else utils.invalidArgs();
+  };
+
+  /**
+   Listen for messages published to the given channels
+
+   @public
    @param channels {Array.<string>} List of channels to subscribe to 
    @param handler {function} Handler for the result of this call. 
    @return {RedisClient}
    */
-  this.subscribe = function(channels, handler) {
+  this.subscribeMany = function(channels, handler) {
     var __args = arguments;
     if (__args.length === 2 && typeof __args[0] === 'object' && __args[0] instanceof Array && typeof __args[1] === 'function') {
-      return utils.convReturnVertxGen(j_redisClient["subscribe(java.util.List,io.vertx.core.Handler)"](channels, function(ar) {
+      return utils.convReturnVertxGen(j_redisClient["subscribeMany(java.util.List,io.vertx.core.Handler)"](channels, function(ar) {
       if (ar.succeeded()) {
         handler(utils.convReturnJson(ar.result()), null);
       } else {

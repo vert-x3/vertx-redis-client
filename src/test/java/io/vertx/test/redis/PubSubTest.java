@@ -6,7 +6,6 @@ import io.vertx.redis.RedisClient;
 import org.junit.Test;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -25,7 +24,7 @@ public class PubSubTest extends AbstractRedisClientBase {
     });
 
     // on sub address subscribe to channel ch1
-    redis.subscribe(Arrays.asList("ch1"), subscribe -> {
+    redis.subscribe("ch1", subscribe -> {
       assertTrue(subscribe.succeeded());
 
       assertEquals("subscribe", subscribe.result().getValue(0));
@@ -101,7 +100,7 @@ public class PubSubTest extends AbstractRedisClientBase {
     });
 
     // on sub address subscribe to channel ch2
-    redis.subscribe(Arrays.asList("ch2"), subscribe -> {
+    redis.subscribe("ch2", subscribe -> {
       assertTrue(subscribe.succeeded());
 
       assertEquals("subscribe", subscribe.result().getValue(0));
@@ -112,7 +111,7 @@ public class PubSubTest extends AbstractRedisClientBase {
       RedisClient redis2 = RedisClient.create(vertx, getConfig());
 
       // on sub address subscribe to channel ch2
-      redis2.subscribe(Arrays.asList("ch2"), subscribe2 -> {
+      redis2.subscribe("ch2", subscribe2 -> {
         assertTrue(subscribe2.succeeded());
 
         assertEquals("subscribe", subscribe2.result().getValue(0));

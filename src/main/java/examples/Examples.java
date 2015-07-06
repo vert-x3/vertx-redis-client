@@ -45,7 +45,7 @@ public class Examples {
 
     RedisClient redis = RedisClient.create(vertx, new JsonObject());
 
-    redis.subscribe(Arrays.asList("channel1"), res -> {
+    redis.subscribe("channel1", res -> {
         if (res.succeeded()) {
             // so something...
         }

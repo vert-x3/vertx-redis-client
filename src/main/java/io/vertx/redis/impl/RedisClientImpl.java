@@ -973,10 +973,16 @@ public final class RedisClientImpl extends AbstractRedisClient {
   } 
 
   @Override
-  public RedisClient subscribe(List<String> channels, Handler<AsyncResult<JsonArray>> handler) {
+  public RedisClient subscribe(String channel, Handler<AsyncResult<JsonArray>> handler) {
+    sendJsonArray(SUBSCRIBE, toPayload(channel), handler);
+    return this;
+  }
+
+  @Override
+  public RedisClient subscribeMany(List<String> channels, Handler<AsyncResult<JsonArray>> handler) {
     sendJsonArray(SUBSCRIBE, toPayload(channels), handler);
     return this;
-  } 
+  }
 
   @Override
   public RedisClient sunion(List<String> keys, Handler<AsyncResult<JsonArray>> handler) {

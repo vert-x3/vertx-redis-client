@@ -92,7 +92,7 @@ vertx.event_bus().consumer("redis.sub.channel1") { |received|
 redis = VertxRedis::RedisClient.create(vertx, {
 })
 
-redis.subscribe(["channel1"]) { |res_err,res|
+redis.subscribe("channel1") { |res_err,res|
   if (res_err == nil)
     # so something...
   end

@@ -90,7 +90,7 @@ vertx.eventBus().consumer("redis.sub.channel1", { received ->
 
 def redis = RedisClient.create(vertx, [:])
 
-redis.subscribe(["channel1"], { res ->
+redis.subscribe("channel1", { res ->
   if (res.succeeded()) {
     // so something...
   }
