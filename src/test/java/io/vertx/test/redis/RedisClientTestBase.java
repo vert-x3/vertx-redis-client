@@ -1569,24 +1569,25 @@ public abstract class RedisClientTestBase extends VertxTestBase {
     RedisClient rdx = RedisClient.create(vertx, job);
 
     String key = makeKey();
-    redis.set(key, "migrate", reply ->{
+    redis.set(key, "migrate", reply -> {
       assertTrue(reply.succeeded());
-      redis.migrate("localhost", 6382, key, 0, 20000, MigrateOptions.NONE, reply2 ->{
+      redis.migrate("localhost", 6382, key, 0, 20000, MigrateOptions.NONE, reply2 -> {
         assertTrue(String.valueOf(reply2.cause()), reply2.succeeded());
-        rdx.get(key, reply3 ->{
+        rdx.get(key, reply3 -> {
           assertTrue(reply3.succeeded());
           assertTrue("migrate".equals(reply3.result()));
-          try{
-            server.stop();            
-          }catch(Exception ignore){}          
+          try {
+            server.stop();
+          } catch (Exception ignore) {
+          }
+          rdx.close(reply4 -> {
+            assertTrue(reply4.succeeded());
+          });
           testComplete();
         });
       });
     });
     await();
-    rdx.close(reply -> {
-      assertTrue(reply.succeeded());
-    });
   }
 
   @Test

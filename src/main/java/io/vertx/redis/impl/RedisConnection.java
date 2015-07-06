@@ -10,6 +10,7 @@ import io.vertx.core.net.NetSocket;
 
 import java.util.LinkedList;
 import java.util.Queue;
+import java.util.concurrent.ConcurrentLinkedQueue;
 
 /**
  * Base class for Redis Vert.x client. Generated client would use the facilities
@@ -21,9 +22,9 @@ class RedisConnection {
 
   // there are 2 queues:
   // pending: commands that have not yet been sent to the server
-  private final Queue<Command<?>> pending = new LinkedList<>();
+  private final Queue<Command<?>> pending = new ConcurrentLinkedQueue<>();
   // waiting: commands that have been sent but not answered
-  private final Queue<Command<?>> waiting = new LinkedList<>();
+  private final Queue<Command<?>> waiting = new ConcurrentLinkedQueue<>();
 
   private final ReplyParser replyParser;
 
@@ -39,13 +40,16 @@ class RedisConnection {
   }
 
   private State state = State.DISCONNECTED;
-
   private NetSocket netSocket;
   private Context context;
 
+  private String auth;
+  private String select;
+
+
   /**
-   * Create a RedisConnectio.
-   * <p>
+   * Create a RedisConnection.
+   *
    * A Redis connection should be used for normal actions, i.e.: not for pub/sub
    *
    * @param vertx
@@ -130,8 +134,34 @@ class RedisConnection {
         } else {
           netSocket = asyncResult.result()
               .handler(replyParser)
-              .closeHandler(v -> state = State.DISCONNECTED)
-              .exceptionHandler(e -> state = State.DISCONNECTED);
+              .closeHandler(v -> {
+                // should clean up queues
+                Command command;
+                // clean up any pending command
+                while ((command = pending.poll()) != null) {
+                  command.handle(Future.failedFuture("Connection closed!"));
+                }
+                // clean up any waiting command
+                while ((command = waiting.poll()) != null) {
+                  command.handle(Future.failedFuture("Connection closed!"));
+                }
+
+                state = State.DISCONNECTED;
+              })
+              .exceptionHandler(e -> {
+                // should clean up queues
+                Command command;
+                // clean up any pending command
+                while ((command = pending.poll()) != null) {
+                  command.handle(Future.failedFuture(e));
+                }
+                // clean up any waiting command
+                while ((command = waiting.poll()) != null) {
+                  command.handle(Future.failedFuture(e));
+                }
+
+                state = State.DISCONNECTED;
+              });
 
           Command command;
 
@@ -165,9 +195,14 @@ class RedisConnection {
     }
   }
 
-  // Redis 'subscribe', 'unsubscribe', 'psubscribe' and 'punsubscribe' commands can have multiple (including zero) waiting
-  // See http://redis.io/topics/pubsub
-  // In all cases we want to have a handler to report errors
+  /**
+   * Sends a message to redis, if the connection is not active then the command is queued for processing and the
+   * procedure to start a connection is started.
+   *
+   * While this procedure is going on (CONNECTING) incomming commands are queued.
+   *
+   * @param command
+   */
   synchronized void send(final Command<?> command) {
     switch (state) {
       case CONNECTED:

@@ -9,6 +9,7 @@ import io.vertx.core.net.NetClientOptions;
 import io.vertx.redis.RedisClient;
 
 import java.nio.charset.Charset;
+import java.util.concurrent.atomic.AtomicInteger;
 
 public abstract class AbstractRedisClient implements RedisClient {
 
@@ -20,7 +21,6 @@ public abstract class AbstractRedisClient implements RedisClient {
   private final Charset binaryCharset;
   private final String baseAddress;
 
-  private final NetClient client;
   // we need 2 connections, one for normal commands and a second in case we do pub/sub
   private final RedisConnection redis;
   private final RedisConnection pubsub;
@@ -37,7 +37,7 @@ public abstract class AbstractRedisClient implements RedisClient {
     final int port = config.getInteger("port", 6379);
 
     // create a netClient for the connection
-    this.client = vertx.createNetClient(new NetClientOptions()
+    final NetClient client = vertx.createNetClient(new NetClientOptions()
         .setTcpKeepAlive(config.getBoolean("tcpKeepAlive", true))
         .setTcpNoDelay(config.getBoolean("tcpNoDelay", true)));
 
@@ -49,12 +49,14 @@ public abstract class AbstractRedisClient implements RedisClient {
 
   @Override
   public synchronized void close(Handler<AsyncResult<Void>> handler) {
-    redis.disconnect();
-    pubsub.disconnect();
+    // this is a special case it should sent the message QUIT and then close the sockets
+    final AtomicInteger cnt = new AtomicInteger(0);
 
-    client.close();
-
-    handler.handle(Future.succeededFuture());
+    sendVoid("QUIT", null, v -> {
+      if (cnt.incrementAndGet() == 2) {
+        handler.handle(Future.succeededFuture());
+      }
+    });
   }
 
   private ResponseTransform getResponseTransformFor(String command) {
@@ -182,8 +184,13 @@ public abstract class AbstractRedisClient implements RedisClient {
         }
         pubsub.send(cmd);
         break;
-
+      case "QUIT":
+        // this is a special case that must be sent to all connections
+        redis.send(cmd);
+        pubsub.send(cmd);
+        break;
       default:
+        // all other commands are sent to the normal connection
         redis.send(cmd);
         break;
     }
