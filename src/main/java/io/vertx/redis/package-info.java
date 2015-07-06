@@ -11,7 +11,7 @@
  *
  * Redis has a rich API and it can be organized in the following groups:
  *
- * * Cluster - Commands related to cluster management, note that using most of these commands you will need a redis server with version &lt;=3.0.0
+ * * Cluster - Commands related to cluster management, note that using most of these commands you will need a redis server with version &gt;=3.0.0
  * * Connection - Commands that allow you to switch DBs, connect, disconnect and authenticate to a server.
  * * Hashes - Commands that allow operations on hashes.
  * * HyperLogLog - Commands to approximating the number of distinct elements in a multiset, a HyperLogLog.
