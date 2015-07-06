@@ -25,6 +25,28 @@
  * * Strings - Commands to work with Strings.
  * * Transactions - Commands to handle transaction lifecycle.
  *
+ * == Using Vert.x-Redis
+ *
+ * To use the Vert.x Redis client, add the following dependency to the _dependencies_ section of your build descriptor:
+ *
+ * * Maven (in your `pom.xml`):
+ *
+ * [source,xml,subs="+attributes"]
+ * ----
+ * <dependency>
+ *   <groupId>{maven-groupId}</groupId>
+ *   <artifactId>{maven-artifactId}</artifactId>
+ *   <version>{maven-version}</version>
+ * </dependency>
+ * ----
+ *
+ * * Gradle (in your `build.gradle` file):
+ *
+ * [source,groovy,subs="+attributes"]
+ * ----
+ * compile {maven-groupId}:{maven-artifactId}:{maven-version}
+ * ----
+ *
  * == Connecting to Redis
  *
  * In order to connect to Redis there is a config required. This config is provided in the form of {@link io.vertx.core.json.JsonObject}
