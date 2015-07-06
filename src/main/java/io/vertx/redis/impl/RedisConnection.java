@@ -10,8 +10,8 @@ import io.vertx.core.net.NetSocket;
 import io.vertx.redis.RedisCommand;
 
 import java.nio.charset.Charset;
-import java.util.LinkedList;
 import java.util.Queue;
+import java.util.concurrent.ConcurrentLinkedQueue;
 
 /**
  * Base class for Redis Vert.x client. Generated client would use the facilities
@@ -23,12 +23,9 @@ class RedisConnection {
 
   // there are 2 queues:
   // pending: commands that have not yet been sent to the server
-  private final Queue<Command<?>> pending = new LinkedList<>();
+  private final Queue<Command<?>> pending = new ConcurrentLinkedQueue<>();
   // waiting: commands that have been sent but not answered
-  private final Queue<Command<?>> waiting = new LinkedList<>();
-
-  // operations on the queues must be put on hold during state transitions
-  private final Object lock = new Object();
+  private final Queue<Command<?>> waiting = new ConcurrentLinkedQueue<>();
 
   private final ReplyParser replyParser;
 
@@ -38,9 +35,22 @@ class RedisConnection {
   private final int port;
 
   private enum State {
+    /**
+     * The connection is not active. The is a stop state.
+     */
     DISCONNECTED,
+    /**
+     * The connection is in transit, from here it can become connected or and error can occur.
+     */
     CONNECTING,
-    CONNECTED
+    /**
+     * Connection is active from here it can become an error or disconnected.
+     */
+    CONNECTED,
+    /**
+     * Connection problem
+     */
+    ERROR
   }
 
   private volatile State state = State.DISCONNECTED;
@@ -123,16 +133,16 @@ class RedisConnection {
         context = vertx.getOrCreateContext();
 
         if (asyncResult.failed()) {
-          synchronized (lock) {
-            Command<?> command;
-            // clean up any pending command
-            while ((command = pending.poll()) != null) {
-              command.handle(Future.failedFuture(asyncResult.cause()));
-            }
-            // clean up any waiting command
-            while ((command = waiting.poll()) != null) {
-              command.handle(Future.failedFuture(asyncResult.cause()));
-            }
+          state = State.ERROR;
+
+          Command<?> command;
+          // clean up any pending command
+          while ((command = pending.poll()) != null) {
+            command.handle(Future.failedFuture(asyncResult.cause()));
+          }
+          // clean up any waiting command
+          while ((command = waiting.poll()) != null) {
+            command.handle(Future.failedFuture(asyncResult.cause()));
           }
 
           netSocket.close();
@@ -142,62 +152,61 @@ class RedisConnection {
           netSocket = asyncResult.result()
               .handler(replyParser)
               .closeHandler(v -> {
-                synchronized (lock) {
-                  // should clean up queues
-                  Command<?> command;
-                  // clean up any pending command
-                  while ((command = pending.poll()) != null) {
-                    command.handle(Future.failedFuture("Connection closed!"));
-                  }
-                  // clean up any waiting command
-                  while ((command = waiting.poll()) != null) {
-                    command.handle(Future.failedFuture("Connection closed!"));
-                  }
+                state = State.ERROR;
+
+                // should clean up queues
+                Command<?> command;
+                // clean up any pending command
+                while ((command = pending.poll()) != null) {
+                  command.handle(Future.failedFuture("Connection closed!"));
+                }
+                // clean up any waiting command
+                while ((command = waiting.poll()) != null) {
+                  command.handle(Future.failedFuture("Connection closed!"));
                 }
 
                 netSocket.close();
                 state = State.DISCONNECTED;
               })
               .exceptionHandler(e -> {
-                synchronized (lock) {
-                  // should clean up queues
-                  Command<?> command;
-                  // clean up any pending command
-                  while ((command = pending.poll()) != null) {
-                    command.handle(Future.failedFuture(e));
-                  }
-                  // clean up any waiting command
-                  while ((command = waiting.poll()) != null) {
-                    command.handle(Future.failedFuture(e));
-                  }
-                }
-                netSocket.close();
+                state = State.ERROR;
 
+                // should clean up queues
+                Command<?> command;
+                // clean up any pending command
+                while ((command = pending.poll()) != null) {
+                  command.handle(Future.failedFuture(e));
+                }
+                // clean up any waiting command
+                while ((command = waiting.poll()) != null) {
+                  command.handle(Future.failedFuture(e));
+                }
+
+                netSocket.close();
                 state = State.DISCONNECTED;
               });
 
-          synchronized (lock) {
-            Command<?> command;
-
-            // clean up any waiting command
-            while ((command = waiting.poll()) != null) {
-              command.handle(Future.failedFuture("Connection lost"));
-            }
-
-            // we are connected so clean up the pending queue
-            while ((command = pending.poll()) != null) {
-              // The order read must match the order written, vertx guarantees
-              // that this is only called from a single thread.
-              for (int i = 0; i < command.getExpectedReplies(); ++i) {
-                waiting.add(command);
-              }
-
-              // write to the socket in the netSocket context
-              final Command<?> _command = command;
-              context.runOnContext(v -> _command.writeTo(netSocket));
-            }
-          }
           state = State.CONNECTED;
+
+          Command<?> command;
+
+          // clean up any waiting command
+          while ((command = waiting.poll()) != null) {
+            command.handle(Future.failedFuture("Connection lost"));
+          }
+
+          // we are connected so clean up the pending queue
+          while ((command = pending.poll()) != null) {
+            // The order read must match the order written, vertx guarantees
+            // that this is only called from a single thread.
+            for (int i = 0; i < command.getExpectedReplies(); ++i) {
+              waiting.add(command);
+            }
+
+            // write to the socket in the netSocket context
+            final Command<?> _command = command;
+            context.runOnContext(v -> _command.writeTo(netSocket));
+          }
         }
       });
     }
@@ -212,19 +221,20 @@ class RedisConnection {
         final Command<Void> cmd = new Command<>(ctx, RedisCommand.QUIT, null, Charset.defaultCharset(), ResponseTransform.NONE, Void.class);
 
         cmd.handler(v -> {
+          // at this we force the state to error so any incoming command will not start a connection
+          state = State.ERROR;
+
           netSocket.close();
 
-          synchronized (lock) {
-            // should clean up queues
-            Command<?> command;
-            // clean up any pending command
-            while ((command = pending.poll()) != null) {
-              command.handle(Future.failedFuture("Connection closed!"));
-            }
-            // clean up any waiting command
-            while ((command = waiting.poll()) != null) {
-              command.handle(Future.failedFuture("Connection closed!"));
-            }
+          // should clean up queues
+          Command<?> command;
+          // clean up any pending command
+          while ((command = pending.poll()) != null) {
+            command.handle(Future.failedFuture("Connection closed!"));
+          }
+          // clean up any waiting command
+          while ((command = waiting.poll()) != null) {
+            command.handle(Future.failedFuture("Connection closed!"));
           }
 
           ctx.runOnContext(v0 -> closeHandler.handle(Future.succeededFuture()));
@@ -233,6 +243,8 @@ class RedisConnection {
         send(cmd);
         break;
 
+      case ERROR:
+        // eventually will become DISCONNECTED
       case DISCONNECTED:
         closeHandler.handle(Future.succeededFuture());
         break;
@@ -252,34 +264,25 @@ class RedisConnection {
       case CONNECTED:
         // The order read must match the order written, vertx guarantees
         // that this is only called from a single thread.
-        synchronized (lock) {
-          for (int i = 0; i < command.getExpectedReplies(); ++i) {
-            waiting.add(command);
-          }
+        for (int i = 0; i < command.getExpectedReplies(); ++i) {
+          waiting.add(command);
         }
         // write to the socket in the netSocket context
         context.runOnContext(v -> command.writeTo(netSocket));
         break;
       case CONNECTING:
-        synchronized (lock) {
-          pending.add(command);
-        }
+      case ERROR:
+        pending.add(command);
         break;
       case DISCONNECTED:
-        synchronized (lock) {
-          pending.add(command);
-        }
+        pending.add(command);
         connect();
         break;
     }
   }
 
   private void handleReply(Reply reply) {
-    Command cmd;
-
-    synchronized (lock) {
-      cmd = waiting.poll();
-    }
+    final Command cmd = waiting.poll();
 
     if (cmd != null) {
       switch (reply.type()) {

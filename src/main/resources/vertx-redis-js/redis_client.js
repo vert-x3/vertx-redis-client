@@ -3653,14 +3653,35 @@ var RedisClient = function(j_val) {
    Watch the given keys to determine execution of the MULTI/EXEC block
 
    @public
+   @param key {string} Key to watch 
+   @param handler {function} Handler for the result of this call. 
+   @return {RedisClient}
+   */
+  this.watch = function(key, handler) {
+    var __args = arguments;
+    if (__args.length === 2 && typeof __args[0] === 'string' && typeof __args[1] === 'function') {
+      return utils.convReturnVertxGen(j_redisClient["watch(java.lang.String,io.vertx.core.Handler)"](key, function(ar) {
+      if (ar.succeeded()) {
+        handler(ar.result(), null);
+      } else {
+        handler(null, ar.cause());
+      }
+    }), RedisClient);
+    } else utils.invalidArgs();
+  };
+
+  /**
+   Watch the given keys to determine execution of the MULTI/EXEC block
+
+   @public
    @param keys {Array.<string>} List of keys to watch 
    @param handler {function} Handler for the result of this call. 
    @return {RedisClient}
    */
-  this.watch = function(keys, handler) {
+  this.watchMany = function(keys, handler) {
     var __args = arguments;
     if (__args.length === 2 && typeof __args[0] === 'object' && __args[0] instanceof Array && typeof __args[1] === 'function') {
-      return utils.convReturnVertxGen(j_redisClient["watch(java.util.List,io.vertx.core.Handler)"](keys, function(ar) {
+      return utils.convReturnVertxGen(j_redisClient["watchMany(java.util.List,io.vertx.core.Handler)"](keys, function(ar) {
       if (ar.succeeded()) {
         handler(ar.result(), null);
       } else {

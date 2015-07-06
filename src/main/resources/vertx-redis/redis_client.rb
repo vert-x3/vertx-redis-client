@@ -1783,14 +1783,24 @@ module VertxRedis
       raise ArgumentError, "Invalid arguments when calling unwatch()"
     end
     #  Watch the given keys to determine execution of the MULTI/EXEC block
+    # @param [String] key Key to watch
+    # @yield Handler for the result of this call.
+    # @return [::VertxRedis::RedisClient]
+    def watch(key=nil)
+      if key.class == String && block_given?
+        return ::Vertx::Util::Utils.safe_create(@j_del.java_method(:watch, [Java::java.lang.String.java_class,Java::IoVertxCore::Handler.java_class]).call(key,(Proc.new { |ar| yield(ar.failed ? ar.cause : nil, ar.succeeded ? ar.result : nil) })),::VertxRedis::RedisClient)
+      end
+      raise ArgumentError, "Invalid arguments when calling watch(key)"
+    end
+    #  Watch the given keys to determine execution of the MULTI/EXEC block
     # @param [Array<String>] keys List of keys to watch
     # @yield Handler for the result of this call.
     # @return [::VertxRedis::RedisClient]
-    def watch(keys=nil)
+    def watch_many(keys=nil)
       if keys.class == Array && block_given?
-        return ::Vertx::Util::Utils.safe_create(@j_del.java_method(:watch, [Java::JavaUtil::List.java_class,Java::IoVertxCore::Handler.java_class]).call(keys.map { |element| element },(Proc.new { |ar| yield(ar.failed ? ar.cause : nil, ar.succeeded ? ar.result : nil) })),::VertxRedis::RedisClient)
+        return ::Vertx::Util::Utils.safe_create(@j_del.java_method(:watchMany, [Java::JavaUtil::List.java_class,Java::IoVertxCore::Handler.java_class]).call(keys.map { |element| element },(Proc.new { |ar| yield(ar.failed ? ar.cause : nil, ar.succeeded ? ar.result : nil) })),::VertxRedis::RedisClient)
       end
-      raise ArgumentError, "Invalid arguments when calling watch(keys)"
+      raise ArgumentError, "Invalid arguments when calling watch_many(keys)"
     end
     #  Add one or more members to a sorted set, or update its score if it already exists
     # @param [String] key Key string
