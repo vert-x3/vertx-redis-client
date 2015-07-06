@@ -7,6 +7,7 @@ import io.vertx.core.json.JsonObject;
 import io.vertx.core.net.NetClient;
 import io.vertx.core.net.NetClientOptions;
 import io.vertx.redis.RedisClient;
+import io.vertx.redis.RedisCommand;
 
 import java.nio.charset.Charset;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -52,52 +53,52 @@ public abstract class AbstractRedisClient implements RedisClient {
     // this is a special case it should sent the message QUIT and then close the sockets
     final AtomicInteger cnt = new AtomicInteger(0);
 
-    sendVoid("QUIT", null, v -> {
+    sendVoid(RedisCommand.QUIT, null, v -> {
       if (cnt.incrementAndGet() == 2) {
         handler.handle(Future.succeededFuture());
       }
     });
   }
 
-  private ResponseTransform getResponseTransformFor(String command) {
-    if (command.equals("HGETALL")) {
+  private ResponseTransform getResponseTransformFor(RedisCommand command) {
+    if (command == RedisCommand.HGETALL) {
       return ResponseTransform.ARRAY_TO_OBJECT;
     }
-    if (command.equals("INFO")) {
+    if (command == RedisCommand.INFO) {
       return ResponseTransform.INFO;
     }
 
     return ResponseTransform.NONE;
   }
 
-  final void sendString(final String command, final JsonArray args, final Handler<AsyncResult<String>> resultHandler) {
+  final void sendString(final RedisCommand command, final JsonArray args, final Handler<AsyncResult<String>> resultHandler) {
     send(command, args, String.class, resultHandler);
   }
 
-  final void sendLong(final String command, final JsonArray args, final Handler<AsyncResult<Long>> resultHandler) {
+  final void sendLong(final RedisCommand command, final JsonArray args, final Handler<AsyncResult<Long>> resultHandler) {
     send(command, args, Long.class, resultHandler);
   }
 
-  final void sendVoid(final String command, final JsonArray args, final Handler<AsyncResult<Void>> resultHandler) {
+  final void sendVoid(final RedisCommand command, final JsonArray args, final Handler<AsyncResult<Void>> resultHandler) {
     send(command, args, Void.class, resultHandler);
   }
 
-  final void sendJsonArray(final String command, final JsonArray args, final Handler<AsyncResult<JsonArray>> resultHandler) {
+  final void sendJsonArray(final RedisCommand command, final JsonArray args, final Handler<AsyncResult<JsonArray>> resultHandler) {
     send(command, args, JsonArray.class, resultHandler);
   }
 
-  final void sendJsonObject(final String command, final JsonArray args, final Handler<AsyncResult<JsonObject>> resultHandler) {
+  final void sendJsonObject(final RedisCommand command, final JsonArray args, final Handler<AsyncResult<JsonObject>> resultHandler) {
     send(command, args, JsonObject.class, resultHandler);
   }
 
-  final <T> void send(final String command, final JsonArray redisArgs,
+  final <T> void send(final RedisCommand command, final JsonArray redisArgs,
                       final Class<T> returnType,
                       final Handler<AsyncResult<T>> resultHandler) {
 
     send(command, redisArgs, returnType, false, resultHandler);
   }
 
-  final <T> void send(final String command, final JsonArray redisArgs, final Class<T> returnType,
+  final <T> void send(final RedisCommand command, final JsonArray redisArgs, final Class<T> returnType,
                       final boolean binary,
                       final Handler<AsyncResult<T>> resultHandler) {
 
@@ -110,7 +111,7 @@ public abstract class AbstractRedisClient implements RedisClient {
         returnType).handler(resultHandler);
 
     switch (command) {
-      case "PSUBSCRIBE":
+      case PSUBSCRIBE:
         cmd.setExpectedReplies(redisArgs.size());
 
         for (Object obj : redisArgs) {
@@ -131,7 +132,7 @@ public abstract class AbstractRedisClient implements RedisClient {
         pubsub.send(cmd);
         break;
 
-      case "SUBSCRIBE":
+      case SUBSCRIBE:
         cmd.setExpectedReplies(redisArgs.size());
 
         for (Object obj : redisArgs) {
@@ -151,7 +152,7 @@ public abstract class AbstractRedisClient implements RedisClient {
         pubsub.send(cmd);
         break;
 
-      case "PUNSUBSCRIBE":
+      case PUNSUBSCRIBE:
         // unregister all channels
         if (redisArgs == null || redisArgs.size() == 0) {
           // unsubscribe all
@@ -168,7 +169,7 @@ public abstract class AbstractRedisClient implements RedisClient {
         pubsub.send(cmd);
         break;
 
-      case "UNSUBSCRIBE":
+      case UNSUBSCRIBE:
         // unregister all channels
         if (redisArgs == null || redisArgs.size() == 0) {
           // unsubscribe all
@@ -184,7 +185,7 @@ public abstract class AbstractRedisClient implements RedisClient {
         }
         pubsub.send(cmd);
         break;
-      case "QUIT":
+      case QUIT:
         // this is a special case that must be sent to all connections
         redis.send(cmd);
         pubsub.send(cmd);
