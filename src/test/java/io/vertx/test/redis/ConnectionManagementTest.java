@@ -15,13 +15,10 @@ public class ConnectionManagementTest extends AbstractRedisClientBase {
   @Test
   public void testCommandAfterQuit() {
     redis.close(v -> {
-      // wait a bit to make sure the socket is closed
-      vertx.setTimer(200l, v0 -> {
-        redis.info(res -> {
-          assertTrue(res.succeeded());
-          assertNotNull(res.result());
-          testComplete();
-        });
+      redis.info(res -> {
+        assertTrue(res.succeeded());
+        assertNotNull(res.result());
+        testComplete();
       });
     });
     await();

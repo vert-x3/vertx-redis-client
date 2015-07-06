@@ -108,8 +108,8 @@ public final class RedisClientImpl extends AbstractRedisClient {
   } 
 
   @Override
-  public RedisClient brpoplpush(String key, String destkey, int seconds, Handler<AsyncResult<JsonArray>> handler) {
-    sendJsonArray(BRPOPLPUSH, toPayload(key, destkey, seconds), handler);
+  public RedisClient brpoplpush(String key, String destkey, int seconds, Handler<AsyncResult<String>> handler) {
+    sendString(BRPOPLPUSH, toPayload(key, destkey, seconds), handler);
     return this;
   } 
 
@@ -949,10 +949,16 @@ public final class RedisClientImpl extends AbstractRedisClient {
   } 
 
   @Override
-  public RedisClient srandmember(String key, int count, Handler<AsyncResult<JsonArray>> handler) {
+  public RedisClient srandmember(String key, Handler<AsyncResult<String>> handler) {
+    sendString(SRANDMEMBER, toPayload(key), handler);
+    return this;
+  }
+
+  @Override
+  public RedisClient srandmemberCount(String key, int count, Handler<AsyncResult<JsonArray>> handler) {
     sendJsonArray(SRANDMEMBER, toPayload(key, count), handler);
     return this;
-  } 
+  }
 
   @Override
   public RedisClient srem(String key, String member, Handler<AsyncResult<Long>> handler) {
@@ -1033,10 +1039,16 @@ public final class RedisClientImpl extends AbstractRedisClient {
   } 
 
   @Override
-  public RedisClient watch(List<String> keys, Handler<AsyncResult<String>> handler) {
+  public RedisClient watch(String key, Handler<AsyncResult<String>> handler) {
+    sendString(WATCH, toPayload(key), handler);
+    return this;
+  }
+
+  @Override
+  public RedisClient watchMany(List<String> keys, Handler<AsyncResult<String>> handler) {
     sendString(WATCH, toPayload(keys), handler);
     return this;
-  } 
+  }
 
   @Override
   public RedisClient zadd(String key, double score, String member, Handler<AsyncResult<Long>> handler) {

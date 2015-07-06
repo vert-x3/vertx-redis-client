@@ -186,7 +186,7 @@ public class ReplyParser implements Handler<Buffer> {
     }
 
     // out of data
-    if (_offset == _buffer.length()) {
+    if (_offset >= _buffer.length()) {
       _buffer = newBuffer;
       _offset = 0;
 

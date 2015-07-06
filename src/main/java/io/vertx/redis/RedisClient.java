@@ -192,7 +192,7 @@ public interface RedisClient {
    * @since 2.2.0
    * group: list
    */
-  RedisClient brpoplpush(String key, String destkey, int seconds, Handler<AsyncResult<JsonArray>> handler);
+  RedisClient brpoplpush(String key, String destkey, int seconds, Handler<AsyncResult<String>> handler);
 
   /**
    * Kill the connection of a client
@@ -1605,12 +1605,22 @@ public interface RedisClient {
    * Get one or multiple random members from a set
    *
    * @param key     Key string
+   * @param handler Handler for the result of this call.
+   * @since 1.0.0
+   * group: set
+   */
+  RedisClient srandmember(String key, Handler<AsyncResult<String>> handler);
+
+  /**
+   * Get one or multiple random members from a set
+   *
+   * @param key     Key string
    * @param count   Number of members to get
    * @param handler Handler for the result of this call.
    * @since 1.0.0
    * group: set
    */
-  RedisClient srandmember(String key, int count, Handler<AsyncResult<JsonArray>> handler);
+  RedisClient srandmemberCount(String key, int count, Handler<AsyncResult<JsonArray>> handler);
 
   /**
    * Remove one member from a set
@@ -1742,12 +1752,22 @@ public interface RedisClient {
   /**
    * Watch the given keys to determine execution of the MULTI/EXEC block
    *
+   * @param key    Key to watch
+   * @param handler Handler for the result of this call.
+   * @since 2.2.0
+   * group: transactions
+   */
+  RedisClient watch(String key, Handler<AsyncResult<String>> handler);
+
+  /**
+   * Watch the given keys to determine execution of the MULTI/EXEC block
+   *
    * @param keys    List of keys to watch
    * @param handler Handler for the result of this call.
    * @since 2.2.0
    * group: transactions
    */
-  RedisClient watch(List<String> keys, Handler<AsyncResult<String>> handler);
+  RedisClient watchMany(List<String> keys, Handler<AsyncResult<String>> handler);
 
   /**
    * Add one or more members to a sorted set, or update its score if it already exists

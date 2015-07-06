@@ -53,14 +53,14 @@ public abstract class AbstractRedisClient implements RedisClient {
     // this is a special case it should sent the message QUIT and then close the sockets
     final AtomicInteger cnt = new AtomicInteger(0);
 
-    sendVoid(RedisCommand.QUIT, null, v -> {
+    final Handler<AsyncResult<Void>> cb = v -> {
       if (cnt.incrementAndGet() == 2) {
-        redis.disconnect();
-        pubsub.disconnect();
-
         handler.handle(Future.succeededFuture());
       }
-    });
+    };
+
+    redis.disconnect(cb);
+    pubsub.disconnect(cb);
   }
 
   private ResponseTransform getResponseTransformFor(RedisCommand command) {

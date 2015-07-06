@@ -109,40 +109,8 @@ public abstract class AbstractRedisClientBase extends VertxTestBase {
     return config;
   }
 
-  protected static JsonArray toJsonArray(final Object... params) {
-    return (params != null) ? new JsonArray(Arrays.asList(params)) : null;
-  }
-
-  protected static Object[] toArray(final Object... params) {
-    return params;
-  }
-
-  protected static String errorMessage(Throwable t) {
-    return t != null ? t.getMessage() : "";
-  }
-
   protected static String makeKey() {
     return UUID.randomUUID().toString();
   }
 
-  protected static Map<String, String> toMap(final String ... params) {
-    if (params.length % 2 != 0) {
-      throw new IllegalArgumentException("Last key has no value");
-    }
-    Map<String, String> result = new HashMap<>();
-    String key = null;
-    for (String param: params) {
-      if (key == null) {
-        key = param;
-      } else {
-        result.put(key, param);
-        key = null;
-      }
-    }
-    return result;
-  }
-
-  protected static <T> List<T> toList(final T ... params) {
-    return Arrays.asList(params);
-  }
 }

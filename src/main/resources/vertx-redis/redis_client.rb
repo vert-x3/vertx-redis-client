@@ -196,7 +196,7 @@ module VertxRedis
     # @return [::VertxRedis::RedisClient]
     def brpoplpush(key=nil,destkey=nil,seconds=nil)
       if key.class == String && destkey.class == String && seconds.class == Fixnum && block_given?
-        return ::Vertx::Util::Utils.safe_create(@j_del.java_method(:brpoplpush, [Java::java.lang.String.java_class,Java::java.lang.String.java_class,Java::int.java_class,Java::IoVertxCore::Handler.java_class]).call(key,destkey,seconds,(Proc.new { |ar| yield(ar.failed ? ar.cause : nil) })),::VertxRedis::RedisClient)
+        return ::Vertx::Util::Utils.safe_create(@j_del.java_method(:brpoplpush, [Java::java.lang.String.java_class,Java::java.lang.String.java_class,Java::int.java_class,Java::IoVertxCore::Handler.java_class]).call(key,destkey,seconds,(Proc.new { |ar| yield(ar.failed ? ar.cause : nil, ar.succeeded ? ar.result : nil) })),::VertxRedis::RedisClient)
       end
       raise ArgumentError, "Invalid arguments when calling brpoplpush(key,destkey,seconds)"
     end
@@ -1633,14 +1633,24 @@ module VertxRedis
     end
     #  Get one or multiple random members from a set
     # @param [String] key Key string
+    # @yield Handler for the result of this call.
+    # @return [::VertxRedis::RedisClient]
+    def srandmember(key=nil)
+      if key.class == String && block_given?
+        return ::Vertx::Util::Utils.safe_create(@j_del.java_method(:srandmember, [Java::java.lang.String.java_class,Java::IoVertxCore::Handler.java_class]).call(key,(Proc.new { |ar| yield(ar.failed ? ar.cause : nil, ar.succeeded ? ar.result : nil) })),::VertxRedis::RedisClient)
+      end
+      raise ArgumentError, "Invalid arguments when calling srandmember(key)"
+    end
+    #  Get one or multiple random members from a set
+    # @param [String] key Key string
     # @param [Fixnum] count Number of members to get
     # @yield Handler for the result of this call.
     # @return [::VertxRedis::RedisClient]
-    def srandmember(key=nil,count=nil)
+    def srandmember_count(key=nil,count=nil)
       if key.class == String && count.class == Fixnum && block_given?
-        return ::Vertx::Util::Utils.safe_create(@j_del.java_method(:srandmember, [Java::java.lang.String.java_class,Java::int.java_class,Java::IoVertxCore::Handler.java_class]).call(key,count,(Proc.new { |ar| yield(ar.failed ? ar.cause : nil, ar.succeeded ? ar.result != nil ? JSON.parse(ar.result.encode) : nil : nil) })),::VertxRedis::RedisClient)
+        return ::Vertx::Util::Utils.safe_create(@j_del.java_method(:srandmemberCount, [Java::java.lang.String.java_class,Java::int.java_class,Java::IoVertxCore::Handler.java_class]).call(key,count,(Proc.new { |ar| yield(ar.failed ? ar.cause : nil, ar.succeeded ? ar.result != nil ? JSON.parse(ar.result.encode) : nil : nil) })),::VertxRedis::RedisClient)
       end
-      raise ArgumentError, "Invalid arguments when calling srandmember(key,count)"
+      raise ArgumentError, "Invalid arguments when calling srandmember_count(key,count)"
     end
     #  Remove one member from a set
     # @param [String] key Key string

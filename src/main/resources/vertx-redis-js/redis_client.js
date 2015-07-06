@@ -387,7 +387,7 @@ var RedisClient = function(j_val) {
     if (__args.length === 4 && typeof __args[0] === 'string' && typeof __args[1] === 'string' && typeof __args[2] ==='number' && typeof __args[3] === 'function') {
       return utils.convReturnVertxGen(j_redisClient["brpoplpush(java.lang.String,java.lang.String,int,io.vertx.core.Handler)"](key, destkey, seconds, function(ar) {
       if (ar.succeeded()) {
-        handler(null, null);
+        handler(ar.result(), null);
       } else {
         handler(null, ar.cause());
       }
@@ -3338,14 +3338,35 @@ var RedisClient = function(j_val) {
 
    @public
    @param key {string} Key string 
+   @param handler {function} Handler for the result of this call. 
+   @return {RedisClient}
+   */
+  this.srandmember = function(key, handler) {
+    var __args = arguments;
+    if (__args.length === 2 && typeof __args[0] === 'string' && typeof __args[1] === 'function') {
+      return utils.convReturnVertxGen(j_redisClient["srandmember(java.lang.String,io.vertx.core.Handler)"](key, function(ar) {
+      if (ar.succeeded()) {
+        handler(ar.result(), null);
+      } else {
+        handler(null, ar.cause());
+      }
+    }), RedisClient);
+    } else utils.invalidArgs();
+  };
+
+  /**
+   Get one or multiple random members from a set
+
+   @public
+   @param key {string} Key string 
    @param count {number} Number of members to get 
    @param handler {function} Handler for the result of this call. 
    @return {RedisClient}
    */
-  this.srandmember = function(key, count, handler) {
+  this.srandmemberCount = function(key, count, handler) {
     var __args = arguments;
     if (__args.length === 3 && typeof __args[0] === 'string' && typeof __args[1] ==='number' && typeof __args[2] === 'function') {
-      return utils.convReturnVertxGen(j_redisClient["srandmember(java.lang.String,int,io.vertx.core.Handler)"](key, count, function(ar) {
+      return utils.convReturnVertxGen(j_redisClient["srandmemberCount(java.lang.String,int,io.vertx.core.Handler)"](key, count, function(ar) {
       if (ar.succeeded()) {
         handler(utils.convReturnJson(ar.result()), null);
       } else {
