@@ -192,7 +192,7 @@ public interface RedisClient {
    * @since 2.2.0
    * group: list
    */
-  RedisClient brpoplpush(String key, String destkey, int seconds, Handler<AsyncResult<Void>> handler);
+  RedisClient brpoplpush(String key, String destkey, int seconds, Handler<AsyncResult<JsonArray>> handler);
 
   /**
    * Kill the connection of a client

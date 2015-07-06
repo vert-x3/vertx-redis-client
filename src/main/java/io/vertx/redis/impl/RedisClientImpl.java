@@ -108,8 +108,8 @@ public final class RedisClientImpl extends AbstractRedisClient {
   } 
 
   @Override
-  public RedisClient brpoplpush(String key, String destkey, int seconds, Handler<AsyncResult<Void>> handler) {
-    sendVoid(BRPOPLPUSH, toPayload(key, destkey, seconds), handler);
+  public RedisClient brpoplpush(String key, String destkey, int seconds, Handler<AsyncResult<JsonArray>> handler) {
+    sendJsonArray(BRPOPLPUSH, toPayload(key, destkey, seconds), handler);
     return this;
   } 
 
