@@ -110,15 +110,17 @@ public final class Reply {
         Reply brKey = ((Reply[]) data)[i];
         Reply brValue = ((Reply[]) data)[i + 1];
 
+        String k = brKey.asType(String.class, encoding);
+
         switch (brValue.type()) {
           case '$':   // Bulk
-            multi.put(brKey.asType(String.class, encoding), brValue.asType(String.class, encoding));
+            multi.put((k == null ? "k" + (i/2) : k), brValue.asType(String.class, encoding));
             break;
           case ':':   // Integer
-            multi.put(brKey.asType(String.class, encoding), brValue.asType(Long.class, encoding));
+            multi.put((k == null ? "k" + (i/2) : k), brValue.asType(Long.class, encoding));
             break;
           case '*':   // Multi
-            multi.put(brKey.asType(String.class, encoding), brValue.asType(JsonArray.class, encoding));
+            multi.put((k == null ? "k" + (i/2) : k), brValue.asType(JsonArray.class, encoding));
             break;
           default:
             throw new RuntimeException("Unknown sub message type in multi: " + ((Reply[]) data)[i + 1].type());
