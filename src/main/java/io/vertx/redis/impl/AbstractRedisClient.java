@@ -14,7 +14,6 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 public abstract class AbstractRedisClient implements RedisClient {
 
-  private final Vertx vertx;
   private final EventBus eb;
   private final RedisSubscriptions subscriptions;
   private final String encoding;
@@ -27,7 +26,6 @@ public abstract class AbstractRedisClient implements RedisClient {
   private final RedisConnection pubsub;
 
   AbstractRedisClient(Vertx vertx, JsonObject config) {
-    this.vertx = vertx;
     this.eb = vertx.eventBus();
     this.encoding = config.getString("encoding", "UTF-8");
     this.charset = Charset.forName(encoding);
@@ -44,8 +42,8 @@ public abstract class AbstractRedisClient implements RedisClient {
 
     subscriptions = new RedisSubscriptions(vertx);
 
-    redis = new RedisConnection(vertx, client, host, port);
-    pubsub = new RedisConnection(vertx, client, host, port, subscriptions);
+    redis = new RedisConnection(client, host, port);
+    pubsub = new RedisConnection(client, host, port, subscriptions);
   }
 
   @Override
@@ -105,13 +103,7 @@ public abstract class AbstractRedisClient implements RedisClient {
                       final boolean binary,
                       final Handler<AsyncResult<T>> resultHandler) {
 
-    final Command<T> cmd = new Command<>(
-        vertx.getOrCreateContext(),
-        command,
-        redisArgs,
-        binary ? binaryCharset : charset,
-        getResponseTransformFor(command),
-        returnType).handler(resultHandler);
+    final Command<T> cmd = new Command<>(command, redisArgs, binary ? binaryCharset : charset, getResponseTransformFor(command), returnType).handler(resultHandler);
 
     switch (command) {
       case PSUBSCRIBE:

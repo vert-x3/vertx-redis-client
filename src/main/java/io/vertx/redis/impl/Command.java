@@ -3,6 +3,7 @@ package io.vertx.redis.impl;
 import io.vertx.core.AsyncResult;
 import io.vertx.core.Context;
 import io.vertx.core.Handler;
+import io.vertx.core.Vertx;
 import io.vertx.core.buffer.Buffer;
 import io.vertx.core.json.JsonArray;
 import io.vertx.core.streams.WriteStream;
@@ -68,8 +69,8 @@ public class Command<T> {
   private int expectedReplies = 1;
   private Handler<AsyncResult<T>> handler;
 
-  public Command(Context context, RedisCommand command, final JsonArray args, Charset encoding, ResponseTransform transform, Class<T> returnType) {
-    this.context = context;
+  public Command(RedisCommand command, final JsonArray args, Charset encoding, ResponseTransform transform, Class<T> returnType) {
+    this.context = Vertx.currentContext();
     this.encoding = encoding.name();
 
     this.transform = transform;
@@ -135,7 +136,11 @@ public class Command<T> {
 
   public void handle(AsyncResult<T> asyncResult) {
     if (handler != null) {
-      context.runOnContext(v -> handler.handle(asyncResult));
+      if (context != null) {
+        context.runOnContext(v -> handler.handle(asyncResult));
+      } else {
+        handler.handle(asyncResult);
+      }
     }
   }
 

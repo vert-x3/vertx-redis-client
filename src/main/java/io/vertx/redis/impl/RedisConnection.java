@@ -10,8 +10,8 @@ import io.vertx.core.net.NetSocket;
 import io.vertx.redis.RedisCommand;
 
 import java.nio.charset.Charset;
+import java.util.LinkedList;
 import java.util.Queue;
-import java.util.concurrent.ConcurrentLinkedQueue;
 
 /**
  * Base class for Redis Vert.x client. Generated client would use the facilities
@@ -23,13 +23,12 @@ class RedisConnection {
 
   // there are 2 queues:
   // pending: commands that have not yet been sent to the server
-  private final Queue<Command<?>> pending = new ConcurrentLinkedQueue<>();
+  private final Queue<Command<?>> pending = new LinkedList<>();
   // waiting: commands that have been sent but not answered
-  private final Queue<Command<?>> waiting = new ConcurrentLinkedQueue<>();
+  private final Queue<Command<?>> waiting = new LinkedList<>();
 
   private final ReplyParser replyParser;
 
-  private final Vertx vertx;
   private final NetClient client;
   private final String host;
   private final int port;
@@ -65,13 +64,11 @@ class RedisConnection {
    * <p>
    * A Redis connection should be used for normal actions, i.e.: not for pub/sub
    *
-   * @param vertx
    * @param client
    * @param host
    * @param port
    */
-  public RedisConnection(Vertx vertx, NetClient client, String host, int port) {
-    this.vertx = vertx;
+  public RedisConnection(NetClient client, String host, int port) {
     this.client = client;
     this.host = host;
     this.port = port;
@@ -82,14 +79,12 @@ class RedisConnection {
   /**
    * Create a Pub/Sub connection.
    *
-   * @param vertx
    * @param client
    * @param host
    * @param port
    * @param subscriptions
    */
-  public RedisConnection(Vertx vertx, NetClient client, String host, int port, RedisSubscriptions subscriptions) {
-    this.vertx = vertx;
+  public RedisConnection(NetClient client, String host, int port, RedisSubscriptions subscriptions) {
     this.client = client;
     this.host = host;
     this.port = port;
@@ -130,18 +125,18 @@ class RedisConnection {
       replyParser.reset();
 
       client.connect(port, host, asyncResult -> {
-        context = vertx.getOrCreateContext();
+        context = Vertx.currentContext();
 
         if (asyncResult.failed()) {
           state = State.ERROR;
 
           Command<?> command;
-          // clean up any pending command
-          while ((command = pending.poll()) != null) {
-            command.handle(Future.failedFuture(asyncResult.cause()));
-          }
           // clean up any waiting command
           while ((command = waiting.poll()) != null) {
+            command.handle(Future.failedFuture(asyncResult.cause()));
+          }
+          // clean up any pending command
+          while ((command = pending.poll()) != null) {
             command.handle(Future.failedFuture(asyncResult.cause()));
           }
 
@@ -156,12 +151,12 @@ class RedisConnection {
 
                 // should clean up queues
                 Command<?> command;
-                // clean up any pending command
-                while ((command = pending.poll()) != null) {
-                  command.handle(Future.failedFuture("Connection closed!"));
-                }
                 // clean up any waiting command
                 while ((command = waiting.poll()) != null) {
+                  command.handle(Future.failedFuture("Connection closed!"));
+                }
+                // clean up any pending command
+                while ((command = pending.poll()) != null) {
                   command.handle(Future.failedFuture("Connection closed!"));
                 }
 
@@ -173,12 +168,12 @@ class RedisConnection {
 
                 // should clean up queues
                 Command<?> command;
-                // clean up any pending command
-                while ((command = pending.poll()) != null) {
-                  command.handle(Future.failedFuture(e));
-                }
                 // clean up any waiting command
                 while ((command = waiting.poll()) != null) {
+                  command.handle(Future.failedFuture(e));
+                }
+                // clean up any pending command
+                while ((command = pending.poll()) != null) {
                   command.handle(Future.failedFuture(e));
                 }
 
@@ -216,28 +211,27 @@ class RedisConnection {
     switch (state) {
       case CONNECTED:
       case CONNECTING:
-        final Context ctx = vertx.getOrCreateContext();
-
-        final Command<Void> cmd = new Command<>(ctx, RedisCommand.QUIT, null, Charset.defaultCharset(), ResponseTransform.NONE, Void.class);
+        final Command<Void> cmd = new Command<>(RedisCommand.QUIT, null, Charset.defaultCharset(), ResponseTransform.NONE, Void.class);
 
         cmd.handler(v -> {
           // at this we force the state to error so any incoming command will not start a connection
           state = State.ERROR;
 
-          netSocket.close();
-
           // should clean up queues
           Command<?> command;
-          // clean up any pending command
-          while ((command = pending.poll()) != null) {
-            command.handle(Future.failedFuture("Connection closed!"));
-          }
           // clean up any waiting command
           while ((command = waiting.poll()) != null) {
             command.handle(Future.failedFuture("Connection closed!"));
           }
+          // clean up any pending command
+          while ((command = pending.poll()) != null) {
+            command.handle(Future.failedFuture("Connection closed!"));
+          }
 
-          ctx.runOnContext(v0 -> closeHandler.handle(Future.succeededFuture()));
+          netSocket.close();
+          state = State.DISCONNECTED;
+
+          closeHandler.handle(Future.succeededFuture());
         });
 
         send(cmd);
