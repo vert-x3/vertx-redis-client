@@ -499,6 +499,447 @@ var RedisClient = function(j_val) {
   };
 
   /**
+   Assign new hash slots to receiving node.
+
+   @public
+   @param slots {Array.<number>} 
+   @param handler {function} Handler for the result of this call. 
+   @return {RedisClient}
+   */
+  this.clusterAddslots = function(slots, handler) {
+    var __args = arguments;
+    if (__args.length === 2 && typeof __args[0] === 'object' && __args[0] instanceof Array && typeof __args[1] === 'function') {
+      return utils.convReturnVertxGen(j_redisClient["clusterAddslots(java.util.List,io.vertx.core.Handler)"](utils.convParamListLong(slots), function(ar) {
+      if (ar.succeeded()) {
+        handler(null, null);
+      } else {
+        handler(null, ar.cause());
+      }
+    }), RedisClient);
+    } else utils.invalidArgs();
+  };
+
+  /**
+   Return the number of failure reports active for a given node.
+
+   @public
+   @param nodeId {string} 
+   @param handler {function} Handler for the result of this call. 
+   @return {RedisClient}
+   */
+  this.clusterCountFailureReports = function(nodeId, handler) {
+    var __args = arguments;
+    if (__args.length === 2 && typeof __args[0] === 'string' && typeof __args[1] === 'function') {
+      return utils.convReturnVertxGen(j_redisClient["clusterCountFailureReports(java.lang.String,io.vertx.core.Handler)"](nodeId, function(ar) {
+      if (ar.succeeded()) {
+        handler(ar.result(), null);
+      } else {
+        handler(null, ar.cause());
+      }
+    }), RedisClient);
+    } else utils.invalidArgs();
+  };
+
+  /**
+   Return the number of local keys in the specified hash slot.
+
+   @public
+   @param slot {number} 
+   @param handler {function} Handler for the result of this call. 
+   @return {RedisClient}
+   */
+  this.clusterCountkeysinslot = function(slot, handler) {
+    var __args = arguments;
+    if (__args.length === 2 && typeof __args[0] ==='number' && typeof __args[1] === 'function') {
+      return utils.convReturnVertxGen(j_redisClient["clusterCountkeysinslot(long,io.vertx.core.Handler)"](slot, function(ar) {
+      if (ar.succeeded()) {
+        handler(ar.result(), null);
+      } else {
+        handler(null, ar.cause());
+      }
+    }), RedisClient);
+    } else utils.invalidArgs();
+  };
+
+  /**
+   Set hash slots as unbound in receiving node.
+
+   @public
+   @param slot {number} 
+   @param handler {function} Handler for the result of this call. 
+   @return {RedisClient}
+   */
+  this.clusterDelslots = function(slot, handler) {
+    var __args = arguments;
+    if (__args.length === 2 && typeof __args[0] ==='number' && typeof __args[1] === 'function') {
+      return utils.convReturnVertxGen(j_redisClient["clusterDelslots(long,io.vertx.core.Handler)"](slot, function(ar) {
+      if (ar.succeeded()) {
+        handler(null, null);
+      } else {
+        handler(null, ar.cause());
+      }
+    }), RedisClient);
+    } else utils.invalidArgs();
+  };
+
+  /**
+   Set hash slots as unbound in receiving node.
+
+   @public
+   @param slots {Array.<number>} 
+   @param handler {function} Handler for the result of this call. 
+   @return {RedisClient}
+   */
+  this.clusterDelslotsMany = function(slots, handler) {
+    var __args = arguments;
+    if (__args.length === 2 && typeof __args[0] === 'object' && __args[0] instanceof Array && typeof __args[1] === 'function') {
+      return utils.convReturnVertxGen(j_redisClient["clusterDelslotsMany(java.util.List,io.vertx.core.Handler)"](utils.convParamListLong(slots), function(ar) {
+      if (ar.succeeded()) {
+        handler(null, null);
+      } else {
+        handler(null, ar.cause());
+      }
+    }), RedisClient);
+    } else utils.invalidArgs();
+  };
+
+  /**
+   Forces a slave to perform a manual failover of its master.
+
+   @public
+   @param handler {function} Handler for the result of this call. 
+   @return {RedisClient}
+   */
+  this.clusterFailover = function(handler) {
+    var __args = arguments;
+    if (__args.length === 1 && typeof __args[0] === 'function') {
+      return utils.convReturnVertxGen(j_redisClient["clusterFailover(io.vertx.core.Handler)"](function(ar) {
+      if (ar.succeeded()) {
+        handler(null, null);
+      } else {
+        handler(null, ar.cause());
+      }
+    }), RedisClient);
+    } else utils.invalidArgs();
+  };
+
+  /**
+   Forces a slave to perform a manual failover of its master.
+
+   @public
+   @param options {Object} 
+   @param handler {function} Handler for the result of this call. 
+   @return {RedisClient}
+   */
+  this.clusterFailOverWithOptions = function(options, handler) {
+    var __args = arguments;
+    if (__args.length === 2 && typeof __args[0] === 'string' && typeof __args[1] === 'function') {
+      return utils.convReturnVertxGen(j_redisClient["clusterFailOverWithOptions(io.vertx.redis.op.FailoverOptions,io.vertx.core.Handler)"](io.vertx.redis.op.FailoverOptions.valueOf(__args[0]), function(ar) {
+      if (ar.succeeded()) {
+        handler(null, null);
+      } else {
+        handler(null, ar.cause());
+      }
+    }), RedisClient);
+    } else utils.invalidArgs();
+  };
+
+  /**
+   Remove a node from the nodes table.
+
+   @public
+   @param nodeId {string} 
+   @param handler {function} Handler for the result of this call. 
+   @return {RedisClient}
+   */
+  this.clusterForget = function(nodeId, handler) {
+    var __args = arguments;
+    if (__args.length === 2 && typeof __args[0] === 'string' && typeof __args[1] === 'function') {
+      return utils.convReturnVertxGen(j_redisClient["clusterForget(java.lang.String,io.vertx.core.Handler)"](nodeId, function(ar) {
+      if (ar.succeeded()) {
+        handler(null, null);
+      } else {
+        handler(null, ar.cause());
+      }
+    }), RedisClient);
+    } else utils.invalidArgs();
+  };
+
+  /**
+   Return local key names in the specified hash slot.
+
+   @public
+   @param slot {number} 
+   @param count {number} 
+   @param handler {function} Handler for the result of this call. 
+   @return {RedisClient}
+   */
+  this.clusterGetkeyinslot = function(slot, count, handler) {
+    var __args = arguments;
+    if (__args.length === 3 && typeof __args[0] ==='number' && typeof __args[1] ==='number' && typeof __args[2] === 'function') {
+      return utils.convReturnVertxGen(j_redisClient["clusterGetkeyinslot(long,long,io.vertx.core.Handler)"](slot, count, function(ar) {
+      if (ar.succeeded()) {
+        handler(utils.convReturnJson(ar.result()), null);
+      } else {
+        handler(null, ar.cause());
+      }
+    }), RedisClient);
+    } else utils.invalidArgs();
+  };
+
+  /**
+   Provides info about Redis Cluster node state.
+
+   @public
+   @param handler {function} Handler for the result of this call. 
+   @return {RedisClient}
+   */
+  this.clusterInfo = function(handler) {
+    var __args = arguments;
+    if (__args.length === 1 && typeof __args[0] === 'function') {
+      return utils.convReturnVertxGen(j_redisClient["clusterInfo(io.vertx.core.Handler)"](function(ar) {
+      if (ar.succeeded()) {
+        handler(utils.convReturnJson(ar.result()), null);
+      } else {
+        handler(null, ar.cause());
+      }
+    }), RedisClient);
+    } else utils.invalidArgs();
+  };
+
+  /**
+   Returns the hash slot of the specified key.
+
+   @public
+   @param key {string} 
+   @param handler {function} Handler for the result of this call. 
+   @return {RedisClient}
+   */
+  this.clusterKeyslot = function(key, handler) {
+    var __args = arguments;
+    if (__args.length === 2 && typeof __args[0] === 'string' && typeof __args[1] === 'function') {
+      return utils.convReturnVertxGen(j_redisClient["clusterKeyslot(java.lang.String,io.vertx.core.Handler)"](key, function(ar) {
+      if (ar.succeeded()) {
+        handler(ar.result(), null);
+      } else {
+        handler(null, ar.cause());
+      }
+    }), RedisClient);
+    } else utils.invalidArgs();
+  };
+
+  /**
+   Force a node cluster to handshake with another node.
+
+   @public
+   @param ip {string} 
+   @param port {number} 
+   @param handler {function} Handler for the result of this call. 
+   @return {RedisClient}
+   */
+  this.clusterMeet = function(ip, port, handler) {
+    var __args = arguments;
+    if (__args.length === 3 && typeof __args[0] === 'string' && typeof __args[1] ==='number' && typeof __args[2] === 'function') {
+      return utils.convReturnVertxGen(j_redisClient["clusterMeet(java.lang.String,long,io.vertx.core.Handler)"](ip, port, function(ar) {
+      if (ar.succeeded()) {
+        handler(null, null);
+      } else {
+        handler(null, ar.cause());
+      }
+    }), RedisClient);
+    } else utils.invalidArgs();
+  };
+
+  /**
+   Get Cluster config for the node.
+
+   @public
+   @param handler {function} Handler for the result of this call. 
+   @return {RedisClient}
+   */
+  this.clusterNodes = function(handler) {
+    var __args = arguments;
+    if (__args.length === 1 && typeof __args[0] === 'function') {
+      return utils.convReturnVertxGen(j_redisClient["clusterNodes(io.vertx.core.Handler)"](function(ar) {
+      if (ar.succeeded()) {
+        handler(utils.convReturnJson(ar.result()), null);
+      } else {
+        handler(null, ar.cause());
+      }
+    }), RedisClient);
+    } else utils.invalidArgs();
+  };
+
+  /**
+   Reconfigure a node as a slave of the specified master node.
+
+   @public
+   @param nodeId {string} 
+   @param handler {function} Handler for the result of this call. 
+   @return {RedisClient}
+   */
+  this.clusterReplicate = function(nodeId, handler) {
+    var __args = arguments;
+    if (__args.length === 2 && typeof __args[0] === 'string' && typeof __args[1] === 'function') {
+      return utils.convReturnVertxGen(j_redisClient["clusterReplicate(java.lang.String,io.vertx.core.Handler)"](nodeId, function(ar) {
+      if (ar.succeeded()) {
+        handler(null, null);
+      } else {
+        handler(null, ar.cause());
+      }
+    }), RedisClient);
+    } else utils.invalidArgs();
+  };
+
+  /**
+   Reset a Redis Cluster node.
+
+   @public
+   @param handler {function} Handler for the result of this call. 
+   @return {RedisClient}
+   */
+  this.clusterReset = function(handler) {
+    var __args = arguments;
+    if (__args.length === 1 && typeof __args[0] === 'function') {
+      return utils.convReturnVertxGen(j_redisClient["clusterReset(io.vertx.core.Handler)"](function(ar) {
+      if (ar.succeeded()) {
+        handler(null, null);
+      } else {
+        handler(null, ar.cause());
+      }
+    }), RedisClient);
+    } else utils.invalidArgs();
+  };
+
+  /**
+   Reset a Redis Cluster node.
+
+   @public
+   @param options {Object} 
+   @param handler {function} Handler for the result of this call. 
+   @return {RedisClient}
+   */
+  this.clusterResetWithOptions = function(options, handler) {
+    var __args = arguments;
+    if (__args.length === 2 && typeof __args[0] === 'string' && typeof __args[1] === 'function') {
+      return utils.convReturnVertxGen(j_redisClient["clusterResetWithOptions(io.vertx.redis.op.ResetOptions,io.vertx.core.Handler)"](io.vertx.redis.op.ResetOptions.valueOf(__args[0]), function(ar) {
+      if (ar.succeeded()) {
+        handler(null, null);
+      } else {
+        handler(null, ar.cause());
+      }
+    }), RedisClient);
+    } else utils.invalidArgs();
+  };
+
+  /**
+   Forces the node to save cluster state on disk.
+
+   @public
+   @param handler {function} Handler for the result of this call. 
+   @return {RedisClient}
+   */
+  this.clusterSaveconfig = function(handler) {
+    var __args = arguments;
+    if (__args.length === 1 && typeof __args[0] === 'function') {
+      return utils.convReturnVertxGen(j_redisClient["clusterSaveconfig(io.vertx.core.Handler)"](function(ar) {
+      if (ar.succeeded()) {
+        handler(null, null);
+      } else {
+        handler(null, ar.cause());
+      }
+    }), RedisClient);
+    } else utils.invalidArgs();
+  };
+
+  /**
+   Set the configuration epoch in a new node.
+
+   @public
+   @param epoch {number} 
+   @param handler {function} Handler for the result of this call. 
+   @return {RedisClient}
+   */
+  this.clusterSetConfigEpoch = function(epoch, handler) {
+    var __args = arguments;
+    if (__args.length === 2 && typeof __args[0] ==='number' && typeof __args[1] === 'function') {
+      return utils.convReturnVertxGen(j_redisClient["clusterSetConfigEpoch(long,io.vertx.core.Handler)"](epoch, function(ar) {
+      if (ar.succeeded()) {
+        handler(null, null);
+      } else {
+        handler(null, ar.cause());
+      }
+    }), RedisClient);
+    } else utils.invalidArgs();
+  };
+
+  /**
+   Bind an hash slot to a specific node.
+
+   @public
+   @param slot {number} 
+   @param subcommand {Object} 
+   @param handler {function} Handler for the result of this call. 
+   @return {RedisClient}
+   */
+  this.clusterSetslot = function(slot, subcommand, handler) {
+    var __args = arguments;
+    if (__args.length === 3 && typeof __args[0] ==='number' && typeof __args[1] === 'string' && typeof __args[2] === 'function') {
+      return utils.convReturnVertxGen(j_redisClient["clusterSetslot(long,io.vertx.redis.op.SlotCmd,io.vertx.core.Handler)"](slot, io.vertx.redis.op.SlotCmd.valueOf(__args[1]), function(ar) {
+      if (ar.succeeded()) {
+        handler(null, null);
+      } else {
+        handler(null, ar.cause());
+      }
+    }), RedisClient);
+    } else utils.invalidArgs();
+  };
+
+  /**
+   Bind an hash slot to a specific node.
+
+   @public
+   @param slot {number} 
+   @param subcommand {Object} 
+   @param nodeId {string} 
+   @param handler {function} Handler for the result of this call. 
+   @return {RedisClient}
+   */
+  this.clusterSetslotWithNode = function(slot, subcommand, nodeId, handler) {
+    var __args = arguments;
+    if (__args.length === 4 && typeof __args[0] ==='number' && typeof __args[1] === 'string' && typeof __args[2] === 'string' && typeof __args[3] === 'function') {
+      return utils.convReturnVertxGen(j_redisClient["clusterSetslotWithNode(long,io.vertx.redis.op.SlotCmd,java.lang.String,io.vertx.core.Handler)"](slot, io.vertx.redis.op.SlotCmd.valueOf(__args[1]), nodeId, function(ar) {
+      if (ar.succeeded()) {
+        handler(null, null);
+      } else {
+        handler(null, ar.cause());
+      }
+    }), RedisClient);
+    } else utils.invalidArgs();
+  };
+
+  /**
+   List slave nodes of the specified master node.
+
+   @public
+   @param nodeId {string} 
+   @param handler {function} Handler for the result of this call. 
+   @return {RedisClient}
+   */
+  this.clusterSlaves = function(nodeId, handler) {
+    var __args = arguments;
+    if (__args.length === 2 && typeof __args[0] === 'string' && typeof __args[1] === 'function') {
+      return utils.convReturnVertxGen(j_redisClient["clusterSlaves(java.lang.String,io.vertx.core.Handler)"](nodeId, function(ar) {
+      if (ar.succeeded()) {
+        handler(utils.convReturnJson(ar.result()), null);
+      } else {
+        handler(null, ar.cause());
+      }
+    }), RedisClient);
+    } else utils.invalidArgs();
+  };
+
+  /**
    Get array of Cluster slot to node mappings
 
    @public
@@ -3640,6 +4081,28 @@ var RedisClient = function(j_val) {
     var __args = arguments;
     if (__args.length === 1 && typeof __args[0] === 'function') {
       return utils.convReturnVertxGen(j_redisClient["unwatch(io.vertx.core.Handler)"](function(ar) {
+      if (ar.succeeded()) {
+        handler(ar.result(), null);
+      } else {
+        handler(null, ar.cause());
+      }
+    }), RedisClient);
+    } else utils.invalidArgs();
+  };
+
+  /**
+   Wait for the synchronous replication of all the write commands sent in the context of the current connection.
+
+   @public
+   @param numSlaves {number} 
+   @param timeout {number} 
+   @param handler {function} Handler for the result of this call. 
+   @return {RedisClient}
+   */
+  this.wait = function(numSlaves, timeout, handler) {
+    var __args = arguments;
+    if (__args.length === 3 && typeof __args[0] ==='number' && typeof __args[1] ==='number' && typeof __args[2] === 'function') {
+      return utils.convReturnVertxGen(j_redisClient["wait(long,long,io.vertx.core.Handler)"](numSlaves, timeout, function(ar) {
       if (ar.succeeded()) {
         handler(ar.result(), null);
       } else {

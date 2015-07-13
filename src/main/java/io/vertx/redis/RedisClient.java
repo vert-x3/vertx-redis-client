@@ -241,6 +241,216 @@ public interface RedisClient {
   RedisClient clientSetname(String name, Handler<AsyncResult<String>> handler);
 
   /**
+   * Assign new hash slots to receiving node.
+   *
+   * @param slots
+   * @param handler Handler for the result of this call.
+   * @since 3.0.0
+   * group: server
+   */
+  RedisClient clusterAddslots(List<Long> slots, Handler<AsyncResult<Void>> handler);
+
+  /**
+   * Return the number of failure reports active for a given node.
+   *
+   * @param nodeId
+   * @param handler Handler for the result of this call.
+   * @since 3.0.0
+   * group: cluster
+   */
+  RedisClient clusterCountFailureReports(String nodeId, Handler<AsyncResult<Long>> handler);
+
+  /**
+   * Return the number of local keys in the specified hash slot.
+   *
+   * @param slot
+   * @param handler Handler for the result of this call.
+   * @since 3.0.0
+   * group: cluster
+   */
+  RedisClient clusterCountkeysinslot(long slot, Handler<AsyncResult<Long>> handler);
+
+  /**
+   * Set hash slots as unbound in receiving node.
+   *
+   * @param slot
+   * @param handler Handler for the result of this call.
+   * @since 3.0.0
+   * group: cluster
+   */
+  RedisClient clusterDelslots(long slot, Handler<AsyncResult<Void>> handler);
+
+  /**
+   * Set hash slots as unbound in receiving node.
+   *
+   * @param slots
+   * @param handler Handler for the result of this call.
+   * @since 3.0.0
+   * group: cluster
+   */
+  RedisClient clusterDelslotsMany(List<Long> slots, Handler<AsyncResult<Void>> handler);
+
+  /**
+   * Forces a slave to perform a manual failover of its master.
+   *
+   * @param handler Handler for the result of this call.
+   * @since 3.0.0
+   * group: cluster
+   */
+  RedisClient clusterFailover(Handler<AsyncResult<Void>> handler);
+
+  /**
+   * Forces a slave to perform a manual failover of its master.
+   *
+   * @param options
+   * @param handler Handler for the result of this call.
+   * @since 3.0.0
+   * group: cluster
+   */
+  RedisClient clusterFailOverWithOptions(FailoverOptions options, Handler<AsyncResult<Void>> handler);
+
+  /**
+   * Remove a node from the nodes table.
+   *
+   * @param nodeId
+   * @param handler Handler for the result of this call.
+   * @since 3.0.0
+   * group: cluster
+   */
+  RedisClient clusterForget(String nodeId, Handler<AsyncResult<Void>> handler);
+
+  /**
+   * Return local key names in the specified hash slot.
+   *
+   * @param slot
+   * @param count
+   * @param handler Handler for the result of this call.
+   * @since 3.0.0
+   * group: cluster
+   */
+  RedisClient clusterGetkeyinslot(long slot, long count, Handler<AsyncResult<JsonArray>> handler);
+
+  /**
+   * Provides info about Redis Cluster node state.
+   *
+   * @param handler Handler for the result of this call.
+   * @since 3.0.0
+   * group: cluster
+   */
+  RedisClient clusterInfo(Handler<AsyncResult<JsonArray>> handler);
+
+  /**
+   * Returns the hash slot of the specified key.
+   *
+   * @param key
+   * @param handler Handler for the result of this call.
+   * @since 3.0.0
+   * group: cluster
+   */
+  RedisClient clusterKeyslot(String key, Handler<AsyncResult<Long>> handler);
+
+  /**
+   * Force a node cluster to handshake with another node.
+   *
+   * @param ip
+   * @param port
+   * @param handler Handler for the result of this call.
+   * @since 3.0.0
+   * group: cluster
+   */
+  RedisClient clusterMeet(String ip, long port, Handler<AsyncResult<Void>> handler);
+
+  /**
+   * Get Cluster config for the node.
+   *
+   * @param handler Handler for the result of this call.
+   * @since 3.0.0
+   * group: cluster
+   */
+  RedisClient clusterNodes(Handler<AsyncResult<JsonArray>> handler);
+
+  /**
+   * Reconfigure a node as a slave of the specified master node.
+   *
+   * @param nodeId
+   * @param handler Handler for the result of this call.
+   * @since 3.0.0
+   * group: cluster
+   */
+  RedisClient clusterReplicate(String nodeId, Handler<AsyncResult<Void>> handler);
+
+  /**
+   * Reset a Redis Cluster node.
+   *
+   * @param handler Handler for the result of this call.
+   * @since 3.0.0
+   * group: cluster
+   */
+  RedisClient clusterReset(Handler<AsyncResult<Void>> handler);
+
+  /**
+   * Reset a Redis Cluster node.
+   *
+   * @param options
+   * @param handler Handler for the result of this call.
+   * @since 3.0.0
+   * group: cluster
+   */
+  RedisClient clusterResetWithOptions(ResetOptions options, Handler<AsyncResult<Void>> handler);
+
+  /**
+   * Forces the node to save cluster state on disk.
+   *
+   * @param handler Handler for the result of this call.
+   * @since 3.0.0
+   * group: cluster
+   */
+  RedisClient clusterSaveconfig(Handler<AsyncResult<Void>> handler);
+
+  /**
+   * Set the configuration epoch in a new node.
+   *
+   * @param epoch
+   * @param handler Handler for the result of this call.
+   * @since 3.0.0
+   * group: cluster
+   */
+  RedisClient clusterSetConfigEpoch(long epoch, Handler<AsyncResult<Void>> handler);
+
+  /**
+   * Bind an hash slot to a specific node.
+   *
+   * @param slot
+   * @param subcommand
+   * @param handler Handler for the result of this call.
+   * @since 3.0.0
+   * group: cluster
+   */
+  RedisClient clusterSetslot(long slot, SlotCmd subcommand, Handler<AsyncResult<Void>> handler);
+
+  /**
+   * Bind an hash slot to a specific node.
+   *
+   * @param slot
+   * @param subcommand
+   * @param nodeId
+   * @param handler Handler for the result of this call.
+   * @since 3.0.0
+   * group: cluster
+   */
+  RedisClient clusterSetslotWithNode(long slot, SlotCmd subcommand, String nodeId, Handler<AsyncResult<Void>> handler);
+
+  /**
+   * List slave nodes of the specified master node.
+   *
+   * @param nodeId
+   * @param handler Handler for the result of this call.
+   * @since 3.0.0
+   * group: cluster
+   */
+  RedisClient clusterSlaves(String nodeId, Handler<AsyncResult<JsonArray>> handler);
+
+  /**
    * Get array of Cluster slot to node mappings
    *
    * @since 3.0.0
@@ -1748,6 +1958,17 @@ public interface RedisClient {
    * group: transactions
    */
   RedisClient unwatch(Handler<AsyncResult<String>> handler);
+
+  /**
+   * Wait for the synchronous replication of all the write commands sent in the context of the current connection.
+   *
+   * @param numSlaves
+   * @param timeout
+   * @param handler Handler for the result of this call.
+   * @since 3.0.0
+   * group: generic
+   */
+  RedisClient wait(long numSlaves, long timeout, Handler<AsyncResult<String>> handler);
 
   /**
    * Watch the given keys to determine execution of the MULTI/EXEC block

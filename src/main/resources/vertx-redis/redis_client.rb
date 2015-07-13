@@ -248,6 +248,216 @@ module VertxRedis
       end
       raise ArgumentError, "Invalid arguments when calling client_setname(name)"
     end
+    #  Assign new hash slots to receiving node.
+    # @param [Array<Fixnum>] slots 
+    # @yield Handler for the result of this call.
+    # @return [::VertxRedis::RedisClient]
+    def cluster_addslots(slots=nil)
+      if slots.class == Array && block_given?
+        return ::Vertx::Util::Utils.safe_create(@j_del.java_method(:clusterAddslots, [Java::JavaUtil::List.java_class,Java::IoVertxCore::Handler.java_class]).call(slots.map { |element| element },(Proc.new { |ar| yield(ar.failed ? ar.cause : nil) })),::VertxRedis::RedisClient)
+      end
+      raise ArgumentError, "Invalid arguments when calling cluster_addslots(slots)"
+    end
+    #  Return the number of failure reports active for a given node.
+    # @param [String] nodeId 
+    # @yield Handler for the result of this call.
+    # @return [::VertxRedis::RedisClient]
+    def cluster_count_failure_reports(nodeId=nil)
+      if nodeId.class == String && block_given?
+        return ::Vertx::Util::Utils.safe_create(@j_del.java_method(:clusterCountFailureReports, [Java::java.lang.String.java_class,Java::IoVertxCore::Handler.java_class]).call(nodeId,(Proc.new { |ar| yield(ar.failed ? ar.cause : nil, ar.succeeded ? ar.result : nil) })),::VertxRedis::RedisClient)
+      end
+      raise ArgumentError, "Invalid arguments when calling cluster_count_failure_reports(nodeId)"
+    end
+    #  Return the number of local keys in the specified hash slot.
+    # @param [Fixnum] slot 
+    # @yield Handler for the result of this call.
+    # @return [::VertxRedis::RedisClient]
+    def cluster_countkeysinslot(slot=nil)
+      if slot.class == Fixnum && block_given?
+        return ::Vertx::Util::Utils.safe_create(@j_del.java_method(:clusterCountkeysinslot, [Java::long.java_class,Java::IoVertxCore::Handler.java_class]).call(slot,(Proc.new { |ar| yield(ar.failed ? ar.cause : nil, ar.succeeded ? ar.result : nil) })),::VertxRedis::RedisClient)
+      end
+      raise ArgumentError, "Invalid arguments when calling cluster_countkeysinslot(slot)"
+    end
+    #  Set hash slots as unbound in receiving node.
+    # @param [Fixnum] slot 
+    # @yield Handler for the result of this call.
+    # @return [::VertxRedis::RedisClient]
+    def cluster_delslots(slot=nil)
+      if slot.class == Fixnum && block_given?
+        return ::Vertx::Util::Utils.safe_create(@j_del.java_method(:clusterDelslots, [Java::long.java_class,Java::IoVertxCore::Handler.java_class]).call(slot,(Proc.new { |ar| yield(ar.failed ? ar.cause : nil) })),::VertxRedis::RedisClient)
+      end
+      raise ArgumentError, "Invalid arguments when calling cluster_delslots(slot)"
+    end
+    #  Set hash slots as unbound in receiving node.
+    # @param [Array<Fixnum>] slots 
+    # @yield Handler for the result of this call.
+    # @return [::VertxRedis::RedisClient]
+    def cluster_delslots_many(slots=nil)
+      if slots.class == Array && block_given?
+        return ::Vertx::Util::Utils.safe_create(@j_del.java_method(:clusterDelslotsMany, [Java::JavaUtil::List.java_class,Java::IoVertxCore::Handler.java_class]).call(slots.map { |element| element },(Proc.new { |ar| yield(ar.failed ? ar.cause : nil) })),::VertxRedis::RedisClient)
+      end
+      raise ArgumentError, "Invalid arguments when calling cluster_delslots_many(slots)"
+    end
+    #  Forces a slave to perform a manual failover of its master.
+    # @yield Handler for the result of this call.
+    # @return [::VertxRedis::RedisClient]
+    def cluster_failover
+      if block_given?
+        return ::Vertx::Util::Utils.safe_create(@j_del.java_method(:clusterFailover, [Java::IoVertxCore::Handler.java_class]).call((Proc.new { |ar| yield(ar.failed ? ar.cause : nil) })),::VertxRedis::RedisClient)
+      end
+      raise ArgumentError, "Invalid arguments when calling cluster_failover()"
+    end
+    #  Forces a slave to perform a manual failover of its master.
+    # @param [:FORCE,:TAKEOVER] options 
+    # @yield Handler for the result of this call.
+    # @return [::VertxRedis::RedisClient]
+    def cluster_fail_over_with_options(options=nil)
+      if options.class == Symbol && block_given?
+        return ::Vertx::Util::Utils.safe_create(@j_del.java_method(:clusterFailOverWithOptions, [Java::IoVertxRedisOp::FailoverOptions.java_class,Java::IoVertxCore::Handler.java_class]).call(Java::IoVertxRedisOp::FailoverOptions.valueOf(options),(Proc.new { |ar| yield(ar.failed ? ar.cause : nil) })),::VertxRedis::RedisClient)
+      end
+      raise ArgumentError, "Invalid arguments when calling cluster_fail_over_with_options(options)"
+    end
+    #  Remove a node from the nodes table.
+    # @param [String] nodeId 
+    # @yield Handler for the result of this call.
+    # @return [::VertxRedis::RedisClient]
+    def cluster_forget(nodeId=nil)
+      if nodeId.class == String && block_given?
+        return ::Vertx::Util::Utils.safe_create(@j_del.java_method(:clusterForget, [Java::java.lang.String.java_class,Java::IoVertxCore::Handler.java_class]).call(nodeId,(Proc.new { |ar| yield(ar.failed ? ar.cause : nil) })),::VertxRedis::RedisClient)
+      end
+      raise ArgumentError, "Invalid arguments when calling cluster_forget(nodeId)"
+    end
+    #  Return local key names in the specified hash slot.
+    # @param [Fixnum] slot 
+    # @param [Fixnum] count 
+    # @yield Handler for the result of this call.
+    # @return [::VertxRedis::RedisClient]
+    def cluster_getkeyinslot(slot=nil,count=nil)
+      if slot.class == Fixnum && count.class == Fixnum && block_given?
+        return ::Vertx::Util::Utils.safe_create(@j_del.java_method(:clusterGetkeyinslot, [Java::long.java_class,Java::long.java_class,Java::IoVertxCore::Handler.java_class]).call(slot,count,(Proc.new { |ar| yield(ar.failed ? ar.cause : nil, ar.succeeded ? ar.result != nil ? JSON.parse(ar.result.encode) : nil : nil) })),::VertxRedis::RedisClient)
+      end
+      raise ArgumentError, "Invalid arguments when calling cluster_getkeyinslot(slot,count)"
+    end
+    #  Provides info about Redis Cluster node state.
+    # @yield Handler for the result of this call.
+    # @return [::VertxRedis::RedisClient]
+    def cluster_info
+      if block_given?
+        return ::Vertx::Util::Utils.safe_create(@j_del.java_method(:clusterInfo, [Java::IoVertxCore::Handler.java_class]).call((Proc.new { |ar| yield(ar.failed ? ar.cause : nil, ar.succeeded ? ar.result != nil ? JSON.parse(ar.result.encode) : nil : nil) })),::VertxRedis::RedisClient)
+      end
+      raise ArgumentError, "Invalid arguments when calling cluster_info()"
+    end
+    #  Returns the hash slot of the specified key.
+    # @param [String] key 
+    # @yield Handler for the result of this call.
+    # @return [::VertxRedis::RedisClient]
+    def cluster_keyslot(key=nil)
+      if key.class == String && block_given?
+        return ::Vertx::Util::Utils.safe_create(@j_del.java_method(:clusterKeyslot, [Java::java.lang.String.java_class,Java::IoVertxCore::Handler.java_class]).call(key,(Proc.new { |ar| yield(ar.failed ? ar.cause : nil, ar.succeeded ? ar.result : nil) })),::VertxRedis::RedisClient)
+      end
+      raise ArgumentError, "Invalid arguments when calling cluster_keyslot(key)"
+    end
+    #  Force a node cluster to handshake with another node.
+    # @param [String] ip 
+    # @param [Fixnum] port 
+    # @yield Handler for the result of this call.
+    # @return [::VertxRedis::RedisClient]
+    def cluster_meet(ip=nil,port=nil)
+      if ip.class == String && port.class == Fixnum && block_given?
+        return ::Vertx::Util::Utils.safe_create(@j_del.java_method(:clusterMeet, [Java::java.lang.String.java_class,Java::long.java_class,Java::IoVertxCore::Handler.java_class]).call(ip,port,(Proc.new { |ar| yield(ar.failed ? ar.cause : nil) })),::VertxRedis::RedisClient)
+      end
+      raise ArgumentError, "Invalid arguments when calling cluster_meet(ip,port)"
+    end
+    #  Get Cluster config for the node.
+    # @yield Handler for the result of this call.
+    # @return [::VertxRedis::RedisClient]
+    def cluster_nodes
+      if block_given?
+        return ::Vertx::Util::Utils.safe_create(@j_del.java_method(:clusterNodes, [Java::IoVertxCore::Handler.java_class]).call((Proc.new { |ar| yield(ar.failed ? ar.cause : nil, ar.succeeded ? ar.result != nil ? JSON.parse(ar.result.encode) : nil : nil) })),::VertxRedis::RedisClient)
+      end
+      raise ArgumentError, "Invalid arguments when calling cluster_nodes()"
+    end
+    #  Reconfigure a node as a slave of the specified master node.
+    # @param [String] nodeId 
+    # @yield Handler for the result of this call.
+    # @return [::VertxRedis::RedisClient]
+    def cluster_replicate(nodeId=nil)
+      if nodeId.class == String && block_given?
+        return ::Vertx::Util::Utils.safe_create(@j_del.java_method(:clusterReplicate, [Java::java.lang.String.java_class,Java::IoVertxCore::Handler.java_class]).call(nodeId,(Proc.new { |ar| yield(ar.failed ? ar.cause : nil) })),::VertxRedis::RedisClient)
+      end
+      raise ArgumentError, "Invalid arguments when calling cluster_replicate(nodeId)"
+    end
+    #  Reset a Redis Cluster node.
+    # @yield Handler for the result of this call.
+    # @return [::VertxRedis::RedisClient]
+    def cluster_reset
+      if block_given?
+        return ::Vertx::Util::Utils.safe_create(@j_del.java_method(:clusterReset, [Java::IoVertxCore::Handler.java_class]).call((Proc.new { |ar| yield(ar.failed ? ar.cause : nil) })),::VertxRedis::RedisClient)
+      end
+      raise ArgumentError, "Invalid arguments when calling cluster_reset()"
+    end
+    #  Reset a Redis Cluster node.
+    # @param [:HARD,:SOFT] options 
+    # @yield Handler for the result of this call.
+    # @return [::VertxRedis::RedisClient]
+    def cluster_reset_with_options(options=nil)
+      if options.class == Symbol && block_given?
+        return ::Vertx::Util::Utils.safe_create(@j_del.java_method(:clusterResetWithOptions, [Java::IoVertxRedisOp::ResetOptions.java_class,Java::IoVertxCore::Handler.java_class]).call(Java::IoVertxRedisOp::ResetOptions.valueOf(options),(Proc.new { |ar| yield(ar.failed ? ar.cause : nil) })),::VertxRedis::RedisClient)
+      end
+      raise ArgumentError, "Invalid arguments when calling cluster_reset_with_options(options)"
+    end
+    #  Forces the node to save cluster state on disk.
+    # @yield Handler for the result of this call.
+    # @return [::VertxRedis::RedisClient]
+    def cluster_saveconfig
+      if block_given?
+        return ::Vertx::Util::Utils.safe_create(@j_del.java_method(:clusterSaveconfig, [Java::IoVertxCore::Handler.java_class]).call((Proc.new { |ar| yield(ar.failed ? ar.cause : nil) })),::VertxRedis::RedisClient)
+      end
+      raise ArgumentError, "Invalid arguments when calling cluster_saveconfig()"
+    end
+    #  Set the configuration epoch in a new node.
+    # @param [Fixnum] epoch 
+    # @yield Handler for the result of this call.
+    # @return [::VertxRedis::RedisClient]
+    def cluster_set_config_epoch(epoch=nil)
+      if epoch.class == Fixnum && block_given?
+        return ::Vertx::Util::Utils.safe_create(@j_del.java_method(:clusterSetConfigEpoch, [Java::long.java_class,Java::IoVertxCore::Handler.java_class]).call(epoch,(Proc.new { |ar| yield(ar.failed ? ar.cause : nil) })),::VertxRedis::RedisClient)
+      end
+      raise ArgumentError, "Invalid arguments when calling cluster_set_config_epoch(epoch)"
+    end
+    #  Bind an hash slot to a specific node.
+    # @param [Fixnum] slot 
+    # @param [:IMPORTING,:MIGRATING,:STABLE,:NODE] subcommand 
+    # @yield Handler for the result of this call.
+    # @return [::VertxRedis::RedisClient]
+    def cluster_setslot(slot=nil,subcommand=nil)
+      if slot.class == Fixnum && subcommand.class == Symbol && block_given?
+        return ::Vertx::Util::Utils.safe_create(@j_del.java_method(:clusterSetslot, [Java::long.java_class,Java::IoVertxRedisOp::SlotCmd.java_class,Java::IoVertxCore::Handler.java_class]).call(slot,Java::IoVertxRedisOp::SlotCmd.valueOf(subcommand),(Proc.new { |ar| yield(ar.failed ? ar.cause : nil) })),::VertxRedis::RedisClient)
+      end
+      raise ArgumentError, "Invalid arguments when calling cluster_setslot(slot,subcommand)"
+    end
+    #  Bind an hash slot to a specific node.
+    # @param [Fixnum] slot 
+    # @param [:IMPORTING,:MIGRATING,:STABLE,:NODE] subcommand 
+    # @param [String] nodeId 
+    # @yield Handler for the result of this call.
+    # @return [::VertxRedis::RedisClient]
+    def cluster_setslot_with_node(slot=nil,subcommand=nil,nodeId=nil)
+      if slot.class == Fixnum && subcommand.class == Symbol && nodeId.class == String && block_given?
+        return ::Vertx::Util::Utils.safe_create(@j_del.java_method(:clusterSetslotWithNode, [Java::long.java_class,Java::IoVertxRedisOp::SlotCmd.java_class,Java::java.lang.String.java_class,Java::IoVertxCore::Handler.java_class]).call(slot,Java::IoVertxRedisOp::SlotCmd.valueOf(subcommand),nodeId,(Proc.new { |ar| yield(ar.failed ? ar.cause : nil) })),::VertxRedis::RedisClient)
+      end
+      raise ArgumentError, "Invalid arguments when calling cluster_setslot_with_node(slot,subcommand,nodeId)"
+    end
+    #  List slave nodes of the specified master node.
+    # @param [String] nodeId 
+    # @yield Handler for the result of this call.
+    # @return [::VertxRedis::RedisClient]
+    def cluster_slaves(nodeId=nil)
+      if nodeId.class == String && block_given?
+        return ::Vertx::Util::Utils.safe_create(@j_del.java_method(:clusterSlaves, [Java::java.lang.String.java_class,Java::IoVertxCore::Handler.java_class]).call(nodeId,(Proc.new { |ar| yield(ar.failed ? ar.cause : nil, ar.succeeded ? ar.result != nil ? JSON.parse(ar.result.encode) : nil : nil) })),::VertxRedis::RedisClient)
+      end
+      raise ArgumentError, "Invalid arguments when calling cluster_slaves(nodeId)"
+    end
     #  Get array of Cluster slot to node mappings
     # @yield 
     # @return [::VertxRedis::RedisClient]
@@ -1781,6 +1991,17 @@ module VertxRedis
         return ::Vertx::Util::Utils.safe_create(@j_del.java_method(:unwatch, [Java::IoVertxCore::Handler.java_class]).call((Proc.new { |ar| yield(ar.failed ? ar.cause : nil, ar.succeeded ? ar.result : nil) })),::VertxRedis::RedisClient)
       end
       raise ArgumentError, "Invalid arguments when calling unwatch()"
+    end
+    #  Wait for the synchronous replication of all the write commands sent in the context of the current connection.
+    # @param [Fixnum] numSlaves 
+    # @param [Fixnum] timeout 
+    # @yield Handler for the result of this call.
+    # @return [::VertxRedis::RedisClient]
+    def wait(numSlaves=nil,timeout=nil)
+      if numSlaves.class == Fixnum && timeout.class == Fixnum && block_given?
+        return ::Vertx::Util::Utils.safe_create(@j_del.java_method(:wait, [Java::long.java_class,Java::long.java_class,Java::IoVertxCore::Handler.java_class]).call(numSlaves,timeout,(Proc.new { |ar| yield(ar.failed ? ar.cause : nil, ar.succeeded ? ar.result : nil) })),::VertxRedis::RedisClient)
+      end
+      raise ArgumentError, "Invalid arguments when calling wait(numSlaves,timeout)"
     end
     #  Watch the given keys to determine execution of the MULTI/EXEC block
     # @param [String] key Key to watch

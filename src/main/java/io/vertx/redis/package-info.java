@@ -11,7 +11,7 @@
  *
  * Redis has a rich API and it can be organized in the following groups:
  *
- * * Cluster - Commands related to cluster management, note that using most of these commands you will need a redis server with version &lt;=3.0.0
+ * * Cluster - Commands related to cluster management, note that using most of these commands you will need a redis server with version &gt;=3.0.0
  * * Connection - Commands that allow you to switch DBs, connect, disconnect and authenticate to a server.
  * * Hashes - Commands that allow operations on hashes.
  * * HyperLogLog - Commands to approximating the number of distinct elements in a multiset, a HyperLogLog.
@@ -24,6 +24,28 @@
  * * Sorted Sets - Commands to work with sorted sets.
  * * Strings - Commands to work with Strings.
  * * Transactions - Commands to handle transaction lifecycle.
+ *
+ * == Using Vert.x-Redis
+ *
+ * To use the Vert.x Redis client, add the following dependency to the _dependencies_ section of your build descriptor:
+ *
+ * * Maven (in your `pom.xml`):
+ *
+ * [source,xml,subs="+attributes"]
+ * ----
+ * <dependency>
+ *   <groupId>{maven-groupId}</groupId>
+ *   <artifactId>{maven-artifactId}</artifactId>
+ *   <version>{maven-version}</version>
+ * </dependency>
+ * ----
+ *
+ * * Gradle (in your `build.gradle` file):
+ *
+ * [source,groovy,subs="+attributes"]
+ * ----
+ * compile {maven-groupId}:{maven-artifactId}:{maven-version}
+ * ----
  *
  * == Connecting to Redis
  *
