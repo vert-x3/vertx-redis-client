@@ -39,7 +39,7 @@ public abstract class RedisClientTestBase extends VertxTestBase {
 
   private static String getProperty(String name) {
     String s = System.getProperty(name);
-    return (s != null && s.trim().length() > 0) ?  s : null;
+    return (s != null && s.trim().length() > 0) ? s : null;
   }
 
   protected RedisClient redis;
@@ -57,8 +57,8 @@ public abstract class RedisClientTestBase extends VertxTestBase {
 
   @AfterClass
   static public void stopRedis() throws Exception {
-    for(Map.Entry<Integer, RedisServer> entry: instances.entrySet()) {
-      if(entry != null){
+    for (Map.Entry<Integer, RedisServer> entry : instances.entrySet()) {
+      if (entry != null) {
         entry.getValue().stop();
       }
     }
@@ -67,14 +67,14 @@ public abstract class RedisClientTestBase extends VertxTestBase {
   public static void createRedisCount(final int count) throws Exception {
     Integer[] ports = new Integer[count];
     Integer basePort = DEFAULT_PORT;
-    for(int i = 0; i < count; i++) {
+    for (int i = 0; i < count; i++) {
       ports[i] = basePort++;
     }
     createRedisInstance(ports);
   }
 
   public static void createRedisInstance(final Integer... ports) throws Exception {
-    for(Integer port: ports) {
+    for (Integer port : ports) {
       System.out.println("Creating redis server on port: " + port);
       instances.put(port, new RedisServer(port));
       System.out.println("Created embedded redis server on port " + port);
@@ -110,13 +110,13 @@ public abstract class RedisClientTestBase extends VertxTestBase {
     return UUID.randomUUID().toString();
   }
 
-  private static Map<String, String> toMap(final String ... params) {
+  private static Map<String, String> toMap(final String... params) {
     if (params.length % 2 != 0) {
       throw new IllegalArgumentException("Last key has no value");
     }
     Map<String, String> result = new HashMap<>();
     String key = null;
-    for (String param: params) {
+    for (String param : params) {
       if (key == null) {
         key = param;
       } else {
@@ -127,7 +127,7 @@ public abstract class RedisClientTestBase extends VertxTestBase {
     return result;
   }
 
-  private static <T> List<T> toList(final T ... params) {
+  private static <T> List<T> toList(final T... params) {
     return Arrays.asList(params);
   }
 
@@ -165,26 +165,27 @@ public abstract class RedisClientTestBase extends VertxTestBase {
   public void testAuth() throws Exception {
 
     RedisServer server = RedisServer.builder().port(6381).setting("requirepass foobar").build();
-      server.start();
-      JsonObject job = new JsonObject().put("host", "localhost").put("port", 6381);
-      RedisClient rdx = RedisClient.create(vertx, job);
+    server.start();
+    JsonObject job = new JsonObject().put("host", "localhost").put("port", 6381);
+    RedisClient rdx = RedisClient.create(vertx, job);
 
-      rdx.auth("barfoo", reply -> {
-        assertFalse(reply.succeeded());
-        rdx.auth("foobar", reply2 -> {
-          assertTrue(reply2.succeeded());
-          try{
-            server.stop();            
-          }catch(Exception ignore){}
-          testComplete();
-        });
+    rdx.auth("barfoo", reply -> {
+      assertFalse(reply.succeeded());
+      rdx.auth("foobar", reply2 -> {
+        assertTrue(reply2.succeeded());
+        try {
+          server.stop();
+        } catch (Exception ignore) {
+        }
+        testComplete();
       });
-      await();    
+    });
+    await();
   }
 
   @Test
   public void testBgrewriteaof() {
-    redis.bgrewriteaof(reply ->{
+    redis.bgrewriteaof(reply -> {
       assertTrue(reply.succeeded());
       testComplete();
     });
@@ -194,7 +195,7 @@ public abstract class RedisClientTestBase extends VertxTestBase {
   @Test
   public void testBgsave() {
 
-    redis.bgsave(reply ->{
+    redis.bgsave(reply -> {
       assertTrue(reply.succeeded());
       assertEquals("Background saving started", reply.result());
       testComplete();
@@ -295,13 +296,13 @@ public abstract class RedisClientTestBase extends VertxTestBase {
   }
 
   @Test
-  public void testBrpoplpush() throws Exception{
+  public void testBrpoplpush() throws Exception {
 
-    redis.brpoplpush("list1", "list2", 100, result ->{
+    redis.brpoplpush("list1", "list2", 100, result -> {
 
-      if (result.succeeded()){
-        redis.lpop("list2", result2 ->{
-          if(result2.succeeded()){
+      if (result.succeeded()) {
+        redis.lpop("list2", result2 -> {
+          if (result2.succeeded()) {
             System.out.println(result2.result());
             assertTrue("hello".equals(result2.result()));
           }
@@ -329,10 +330,10 @@ public abstract class RedisClientTestBase extends VertxTestBase {
     redis.clientList(reply -> {
       assertTrue(reply.succeeded());
       String clients = reply.result();
-      String [] keyvals = clients.split("\\s");
+      String[] keyvals = clients.split("\\s");
       String addr = null;
-      for (String keyval: keyvals) {
-        String [] pair = keyval.split("=");
+      for (String keyval : keyvals) {
+        String[] pair = keyval.split("=");
         if ("addr".equals(pair[0])) {
           addr = pair[1];
           break;
@@ -359,7 +360,7 @@ public abstract class RedisClientTestBase extends VertxTestBase {
   }
 
   @Test
-  public void testClientSetAndGetName() throws Exception{
+  public void testClientSetAndGetName() throws Exception {
 
     redis.clientGetname(result -> {
       assertTrue(String.valueOf(result.cause()), result.succeeded());
@@ -392,10 +393,10 @@ public abstract class RedisClientTestBase extends VertxTestBase {
   @Test
   public void testConfigSetAndGet() {
 
-    redis.configSet("dbfilename", "redis.dump", reply ->{
-      if(reply.succeeded()){
+    redis.configSet("dbfilename", "redis.dump", reply -> {
+      if (reply.succeeded()) {
         redis.configGet("dbfilename", reply2 -> {
-          if(reply2.succeeded()){
+          if (reply2.succeeded()) {
             assertNotNull(reply2.result().getString(0));
             assertTrue(reply2.result().getString(1).equals("redis.dump"));
             testComplete();
@@ -410,14 +411,14 @@ public abstract class RedisClientTestBase extends VertxTestBase {
   @Test
   public void testConfigResetstat() {
 
-    redis.info(reply ->{
+    redis.info(reply -> {
       assertTrue(reply.succeeded());
       JsonObject result = reply.result().getJsonObject("stats");
       Integer conn = Integer.valueOf(result.getString("total_connections_received"));
       assertTrue(conn > 0);
       redis.configResetstat(reply2 -> {
         assertTrue(reply2.succeeded());
-        redis.info(reply3 ->{
+        redis.info(reply3 -> {
           assertTrue(reply3.succeeded());
           //Note, this may appear strange, but the embedded server handles stats differently
           //Many are not reset correctly. Here we just test the flow of the COMMANDS
@@ -432,14 +433,14 @@ public abstract class RedisClientTestBase extends VertxTestBase {
   @Test
   public void testDbsize() {
 
-    redis.dbsize(reply-> {
+    redis.dbsize(reply -> {
       assertTrue(reply.succeeded());
       Long size = reply.result();
-      redis.set("new", "value", reply2 ->{
+      redis.set("new", "value", reply2 -> {
         assertTrue(reply2.succeeded());
-        redis.dbsize(reply3 ->{
+        redis.dbsize(reply3 -> {
           assertTrue(reply3.succeeded());
-          assert(reply3.result() == size + 1);
+          assertEquals(Long.valueOf(size + 1l), reply3.result());
           testComplete();
         });
       });
@@ -460,17 +461,16 @@ public abstract class RedisClientTestBase extends VertxTestBase {
     JsonObject job = new JsonObject().put("host", "localhost").put("port", 6381);
     RedisClient rdx = RedisClient.create(vertx, job);
 
-    rdx.debugSegfault(reply ->{
-      assertTrue(reply.succeeded());
-      rdx.info(reply2 ->{
+    rdx.debugSegfault(reply -> {
+      // this should fail, since we crashed the server on purpose
+      assertTrue(reply.failed());
+      rdx.info(reply2 -> {
         assertFalse(reply2.succeeded());
-        try{
-          server.stop();          
-        }catch(Exception ignore){}
+        server.stop();
         testComplete();
       });
     });
-
+    await();
   }
 
   @Test
@@ -525,17 +525,17 @@ public abstract class RedisClientTestBase extends VertxTestBase {
 
   @Test
   public void testDiscard() {
-    
-    String key = makeKey();    
-    redis.set(key, "0", reply ->{
+
+    String key = makeKey();
+    redis.set(key, "0", reply -> {
       assertTrue(reply.succeeded());
-      redis.multi(reply2 ->{
+      redis.multi(reply2 -> {
         assertTrue(reply2.succeeded());
-        redis.incr(key, reply3 ->{
+        redis.incr(key, reply3 -> {
           assertTrue(reply3.succeeded());
-          redis.discard(reply4 ->{
+          redis.discard(reply4 -> {
             assertTrue(reply4.succeeded());
-            redis.get(key, reply5 ->{
+            redis.get(key, reply5 -> {
               assertTrue(reply5.succeeded());
               assertTrue(Integer.valueOf(reply5.result()) == 0);
               testComplete();
@@ -596,12 +596,12 @@ public abstract class RedisClientTestBase extends VertxTestBase {
     final String key1 = makeKey();
     final String key2 = makeKey();
     redis.eval("return {KEYS[1],KEYS[2],ARGV[1],ARGV[2]}", toList(key1, key2), toList("first", "second"),
-      reply -> {
-        assertTrue(reply.succeeded());
-        Object r = reply.result();
-        assertNotNull(r);
-        testComplete();
-      });
+        reply -> {
+          assertTrue(reply.succeeded());
+          Object r = reply.result();
+          assertNotNull(r);
+          testComplete();
+        });
     await();
   }
 
@@ -630,10 +630,10 @@ public abstract class RedisClientTestBase extends VertxTestBase {
   @Test
   public void testEvalsha() {
     String inline = "return 1";
-    redis.scriptLoad(inline, reply->{
+    redis.scriptLoad(inline, reply -> {
       assertTrue(reply.succeeded());
       assertNotNull(reply.result());
-      redis.evalsha(reply.result(), Collections.emptyList(), Collections.emptyList(), reply2 ->{
+      redis.evalsha(reply.result(), Collections.emptyList(), Collections.emptyList(), reply2 -> {
         assertTrue(reply2.succeeded());
         testComplete();
       });
@@ -1569,24 +1569,25 @@ public abstract class RedisClientTestBase extends VertxTestBase {
     RedisClient rdx = RedisClient.create(vertx, job);
 
     String key = makeKey();
-    redis.set(key, "migrate", reply ->{
+    redis.set(key, "migrate", reply -> {
       assertTrue(reply.succeeded());
-      redis.migrate("localhost", 6382, key, 0, 20000, MigrateOptions.NONE, reply2 ->{
+      redis.migrate("localhost", 6382, key, 0, 20000, MigrateOptions.NONE, reply2 -> {
         assertTrue(String.valueOf(reply2.cause()), reply2.succeeded());
-        rdx.get(key, reply3 ->{
+        rdx.get(key, reply3 -> {
           assertTrue(reply3.succeeded());
           assertTrue("migrate".equals(reply3.result()));
-          try{
-            server.stop();            
-          }catch(Exception ignore){}          
+          try {
+            server.stop();
+          } catch (Exception ignore) {
+          }
+          rdx.close(reply4 -> {
+            assertTrue(reply4.succeeded());
+          });
           testComplete();
         });
       });
     });
     await();
-    rdx.close(reply -> {
-      assertTrue(reply.succeeded());
-    });
   }
 
   @Test
@@ -1676,7 +1677,7 @@ public abstract class RedisClientTestBase extends VertxTestBase {
         });
       });
     });
-    
+
 
     await();
   }
@@ -1685,7 +1686,7 @@ public abstract class RedisClientTestBase extends VertxTestBase {
   public void testObject() {
 
     String mykey = makeKey();
-    redis.set(mykey, "test", reply ->{
+    redis.set(mykey, "test", reply -> {
       assertTrue(reply.succeeded());
       redis.object(mykey, ObjectCmd.REFCOUNT, reply2 -> {
         assertTrue(reply2.succeeded());
@@ -1728,7 +1729,7 @@ public abstract class RedisClientTestBase extends VertxTestBase {
   }
 
   @Test
-  public void testPexpire() {    
+  public void testPexpire() {
     final String mykey = makeKey();
     redis.set(mykey, "Hello", reply0 -> {
       assertTrue(reply0.succeeded());
@@ -1796,7 +1797,7 @@ public abstract class RedisClientTestBase extends VertxTestBase {
   @Test
   public void testPubSubChannels() {
 
-    redis.subscribe(toList("rustic"), sub -> {
+    redis.subscribe("rustic", sub -> {
 
     });
   }
@@ -1805,7 +1806,7 @@ public abstract class RedisClientTestBase extends VertxTestBase {
   @Ignore
   public void testPubSubNumsub() {
     // TODO
-    redis.subscribe(toList("rustic"), sub->{
+    redis.subscribe("rustic", sub -> {
 
     });
   }
@@ -1814,7 +1815,7 @@ public abstract class RedisClientTestBase extends VertxTestBase {
   @Ignore
   public void testPubSubNumpat() {
     // TODO
-    redis.subscribe(toList("rustic"), sub -> {
+    redis.subscribe("rustic", sub -> {
 
     });
   }
@@ -1853,7 +1854,7 @@ public abstract class RedisClientTestBase extends VertxTestBase {
         assertTrue(reply2.result() == 0);
         testComplete();
       });
-    });  
+    });
     await();
   }
 
@@ -1866,10 +1867,10 @@ public abstract class RedisClientTestBase extends VertxTestBase {
   @Test
   public void testRandomkey() {
 
-    redis.set("foo", "bar", reply->{
-      if(reply.succeeded()){
-        redis.randomkey(reply2->{
-          if(reply2.succeeded()){
+    redis.set("foo", "bar", reply -> {
+      if (reply.succeeded()) {
+        redis.randomkey(reply2 -> {
+          if (reply2.succeeded()) {
             assertNotNull(reply2.result());
             testComplete();
           }
@@ -1925,7 +1926,7 @@ public abstract class RedisClientTestBase extends VertxTestBase {
   public void testRestore() {
     final String mykey = makeKey();
     final String myotherkey = makeKey();
-    final String value = new String(new char[] {0xff, 0xf0, 0x00, 'A', 'B', 'C'});
+    final String value = new String(new char[]{0xff, 0xf0, 0x00, 'A', 'B', 'C'});
     redis.setBinary(mykey, value, reply0 -> {
       assertTrue(reply0.succeeded());
       redis.dump(mykey, reply1 -> {
@@ -1977,29 +1978,29 @@ public abstract class RedisClientTestBase extends VertxTestBase {
     final String mykey = makeKey();
     final String myotherkey = makeKey();
     redis.rpush(mykey, "one", reply0 -> {
-        assertTrue(reply0.succeeded());
-        assertEquals(1, reply0.result().longValue());
-        redis.rpush(mykey, "two", reply1 -> {
-          assertTrue(reply1.succeeded());
-          assertEquals(2, reply1.result().longValue());
-          redis.rpush(mykey, "three", reply2 -> {
-            assertTrue(reply2.succeeded());
-            assertEquals(3, reply2.result().longValue());
-            redis.rpoplpush(mykey, myotherkey, reply3 -> {
-              assertTrue(reply3.succeeded());
-              assertEquals("three", reply3.result());
-              redis.lrange(mykey, 0, -1, reply5 -> {
-                assertTrue(reply5.succeeded());
-                assertArrayEquals(toArray("one", "two"), reply5.result().getList().toArray());
-                redis.lrange(myotherkey, 0, -1, reply6 -> {
-                  assertArrayEquals(toArray("three"), reply6.result().getList().toArray());
-                  testComplete();
+          assertTrue(reply0.succeeded());
+          assertEquals(1, reply0.result().longValue());
+          redis.rpush(mykey, "two", reply1 -> {
+            assertTrue(reply1.succeeded());
+            assertEquals(2, reply1.result().longValue());
+            redis.rpush(mykey, "three", reply2 -> {
+              assertTrue(reply2.succeeded());
+              assertEquals(3, reply2.result().longValue());
+              redis.rpoplpush(mykey, myotherkey, reply3 -> {
+                assertTrue(reply3.succeeded());
+                assertEquals("three", reply3.result());
+                redis.lrange(mykey, 0, -1, reply5 -> {
+                  assertTrue(reply5.succeeded());
+                  assertArrayEquals(toArray("one", "two"), reply5.result().getList().toArray());
+                  redis.lrange(myotherkey, 0, -1, reply6 -> {
+                    assertArrayEquals(toArray("three"), reply6.result().getList().toArray());
+                    testComplete();
+                  });
                 });
               });
             });
           });
-        });
-      }
+        }
 
     );
 
@@ -2144,7 +2145,7 @@ public abstract class RedisClientTestBase extends VertxTestBase {
   public void testScriptkill() throws Exception {
 
     String inline = "while true do end";
-    redis.eval(inline, Collections.emptyList(), Collections.emptyList(), reply ->{
+    redis.eval(inline, Collections.emptyList(), Collections.emptyList(), reply -> {
       //server should be locked at this point
     });
 
@@ -2255,7 +2256,7 @@ public abstract class RedisClientTestBase extends VertxTestBase {
 
   @Test
   public void testSet() {
-    final String mykey = makeKey();        
+    final String mykey = makeKey();
     redis.set(mykey, "Hello", reply0 -> {
       assertTrue(reply0.succeeded());
       redis.get(mykey, reply1 -> {
@@ -2556,18 +2557,18 @@ public abstract class RedisClientTestBase extends VertxTestBase {
 
   @Test
   public void testSrandmember() {
-    //        final String mykey = makeKey();
-    //        redis.sadd(toJsonArray(mykey, "one", "two", "three"), reply0 -> {
-    //            assertTrue(reply0.succeeded());
-    //            assertEquals(3, reply0.result().longValue());
-    //            redis.srandmember(toJsonArray(mykey), reply1 -> {
-    //                assertTrue(reply1.succeeded());
-    //                String randmember = reply1.result().getString(1);
-    //                assertTrue(randmember.equals("one") || randmember.equals("two") || randmember.equals("three"));
-    //                testComplete();
-    //            });
-    //        });
-    //        await();
+    final String mykey = makeKey();
+    redis.saddMany(mykey, toList("one", "two", "three"), reply0 -> {
+      assertTrue(reply0.succeeded());
+      assertEquals(3, reply0.result().longValue());
+      redis.srandmember(mykey, reply1 -> {
+        assertTrue(reply1.succeeded());
+        String randmember = reply1.result();
+        assertTrue(randmember.equals("one") || randmember.equals("two") || randmember.equals("three"));
+        testComplete();
+      });
+    });
+    await();
   }
 
   @Test
@@ -2607,11 +2608,11 @@ public abstract class RedisClientTestBase extends VertxTestBase {
     await();
   }
 
-  @Test  
+  @Test
   public void testSubscribe() {
-    
+
     String key = makeKey();
-    redis.subscribe(toList(key), reply -> {
+    redis.subscribe(key, reply -> {
       assertTrue(reply.succeeded());
       redis.unsubscribe(toList(key), reply2 -> {
         assertTrue(reply2.succeeded());
@@ -2705,9 +2706,13 @@ public abstract class RedisClientTestBase extends VertxTestBase {
   }
 
   @Test
-  @Ignore
   public void testSync() {
-    // TODO
+    redis.sync(v -> {
+      assertTrue(v.succeeded());
+      testComplete();
+
+    });
+    await();
   }
 
   @Test
@@ -2774,7 +2779,7 @@ public abstract class RedisClientTestBase extends VertxTestBase {
   @Test
   public void testUnsubscribe() {
     String key = makeKey();
-    redis.subscribe(toList(key), reply -> {
+    redis.subscribe(key, reply -> {
       assertTrue(reply.succeeded());
       redis.unsubscribe(toList(key), reply2 -> {
         assertTrue(reply2.succeeded());
@@ -2791,55 +2796,46 @@ public abstract class RedisClientTestBase extends VertxTestBase {
   }
 
   @Test
-  @Ignore
   public void testWatch() throws Exception {
-    // TODO
     String key = makeKey();
-    
+
     RedisClient rdx = RedisClient.create(vertx, getConfig());
 
-    CountDownLatch clientLatch = new CountDownLatch(1);
-    
-    redis.set(key, "0", reply ->{
+    redis.set(key, "0", reply -> {
       assertTrue(reply.succeeded());
-      redis.watch(toList(key), reply2 ->{
+      redis.watch(key, reply2 -> {
         assertTrue(reply2.succeeded());
-        redis.multi(reply3 ->{
+
+        redis.multi(reply3 -> {
           assertTrue(reply3.succeeded());
-          redis.incr(key, reply4 ->{
+          redis.incr(key, reply4 -> {
             assertTrue(reply4.succeeded());
-              try {
-                clientLatch.wait();                
-              }catch(Exception e){}
-              redis.incr(key, reply5 ->{
+
+            rdx.incr(key, reply1 -> {
+              assertTrue(reply1.succeeded());
+              assertEquals(Long.valueOf(1l), reply1.result());
+
+              redis.incr(key, reply5 -> {
                 assertTrue(reply5.succeeded());
-              });  
-              redis.incrby(key, 10, reply6 ->{
-                assertTrue(reply6.succeeded());
-              });
-              redis.exec(reply7 ->{
-                /**
-                 * Note, this should really fail as we have watched a key and modified
-                 * it outside of the multi protocol. However, it does not appear to be 
-                 * showing this
-                 */
-                assertFalse(reply7.succeeded());
-                redis.get(key, reply8 ->{
-                  assertTrue(reply8.succeeded());
-                  assertTrue(Integer.valueOf(reply8.result()) == 1);
-                  testComplete();
+                redis.incrby(key, 10, reply6 -> {
+                  assertTrue(reply6.succeeded());
+                  redis.exec(reply7 -> {
+                    assertTrue(reply7.succeeded());
+                    assertNull(reply7.result());
+                    redis.get(key, reply8 -> {
+                      assertTrue(reply8.succeeded());
+                      assertEquals("1", reply8.result());
+                      testComplete();
+                    });
+                  });
                 });
               });
             });
           });
         });
       });
-    
-    rdx.incr(key, reply ->{
-      assertTrue(reply.succeeded());
-      clientLatch.countDown();
     });
-        
+
     await();
   }
 
@@ -3021,7 +3017,7 @@ public abstract class RedisClientTestBase extends VertxTestBase {
   @Test
   public void testZrangebyscoreWithLimits() {
     RangeLimitOptions options = new RangeLimitOptions();
-    options.setLimit(0,1);
+    options.setLimit(0, 1);
     redis.zrangebyscore("yourkey", "-inf", "+inf", options, result -> {
       // whatever
       assertTrue(result.succeeded());
@@ -3239,7 +3235,7 @@ public abstract class RedisClientTestBase extends VertxTestBase {
   @Category(RedisPost28Tests.class)
   public void testBitpos() {
     final String key = makeKey();
-    final byte[] value = new byte[] {(byte) 0xff, (byte) 0xf0, (byte) 0x00};
+    final byte[] value = new byte[]{(byte) 0xff, (byte) 0xf0, (byte) 0x00};
     Charset charset = Charset.forName("iso-8859-1");
     redis.setBinary(key, new String(value, charset), reply0 -> {
       assertTrue(reply0.succeeded());
@@ -3266,7 +3262,7 @@ public abstract class RedisClientTestBase extends VertxTestBase {
   @Category(RedisPost28Tests.class)
   public void testBitposFrom() {
     final String key = makeKey();
-    final byte[] value = new byte[] {(byte) 0x00, (byte) 0xff, (byte) 0xf0};
+    final byte[] value = new byte[]{(byte) 0x00, (byte) 0xff, (byte) 0xf0};
     Charset charset = Charset.forName("iso-8859-1");
     redis.setBinary(key, new String(value, charset), reply0 -> {
       assertTrue(reply0.succeeded());
@@ -3288,7 +3284,7 @@ public abstract class RedisClientTestBase extends VertxTestBase {
   public void testBinarySetAndGet() {
     final String key = makeKey();
     final byte[] value = new byte[256];
-    for (int i=0; i < value.length; i++) {
+    for (int i = 0; i < value.length; i++) {
       value[i] = (byte) i;
     }
     Charset charset = Charset.forName("iso-8859-1");

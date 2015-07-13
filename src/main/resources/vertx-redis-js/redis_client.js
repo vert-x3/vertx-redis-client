@@ -387,7 +387,7 @@ var RedisClient = function(j_val) {
     if (__args.length === 4 && typeof __args[0] === 'string' && typeof __args[1] === 'string' && typeof __args[2] ==='number' && typeof __args[3] === 'function') {
       return utils.convReturnVertxGen(j_redisClient["brpoplpush(java.lang.String,java.lang.String,int,io.vertx.core.Handler)"](key, destkey, seconds, function(ar) {
       if (ar.succeeded()) {
-        handler(null, null);
+        handler(ar.result(), null);
       } else {
         handler(null, ar.cause());
       }
@@ -2714,7 +2714,7 @@ var RedisClient = function(j_val) {
     if (__args.length === 2 && typeof __args[0] === 'string' && typeof __args[1] === 'function') {
       return utils.convReturnVertxGen(j_redisClient["psubscribe(java.lang.String,io.vertx.core.Handler)"](pattern, function(ar) {
       if (ar.succeeded()) {
-        handler(null, null);
+        handler(utils.convReturnJson(ar.result()), null);
       } else {
         handler(null, ar.cause());
       }
@@ -2735,7 +2735,7 @@ var RedisClient = function(j_val) {
     if (__args.length === 2 && typeof __args[0] === 'object' && __args[0] instanceof Array && typeof __args[1] === 'function') {
       return utils.convReturnVertxGen(j_redisClient["psubscribeMany(java.util.List,io.vertx.core.Handler)"](patterns, function(ar) {
       if (ar.succeeded()) {
-        handler(null, null);
+        handler(utils.convReturnJson(ar.result()), null);
       } else {
         handler(null, ar.cause());
       }
@@ -3779,14 +3779,35 @@ var RedisClient = function(j_val) {
 
    @public
    @param key {string} Key string 
+   @param handler {function} Handler for the result of this call. 
+   @return {RedisClient}
+   */
+  this.srandmember = function(key, handler) {
+    var __args = arguments;
+    if (__args.length === 2 && typeof __args[0] === 'string' && typeof __args[1] === 'function') {
+      return utils.convReturnVertxGen(j_redisClient["srandmember(java.lang.String,io.vertx.core.Handler)"](key, function(ar) {
+      if (ar.succeeded()) {
+        handler(ar.result(), null);
+      } else {
+        handler(null, ar.cause());
+      }
+    }), RedisClient);
+    } else utils.invalidArgs();
+  };
+
+  /**
+   Get one or multiple random members from a set
+
+   @public
+   @param key {string} Key string 
    @param count {number} Number of members to get 
    @param handler {function} Handler for the result of this call. 
    @return {RedisClient}
    */
-  this.srandmember = function(key, count, handler) {
+  this.srandmemberCount = function(key, count, handler) {
     var __args = arguments;
     if (__args.length === 3 && typeof __args[0] === 'string' && typeof __args[1] ==='number' && typeof __args[2] === 'function') {
-      return utils.convReturnVertxGen(j_redisClient["srandmember(java.lang.String,int,io.vertx.core.Handler)"](key, count, function(ar) {
+      return utils.convReturnVertxGen(j_redisClient["srandmemberCount(java.lang.String,int,io.vertx.core.Handler)"](key, count, function(ar) {
       if (ar.succeeded()) {
         handler(utils.convReturnJson(ar.result()), null);
       } else {
@@ -3865,16 +3886,37 @@ var RedisClient = function(j_val) {
    Listen for messages published to the given channels
 
    @public
+   @param channel {string} Channel to subscribe to 
+   @param handler {function} Handler for the result of this call. 
+   @return {RedisClient}
+   */
+  this.subscribe = function(channel, handler) {
+    var __args = arguments;
+    if (__args.length === 2 && typeof __args[0] === 'string' && typeof __args[1] === 'function') {
+      return utils.convReturnVertxGen(j_redisClient["subscribe(java.lang.String,io.vertx.core.Handler)"](channel, function(ar) {
+      if (ar.succeeded()) {
+        handler(utils.convReturnJson(ar.result()), null);
+      } else {
+        handler(null, ar.cause());
+      }
+    }), RedisClient);
+    } else utils.invalidArgs();
+  };
+
+  /**
+   Listen for messages published to the given channels
+
+   @public
    @param channels {Array.<string>} List of channels to subscribe to 
    @param handler {function} Handler for the result of this call. 
    @return {RedisClient}
    */
-  this.subscribe = function(channels, handler) {
+  this.subscribeMany = function(channels, handler) {
     var __args = arguments;
     if (__args.length === 2 && typeof __args[0] === 'object' && __args[0] instanceof Array && typeof __args[1] === 'function') {
-      return utils.convReturnVertxGen(j_redisClient["subscribe(java.util.List,io.vertx.core.Handler)"](channels, function(ar) {
+      return utils.convReturnVertxGen(j_redisClient["subscribeMany(java.util.List,io.vertx.core.Handler)"](channels, function(ar) {
       if (ar.succeeded()) {
-        handler(null, null);
+        handler(utils.convReturnJson(ar.result()), null);
       } else {
         handler(null, ar.cause());
       }
@@ -4074,14 +4116,35 @@ var RedisClient = function(j_val) {
    Watch the given keys to determine execution of the MULTI/EXEC block
 
    @public
+   @param key {string} Key to watch 
+   @param handler {function} Handler for the result of this call. 
+   @return {RedisClient}
+   */
+  this.watch = function(key, handler) {
+    var __args = arguments;
+    if (__args.length === 2 && typeof __args[0] === 'string' && typeof __args[1] === 'function') {
+      return utils.convReturnVertxGen(j_redisClient["watch(java.lang.String,io.vertx.core.Handler)"](key, function(ar) {
+      if (ar.succeeded()) {
+        handler(ar.result(), null);
+      } else {
+        handler(null, ar.cause());
+      }
+    }), RedisClient);
+    } else utils.invalidArgs();
+  };
+
+  /**
+   Watch the given keys to determine execution of the MULTI/EXEC block
+
+   @public
    @param keys {Array.<string>} List of keys to watch 
    @param handler {function} Handler for the result of this call. 
    @return {RedisClient}
    */
-  this.watch = function(keys, handler) {
+  this.watchMany = function(keys, handler) {
     var __args = arguments;
     if (__args.length === 2 && typeof __args[0] === 'object' && __args[0] instanceof Array && typeof __args[1] === 'function') {
-      return utils.convReturnVertxGen(j_redisClient["watch(java.util.List,io.vertx.core.Handler)"](keys, function(ar) {
+      return utils.convReturnVertxGen(j_redisClient["watchMany(java.util.List,io.vertx.core.Handler)"](keys, function(ar) {
       if (ar.succeeded()) {
         handler(ar.result(), null);
       } else {

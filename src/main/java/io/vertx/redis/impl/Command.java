@@ -3,9 +3,11 @@ package io.vertx.redis.impl;
 import io.vertx.core.AsyncResult;
 import io.vertx.core.Context;
 import io.vertx.core.Handler;
+import io.vertx.core.Vertx;
 import io.vertx.core.buffer.Buffer;
 import io.vertx.core.json.JsonArray;
 import io.vertx.core.streams.WriteStream;
+import io.vertx.redis.RedisCommand;
 
 import java.nio.charset.Charset;
 
@@ -60,13 +62,19 @@ public class Command<T> {
 
   private final Context context;
   private final Buffer buffer;
+  private final ResponseTransform transform;
+  private final String encoding;
+  private final Class<T> returnType;
+
   private int expectedReplies = 1;
-  private Handler<Reply> handler;
-  private Handler<AsyncResult<T>> userHandler;
+  private Handler<AsyncResult<T>> handler;
 
-  public Command(Context context, String command, final JsonArray args, Charset encoding) {
+  public Command(RedisCommand command, final JsonArray args, Charset encoding, ResponseTransform transform, Class<T> returnType) {
+    this.context = Vertx.currentContext();
+    this.encoding = encoding.name();
 
-    this.context = context;
+    this.transform = transform;
+    this.returnType = returnType;
 
     int totalArgs;
     if (args == null) {
@@ -75,27 +83,17 @@ public class Command<T> {
       totalArgs = args.size();
     }
 
-    int spc = command.indexOf(' '); // there are commands which are multi word
-    String extraCommand = null;
-
-    if (spc != -1) {
-      extraCommand = command.substring(spc + 1);
-      command = command.substring(0, spc);
-    }
+    String[] commandTokens = command.getTokens();
 
     // serialize the request
     buffer = Buffer.buffer();
     buffer.appendByte(ARGS_PREFIX);
-    if (extraCommand == null) {
-      buffer.appendBytes(numToBytes(totalArgs + 1));
-    } else {
-      buffer.appendBytes(numToBytes(totalArgs + 2));
-    }
+    buffer.appendBytes(numToBytes(totalArgs + commandTokens.length));
     buffer.appendBytes(CRLF);
+
     // serialize the command
-    appendToBuffer(command.getBytes(encoding), encoding, buffer);
-    if (extraCommand != null) {
-      appendToBuffer(extraCommand.getBytes(encoding), encoding, buffer);
+    for (String token : commandTokens) {
+      appendToBuffer(token.getBytes(encoding), encoding, buffer);
     }
 
     // serialize arguments
@@ -104,39 +102,50 @@ public class Command<T> {
     }
   }
 
+  // setters
+
   public Command<T> setExpectedReplies(int expectedReplies) {
     this.expectedReplies = expectedReplies;
     return this;
   }
 
-  public Command<T> setHandler(Handler<Reply> handler) {
+  public Command<T> handler(Handler<AsyncResult<T>> handler) {
     this.handler = handler;
     return this;
   }
 
-  public Command setUserHandler(Handler<AsyncResult<T>> handler) {
-    this.userHandler = handler;
-    return this;
-  }
-
-  public Handler<AsyncResult<T>> getUserHandler() {
-    return userHandler;
-  }
-
-  public Context getContext() {
-    return context;
-  }
-
-  public void writeTo(WriteStream<Buffer> writeStream) {
-    writeStream.write(buffer);
-  }
+  // getters
 
   public int getExpectedReplies() {
     return expectedReplies;
   }
 
-  public Handler<Reply> getHandler() {
-    return handler;
+  public ResponseTransform responseTransform() {
+    return transform;
+  }
+
+  public String encoding() {
+    return encoding;
+  }
+
+  public Class<T> returnType() {
+    return returnType;
+  }
+
+  // methods
+
+  public void handle(AsyncResult<T> asyncResult) {
+    if (handler != null) {
+      if (context != null) {
+        context.runOnContext(v -> handler.handle(asyncResult));
+      } else {
+        handler.handle(asyncResult);
+      }
+    }
+  }
+
+  public void writeTo(WriteStream<Buffer> writeStream) {
+    writeStream.write(buffer);
   }
 
   private void appendToBuffer(final Object value, final Charset encoding, final Buffer buffer) {
@@ -174,6 +183,4 @@ public class Command<T> {
       buffer.appendBytes(CRLF);
     }
   }
-
-
 }

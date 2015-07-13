@@ -1,19 +1,48 @@
 package io.vertx.redis.impl;
 
+import io.vertx.core.Context;
+import io.vertx.core.Vertx;
+import io.vertx.core.logging.Logger;
+import io.vertx.core.logging.LoggerFactory;
+
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 public class RedisSubscriptions {
 
-  private final Map<String, MessageHandler> channelSubscribers = new ConcurrentHashMap<>();
-  private final Map<String, MessageHandler> patternSubscribers = new ConcurrentHashMap<>();
+  private static final Logger log = LoggerFactory.getLogger(RedisSubscriptions.class);
+
+  private class Subscription {
+    final Context context;
+    final MessageHandler handler;
+
+    Subscription(MessageHandler handler) {
+      context = vertx.getOrCreateContext();
+      this.handler = handler;
+    }
+
+    void handle(String channelOrPattern, Reply[] replyData) {
+      context.runOnContext(v -> {
+        handler.handle(channelOrPattern, replyData);
+      });
+    }
+  }
+
+  private final Vertx vertx;
+
+  private final Map<String, Subscription> channelSubscribers = new ConcurrentHashMap<>();
+  private final Map<String, Subscription> patternSubscribers = new ConcurrentHashMap<>();
+
+  public RedisSubscriptions(Vertx vertx) {
+    this.vertx = vertx;
+  }
 
   public void registerChannelSubscribeHandler(String channel, MessageHandler messageHandler) {
-    channelSubscribers.put(channel, messageHandler);
+    channelSubscribers.put(channel, new Subscription(messageHandler));
   }
 
   public void registerPatternSubscribeHandler(String pattern, MessageHandler messageHandler) {
-    patternSubscribers.put(pattern, messageHandler);
+    patternSubscribers.put(pattern, new Subscription(messageHandler));
   }
 
   public void unregisterChannelSubscribeHandler(String channel) {
@@ -32,12 +61,22 @@ public class RedisSubscriptions {
     }
   }
 
-  public MessageHandler getChannelHandler(String channel) {
-    return channelSubscribers.get(channel);
+  public void handleChannel(String channel, Reply[] replyData) {
+    Subscription s = channelSubscribers.get(channel);
+    if (s != null) {
+      s.handle(channel, replyData);
+    } else {
+      log.warn("No pub/sub handler waiting for message");
+    }
   }
 
-  public MessageHandler getPatternHandler(String pattern) {
-    return patternSubscribers.get(pattern);
+  public void handlePattern(String pattern, Reply[] replyData) {
+    Subscription s = patternSubscribers.get(pattern);
+    if (s != null) {
+      s.handle(pattern, replyData);
+    } else {
+      log.warn("No pub/sub handler waiting for message");
+    }
   }
 
   public int channelSize() {

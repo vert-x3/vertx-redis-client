@@ -196,7 +196,7 @@ module VertxRedis
     # @return [::VertxRedis::RedisClient]
     def brpoplpush(key=nil,destkey=nil,seconds=nil)
       if key.class == String && destkey.class == String && seconds.class == Fixnum && block_given?
-        return ::Vertx::Util::Utils.safe_create(@j_del.java_method(:brpoplpush, [Java::java.lang.String.java_class,Java::java.lang.String.java_class,Java::int.java_class,Java::IoVertxCore::Handler.java_class]).call(key,destkey,seconds,(Proc.new { |ar| yield(ar.failed ? ar.cause : nil) })),::VertxRedis::RedisClient)
+        return ::Vertx::Util::Utils.safe_create(@j_del.java_method(:brpoplpush, [Java::java.lang.String.java_class,Java::java.lang.String.java_class,Java::int.java_class,Java::IoVertxCore::Handler.java_class]).call(key,destkey,seconds,(Proc.new { |ar| yield(ar.failed ? ar.cause : nil, ar.succeeded ? ar.result : nil) })),::VertxRedis::RedisClient)
       end
       raise ArgumentError, "Invalid arguments when calling brpoplpush(key,destkey,seconds)"
     end
@@ -1324,7 +1324,7 @@ module VertxRedis
     # @return [::VertxRedis::RedisClient]
     def psubscribe(pattern=nil)
       if pattern.class == String && block_given?
-        return ::Vertx::Util::Utils.safe_create(@j_del.java_method(:psubscribe, [Java::java.lang.String.java_class,Java::IoVertxCore::Handler.java_class]).call(pattern,(Proc.new { |ar| yield(ar.failed ? ar.cause : nil) })),::VertxRedis::RedisClient)
+        return ::Vertx::Util::Utils.safe_create(@j_del.java_method(:psubscribe, [Java::java.lang.String.java_class,Java::IoVertxCore::Handler.java_class]).call(pattern,(Proc.new { |ar| yield(ar.failed ? ar.cause : nil, ar.succeeded ? ar.result != nil ? JSON.parse(ar.result.encode) : nil : nil) })),::VertxRedis::RedisClient)
       end
       raise ArgumentError, "Invalid arguments when calling psubscribe(pattern)"
     end
@@ -1334,7 +1334,7 @@ module VertxRedis
     # @return [::VertxRedis::RedisClient]
     def psubscribe_many(patterns=nil)
       if patterns.class == Array && block_given?
-        return ::Vertx::Util::Utils.safe_create(@j_del.java_method(:psubscribeMany, [Java::JavaUtil::List.java_class,Java::IoVertxCore::Handler.java_class]).call(patterns.map { |element| element },(Proc.new { |ar| yield(ar.failed ? ar.cause : nil) })),::VertxRedis::RedisClient)
+        return ::Vertx::Util::Utils.safe_create(@j_del.java_method(:psubscribeMany, [Java::JavaUtil::List.java_class,Java::IoVertxCore::Handler.java_class]).call(patterns.map { |element| element },(Proc.new { |ar| yield(ar.failed ? ar.cause : nil, ar.succeeded ? ar.result != nil ? JSON.parse(ar.result.encode) : nil : nil) })),::VertxRedis::RedisClient)
       end
       raise ArgumentError, "Invalid arguments when calling psubscribe_many(patterns)"
     end
@@ -1843,14 +1843,24 @@ module VertxRedis
     end
     #  Get one or multiple random members from a set
     # @param [String] key Key string
+    # @yield Handler for the result of this call.
+    # @return [::VertxRedis::RedisClient]
+    def srandmember(key=nil)
+      if key.class == String && block_given?
+        return ::Vertx::Util::Utils.safe_create(@j_del.java_method(:srandmember, [Java::java.lang.String.java_class,Java::IoVertxCore::Handler.java_class]).call(key,(Proc.new { |ar| yield(ar.failed ? ar.cause : nil, ar.succeeded ? ar.result : nil) })),::VertxRedis::RedisClient)
+      end
+      raise ArgumentError, "Invalid arguments when calling srandmember(key)"
+    end
+    #  Get one or multiple random members from a set
+    # @param [String] key Key string
     # @param [Fixnum] count Number of members to get
     # @yield Handler for the result of this call.
     # @return [::VertxRedis::RedisClient]
-    def srandmember(key=nil,count=nil)
+    def srandmember_count(key=nil,count=nil)
       if key.class == String && count.class == Fixnum && block_given?
-        return ::Vertx::Util::Utils.safe_create(@j_del.java_method(:srandmember, [Java::java.lang.String.java_class,Java::int.java_class,Java::IoVertxCore::Handler.java_class]).call(key,count,(Proc.new { |ar| yield(ar.failed ? ar.cause : nil, ar.succeeded ? ar.result != nil ? JSON.parse(ar.result.encode) : nil : nil) })),::VertxRedis::RedisClient)
+        return ::Vertx::Util::Utils.safe_create(@j_del.java_method(:srandmemberCount, [Java::java.lang.String.java_class,Java::int.java_class,Java::IoVertxCore::Handler.java_class]).call(key,count,(Proc.new { |ar| yield(ar.failed ? ar.cause : nil, ar.succeeded ? ar.result != nil ? JSON.parse(ar.result.encode) : nil : nil) })),::VertxRedis::RedisClient)
       end
-      raise ArgumentError, "Invalid arguments when calling srandmember(key,count)"
+      raise ArgumentError, "Invalid arguments when calling srandmember_count(key,count)"
     end
     #  Remove one member from a set
     # @param [String] key Key string
@@ -1885,14 +1895,24 @@ module VertxRedis
       raise ArgumentError, "Invalid arguments when calling strlen(key)"
     end
     #  Listen for messages published to the given channels
+    # @param [String] channel Channel to subscribe to
+    # @yield Handler for the result of this call.
+    # @return [::VertxRedis::RedisClient]
+    def subscribe(channel=nil)
+      if channel.class == String && block_given?
+        return ::Vertx::Util::Utils.safe_create(@j_del.java_method(:subscribe, [Java::java.lang.String.java_class,Java::IoVertxCore::Handler.java_class]).call(channel,(Proc.new { |ar| yield(ar.failed ? ar.cause : nil, ar.succeeded ? ar.result != nil ? JSON.parse(ar.result.encode) : nil : nil) })),::VertxRedis::RedisClient)
+      end
+      raise ArgumentError, "Invalid arguments when calling subscribe(channel)"
+    end
+    #  Listen for messages published to the given channels
     # @param [Array<String>] channels List of channels to subscribe to
     # @yield Handler for the result of this call.
     # @return [::VertxRedis::RedisClient]
-    def subscribe(channels=nil)
+    def subscribe_many(channels=nil)
       if channels.class == Array && block_given?
-        return ::Vertx::Util::Utils.safe_create(@j_del.java_method(:subscribe, [Java::JavaUtil::List.java_class,Java::IoVertxCore::Handler.java_class]).call(channels.map { |element| element },(Proc.new { |ar| yield(ar.failed ? ar.cause : nil) })),::VertxRedis::RedisClient)
+        return ::Vertx::Util::Utils.safe_create(@j_del.java_method(:subscribeMany, [Java::JavaUtil::List.java_class,Java::IoVertxCore::Handler.java_class]).call(channels.map { |element| element },(Proc.new { |ar| yield(ar.failed ? ar.cause : nil, ar.succeeded ? ar.result != nil ? JSON.parse(ar.result.encode) : nil : nil) })),::VertxRedis::RedisClient)
       end
-      raise ArgumentError, "Invalid arguments when calling subscribe(channels)"
+      raise ArgumentError, "Invalid arguments when calling subscribe_many(channels)"
     end
     #  Add multiple sets
     # @param [Array<String>] keys List of keys identifying sets to add up
@@ -1984,14 +2004,24 @@ module VertxRedis
       raise ArgumentError, "Invalid arguments when calling wait(numSlaves,timeout)"
     end
     #  Watch the given keys to determine execution of the MULTI/EXEC block
+    # @param [String] key Key to watch
+    # @yield Handler for the result of this call.
+    # @return [::VertxRedis::RedisClient]
+    def watch(key=nil)
+      if key.class == String && block_given?
+        return ::Vertx::Util::Utils.safe_create(@j_del.java_method(:watch, [Java::java.lang.String.java_class,Java::IoVertxCore::Handler.java_class]).call(key,(Proc.new { |ar| yield(ar.failed ? ar.cause : nil, ar.succeeded ? ar.result : nil) })),::VertxRedis::RedisClient)
+      end
+      raise ArgumentError, "Invalid arguments when calling watch(key)"
+    end
+    #  Watch the given keys to determine execution of the MULTI/EXEC block
     # @param [Array<String>] keys List of keys to watch
     # @yield Handler for the result of this call.
     # @return [::VertxRedis::RedisClient]
-    def watch(keys=nil)
+    def watch_many(keys=nil)
       if keys.class == Array && block_given?
-        return ::Vertx::Util::Utils.safe_create(@j_del.java_method(:watch, [Java::JavaUtil::List.java_class,Java::IoVertxCore::Handler.java_class]).call(keys.map { |element| element },(Proc.new { |ar| yield(ar.failed ? ar.cause : nil, ar.succeeded ? ar.result : nil) })),::VertxRedis::RedisClient)
+        return ::Vertx::Util::Utils.safe_create(@j_del.java_method(:watchMany, [Java::JavaUtil::List.java_class,Java::IoVertxCore::Handler.java_class]).call(keys.map { |element| element },(Proc.new { |ar| yield(ar.failed ? ar.cause : nil, ar.succeeded ? ar.result : nil) })),::VertxRedis::RedisClient)
       end
-      raise ArgumentError, "Invalid arguments when calling watch(keys)"
+      raise ArgumentError, "Invalid arguments when calling watch_many(keys)"
     end
     #  Add one or more members to a sorted set, or update its score if it already exists
     # @param [String] key Key string

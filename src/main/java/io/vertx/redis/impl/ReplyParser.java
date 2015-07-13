@@ -4,15 +4,26 @@ import io.vertx.core.Handler;
 import io.vertx.core.buffer.Buffer;
 
 public class ReplyParser implements Handler<Buffer> {
+  
+  private static class IndexOutOfBoundsException extends Exception {
+    public IndexOutOfBoundsException(String message) {
+      super(message);
+    }
+    
+    @Override
+    public synchronized Throwable fillInStackTrace() {
+      return this;
+    }
+  }
 
   private Buffer _buffer;
   private int _offset;
   private final String _encoding = "utf-8";
 
-  private final ReplyHandler client;
+  private final Handler<Reply> handler;
 
-  public ReplyParser(ReplyHandler client) {
-    this.client = client;
+  public ReplyParser(Handler<Reply> handler) {
+    this.handler = handler;
   }
 
   public void reset() {
@@ -21,7 +32,7 @@ public class ReplyParser implements Handler<Buffer> {
   }
 
 
-  private Reply parseResult(byte type) throws ArrayIndexOutOfBoundsException {
+  private Reply parseResult(byte type) throws IndexOutOfBoundsException {
     int start, end, offset;
     int packetSize;
 
@@ -35,7 +46,7 @@ public class ReplyParser implements Handler<Buffer> {
 
       if (end > _buffer.length()) {
         _offset = start;
-        throw new ArrayIndexOutOfBoundsException("Wait for more data.");
+        throw new IndexOutOfBoundsException("Wait for more data.");
       }
 
       if (type == '+') {
@@ -53,7 +64,7 @@ public class ReplyParser implements Handler<Buffer> {
 
       if (end > _buffer.length()) {
         _offset = start;
-        throw new ArrayIndexOutOfBoundsException("Wait for more data.");
+        throw new IndexOutOfBoundsException("Wait for more data.");
       }
 
       // return the coerced numeric value
@@ -78,7 +89,7 @@ public class ReplyParser implements Handler<Buffer> {
 
       if (end > _buffer.length()) {
         _offset = offset;
-        throw new ArrayIndexOutOfBoundsException("Wait for more data.");
+        throw new IndexOutOfBoundsException("Wait for more data.");
       }
 
       return new Reply(type, _buffer.getBuffer(start, end));
@@ -93,7 +104,7 @@ public class ReplyParser implements Handler<Buffer> {
 
       if (packetSize > bytesRemaining()) {
         _offset = offset - 1;
-        throw new ArrayIndexOutOfBoundsException("Wait for more data.");
+        throw new IndexOutOfBoundsException("Wait for more data.");
       }
 
       Reply reply = new Reply(type, packetSize);
@@ -105,7 +116,7 @@ public class ReplyParser implements Handler<Buffer> {
         ntype = _buffer.getByte(_offset++);
 
         if (_offset > _buffer.length()) {
-          throw new ArrayIndexOutOfBoundsException("Wait for more data.");
+          throw new IndexOutOfBoundsException("Wait for more data.");
         }
         res = parseResult(ntype);
         reply.set(i, res);
@@ -122,7 +133,6 @@ public class ReplyParser implements Handler<Buffer> {
     append(buffer);
 
     byte type;
-    Reply ret;
     int offset;
 
     loop:
@@ -145,16 +155,16 @@ public class ReplyParser implements Handler<Buffer> {
           case '-':
           case ':':
           case '$':
-            ret = parseResult(type);
+            final Reply ret = parseResult(type);
 
             if (ret == null) {
               break loop;
             }
 
-            client.handleReply(ret);
+            handler.handle(ret);
             break;
         }
-      } catch (ArrayIndexOutOfBoundsException err) {
+      } catch (IndexOutOfBoundsException err) {
         // catch the error (not enough data), rewind, and wait
         // for the next packet to appear
         _offset = offset;
@@ -192,7 +202,7 @@ public class ReplyParser implements Handler<Buffer> {
     _offset = 0;
   }
 
-  private int parsePacketSize() throws ArrayIndexOutOfBoundsException {
+  private int parsePacketSize() throws IndexOutOfBoundsException {
     int end = packetEndOffset();
     String value = _buffer.getString(_offset, end - 1, _encoding);
 
@@ -210,14 +220,14 @@ public class ReplyParser implements Handler<Buffer> {
     return (int) size;
   }
 
-  private int packetEndOffset() throws ArrayIndexOutOfBoundsException {
+  private int packetEndOffset() throws IndexOutOfBoundsException {
     int offset = _offset;
 
     while (_buffer.getByte(offset) != '\r' && _buffer.getByte(offset + 1) != '\n') {
       offset++;
 
-      if (offset >= _buffer.length()) {
-        throw new ArrayIndexOutOfBoundsException("didn't see LF after NL reading multi bulk count (" + offset + " => " + _buffer.length() + ", " + _offset + ")");
+      if (offset == _buffer.length()) {
+        throw new IndexOutOfBoundsException("didn't see LF after NL reading multi bulk count (" + offset + " => " + _buffer.length() + ", " + _offset + ")");
       }
     }
 

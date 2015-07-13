@@ -192,7 +192,7 @@ public interface RedisClient {
    * @since 2.2.0
    * group: list
    */
-  RedisClient brpoplpush(String key, String destkey, int seconds, Handler<AsyncResult<Void>> handler);
+  RedisClient brpoplpush(String key, String destkey, int seconds, Handler<AsyncResult<String>> handler);
 
   /**
    * Kill the connection of a client
@@ -328,7 +328,7 @@ public interface RedisClient {
    * @since 3.0.0
    * group: cluster
    */
-  RedisClient clusterGetkeyinslot(long slot, long count, Handler<AsyncResult<JsonArray>> handler);
+  RedisClient clusterGetkeysinslot(long slot, long count, Handler<AsyncResult<JsonArray>> handler);
 
   /**
    * Provides info about Redis Cluster node state.
@@ -1301,7 +1301,7 @@ public interface RedisClient {
    * @since 2.0.0
    * group: pubsub
    */
-  RedisClient psubscribe(String pattern, Handler<AsyncResult<Void>> handler);
+  RedisClient psubscribe(String pattern, Handler<AsyncResult<JsonArray>> handler);
 
   /**
    * Listen for messages published to channels matching the given patterns
@@ -1311,7 +1311,7 @@ public interface RedisClient {
    * @since 2.0.0
    * group: pubsub
    */
-  RedisClient psubscribeMany(List<String> patterns, Handler<AsyncResult<Void>> handler);
+  RedisClient psubscribeMany(List<String> patterns, Handler<AsyncResult<JsonArray>> handler);
 
   /**
    * Lists the currently active channels - only those matching the pattern
@@ -1815,12 +1815,22 @@ public interface RedisClient {
    * Get one or multiple random members from a set
    *
    * @param key     Key string
+   * @param handler Handler for the result of this call.
+   * @since 1.0.0
+   * group: set
+   */
+  RedisClient srandmember(String key, Handler<AsyncResult<String>> handler);
+
+  /**
+   * Get one or multiple random members from a set
+   *
+   * @param key     Key string
    * @param count   Number of members to get
    * @param handler Handler for the result of this call.
    * @since 1.0.0
    * group: set
    */
-  RedisClient srandmember(String key, int count, Handler<AsyncResult<JsonArray>> handler);
+  RedisClient srandmemberCount(String key, int count, Handler<AsyncResult<JsonArray>> handler);
 
   /**
    * Remove one member from a set
@@ -1857,12 +1867,22 @@ public interface RedisClient {
   /**
    * Listen for messages published to the given channels
    *
+   * @param channel Channel to subscribe to
+   * @param handler  Handler for the result of this call.
+   * @since 2.0.0
+   * group: pubsub
+   */
+  RedisClient subscribe(String channel, Handler<AsyncResult<JsonArray>> handler);
+
+  /**
+   * Listen for messages published to the given channels
+   *
    * @param channels List of channels to subscribe to
    * @param handler  Handler for the result of this call.
    * @since 2.0.0
    * group: pubsub
    */
-  RedisClient subscribe(List<String> channels, Handler<AsyncResult<Void>> handler);
+  RedisClient subscribeMany(List<String> channels, Handler<AsyncResult<JsonArray>> handler);
 
   /**
    * Add multiple sets
@@ -1953,12 +1973,22 @@ public interface RedisClient {
   /**
    * Watch the given keys to determine execution of the MULTI/EXEC block
    *
+   * @param key    Key to watch
+   * @param handler Handler for the result of this call.
+   * @since 2.2.0
+   * group: transactions
+   */
+  RedisClient watch(String key, Handler<AsyncResult<String>> handler);
+
+  /**
+   * Watch the given keys to determine execution of the MULTI/EXEC block
+   *
    * @param keys    List of keys to watch
    * @param handler Handler for the result of this call.
    * @since 2.2.0
    * group: transactions
    */
-  RedisClient watch(List<String> keys, Handler<AsyncResult<String>> handler);
+  RedisClient watchMany(List<String> keys, Handler<AsyncResult<String>> handler);
 
   /**
    * Add one or more members to a sorted set, or update its score if it already exists

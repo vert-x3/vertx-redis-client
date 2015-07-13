@@ -4,121 +4,111 @@ import io.vertx.core.*;
 import io.vertx.core.eventbus.EventBus;
 import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;
-import io.vertx.core.logging.Logger;
-import io.vertx.core.logging.LoggerFactory;
+import io.vertx.core.net.NetClient;
+import io.vertx.core.net.NetClientOptions;
 import io.vertx.redis.RedisClient;
+import io.vertx.redis.RedisCommand;
 
 import java.nio.charset.Charset;
-import java.util.LinkedList;
-import java.util.Queue;
+import java.util.concurrent.atomic.AtomicInteger;
 
 public abstract class AbstractRedisClient implements RedisClient {
 
-  private static final Logger log = LoggerFactory.getLogger(AbstractRedisClient.class);
-
-  private enum ResponseTransform {
-    NONE,
-    ARRAY_TO_OBJECT,
-    INFO
-  }
-
-  private final Vertx vertx;
-  private final JsonObject config;
   private final EventBus eb;
-  private final RedisSubscriptions subscriptions = new RedisSubscriptions();
-  private final Queue<Command<?>> pending = new LinkedList<>();
+  private final RedisSubscriptions subscriptions;
   private final String encoding;
   private final Charset charset;
-  private final String binaryEnc;
   private final Charset binaryCharset;
   private final String baseAddress;
 
-  private RedisConnection redisConnection;
+  // we need 2 connections, one for normal commands and a second in case we do pub/sub
+  private final RedisConnection redis;
+  private final RedisConnection pubsub;
 
   AbstractRedisClient(Vertx vertx, JsonObject config) {
-    this.vertx = vertx;
-    this.config = config;
     this.eb = vertx.eventBus();
     this.encoding = config.getString("encoding", "UTF-8");
     this.charset = Charset.forName(encoding);
-    this.binaryEnc = "iso-8859-1";
-    this.binaryCharset = Charset.forName(binaryEnc);
-    this.baseAddress = config.getString("address", "io.vertx.mod-redis");
-    boolean binary = config.getBoolean("binary", false);
-    if (binary) {
-      log.warn("Binary mode is not implemented yet!!!");
-    }
+    this.binaryCharset = Charset.forName("iso-8859-1");
+    this.baseAddress = config.getString("address", "io.vertx.redis");
+
+    final String host = config.getString("host", "localhost");
+    final int port = config.getInteger("port", 6379);
+
+    // create a netClient for the connection
+    final NetClient client = vertx.createNetClient(new NetClientOptions()
+        .setTcpKeepAlive(config.getBoolean("tcpKeepAlive", true))
+        .setTcpNoDelay(config.getBoolean("tcpNoDelay", true)));
+
+    subscriptions = new RedisSubscriptions(vertx);
+
+    redis = new RedisConnection(client, host, port);
+    pubsub = new RedisConnection(client, host, port, subscriptions);
   }
 
   @Override
   public synchronized void close(Handler<AsyncResult<Void>> handler) {
-    if (redisConnection != null) {
-      redisConnection.disconnect(handler);
-      redisConnection = null;
-    } else if (handler != null) {
-      vertx.getOrCreateContext().runOnContext(v -> handler.handle(Future.succeededFuture()));
-    }
+    // this is a special case it should sent the message QUIT and then close the sockets
+    final AtomicInteger cnt = new AtomicInteger(0);
+
+    final Handler<AsyncResult<Void>> cb = v -> {
+      if (cnt.incrementAndGet() == 2) {
+        handler.handle(Future.succeededFuture());
+      }
+    };
+
+    redis.disconnect(cb);
+    pubsub.disconnect(cb);
   }
 
-  private ResponseTransform getResponseTransformFor(String command) {
-    if (command.equals("HGETALL")) {
+  private ResponseTransform getResponseTransformFor(RedisCommand command) {
+    if (command == RedisCommand.HGETALL) {
       return ResponseTransform.ARRAY_TO_OBJECT;
     }
-    if (command.equals("INFO")) {
+    if (command == RedisCommand.INFO) {
       return ResponseTransform.INFO;
     }
 
     return ResponseTransform.NONE;
   }
 
-  final void sendString(final String command, final JsonArray args, final Handler<AsyncResult<String>> resultHandler) {
+  final void sendString(final RedisCommand command, final JsonArray args, final Handler<AsyncResult<String>> resultHandler) {
     send(command, args, String.class, resultHandler);
   }
 
-  final void sendLong(final String command, final JsonArray args, final Handler<AsyncResult<Long>> resultHandler) {
+  final void sendLong(final RedisCommand command, final JsonArray args, final Handler<AsyncResult<Long>> resultHandler) {
     send(command, args, Long.class, resultHandler);
   }
 
-  final void sendVoid(final String command, final JsonArray args, final Handler<AsyncResult<Void>> resultHandler) {
+  final void sendVoid(final RedisCommand command, final JsonArray args, final Handler<AsyncResult<Void>> resultHandler) {
     send(command, args, Void.class, resultHandler);
   }
 
-  final void sendJsonArray(final String command, final JsonArray args, final Handler<AsyncResult<JsonArray>> resultHandler) {
+  final void sendJsonArray(final RedisCommand command, final JsonArray args, final Handler<AsyncResult<JsonArray>> resultHandler) {
     send(command, args, JsonArray.class, resultHandler);
   }
 
-  final void sendJsonObject(final String command, final JsonArray args, final Handler<AsyncResult<JsonObject>> resultHandler) {
+  final void sendJsonObject(final RedisCommand command, final JsonArray args, final Handler<AsyncResult<JsonObject>> resultHandler) {
     send(command, args, JsonObject.class, resultHandler);
   }
 
-  @SuppressWarnings("unchecked")
-  final <T> void send(final String command, final JsonArray redisArgs,
+  final <T> void send(final RedisCommand command, final JsonArray redisArgs,
                       final Class<T> returnType,
                       final Handler<AsyncResult<T>> resultHandler) {
 
     send(command, redisArgs, returnType, false, resultHandler);
   }
 
-  @SuppressWarnings("unchecked")
-  final <T> void send(final String command, final JsonArray redisArgs,
-                      final Class<T> returnType,
+  final <T> void send(final RedisCommand command, final JsonArray redisArgs, final Class<T> returnType,
                       final boolean binary,
                       final Handler<AsyncResult<T>> resultHandler) {
 
-    final ResponseTransform transform = getResponseTransformFor(command);
+    final Command<T> cmd = new Command<>(command, redisArgs, binary ? binaryCharset : charset, getResponseTransformFor(command), returnType).handler(resultHandler);
 
-    // subscribe/psubscribe and unsubscribe/punsubscribe commands can have multiple (including zero) replies
-    int expectedReplies = 1;
+    switch (command) {
+      case PSUBSCRIBE:
+        cmd.setExpectedReplies(redisArgs.size());
 
-    switch (command.toLowerCase()) {
-      // argument "pattern" ["pattern"...]
-      case "psubscribe":
-        // in this case we need also to register handlers
-        if (redisArgs == null) {
-          resultHandler.handle(new RedisAsyncResult<>("at least one pattern is required!"));
-          return;
-        }
-        expectedReplies = redisArgs.size();
         for (Object obj : redisArgs) {
           String pattern = (String) obj;
           // compose the listening address as base + . + pattern
@@ -134,15 +124,12 @@ public abstract class AbstractRedisClient implements RedisClient {
             eb.send(vertxChannel, replyMessage);
           });
         }
+        pubsub.send(cmd);
         break;
-      // argument "channel" ["channel"...]
-      case "subscribe":
-        if (redisArgs == null) {
-          resultHandler.handle(new RedisAsyncResult<>("at least one pattern is required!"));
-          return;
-        }
-        // in this case we need also to register handlers
-        expectedReplies = redisArgs.size();
+
+      case SUBSCRIBE:
+        cmd.setExpectedReplies(redisArgs.size());
+
         for (Object obj : redisArgs) {
           String channel = (String) obj;
           // compose the listening address as base + . + channel
@@ -157,165 +144,51 @@ public abstract class AbstractRedisClient implements RedisClient {
             eb.send(vertxChannel, replyMessage);
           });
         }
+        pubsub.send(cmd);
         break;
-      // argument ["pattern" ["pattern"...]]
-      case "punsubscribe":
+
+      case PUNSUBSCRIBE:
         // unregister all channels
         if (redisArgs == null || redisArgs.size() == 0) {
           // unsubscribe all
-          expectedReplies = subscriptions.patternSize();
+          cmd.setExpectedReplies(subscriptions.patternSize());
           subscriptions.unregisterPatternSubscribeHandler(null);
         } else {
-          expectedReplies = redisArgs.size();
+          cmd.setExpectedReplies(redisArgs.size());
+
           for (Object obj : redisArgs) {
             String pattern = (String) obj;
             subscriptions.unregisterPatternSubscribeHandler(pattern);
           }
         }
+        pubsub.send(cmd);
         break;
-      // argument ["channel" ["channel"...]]
-      case "unsubscribe":
+
+      case UNSUBSCRIBE:
         // unregister all channels
         if (redisArgs == null || redisArgs.size() == 0) {
           // unsubscribe all
-          expectedReplies = subscriptions.channelSize();
+          cmd.setExpectedReplies(subscriptions.channelSize());
           subscriptions.unregisterChannelSubscribeHandler(null);
         } else {
-          expectedReplies = redisArgs.size();
+          cmd.setExpectedReplies(redisArgs.size());
+
           for (Object obj : redisArgs) {
             String channel = (String) obj;
             subscriptions.unregisterChannelSubscribeHandler(channel);
           }
         }
+        pubsub.send(cmd);
+        break;
+      case QUIT:
+        // this is a special case that must be sent to all connections
+        redis.send(cmd);
+        pubsub.send(cmd);
+        break;
+      default:
+        // all other commands are sent to the normal connection
+        redis.send(cmd);
         break;
     }
-
-    Context context = vertx.getOrCreateContext();
-
-    Command<T> comm = new Command<T>(context, command, redisArgs, binary ? binaryCharset : charset)
-                     .setExpectedReplies(expectedReplies).setHandler((Reply reply) -> {
-        switch (reply.type()) {
-          case '-': // Error
-            resultHandler.handle(new RedisAsyncResult<>(reply.asType(String.class)));
-            return;
-          case '+':   // Status
-            resultHandler.handle(new RedisAsyncResult<>(null, reply.asType(returnType)));
-            return;
-          case '$':  // Bulk
-            if (transform == ResponseTransform.INFO) {
-              String info = reply.asType(String.class, encoding);
-
-              if (info == null) {
-                resultHandler.handle(new RedisAsyncResult<>(null, null));
-              } else {
-                String lines[] = info.split("\\r?\\n");
-                JsonObject value = new JsonObject();
-
-                JsonObject section = null;
-                for (String line : lines) {
-                  if (line.length() == 0) {
-                    // end of section
-                    section = null;
-                    continue;
-                  }
-
-                  if (line.charAt(0) == '#') {
-                    // begin section
-                    section = new JsonObject();
-                    // create a sub key with the section name
-                    value.put(line.substring(2).toLowerCase(), section);
-                  } else {
-                    // entry in section
-                    int split = line.indexOf(':');
-                    if (section == null) {
-                      value.put(line.substring(0, split), line.substring(split + 1));
-                    } else {
-                      section.put(line.substring(0, split), line.substring(split + 1));
-                    }
-                  }
-                }
-                resultHandler.handle(new RedisAsyncResult<>(null, (T) value));
-              }
-            } else {
-              resultHandler.handle(new RedisAsyncResult<>(null, reply.asType(returnType, binary ? binaryEnc : encoding)));
-            }
-            return;
-          case '*': // Multi
-            if (transform == ResponseTransform.ARRAY_TO_OBJECT) {
-              resultHandler.handle(new RedisAsyncResult<>(null, (T) reply.asType(JsonObject.class, encoding)));
-            } else {
-              resultHandler.handle(new RedisAsyncResult<>(null, (T) reply.asType(JsonArray.class, encoding)));
-            }
-            return;
-          case ':':   // Integer
-            resultHandler.handle(new RedisAsyncResult<>(null, reply.asType(returnType)));
-            return;
-          default:
-            resultHandler.handle(new RedisAsyncResult<>("Unknown message type"));
-        }
-      });
-    comm.setUserHandler(resultHandler);
-
-    doSend(comm);
   }
-
-  private synchronized void doSend(Command command) {
-    if (redisConnection == null) {
-      pending.add(command);
-      connect();
-    } else {
-      sendOnConnection(command);
-    }
-  }
-
-  private void connect() {
-    final String host = config.getString("host", "localhost");
-    final int port = config.getInteger("port", 6379);
-    RedisConnection conn = new RedisConnection(vertx, host, port, subscriptions, v -> connectionClosed());
-    conn.connect(res -> {
-      if (res.succeeded()) {
-        connected(conn);
-      } else {
-        sendPendingFailed(res.cause());
-      }
-    });
-  }
-
-  private synchronized void connectionClosed() {
-    if (redisConnection != null) {
-      redisConnection = null;
-      log.warn("Connection has been closed by peer");
-    }
-  }
-
-  private synchronized void connected(RedisConnection conn) {
-    this.redisConnection = conn;
-    Command command;
-    while ((command = pending.poll()) != null) {
-      sendOnConnection(command);
-    }
-  }
-
-  @SuppressWarnings("unchecked")
-  private synchronized void sendPendingFailed(Throwable cause) {
-    Command command;
-    while ((command = pending.poll()) != null) {
-      Handler<AsyncResult<Object>> userHandler = command.getUserHandler();
-      if (userHandler != null) {
-        command.getContext().runOnContext(aVoid -> {
-          try {
-            userHandler.handle(Future.failedFuture(cause));
-          } catch (Throwable t) {
-            log.error("Failure in user handler", t);
-          }
-        });
-      }
-    }
-  }
-
-  private void sendOnConnection(Command command) {
-    redisConnection.send(command);
-  }
-
 }
-
