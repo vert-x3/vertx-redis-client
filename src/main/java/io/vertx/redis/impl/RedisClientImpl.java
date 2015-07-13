@@ -145,127 +145,127 @@ public final class RedisClientImpl extends AbstractRedisClient {
 
   @Override
   public RedisClient clusterAddslots(List<Long> slots, Handler<AsyncResult<Void>> handler) {
-    sendVoid("CLUSTER ADDSLOTS", null, handler);
+    sendVoid(CLUSTER_ADDSLOTS, null, handler);
     return this;
   }
 
   @Override
   public RedisClient clusterCountFailureReports(String nodeId, Handler<AsyncResult<Long>> handler) {
-    sendLong("CLUSTER COUNT-FAILURE-REPORTS", toPayload(nodeId), handler);
+    sendLong(CLUSTER_COUNT_FAILURE_REPORTS, toPayload(nodeId), handler);
     return this;
   }
 
   @Override
   public RedisClient clusterCountkeysinslot(long slot, Handler<AsyncResult<Long>> handler) {
-    sendLong("CLUSTER COUNTKEYSINSLOT", toPayload(slot), handler);
+    sendLong(CLUSTER_COUNTKEYSINSLOT, toPayload(slot), handler);
     return this;
   }
 
   @Override
   public RedisClient clusterDelslots(long slot, Handler<AsyncResult<Void>> handler) {
-    sendVoid("CLUSTER DELSLOTS", toPayload(slot), handler);
+    sendVoid(CLUSTER_DELSLOTS, toPayload(slot), handler);
     return this;
   }
 
   @Override
   public RedisClient clusterDelslotsMany(List<Long> slots, Handler<AsyncResult<Void>> handler) {
-    sendVoid("CLUSTER DELSLOTS", toPayload(slots), handler);
+    sendVoid(CLUSTER_DELSLOTS, toPayload(slots), handler);
     return this;
   }
 
   @Override
   public RedisClient clusterFailover(Handler<AsyncResult<Void>> handler) {
-    sendVoid("CLUSTER FAILOVER", null, handler);
+    sendVoid(CLUSTER_FAILOVER, null, handler);
     return this;
   }
 
   @Override
   public RedisClient clusterFailOverWithOptions(FailoverOptions options, Handler<AsyncResult<Void>> handler) {
-    sendVoid("CLUSTER FAILOVER", toPayload(options), handler);
+    sendVoid(CLUSTER_FAILOVER, toPayload(options), handler);
     return this;
   }
 
   @Override
   public RedisClient clusterForget(String nodeId, Handler<AsyncResult<Void>> handler) {
-    sendVoid("CLUSTER FORGET", toPayload(nodeId), handler);
+    sendVoid(CLUSTER_FORGET, toPayload(nodeId), handler);
     return this;
   }
 
   @Override
-  public RedisClient clusterGetkeyinslot(long slot, long count, Handler<AsyncResult<JsonArray>> handler) {
-    sendJsonArray("CLUSTER GETKEYINSLOT", toPayload(slot, count), handler);
+  public RedisClient clusterGetkeysinslot(long slot, long count, Handler<AsyncResult<JsonArray>> handler) {
+    sendJsonArray(CLUSTER_GETKEYSINSLOT, toPayload(slot, count), handler);
     return this;
   }
 
   @Override
   public RedisClient clusterInfo(Handler<AsyncResult<JsonArray>> handler) {
-    sendJsonArray("CLUSTER INFO", null, handler);
+    sendJsonArray(CLUSTER_INFO, null, handler);
     return this;
   }
 
   @Override
   public RedisClient clusterKeyslot(String key, Handler<AsyncResult<Long>> handler) {
-    sendLong("CLUSTER KEYSLOT", toPayload(key), handler);
+    sendLong(CLUSTER_KEYSLOT, toPayload(key), handler);
     return this;
   }
 
   @Override
   public RedisClient clusterMeet(String ip, long port, Handler<AsyncResult<Void>> handler) {
-    sendVoid("CLUSTER MEET", toPayload(ip, port), handler);
+    sendVoid(CLUSTER_MEET, toPayload(ip, port), handler);
     return this;
   }
 
   @Override
   public RedisClient clusterNodes(Handler<AsyncResult<JsonArray>> handler) {
-    sendJsonArray("CLUSTER NODES", null, handler);
+    sendJsonArray(CLUSTER_NODES, null, handler);
     return this;
   }
 
   @Override
   public RedisClient clusterReplicate(String nodeId, Handler<AsyncResult<Void>> handler) {
-    sendVoid("CLUSTER REPLICATE", toPayload(nodeId), handler);
+    sendVoid(CLUSTER_REPLICATE, toPayload(nodeId), handler);
     return this;
   }
 
   @Override
   public RedisClient clusterReset(Handler<AsyncResult<Void>> handler) {
-    sendVoid("CLUSTER RESET", null, handler);
+    sendVoid(CLUSTER_RESET, null, handler);
     return this;
   }
 
   @Override
   public RedisClient clusterResetWithOptions(ResetOptions options, Handler<AsyncResult<Void>> handler) {
-    sendVoid("CLUSTER RESET", toPayload(options), handler);
+    sendVoid(CLUSTER_RESET, toPayload(options), handler);
     return this;
   }
 
   @Override
   public RedisClient clusterSaveconfig(Handler<AsyncResult<Void>> handler) {
-    sendVoid("CLUSTER SAVECONFIG", null, handler);
+    sendVoid(CLUSTER_SAVECONFIG, null, handler);
     return this;
   }
 
   @Override
   public RedisClient clusterSetConfigEpoch(long epoch, Handler<AsyncResult<Void>> handler) {
-    sendVoid("CLUSTER SET-CONFIG-EPOCH", toPayload(epoch), handler);
+    sendVoid(CLUSTER_SET_CONFIG_EPOCH, toPayload(epoch), handler);
     return this;
   }
 
   @Override
   public RedisClient clusterSetslot(long slot, SlotCmd subcommand, Handler<AsyncResult<Void>> handler) {
-    sendVoid("CLUSTER SETSLOT", toPayload(slot, subcommand), handler);
+    sendVoid(CLUSTER_SETSLOT, toPayload(slot, subcommand), handler);
     return this;
   }
 
   @Override
   public RedisClient clusterSetslotWithNode(long slot, SlotCmd subcommand, String nodeId, Handler<AsyncResult<Void>> handler) {
-    sendVoid("CLUSTER SETSLOT", toPayload(slot, subcommand, nodeId), handler);
+    sendVoid(CLUSTER_SETSLOT, toPayload(slot, subcommand, nodeId), handler);
     return this;
   }
 
   @Override
   public RedisClient clusterSlaves(String nodeId, Handler<AsyncResult<JsonArray>> handler) {
-    sendJsonArray("CLUSTER SLAVES", toPayload(nodeId), handler);
+    sendJsonArray(CLUSTER_SLAVES, toPayload(nodeId), handler);
     return this;
   }
 
@@ -1166,7 +1166,7 @@ public final class RedisClientImpl extends AbstractRedisClient {
 
   @Override
   public RedisClient wait(long numSlaves, long timeout, Handler<AsyncResult<String>> handler) {
-    sendString("WAIT", toPayload(numSlaves, timeout), handler);
+    sendString(WAIT, toPayload(numSlaves, timeout), handler);
     return this;
   }
 
@@ -1370,6 +1370,7 @@ public final class RedisClientImpl extends AbstractRedisClient {
    * @param parameters Call parameters
    * @return JsonArray that can be passed to send()
    */
+  @SuppressWarnings("unchecked")
   private static JsonArray toPayload(Object ... parameters) {
     JsonArray result = new JsonArray();
     for (Object param: parameters) {

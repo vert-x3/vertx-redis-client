@@ -328,7 +328,7 @@ public interface RedisClient {
    * @since 3.0.0
    * group: cluster
    */
-  RedisClient clusterGetkeyinslot(long slot, long count, Handler<AsyncResult<JsonArray>> handler);
+  RedisClient clusterGetkeysinslot(long slot, long count, Handler<AsyncResult<JsonArray>> handler);
 
   /**
    * Provides info about Redis Cluster node state.
