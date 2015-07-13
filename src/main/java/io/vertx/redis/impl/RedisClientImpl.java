@@ -138,7 +138,133 @@ public final class RedisClientImpl extends AbstractRedisClient {
   public RedisClient clientSetname(String name, Handler<AsyncResult<String>> handler) {
     sendString("CLIENT SETNAME", toPayload(name), handler);
     return this;
-  } 
+  }
+
+  @Override
+  public RedisClient clusterAddslots(List<Long> slots, Handler<AsyncResult<Void>> handler) {
+    sendVoid("CLUSTER ADDSLOTS", null, handler);
+    return this;
+  }
+
+  @Override
+  public RedisClient clusterCountFailureReports(String nodeId, Handler<AsyncResult<Long>> handler) {
+    sendLong("CLUSTER COUNT-FAILURE-REPORTS", toPayload(nodeId), handler);
+    return this;
+  }
+
+  @Override
+  public RedisClient clusterCountkeysinslot(long slot, Handler<AsyncResult<Long>> handler) {
+    sendLong("CLUSTER COUNTKEYSINSLOT", toPayload(slot), handler);
+    return this;
+  }
+
+  @Override
+  public RedisClient clusterDelslots(long slot, Handler<AsyncResult<Void>> handler) {
+    sendVoid("CLUSTER DELSLOTS", toPayload(slot), handler);
+    return this;
+  }
+
+  @Override
+  public RedisClient clusterDelslotsMany(List<Long> slots, Handler<AsyncResult<Void>> handler) {
+    sendVoid("CLUSTER DELSLOTS", toPayload(slots), handler);
+    return this;
+  }
+
+  @Override
+  public RedisClient clusterFailover(Handler<AsyncResult<Void>> handler) {
+    sendVoid("CLUSTER FAILOVER", null, handler);
+    return this;
+  }
+
+  @Override
+  public RedisClient clusterFailOverWithOptions(FailoverOptions options, Handler<AsyncResult<Void>> handler) {
+    sendVoid("CLUSTER FAILOVER", toPayload(options), handler);
+    return this;
+  }
+
+  @Override
+  public RedisClient clusterForget(String nodeId, Handler<AsyncResult<Void>> handler) {
+    sendVoid("CLUSTER FORGET", toPayload(nodeId), handler);
+    return this;
+  }
+
+  @Override
+  public RedisClient clusterGetkeyinslot(long slot, long count, Handler<AsyncResult<JsonArray>> handler) {
+    sendJsonArray("CLUSTER GETKEYINSLOT", toPayload(slot, count), handler);
+    return this;
+  }
+
+  @Override
+  public RedisClient clusterInfo(Handler<AsyncResult<JsonArray>> handler) {
+    sendJsonArray("CLUSTER INFO", null, handler);
+    return this;
+  }
+
+  @Override
+  public RedisClient clusterKeyslot(String key, Handler<AsyncResult<Long>> handler) {
+    sendLong("CLUSTER KEYSLOT", toPayload(key), handler);
+    return this;
+  }
+
+  @Override
+  public RedisClient clusterMeet(String ip, long port, Handler<AsyncResult<Void>> handler) {
+    sendVoid("CLUSTER MEET", toPayload(ip, port), handler);
+    return this;
+  }
+
+  @Override
+  public RedisClient clusterNodes(Handler<AsyncResult<JsonArray>> handler) {
+    sendJsonArray("CLUSTER NODES", null, handler);
+    return this;
+  }
+
+  @Override
+  public RedisClient clusterReplicate(String nodeId, Handler<AsyncResult<Void>> handler) {
+    sendVoid("CLUSTER REPLICATE", toPayload(nodeId), handler);
+    return this;
+  }
+
+  @Override
+  public RedisClient clusterReset(Handler<AsyncResult<Void>> handler) {
+    sendVoid("CLUSTER RESET", null, handler);
+    return this;
+  }
+
+  @Override
+  public RedisClient clusterResetWithOptions(ResetOptions options, Handler<AsyncResult<Void>> handler) {
+    sendVoid("CLUSTER RESET", toPayload(options), handler);
+    return this;
+  }
+
+  @Override
+  public RedisClient clusterSaveconfig(Handler<AsyncResult<Void>> handler) {
+    sendVoid("CLUSTER SAVECONFIG", null, handler);
+    return this;
+  }
+
+  @Override
+  public RedisClient clusterSetConfigEpoch(long epoch, Handler<AsyncResult<Void>> handler) {
+    sendVoid("CLUSTER SET-CONFIG-EPOCH", toPayload(epoch), handler);
+    return this;
+  }
+
+  @Override
+  public RedisClient clusterSetslot(long slot, SlotCmd subcommand, Handler<AsyncResult<Void>> handler) {
+    sendVoid("CLUSTER SETSLOT", toPayload(slot, subcommand), handler);
+    return this;
+  }
+
+  @Override
+  public RedisClient clusterSetslotWithNode(long slot, SlotCmd subcommand, String nodeId, Handler<AsyncResult<Void>> handler) {
+    sendVoid("CLUSTER SETSLOT", toPayload(slot, subcommand, nodeId), handler);
+    return this;
+  }
+
+  @Override
+  public RedisClient clusterSlaves(String nodeId, Handler<AsyncResult<JsonArray>> handler) {
+    sendJsonArray("CLUSTER SLAVES", toPayload(nodeId), handler);
+    return this;
+  }
 
   @Override
   public RedisClient clusterSlots(Handler<AsyncResult<JsonArray>> handler) {
@@ -1015,7 +1141,13 @@ public final class RedisClientImpl extends AbstractRedisClient {
   public RedisClient unwatch(Handler<AsyncResult<String>> handler) {
     sendString("UNWATCH", null, handler);
     return this;
-  } 
+  }
+
+  @Override
+  public RedisClient wait(long numSlaves, long timeout, Handler<AsyncResult<String>> handler) {
+    sendString("WAIT", toPayload(numSlaves, timeout), handler);
+    return this;
+  }
 
   @Override
   public RedisClient watch(List<String> keys, Handler<AsyncResult<String>> handler) {
