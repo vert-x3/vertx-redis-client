@@ -332,11 +332,11 @@ module VertxRedis
     # @param [Fixnum] count 
     # @yield Handler for the result of this call.
     # @return [::VertxRedis::RedisClient]
-    def cluster_getkeyinslot(slot=nil,count=nil)
+    def cluster_getkeysinslot(slot=nil,count=nil)
       if slot.class == Fixnum && count.class == Fixnum && block_given?
-        return ::Vertx::Util::Utils.safe_create(@j_del.java_method(:clusterGetkeyinslot, [Java::long.java_class,Java::long.java_class,Java::IoVertxCore::Handler.java_class]).call(slot,count,(Proc.new { |ar| yield(ar.failed ? ar.cause : nil, ar.succeeded ? ar.result != nil ? JSON.parse(ar.result.encode) : nil : nil) })),::VertxRedis::RedisClient)
+        return ::Vertx::Util::Utils.safe_create(@j_del.java_method(:clusterGetkeysinslot, [Java::long.java_class,Java::long.java_class,Java::IoVertxCore::Handler.java_class]).call(slot,count,(Proc.new { |ar| yield(ar.failed ? ar.cause : nil, ar.succeeded ? ar.result != nil ? JSON.parse(ar.result.encode) : nil : nil) })),::VertxRedis::RedisClient)
       end
-      raise ArgumentError, "Invalid arguments when calling cluster_getkeyinslot(slot,count)"
+      raise ArgumentError, "Invalid arguments when calling cluster_getkeysinslot(slot,count)"
     end
     #  Provides info about Redis Cluster node state.
     # @yield Handler for the result of this call.
@@ -660,7 +660,7 @@ module VertxRedis
     # @return [::VertxRedis::RedisClient]
     def exec
       if block_given?
-        return ::Vertx::Util::Utils.safe_create(@j_del.java_method(:exec, [Java::IoVertxCore::Handler.java_class]).call((Proc.new { |ar| yield(ar.failed ? ar.cause : nil) })),::VertxRedis::RedisClient)
+        return ::Vertx::Util::Utils.safe_create(@j_del.java_method(:exec, [Java::IoVertxCore::Handler.java_class]).call((Proc.new { |ar| yield(ar.failed ? ar.cause : nil, ar.succeeded ? ar.result != nil ? JSON.parse(ar.result.encode) : nil : nil) })),::VertxRedis::RedisClient)
       end
       raise ArgumentError, "Invalid arguments when calling exec()"
     end

@@ -674,10 +674,10 @@ var RedisClient = function(j_val) {
    @param handler {function} Handler for the result of this call. 
    @return {RedisClient}
    */
-  this.clusterGetkeyinslot = function(slot, count, handler) {
+  this.clusterGetkeysinslot = function(slot, count, handler) {
     var __args = arguments;
     if (__args.length === 3 && typeof __args[0] ==='number' && typeof __args[1] ==='number' && typeof __args[2] === 'function') {
-      return utils.convReturnVertxGen(j_redisClient["clusterGetkeyinslot(long,long,io.vertx.core.Handler)"](slot, count, function(ar) {
+      return utils.convReturnVertxGen(j_redisClient["clusterGetkeysinslot(long,long,io.vertx.core.Handler)"](slot, count, function(ar) {
       if (ar.succeeded()) {
         handler(utils.convReturnJson(ar.result()), null);
       } else {
@@ -1368,7 +1368,7 @@ var RedisClient = function(j_val) {
     if (__args.length === 1 && typeof __args[0] === 'function') {
       return utils.convReturnVertxGen(j_redisClient["exec(io.vertx.core.Handler)"](function(ar) {
       if (ar.succeeded()) {
-        handler(null, null);
+        handler(utils.convReturnJson(ar.result()), null);
       } else {
         handler(null, ar.cause());
       }

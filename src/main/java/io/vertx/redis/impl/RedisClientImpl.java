@@ -404,8 +404,8 @@ public final class RedisClientImpl extends AbstractRedisClient {
   } 
 
   @Override
-  public RedisClient exec(Handler<AsyncResult<Void>> handler) {
-    sendVoid(EXEC, null, handler);
+  public RedisClient exec(Handler<AsyncResult<JsonArray>> handler) {
+    sendJsonArray(EXEC, null, handler);
     return this;
   } 
 

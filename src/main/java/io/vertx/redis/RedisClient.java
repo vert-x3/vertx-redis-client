@@ -644,7 +644,7 @@ public interface RedisClient {
    * @since 1.2.0
    * group: transactions
    */
-  RedisClient exec(Handler<AsyncResult<Void>> handler);
+  RedisClient exec(Handler<AsyncResult<JsonArray>> handler);
 
   /**
    * Determine if a key exists
