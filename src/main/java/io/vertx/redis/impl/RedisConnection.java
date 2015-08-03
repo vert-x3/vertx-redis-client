@@ -140,7 +140,11 @@ class RedisConnection {
             command.handle(Future.failedFuture(asyncResult.cause()));
           }
 
-          netSocket.close();
+          // close the socket if previously connected
+          if (netSocket != null) {
+            netSocket.close();
+          }
+
           state = State.DISCONNECTED;
 
         } else {

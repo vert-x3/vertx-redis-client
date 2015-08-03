@@ -11,7 +11,7 @@
 ^|Name | Type ^| Description
 
 |[[count]]`count`
-|`Number`
+|`Number (int)`
 |-
 |[[match]]`match`
 |`String`

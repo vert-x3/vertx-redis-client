@@ -24,4 +24,9 @@ Set ID filter+++
 |`Boolean`
 |+++
 Set SKIPME filter+++
+
+|[[type]]`type`
+|`Enum`
+|+++
+Set TYPE filter+++
 |===

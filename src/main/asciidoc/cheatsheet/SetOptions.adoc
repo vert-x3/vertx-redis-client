@@ -11,13 +11,13 @@
 ^|Name | Type ^| Description
 
 |[[ex]]`ex`
-|`Number`
-|-
-|[[px]]`px`
-|`Number`
+|`Number (long)`
 |-
 |[[nx]]`nx`
 |`Boolean`
+|-
+|[[px]]`px`
+|`Number (long)`
 |-
 |[[xx]]`xx`
 |`Boolean`

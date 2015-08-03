@@ -16,22 +16,18 @@
 
 /** @module vertx-redis-js/redis_client */
 var utils = require('vertx-js/util/utils');
+var Vertx = require('vertx-js/vertx');
 
 var io = Packages.io;
 var JsonObject = io.vertx.core.json.JsonObject;
 var JRedisClient = io.vertx.redis.RedisClient;
 var KillFilter = io.vertx.redis.op.KillFilter;
-var MigrateOptions = io.vertx.redis.op.MigrateOptions;
+var LimitOptions = io.vertx.redis.op.LimitOptions;
 var SetOptions = io.vertx.redis.op.SetOptions;
 var SortOptions = io.vertx.redis.op.SortOptions;
-var LimitOptions = io.vertx.redis.op.LimitOptions;
+var MigrateOptions = io.vertx.redis.op.MigrateOptions;
+var ScanOptions = io.vertx.redis.op.ScanOptions;
 var RangeLimitOptions = io.vertx.redis.op.RangeLimitOptions;
-var LimitOptions = io.vertx.redis.op.LimitOptions;
-var RangeLimitOptions = io.vertx.redis.op.RangeLimitOptions;
-var ScanOptions = io.vertx.redis.op.ScanOptions;
-var ScanOptions = io.vertx.redis.op.ScanOptions;
-var ScanOptions = io.vertx.redis.op.ScanOptions;
-var ScanOptions = io.vertx.redis.op.ScanOptions;
 
 /**
  @class
