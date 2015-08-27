@@ -1,5 +1,6 @@
 package io.vertx.redis;
 
+import io.vertx.codegen.annotations.Fluent;
 import io.vertx.codegen.annotations.VertxGen;
 import io.vertx.core.AsyncResult;
 import io.vertx.core.Handler;
@@ -35,6 +36,7 @@ public interface RedisClient {
    * @since 2.0.0
    * group: string
    */
+  @Fluent
   RedisClient append(String key, String value, Handler<AsyncResult<Long>> handler);
 
   /**
@@ -45,6 +47,7 @@ public interface RedisClient {
    * @since 1.0.0
    * group: connection
    */
+  @Fluent
   RedisClient auth(String password, Handler<AsyncResult<String>> handler);
 
   /**
@@ -53,6 +56,7 @@ public interface RedisClient {
    * @since 1.0.0
    * group: server
    */
+  @Fluent
   RedisClient bgrewriteaof(Handler<AsyncResult<String>> handler);
 
   /**
@@ -61,6 +65,7 @@ public interface RedisClient {
    * @since 1.0.0
    * group: server
    */
+  @Fluent
   RedisClient bgsave(Handler<AsyncResult<String>> handler);
 
   /**
@@ -71,6 +76,7 @@ public interface RedisClient {
    * @since 2.6.0
    * group: string
    */
+  @Fluent
   RedisClient bitcount(String key, Handler<AsyncResult<Long>> handler);
 
   /**
@@ -83,6 +89,7 @@ public interface RedisClient {
    * @since 2.6.0
    * group: string
    */
+  @Fluent
   RedisClient bitcountRange(String key, long start, long end, Handler<AsyncResult<Long>> handler);
 
   /**
@@ -95,6 +102,7 @@ public interface RedisClient {
    * @since 2.6.0
    * group: string
    */
+  @Fluent
   RedisClient bitop(BitOperation operation, String destkey, List<String> keys, Handler<AsyncResult<Long>> handler);
 
   /**
@@ -106,6 +114,7 @@ public interface RedisClient {
    * @since 2.8.7
    * group: string
    */
+  @Fluent
   RedisClient bitpos(String key, int bit, Handler<AsyncResult<Long>> handler);
 
   /**
@@ -120,6 +129,7 @@ public interface RedisClient {
    * @since 2.8.7
    * group: string
    */
+  @Fluent
   RedisClient bitposFrom(String key, int bit, int start, Handler<AsyncResult<Long>> handler);
 
   /**
@@ -136,6 +146,7 @@ public interface RedisClient {
    * @since 2.8.7
    * group: string
    */
+  @Fluent
   RedisClient bitposRange(String key, int bit, int start, int stop, Handler<AsyncResult<Long>> handler);
 
   /**
@@ -147,6 +158,7 @@ public interface RedisClient {
    * @since 2.0.0
    * group: list
    */
+  @Fluent
   RedisClient blpop(String key, int seconds, Handler<AsyncResult<JsonArray>> handler);
 
   /**
@@ -158,6 +170,7 @@ public interface RedisClient {
    * @since 2.0.0
    * group: list
    */
+  @Fluent
   RedisClient blpopMany(List<String> keys, int seconds, Handler<AsyncResult<JsonArray>> handler);
 
   /**
@@ -169,6 +182,7 @@ public interface RedisClient {
    * @since 2.0.0
    * group: list
    */
+  @Fluent
   RedisClient brpop(String key, int seconds, Handler<AsyncResult<JsonArray>> handler);
 
   /**
@@ -180,6 +194,7 @@ public interface RedisClient {
    * @since 2.0.0
    * group: list
    */
+  @Fluent
   RedisClient brpopMany(List<String> keys, int seconds, Handler<AsyncResult<JsonArray>> handler);
 
   /**
@@ -192,6 +207,7 @@ public interface RedisClient {
    * @since 2.2.0
    * group: list
    */
+  @Fluent
   RedisClient brpoplpush(String key, String destkey, int seconds, Handler<AsyncResult<String>> handler);
 
   /**
@@ -202,6 +218,7 @@ public interface RedisClient {
    * @since 2.4.0
    * group: server
    */
+  @Fluent
   RedisClient clientKill(KillFilter filter, Handler<AsyncResult<Long>> handler);
 
   /**
@@ -210,6 +227,7 @@ public interface RedisClient {
    * @since 2.4.0
    * group: server
    */
+  @Fluent
   RedisClient clientList(Handler<AsyncResult<String>> handler);
 
   /**
@@ -218,6 +236,7 @@ public interface RedisClient {
    * @since 2.6.9
    * group: server
    */
+  @Fluent
   RedisClient clientGetname(Handler<AsyncResult<String>> handler);
 
   /**
@@ -228,6 +247,7 @@ public interface RedisClient {
    * @since 2.9.50
    * group: server
    */
+  @Fluent
   RedisClient clientPause(long millis, Handler<AsyncResult<String>> handler);
 
   /**
@@ -238,6 +258,7 @@ public interface RedisClient {
    * @since 2.6.9
    * group: server
    */
+  @Fluent
   RedisClient clientSetname(String name, Handler<AsyncResult<String>> handler);
 
   /**
@@ -248,6 +269,7 @@ public interface RedisClient {
    * @since 3.0.0
    * group: server
    */
+  @Fluent
   RedisClient clusterAddslots(List<Long> slots, Handler<AsyncResult<Void>> handler);
 
   /**
@@ -258,6 +280,7 @@ public interface RedisClient {
    * @since 3.0.0
    * group: cluster
    */
+  @Fluent
   RedisClient clusterCountFailureReports(String nodeId, Handler<AsyncResult<Long>> handler);
 
   /**
@@ -268,6 +291,7 @@ public interface RedisClient {
    * @since 3.0.0
    * group: cluster
    */
+  @Fluent
   RedisClient clusterCountkeysinslot(long slot, Handler<AsyncResult<Long>> handler);
 
   /**
@@ -278,6 +302,7 @@ public interface RedisClient {
    * @since 3.0.0
    * group: cluster
    */
+  @Fluent
   RedisClient clusterDelslots(long slot, Handler<AsyncResult<Void>> handler);
 
   /**
@@ -288,6 +313,7 @@ public interface RedisClient {
    * @since 3.0.0
    * group: cluster
    */
+  @Fluent
   RedisClient clusterDelslotsMany(List<Long> slots, Handler<AsyncResult<Void>> handler);
 
   /**
@@ -297,6 +323,7 @@ public interface RedisClient {
    * @since 3.0.0
    * group: cluster
    */
+  @Fluent
   RedisClient clusterFailover(Handler<AsyncResult<Void>> handler);
 
   /**
@@ -307,6 +334,7 @@ public interface RedisClient {
    * @since 3.0.0
    * group: cluster
    */
+  @Fluent
   RedisClient clusterFailOverWithOptions(FailoverOptions options, Handler<AsyncResult<Void>> handler);
 
   /**
@@ -317,6 +345,7 @@ public interface RedisClient {
    * @since 3.0.0
    * group: cluster
    */
+  @Fluent
   RedisClient clusterForget(String nodeId, Handler<AsyncResult<Void>> handler);
 
   /**
@@ -328,6 +357,7 @@ public interface RedisClient {
    * @since 3.0.0
    * group: cluster
    */
+  @Fluent
   RedisClient clusterGetkeysinslot(long slot, long count, Handler<AsyncResult<JsonArray>> handler);
 
   /**
@@ -337,6 +367,7 @@ public interface RedisClient {
    * @since 3.0.0
    * group: cluster
    */
+  @Fluent
   RedisClient clusterInfo(Handler<AsyncResult<JsonArray>> handler);
 
   /**
@@ -347,6 +378,7 @@ public interface RedisClient {
    * @since 3.0.0
    * group: cluster
    */
+  @Fluent
   RedisClient clusterKeyslot(String key, Handler<AsyncResult<Long>> handler);
 
   /**
@@ -358,6 +390,7 @@ public interface RedisClient {
    * @since 3.0.0
    * group: cluster
    */
+  @Fluent
   RedisClient clusterMeet(String ip, long port, Handler<AsyncResult<Void>> handler);
 
   /**
@@ -367,6 +400,7 @@ public interface RedisClient {
    * @since 3.0.0
    * group: cluster
    */
+  @Fluent
   RedisClient clusterNodes(Handler<AsyncResult<JsonArray>> handler);
 
   /**
@@ -377,6 +411,7 @@ public interface RedisClient {
    * @since 3.0.0
    * group: cluster
    */
+  @Fluent
   RedisClient clusterReplicate(String nodeId, Handler<AsyncResult<Void>> handler);
 
   /**
@@ -386,6 +421,7 @@ public interface RedisClient {
    * @since 3.0.0
    * group: cluster
    */
+  @Fluent
   RedisClient clusterReset(Handler<AsyncResult<Void>> handler);
 
   /**
@@ -396,6 +432,7 @@ public interface RedisClient {
    * @since 3.0.0
    * group: cluster
    */
+  @Fluent
   RedisClient clusterResetWithOptions(ResetOptions options, Handler<AsyncResult<Void>> handler);
 
   /**
@@ -405,6 +442,7 @@ public interface RedisClient {
    * @since 3.0.0
    * group: cluster
    */
+  @Fluent
   RedisClient clusterSaveconfig(Handler<AsyncResult<Void>> handler);
 
   /**
@@ -415,6 +453,7 @@ public interface RedisClient {
    * @since 3.0.0
    * group: cluster
    */
+  @Fluent
   RedisClient clusterSetConfigEpoch(long epoch, Handler<AsyncResult<Void>> handler);
 
   /**
@@ -426,6 +465,7 @@ public interface RedisClient {
    * @since 3.0.0
    * group: cluster
    */
+  @Fluent
   RedisClient clusterSetslot(long slot, SlotCmd subcommand, Handler<AsyncResult<Void>> handler);
 
   /**
@@ -438,6 +478,7 @@ public interface RedisClient {
    * @since 3.0.0
    * group: cluster
    */
+  @Fluent
   RedisClient clusterSetslotWithNode(long slot, SlotCmd subcommand, String nodeId, Handler<AsyncResult<Void>> handler);
 
   /**
@@ -448,6 +489,7 @@ public interface RedisClient {
    * @since 3.0.0
    * group: cluster
    */
+  @Fluent
   RedisClient clusterSlaves(String nodeId, Handler<AsyncResult<JsonArray>> handler);
 
   /**
@@ -456,6 +498,7 @@ public interface RedisClient {
    * @since 3.0.0
    * group: server
    */
+  @Fluent
   RedisClient clusterSlots(Handler<AsyncResult<JsonArray>> handler);
 
   /**
@@ -464,6 +507,7 @@ public interface RedisClient {
    * @since 2.8.13
    * group: server
    */
+  @Fluent
   RedisClient command(Handler<AsyncResult<JsonArray>> handler);
 
   /**
@@ -472,6 +516,7 @@ public interface RedisClient {
    * @since 2.8.13
    * group: server
    */
+  @Fluent
   RedisClient commandCount(Handler<AsyncResult<Long>> handler);
 
   /**
@@ -480,6 +525,7 @@ public interface RedisClient {
    * @since 2.8.13
    * group: server
    */
+  @Fluent
   RedisClient commandGetkeys(Handler<AsyncResult<JsonArray>> handler);
 
   /**
@@ -490,6 +536,7 @@ public interface RedisClient {
    * @since 2.8.13
    * group: server
    */
+  @Fluent
   RedisClient commandInfo(List<String> commands, Handler<AsyncResult<JsonArray>> handler);
 
   /**
@@ -500,6 +547,7 @@ public interface RedisClient {
    * @since 2.0.0
    * group: server
    */
+  @Fluent
   RedisClient configGet(String parameter, Handler<AsyncResult<JsonArray>> handler);
 
   /**
@@ -508,6 +556,7 @@ public interface RedisClient {
    * @since 2.8.0
    * group: server
    */
+  @Fluent
   RedisClient configRewrite(Handler<AsyncResult<String>> handler);
 
   /**
@@ -519,6 +568,7 @@ public interface RedisClient {
    * @since 2.0.0
    * group: server
    */
+  @Fluent
   RedisClient configSet(String parameter, String value, Handler<AsyncResult<String>> handler);
 
   /**
@@ -527,6 +577,7 @@ public interface RedisClient {
    * @since 2.0.0
    * group: server
    */
+  @Fluent
   RedisClient configResetstat(Handler<AsyncResult<String>> handler);
 
   /**
@@ -535,6 +586,7 @@ public interface RedisClient {
    * @since 1.0.0
    * group: server
    */
+  @Fluent
   RedisClient dbsize(Handler<AsyncResult<Long>> handler);
 
   /**
@@ -545,6 +597,7 @@ public interface RedisClient {
    * @since 1.0.0
    * group: server
    */
+  @Fluent
   RedisClient debugObject(String key, Handler<AsyncResult<String>> handler);
 
   /**
@@ -553,6 +606,7 @@ public interface RedisClient {
    * @since 1.0.0
    * group: server
    */
+  @Fluent
   RedisClient debugSegfault(Handler<AsyncResult<String>> handler);
 
   /**
@@ -563,6 +617,7 @@ public interface RedisClient {
    * @since 1.0.0
    * group: string
    */
+  @Fluent
   RedisClient decr(String key, Handler<AsyncResult<Long>> handler);
 
   /**
@@ -574,6 +629,7 @@ public interface RedisClient {
    * @since 1.0.0
    * group: string
    */
+  @Fluent
   RedisClient decrby(String key, long decrement, Handler<AsyncResult<Long>> handler);
 
   /**
@@ -584,6 +640,7 @@ public interface RedisClient {
    * @since 1.0.0
    * group: generic
    */
+  @Fluent
   RedisClient del(List<String> keys, Handler<AsyncResult<Long>> handler);
 
   /**
@@ -592,6 +649,7 @@ public interface RedisClient {
    * @since 2.0.0
    * group: transactions
    */
+  @Fluent
   RedisClient discard(Handler<AsyncResult<String>> handler);
 
   /**
@@ -602,6 +660,7 @@ public interface RedisClient {
    * @since 2.6.0
    * group: generic
    */
+  @Fluent
   RedisClient dump(String key, Handler<AsyncResult<String>> handler);
 
   /**
@@ -612,6 +671,7 @@ public interface RedisClient {
    * @since 1.0.0
    * group: connection
    */
+  @Fluent
   RedisClient echo(String message, Handler<AsyncResult<String>> handler);
 
   /**
@@ -624,6 +684,7 @@ public interface RedisClient {
    * @since 2.6.0
    * group: scripting
    */
+  @Fluent
   RedisClient eval(String script, List<String> keys, List<String> args, Handler<AsyncResult<Void>> handler);
 
   /**
@@ -636,6 +697,7 @@ public interface RedisClient {
    * @since 2.6.0
    * group: scripting
    */
+  @Fluent
   RedisClient evalsha(String sha1, List<String> keys, List<String> values, Handler<AsyncResult<Void>> handler);
 
   /**
@@ -644,6 +706,7 @@ public interface RedisClient {
    * @since 1.2.0
    * group: transactions
    */
+  @Fluent
   RedisClient exec(Handler<AsyncResult<JsonArray>> handler);
 
   /**
@@ -654,6 +717,7 @@ public interface RedisClient {
    * @since 1.0.0
    * group: generic
    */
+  @Fluent
   RedisClient exists(String key, Handler<AsyncResult<Long>> handler);
 
   /**
@@ -665,6 +729,7 @@ public interface RedisClient {
    * @since 1.0.0
    * group: generic
    */
+  @Fluent
   RedisClient expire(String key, int seconds, Handler<AsyncResult<Long>> handler);
 
   /**
@@ -676,6 +741,7 @@ public interface RedisClient {
    * @since 1.2.0
    * group: generic
    */
+  @Fluent
   RedisClient expireat(String key, long seconds, Handler<AsyncResult<Long>> handler);
 
   /**
@@ -684,6 +750,7 @@ public interface RedisClient {
    * @since 1.0.0
    * group: server
    */
+  @Fluent
   RedisClient flushall(Handler<AsyncResult<String>> handler);
 
   /**
@@ -692,6 +759,7 @@ public interface RedisClient {
    * @since 1.0.0
    * group: server
    */
+  @Fluent
   RedisClient flushdb(Handler<AsyncResult<String>> handler);
 
   /**
@@ -702,6 +770,7 @@ public interface RedisClient {
    * @since 1.0.0
    * group: string
    */
+  @Fluent
   RedisClient get(String key, Handler<AsyncResult<String>> handler);
 
   /**
@@ -712,6 +781,7 @@ public interface RedisClient {
    * @since 1.0.0
    * group: string
    */
+  @Fluent
   RedisClient getBinary(String key, Handler<AsyncResult<String>> handler);
 
   /**
@@ -723,6 +793,7 @@ public interface RedisClient {
    * @since 2.2.0
    * group: string
    */
+  @Fluent
   RedisClient getbit(String key, long offset, Handler<AsyncResult<Long>> handler);
 
   /**
@@ -735,6 +806,7 @@ public interface RedisClient {
    * @since 2.4.0
    * group: string
    */
+  @Fluent
   RedisClient getrange(String key, long start, long end, Handler<AsyncResult<String>> handler);
 
   /**
@@ -746,6 +818,7 @@ public interface RedisClient {
    * @since 1.0.0
    * group: string
    */
+  @Fluent
   RedisClient getset(String key, String value, Handler<AsyncResult<String>> handler);
 
   /**
@@ -757,6 +830,7 @@ public interface RedisClient {
    * @since 2.0.0
    * group: hash
    */
+  @Fluent
   RedisClient hdel(String key, String field, Handler<AsyncResult<Long>> handler);
 
   /**
@@ -768,6 +842,7 @@ public interface RedisClient {
    * @since 2.0.0
    * group: hash
    */
+  @Fluent
   RedisClient hdelMany(String key, List<String> fields, Handler<AsyncResult<Long>> handler);
 
   /**
@@ -779,6 +854,7 @@ public interface RedisClient {
    * @since 2.0.0
    * group: hash
    */
+  @Fluent
   RedisClient hexists(String key, String field, Handler<AsyncResult<Long>> handler);
 
   /**
@@ -790,6 +866,7 @@ public interface RedisClient {
    * @since 2.0.0
    * group: hash
    */
+  @Fluent
   RedisClient hget(String key, String field, Handler<AsyncResult<String>> handler);
 
   /**
@@ -800,6 +877,7 @@ public interface RedisClient {
    * @since 2.0.0
    * group: hash
    */
+  @Fluent
   RedisClient hgetall(String key, Handler<AsyncResult<JsonObject>> handler);
 
   /**
@@ -812,6 +890,7 @@ public interface RedisClient {
    * @since 2.0.0
    * group: hash
    */
+  @Fluent
   RedisClient hincrby(String key, String field, long increment, Handler<AsyncResult<Long>> handler);
 
   /**
@@ -824,6 +903,7 @@ public interface RedisClient {
    * @since 2.6.0
    * group: hash
    */
+  @Fluent
   RedisClient hincrbyfloat(String key, String field, double increment, Handler<AsyncResult<String>> handler);
 
   /**
@@ -834,6 +914,7 @@ public interface RedisClient {
    * @since 2.0.0
    * group: hash
    */
+  @Fluent
   RedisClient hkeys(String key, Handler<AsyncResult<JsonArray>> handler);
 
   /**
@@ -844,6 +925,7 @@ public interface RedisClient {
    * @since 2.0.0
    * group: hash
    */
+  @Fluent
   RedisClient hlen(String key, Handler<AsyncResult<Long>> handler);
 
   /**
@@ -855,6 +937,7 @@ public interface RedisClient {
    * @since 2.0.0
    * group: hash
    */
+  @Fluent
   RedisClient hmget(String key, List<String> fields, Handler<AsyncResult<JsonArray>> handler);
 
   /**
@@ -866,6 +949,7 @@ public interface RedisClient {
    * @since 2.0.0
    * group: hash
    */
+  @Fluent
   RedisClient hmset(String key, Map<String, String> values, Handler<AsyncResult<String>> handler);
 
   /**
@@ -878,6 +962,7 @@ public interface RedisClient {
    * @since 2.0.0
    * group: hash
    */
+  @Fluent
   RedisClient hset(String key, String field, String value, Handler<AsyncResult<Long>> handler);
 
   /**
@@ -890,6 +975,7 @@ public interface RedisClient {
    * @since 2.0.0
    * group: hash
    */
+  @Fluent
   RedisClient hsetnx(String key, String field, String value, Handler<AsyncResult<Long>> handler);
 
   /**
@@ -900,6 +986,7 @@ public interface RedisClient {
    * @since 2.0.0
    * group: hash
    */
+  @Fluent
   RedisClient hvals(String key, Handler<AsyncResult<JsonArray>> handler);
 
   /**
@@ -910,6 +997,7 @@ public interface RedisClient {
    * @since 1.0.0
    * group: string
    */
+  @Fluent
   RedisClient incr(String key, Handler<AsyncResult<Long>> handler);
 
   /**
@@ -921,6 +1009,7 @@ public interface RedisClient {
    * @since 1.0.0
    * group: string
    */
+  @Fluent
   RedisClient incrby(String key, long increment, Handler<AsyncResult<Long>> handler);
 
   /**
@@ -932,6 +1021,7 @@ public interface RedisClient {
    * @since 2.6.0
    * group: string
    */
+  @Fluent
   RedisClient incrbyfloat(String key, double increment, Handler<AsyncResult<String>> handler);
 
   /**
@@ -941,6 +1031,7 @@ public interface RedisClient {
    * @since 1.0.0
    * group: server
    */
+  @Fluent
   RedisClient info(Handler<AsyncResult<JsonObject>> handler);
 
   /**
@@ -951,6 +1042,7 @@ public interface RedisClient {
    * @since 1.0.0
    * group: server
    */
+  @Fluent
   RedisClient infoSection(String section, Handler<AsyncResult<JsonObject>> handler);
 
   /**
@@ -961,6 +1053,7 @@ public interface RedisClient {
    * @since 1.0.0
    * group: generic
    */
+  @Fluent
   RedisClient keys(String pattern, Handler<AsyncResult<JsonArray>> handler);
 
   /**
@@ -969,6 +1062,7 @@ public interface RedisClient {
    * @since 1.0.0
    * group: server
    */
+  @Fluent
   RedisClient lastsave(Handler<AsyncResult<Long>> handler);
 
   /**
@@ -980,6 +1074,7 @@ public interface RedisClient {
    * @since 1.0.0
    * group: list
    */
+  @Fluent
   RedisClient lindex(String key, int index, Handler<AsyncResult<String>> handler);
 
   /**
@@ -993,6 +1088,7 @@ public interface RedisClient {
    * @since 2.2.0
    * group: list
    */
+  @Fluent
   RedisClient linsert(String key, InsertOptions option, String pivot, String value, Handler<AsyncResult<Long>> handler);
 
   /**
@@ -1003,6 +1099,7 @@ public interface RedisClient {
    * @since 1.0.0
    * group: list
    */
+  @Fluent
   RedisClient llen(String key, Handler<AsyncResult<Long>> handler);
 
   /**
@@ -1013,6 +1110,7 @@ public interface RedisClient {
    * @since 1.0.0
    * group: list
    */
+  @Fluent
   RedisClient lpop(String key, Handler<AsyncResult<String>> handler);
 
   /**
@@ -1024,6 +1122,7 @@ public interface RedisClient {
    * @since 1.0.0
    * group: list
    */
+  @Fluent
   RedisClient lpushMany(String key, List<String> values, Handler<AsyncResult<Long>> handler);
 
   /**
@@ -1035,6 +1134,7 @@ public interface RedisClient {
    * @since 1.0.0
    * group: list
    */
+  @Fluent
   RedisClient lpush(String key, String value, Handler<AsyncResult<Long>> handler);
 
   /**
@@ -1046,6 +1146,7 @@ public interface RedisClient {
    * @since 2.2.0
    * group: list
    */
+  @Fluent
   RedisClient lpushx(String key, String value, Handler<AsyncResult<Long>> handler);
 
   /**
@@ -1058,6 +1159,7 @@ public interface RedisClient {
    * @since 1.0.0
    * group: list
    */
+  @Fluent
   RedisClient lrange(String key, long from, long to, Handler<AsyncResult<JsonArray>> handler);
 
   /**
@@ -1070,6 +1172,7 @@ public interface RedisClient {
    * @since 1.0.0
    * group: list
    */
+  @Fluent
   RedisClient lrem(String key, long count, String value, Handler<AsyncResult<Long>> handler);
 
   /**
@@ -1082,6 +1185,7 @@ public interface RedisClient {
    * @since 1.0.0
    * group: list
    */
+  @Fluent
   RedisClient lset(String key, long index, String value, Handler<AsyncResult<String>> handler);
 
   /**
@@ -1094,6 +1198,7 @@ public interface RedisClient {
    * @since 1.0.0
    * group: list
    */
+  @Fluent
   RedisClient ltrim(String key, long from, long to, Handler<AsyncResult<String>> handler);
 
   /**
@@ -1104,6 +1209,7 @@ public interface RedisClient {
    * @since 1.0.0
    * group: string
    */
+  @Fluent
   RedisClient mget(String key, Handler<AsyncResult<JsonArray>> handler);
 
   /**
@@ -1114,6 +1220,7 @@ public interface RedisClient {
    * @since 1.0.0
    * group: string
    */
+  @Fluent
   RedisClient mgetMany(List<String> keys, Handler<AsyncResult<JsonArray>> handler);
 
   /**
@@ -1128,6 +1235,7 @@ public interface RedisClient {
    * @since 2.6.0
    * group: generic
    */
+  @Fluent
   RedisClient migrate(String host, int port, String key, int destdb, long timeout, MigrateOptions options, Handler<AsyncResult<String>> handler);
 
   /**
@@ -1136,6 +1244,7 @@ public interface RedisClient {
    * @since 1.0.0
    * group: server
    */
+  @Fluent
   RedisClient monitor(Handler<AsyncResult<Void>> handler);
 
   /**
@@ -1147,6 +1256,7 @@ public interface RedisClient {
    * @since 1.0.0
    * group: generic
    */
+  @Fluent
   RedisClient move(String key, int destdb, Handler<AsyncResult<Long>> handler);
 
   /**
@@ -1157,6 +1267,7 @@ public interface RedisClient {
    * @since 1.0.1
    * group: string
    */
+  @Fluent
   RedisClient mset(Map<String, String> keyvals, Handler<AsyncResult<String>> handler);
 
   /**
@@ -1167,6 +1278,7 @@ public interface RedisClient {
    * @since 1.0.1
    * group: string
    */
+  @Fluent
   RedisClient msetnx(Map<String, String> keyvals, Handler<AsyncResult<Long>> handler);
 
   /**
@@ -1175,6 +1287,7 @@ public interface RedisClient {
    * @since 1.2.0
    * group: transactions
    */
+  @Fluent
   RedisClient multi(Handler<AsyncResult<String>> handler);
 
   /**
@@ -1186,6 +1299,7 @@ public interface RedisClient {
    * @since 2.2.3
    * group: generic
    */
+  @Fluent
   RedisClient object(String key, ObjectCmd cmd, Handler<AsyncResult<Void>> handler);
 
   /**
@@ -1196,6 +1310,7 @@ public interface RedisClient {
    * @since 2.2.0
    * group: generic
    */
+  @Fluent
   RedisClient persist(String key, Handler<AsyncResult<Long>> handler);
 
   /**
@@ -1207,6 +1322,7 @@ public interface RedisClient {
    * @since 2.6.0
    * group: generic
    */
+  @Fluent
   RedisClient pexpire(String key, long millis, Handler<AsyncResult<Long>> handler);
 
   /**
@@ -1218,6 +1334,7 @@ public interface RedisClient {
    * @since 2.6.0
    * group: generic
    */
+  @Fluent
   RedisClient pexpireat(String key, long millis, Handler<AsyncResult<Long>> handler);
 
   /**
@@ -1229,6 +1346,7 @@ public interface RedisClient {
    * @since 2.8.9
    * group: hyperloglog
    */
+  @Fluent
   RedisClient pfadd(String key, String element, Handler<AsyncResult<Long>> handler);
 
   /**
@@ -1240,6 +1358,7 @@ public interface RedisClient {
    * @since 2.8.9
    * group: hyperloglog
    */
+  @Fluent
   RedisClient pfaddMany(String key, List<String> elements, Handler<AsyncResult<Long>> handler);
 
   /**
@@ -1250,6 +1369,7 @@ public interface RedisClient {
    * @since 2.8.9
    * group: hyperloglog
    */
+  @Fluent
   RedisClient pfcount(String key, Handler<AsyncResult<Long>> handler);
 
   /**
@@ -1260,6 +1380,7 @@ public interface RedisClient {
    * @since 2.8.9
    * group: hyperloglog
    */
+  @Fluent
   RedisClient pfcountMany(List<String> keys, Handler<AsyncResult<Long>> handler);
 
   /**
@@ -1271,6 +1392,7 @@ public interface RedisClient {
    * @since 2.8.9
    * group: hyperloglog
    */
+  @Fluent
   RedisClient pfmerge(String destkey, List<String> keys, Handler<AsyncResult<String>> handler);
 
   /**
@@ -1279,6 +1401,7 @@ public interface RedisClient {
    * @since 1.0.0
    * group: connection
    */
+  @Fluent
   RedisClient ping(Handler<AsyncResult<String>> handler);
 
   /**
@@ -1291,6 +1414,7 @@ public interface RedisClient {
    * @since 2.6.0
    * group: string
    */
+  @Fluent
   RedisClient psetex(String key, long millis, String value, Handler<AsyncResult<Void>> handler);
 
   /**
@@ -1301,6 +1425,7 @@ public interface RedisClient {
    * @since 2.0.0
    * group: pubsub
    */
+  @Fluent
   RedisClient psubscribe(String pattern, Handler<AsyncResult<JsonArray>> handler);
 
   /**
@@ -1311,6 +1436,7 @@ public interface RedisClient {
    * @since 2.0.0
    * group: pubsub
    */
+  @Fluent
   RedisClient psubscribeMany(List<String> patterns, Handler<AsyncResult<JsonArray>> handler);
 
   /**
@@ -1321,6 +1447,7 @@ public interface RedisClient {
    * @since 2.8.0
    * group: pubsub
    */
+  @Fluent
   RedisClient pubsubChannels(String pattern, Handler<AsyncResult<JsonArray>> handler);
 
   /**
@@ -1331,6 +1458,7 @@ public interface RedisClient {
    * @since 2.8.0
    * group: pubsub
    */
+  @Fluent
   RedisClient pubsubNumsub(List<String> channels, Handler<AsyncResult<JsonArray>> handler);
 
   /**
@@ -1340,6 +1468,7 @@ public interface RedisClient {
    * @since 2.8.0
    * group: pubsub
    */
+  @Fluent
   RedisClient pubsubNumpat(Handler<AsyncResult<Long>> handler);
 
   /**
@@ -1350,6 +1479,7 @@ public interface RedisClient {
    * @since 2.6.0
    * group: generic
    */
+  @Fluent
   RedisClient pttl(String key, Handler<AsyncResult<Long>> handler);
 
   /**
@@ -1361,6 +1491,7 @@ public interface RedisClient {
    * @since 2.0.0
    * group: pubsub
    */
+  @Fluent
   RedisClient publish(String channel, String message, Handler<AsyncResult<Long>> handler);
 
   /**
@@ -1371,6 +1502,7 @@ public interface RedisClient {
    * @since 2.0.0
    * group: pubsub
    */
+  @Fluent
   RedisClient punsubscribe(List<String> patterns, Handler<AsyncResult<Void>> handler);
 
   /**
@@ -1379,6 +1511,7 @@ public interface RedisClient {
    * @since 1.0.0
    * group: generic
    */
+  @Fluent
   RedisClient randomkey(Handler<AsyncResult<String>> handler);
 
   /**
@@ -1390,6 +1523,7 @@ public interface RedisClient {
    * @since 1.0.0
    * group: generic
    */
+  @Fluent
   RedisClient rename(String key, String newkey, Handler<AsyncResult<String>> handler);
 
   /**
@@ -1401,6 +1535,7 @@ public interface RedisClient {
    * @since 1.0.0
    * group: generic
    */
+  @Fluent
   RedisClient renamenx(String key, String newkey, Handler<AsyncResult<Long>> handler);
 
   /**
@@ -1413,6 +1548,7 @@ public interface RedisClient {
    * @since 2.6.0
    * group: generic
    */
+  @Fluent
   RedisClient restore(String key, long millis, String serialized, Handler<AsyncResult<String>> handler);
 
   /**
@@ -1421,6 +1557,7 @@ public interface RedisClient {
    * @since 2.8.12
    * group: server
    */
+  @Fluent
   RedisClient role(Handler<AsyncResult<JsonArray>> handler);
 
   /**
@@ -1431,6 +1568,7 @@ public interface RedisClient {
    * @since 1.0.0
    * group: list
    */
+  @Fluent
   RedisClient rpop(String key, Handler<AsyncResult<String>> handler);
 
   /**
@@ -1442,6 +1580,7 @@ public interface RedisClient {
    * @since 1.2.0
    * group: list
    */
+  @Fluent
   RedisClient rpoplpush(String key, String destkey, Handler<AsyncResult<String>> handler);
 
   /**
@@ -1453,6 +1592,7 @@ public interface RedisClient {
    * @since 1.0.0
    * group: list
    */
+  @Fluent
   RedisClient rpushMany(String key, List<String> values, Handler<AsyncResult<Long>> handler);
 
   /**
@@ -1464,6 +1604,7 @@ public interface RedisClient {
    * @since 1.0.0
    * group: list
    */
+  @Fluent
   RedisClient rpush(String key, String value, Handler<AsyncResult<Long>> handler);
 
   /**
@@ -1475,6 +1616,7 @@ public interface RedisClient {
    * @since 2.2.0
    * group: list
    */
+  @Fluent
   RedisClient rpushx(String key, String value, Handler<AsyncResult<Long>> handler);
 
   /**
@@ -1486,6 +1628,7 @@ public interface RedisClient {
    * @since 1.0.0
    * group: set
    */
+  @Fluent
   RedisClient sadd(String key, String member, Handler<AsyncResult<Long>> handler);
 
   /**
@@ -1497,6 +1640,7 @@ public interface RedisClient {
    * @since 1.0.0
    * group: set
    */
+  @Fluent
   RedisClient saddMany(String key, List<String> members, Handler<AsyncResult<Long>> handler);
 
   /**
@@ -1505,6 +1649,7 @@ public interface RedisClient {
    * @since 1.0.0
    * group: server
    */
+  @Fluent
   RedisClient save(Handler<AsyncResult<String>> handler);
 
   /**
@@ -1515,6 +1660,7 @@ public interface RedisClient {
    * @since 1.0.0
    * group: set
    */
+  @Fluent
   RedisClient scard(String key, Handler<AsyncResult<Long>> handler);
 
   /**
@@ -1525,6 +1671,7 @@ public interface RedisClient {
    * @since 2.6.0
    * group: scripting
    */
+  @Fluent
   RedisClient scriptExists(String script, Handler<AsyncResult<JsonArray>> handler);
 
   /**
@@ -1535,6 +1682,7 @@ public interface RedisClient {
    * @since 2.6.0
    * group: scripting
    */
+  @Fluent
   RedisClient scriptExistsMany(List<String> scripts, Handler<AsyncResult<JsonArray>> handler);
 
   /**
@@ -1543,6 +1691,7 @@ public interface RedisClient {
    * @since 2.6.0
    * group: scripting
    */
+  @Fluent
   RedisClient scriptFlush(Handler<AsyncResult<String>> handler);
 
   /**
@@ -1551,6 +1700,7 @@ public interface RedisClient {
    * @since 2.6.0
    * group: scripting
    */
+  @Fluent
   RedisClient scriptKill(Handler<AsyncResult<String>> handler);
 
   /**
@@ -1561,6 +1711,7 @@ public interface RedisClient {
    * @since 2.6.0
    * group: scripting
    */
+  @Fluent
   RedisClient scriptLoad(String script, Handler<AsyncResult<String>> handler);
 
   /**
@@ -1572,6 +1723,7 @@ public interface RedisClient {
    * @since 1.0.0
    * group: set
    */
+  @Fluent
   RedisClient sdiff(String key, List<String> cmpkeys, Handler<AsyncResult<JsonArray>> handler);
 
   /**
@@ -1584,6 +1736,7 @@ public interface RedisClient {
    * @since 1.0.0
    * group: set
    */
+  @Fluent
   RedisClient sdiffstore(String destkey, String key, List<String> cmpkeys, Handler<AsyncResult<Long>> handler);
 
   /**
@@ -1594,6 +1747,7 @@ public interface RedisClient {
    * @since 1.0.0
    * group: connection
    */
+  @Fluent
   RedisClient select(int dbindex, Handler<AsyncResult<String>> handler);
 
   /**
@@ -1605,6 +1759,7 @@ public interface RedisClient {
    * @since 1.0.0
    * group: string
    */
+  @Fluent
   RedisClient set(String key, String value, Handler<AsyncResult<Void>> handler);
 
   /**
@@ -1617,6 +1772,7 @@ public interface RedisClient {
    * @since 1.0.0
    * group: string
    */
+  @Fluent
   RedisClient setWithOptions(String key, String value, SetOptions options, Handler<AsyncResult<Void>> handler);
 
   /**
@@ -1628,6 +1784,7 @@ public interface RedisClient {
    * @since 1.0.0
    * group: string
    */
+  @Fluent
   RedisClient setBinary(String key, String value, Handler<AsyncResult<Void>> handler);
 
   /**
@@ -1640,6 +1797,7 @@ public interface RedisClient {
    * @since 2.2.0
    * group: string
    */
+  @Fluent
   RedisClient setbit(String key, long offset, int bit, Handler<AsyncResult<Long>> handler);
 
   /**
@@ -1652,6 +1810,7 @@ public interface RedisClient {
    * @since 2.0.0
    * group: string
    */
+  @Fluent
   RedisClient setex(String key, long seconds, String value, Handler<AsyncResult<String>> handler);
 
   /**
@@ -1663,6 +1822,7 @@ public interface RedisClient {
    * @since 1.0.0
    * group: string
    */
+  @Fluent
   RedisClient setnx(String key, String value, Handler<AsyncResult<Long>> handler);
 
   /**
@@ -1675,6 +1835,7 @@ public interface RedisClient {
    * @since 2.2.0
    * group: string
    */
+  @Fluent
   RedisClient setrange(String key, int offset, String value, Handler<AsyncResult<Long>> handler);
 
   /**
@@ -1685,6 +1846,7 @@ public interface RedisClient {
    * @since 1.0.0
    * group: set
    */
+  @Fluent
   RedisClient sinter(List<String> keys, Handler<AsyncResult<JsonArray>> handler);
 
   /**
@@ -1696,6 +1858,7 @@ public interface RedisClient {
    * @since 1.0.0
    * group: set
    */
+  @Fluent
   RedisClient sinterstore(String destkey, List<String> keys, Handler<AsyncResult<Long>> handler);
 
   /**
@@ -1707,6 +1870,7 @@ public interface RedisClient {
    * @since 1.0.0
    * group: set
    */
+  @Fluent
   RedisClient sismember(String key, String member, Handler<AsyncResult<Long>> handler);
 
   /**
@@ -1718,6 +1882,7 @@ public interface RedisClient {
    * @since 1.0.0
    * group: server
    */
+  @Fluent
   RedisClient slaveof(String host, int port, Handler<AsyncResult<String>> handler);
 
   /**
@@ -1727,6 +1892,7 @@ public interface RedisClient {
    * @since 1.0.0
    * group: server
    */
+  @Fluent
   RedisClient slaveofNoone(Handler<AsyncResult<String>> handler);
 
   /**
@@ -1737,6 +1903,7 @@ public interface RedisClient {
    * @since 2.2.12
    * group: server
    */
+  @Fluent
   RedisClient slowlogGet(int limit, Handler<AsyncResult<JsonArray>> handler);
 
   /**
@@ -1746,6 +1913,7 @@ public interface RedisClient {
    * @since 2.2.12
    * group: server
    */
+  @Fluent
   RedisClient slowlogLen(Handler<AsyncResult<Long>> handler);
 
   /**
@@ -1755,6 +1923,7 @@ public interface RedisClient {
    * @since 2.2.12
    * group: server
    */
+  @Fluent
   RedisClient slowlogReset(Handler<AsyncResult<Void>> handler);
 
   /**
@@ -1765,6 +1934,7 @@ public interface RedisClient {
    * @since 1.0.0
    * group: set
    */
+  @Fluent
   RedisClient smembers(String key, Handler<AsyncResult<JsonArray>> handler);
 
   /**
@@ -1777,6 +1947,7 @@ public interface RedisClient {
    * @since 1.0.0
    * group: set
    */
+  @Fluent
   RedisClient smove(String key, String destkey, String member, Handler<AsyncResult<Long>> handler);
 
   /**
@@ -1788,6 +1959,7 @@ public interface RedisClient {
    * @since 1.0.0
    * group: generic
    */
+  @Fluent
   RedisClient sort(String key, SortOptions options, Handler<AsyncResult<JsonArray>> handler);
 
   /**
@@ -1798,6 +1970,7 @@ public interface RedisClient {
    * @since 1.0.0
    * group: set
    */
+  @Fluent
   RedisClient spop(String key, Handler<AsyncResult<String>> handler);
 
   /**
@@ -1809,6 +1982,7 @@ public interface RedisClient {
    * @since 1.0.0
    * group: set
    */
+  @Fluent
   RedisClient spopMany(String key, int count, Handler<AsyncResult<String>> handler);
 
   /**
@@ -1819,6 +1993,7 @@ public interface RedisClient {
    * @since 1.0.0
    * group: set
    */
+  @Fluent
   RedisClient srandmember(String key, Handler<AsyncResult<String>> handler);
 
   /**
@@ -1830,6 +2005,7 @@ public interface RedisClient {
    * @since 1.0.0
    * group: set
    */
+  @Fluent
   RedisClient srandmemberCount(String key, int count, Handler<AsyncResult<JsonArray>> handler);
 
   /**
@@ -1841,6 +2017,7 @@ public interface RedisClient {
    * @since 1.0.0
    * group: set
    */
+  @Fluent
   RedisClient srem(String key, String member, Handler<AsyncResult<Long>> handler);
 
   /**
@@ -1852,6 +2029,7 @@ public interface RedisClient {
    * @since 1.0.0
    * group: set
    */
+  @Fluent
   RedisClient sremMany(String key, List<String> members, Handler<AsyncResult<Long>> handler);
 
   /**
@@ -1862,6 +2040,7 @@ public interface RedisClient {
    * @since 2.2.0
    * group: string
    */
+  @Fluent
   RedisClient strlen(String key, Handler<AsyncResult<Long>> handler);
 
   /**
@@ -1872,6 +2051,7 @@ public interface RedisClient {
    * @since 2.0.0
    * group: pubsub
    */
+  @Fluent
   RedisClient subscribe(String channel, Handler<AsyncResult<JsonArray>> handler);
 
   /**
@@ -1882,6 +2062,7 @@ public interface RedisClient {
    * @since 2.0.0
    * group: pubsub
    */
+  @Fluent
   RedisClient subscribeMany(List<String> channels, Handler<AsyncResult<JsonArray>> handler);
 
   /**
@@ -1892,6 +2073,7 @@ public interface RedisClient {
    * @since 1.0.0
    * group: set
    */
+  @Fluent
   RedisClient sunion(List<String> keys, Handler<AsyncResult<JsonArray>> handler);
 
   /**
@@ -1903,6 +2085,7 @@ public interface RedisClient {
    * @since 1.0.0
    * group: set
    */
+  @Fluent
   RedisClient sunionstore(String destkey, List<String> keys, Handler<AsyncResult<Long>> handler);
 
   /**
@@ -1911,6 +2094,7 @@ public interface RedisClient {
    * @since 1.0.0
    * group: server
    */
+  @Fluent
   RedisClient sync(Handler<AsyncResult<Void>> handler);
 
   /**
@@ -1919,6 +2103,7 @@ public interface RedisClient {
    * @since 2.6.0
    * group: server
    */
+  @Fluent
   RedisClient time(Handler<AsyncResult<JsonArray>> handler);
 
   /**
@@ -1929,6 +2114,7 @@ public interface RedisClient {
    * @since 1.0.0
    * group: generic
    */
+  @Fluent
   RedisClient ttl(String key, Handler<AsyncResult<Long>> handler);
 
   /**
@@ -1939,6 +2125,7 @@ public interface RedisClient {
    * @since 1.0.0
    * group: generic
    */
+  @Fluent
   RedisClient type(String key, Handler<AsyncResult<String>> handler);
 
   /**
@@ -1949,6 +2136,7 @@ public interface RedisClient {
    * @since 2.0.0
    * group: pubsub
    */
+  @Fluent
   RedisClient unsubscribe(List<String> channels, Handler<AsyncResult<Void>> handler);
 
   /**
@@ -1957,6 +2145,7 @@ public interface RedisClient {
    * @since 2.2.0
    * group: transactions
    */
+  @Fluent
   RedisClient unwatch(Handler<AsyncResult<String>> handler);
 
   /**
@@ -1968,6 +2157,7 @@ public interface RedisClient {
    * @since 3.0.0
    * group: generic
    */
+  @Fluent
   RedisClient wait(long numSlaves, long timeout, Handler<AsyncResult<String>> handler);
 
   /**
@@ -1978,6 +2168,7 @@ public interface RedisClient {
    * @since 2.2.0
    * group: transactions
    */
+  @Fluent
   RedisClient watch(String key, Handler<AsyncResult<String>> handler);
 
   /**
@@ -1988,6 +2179,7 @@ public interface RedisClient {
    * @since 2.2.0
    * group: transactions
    */
+  @Fluent
   RedisClient watchMany(List<String> keys, Handler<AsyncResult<String>> handler);
 
   /**
@@ -2000,6 +2192,7 @@ public interface RedisClient {
    * @since 1.2.0
    * group: sorted_set
    */
+  @Fluent
   RedisClient zadd(String key, double score, String member, Handler<AsyncResult<Long>> handler);
 
   /**
@@ -2011,6 +2204,7 @@ public interface RedisClient {
    * @since 1.2.0
    * group: sorted_set
    */
+  @Fluent
   RedisClient zaddMany(String key, Map<String, Double> members, Handler<AsyncResult<Long>> handler);
 
   /**
@@ -2021,6 +2215,7 @@ public interface RedisClient {
    * @since 1.2.0
    * group: sorted_set
    */
+  @Fluent
   RedisClient zcard(String key, Handler<AsyncResult<Long>> handler);
 
   /**
@@ -2033,6 +2228,7 @@ public interface RedisClient {
    * @since 2.0.0
    * group: sorted_set
    */
+  @Fluent
   RedisClient zcount(String key, double min, double max, Handler<AsyncResult<Long>> handler);
 
   /**
@@ -2045,6 +2241,7 @@ public interface RedisClient {
    * @since 1.2.0
    * group: sorted_set
    */
+  @Fluent
   RedisClient zincrby(String key, double increment, String member, Handler<AsyncResult<String>> handler);
 
   /**
@@ -2057,6 +2254,7 @@ public interface RedisClient {
    * @since 2.0.0
    * group: sorted_set
    */
+  @Fluent
   RedisClient zinterstore(String destkey, List<String> sets, AggregateOptions options, Handler<AsyncResult<Long>> handler);
 
   /**
@@ -2069,6 +2267,7 @@ public interface RedisClient {
    * @since 2.0.0
    * group: sorted_set
    */
+  @Fluent
   RedisClient zinterstoreWeighed(String destkey, Map<String, Double> sets, AggregateOptions options, Handler<AsyncResult<Long>> handler);
 
   /**
@@ -2081,6 +2280,7 @@ public interface RedisClient {
    * @since 2.8.9
    * group: sorted_set
    */
+  @Fluent
   RedisClient zlexcount(String key, String min, String max, Handler<AsyncResult<Long>> handler);
 
   /**
@@ -2093,6 +2293,7 @@ public interface RedisClient {
    * @since 1.2.0
    * group: sorted_set
    */
+  @Fluent
   RedisClient zrange(String key, long start, long stop, Handler<AsyncResult<JsonArray>> handler);
 
   /**
@@ -2106,6 +2307,7 @@ public interface RedisClient {
    * @since 1.2.0
    * group: sorted_set
    */
+  @Fluent
   RedisClient zrangeWithOptions(String key, long start, long stop, RangeOptions options, Handler<AsyncResult<JsonArray>> handler);
 
   /**
@@ -2119,6 +2321,7 @@ public interface RedisClient {
    * @since 2.8.9
    * group: sorted_set
    */
+  @Fluent
   RedisClient zrangebylex(String key, String min, String max, LimitOptions options, Handler<AsyncResult<JsonArray>> handler);
 
   /**
@@ -2132,6 +2335,7 @@ public interface RedisClient {
    * @since 1.0.5
    * group: sorted_set
    */
+  @Fluent
   RedisClient zrangebyscore(String key, String min, String max, RangeLimitOptions options, Handler<AsyncResult<JsonArray>> handler);
 
   /**
@@ -2143,6 +2347,7 @@ public interface RedisClient {
    * @since 2.0.0
    * group: sorted_set
    */
+  @Fluent
   RedisClient zrank(String key, String member, Handler<AsyncResult<Long>> handler);
 
   /**
@@ -2154,6 +2359,7 @@ public interface RedisClient {
    * @since 1.2.0
    * group: sorted_set
    */
+  @Fluent
   RedisClient zrem(String key, String member, Handler<AsyncResult<Long>> handler);
 
   /**
@@ -2165,6 +2371,7 @@ public interface RedisClient {
    * @since 1.2.0
    * group: sorted_set
    */
+  @Fluent
   RedisClient zremMany(String key, List<String> members, Handler<AsyncResult<Long>> handler);
 
   /**
@@ -2177,6 +2384,7 @@ public interface RedisClient {
    * @since 2.8.9
    * group: sorted_set
    */
+  @Fluent
   RedisClient zremrangebylex(String key, String min, String max, Handler<AsyncResult<Long>> handler);
 
   /**
@@ -2189,6 +2397,7 @@ public interface RedisClient {
    * @since 2.0.0
    * group: sorted_set
    */
+  @Fluent
   RedisClient zremrangebyrank(String key, long start, long stop, Handler<AsyncResult<Long>> handler);
 
   /**
@@ -2200,6 +2409,7 @@ public interface RedisClient {
    * @since 1.2.0
    * group: sorted_set
    */
+  @Fluent
   RedisClient zremrangebyscore(String key, String min, String max, Handler<AsyncResult<Long>> handler);
 
   /**
@@ -2213,6 +2423,7 @@ public interface RedisClient {
    * @since 1.2.0
    * group: sorted_set
    */
+  @Fluent
   RedisClient zrevrange(String key, long start, long stop, RangeOptions options, Handler<AsyncResult<JsonArray>> handler);
 
   /**
@@ -2226,6 +2437,7 @@ public interface RedisClient {
    * @since 2.8.9
    * group: sorted_set
    */
+  @Fluent
   RedisClient zrevrangebylex(String key, String max, String min, LimitOptions options, Handler<AsyncResult<JsonArray>> handler);
 
   /**
@@ -2239,6 +2451,7 @@ public interface RedisClient {
    * @since 2.2.0
    * group: sorted_set
    */
+  @Fluent
   RedisClient zrevrangebyscore(String key, String max, String min, RangeLimitOptions options, Handler<AsyncResult<JsonArray>> handler);
 
   /**
@@ -2250,6 +2463,7 @@ public interface RedisClient {
    * @since 2.0.0
    * group: sorted_set
    */
+  @Fluent
   RedisClient zrevrank(String key, String member, Handler<AsyncResult<Long>> handler);
 
   /**
@@ -2261,6 +2475,7 @@ public interface RedisClient {
    * @since 1.2.0
    * group: sorted_set
    */
+  @Fluent
   RedisClient zscore(String key, String member, Handler<AsyncResult<String>> handler);
 
   /**
@@ -2273,6 +2488,7 @@ public interface RedisClient {
    * @since 2.0.0
    * group: sorted_set
    */
+  @Fluent
   RedisClient zunionstore(String destkey, List<String> sets, AggregateOptions options, Handler<AsyncResult<Long>> handler);
 
   /**
@@ -2285,6 +2501,7 @@ public interface RedisClient {
    * @since 2.0.0
    * group: sorted_set
    */
+  @Fluent
   RedisClient zunionstoreWeighed(String key, Map<String, Double> sets, AggregateOptions options, Handler<AsyncResult<Long>> handler);
 
   /**
@@ -2296,6 +2513,7 @@ public interface RedisClient {
    * @since 2.8.0
    * group: generic
    */
+  @Fluent
   RedisClient scan(String cursor, ScanOptions options, Handler<AsyncResult<Void>> handler);
 
   /**
@@ -2308,6 +2526,7 @@ public interface RedisClient {
    * @since 2.8.0
    * group: set
    */
+  @Fluent
   RedisClient sscan(String key, String cursor, ScanOptions options, Handler<AsyncResult<Void>> handler);
 
   /**
@@ -2320,6 +2539,7 @@ public interface RedisClient {
    * @since 2.8.0
    * group: hash
    */
+  @Fluent
   RedisClient hscan(String key, String cursor, ScanOptions options, Handler<AsyncResult<JsonArray>> handler);
 
   /**
@@ -2332,6 +2552,7 @@ public interface RedisClient {
    * @since 2.8.0
    * group: sorted_set
    */
+  @Fluent
   RedisClient zscan(String key, String cursor, ScanOptions options, Handler<AsyncResult<Void>> handler);
 
 }

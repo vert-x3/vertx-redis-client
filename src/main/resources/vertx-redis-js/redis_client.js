@@ -68,13 +68,14 @@ var RedisClient = function(j_val) {
   this.append = function(key, value, handler) {
     var __args = arguments;
     if (__args.length === 3 && typeof __args[0] === 'string' && typeof __args[1] === 'string' && typeof __args[2] === 'function') {
-      return utils.convReturnVertxGen(j_redisClient["append(java.lang.String,java.lang.String,io.vertx.core.Handler)"](key, value, function(ar) {
+      j_redisClient["append(java.lang.String,java.lang.String,io.vertx.core.Handler)"](key, value, function(ar) {
       if (ar.succeeded()) {
         handler(ar.result(), null);
       } else {
         handler(null, ar.cause());
       }
-    }), RedisClient);
+    });
+      return that;
     } else utils.invalidArgs();
   };
 
@@ -89,13 +90,14 @@ var RedisClient = function(j_val) {
   this.auth = function(password, handler) {
     var __args = arguments;
     if (__args.length === 2 && typeof __args[0] === 'string' && typeof __args[1] === 'function') {
-      return utils.convReturnVertxGen(j_redisClient["auth(java.lang.String,io.vertx.core.Handler)"](password, function(ar) {
+      j_redisClient["auth(java.lang.String,io.vertx.core.Handler)"](password, function(ar) {
       if (ar.succeeded()) {
         handler(ar.result(), null);
       } else {
         handler(null, ar.cause());
       }
-    }), RedisClient);
+    });
+      return that;
     } else utils.invalidArgs();
   };
 
@@ -109,13 +111,14 @@ var RedisClient = function(j_val) {
   this.bgrewriteaof = function(handler) {
     var __args = arguments;
     if (__args.length === 1 && typeof __args[0] === 'function') {
-      return utils.convReturnVertxGen(j_redisClient["bgrewriteaof(io.vertx.core.Handler)"](function(ar) {
+      j_redisClient["bgrewriteaof(io.vertx.core.Handler)"](function(ar) {
       if (ar.succeeded()) {
         handler(ar.result(), null);
       } else {
         handler(null, ar.cause());
       }
-    }), RedisClient);
+    });
+      return that;
     } else utils.invalidArgs();
   };
 
@@ -129,13 +132,14 @@ var RedisClient = function(j_val) {
   this.bgsave = function(handler) {
     var __args = arguments;
     if (__args.length === 1 && typeof __args[0] === 'function') {
-      return utils.convReturnVertxGen(j_redisClient["bgsave(io.vertx.core.Handler)"](function(ar) {
+      j_redisClient["bgsave(io.vertx.core.Handler)"](function(ar) {
       if (ar.succeeded()) {
         handler(ar.result(), null);
       } else {
         handler(null, ar.cause());
       }
-    }), RedisClient);
+    });
+      return that;
     } else utils.invalidArgs();
   };
 
@@ -150,13 +154,14 @@ var RedisClient = function(j_val) {
   this.bitcount = function(key, handler) {
     var __args = arguments;
     if (__args.length === 2 && typeof __args[0] === 'string' && typeof __args[1] === 'function') {
-      return utils.convReturnVertxGen(j_redisClient["bitcount(java.lang.String,io.vertx.core.Handler)"](key, function(ar) {
+      j_redisClient["bitcount(java.lang.String,io.vertx.core.Handler)"](key, function(ar) {
       if (ar.succeeded()) {
         handler(ar.result(), null);
       } else {
         handler(null, ar.cause());
       }
-    }), RedisClient);
+    });
+      return that;
     } else utils.invalidArgs();
   };
 
@@ -173,13 +178,14 @@ var RedisClient = function(j_val) {
   this.bitcountRange = function(key, start, end, handler) {
     var __args = arguments;
     if (__args.length === 4 && typeof __args[0] === 'string' && typeof __args[1] ==='number' && typeof __args[2] ==='number' && typeof __args[3] === 'function') {
-      return utils.convReturnVertxGen(j_redisClient["bitcountRange(java.lang.String,long,long,io.vertx.core.Handler)"](key, start, end, function(ar) {
+      j_redisClient["bitcountRange(java.lang.String,long,long,io.vertx.core.Handler)"](key, start, end, function(ar) {
       if (ar.succeeded()) {
         handler(ar.result(), null);
       } else {
         handler(null, ar.cause());
       }
-    }), RedisClient);
+    });
+      return that;
     } else utils.invalidArgs();
   };
 
@@ -196,13 +202,14 @@ var RedisClient = function(j_val) {
   this.bitop = function(operation, destkey, keys, handler) {
     var __args = arguments;
     if (__args.length === 4 && typeof __args[0] === 'string' && typeof __args[1] === 'string' && typeof __args[2] === 'object' && __args[2] instanceof Array && typeof __args[3] === 'function') {
-      return utils.convReturnVertxGen(j_redisClient["bitop(io.vertx.redis.op.BitOperation,java.lang.String,java.util.List,io.vertx.core.Handler)"](io.vertx.redis.op.BitOperation.valueOf(__args[0]), destkey, keys, function(ar) {
+      j_redisClient["bitop(io.vertx.redis.op.BitOperation,java.lang.String,java.util.List,io.vertx.core.Handler)"](io.vertx.redis.op.BitOperation.valueOf(__args[0]), destkey, keys, function(ar) {
       if (ar.succeeded()) {
         handler(ar.result(), null);
       } else {
         handler(null, ar.cause());
       }
-    }), RedisClient);
+    });
+      return that;
     } else utils.invalidArgs();
   };
 
@@ -218,13 +225,14 @@ var RedisClient = function(j_val) {
   this.bitpos = function(key, bit, handler) {
     var __args = arguments;
     if (__args.length === 3 && typeof __args[0] === 'string' && typeof __args[1] ==='number' && typeof __args[2] === 'function') {
-      return utils.convReturnVertxGen(j_redisClient["bitpos(java.lang.String,int,io.vertx.core.Handler)"](key, bit, function(ar) {
+      j_redisClient["bitpos(java.lang.String,int,io.vertx.core.Handler)"](key, bit, function(ar) {
       if (ar.succeeded()) {
         handler(ar.result(), null);
       } else {
         handler(null, ar.cause());
       }
-    }), RedisClient);
+    });
+      return that;
     } else utils.invalidArgs();
   };
 
@@ -243,13 +251,14 @@ var RedisClient = function(j_val) {
   this.bitposFrom = function(key, bit, start, handler) {
     var __args = arguments;
     if (__args.length === 4 && typeof __args[0] === 'string' && typeof __args[1] ==='number' && typeof __args[2] ==='number' && typeof __args[3] === 'function') {
-      return utils.convReturnVertxGen(j_redisClient["bitposFrom(java.lang.String,int,int,io.vertx.core.Handler)"](key, bit, start, function(ar) {
+      j_redisClient["bitposFrom(java.lang.String,int,int,io.vertx.core.Handler)"](key, bit, start, function(ar) {
       if (ar.succeeded()) {
         handler(ar.result(), null);
       } else {
         handler(null, ar.cause());
       }
-    }), RedisClient);
+    });
+      return that;
     } else utils.invalidArgs();
   };
 
@@ -270,13 +279,14 @@ var RedisClient = function(j_val) {
   this.bitposRange = function(key, bit, start, stop, handler) {
     var __args = arguments;
     if (__args.length === 5 && typeof __args[0] === 'string' && typeof __args[1] ==='number' && typeof __args[2] ==='number' && typeof __args[3] ==='number' && typeof __args[4] === 'function') {
-      return utils.convReturnVertxGen(j_redisClient["bitposRange(java.lang.String,int,int,int,io.vertx.core.Handler)"](key, bit, start, stop, function(ar) {
+      j_redisClient["bitposRange(java.lang.String,int,int,int,io.vertx.core.Handler)"](key, bit, start, stop, function(ar) {
       if (ar.succeeded()) {
         handler(ar.result(), null);
       } else {
         handler(null, ar.cause());
       }
-    }), RedisClient);
+    });
+      return that;
     } else utils.invalidArgs();
   };
 
@@ -292,13 +302,14 @@ var RedisClient = function(j_val) {
   this.blpop = function(key, seconds, handler) {
     var __args = arguments;
     if (__args.length === 3 && typeof __args[0] === 'string' && typeof __args[1] ==='number' && typeof __args[2] === 'function') {
-      return utils.convReturnVertxGen(j_redisClient["blpop(java.lang.String,int,io.vertx.core.Handler)"](key, seconds, function(ar) {
+      j_redisClient["blpop(java.lang.String,int,io.vertx.core.Handler)"](key, seconds, function(ar) {
       if (ar.succeeded()) {
         handler(utils.convReturnJson(ar.result()), null);
       } else {
         handler(null, ar.cause());
       }
-    }), RedisClient);
+    });
+      return that;
     } else utils.invalidArgs();
   };
 
@@ -314,13 +325,14 @@ var RedisClient = function(j_val) {
   this.blpopMany = function(keys, seconds, handler) {
     var __args = arguments;
     if (__args.length === 3 && typeof __args[0] === 'object' && __args[0] instanceof Array && typeof __args[1] ==='number' && typeof __args[2] === 'function') {
-      return utils.convReturnVertxGen(j_redisClient["blpopMany(java.util.List,int,io.vertx.core.Handler)"](keys, seconds, function(ar) {
+      j_redisClient["blpopMany(java.util.List,int,io.vertx.core.Handler)"](keys, seconds, function(ar) {
       if (ar.succeeded()) {
         handler(utils.convReturnJson(ar.result()), null);
       } else {
         handler(null, ar.cause());
       }
-    }), RedisClient);
+    });
+      return that;
     } else utils.invalidArgs();
   };
 
@@ -336,13 +348,14 @@ var RedisClient = function(j_val) {
   this.brpop = function(key, seconds, handler) {
     var __args = arguments;
     if (__args.length === 3 && typeof __args[0] === 'string' && typeof __args[1] ==='number' && typeof __args[2] === 'function') {
-      return utils.convReturnVertxGen(j_redisClient["brpop(java.lang.String,int,io.vertx.core.Handler)"](key, seconds, function(ar) {
+      j_redisClient["brpop(java.lang.String,int,io.vertx.core.Handler)"](key, seconds, function(ar) {
       if (ar.succeeded()) {
         handler(utils.convReturnJson(ar.result()), null);
       } else {
         handler(null, ar.cause());
       }
-    }), RedisClient);
+    });
+      return that;
     } else utils.invalidArgs();
   };
 
@@ -358,13 +371,14 @@ var RedisClient = function(j_val) {
   this.brpopMany = function(keys, seconds, handler) {
     var __args = arguments;
     if (__args.length === 3 && typeof __args[0] === 'object' && __args[0] instanceof Array && typeof __args[1] ==='number' && typeof __args[2] === 'function') {
-      return utils.convReturnVertxGen(j_redisClient["brpopMany(java.util.List,int,io.vertx.core.Handler)"](keys, seconds, function(ar) {
+      j_redisClient["brpopMany(java.util.List,int,io.vertx.core.Handler)"](keys, seconds, function(ar) {
       if (ar.succeeded()) {
         handler(utils.convReturnJson(ar.result()), null);
       } else {
         handler(null, ar.cause());
       }
-    }), RedisClient);
+    });
+      return that;
     } else utils.invalidArgs();
   };
 
@@ -381,13 +395,14 @@ var RedisClient = function(j_val) {
   this.brpoplpush = function(key, destkey, seconds, handler) {
     var __args = arguments;
     if (__args.length === 4 && typeof __args[0] === 'string' && typeof __args[1] === 'string' && typeof __args[2] ==='number' && typeof __args[3] === 'function') {
-      return utils.convReturnVertxGen(j_redisClient["brpoplpush(java.lang.String,java.lang.String,int,io.vertx.core.Handler)"](key, destkey, seconds, function(ar) {
+      j_redisClient["brpoplpush(java.lang.String,java.lang.String,int,io.vertx.core.Handler)"](key, destkey, seconds, function(ar) {
       if (ar.succeeded()) {
         handler(ar.result(), null);
       } else {
         handler(null, ar.cause());
       }
-    }), RedisClient);
+    });
+      return that;
     } else utils.invalidArgs();
   };
 
@@ -402,13 +417,14 @@ var RedisClient = function(j_val) {
   this.clientKill = function(filter, handler) {
     var __args = arguments;
     if (__args.length === 2 && typeof __args[0] === 'object' && typeof __args[1] === 'function') {
-      return utils.convReturnVertxGen(j_redisClient["clientKill(io.vertx.redis.op.KillFilter,io.vertx.core.Handler)"](filter != null ? new KillFilter(new JsonObject(JSON.stringify(filter))) : null, function(ar) {
+      j_redisClient["clientKill(io.vertx.redis.op.KillFilter,io.vertx.core.Handler)"](filter != null ? new KillFilter(new JsonObject(JSON.stringify(filter))) : null, function(ar) {
       if (ar.succeeded()) {
         handler(ar.result(), null);
       } else {
         handler(null, ar.cause());
       }
-    }), RedisClient);
+    });
+      return that;
     } else utils.invalidArgs();
   };
 
@@ -422,13 +438,14 @@ var RedisClient = function(j_val) {
   this.clientList = function(handler) {
     var __args = arguments;
     if (__args.length === 1 && typeof __args[0] === 'function') {
-      return utils.convReturnVertxGen(j_redisClient["clientList(io.vertx.core.Handler)"](function(ar) {
+      j_redisClient["clientList(io.vertx.core.Handler)"](function(ar) {
       if (ar.succeeded()) {
         handler(ar.result(), null);
       } else {
         handler(null, ar.cause());
       }
-    }), RedisClient);
+    });
+      return that;
     } else utils.invalidArgs();
   };
 
@@ -442,13 +459,14 @@ var RedisClient = function(j_val) {
   this.clientGetname = function(handler) {
     var __args = arguments;
     if (__args.length === 1 && typeof __args[0] === 'function') {
-      return utils.convReturnVertxGen(j_redisClient["clientGetname(io.vertx.core.Handler)"](function(ar) {
+      j_redisClient["clientGetname(io.vertx.core.Handler)"](function(ar) {
       if (ar.succeeded()) {
         handler(ar.result(), null);
       } else {
         handler(null, ar.cause());
       }
-    }), RedisClient);
+    });
+      return that;
     } else utils.invalidArgs();
   };
 
@@ -463,13 +481,14 @@ var RedisClient = function(j_val) {
   this.clientPause = function(millis, handler) {
     var __args = arguments;
     if (__args.length === 2 && typeof __args[0] ==='number' && typeof __args[1] === 'function') {
-      return utils.convReturnVertxGen(j_redisClient["clientPause(long,io.vertx.core.Handler)"](millis, function(ar) {
+      j_redisClient["clientPause(long,io.vertx.core.Handler)"](millis, function(ar) {
       if (ar.succeeded()) {
         handler(ar.result(), null);
       } else {
         handler(null, ar.cause());
       }
-    }), RedisClient);
+    });
+      return that;
     } else utils.invalidArgs();
   };
 
@@ -484,13 +503,14 @@ var RedisClient = function(j_val) {
   this.clientSetname = function(name, handler) {
     var __args = arguments;
     if (__args.length === 2 && typeof __args[0] === 'string' && typeof __args[1] === 'function') {
-      return utils.convReturnVertxGen(j_redisClient["clientSetname(java.lang.String,io.vertx.core.Handler)"](name, function(ar) {
+      j_redisClient["clientSetname(java.lang.String,io.vertx.core.Handler)"](name, function(ar) {
       if (ar.succeeded()) {
         handler(ar.result(), null);
       } else {
         handler(null, ar.cause());
       }
-    }), RedisClient);
+    });
+      return that;
     } else utils.invalidArgs();
   };
 
@@ -505,13 +525,14 @@ var RedisClient = function(j_val) {
   this.clusterAddslots = function(slots, handler) {
     var __args = arguments;
     if (__args.length === 2 && typeof __args[0] === 'object' && __args[0] instanceof Array && typeof __args[1] === 'function') {
-      return utils.convReturnVertxGen(j_redisClient["clusterAddslots(java.util.List,io.vertx.core.Handler)"](utils.convParamListLong(slots), function(ar) {
+      j_redisClient["clusterAddslots(java.util.List,io.vertx.core.Handler)"](utils.convParamListLong(slots), function(ar) {
       if (ar.succeeded()) {
         handler(null, null);
       } else {
         handler(null, ar.cause());
       }
-    }), RedisClient);
+    });
+      return that;
     } else utils.invalidArgs();
   };
 
@@ -526,13 +547,14 @@ var RedisClient = function(j_val) {
   this.clusterCountFailureReports = function(nodeId, handler) {
     var __args = arguments;
     if (__args.length === 2 && typeof __args[0] === 'string' && typeof __args[1] === 'function') {
-      return utils.convReturnVertxGen(j_redisClient["clusterCountFailureReports(java.lang.String,io.vertx.core.Handler)"](nodeId, function(ar) {
+      j_redisClient["clusterCountFailureReports(java.lang.String,io.vertx.core.Handler)"](nodeId, function(ar) {
       if (ar.succeeded()) {
         handler(ar.result(), null);
       } else {
         handler(null, ar.cause());
       }
-    }), RedisClient);
+    });
+      return that;
     } else utils.invalidArgs();
   };
 
@@ -547,13 +569,14 @@ var RedisClient = function(j_val) {
   this.clusterCountkeysinslot = function(slot, handler) {
     var __args = arguments;
     if (__args.length === 2 && typeof __args[0] ==='number' && typeof __args[1] === 'function') {
-      return utils.convReturnVertxGen(j_redisClient["clusterCountkeysinslot(long,io.vertx.core.Handler)"](slot, function(ar) {
+      j_redisClient["clusterCountkeysinslot(long,io.vertx.core.Handler)"](slot, function(ar) {
       if (ar.succeeded()) {
         handler(ar.result(), null);
       } else {
         handler(null, ar.cause());
       }
-    }), RedisClient);
+    });
+      return that;
     } else utils.invalidArgs();
   };
 
@@ -568,13 +591,14 @@ var RedisClient = function(j_val) {
   this.clusterDelslots = function(slot, handler) {
     var __args = arguments;
     if (__args.length === 2 && typeof __args[0] ==='number' && typeof __args[1] === 'function') {
-      return utils.convReturnVertxGen(j_redisClient["clusterDelslots(long,io.vertx.core.Handler)"](slot, function(ar) {
+      j_redisClient["clusterDelslots(long,io.vertx.core.Handler)"](slot, function(ar) {
       if (ar.succeeded()) {
         handler(null, null);
       } else {
         handler(null, ar.cause());
       }
-    }), RedisClient);
+    });
+      return that;
     } else utils.invalidArgs();
   };
 
@@ -589,13 +613,14 @@ var RedisClient = function(j_val) {
   this.clusterDelslotsMany = function(slots, handler) {
     var __args = arguments;
     if (__args.length === 2 && typeof __args[0] === 'object' && __args[0] instanceof Array && typeof __args[1] === 'function') {
-      return utils.convReturnVertxGen(j_redisClient["clusterDelslotsMany(java.util.List,io.vertx.core.Handler)"](utils.convParamListLong(slots), function(ar) {
+      j_redisClient["clusterDelslotsMany(java.util.List,io.vertx.core.Handler)"](utils.convParamListLong(slots), function(ar) {
       if (ar.succeeded()) {
         handler(null, null);
       } else {
         handler(null, ar.cause());
       }
-    }), RedisClient);
+    });
+      return that;
     } else utils.invalidArgs();
   };
 
@@ -609,13 +634,14 @@ var RedisClient = function(j_val) {
   this.clusterFailover = function(handler) {
     var __args = arguments;
     if (__args.length === 1 && typeof __args[0] === 'function') {
-      return utils.convReturnVertxGen(j_redisClient["clusterFailover(io.vertx.core.Handler)"](function(ar) {
+      j_redisClient["clusterFailover(io.vertx.core.Handler)"](function(ar) {
       if (ar.succeeded()) {
         handler(null, null);
       } else {
         handler(null, ar.cause());
       }
-    }), RedisClient);
+    });
+      return that;
     } else utils.invalidArgs();
   };
 
@@ -630,13 +656,14 @@ var RedisClient = function(j_val) {
   this.clusterFailOverWithOptions = function(options, handler) {
     var __args = arguments;
     if (__args.length === 2 && typeof __args[0] === 'string' && typeof __args[1] === 'function') {
-      return utils.convReturnVertxGen(j_redisClient["clusterFailOverWithOptions(io.vertx.redis.op.FailoverOptions,io.vertx.core.Handler)"](io.vertx.redis.op.FailoverOptions.valueOf(__args[0]), function(ar) {
+      j_redisClient["clusterFailOverWithOptions(io.vertx.redis.op.FailoverOptions,io.vertx.core.Handler)"](io.vertx.redis.op.FailoverOptions.valueOf(__args[0]), function(ar) {
       if (ar.succeeded()) {
         handler(null, null);
       } else {
         handler(null, ar.cause());
       }
-    }), RedisClient);
+    });
+      return that;
     } else utils.invalidArgs();
   };
 
@@ -651,13 +678,14 @@ var RedisClient = function(j_val) {
   this.clusterForget = function(nodeId, handler) {
     var __args = arguments;
     if (__args.length === 2 && typeof __args[0] === 'string' && typeof __args[1] === 'function') {
-      return utils.convReturnVertxGen(j_redisClient["clusterForget(java.lang.String,io.vertx.core.Handler)"](nodeId, function(ar) {
+      j_redisClient["clusterForget(java.lang.String,io.vertx.core.Handler)"](nodeId, function(ar) {
       if (ar.succeeded()) {
         handler(null, null);
       } else {
         handler(null, ar.cause());
       }
-    }), RedisClient);
+    });
+      return that;
     } else utils.invalidArgs();
   };
 
@@ -673,13 +701,14 @@ var RedisClient = function(j_val) {
   this.clusterGetkeysinslot = function(slot, count, handler) {
     var __args = arguments;
     if (__args.length === 3 && typeof __args[0] ==='number' && typeof __args[1] ==='number' && typeof __args[2] === 'function') {
-      return utils.convReturnVertxGen(j_redisClient["clusterGetkeysinslot(long,long,io.vertx.core.Handler)"](slot, count, function(ar) {
+      j_redisClient["clusterGetkeysinslot(long,long,io.vertx.core.Handler)"](slot, count, function(ar) {
       if (ar.succeeded()) {
         handler(utils.convReturnJson(ar.result()), null);
       } else {
         handler(null, ar.cause());
       }
-    }), RedisClient);
+    });
+      return that;
     } else utils.invalidArgs();
   };
 
@@ -693,13 +722,14 @@ var RedisClient = function(j_val) {
   this.clusterInfo = function(handler) {
     var __args = arguments;
     if (__args.length === 1 && typeof __args[0] === 'function') {
-      return utils.convReturnVertxGen(j_redisClient["clusterInfo(io.vertx.core.Handler)"](function(ar) {
+      j_redisClient["clusterInfo(io.vertx.core.Handler)"](function(ar) {
       if (ar.succeeded()) {
         handler(utils.convReturnJson(ar.result()), null);
       } else {
         handler(null, ar.cause());
       }
-    }), RedisClient);
+    });
+      return that;
     } else utils.invalidArgs();
   };
 
@@ -714,13 +744,14 @@ var RedisClient = function(j_val) {
   this.clusterKeyslot = function(key, handler) {
     var __args = arguments;
     if (__args.length === 2 && typeof __args[0] === 'string' && typeof __args[1] === 'function') {
-      return utils.convReturnVertxGen(j_redisClient["clusterKeyslot(java.lang.String,io.vertx.core.Handler)"](key, function(ar) {
+      j_redisClient["clusterKeyslot(java.lang.String,io.vertx.core.Handler)"](key, function(ar) {
       if (ar.succeeded()) {
         handler(ar.result(), null);
       } else {
         handler(null, ar.cause());
       }
-    }), RedisClient);
+    });
+      return that;
     } else utils.invalidArgs();
   };
 
@@ -736,13 +767,14 @@ var RedisClient = function(j_val) {
   this.clusterMeet = function(ip, port, handler) {
     var __args = arguments;
     if (__args.length === 3 && typeof __args[0] === 'string' && typeof __args[1] ==='number' && typeof __args[2] === 'function') {
-      return utils.convReturnVertxGen(j_redisClient["clusterMeet(java.lang.String,long,io.vertx.core.Handler)"](ip, port, function(ar) {
+      j_redisClient["clusterMeet(java.lang.String,long,io.vertx.core.Handler)"](ip, port, function(ar) {
       if (ar.succeeded()) {
         handler(null, null);
       } else {
         handler(null, ar.cause());
       }
-    }), RedisClient);
+    });
+      return that;
     } else utils.invalidArgs();
   };
 
@@ -756,13 +788,14 @@ var RedisClient = function(j_val) {
   this.clusterNodes = function(handler) {
     var __args = arguments;
     if (__args.length === 1 && typeof __args[0] === 'function') {
-      return utils.convReturnVertxGen(j_redisClient["clusterNodes(io.vertx.core.Handler)"](function(ar) {
+      j_redisClient["clusterNodes(io.vertx.core.Handler)"](function(ar) {
       if (ar.succeeded()) {
         handler(utils.convReturnJson(ar.result()), null);
       } else {
         handler(null, ar.cause());
       }
-    }), RedisClient);
+    });
+      return that;
     } else utils.invalidArgs();
   };
 
@@ -777,13 +810,14 @@ var RedisClient = function(j_val) {
   this.clusterReplicate = function(nodeId, handler) {
     var __args = arguments;
     if (__args.length === 2 && typeof __args[0] === 'string' && typeof __args[1] === 'function') {
-      return utils.convReturnVertxGen(j_redisClient["clusterReplicate(java.lang.String,io.vertx.core.Handler)"](nodeId, function(ar) {
+      j_redisClient["clusterReplicate(java.lang.String,io.vertx.core.Handler)"](nodeId, function(ar) {
       if (ar.succeeded()) {
         handler(null, null);
       } else {
         handler(null, ar.cause());
       }
-    }), RedisClient);
+    });
+      return that;
     } else utils.invalidArgs();
   };
 
@@ -797,13 +831,14 @@ var RedisClient = function(j_val) {
   this.clusterReset = function(handler) {
     var __args = arguments;
     if (__args.length === 1 && typeof __args[0] === 'function') {
-      return utils.convReturnVertxGen(j_redisClient["clusterReset(io.vertx.core.Handler)"](function(ar) {
+      j_redisClient["clusterReset(io.vertx.core.Handler)"](function(ar) {
       if (ar.succeeded()) {
         handler(null, null);
       } else {
         handler(null, ar.cause());
       }
-    }), RedisClient);
+    });
+      return that;
     } else utils.invalidArgs();
   };
 
@@ -818,13 +853,14 @@ var RedisClient = function(j_val) {
   this.clusterResetWithOptions = function(options, handler) {
     var __args = arguments;
     if (__args.length === 2 && typeof __args[0] === 'string' && typeof __args[1] === 'function') {
-      return utils.convReturnVertxGen(j_redisClient["clusterResetWithOptions(io.vertx.redis.op.ResetOptions,io.vertx.core.Handler)"](io.vertx.redis.op.ResetOptions.valueOf(__args[0]), function(ar) {
+      j_redisClient["clusterResetWithOptions(io.vertx.redis.op.ResetOptions,io.vertx.core.Handler)"](io.vertx.redis.op.ResetOptions.valueOf(__args[0]), function(ar) {
       if (ar.succeeded()) {
         handler(null, null);
       } else {
         handler(null, ar.cause());
       }
-    }), RedisClient);
+    });
+      return that;
     } else utils.invalidArgs();
   };
 
@@ -838,13 +874,14 @@ var RedisClient = function(j_val) {
   this.clusterSaveconfig = function(handler) {
     var __args = arguments;
     if (__args.length === 1 && typeof __args[0] === 'function') {
-      return utils.convReturnVertxGen(j_redisClient["clusterSaveconfig(io.vertx.core.Handler)"](function(ar) {
+      j_redisClient["clusterSaveconfig(io.vertx.core.Handler)"](function(ar) {
       if (ar.succeeded()) {
         handler(null, null);
       } else {
         handler(null, ar.cause());
       }
-    }), RedisClient);
+    });
+      return that;
     } else utils.invalidArgs();
   };
 
@@ -859,13 +896,14 @@ var RedisClient = function(j_val) {
   this.clusterSetConfigEpoch = function(epoch, handler) {
     var __args = arguments;
     if (__args.length === 2 && typeof __args[0] ==='number' && typeof __args[1] === 'function') {
-      return utils.convReturnVertxGen(j_redisClient["clusterSetConfigEpoch(long,io.vertx.core.Handler)"](epoch, function(ar) {
+      j_redisClient["clusterSetConfigEpoch(long,io.vertx.core.Handler)"](epoch, function(ar) {
       if (ar.succeeded()) {
         handler(null, null);
       } else {
         handler(null, ar.cause());
       }
-    }), RedisClient);
+    });
+      return that;
     } else utils.invalidArgs();
   };
 
@@ -881,13 +919,14 @@ var RedisClient = function(j_val) {
   this.clusterSetslot = function(slot, subcommand, handler) {
     var __args = arguments;
     if (__args.length === 3 && typeof __args[0] ==='number' && typeof __args[1] === 'string' && typeof __args[2] === 'function') {
-      return utils.convReturnVertxGen(j_redisClient["clusterSetslot(long,io.vertx.redis.op.SlotCmd,io.vertx.core.Handler)"](slot, io.vertx.redis.op.SlotCmd.valueOf(__args[1]), function(ar) {
+      j_redisClient["clusterSetslot(long,io.vertx.redis.op.SlotCmd,io.vertx.core.Handler)"](slot, io.vertx.redis.op.SlotCmd.valueOf(__args[1]), function(ar) {
       if (ar.succeeded()) {
         handler(null, null);
       } else {
         handler(null, ar.cause());
       }
-    }), RedisClient);
+    });
+      return that;
     } else utils.invalidArgs();
   };
 
@@ -904,13 +943,14 @@ var RedisClient = function(j_val) {
   this.clusterSetslotWithNode = function(slot, subcommand, nodeId, handler) {
     var __args = arguments;
     if (__args.length === 4 && typeof __args[0] ==='number' && typeof __args[1] === 'string' && typeof __args[2] === 'string' && typeof __args[3] === 'function') {
-      return utils.convReturnVertxGen(j_redisClient["clusterSetslotWithNode(long,io.vertx.redis.op.SlotCmd,java.lang.String,io.vertx.core.Handler)"](slot, io.vertx.redis.op.SlotCmd.valueOf(__args[1]), nodeId, function(ar) {
+      j_redisClient["clusterSetslotWithNode(long,io.vertx.redis.op.SlotCmd,java.lang.String,io.vertx.core.Handler)"](slot, io.vertx.redis.op.SlotCmd.valueOf(__args[1]), nodeId, function(ar) {
       if (ar.succeeded()) {
         handler(null, null);
       } else {
         handler(null, ar.cause());
       }
-    }), RedisClient);
+    });
+      return that;
     } else utils.invalidArgs();
   };
 
@@ -925,13 +965,14 @@ var RedisClient = function(j_val) {
   this.clusterSlaves = function(nodeId, handler) {
     var __args = arguments;
     if (__args.length === 2 && typeof __args[0] === 'string' && typeof __args[1] === 'function') {
-      return utils.convReturnVertxGen(j_redisClient["clusterSlaves(java.lang.String,io.vertx.core.Handler)"](nodeId, function(ar) {
+      j_redisClient["clusterSlaves(java.lang.String,io.vertx.core.Handler)"](nodeId, function(ar) {
       if (ar.succeeded()) {
         handler(utils.convReturnJson(ar.result()), null);
       } else {
         handler(null, ar.cause());
       }
-    }), RedisClient);
+    });
+      return that;
     } else utils.invalidArgs();
   };
 
@@ -945,13 +986,14 @@ var RedisClient = function(j_val) {
   this.clusterSlots = function(handler) {
     var __args = arguments;
     if (__args.length === 1 && typeof __args[0] === 'function') {
-      return utils.convReturnVertxGen(j_redisClient["clusterSlots(io.vertx.core.Handler)"](function(ar) {
+      j_redisClient["clusterSlots(io.vertx.core.Handler)"](function(ar) {
       if (ar.succeeded()) {
         handler(utils.convReturnJson(ar.result()), null);
       } else {
         handler(null, ar.cause());
       }
-    }), RedisClient);
+    });
+      return that;
     } else utils.invalidArgs();
   };
 
@@ -965,13 +1007,14 @@ var RedisClient = function(j_val) {
   this.command = function(handler) {
     var __args = arguments;
     if (__args.length === 1 && typeof __args[0] === 'function') {
-      return utils.convReturnVertxGen(j_redisClient["command(io.vertx.core.Handler)"](function(ar) {
+      j_redisClient["command(io.vertx.core.Handler)"](function(ar) {
       if (ar.succeeded()) {
         handler(utils.convReturnJson(ar.result()), null);
       } else {
         handler(null, ar.cause());
       }
-    }), RedisClient);
+    });
+      return that;
     } else utils.invalidArgs();
   };
 
@@ -985,13 +1028,14 @@ var RedisClient = function(j_val) {
   this.commandCount = function(handler) {
     var __args = arguments;
     if (__args.length === 1 && typeof __args[0] === 'function') {
-      return utils.convReturnVertxGen(j_redisClient["commandCount(io.vertx.core.Handler)"](function(ar) {
+      j_redisClient["commandCount(io.vertx.core.Handler)"](function(ar) {
       if (ar.succeeded()) {
         handler(ar.result(), null);
       } else {
         handler(null, ar.cause());
       }
-    }), RedisClient);
+    });
+      return that;
     } else utils.invalidArgs();
   };
 
@@ -1005,13 +1049,14 @@ var RedisClient = function(j_val) {
   this.commandGetkeys = function(handler) {
     var __args = arguments;
     if (__args.length === 1 && typeof __args[0] === 'function') {
-      return utils.convReturnVertxGen(j_redisClient["commandGetkeys(io.vertx.core.Handler)"](function(ar) {
+      j_redisClient["commandGetkeys(io.vertx.core.Handler)"](function(ar) {
       if (ar.succeeded()) {
         handler(utils.convReturnJson(ar.result()), null);
       } else {
         handler(null, ar.cause());
       }
-    }), RedisClient);
+    });
+      return that;
     } else utils.invalidArgs();
   };
 
@@ -1026,13 +1071,14 @@ var RedisClient = function(j_val) {
   this.commandInfo = function(commands, handler) {
     var __args = arguments;
     if (__args.length === 2 && typeof __args[0] === 'object' && __args[0] instanceof Array && typeof __args[1] === 'function') {
-      return utils.convReturnVertxGen(j_redisClient["commandInfo(java.util.List,io.vertx.core.Handler)"](commands, function(ar) {
+      j_redisClient["commandInfo(java.util.List,io.vertx.core.Handler)"](commands, function(ar) {
       if (ar.succeeded()) {
         handler(utils.convReturnJson(ar.result()), null);
       } else {
         handler(null, ar.cause());
       }
-    }), RedisClient);
+    });
+      return that;
     } else utils.invalidArgs();
   };
 
@@ -1047,13 +1093,14 @@ var RedisClient = function(j_val) {
   this.configGet = function(parameter, handler) {
     var __args = arguments;
     if (__args.length === 2 && typeof __args[0] === 'string' && typeof __args[1] === 'function') {
-      return utils.convReturnVertxGen(j_redisClient["configGet(java.lang.String,io.vertx.core.Handler)"](parameter, function(ar) {
+      j_redisClient["configGet(java.lang.String,io.vertx.core.Handler)"](parameter, function(ar) {
       if (ar.succeeded()) {
         handler(utils.convReturnJson(ar.result()), null);
       } else {
         handler(null, ar.cause());
       }
-    }), RedisClient);
+    });
+      return that;
     } else utils.invalidArgs();
   };
 
@@ -1067,13 +1114,14 @@ var RedisClient = function(j_val) {
   this.configRewrite = function(handler) {
     var __args = arguments;
     if (__args.length === 1 && typeof __args[0] === 'function') {
-      return utils.convReturnVertxGen(j_redisClient["configRewrite(io.vertx.core.Handler)"](function(ar) {
+      j_redisClient["configRewrite(io.vertx.core.Handler)"](function(ar) {
       if (ar.succeeded()) {
         handler(ar.result(), null);
       } else {
         handler(null, ar.cause());
       }
-    }), RedisClient);
+    });
+      return that;
     } else utils.invalidArgs();
   };
 
@@ -1089,13 +1137,14 @@ var RedisClient = function(j_val) {
   this.configSet = function(parameter, value, handler) {
     var __args = arguments;
     if (__args.length === 3 && typeof __args[0] === 'string' && typeof __args[1] === 'string' && typeof __args[2] === 'function') {
-      return utils.convReturnVertxGen(j_redisClient["configSet(java.lang.String,java.lang.String,io.vertx.core.Handler)"](parameter, value, function(ar) {
+      j_redisClient["configSet(java.lang.String,java.lang.String,io.vertx.core.Handler)"](parameter, value, function(ar) {
       if (ar.succeeded()) {
         handler(ar.result(), null);
       } else {
         handler(null, ar.cause());
       }
-    }), RedisClient);
+    });
+      return that;
     } else utils.invalidArgs();
   };
 
@@ -1109,13 +1158,14 @@ var RedisClient = function(j_val) {
   this.configResetstat = function(handler) {
     var __args = arguments;
     if (__args.length === 1 && typeof __args[0] === 'function') {
-      return utils.convReturnVertxGen(j_redisClient["configResetstat(io.vertx.core.Handler)"](function(ar) {
+      j_redisClient["configResetstat(io.vertx.core.Handler)"](function(ar) {
       if (ar.succeeded()) {
         handler(ar.result(), null);
       } else {
         handler(null, ar.cause());
       }
-    }), RedisClient);
+    });
+      return that;
     } else utils.invalidArgs();
   };
 
@@ -1129,13 +1179,14 @@ var RedisClient = function(j_val) {
   this.dbsize = function(handler) {
     var __args = arguments;
     if (__args.length === 1 && typeof __args[0] === 'function') {
-      return utils.convReturnVertxGen(j_redisClient["dbsize(io.vertx.core.Handler)"](function(ar) {
+      j_redisClient["dbsize(io.vertx.core.Handler)"](function(ar) {
       if (ar.succeeded()) {
         handler(ar.result(), null);
       } else {
         handler(null, ar.cause());
       }
-    }), RedisClient);
+    });
+      return that;
     } else utils.invalidArgs();
   };
 
@@ -1150,13 +1201,14 @@ var RedisClient = function(j_val) {
   this.debugObject = function(key, handler) {
     var __args = arguments;
     if (__args.length === 2 && typeof __args[0] === 'string' && typeof __args[1] === 'function') {
-      return utils.convReturnVertxGen(j_redisClient["debugObject(java.lang.String,io.vertx.core.Handler)"](key, function(ar) {
+      j_redisClient["debugObject(java.lang.String,io.vertx.core.Handler)"](key, function(ar) {
       if (ar.succeeded()) {
         handler(ar.result(), null);
       } else {
         handler(null, ar.cause());
       }
-    }), RedisClient);
+    });
+      return that;
     } else utils.invalidArgs();
   };
 
@@ -1170,13 +1222,14 @@ var RedisClient = function(j_val) {
   this.debugSegfault = function(handler) {
     var __args = arguments;
     if (__args.length === 1 && typeof __args[0] === 'function') {
-      return utils.convReturnVertxGen(j_redisClient["debugSegfault(io.vertx.core.Handler)"](function(ar) {
+      j_redisClient["debugSegfault(io.vertx.core.Handler)"](function(ar) {
       if (ar.succeeded()) {
         handler(ar.result(), null);
       } else {
         handler(null, ar.cause());
       }
-    }), RedisClient);
+    });
+      return that;
     } else utils.invalidArgs();
   };
 
@@ -1191,13 +1244,14 @@ var RedisClient = function(j_val) {
   this.decr = function(key, handler) {
     var __args = arguments;
     if (__args.length === 2 && typeof __args[0] === 'string' && typeof __args[1] === 'function') {
-      return utils.convReturnVertxGen(j_redisClient["decr(java.lang.String,io.vertx.core.Handler)"](key, function(ar) {
+      j_redisClient["decr(java.lang.String,io.vertx.core.Handler)"](key, function(ar) {
       if (ar.succeeded()) {
         handler(ar.result(), null);
       } else {
         handler(null, ar.cause());
       }
-    }), RedisClient);
+    });
+      return that;
     } else utils.invalidArgs();
   };
 
@@ -1213,13 +1267,14 @@ var RedisClient = function(j_val) {
   this.decrby = function(key, decrement, handler) {
     var __args = arguments;
     if (__args.length === 3 && typeof __args[0] === 'string' && typeof __args[1] ==='number' && typeof __args[2] === 'function') {
-      return utils.convReturnVertxGen(j_redisClient["decrby(java.lang.String,long,io.vertx.core.Handler)"](key, decrement, function(ar) {
+      j_redisClient["decrby(java.lang.String,long,io.vertx.core.Handler)"](key, decrement, function(ar) {
       if (ar.succeeded()) {
         handler(ar.result(), null);
       } else {
         handler(null, ar.cause());
       }
-    }), RedisClient);
+    });
+      return that;
     } else utils.invalidArgs();
   };
 
@@ -1234,13 +1289,14 @@ var RedisClient = function(j_val) {
   this.del = function(keys, handler) {
     var __args = arguments;
     if (__args.length === 2 && typeof __args[0] === 'object' && __args[0] instanceof Array && typeof __args[1] === 'function') {
-      return utils.convReturnVertxGen(j_redisClient["del(java.util.List,io.vertx.core.Handler)"](keys, function(ar) {
+      j_redisClient["del(java.util.List,io.vertx.core.Handler)"](keys, function(ar) {
       if (ar.succeeded()) {
         handler(ar.result(), null);
       } else {
         handler(null, ar.cause());
       }
-    }), RedisClient);
+    });
+      return that;
     } else utils.invalidArgs();
   };
 
@@ -1254,13 +1310,14 @@ var RedisClient = function(j_val) {
   this.discard = function(handler) {
     var __args = arguments;
     if (__args.length === 1 && typeof __args[0] === 'function') {
-      return utils.convReturnVertxGen(j_redisClient["discard(io.vertx.core.Handler)"](function(ar) {
+      j_redisClient["discard(io.vertx.core.Handler)"](function(ar) {
       if (ar.succeeded()) {
         handler(ar.result(), null);
       } else {
         handler(null, ar.cause());
       }
-    }), RedisClient);
+    });
+      return that;
     } else utils.invalidArgs();
   };
 
@@ -1275,13 +1332,14 @@ var RedisClient = function(j_val) {
   this.dump = function(key, handler) {
     var __args = arguments;
     if (__args.length === 2 && typeof __args[0] === 'string' && typeof __args[1] === 'function') {
-      return utils.convReturnVertxGen(j_redisClient["dump(java.lang.String,io.vertx.core.Handler)"](key, function(ar) {
+      j_redisClient["dump(java.lang.String,io.vertx.core.Handler)"](key, function(ar) {
       if (ar.succeeded()) {
         handler(ar.result(), null);
       } else {
         handler(null, ar.cause());
       }
-    }), RedisClient);
+    });
+      return that;
     } else utils.invalidArgs();
   };
 
@@ -1296,13 +1354,14 @@ var RedisClient = function(j_val) {
   this.echo = function(message, handler) {
     var __args = arguments;
     if (__args.length === 2 && typeof __args[0] === 'string' && typeof __args[1] === 'function') {
-      return utils.convReturnVertxGen(j_redisClient["echo(java.lang.String,io.vertx.core.Handler)"](message, function(ar) {
+      j_redisClient["echo(java.lang.String,io.vertx.core.Handler)"](message, function(ar) {
       if (ar.succeeded()) {
         handler(ar.result(), null);
       } else {
         handler(null, ar.cause());
       }
-    }), RedisClient);
+    });
+      return that;
     } else utils.invalidArgs();
   };
 
@@ -1319,13 +1378,14 @@ var RedisClient = function(j_val) {
   this.eval = function(script, keys, args, handler) {
     var __args = arguments;
     if (__args.length === 4 && typeof __args[0] === 'string' && typeof __args[1] === 'object' && __args[1] instanceof Array && typeof __args[2] === 'object' && __args[2] instanceof Array && typeof __args[3] === 'function') {
-      return utils.convReturnVertxGen(j_redisClient["eval(java.lang.String,java.util.List,java.util.List,io.vertx.core.Handler)"](script, keys, args, function(ar) {
+      j_redisClient["eval(java.lang.String,java.util.List,java.util.List,io.vertx.core.Handler)"](script, keys, args, function(ar) {
       if (ar.succeeded()) {
         handler(null, null);
       } else {
         handler(null, ar.cause());
       }
-    }), RedisClient);
+    });
+      return that;
     } else utils.invalidArgs();
   };
 
@@ -1342,13 +1402,14 @@ var RedisClient = function(j_val) {
   this.evalsha = function(sha1, keys, values, handler) {
     var __args = arguments;
     if (__args.length === 4 && typeof __args[0] === 'string' && typeof __args[1] === 'object' && __args[1] instanceof Array && typeof __args[2] === 'object' && __args[2] instanceof Array && typeof __args[3] === 'function') {
-      return utils.convReturnVertxGen(j_redisClient["evalsha(java.lang.String,java.util.List,java.util.List,io.vertx.core.Handler)"](sha1, keys, values, function(ar) {
+      j_redisClient["evalsha(java.lang.String,java.util.List,java.util.List,io.vertx.core.Handler)"](sha1, keys, values, function(ar) {
       if (ar.succeeded()) {
         handler(null, null);
       } else {
         handler(null, ar.cause());
       }
-    }), RedisClient);
+    });
+      return that;
     } else utils.invalidArgs();
   };
 
@@ -1362,13 +1423,14 @@ var RedisClient = function(j_val) {
   this.exec = function(handler) {
     var __args = arguments;
     if (__args.length === 1 && typeof __args[0] === 'function') {
-      return utils.convReturnVertxGen(j_redisClient["exec(io.vertx.core.Handler)"](function(ar) {
+      j_redisClient["exec(io.vertx.core.Handler)"](function(ar) {
       if (ar.succeeded()) {
         handler(utils.convReturnJson(ar.result()), null);
       } else {
         handler(null, ar.cause());
       }
-    }), RedisClient);
+    });
+      return that;
     } else utils.invalidArgs();
   };
 
@@ -1383,13 +1445,14 @@ var RedisClient = function(j_val) {
   this.exists = function(key, handler) {
     var __args = arguments;
     if (__args.length === 2 && typeof __args[0] === 'string' && typeof __args[1] === 'function') {
-      return utils.convReturnVertxGen(j_redisClient["exists(java.lang.String,io.vertx.core.Handler)"](key, function(ar) {
+      j_redisClient["exists(java.lang.String,io.vertx.core.Handler)"](key, function(ar) {
       if (ar.succeeded()) {
         handler(ar.result(), null);
       } else {
         handler(null, ar.cause());
       }
-    }), RedisClient);
+    });
+      return that;
     } else utils.invalidArgs();
   };
 
@@ -1405,13 +1468,14 @@ var RedisClient = function(j_val) {
   this.expire = function(key, seconds, handler) {
     var __args = arguments;
     if (__args.length === 3 && typeof __args[0] === 'string' && typeof __args[1] ==='number' && typeof __args[2] === 'function') {
-      return utils.convReturnVertxGen(j_redisClient["expire(java.lang.String,int,io.vertx.core.Handler)"](key, seconds, function(ar) {
+      j_redisClient["expire(java.lang.String,int,io.vertx.core.Handler)"](key, seconds, function(ar) {
       if (ar.succeeded()) {
         handler(ar.result(), null);
       } else {
         handler(null, ar.cause());
       }
-    }), RedisClient);
+    });
+      return that;
     } else utils.invalidArgs();
   };
 
@@ -1427,13 +1491,14 @@ var RedisClient = function(j_val) {
   this.expireat = function(key, seconds, handler) {
     var __args = arguments;
     if (__args.length === 3 && typeof __args[0] === 'string' && typeof __args[1] ==='number' && typeof __args[2] === 'function') {
-      return utils.convReturnVertxGen(j_redisClient["expireat(java.lang.String,long,io.vertx.core.Handler)"](key, seconds, function(ar) {
+      j_redisClient["expireat(java.lang.String,long,io.vertx.core.Handler)"](key, seconds, function(ar) {
       if (ar.succeeded()) {
         handler(ar.result(), null);
       } else {
         handler(null, ar.cause());
       }
-    }), RedisClient);
+    });
+      return that;
     } else utils.invalidArgs();
   };
 
@@ -1447,13 +1512,14 @@ var RedisClient = function(j_val) {
   this.flushall = function(handler) {
     var __args = arguments;
     if (__args.length === 1 && typeof __args[0] === 'function') {
-      return utils.convReturnVertxGen(j_redisClient["flushall(io.vertx.core.Handler)"](function(ar) {
+      j_redisClient["flushall(io.vertx.core.Handler)"](function(ar) {
       if (ar.succeeded()) {
         handler(ar.result(), null);
       } else {
         handler(null, ar.cause());
       }
-    }), RedisClient);
+    });
+      return that;
     } else utils.invalidArgs();
   };
 
@@ -1467,13 +1533,14 @@ var RedisClient = function(j_val) {
   this.flushdb = function(handler) {
     var __args = arguments;
     if (__args.length === 1 && typeof __args[0] === 'function') {
-      return utils.convReturnVertxGen(j_redisClient["flushdb(io.vertx.core.Handler)"](function(ar) {
+      j_redisClient["flushdb(io.vertx.core.Handler)"](function(ar) {
       if (ar.succeeded()) {
         handler(ar.result(), null);
       } else {
         handler(null, ar.cause());
       }
-    }), RedisClient);
+    });
+      return that;
     } else utils.invalidArgs();
   };
 
@@ -1488,13 +1555,14 @@ var RedisClient = function(j_val) {
   this.get = function(key, handler) {
     var __args = arguments;
     if (__args.length === 2 && typeof __args[0] === 'string' && typeof __args[1] === 'function') {
-      return utils.convReturnVertxGen(j_redisClient["get(java.lang.String,io.vertx.core.Handler)"](key, function(ar) {
+      j_redisClient["get(java.lang.String,io.vertx.core.Handler)"](key, function(ar) {
       if (ar.succeeded()) {
         handler(ar.result(), null);
       } else {
         handler(null, ar.cause());
       }
-    }), RedisClient);
+    });
+      return that;
     } else utils.invalidArgs();
   };
 
@@ -1509,13 +1577,14 @@ var RedisClient = function(j_val) {
   this.getBinary = function(key, handler) {
     var __args = arguments;
     if (__args.length === 2 && typeof __args[0] === 'string' && typeof __args[1] === 'function') {
-      return utils.convReturnVertxGen(j_redisClient["getBinary(java.lang.String,io.vertx.core.Handler)"](key, function(ar) {
+      j_redisClient["getBinary(java.lang.String,io.vertx.core.Handler)"](key, function(ar) {
       if (ar.succeeded()) {
         handler(ar.result(), null);
       } else {
         handler(null, ar.cause());
       }
-    }), RedisClient);
+    });
+      return that;
     } else utils.invalidArgs();
   };
 
@@ -1531,13 +1600,14 @@ var RedisClient = function(j_val) {
   this.getbit = function(key, offset, handler) {
     var __args = arguments;
     if (__args.length === 3 && typeof __args[0] === 'string' && typeof __args[1] ==='number' && typeof __args[2] === 'function') {
-      return utils.convReturnVertxGen(j_redisClient["getbit(java.lang.String,long,io.vertx.core.Handler)"](key, offset, function(ar) {
+      j_redisClient["getbit(java.lang.String,long,io.vertx.core.Handler)"](key, offset, function(ar) {
       if (ar.succeeded()) {
         handler(ar.result(), null);
       } else {
         handler(null, ar.cause());
       }
-    }), RedisClient);
+    });
+      return that;
     } else utils.invalidArgs();
   };
 
@@ -1554,13 +1624,14 @@ var RedisClient = function(j_val) {
   this.getrange = function(key, start, end, handler) {
     var __args = arguments;
     if (__args.length === 4 && typeof __args[0] === 'string' && typeof __args[1] ==='number' && typeof __args[2] ==='number' && typeof __args[3] === 'function') {
-      return utils.convReturnVertxGen(j_redisClient["getrange(java.lang.String,long,long,io.vertx.core.Handler)"](key, start, end, function(ar) {
+      j_redisClient["getrange(java.lang.String,long,long,io.vertx.core.Handler)"](key, start, end, function(ar) {
       if (ar.succeeded()) {
         handler(ar.result(), null);
       } else {
         handler(null, ar.cause());
       }
-    }), RedisClient);
+    });
+      return that;
     } else utils.invalidArgs();
   };
 
@@ -1576,13 +1647,14 @@ var RedisClient = function(j_val) {
   this.getset = function(key, value, handler) {
     var __args = arguments;
     if (__args.length === 3 && typeof __args[0] === 'string' && typeof __args[1] === 'string' && typeof __args[2] === 'function') {
-      return utils.convReturnVertxGen(j_redisClient["getset(java.lang.String,java.lang.String,io.vertx.core.Handler)"](key, value, function(ar) {
+      j_redisClient["getset(java.lang.String,java.lang.String,io.vertx.core.Handler)"](key, value, function(ar) {
       if (ar.succeeded()) {
         handler(ar.result(), null);
       } else {
         handler(null, ar.cause());
       }
-    }), RedisClient);
+    });
+      return that;
     } else utils.invalidArgs();
   };
 
@@ -1598,13 +1670,14 @@ var RedisClient = function(j_val) {
   this.hdel = function(key, field, handler) {
     var __args = arguments;
     if (__args.length === 3 && typeof __args[0] === 'string' && typeof __args[1] === 'string' && typeof __args[2] === 'function') {
-      return utils.convReturnVertxGen(j_redisClient["hdel(java.lang.String,java.lang.String,io.vertx.core.Handler)"](key, field, function(ar) {
+      j_redisClient["hdel(java.lang.String,java.lang.String,io.vertx.core.Handler)"](key, field, function(ar) {
       if (ar.succeeded()) {
         handler(ar.result(), null);
       } else {
         handler(null, ar.cause());
       }
-    }), RedisClient);
+    });
+      return that;
     } else utils.invalidArgs();
   };
 
@@ -1620,13 +1693,14 @@ var RedisClient = function(j_val) {
   this.hdelMany = function(key, fields, handler) {
     var __args = arguments;
     if (__args.length === 3 && typeof __args[0] === 'string' && typeof __args[1] === 'object' && __args[1] instanceof Array && typeof __args[2] === 'function') {
-      return utils.convReturnVertxGen(j_redisClient["hdelMany(java.lang.String,java.util.List,io.vertx.core.Handler)"](key, fields, function(ar) {
+      j_redisClient["hdelMany(java.lang.String,java.util.List,io.vertx.core.Handler)"](key, fields, function(ar) {
       if (ar.succeeded()) {
         handler(ar.result(), null);
       } else {
         handler(null, ar.cause());
       }
-    }), RedisClient);
+    });
+      return that;
     } else utils.invalidArgs();
   };
 
@@ -1642,13 +1716,14 @@ var RedisClient = function(j_val) {
   this.hexists = function(key, field, handler) {
     var __args = arguments;
     if (__args.length === 3 && typeof __args[0] === 'string' && typeof __args[1] === 'string' && typeof __args[2] === 'function') {
-      return utils.convReturnVertxGen(j_redisClient["hexists(java.lang.String,java.lang.String,io.vertx.core.Handler)"](key, field, function(ar) {
+      j_redisClient["hexists(java.lang.String,java.lang.String,io.vertx.core.Handler)"](key, field, function(ar) {
       if (ar.succeeded()) {
         handler(ar.result(), null);
       } else {
         handler(null, ar.cause());
       }
-    }), RedisClient);
+    });
+      return that;
     } else utils.invalidArgs();
   };
 
@@ -1664,13 +1739,14 @@ var RedisClient = function(j_val) {
   this.hget = function(key, field, handler) {
     var __args = arguments;
     if (__args.length === 3 && typeof __args[0] === 'string' && typeof __args[1] === 'string' && typeof __args[2] === 'function') {
-      return utils.convReturnVertxGen(j_redisClient["hget(java.lang.String,java.lang.String,io.vertx.core.Handler)"](key, field, function(ar) {
+      j_redisClient["hget(java.lang.String,java.lang.String,io.vertx.core.Handler)"](key, field, function(ar) {
       if (ar.succeeded()) {
         handler(ar.result(), null);
       } else {
         handler(null, ar.cause());
       }
-    }), RedisClient);
+    });
+      return that;
     } else utils.invalidArgs();
   };
 
@@ -1685,13 +1761,14 @@ var RedisClient = function(j_val) {
   this.hgetall = function(key, handler) {
     var __args = arguments;
     if (__args.length === 2 && typeof __args[0] === 'string' && typeof __args[1] === 'function') {
-      return utils.convReturnVertxGen(j_redisClient["hgetall(java.lang.String,io.vertx.core.Handler)"](key, function(ar) {
+      j_redisClient["hgetall(java.lang.String,io.vertx.core.Handler)"](key, function(ar) {
       if (ar.succeeded()) {
         handler(utils.convReturnJson(ar.result()), null);
       } else {
         handler(null, ar.cause());
       }
-    }), RedisClient);
+    });
+      return that;
     } else utils.invalidArgs();
   };
 
@@ -1708,13 +1785,14 @@ var RedisClient = function(j_val) {
   this.hincrby = function(key, field, increment, handler) {
     var __args = arguments;
     if (__args.length === 4 && typeof __args[0] === 'string' && typeof __args[1] === 'string' && typeof __args[2] ==='number' && typeof __args[3] === 'function') {
-      return utils.convReturnVertxGen(j_redisClient["hincrby(java.lang.String,java.lang.String,long,io.vertx.core.Handler)"](key, field, increment, function(ar) {
+      j_redisClient["hincrby(java.lang.String,java.lang.String,long,io.vertx.core.Handler)"](key, field, increment, function(ar) {
       if (ar.succeeded()) {
         handler(ar.result(), null);
       } else {
         handler(null, ar.cause());
       }
-    }), RedisClient);
+    });
+      return that;
     } else utils.invalidArgs();
   };
 
@@ -1731,13 +1809,14 @@ var RedisClient = function(j_val) {
   this.hincrbyfloat = function(key, field, increment, handler) {
     var __args = arguments;
     if (__args.length === 4 && typeof __args[0] === 'string' && typeof __args[1] === 'string' && typeof __args[2] ==='number' && typeof __args[3] === 'function') {
-      return utils.convReturnVertxGen(j_redisClient["hincrbyfloat(java.lang.String,java.lang.String,double,io.vertx.core.Handler)"](key, field, increment, function(ar) {
+      j_redisClient["hincrbyfloat(java.lang.String,java.lang.String,double,io.vertx.core.Handler)"](key, field, increment, function(ar) {
       if (ar.succeeded()) {
         handler(ar.result(), null);
       } else {
         handler(null, ar.cause());
       }
-    }), RedisClient);
+    });
+      return that;
     } else utils.invalidArgs();
   };
 
@@ -1752,13 +1831,14 @@ var RedisClient = function(j_val) {
   this.hkeys = function(key, handler) {
     var __args = arguments;
     if (__args.length === 2 && typeof __args[0] === 'string' && typeof __args[1] === 'function') {
-      return utils.convReturnVertxGen(j_redisClient["hkeys(java.lang.String,io.vertx.core.Handler)"](key, function(ar) {
+      j_redisClient["hkeys(java.lang.String,io.vertx.core.Handler)"](key, function(ar) {
       if (ar.succeeded()) {
         handler(utils.convReturnJson(ar.result()), null);
       } else {
         handler(null, ar.cause());
       }
-    }), RedisClient);
+    });
+      return that;
     } else utils.invalidArgs();
   };
 
@@ -1773,13 +1853,14 @@ var RedisClient = function(j_val) {
   this.hlen = function(key, handler) {
     var __args = arguments;
     if (__args.length === 2 && typeof __args[0] === 'string' && typeof __args[1] === 'function') {
-      return utils.convReturnVertxGen(j_redisClient["hlen(java.lang.String,io.vertx.core.Handler)"](key, function(ar) {
+      j_redisClient["hlen(java.lang.String,io.vertx.core.Handler)"](key, function(ar) {
       if (ar.succeeded()) {
         handler(ar.result(), null);
       } else {
         handler(null, ar.cause());
       }
-    }), RedisClient);
+    });
+      return that;
     } else utils.invalidArgs();
   };
 
@@ -1795,13 +1876,14 @@ var RedisClient = function(j_val) {
   this.hmget = function(key, fields, handler) {
     var __args = arguments;
     if (__args.length === 3 && typeof __args[0] === 'string' && typeof __args[1] === 'object' && __args[1] instanceof Array && typeof __args[2] === 'function') {
-      return utils.convReturnVertxGen(j_redisClient["hmget(java.lang.String,java.util.List,io.vertx.core.Handler)"](key, fields, function(ar) {
+      j_redisClient["hmget(java.lang.String,java.util.List,io.vertx.core.Handler)"](key, fields, function(ar) {
       if (ar.succeeded()) {
         handler(utils.convReturnJson(ar.result()), null);
       } else {
         handler(null, ar.cause());
       }
-    }), RedisClient);
+    });
+      return that;
     } else utils.invalidArgs();
   };
 
@@ -1817,13 +1899,14 @@ var RedisClient = function(j_val) {
   this.hmset = function(key, values, handler) {
     var __args = arguments;
     if (__args.length === 3 && typeof __args[0] === 'string' && typeof __args[1] === 'object' && typeof __args[2] === 'function') {
-      return utils.convReturnVertxGen(j_redisClient["hmset(java.lang.String,java.util.Map,io.vertx.core.Handler)"](key, values, function(ar) {
+      j_redisClient["hmset(java.lang.String,java.util.Map,io.vertx.core.Handler)"](key, values, function(ar) {
       if (ar.succeeded()) {
         handler(ar.result(), null);
       } else {
         handler(null, ar.cause());
       }
-    }), RedisClient);
+    });
+      return that;
     } else utils.invalidArgs();
   };
 
@@ -1840,13 +1923,14 @@ var RedisClient = function(j_val) {
   this.hset = function(key, field, value, handler) {
     var __args = arguments;
     if (__args.length === 4 && typeof __args[0] === 'string' && typeof __args[1] === 'string' && typeof __args[2] === 'string' && typeof __args[3] === 'function') {
-      return utils.convReturnVertxGen(j_redisClient["hset(java.lang.String,java.lang.String,java.lang.String,io.vertx.core.Handler)"](key, field, value, function(ar) {
+      j_redisClient["hset(java.lang.String,java.lang.String,java.lang.String,io.vertx.core.Handler)"](key, field, value, function(ar) {
       if (ar.succeeded()) {
         handler(ar.result(), null);
       } else {
         handler(null, ar.cause());
       }
-    }), RedisClient);
+    });
+      return that;
     } else utils.invalidArgs();
   };
 
@@ -1863,13 +1947,14 @@ var RedisClient = function(j_val) {
   this.hsetnx = function(key, field, value, handler) {
     var __args = arguments;
     if (__args.length === 4 && typeof __args[0] === 'string' && typeof __args[1] === 'string' && typeof __args[2] === 'string' && typeof __args[3] === 'function') {
-      return utils.convReturnVertxGen(j_redisClient["hsetnx(java.lang.String,java.lang.String,java.lang.String,io.vertx.core.Handler)"](key, field, value, function(ar) {
+      j_redisClient["hsetnx(java.lang.String,java.lang.String,java.lang.String,io.vertx.core.Handler)"](key, field, value, function(ar) {
       if (ar.succeeded()) {
         handler(ar.result(), null);
       } else {
         handler(null, ar.cause());
       }
-    }), RedisClient);
+    });
+      return that;
     } else utils.invalidArgs();
   };
 
@@ -1884,13 +1969,14 @@ var RedisClient = function(j_val) {
   this.hvals = function(key, handler) {
     var __args = arguments;
     if (__args.length === 2 && typeof __args[0] === 'string' && typeof __args[1] === 'function') {
-      return utils.convReturnVertxGen(j_redisClient["hvals(java.lang.String,io.vertx.core.Handler)"](key, function(ar) {
+      j_redisClient["hvals(java.lang.String,io.vertx.core.Handler)"](key, function(ar) {
       if (ar.succeeded()) {
         handler(utils.convReturnJson(ar.result()), null);
       } else {
         handler(null, ar.cause());
       }
-    }), RedisClient);
+    });
+      return that;
     } else utils.invalidArgs();
   };
 
@@ -1905,13 +1991,14 @@ var RedisClient = function(j_val) {
   this.incr = function(key, handler) {
     var __args = arguments;
     if (__args.length === 2 && typeof __args[0] === 'string' && typeof __args[1] === 'function') {
-      return utils.convReturnVertxGen(j_redisClient["incr(java.lang.String,io.vertx.core.Handler)"](key, function(ar) {
+      j_redisClient["incr(java.lang.String,io.vertx.core.Handler)"](key, function(ar) {
       if (ar.succeeded()) {
         handler(ar.result(), null);
       } else {
         handler(null, ar.cause());
       }
-    }), RedisClient);
+    });
+      return that;
     } else utils.invalidArgs();
   };
 
@@ -1927,13 +2014,14 @@ var RedisClient = function(j_val) {
   this.incrby = function(key, increment, handler) {
     var __args = arguments;
     if (__args.length === 3 && typeof __args[0] === 'string' && typeof __args[1] ==='number' && typeof __args[2] === 'function') {
-      return utils.convReturnVertxGen(j_redisClient["incrby(java.lang.String,long,io.vertx.core.Handler)"](key, increment, function(ar) {
+      j_redisClient["incrby(java.lang.String,long,io.vertx.core.Handler)"](key, increment, function(ar) {
       if (ar.succeeded()) {
         handler(ar.result(), null);
       } else {
         handler(null, ar.cause());
       }
-    }), RedisClient);
+    });
+      return that;
     } else utils.invalidArgs();
   };
 
@@ -1949,13 +2037,14 @@ var RedisClient = function(j_val) {
   this.incrbyfloat = function(key, increment, handler) {
     var __args = arguments;
     if (__args.length === 3 && typeof __args[0] === 'string' && typeof __args[1] ==='number' && typeof __args[2] === 'function') {
-      return utils.convReturnVertxGen(j_redisClient["incrbyfloat(java.lang.String,double,io.vertx.core.Handler)"](key, increment, function(ar) {
+      j_redisClient["incrbyfloat(java.lang.String,double,io.vertx.core.Handler)"](key, increment, function(ar) {
       if (ar.succeeded()) {
         handler(ar.result(), null);
       } else {
         handler(null, ar.cause());
       }
-    }), RedisClient);
+    });
+      return that;
     } else utils.invalidArgs();
   };
 
@@ -1969,13 +2058,14 @@ var RedisClient = function(j_val) {
   this.info = function(handler) {
     var __args = arguments;
     if (__args.length === 1 && typeof __args[0] === 'function') {
-      return utils.convReturnVertxGen(j_redisClient["info(io.vertx.core.Handler)"](function(ar) {
+      j_redisClient["info(io.vertx.core.Handler)"](function(ar) {
       if (ar.succeeded()) {
         handler(utils.convReturnJson(ar.result()), null);
       } else {
         handler(null, ar.cause());
       }
-    }), RedisClient);
+    });
+      return that;
     } else utils.invalidArgs();
   };
 
@@ -1990,13 +2080,14 @@ var RedisClient = function(j_val) {
   this.infoSection = function(section, handler) {
     var __args = arguments;
     if (__args.length === 2 && typeof __args[0] === 'string' && typeof __args[1] === 'function') {
-      return utils.convReturnVertxGen(j_redisClient["infoSection(java.lang.String,io.vertx.core.Handler)"](section, function(ar) {
+      j_redisClient["infoSection(java.lang.String,io.vertx.core.Handler)"](section, function(ar) {
       if (ar.succeeded()) {
         handler(utils.convReturnJson(ar.result()), null);
       } else {
         handler(null, ar.cause());
       }
-    }), RedisClient);
+    });
+      return that;
     } else utils.invalidArgs();
   };
 
@@ -2011,13 +2102,14 @@ var RedisClient = function(j_val) {
   this.keys = function(pattern, handler) {
     var __args = arguments;
     if (__args.length === 2 && typeof __args[0] === 'string' && typeof __args[1] === 'function') {
-      return utils.convReturnVertxGen(j_redisClient["keys(java.lang.String,io.vertx.core.Handler)"](pattern, function(ar) {
+      j_redisClient["keys(java.lang.String,io.vertx.core.Handler)"](pattern, function(ar) {
       if (ar.succeeded()) {
         handler(utils.convReturnJson(ar.result()), null);
       } else {
         handler(null, ar.cause());
       }
-    }), RedisClient);
+    });
+      return that;
     } else utils.invalidArgs();
   };
 
@@ -2031,13 +2123,14 @@ var RedisClient = function(j_val) {
   this.lastsave = function(handler) {
     var __args = arguments;
     if (__args.length === 1 && typeof __args[0] === 'function') {
-      return utils.convReturnVertxGen(j_redisClient["lastsave(io.vertx.core.Handler)"](function(ar) {
+      j_redisClient["lastsave(io.vertx.core.Handler)"](function(ar) {
       if (ar.succeeded()) {
         handler(ar.result(), null);
       } else {
         handler(null, ar.cause());
       }
-    }), RedisClient);
+    });
+      return that;
     } else utils.invalidArgs();
   };
 
@@ -2053,13 +2146,14 @@ var RedisClient = function(j_val) {
   this.lindex = function(key, index, handler) {
     var __args = arguments;
     if (__args.length === 3 && typeof __args[0] === 'string' && typeof __args[1] ==='number' && typeof __args[2] === 'function') {
-      return utils.convReturnVertxGen(j_redisClient["lindex(java.lang.String,int,io.vertx.core.Handler)"](key, index, function(ar) {
+      j_redisClient["lindex(java.lang.String,int,io.vertx.core.Handler)"](key, index, function(ar) {
       if (ar.succeeded()) {
         handler(ar.result(), null);
       } else {
         handler(null, ar.cause());
       }
-    }), RedisClient);
+    });
+      return that;
     } else utils.invalidArgs();
   };
 
@@ -2077,13 +2171,14 @@ var RedisClient = function(j_val) {
   this.linsert = function(key, option, pivot, value, handler) {
     var __args = arguments;
     if (__args.length === 5 && typeof __args[0] === 'string' && typeof __args[1] === 'string' && typeof __args[2] === 'string' && typeof __args[3] === 'string' && typeof __args[4] === 'function') {
-      return utils.convReturnVertxGen(j_redisClient["linsert(java.lang.String,io.vertx.redis.op.InsertOptions,java.lang.String,java.lang.String,io.vertx.core.Handler)"](key, io.vertx.redis.op.InsertOptions.valueOf(__args[1]), pivot, value, function(ar) {
+      j_redisClient["linsert(java.lang.String,io.vertx.redis.op.InsertOptions,java.lang.String,java.lang.String,io.vertx.core.Handler)"](key, io.vertx.redis.op.InsertOptions.valueOf(__args[1]), pivot, value, function(ar) {
       if (ar.succeeded()) {
         handler(ar.result(), null);
       } else {
         handler(null, ar.cause());
       }
-    }), RedisClient);
+    });
+      return that;
     } else utils.invalidArgs();
   };
 
@@ -2098,13 +2193,14 @@ var RedisClient = function(j_val) {
   this.llen = function(key, handler) {
     var __args = arguments;
     if (__args.length === 2 && typeof __args[0] === 'string' && typeof __args[1] === 'function') {
-      return utils.convReturnVertxGen(j_redisClient["llen(java.lang.String,io.vertx.core.Handler)"](key, function(ar) {
+      j_redisClient["llen(java.lang.String,io.vertx.core.Handler)"](key, function(ar) {
       if (ar.succeeded()) {
         handler(ar.result(), null);
       } else {
         handler(null, ar.cause());
       }
-    }), RedisClient);
+    });
+      return that;
     } else utils.invalidArgs();
   };
 
@@ -2119,13 +2215,14 @@ var RedisClient = function(j_val) {
   this.lpop = function(key, handler) {
     var __args = arguments;
     if (__args.length === 2 && typeof __args[0] === 'string' && typeof __args[1] === 'function') {
-      return utils.convReturnVertxGen(j_redisClient["lpop(java.lang.String,io.vertx.core.Handler)"](key, function(ar) {
+      j_redisClient["lpop(java.lang.String,io.vertx.core.Handler)"](key, function(ar) {
       if (ar.succeeded()) {
         handler(ar.result(), null);
       } else {
         handler(null, ar.cause());
       }
-    }), RedisClient);
+    });
+      return that;
     } else utils.invalidArgs();
   };
 
@@ -2141,13 +2238,14 @@ var RedisClient = function(j_val) {
   this.lpushMany = function(key, values, handler) {
     var __args = arguments;
     if (__args.length === 3 && typeof __args[0] === 'string' && typeof __args[1] === 'object' && __args[1] instanceof Array && typeof __args[2] === 'function') {
-      return utils.convReturnVertxGen(j_redisClient["lpushMany(java.lang.String,java.util.List,io.vertx.core.Handler)"](key, values, function(ar) {
+      j_redisClient["lpushMany(java.lang.String,java.util.List,io.vertx.core.Handler)"](key, values, function(ar) {
       if (ar.succeeded()) {
         handler(ar.result(), null);
       } else {
         handler(null, ar.cause());
       }
-    }), RedisClient);
+    });
+      return that;
     } else utils.invalidArgs();
   };
 
@@ -2163,13 +2261,14 @@ var RedisClient = function(j_val) {
   this.lpush = function(key, value, handler) {
     var __args = arguments;
     if (__args.length === 3 && typeof __args[0] === 'string' && typeof __args[1] === 'string' && typeof __args[2] === 'function') {
-      return utils.convReturnVertxGen(j_redisClient["lpush(java.lang.String,java.lang.String,io.vertx.core.Handler)"](key, value, function(ar) {
+      j_redisClient["lpush(java.lang.String,java.lang.String,io.vertx.core.Handler)"](key, value, function(ar) {
       if (ar.succeeded()) {
         handler(ar.result(), null);
       } else {
         handler(null, ar.cause());
       }
-    }), RedisClient);
+    });
+      return that;
     } else utils.invalidArgs();
   };
 
@@ -2185,13 +2284,14 @@ var RedisClient = function(j_val) {
   this.lpushx = function(key, value, handler) {
     var __args = arguments;
     if (__args.length === 3 && typeof __args[0] === 'string' && typeof __args[1] === 'string' && typeof __args[2] === 'function') {
-      return utils.convReturnVertxGen(j_redisClient["lpushx(java.lang.String,java.lang.String,io.vertx.core.Handler)"](key, value, function(ar) {
+      j_redisClient["lpushx(java.lang.String,java.lang.String,io.vertx.core.Handler)"](key, value, function(ar) {
       if (ar.succeeded()) {
         handler(ar.result(), null);
       } else {
         handler(null, ar.cause());
       }
-    }), RedisClient);
+    });
+      return that;
     } else utils.invalidArgs();
   };
 
@@ -2208,13 +2308,14 @@ var RedisClient = function(j_val) {
   this.lrange = function(key, from, to, handler) {
     var __args = arguments;
     if (__args.length === 4 && typeof __args[0] === 'string' && typeof __args[1] ==='number' && typeof __args[2] ==='number' && typeof __args[3] === 'function') {
-      return utils.convReturnVertxGen(j_redisClient["lrange(java.lang.String,long,long,io.vertx.core.Handler)"](key, from, to, function(ar) {
+      j_redisClient["lrange(java.lang.String,long,long,io.vertx.core.Handler)"](key, from, to, function(ar) {
       if (ar.succeeded()) {
         handler(utils.convReturnJson(ar.result()), null);
       } else {
         handler(null, ar.cause());
       }
-    }), RedisClient);
+    });
+      return that;
     } else utils.invalidArgs();
   };
 
@@ -2231,13 +2332,14 @@ var RedisClient = function(j_val) {
   this.lrem = function(key, count, value, handler) {
     var __args = arguments;
     if (__args.length === 4 && typeof __args[0] === 'string' && typeof __args[1] ==='number' && typeof __args[2] === 'string' && typeof __args[3] === 'function') {
-      return utils.convReturnVertxGen(j_redisClient["lrem(java.lang.String,long,java.lang.String,io.vertx.core.Handler)"](key, count, value, function(ar) {
+      j_redisClient["lrem(java.lang.String,long,java.lang.String,io.vertx.core.Handler)"](key, count, value, function(ar) {
       if (ar.succeeded()) {
         handler(ar.result(), null);
       } else {
         handler(null, ar.cause());
       }
-    }), RedisClient);
+    });
+      return that;
     } else utils.invalidArgs();
   };
 
@@ -2254,13 +2356,14 @@ var RedisClient = function(j_val) {
   this.lset = function(key, index, value, handler) {
     var __args = arguments;
     if (__args.length === 4 && typeof __args[0] === 'string' && typeof __args[1] ==='number' && typeof __args[2] === 'string' && typeof __args[3] === 'function') {
-      return utils.convReturnVertxGen(j_redisClient["lset(java.lang.String,long,java.lang.String,io.vertx.core.Handler)"](key, index, value, function(ar) {
+      j_redisClient["lset(java.lang.String,long,java.lang.String,io.vertx.core.Handler)"](key, index, value, function(ar) {
       if (ar.succeeded()) {
         handler(ar.result(), null);
       } else {
         handler(null, ar.cause());
       }
-    }), RedisClient);
+    });
+      return that;
     } else utils.invalidArgs();
   };
 
@@ -2277,13 +2380,14 @@ var RedisClient = function(j_val) {
   this.ltrim = function(key, from, to, handler) {
     var __args = arguments;
     if (__args.length === 4 && typeof __args[0] === 'string' && typeof __args[1] ==='number' && typeof __args[2] ==='number' && typeof __args[3] === 'function') {
-      return utils.convReturnVertxGen(j_redisClient["ltrim(java.lang.String,long,long,io.vertx.core.Handler)"](key, from, to, function(ar) {
+      j_redisClient["ltrim(java.lang.String,long,long,io.vertx.core.Handler)"](key, from, to, function(ar) {
       if (ar.succeeded()) {
         handler(ar.result(), null);
       } else {
         handler(null, ar.cause());
       }
-    }), RedisClient);
+    });
+      return that;
     } else utils.invalidArgs();
   };
 
@@ -2298,13 +2402,14 @@ var RedisClient = function(j_val) {
   this.mget = function(key, handler) {
     var __args = arguments;
     if (__args.length === 2 && typeof __args[0] === 'string' && typeof __args[1] === 'function') {
-      return utils.convReturnVertxGen(j_redisClient["mget(java.lang.String,io.vertx.core.Handler)"](key, function(ar) {
+      j_redisClient["mget(java.lang.String,io.vertx.core.Handler)"](key, function(ar) {
       if (ar.succeeded()) {
         handler(utils.convReturnJson(ar.result()), null);
       } else {
         handler(null, ar.cause());
       }
-    }), RedisClient);
+    });
+      return that;
     } else utils.invalidArgs();
   };
 
@@ -2319,13 +2424,14 @@ var RedisClient = function(j_val) {
   this.mgetMany = function(keys, handler) {
     var __args = arguments;
     if (__args.length === 2 && typeof __args[0] === 'object' && __args[0] instanceof Array && typeof __args[1] === 'function') {
-      return utils.convReturnVertxGen(j_redisClient["mgetMany(java.util.List,io.vertx.core.Handler)"](keys, function(ar) {
+      j_redisClient["mgetMany(java.util.List,io.vertx.core.Handler)"](keys, function(ar) {
       if (ar.succeeded()) {
         handler(utils.convReturnJson(ar.result()), null);
       } else {
         handler(null, ar.cause());
       }
-    }), RedisClient);
+    });
+      return that;
     } else utils.invalidArgs();
   };
 
@@ -2345,13 +2451,14 @@ var RedisClient = function(j_val) {
   this.migrate = function(host, port, key, destdb, timeout, options, handler) {
     var __args = arguments;
     if (__args.length === 7 && typeof __args[0] === 'string' && typeof __args[1] ==='number' && typeof __args[2] === 'string' && typeof __args[3] ==='number' && typeof __args[4] ==='number' && typeof __args[5] === 'object' && typeof __args[6] === 'function') {
-      return utils.convReturnVertxGen(j_redisClient["migrate(java.lang.String,int,java.lang.String,int,long,io.vertx.redis.op.MigrateOptions,io.vertx.core.Handler)"](host, port, key, destdb, timeout, options != null ? new MigrateOptions(new JsonObject(JSON.stringify(options))) : null, function(ar) {
+      j_redisClient["migrate(java.lang.String,int,java.lang.String,int,long,io.vertx.redis.op.MigrateOptions,io.vertx.core.Handler)"](host, port, key, destdb, timeout, options != null ? new MigrateOptions(new JsonObject(JSON.stringify(options))) : null, function(ar) {
       if (ar.succeeded()) {
         handler(ar.result(), null);
       } else {
         handler(null, ar.cause());
       }
-    }), RedisClient);
+    });
+      return that;
     } else utils.invalidArgs();
   };
 
@@ -2365,13 +2472,14 @@ var RedisClient = function(j_val) {
   this.monitor = function(handler) {
     var __args = arguments;
     if (__args.length === 1 && typeof __args[0] === 'function') {
-      return utils.convReturnVertxGen(j_redisClient["monitor(io.vertx.core.Handler)"](function(ar) {
+      j_redisClient["monitor(io.vertx.core.Handler)"](function(ar) {
       if (ar.succeeded()) {
         handler(null, null);
       } else {
         handler(null, ar.cause());
       }
-    }), RedisClient);
+    });
+      return that;
     } else utils.invalidArgs();
   };
 
@@ -2387,13 +2495,14 @@ var RedisClient = function(j_val) {
   this.move = function(key, destdb, handler) {
     var __args = arguments;
     if (__args.length === 3 && typeof __args[0] === 'string' && typeof __args[1] ==='number' && typeof __args[2] === 'function') {
-      return utils.convReturnVertxGen(j_redisClient["move(java.lang.String,int,io.vertx.core.Handler)"](key, destdb, function(ar) {
+      j_redisClient["move(java.lang.String,int,io.vertx.core.Handler)"](key, destdb, function(ar) {
       if (ar.succeeded()) {
         handler(ar.result(), null);
       } else {
         handler(null, ar.cause());
       }
-    }), RedisClient);
+    });
+      return that;
     } else utils.invalidArgs();
   };
 
@@ -2408,13 +2517,14 @@ var RedisClient = function(j_val) {
   this.mset = function(keyvals, handler) {
     var __args = arguments;
     if (__args.length === 2 && typeof __args[0] === 'object' && typeof __args[1] === 'function') {
-      return utils.convReturnVertxGen(j_redisClient["mset(java.util.Map,io.vertx.core.Handler)"](keyvals, function(ar) {
+      j_redisClient["mset(java.util.Map,io.vertx.core.Handler)"](keyvals, function(ar) {
       if (ar.succeeded()) {
         handler(ar.result(), null);
       } else {
         handler(null, ar.cause());
       }
-    }), RedisClient);
+    });
+      return that;
     } else utils.invalidArgs();
   };
 
@@ -2429,13 +2539,14 @@ var RedisClient = function(j_val) {
   this.msetnx = function(keyvals, handler) {
     var __args = arguments;
     if (__args.length === 2 && typeof __args[0] === 'object' && typeof __args[1] === 'function') {
-      return utils.convReturnVertxGen(j_redisClient["msetnx(java.util.Map,io.vertx.core.Handler)"](keyvals, function(ar) {
+      j_redisClient["msetnx(java.util.Map,io.vertx.core.Handler)"](keyvals, function(ar) {
       if (ar.succeeded()) {
         handler(ar.result(), null);
       } else {
         handler(null, ar.cause());
       }
-    }), RedisClient);
+    });
+      return that;
     } else utils.invalidArgs();
   };
 
@@ -2449,13 +2560,14 @@ var RedisClient = function(j_val) {
   this.multi = function(handler) {
     var __args = arguments;
     if (__args.length === 1 && typeof __args[0] === 'function') {
-      return utils.convReturnVertxGen(j_redisClient["multi(io.vertx.core.Handler)"](function(ar) {
+      j_redisClient["multi(io.vertx.core.Handler)"](function(ar) {
       if (ar.succeeded()) {
         handler(ar.result(), null);
       } else {
         handler(null, ar.cause());
       }
-    }), RedisClient);
+    });
+      return that;
     } else utils.invalidArgs();
   };
 
@@ -2471,13 +2583,14 @@ var RedisClient = function(j_val) {
   this.object = function(key, cmd, handler) {
     var __args = arguments;
     if (__args.length === 3 && typeof __args[0] === 'string' && typeof __args[1] === 'string' && typeof __args[2] === 'function') {
-      return utils.convReturnVertxGen(j_redisClient["object(java.lang.String,io.vertx.redis.op.ObjectCmd,io.vertx.core.Handler)"](key, io.vertx.redis.op.ObjectCmd.valueOf(__args[1]), function(ar) {
+      j_redisClient["object(java.lang.String,io.vertx.redis.op.ObjectCmd,io.vertx.core.Handler)"](key, io.vertx.redis.op.ObjectCmd.valueOf(__args[1]), function(ar) {
       if (ar.succeeded()) {
         handler(null, null);
       } else {
         handler(null, ar.cause());
       }
-    }), RedisClient);
+    });
+      return that;
     } else utils.invalidArgs();
   };
 
@@ -2492,13 +2605,14 @@ var RedisClient = function(j_val) {
   this.persist = function(key, handler) {
     var __args = arguments;
     if (__args.length === 2 && typeof __args[0] === 'string' && typeof __args[1] === 'function') {
-      return utils.convReturnVertxGen(j_redisClient["persist(java.lang.String,io.vertx.core.Handler)"](key, function(ar) {
+      j_redisClient["persist(java.lang.String,io.vertx.core.Handler)"](key, function(ar) {
       if (ar.succeeded()) {
         handler(ar.result(), null);
       } else {
         handler(null, ar.cause());
       }
-    }), RedisClient);
+    });
+      return that;
     } else utils.invalidArgs();
   };
 
@@ -2514,13 +2628,14 @@ var RedisClient = function(j_val) {
   this.pexpire = function(key, millis, handler) {
     var __args = arguments;
     if (__args.length === 3 && typeof __args[0] === 'string' && typeof __args[1] ==='number' && typeof __args[2] === 'function') {
-      return utils.convReturnVertxGen(j_redisClient["pexpire(java.lang.String,long,io.vertx.core.Handler)"](key, millis, function(ar) {
+      j_redisClient["pexpire(java.lang.String,long,io.vertx.core.Handler)"](key, millis, function(ar) {
       if (ar.succeeded()) {
         handler(ar.result(), null);
       } else {
         handler(null, ar.cause());
       }
-    }), RedisClient);
+    });
+      return that;
     } else utils.invalidArgs();
   };
 
@@ -2536,13 +2651,14 @@ var RedisClient = function(j_val) {
   this.pexpireat = function(key, millis, handler) {
     var __args = arguments;
     if (__args.length === 3 && typeof __args[0] === 'string' && typeof __args[1] ==='number' && typeof __args[2] === 'function') {
-      return utils.convReturnVertxGen(j_redisClient["pexpireat(java.lang.String,long,io.vertx.core.Handler)"](key, millis, function(ar) {
+      j_redisClient["pexpireat(java.lang.String,long,io.vertx.core.Handler)"](key, millis, function(ar) {
       if (ar.succeeded()) {
         handler(ar.result(), null);
       } else {
         handler(null, ar.cause());
       }
-    }), RedisClient);
+    });
+      return that;
     } else utils.invalidArgs();
   };
 
@@ -2558,13 +2674,14 @@ var RedisClient = function(j_val) {
   this.pfadd = function(key, element, handler) {
     var __args = arguments;
     if (__args.length === 3 && typeof __args[0] === 'string' && typeof __args[1] === 'string' && typeof __args[2] === 'function') {
-      return utils.convReturnVertxGen(j_redisClient["pfadd(java.lang.String,java.lang.String,io.vertx.core.Handler)"](key, element, function(ar) {
+      j_redisClient["pfadd(java.lang.String,java.lang.String,io.vertx.core.Handler)"](key, element, function(ar) {
       if (ar.succeeded()) {
         handler(ar.result(), null);
       } else {
         handler(null, ar.cause());
       }
-    }), RedisClient);
+    });
+      return that;
     } else utils.invalidArgs();
   };
 
@@ -2580,13 +2697,14 @@ var RedisClient = function(j_val) {
   this.pfaddMany = function(key, elements, handler) {
     var __args = arguments;
     if (__args.length === 3 && typeof __args[0] === 'string' && typeof __args[1] === 'object' && __args[1] instanceof Array && typeof __args[2] === 'function') {
-      return utils.convReturnVertxGen(j_redisClient["pfaddMany(java.lang.String,java.util.List,io.vertx.core.Handler)"](key, elements, function(ar) {
+      j_redisClient["pfaddMany(java.lang.String,java.util.List,io.vertx.core.Handler)"](key, elements, function(ar) {
       if (ar.succeeded()) {
         handler(ar.result(), null);
       } else {
         handler(null, ar.cause());
       }
-    }), RedisClient);
+    });
+      return that;
     } else utils.invalidArgs();
   };
 
@@ -2601,13 +2719,14 @@ var RedisClient = function(j_val) {
   this.pfcount = function(key, handler) {
     var __args = arguments;
     if (__args.length === 2 && typeof __args[0] === 'string' && typeof __args[1] === 'function') {
-      return utils.convReturnVertxGen(j_redisClient["pfcount(java.lang.String,io.vertx.core.Handler)"](key, function(ar) {
+      j_redisClient["pfcount(java.lang.String,io.vertx.core.Handler)"](key, function(ar) {
       if (ar.succeeded()) {
         handler(ar.result(), null);
       } else {
         handler(null, ar.cause());
       }
-    }), RedisClient);
+    });
+      return that;
     } else utils.invalidArgs();
   };
 
@@ -2622,13 +2741,14 @@ var RedisClient = function(j_val) {
   this.pfcountMany = function(keys, handler) {
     var __args = arguments;
     if (__args.length === 2 && typeof __args[0] === 'object' && __args[0] instanceof Array && typeof __args[1] === 'function') {
-      return utils.convReturnVertxGen(j_redisClient["pfcountMany(java.util.List,io.vertx.core.Handler)"](keys, function(ar) {
+      j_redisClient["pfcountMany(java.util.List,io.vertx.core.Handler)"](keys, function(ar) {
       if (ar.succeeded()) {
         handler(ar.result(), null);
       } else {
         handler(null, ar.cause());
       }
-    }), RedisClient);
+    });
+      return that;
     } else utils.invalidArgs();
   };
 
@@ -2644,13 +2764,14 @@ var RedisClient = function(j_val) {
   this.pfmerge = function(destkey, keys, handler) {
     var __args = arguments;
     if (__args.length === 3 && typeof __args[0] === 'string' && typeof __args[1] === 'object' && __args[1] instanceof Array && typeof __args[2] === 'function') {
-      return utils.convReturnVertxGen(j_redisClient["pfmerge(java.lang.String,java.util.List,io.vertx.core.Handler)"](destkey, keys, function(ar) {
+      j_redisClient["pfmerge(java.lang.String,java.util.List,io.vertx.core.Handler)"](destkey, keys, function(ar) {
       if (ar.succeeded()) {
         handler(ar.result(), null);
       } else {
         handler(null, ar.cause());
       }
-    }), RedisClient);
+    });
+      return that;
     } else utils.invalidArgs();
   };
 
@@ -2664,13 +2785,14 @@ var RedisClient = function(j_val) {
   this.ping = function(handler) {
     var __args = arguments;
     if (__args.length === 1 && typeof __args[0] === 'function') {
-      return utils.convReturnVertxGen(j_redisClient["ping(io.vertx.core.Handler)"](function(ar) {
+      j_redisClient["ping(io.vertx.core.Handler)"](function(ar) {
       if (ar.succeeded()) {
         handler(ar.result(), null);
       } else {
         handler(null, ar.cause());
       }
-    }), RedisClient);
+    });
+      return that;
     } else utils.invalidArgs();
   };
 
@@ -2687,13 +2809,14 @@ var RedisClient = function(j_val) {
   this.psetex = function(key, millis, value, handler) {
     var __args = arguments;
     if (__args.length === 4 && typeof __args[0] === 'string' && typeof __args[1] ==='number' && typeof __args[2] === 'string' && typeof __args[3] === 'function') {
-      return utils.convReturnVertxGen(j_redisClient["psetex(java.lang.String,long,java.lang.String,io.vertx.core.Handler)"](key, millis, value, function(ar) {
+      j_redisClient["psetex(java.lang.String,long,java.lang.String,io.vertx.core.Handler)"](key, millis, value, function(ar) {
       if (ar.succeeded()) {
         handler(null, null);
       } else {
         handler(null, ar.cause());
       }
-    }), RedisClient);
+    });
+      return that;
     } else utils.invalidArgs();
   };
 
@@ -2708,13 +2831,14 @@ var RedisClient = function(j_val) {
   this.psubscribe = function(pattern, handler) {
     var __args = arguments;
     if (__args.length === 2 && typeof __args[0] === 'string' && typeof __args[1] === 'function') {
-      return utils.convReturnVertxGen(j_redisClient["psubscribe(java.lang.String,io.vertx.core.Handler)"](pattern, function(ar) {
+      j_redisClient["psubscribe(java.lang.String,io.vertx.core.Handler)"](pattern, function(ar) {
       if (ar.succeeded()) {
         handler(utils.convReturnJson(ar.result()), null);
       } else {
         handler(null, ar.cause());
       }
-    }), RedisClient);
+    });
+      return that;
     } else utils.invalidArgs();
   };
 
@@ -2729,13 +2853,14 @@ var RedisClient = function(j_val) {
   this.psubscribeMany = function(patterns, handler) {
     var __args = arguments;
     if (__args.length === 2 && typeof __args[0] === 'object' && __args[0] instanceof Array && typeof __args[1] === 'function') {
-      return utils.convReturnVertxGen(j_redisClient["psubscribeMany(java.util.List,io.vertx.core.Handler)"](patterns, function(ar) {
+      j_redisClient["psubscribeMany(java.util.List,io.vertx.core.Handler)"](patterns, function(ar) {
       if (ar.succeeded()) {
         handler(utils.convReturnJson(ar.result()), null);
       } else {
         handler(null, ar.cause());
       }
-    }), RedisClient);
+    });
+      return that;
     } else utils.invalidArgs();
   };
 
@@ -2750,13 +2875,14 @@ var RedisClient = function(j_val) {
   this.pubsubChannels = function(pattern, handler) {
     var __args = arguments;
     if (__args.length === 2 && typeof __args[0] === 'string' && typeof __args[1] === 'function') {
-      return utils.convReturnVertxGen(j_redisClient["pubsubChannels(java.lang.String,io.vertx.core.Handler)"](pattern, function(ar) {
+      j_redisClient["pubsubChannels(java.lang.String,io.vertx.core.Handler)"](pattern, function(ar) {
       if (ar.succeeded()) {
         handler(utils.convReturnJson(ar.result()), null);
       } else {
         handler(null, ar.cause());
       }
-    }), RedisClient);
+    });
+      return that;
     } else utils.invalidArgs();
   };
 
@@ -2771,13 +2897,14 @@ var RedisClient = function(j_val) {
   this.pubsubNumsub = function(channels, handler) {
     var __args = arguments;
     if (__args.length === 2 && typeof __args[0] === 'object' && __args[0] instanceof Array && typeof __args[1] === 'function') {
-      return utils.convReturnVertxGen(j_redisClient["pubsubNumsub(java.util.List,io.vertx.core.Handler)"](channels, function(ar) {
+      j_redisClient["pubsubNumsub(java.util.List,io.vertx.core.Handler)"](channels, function(ar) {
       if (ar.succeeded()) {
         handler(utils.convReturnJson(ar.result()), null);
       } else {
         handler(null, ar.cause());
       }
-    }), RedisClient);
+    });
+      return that;
     } else utils.invalidArgs();
   };
 
@@ -2791,13 +2918,14 @@ var RedisClient = function(j_val) {
   this.pubsubNumpat = function(handler) {
     var __args = arguments;
     if (__args.length === 1 && typeof __args[0] === 'function') {
-      return utils.convReturnVertxGen(j_redisClient["pubsubNumpat(io.vertx.core.Handler)"](function(ar) {
+      j_redisClient["pubsubNumpat(io.vertx.core.Handler)"](function(ar) {
       if (ar.succeeded()) {
         handler(ar.result(), null);
       } else {
         handler(null, ar.cause());
       }
-    }), RedisClient);
+    });
+      return that;
     } else utils.invalidArgs();
   };
 
@@ -2812,13 +2940,14 @@ var RedisClient = function(j_val) {
   this.pttl = function(key, handler) {
     var __args = arguments;
     if (__args.length === 2 && typeof __args[0] === 'string' && typeof __args[1] === 'function') {
-      return utils.convReturnVertxGen(j_redisClient["pttl(java.lang.String,io.vertx.core.Handler)"](key, function(ar) {
+      j_redisClient["pttl(java.lang.String,io.vertx.core.Handler)"](key, function(ar) {
       if (ar.succeeded()) {
         handler(ar.result(), null);
       } else {
         handler(null, ar.cause());
       }
-    }), RedisClient);
+    });
+      return that;
     } else utils.invalidArgs();
   };
 
@@ -2834,13 +2963,14 @@ var RedisClient = function(j_val) {
   this.publish = function(channel, message, handler) {
     var __args = arguments;
     if (__args.length === 3 && typeof __args[0] === 'string' && typeof __args[1] === 'string' && typeof __args[2] === 'function') {
-      return utils.convReturnVertxGen(j_redisClient["publish(java.lang.String,java.lang.String,io.vertx.core.Handler)"](channel, message, function(ar) {
+      j_redisClient["publish(java.lang.String,java.lang.String,io.vertx.core.Handler)"](channel, message, function(ar) {
       if (ar.succeeded()) {
         handler(ar.result(), null);
       } else {
         handler(null, ar.cause());
       }
-    }), RedisClient);
+    });
+      return that;
     } else utils.invalidArgs();
   };
 
@@ -2855,13 +2985,14 @@ var RedisClient = function(j_val) {
   this.punsubscribe = function(patterns, handler) {
     var __args = arguments;
     if (__args.length === 2 && typeof __args[0] === 'object' && __args[0] instanceof Array && typeof __args[1] === 'function') {
-      return utils.convReturnVertxGen(j_redisClient["punsubscribe(java.util.List,io.vertx.core.Handler)"](patterns, function(ar) {
+      j_redisClient["punsubscribe(java.util.List,io.vertx.core.Handler)"](patterns, function(ar) {
       if (ar.succeeded()) {
         handler(null, null);
       } else {
         handler(null, ar.cause());
       }
-    }), RedisClient);
+    });
+      return that;
     } else utils.invalidArgs();
   };
 
@@ -2875,13 +3006,14 @@ var RedisClient = function(j_val) {
   this.randomkey = function(handler) {
     var __args = arguments;
     if (__args.length === 1 && typeof __args[0] === 'function') {
-      return utils.convReturnVertxGen(j_redisClient["randomkey(io.vertx.core.Handler)"](function(ar) {
+      j_redisClient["randomkey(io.vertx.core.Handler)"](function(ar) {
       if (ar.succeeded()) {
         handler(ar.result(), null);
       } else {
         handler(null, ar.cause());
       }
-    }), RedisClient);
+    });
+      return that;
     } else utils.invalidArgs();
   };
 
@@ -2897,13 +3029,14 @@ var RedisClient = function(j_val) {
   this.rename = function(key, newkey, handler) {
     var __args = arguments;
     if (__args.length === 3 && typeof __args[0] === 'string' && typeof __args[1] === 'string' && typeof __args[2] === 'function') {
-      return utils.convReturnVertxGen(j_redisClient["rename(java.lang.String,java.lang.String,io.vertx.core.Handler)"](key, newkey, function(ar) {
+      j_redisClient["rename(java.lang.String,java.lang.String,io.vertx.core.Handler)"](key, newkey, function(ar) {
       if (ar.succeeded()) {
         handler(ar.result(), null);
       } else {
         handler(null, ar.cause());
       }
-    }), RedisClient);
+    });
+      return that;
     } else utils.invalidArgs();
   };
 
@@ -2919,13 +3052,14 @@ var RedisClient = function(j_val) {
   this.renamenx = function(key, newkey, handler) {
     var __args = arguments;
     if (__args.length === 3 && typeof __args[0] === 'string' && typeof __args[1] === 'string' && typeof __args[2] === 'function') {
-      return utils.convReturnVertxGen(j_redisClient["renamenx(java.lang.String,java.lang.String,io.vertx.core.Handler)"](key, newkey, function(ar) {
+      j_redisClient["renamenx(java.lang.String,java.lang.String,io.vertx.core.Handler)"](key, newkey, function(ar) {
       if (ar.succeeded()) {
         handler(ar.result(), null);
       } else {
         handler(null, ar.cause());
       }
-    }), RedisClient);
+    });
+      return that;
     } else utils.invalidArgs();
   };
 
@@ -2942,13 +3076,14 @@ var RedisClient = function(j_val) {
   this.restore = function(key, millis, serialized, handler) {
     var __args = arguments;
     if (__args.length === 4 && typeof __args[0] === 'string' && typeof __args[1] ==='number' && typeof __args[2] === 'string' && typeof __args[3] === 'function') {
-      return utils.convReturnVertxGen(j_redisClient["restore(java.lang.String,long,java.lang.String,io.vertx.core.Handler)"](key, millis, serialized, function(ar) {
+      j_redisClient["restore(java.lang.String,long,java.lang.String,io.vertx.core.Handler)"](key, millis, serialized, function(ar) {
       if (ar.succeeded()) {
         handler(ar.result(), null);
       } else {
         handler(null, ar.cause());
       }
-    }), RedisClient);
+    });
+      return that;
     } else utils.invalidArgs();
   };
 
@@ -2962,13 +3097,14 @@ var RedisClient = function(j_val) {
   this.role = function(handler) {
     var __args = arguments;
     if (__args.length === 1 && typeof __args[0] === 'function') {
-      return utils.convReturnVertxGen(j_redisClient["role(io.vertx.core.Handler)"](function(ar) {
+      j_redisClient["role(io.vertx.core.Handler)"](function(ar) {
       if (ar.succeeded()) {
         handler(utils.convReturnJson(ar.result()), null);
       } else {
         handler(null, ar.cause());
       }
-    }), RedisClient);
+    });
+      return that;
     } else utils.invalidArgs();
   };
 
@@ -2983,13 +3119,14 @@ var RedisClient = function(j_val) {
   this.rpop = function(key, handler) {
     var __args = arguments;
     if (__args.length === 2 && typeof __args[0] === 'string' && typeof __args[1] === 'function') {
-      return utils.convReturnVertxGen(j_redisClient["rpop(java.lang.String,io.vertx.core.Handler)"](key, function(ar) {
+      j_redisClient["rpop(java.lang.String,io.vertx.core.Handler)"](key, function(ar) {
       if (ar.succeeded()) {
         handler(ar.result(), null);
       } else {
         handler(null, ar.cause());
       }
-    }), RedisClient);
+    });
+      return that;
     } else utils.invalidArgs();
   };
 
@@ -3005,13 +3142,14 @@ var RedisClient = function(j_val) {
   this.rpoplpush = function(key, destkey, handler) {
     var __args = arguments;
     if (__args.length === 3 && typeof __args[0] === 'string' && typeof __args[1] === 'string' && typeof __args[2] === 'function') {
-      return utils.convReturnVertxGen(j_redisClient["rpoplpush(java.lang.String,java.lang.String,io.vertx.core.Handler)"](key, destkey, function(ar) {
+      j_redisClient["rpoplpush(java.lang.String,java.lang.String,io.vertx.core.Handler)"](key, destkey, function(ar) {
       if (ar.succeeded()) {
         handler(ar.result(), null);
       } else {
         handler(null, ar.cause());
       }
-    }), RedisClient);
+    });
+      return that;
     } else utils.invalidArgs();
   };
 
@@ -3027,13 +3165,14 @@ var RedisClient = function(j_val) {
   this.rpushMany = function(key, values, handler) {
     var __args = arguments;
     if (__args.length === 3 && typeof __args[0] === 'string' && typeof __args[1] === 'object' && __args[1] instanceof Array && typeof __args[2] === 'function') {
-      return utils.convReturnVertxGen(j_redisClient["rpushMany(java.lang.String,java.util.List,io.vertx.core.Handler)"](key, values, function(ar) {
+      j_redisClient["rpushMany(java.lang.String,java.util.List,io.vertx.core.Handler)"](key, values, function(ar) {
       if (ar.succeeded()) {
         handler(ar.result(), null);
       } else {
         handler(null, ar.cause());
       }
-    }), RedisClient);
+    });
+      return that;
     } else utils.invalidArgs();
   };
 
@@ -3049,13 +3188,14 @@ var RedisClient = function(j_val) {
   this.rpush = function(key, value, handler) {
     var __args = arguments;
     if (__args.length === 3 && typeof __args[0] === 'string' && typeof __args[1] === 'string' && typeof __args[2] === 'function') {
-      return utils.convReturnVertxGen(j_redisClient["rpush(java.lang.String,java.lang.String,io.vertx.core.Handler)"](key, value, function(ar) {
+      j_redisClient["rpush(java.lang.String,java.lang.String,io.vertx.core.Handler)"](key, value, function(ar) {
       if (ar.succeeded()) {
         handler(ar.result(), null);
       } else {
         handler(null, ar.cause());
       }
-    }), RedisClient);
+    });
+      return that;
     } else utils.invalidArgs();
   };
 
@@ -3071,13 +3211,14 @@ var RedisClient = function(j_val) {
   this.rpushx = function(key, value, handler) {
     var __args = arguments;
     if (__args.length === 3 && typeof __args[0] === 'string' && typeof __args[1] === 'string' && typeof __args[2] === 'function') {
-      return utils.convReturnVertxGen(j_redisClient["rpushx(java.lang.String,java.lang.String,io.vertx.core.Handler)"](key, value, function(ar) {
+      j_redisClient["rpushx(java.lang.String,java.lang.String,io.vertx.core.Handler)"](key, value, function(ar) {
       if (ar.succeeded()) {
         handler(ar.result(), null);
       } else {
         handler(null, ar.cause());
       }
-    }), RedisClient);
+    });
+      return that;
     } else utils.invalidArgs();
   };
 
@@ -3093,13 +3234,14 @@ var RedisClient = function(j_val) {
   this.sadd = function(key, member, handler) {
     var __args = arguments;
     if (__args.length === 3 && typeof __args[0] === 'string' && typeof __args[1] === 'string' && typeof __args[2] === 'function') {
-      return utils.convReturnVertxGen(j_redisClient["sadd(java.lang.String,java.lang.String,io.vertx.core.Handler)"](key, member, function(ar) {
+      j_redisClient["sadd(java.lang.String,java.lang.String,io.vertx.core.Handler)"](key, member, function(ar) {
       if (ar.succeeded()) {
         handler(ar.result(), null);
       } else {
         handler(null, ar.cause());
       }
-    }), RedisClient);
+    });
+      return that;
     } else utils.invalidArgs();
   };
 
@@ -3115,13 +3257,14 @@ var RedisClient = function(j_val) {
   this.saddMany = function(key, members, handler) {
     var __args = arguments;
     if (__args.length === 3 && typeof __args[0] === 'string' && typeof __args[1] === 'object' && __args[1] instanceof Array && typeof __args[2] === 'function') {
-      return utils.convReturnVertxGen(j_redisClient["saddMany(java.lang.String,java.util.List,io.vertx.core.Handler)"](key, members, function(ar) {
+      j_redisClient["saddMany(java.lang.String,java.util.List,io.vertx.core.Handler)"](key, members, function(ar) {
       if (ar.succeeded()) {
         handler(ar.result(), null);
       } else {
         handler(null, ar.cause());
       }
-    }), RedisClient);
+    });
+      return that;
     } else utils.invalidArgs();
   };
 
@@ -3135,13 +3278,14 @@ var RedisClient = function(j_val) {
   this.save = function(handler) {
     var __args = arguments;
     if (__args.length === 1 && typeof __args[0] === 'function') {
-      return utils.convReturnVertxGen(j_redisClient["save(io.vertx.core.Handler)"](function(ar) {
+      j_redisClient["save(io.vertx.core.Handler)"](function(ar) {
       if (ar.succeeded()) {
         handler(ar.result(), null);
       } else {
         handler(null, ar.cause());
       }
-    }), RedisClient);
+    });
+      return that;
     } else utils.invalidArgs();
   };
 
@@ -3156,13 +3300,14 @@ var RedisClient = function(j_val) {
   this.scard = function(key, handler) {
     var __args = arguments;
     if (__args.length === 2 && typeof __args[0] === 'string' && typeof __args[1] === 'function') {
-      return utils.convReturnVertxGen(j_redisClient["scard(java.lang.String,io.vertx.core.Handler)"](key, function(ar) {
+      j_redisClient["scard(java.lang.String,io.vertx.core.Handler)"](key, function(ar) {
       if (ar.succeeded()) {
         handler(ar.result(), null);
       } else {
         handler(null, ar.cause());
       }
-    }), RedisClient);
+    });
+      return that;
     } else utils.invalidArgs();
   };
 
@@ -3177,13 +3322,14 @@ var RedisClient = function(j_val) {
   this.scriptExists = function(script, handler) {
     var __args = arguments;
     if (__args.length === 2 && typeof __args[0] === 'string' && typeof __args[1] === 'function') {
-      return utils.convReturnVertxGen(j_redisClient["scriptExists(java.lang.String,io.vertx.core.Handler)"](script, function(ar) {
+      j_redisClient["scriptExists(java.lang.String,io.vertx.core.Handler)"](script, function(ar) {
       if (ar.succeeded()) {
         handler(utils.convReturnJson(ar.result()), null);
       } else {
         handler(null, ar.cause());
       }
-    }), RedisClient);
+    });
+      return that;
     } else utils.invalidArgs();
   };
 
@@ -3198,13 +3344,14 @@ var RedisClient = function(j_val) {
   this.scriptExistsMany = function(scripts, handler) {
     var __args = arguments;
     if (__args.length === 2 && typeof __args[0] === 'object' && __args[0] instanceof Array && typeof __args[1] === 'function') {
-      return utils.convReturnVertxGen(j_redisClient["scriptExistsMany(java.util.List,io.vertx.core.Handler)"](scripts, function(ar) {
+      j_redisClient["scriptExistsMany(java.util.List,io.vertx.core.Handler)"](scripts, function(ar) {
       if (ar.succeeded()) {
         handler(utils.convReturnJson(ar.result()), null);
       } else {
         handler(null, ar.cause());
       }
-    }), RedisClient);
+    });
+      return that;
     } else utils.invalidArgs();
   };
 
@@ -3218,13 +3365,14 @@ var RedisClient = function(j_val) {
   this.scriptFlush = function(handler) {
     var __args = arguments;
     if (__args.length === 1 && typeof __args[0] === 'function') {
-      return utils.convReturnVertxGen(j_redisClient["scriptFlush(io.vertx.core.Handler)"](function(ar) {
+      j_redisClient["scriptFlush(io.vertx.core.Handler)"](function(ar) {
       if (ar.succeeded()) {
         handler(ar.result(), null);
       } else {
         handler(null, ar.cause());
       }
-    }), RedisClient);
+    });
+      return that;
     } else utils.invalidArgs();
   };
 
@@ -3238,13 +3386,14 @@ var RedisClient = function(j_val) {
   this.scriptKill = function(handler) {
     var __args = arguments;
     if (__args.length === 1 && typeof __args[0] === 'function') {
-      return utils.convReturnVertxGen(j_redisClient["scriptKill(io.vertx.core.Handler)"](function(ar) {
+      j_redisClient["scriptKill(io.vertx.core.Handler)"](function(ar) {
       if (ar.succeeded()) {
         handler(ar.result(), null);
       } else {
         handler(null, ar.cause());
       }
-    }), RedisClient);
+    });
+      return that;
     } else utils.invalidArgs();
   };
 
@@ -3259,13 +3408,14 @@ var RedisClient = function(j_val) {
   this.scriptLoad = function(script, handler) {
     var __args = arguments;
     if (__args.length === 2 && typeof __args[0] === 'string' && typeof __args[1] === 'function') {
-      return utils.convReturnVertxGen(j_redisClient["scriptLoad(java.lang.String,io.vertx.core.Handler)"](script, function(ar) {
+      j_redisClient["scriptLoad(java.lang.String,io.vertx.core.Handler)"](script, function(ar) {
       if (ar.succeeded()) {
         handler(ar.result(), null);
       } else {
         handler(null, ar.cause());
       }
-    }), RedisClient);
+    });
+      return that;
     } else utils.invalidArgs();
   };
 
@@ -3281,13 +3431,14 @@ var RedisClient = function(j_val) {
   this.sdiff = function(key, cmpkeys, handler) {
     var __args = arguments;
     if (__args.length === 3 && typeof __args[0] === 'string' && typeof __args[1] === 'object' && __args[1] instanceof Array && typeof __args[2] === 'function') {
-      return utils.convReturnVertxGen(j_redisClient["sdiff(java.lang.String,java.util.List,io.vertx.core.Handler)"](key, cmpkeys, function(ar) {
+      j_redisClient["sdiff(java.lang.String,java.util.List,io.vertx.core.Handler)"](key, cmpkeys, function(ar) {
       if (ar.succeeded()) {
         handler(utils.convReturnJson(ar.result()), null);
       } else {
         handler(null, ar.cause());
       }
-    }), RedisClient);
+    });
+      return that;
     } else utils.invalidArgs();
   };
 
@@ -3304,13 +3455,14 @@ var RedisClient = function(j_val) {
   this.sdiffstore = function(destkey, key, cmpkeys, handler) {
     var __args = arguments;
     if (__args.length === 4 && typeof __args[0] === 'string' && typeof __args[1] === 'string' && typeof __args[2] === 'object' && __args[2] instanceof Array && typeof __args[3] === 'function') {
-      return utils.convReturnVertxGen(j_redisClient["sdiffstore(java.lang.String,java.lang.String,java.util.List,io.vertx.core.Handler)"](destkey, key, cmpkeys, function(ar) {
+      j_redisClient["sdiffstore(java.lang.String,java.lang.String,java.util.List,io.vertx.core.Handler)"](destkey, key, cmpkeys, function(ar) {
       if (ar.succeeded()) {
         handler(ar.result(), null);
       } else {
         handler(null, ar.cause());
       }
-    }), RedisClient);
+    });
+      return that;
     } else utils.invalidArgs();
   };
 
@@ -3325,13 +3477,14 @@ var RedisClient = function(j_val) {
   this.select = function(dbindex, handler) {
     var __args = arguments;
     if (__args.length === 2 && typeof __args[0] ==='number' && typeof __args[1] === 'function') {
-      return utils.convReturnVertxGen(j_redisClient["select(int,io.vertx.core.Handler)"](dbindex, function(ar) {
+      j_redisClient["select(int,io.vertx.core.Handler)"](dbindex, function(ar) {
       if (ar.succeeded()) {
         handler(ar.result(), null);
       } else {
         handler(null, ar.cause());
       }
-    }), RedisClient);
+    });
+      return that;
     } else utils.invalidArgs();
   };
 
@@ -3347,13 +3500,14 @@ var RedisClient = function(j_val) {
   this.set = function(key, value, handler) {
     var __args = arguments;
     if (__args.length === 3 && typeof __args[0] === 'string' && typeof __args[1] === 'string' && typeof __args[2] === 'function') {
-      return utils.convReturnVertxGen(j_redisClient["set(java.lang.String,java.lang.String,io.vertx.core.Handler)"](key, value, function(ar) {
+      j_redisClient["set(java.lang.String,java.lang.String,io.vertx.core.Handler)"](key, value, function(ar) {
       if (ar.succeeded()) {
         handler(null, null);
       } else {
         handler(null, ar.cause());
       }
-    }), RedisClient);
+    });
+      return that;
     } else utils.invalidArgs();
   };
 
@@ -3370,13 +3524,14 @@ var RedisClient = function(j_val) {
   this.setWithOptions = function(key, value, options, handler) {
     var __args = arguments;
     if (__args.length === 4 && typeof __args[0] === 'string' && typeof __args[1] === 'string' && typeof __args[2] === 'object' && typeof __args[3] === 'function') {
-      return utils.convReturnVertxGen(j_redisClient["setWithOptions(java.lang.String,java.lang.String,io.vertx.redis.op.SetOptions,io.vertx.core.Handler)"](key, value, options != null ? new SetOptions(new JsonObject(JSON.stringify(options))) : null, function(ar) {
+      j_redisClient["setWithOptions(java.lang.String,java.lang.String,io.vertx.redis.op.SetOptions,io.vertx.core.Handler)"](key, value, options != null ? new SetOptions(new JsonObject(JSON.stringify(options))) : null, function(ar) {
       if (ar.succeeded()) {
         handler(null, null);
       } else {
         handler(null, ar.cause());
       }
-    }), RedisClient);
+    });
+      return that;
     } else utils.invalidArgs();
   };
 
@@ -3392,13 +3547,14 @@ var RedisClient = function(j_val) {
   this.setBinary = function(key, value, handler) {
     var __args = arguments;
     if (__args.length === 3 && typeof __args[0] === 'string' && typeof __args[1] === 'string' && typeof __args[2] === 'function') {
-      return utils.convReturnVertxGen(j_redisClient["setBinary(java.lang.String,java.lang.String,io.vertx.core.Handler)"](key, value, function(ar) {
+      j_redisClient["setBinary(java.lang.String,java.lang.String,io.vertx.core.Handler)"](key, value, function(ar) {
       if (ar.succeeded()) {
         handler(null, null);
       } else {
         handler(null, ar.cause());
       }
-    }), RedisClient);
+    });
+      return that;
     } else utils.invalidArgs();
   };
 
@@ -3415,13 +3571,14 @@ var RedisClient = function(j_val) {
   this.setbit = function(key, offset, bit, handler) {
     var __args = arguments;
     if (__args.length === 4 && typeof __args[0] === 'string' && typeof __args[1] ==='number' && typeof __args[2] ==='number' && typeof __args[3] === 'function') {
-      return utils.convReturnVertxGen(j_redisClient["setbit(java.lang.String,long,int,io.vertx.core.Handler)"](key, offset, bit, function(ar) {
+      j_redisClient["setbit(java.lang.String,long,int,io.vertx.core.Handler)"](key, offset, bit, function(ar) {
       if (ar.succeeded()) {
         handler(ar.result(), null);
       } else {
         handler(null, ar.cause());
       }
-    }), RedisClient);
+    });
+      return that;
     } else utils.invalidArgs();
   };
 
@@ -3438,13 +3595,14 @@ var RedisClient = function(j_val) {
   this.setex = function(key, seconds, value, handler) {
     var __args = arguments;
     if (__args.length === 4 && typeof __args[0] === 'string' && typeof __args[1] ==='number' && typeof __args[2] === 'string' && typeof __args[3] === 'function') {
-      return utils.convReturnVertxGen(j_redisClient["setex(java.lang.String,long,java.lang.String,io.vertx.core.Handler)"](key, seconds, value, function(ar) {
+      j_redisClient["setex(java.lang.String,long,java.lang.String,io.vertx.core.Handler)"](key, seconds, value, function(ar) {
       if (ar.succeeded()) {
         handler(ar.result(), null);
       } else {
         handler(null, ar.cause());
       }
-    }), RedisClient);
+    });
+      return that;
     } else utils.invalidArgs();
   };
 
@@ -3460,13 +3618,14 @@ var RedisClient = function(j_val) {
   this.setnx = function(key, value, handler) {
     var __args = arguments;
     if (__args.length === 3 && typeof __args[0] === 'string' && typeof __args[1] === 'string' && typeof __args[2] === 'function') {
-      return utils.convReturnVertxGen(j_redisClient["setnx(java.lang.String,java.lang.String,io.vertx.core.Handler)"](key, value, function(ar) {
+      j_redisClient["setnx(java.lang.String,java.lang.String,io.vertx.core.Handler)"](key, value, function(ar) {
       if (ar.succeeded()) {
         handler(ar.result(), null);
       } else {
         handler(null, ar.cause());
       }
-    }), RedisClient);
+    });
+      return that;
     } else utils.invalidArgs();
   };
 
@@ -3483,13 +3642,14 @@ var RedisClient = function(j_val) {
   this.setrange = function(key, offset, value, handler) {
     var __args = arguments;
     if (__args.length === 4 && typeof __args[0] === 'string' && typeof __args[1] ==='number' && typeof __args[2] === 'string' && typeof __args[3] === 'function') {
-      return utils.convReturnVertxGen(j_redisClient["setrange(java.lang.String,int,java.lang.String,io.vertx.core.Handler)"](key, offset, value, function(ar) {
+      j_redisClient["setrange(java.lang.String,int,java.lang.String,io.vertx.core.Handler)"](key, offset, value, function(ar) {
       if (ar.succeeded()) {
         handler(ar.result(), null);
       } else {
         handler(null, ar.cause());
       }
-    }), RedisClient);
+    });
+      return that;
     } else utils.invalidArgs();
   };
 
@@ -3504,13 +3664,14 @@ var RedisClient = function(j_val) {
   this.sinter = function(keys, handler) {
     var __args = arguments;
     if (__args.length === 2 && typeof __args[0] === 'object' && __args[0] instanceof Array && typeof __args[1] === 'function') {
-      return utils.convReturnVertxGen(j_redisClient["sinter(java.util.List,io.vertx.core.Handler)"](keys, function(ar) {
+      j_redisClient["sinter(java.util.List,io.vertx.core.Handler)"](keys, function(ar) {
       if (ar.succeeded()) {
         handler(utils.convReturnJson(ar.result()), null);
       } else {
         handler(null, ar.cause());
       }
-    }), RedisClient);
+    });
+      return that;
     } else utils.invalidArgs();
   };
 
@@ -3526,13 +3687,14 @@ var RedisClient = function(j_val) {
   this.sinterstore = function(destkey, keys, handler) {
     var __args = arguments;
     if (__args.length === 3 && typeof __args[0] === 'string' && typeof __args[1] === 'object' && __args[1] instanceof Array && typeof __args[2] === 'function') {
-      return utils.convReturnVertxGen(j_redisClient["sinterstore(java.lang.String,java.util.List,io.vertx.core.Handler)"](destkey, keys, function(ar) {
+      j_redisClient["sinterstore(java.lang.String,java.util.List,io.vertx.core.Handler)"](destkey, keys, function(ar) {
       if (ar.succeeded()) {
         handler(ar.result(), null);
       } else {
         handler(null, ar.cause());
       }
-    }), RedisClient);
+    });
+      return that;
     } else utils.invalidArgs();
   };
 
@@ -3548,13 +3710,14 @@ var RedisClient = function(j_val) {
   this.sismember = function(key, member, handler) {
     var __args = arguments;
     if (__args.length === 3 && typeof __args[0] === 'string' && typeof __args[1] === 'string' && typeof __args[2] === 'function') {
-      return utils.convReturnVertxGen(j_redisClient["sismember(java.lang.String,java.lang.String,io.vertx.core.Handler)"](key, member, function(ar) {
+      j_redisClient["sismember(java.lang.String,java.lang.String,io.vertx.core.Handler)"](key, member, function(ar) {
       if (ar.succeeded()) {
         handler(ar.result(), null);
       } else {
         handler(null, ar.cause());
       }
-    }), RedisClient);
+    });
+      return that;
     } else utils.invalidArgs();
   };
 
@@ -3570,13 +3733,14 @@ var RedisClient = function(j_val) {
   this.slaveof = function(host, port, handler) {
     var __args = arguments;
     if (__args.length === 3 && typeof __args[0] === 'string' && typeof __args[1] ==='number' && typeof __args[2] === 'function') {
-      return utils.convReturnVertxGen(j_redisClient["slaveof(java.lang.String,int,io.vertx.core.Handler)"](host, port, function(ar) {
+      j_redisClient["slaveof(java.lang.String,int,io.vertx.core.Handler)"](host, port, function(ar) {
       if (ar.succeeded()) {
         handler(ar.result(), null);
       } else {
         handler(null, ar.cause());
       }
-    }), RedisClient);
+    });
+      return that;
     } else utils.invalidArgs();
   };
 
@@ -3590,13 +3754,14 @@ var RedisClient = function(j_val) {
   this.slaveofNoone = function(handler) {
     var __args = arguments;
     if (__args.length === 1 && typeof __args[0] === 'function') {
-      return utils.convReturnVertxGen(j_redisClient["slaveofNoone(io.vertx.core.Handler)"](function(ar) {
+      j_redisClient["slaveofNoone(io.vertx.core.Handler)"](function(ar) {
       if (ar.succeeded()) {
         handler(ar.result(), null);
       } else {
         handler(null, ar.cause());
       }
-    }), RedisClient);
+    });
+      return that;
     } else utils.invalidArgs();
   };
 
@@ -3611,13 +3776,14 @@ var RedisClient = function(j_val) {
   this.slowlogGet = function(limit, handler) {
     var __args = arguments;
     if (__args.length === 2 && typeof __args[0] ==='number' && typeof __args[1] === 'function') {
-      return utils.convReturnVertxGen(j_redisClient["slowlogGet(int,io.vertx.core.Handler)"](limit, function(ar) {
+      j_redisClient["slowlogGet(int,io.vertx.core.Handler)"](limit, function(ar) {
       if (ar.succeeded()) {
         handler(utils.convReturnJson(ar.result()), null);
       } else {
         handler(null, ar.cause());
       }
-    }), RedisClient);
+    });
+      return that;
     } else utils.invalidArgs();
   };
 
@@ -3631,13 +3797,14 @@ var RedisClient = function(j_val) {
   this.slowlogLen = function(handler) {
     var __args = arguments;
     if (__args.length === 1 && typeof __args[0] === 'function') {
-      return utils.convReturnVertxGen(j_redisClient["slowlogLen(io.vertx.core.Handler)"](function(ar) {
+      j_redisClient["slowlogLen(io.vertx.core.Handler)"](function(ar) {
       if (ar.succeeded()) {
         handler(ar.result(), null);
       } else {
         handler(null, ar.cause());
       }
-    }), RedisClient);
+    });
+      return that;
     } else utils.invalidArgs();
   };
 
@@ -3651,13 +3818,14 @@ var RedisClient = function(j_val) {
   this.slowlogReset = function(handler) {
     var __args = arguments;
     if (__args.length === 1 && typeof __args[0] === 'function') {
-      return utils.convReturnVertxGen(j_redisClient["slowlogReset(io.vertx.core.Handler)"](function(ar) {
+      j_redisClient["slowlogReset(io.vertx.core.Handler)"](function(ar) {
       if (ar.succeeded()) {
         handler(null, null);
       } else {
         handler(null, ar.cause());
       }
-    }), RedisClient);
+    });
+      return that;
     } else utils.invalidArgs();
   };
 
@@ -3672,13 +3840,14 @@ var RedisClient = function(j_val) {
   this.smembers = function(key, handler) {
     var __args = arguments;
     if (__args.length === 2 && typeof __args[0] === 'string' && typeof __args[1] === 'function') {
-      return utils.convReturnVertxGen(j_redisClient["smembers(java.lang.String,io.vertx.core.Handler)"](key, function(ar) {
+      j_redisClient["smembers(java.lang.String,io.vertx.core.Handler)"](key, function(ar) {
       if (ar.succeeded()) {
         handler(utils.convReturnJson(ar.result()), null);
       } else {
         handler(null, ar.cause());
       }
-    }), RedisClient);
+    });
+      return that;
     } else utils.invalidArgs();
   };
 
@@ -3695,13 +3864,14 @@ var RedisClient = function(j_val) {
   this.smove = function(key, destkey, member, handler) {
     var __args = arguments;
     if (__args.length === 4 && typeof __args[0] === 'string' && typeof __args[1] === 'string' && typeof __args[2] === 'string' && typeof __args[3] === 'function') {
-      return utils.convReturnVertxGen(j_redisClient["smove(java.lang.String,java.lang.String,java.lang.String,io.vertx.core.Handler)"](key, destkey, member, function(ar) {
+      j_redisClient["smove(java.lang.String,java.lang.String,java.lang.String,io.vertx.core.Handler)"](key, destkey, member, function(ar) {
       if (ar.succeeded()) {
         handler(ar.result(), null);
       } else {
         handler(null, ar.cause());
       }
-    }), RedisClient);
+    });
+      return that;
     } else utils.invalidArgs();
   };
 
@@ -3717,13 +3887,14 @@ var RedisClient = function(j_val) {
   this.sort = function(key, options, handler) {
     var __args = arguments;
     if (__args.length === 3 && typeof __args[0] === 'string' && typeof __args[1] === 'object' && typeof __args[2] === 'function') {
-      return utils.convReturnVertxGen(j_redisClient["sort(java.lang.String,io.vertx.redis.op.SortOptions,io.vertx.core.Handler)"](key, options != null ? new SortOptions(new JsonObject(JSON.stringify(options))) : null, function(ar) {
+      j_redisClient["sort(java.lang.String,io.vertx.redis.op.SortOptions,io.vertx.core.Handler)"](key, options != null ? new SortOptions(new JsonObject(JSON.stringify(options))) : null, function(ar) {
       if (ar.succeeded()) {
         handler(utils.convReturnJson(ar.result()), null);
       } else {
         handler(null, ar.cause());
       }
-    }), RedisClient);
+    });
+      return that;
     } else utils.invalidArgs();
   };
 
@@ -3738,13 +3909,14 @@ var RedisClient = function(j_val) {
   this.spop = function(key, handler) {
     var __args = arguments;
     if (__args.length === 2 && typeof __args[0] === 'string' && typeof __args[1] === 'function') {
-      return utils.convReturnVertxGen(j_redisClient["spop(java.lang.String,io.vertx.core.Handler)"](key, function(ar) {
+      j_redisClient["spop(java.lang.String,io.vertx.core.Handler)"](key, function(ar) {
       if (ar.succeeded()) {
         handler(ar.result(), null);
       } else {
         handler(null, ar.cause());
       }
-    }), RedisClient);
+    });
+      return that;
     } else utils.invalidArgs();
   };
 
@@ -3760,13 +3932,14 @@ var RedisClient = function(j_val) {
   this.spopMany = function(key, count, handler) {
     var __args = arguments;
     if (__args.length === 3 && typeof __args[0] === 'string' && typeof __args[1] ==='number' && typeof __args[2] === 'function') {
-      return utils.convReturnVertxGen(j_redisClient["spopMany(java.lang.String,int,io.vertx.core.Handler)"](key, count, function(ar) {
+      j_redisClient["spopMany(java.lang.String,int,io.vertx.core.Handler)"](key, count, function(ar) {
       if (ar.succeeded()) {
         handler(ar.result(), null);
       } else {
         handler(null, ar.cause());
       }
-    }), RedisClient);
+    });
+      return that;
     } else utils.invalidArgs();
   };
 
@@ -3781,13 +3954,14 @@ var RedisClient = function(j_val) {
   this.srandmember = function(key, handler) {
     var __args = arguments;
     if (__args.length === 2 && typeof __args[0] === 'string' && typeof __args[1] === 'function') {
-      return utils.convReturnVertxGen(j_redisClient["srandmember(java.lang.String,io.vertx.core.Handler)"](key, function(ar) {
+      j_redisClient["srandmember(java.lang.String,io.vertx.core.Handler)"](key, function(ar) {
       if (ar.succeeded()) {
         handler(ar.result(), null);
       } else {
         handler(null, ar.cause());
       }
-    }), RedisClient);
+    });
+      return that;
     } else utils.invalidArgs();
   };
 
@@ -3803,13 +3977,14 @@ var RedisClient = function(j_val) {
   this.srandmemberCount = function(key, count, handler) {
     var __args = arguments;
     if (__args.length === 3 && typeof __args[0] === 'string' && typeof __args[1] ==='number' && typeof __args[2] === 'function') {
-      return utils.convReturnVertxGen(j_redisClient["srandmemberCount(java.lang.String,int,io.vertx.core.Handler)"](key, count, function(ar) {
+      j_redisClient["srandmemberCount(java.lang.String,int,io.vertx.core.Handler)"](key, count, function(ar) {
       if (ar.succeeded()) {
         handler(utils.convReturnJson(ar.result()), null);
       } else {
         handler(null, ar.cause());
       }
-    }), RedisClient);
+    });
+      return that;
     } else utils.invalidArgs();
   };
 
@@ -3825,13 +4000,14 @@ var RedisClient = function(j_val) {
   this.srem = function(key, member, handler) {
     var __args = arguments;
     if (__args.length === 3 && typeof __args[0] === 'string' && typeof __args[1] === 'string' && typeof __args[2] === 'function') {
-      return utils.convReturnVertxGen(j_redisClient["srem(java.lang.String,java.lang.String,io.vertx.core.Handler)"](key, member, function(ar) {
+      j_redisClient["srem(java.lang.String,java.lang.String,io.vertx.core.Handler)"](key, member, function(ar) {
       if (ar.succeeded()) {
         handler(ar.result(), null);
       } else {
         handler(null, ar.cause());
       }
-    }), RedisClient);
+    });
+      return that;
     } else utils.invalidArgs();
   };
 
@@ -3847,13 +4023,14 @@ var RedisClient = function(j_val) {
   this.sremMany = function(key, members, handler) {
     var __args = arguments;
     if (__args.length === 3 && typeof __args[0] === 'string' && typeof __args[1] === 'object' && __args[1] instanceof Array && typeof __args[2] === 'function') {
-      return utils.convReturnVertxGen(j_redisClient["sremMany(java.lang.String,java.util.List,io.vertx.core.Handler)"](key, members, function(ar) {
+      j_redisClient["sremMany(java.lang.String,java.util.List,io.vertx.core.Handler)"](key, members, function(ar) {
       if (ar.succeeded()) {
         handler(ar.result(), null);
       } else {
         handler(null, ar.cause());
       }
-    }), RedisClient);
+    });
+      return that;
     } else utils.invalidArgs();
   };
 
@@ -3868,13 +4045,14 @@ var RedisClient = function(j_val) {
   this.strlen = function(key, handler) {
     var __args = arguments;
     if (__args.length === 2 && typeof __args[0] === 'string' && typeof __args[1] === 'function') {
-      return utils.convReturnVertxGen(j_redisClient["strlen(java.lang.String,io.vertx.core.Handler)"](key, function(ar) {
+      j_redisClient["strlen(java.lang.String,io.vertx.core.Handler)"](key, function(ar) {
       if (ar.succeeded()) {
         handler(ar.result(), null);
       } else {
         handler(null, ar.cause());
       }
-    }), RedisClient);
+    });
+      return that;
     } else utils.invalidArgs();
   };
 
@@ -3889,13 +4067,14 @@ var RedisClient = function(j_val) {
   this.subscribe = function(channel, handler) {
     var __args = arguments;
     if (__args.length === 2 && typeof __args[0] === 'string' && typeof __args[1] === 'function') {
-      return utils.convReturnVertxGen(j_redisClient["subscribe(java.lang.String,io.vertx.core.Handler)"](channel, function(ar) {
+      j_redisClient["subscribe(java.lang.String,io.vertx.core.Handler)"](channel, function(ar) {
       if (ar.succeeded()) {
         handler(utils.convReturnJson(ar.result()), null);
       } else {
         handler(null, ar.cause());
       }
-    }), RedisClient);
+    });
+      return that;
     } else utils.invalidArgs();
   };
 
@@ -3910,13 +4089,14 @@ var RedisClient = function(j_val) {
   this.subscribeMany = function(channels, handler) {
     var __args = arguments;
     if (__args.length === 2 && typeof __args[0] === 'object' && __args[0] instanceof Array && typeof __args[1] === 'function') {
-      return utils.convReturnVertxGen(j_redisClient["subscribeMany(java.util.List,io.vertx.core.Handler)"](channels, function(ar) {
+      j_redisClient["subscribeMany(java.util.List,io.vertx.core.Handler)"](channels, function(ar) {
       if (ar.succeeded()) {
         handler(utils.convReturnJson(ar.result()), null);
       } else {
         handler(null, ar.cause());
       }
-    }), RedisClient);
+    });
+      return that;
     } else utils.invalidArgs();
   };
 
@@ -3931,13 +4111,14 @@ var RedisClient = function(j_val) {
   this.sunion = function(keys, handler) {
     var __args = arguments;
     if (__args.length === 2 && typeof __args[0] === 'object' && __args[0] instanceof Array && typeof __args[1] === 'function') {
-      return utils.convReturnVertxGen(j_redisClient["sunion(java.util.List,io.vertx.core.Handler)"](keys, function(ar) {
+      j_redisClient["sunion(java.util.List,io.vertx.core.Handler)"](keys, function(ar) {
       if (ar.succeeded()) {
         handler(utils.convReturnJson(ar.result()), null);
       } else {
         handler(null, ar.cause());
       }
-    }), RedisClient);
+    });
+      return that;
     } else utils.invalidArgs();
   };
 
@@ -3953,13 +4134,14 @@ var RedisClient = function(j_val) {
   this.sunionstore = function(destkey, keys, handler) {
     var __args = arguments;
     if (__args.length === 3 && typeof __args[0] === 'string' && typeof __args[1] === 'object' && __args[1] instanceof Array && typeof __args[2] === 'function') {
-      return utils.convReturnVertxGen(j_redisClient["sunionstore(java.lang.String,java.util.List,io.vertx.core.Handler)"](destkey, keys, function(ar) {
+      j_redisClient["sunionstore(java.lang.String,java.util.List,io.vertx.core.Handler)"](destkey, keys, function(ar) {
       if (ar.succeeded()) {
         handler(ar.result(), null);
       } else {
         handler(null, ar.cause());
       }
-    }), RedisClient);
+    });
+      return that;
     } else utils.invalidArgs();
   };
 
@@ -3973,13 +4155,14 @@ var RedisClient = function(j_val) {
   this.sync = function(handler) {
     var __args = arguments;
     if (__args.length === 1 && typeof __args[0] === 'function') {
-      return utils.convReturnVertxGen(j_redisClient["sync(io.vertx.core.Handler)"](function(ar) {
+      j_redisClient["sync(io.vertx.core.Handler)"](function(ar) {
       if (ar.succeeded()) {
         handler(null, null);
       } else {
         handler(null, ar.cause());
       }
-    }), RedisClient);
+    });
+      return that;
     } else utils.invalidArgs();
   };
 
@@ -3993,13 +4176,14 @@ var RedisClient = function(j_val) {
   this.time = function(handler) {
     var __args = arguments;
     if (__args.length === 1 && typeof __args[0] === 'function') {
-      return utils.convReturnVertxGen(j_redisClient["time(io.vertx.core.Handler)"](function(ar) {
+      j_redisClient["time(io.vertx.core.Handler)"](function(ar) {
       if (ar.succeeded()) {
         handler(utils.convReturnJson(ar.result()), null);
       } else {
         handler(null, ar.cause());
       }
-    }), RedisClient);
+    });
+      return that;
     } else utils.invalidArgs();
   };
 
@@ -4014,13 +4198,14 @@ var RedisClient = function(j_val) {
   this.ttl = function(key, handler) {
     var __args = arguments;
     if (__args.length === 2 && typeof __args[0] === 'string' && typeof __args[1] === 'function') {
-      return utils.convReturnVertxGen(j_redisClient["ttl(java.lang.String,io.vertx.core.Handler)"](key, function(ar) {
+      j_redisClient["ttl(java.lang.String,io.vertx.core.Handler)"](key, function(ar) {
       if (ar.succeeded()) {
         handler(ar.result(), null);
       } else {
         handler(null, ar.cause());
       }
-    }), RedisClient);
+    });
+      return that;
     } else utils.invalidArgs();
   };
 
@@ -4035,13 +4220,14 @@ var RedisClient = function(j_val) {
   this.type = function(key, handler) {
     var __args = arguments;
     if (__args.length === 2 && typeof __args[0] === 'string' && typeof __args[1] === 'function') {
-      return utils.convReturnVertxGen(j_redisClient["type(java.lang.String,io.vertx.core.Handler)"](key, function(ar) {
+      j_redisClient["type(java.lang.String,io.vertx.core.Handler)"](key, function(ar) {
       if (ar.succeeded()) {
         handler(ar.result(), null);
       } else {
         handler(null, ar.cause());
       }
-    }), RedisClient);
+    });
+      return that;
     } else utils.invalidArgs();
   };
 
@@ -4056,13 +4242,14 @@ var RedisClient = function(j_val) {
   this.unsubscribe = function(channels, handler) {
     var __args = arguments;
     if (__args.length === 2 && typeof __args[0] === 'object' && __args[0] instanceof Array && typeof __args[1] === 'function') {
-      return utils.convReturnVertxGen(j_redisClient["unsubscribe(java.util.List,io.vertx.core.Handler)"](channels, function(ar) {
+      j_redisClient["unsubscribe(java.util.List,io.vertx.core.Handler)"](channels, function(ar) {
       if (ar.succeeded()) {
         handler(null, null);
       } else {
         handler(null, ar.cause());
       }
-    }), RedisClient);
+    });
+      return that;
     } else utils.invalidArgs();
   };
 
@@ -4076,13 +4263,14 @@ var RedisClient = function(j_val) {
   this.unwatch = function(handler) {
     var __args = arguments;
     if (__args.length === 1 && typeof __args[0] === 'function') {
-      return utils.convReturnVertxGen(j_redisClient["unwatch(io.vertx.core.Handler)"](function(ar) {
+      j_redisClient["unwatch(io.vertx.core.Handler)"](function(ar) {
       if (ar.succeeded()) {
         handler(ar.result(), null);
       } else {
         handler(null, ar.cause());
       }
-    }), RedisClient);
+    });
+      return that;
     } else utils.invalidArgs();
   };
 
@@ -4098,13 +4286,14 @@ var RedisClient = function(j_val) {
   this.wait = function(numSlaves, timeout, handler) {
     var __args = arguments;
     if (__args.length === 3 && typeof __args[0] ==='number' && typeof __args[1] ==='number' && typeof __args[2] === 'function') {
-      return utils.convReturnVertxGen(j_redisClient["wait(long,long,io.vertx.core.Handler)"](numSlaves, timeout, function(ar) {
+      j_redisClient["wait(long,long,io.vertx.core.Handler)"](numSlaves, timeout, function(ar) {
       if (ar.succeeded()) {
         handler(ar.result(), null);
       } else {
         handler(null, ar.cause());
       }
-    }), RedisClient);
+    });
+      return that;
     } else utils.invalidArgs();
   };
 
@@ -4119,13 +4308,14 @@ var RedisClient = function(j_val) {
   this.watch = function(key, handler) {
     var __args = arguments;
     if (__args.length === 2 && typeof __args[0] === 'string' && typeof __args[1] === 'function') {
-      return utils.convReturnVertxGen(j_redisClient["watch(java.lang.String,io.vertx.core.Handler)"](key, function(ar) {
+      j_redisClient["watch(java.lang.String,io.vertx.core.Handler)"](key, function(ar) {
       if (ar.succeeded()) {
         handler(ar.result(), null);
       } else {
         handler(null, ar.cause());
       }
-    }), RedisClient);
+    });
+      return that;
     } else utils.invalidArgs();
   };
 
@@ -4140,13 +4330,14 @@ var RedisClient = function(j_val) {
   this.watchMany = function(keys, handler) {
     var __args = arguments;
     if (__args.length === 2 && typeof __args[0] === 'object' && __args[0] instanceof Array && typeof __args[1] === 'function') {
-      return utils.convReturnVertxGen(j_redisClient["watchMany(java.util.List,io.vertx.core.Handler)"](keys, function(ar) {
+      j_redisClient["watchMany(java.util.List,io.vertx.core.Handler)"](keys, function(ar) {
       if (ar.succeeded()) {
         handler(ar.result(), null);
       } else {
         handler(null, ar.cause());
       }
-    }), RedisClient);
+    });
+      return that;
     } else utils.invalidArgs();
   };
 
@@ -4163,13 +4354,14 @@ var RedisClient = function(j_val) {
   this.zadd = function(key, score, member, handler) {
     var __args = arguments;
     if (__args.length === 4 && typeof __args[0] === 'string' && typeof __args[1] ==='number' && typeof __args[2] === 'string' && typeof __args[3] === 'function') {
-      return utils.convReturnVertxGen(j_redisClient["zadd(java.lang.String,double,java.lang.String,io.vertx.core.Handler)"](key, score, member, function(ar) {
+      j_redisClient["zadd(java.lang.String,double,java.lang.String,io.vertx.core.Handler)"](key, score, member, function(ar) {
       if (ar.succeeded()) {
         handler(ar.result(), null);
       } else {
         handler(null, ar.cause());
       }
-    }), RedisClient);
+    });
+      return that;
     } else utils.invalidArgs();
   };
 
@@ -4185,13 +4377,14 @@ var RedisClient = function(j_val) {
   this.zaddMany = function(key, members, handler) {
     var __args = arguments;
     if (__args.length === 3 && typeof __args[0] === 'string' && typeof __args[1] === 'object' && typeof __args[2] === 'function') {
-      return utils.convReturnVertxGen(j_redisClient["zaddMany(java.lang.String,java.util.Map,io.vertx.core.Handler)"](key, members, function(ar) {
+      j_redisClient["zaddMany(java.lang.String,java.util.Map,io.vertx.core.Handler)"](key, members, function(ar) {
       if (ar.succeeded()) {
         handler(ar.result(), null);
       } else {
         handler(null, ar.cause());
       }
-    }), RedisClient);
+    });
+      return that;
     } else utils.invalidArgs();
   };
 
@@ -4206,13 +4399,14 @@ var RedisClient = function(j_val) {
   this.zcard = function(key, handler) {
     var __args = arguments;
     if (__args.length === 2 && typeof __args[0] === 'string' && typeof __args[1] === 'function') {
-      return utils.convReturnVertxGen(j_redisClient["zcard(java.lang.String,io.vertx.core.Handler)"](key, function(ar) {
+      j_redisClient["zcard(java.lang.String,io.vertx.core.Handler)"](key, function(ar) {
       if (ar.succeeded()) {
         handler(ar.result(), null);
       } else {
         handler(null, ar.cause());
       }
-    }), RedisClient);
+    });
+      return that;
     } else utils.invalidArgs();
   };
 
@@ -4229,13 +4423,14 @@ var RedisClient = function(j_val) {
   this.zcount = function(key, min, max, handler) {
     var __args = arguments;
     if (__args.length === 4 && typeof __args[0] === 'string' && typeof __args[1] ==='number' && typeof __args[2] ==='number' && typeof __args[3] === 'function') {
-      return utils.convReturnVertxGen(j_redisClient["zcount(java.lang.String,double,double,io.vertx.core.Handler)"](key, min, max, function(ar) {
+      j_redisClient["zcount(java.lang.String,double,double,io.vertx.core.Handler)"](key, min, max, function(ar) {
       if (ar.succeeded()) {
         handler(ar.result(), null);
       } else {
         handler(null, ar.cause());
       }
-    }), RedisClient);
+    });
+      return that;
     } else utils.invalidArgs();
   };
 
@@ -4252,13 +4447,14 @@ var RedisClient = function(j_val) {
   this.zincrby = function(key, increment, member, handler) {
     var __args = arguments;
     if (__args.length === 4 && typeof __args[0] === 'string' && typeof __args[1] ==='number' && typeof __args[2] === 'string' && typeof __args[3] === 'function') {
-      return utils.convReturnVertxGen(j_redisClient["zincrby(java.lang.String,double,java.lang.String,io.vertx.core.Handler)"](key, increment, member, function(ar) {
+      j_redisClient["zincrby(java.lang.String,double,java.lang.String,io.vertx.core.Handler)"](key, increment, member, function(ar) {
       if (ar.succeeded()) {
         handler(ar.result(), null);
       } else {
         handler(null, ar.cause());
       }
-    }), RedisClient);
+    });
+      return that;
     } else utils.invalidArgs();
   };
 
@@ -4275,13 +4471,14 @@ var RedisClient = function(j_val) {
   this.zinterstore = function(destkey, sets, options, handler) {
     var __args = arguments;
     if (__args.length === 4 && typeof __args[0] === 'string' && typeof __args[1] === 'object' && __args[1] instanceof Array && typeof __args[2] === 'string' && typeof __args[3] === 'function') {
-      return utils.convReturnVertxGen(j_redisClient["zinterstore(java.lang.String,java.util.List,io.vertx.redis.op.AggregateOptions,io.vertx.core.Handler)"](destkey, sets, io.vertx.redis.op.AggregateOptions.valueOf(__args[2]), function(ar) {
+      j_redisClient["zinterstore(java.lang.String,java.util.List,io.vertx.redis.op.AggregateOptions,io.vertx.core.Handler)"](destkey, sets, io.vertx.redis.op.AggregateOptions.valueOf(__args[2]), function(ar) {
       if (ar.succeeded()) {
         handler(ar.result(), null);
       } else {
         handler(null, ar.cause());
       }
-    }), RedisClient);
+    });
+      return that;
     } else utils.invalidArgs();
   };
 
@@ -4298,13 +4495,14 @@ var RedisClient = function(j_val) {
   this.zinterstoreWeighed = function(destkey, sets, options, handler) {
     var __args = arguments;
     if (__args.length === 4 && typeof __args[0] === 'string' && typeof __args[1] === 'object' && typeof __args[2] === 'string' && typeof __args[3] === 'function') {
-      return utils.convReturnVertxGen(j_redisClient["zinterstoreWeighed(java.lang.String,java.util.Map,io.vertx.redis.op.AggregateOptions,io.vertx.core.Handler)"](destkey, sets, io.vertx.redis.op.AggregateOptions.valueOf(__args[2]), function(ar) {
+      j_redisClient["zinterstoreWeighed(java.lang.String,java.util.Map,io.vertx.redis.op.AggregateOptions,io.vertx.core.Handler)"](destkey, sets, io.vertx.redis.op.AggregateOptions.valueOf(__args[2]), function(ar) {
       if (ar.succeeded()) {
         handler(ar.result(), null);
       } else {
         handler(null, ar.cause());
       }
-    }), RedisClient);
+    });
+      return that;
     } else utils.invalidArgs();
   };
 
@@ -4321,13 +4519,14 @@ var RedisClient = function(j_val) {
   this.zlexcount = function(key, min, max, handler) {
     var __args = arguments;
     if (__args.length === 4 && typeof __args[0] === 'string' && typeof __args[1] === 'string' && typeof __args[2] === 'string' && typeof __args[3] === 'function') {
-      return utils.convReturnVertxGen(j_redisClient["zlexcount(java.lang.String,java.lang.String,java.lang.String,io.vertx.core.Handler)"](key, min, max, function(ar) {
+      j_redisClient["zlexcount(java.lang.String,java.lang.String,java.lang.String,io.vertx.core.Handler)"](key, min, max, function(ar) {
       if (ar.succeeded()) {
         handler(ar.result(), null);
       } else {
         handler(null, ar.cause());
       }
-    }), RedisClient);
+    });
+      return that;
     } else utils.invalidArgs();
   };
 
@@ -4344,13 +4543,14 @@ var RedisClient = function(j_val) {
   this.zrange = function(key, start, stop, handler) {
     var __args = arguments;
     if (__args.length === 4 && typeof __args[0] === 'string' && typeof __args[1] ==='number' && typeof __args[2] ==='number' && typeof __args[3] === 'function') {
-      return utils.convReturnVertxGen(j_redisClient["zrange(java.lang.String,long,long,io.vertx.core.Handler)"](key, start, stop, function(ar) {
+      j_redisClient["zrange(java.lang.String,long,long,io.vertx.core.Handler)"](key, start, stop, function(ar) {
       if (ar.succeeded()) {
         handler(utils.convReturnJson(ar.result()), null);
       } else {
         handler(null, ar.cause());
       }
-    }), RedisClient);
+    });
+      return that;
     } else utils.invalidArgs();
   };
 
@@ -4368,13 +4568,14 @@ var RedisClient = function(j_val) {
   this.zrangeWithOptions = function(key, start, stop, options, handler) {
     var __args = arguments;
     if (__args.length === 5 && typeof __args[0] === 'string' && typeof __args[1] ==='number' && typeof __args[2] ==='number' && typeof __args[3] === 'string' && typeof __args[4] === 'function') {
-      return utils.convReturnVertxGen(j_redisClient["zrangeWithOptions(java.lang.String,long,long,io.vertx.redis.op.RangeOptions,io.vertx.core.Handler)"](key, start, stop, io.vertx.redis.op.RangeOptions.valueOf(__args[3]), function(ar) {
+      j_redisClient["zrangeWithOptions(java.lang.String,long,long,io.vertx.redis.op.RangeOptions,io.vertx.core.Handler)"](key, start, stop, io.vertx.redis.op.RangeOptions.valueOf(__args[3]), function(ar) {
       if (ar.succeeded()) {
         handler(utils.convReturnJson(ar.result()), null);
       } else {
         handler(null, ar.cause());
       }
-    }), RedisClient);
+    });
+      return that;
     } else utils.invalidArgs();
   };
 
@@ -4392,13 +4593,14 @@ var RedisClient = function(j_val) {
   this.zrangebylex = function(key, min, max, options, handler) {
     var __args = arguments;
     if (__args.length === 5 && typeof __args[0] === 'string' && typeof __args[1] === 'string' && typeof __args[2] === 'string' && typeof __args[3] === 'object' && typeof __args[4] === 'function') {
-      return utils.convReturnVertxGen(j_redisClient["zrangebylex(java.lang.String,java.lang.String,java.lang.String,io.vertx.redis.op.LimitOptions,io.vertx.core.Handler)"](key, min, max, options != null ? new LimitOptions(new JsonObject(JSON.stringify(options))) : null, function(ar) {
+      j_redisClient["zrangebylex(java.lang.String,java.lang.String,java.lang.String,io.vertx.redis.op.LimitOptions,io.vertx.core.Handler)"](key, min, max, options != null ? new LimitOptions(new JsonObject(JSON.stringify(options))) : null, function(ar) {
       if (ar.succeeded()) {
         handler(utils.convReturnJson(ar.result()), null);
       } else {
         handler(null, ar.cause());
       }
-    }), RedisClient);
+    });
+      return that;
     } else utils.invalidArgs();
   };
 
@@ -4416,13 +4618,14 @@ var RedisClient = function(j_val) {
   this.zrangebyscore = function(key, min, max, options, handler) {
     var __args = arguments;
     if (__args.length === 5 && typeof __args[0] === 'string' && typeof __args[1] === 'string' && typeof __args[2] === 'string' && typeof __args[3] === 'object' && typeof __args[4] === 'function') {
-      return utils.convReturnVertxGen(j_redisClient["zrangebyscore(java.lang.String,java.lang.String,java.lang.String,io.vertx.redis.op.RangeLimitOptions,io.vertx.core.Handler)"](key, min, max, options != null ? new RangeLimitOptions(new JsonObject(JSON.stringify(options))) : null, function(ar) {
+      j_redisClient["zrangebyscore(java.lang.String,java.lang.String,java.lang.String,io.vertx.redis.op.RangeLimitOptions,io.vertx.core.Handler)"](key, min, max, options != null ? new RangeLimitOptions(new JsonObject(JSON.stringify(options))) : null, function(ar) {
       if (ar.succeeded()) {
         handler(utils.convReturnJson(ar.result()), null);
       } else {
         handler(null, ar.cause());
       }
-    }), RedisClient);
+    });
+      return that;
     } else utils.invalidArgs();
   };
 
@@ -4438,13 +4641,14 @@ var RedisClient = function(j_val) {
   this.zrank = function(key, member, handler) {
     var __args = arguments;
     if (__args.length === 3 && typeof __args[0] === 'string' && typeof __args[1] === 'string' && typeof __args[2] === 'function') {
-      return utils.convReturnVertxGen(j_redisClient["zrank(java.lang.String,java.lang.String,io.vertx.core.Handler)"](key, member, function(ar) {
+      j_redisClient["zrank(java.lang.String,java.lang.String,io.vertx.core.Handler)"](key, member, function(ar) {
       if (ar.succeeded()) {
         handler(ar.result(), null);
       } else {
         handler(null, ar.cause());
       }
-    }), RedisClient);
+    });
+      return that;
     } else utils.invalidArgs();
   };
 
@@ -4460,13 +4664,14 @@ var RedisClient = function(j_val) {
   this.zrem = function(key, member, handler) {
     var __args = arguments;
     if (__args.length === 3 && typeof __args[0] === 'string' && typeof __args[1] === 'string' && typeof __args[2] === 'function') {
-      return utils.convReturnVertxGen(j_redisClient["zrem(java.lang.String,java.lang.String,io.vertx.core.Handler)"](key, member, function(ar) {
+      j_redisClient["zrem(java.lang.String,java.lang.String,io.vertx.core.Handler)"](key, member, function(ar) {
       if (ar.succeeded()) {
         handler(ar.result(), null);
       } else {
         handler(null, ar.cause());
       }
-    }), RedisClient);
+    });
+      return that;
     } else utils.invalidArgs();
   };
 
@@ -4482,13 +4687,14 @@ var RedisClient = function(j_val) {
   this.zremMany = function(key, members, handler) {
     var __args = arguments;
     if (__args.length === 3 && typeof __args[0] === 'string' && typeof __args[1] === 'object' && __args[1] instanceof Array && typeof __args[2] === 'function') {
-      return utils.convReturnVertxGen(j_redisClient["zremMany(java.lang.String,java.util.List,io.vertx.core.Handler)"](key, members, function(ar) {
+      j_redisClient["zremMany(java.lang.String,java.util.List,io.vertx.core.Handler)"](key, members, function(ar) {
       if (ar.succeeded()) {
         handler(ar.result(), null);
       } else {
         handler(null, ar.cause());
       }
-    }), RedisClient);
+    });
+      return that;
     } else utils.invalidArgs();
   };
 
@@ -4505,13 +4711,14 @@ var RedisClient = function(j_val) {
   this.zremrangebylex = function(key, min, max, handler) {
     var __args = arguments;
     if (__args.length === 4 && typeof __args[0] === 'string' && typeof __args[1] === 'string' && typeof __args[2] === 'string' && typeof __args[3] === 'function') {
-      return utils.convReturnVertxGen(j_redisClient["zremrangebylex(java.lang.String,java.lang.String,java.lang.String,io.vertx.core.Handler)"](key, min, max, function(ar) {
+      j_redisClient["zremrangebylex(java.lang.String,java.lang.String,java.lang.String,io.vertx.core.Handler)"](key, min, max, function(ar) {
       if (ar.succeeded()) {
         handler(ar.result(), null);
       } else {
         handler(null, ar.cause());
       }
-    }), RedisClient);
+    });
+      return that;
     } else utils.invalidArgs();
   };
 
@@ -4528,13 +4735,14 @@ var RedisClient = function(j_val) {
   this.zremrangebyrank = function(key, start, stop, handler) {
     var __args = arguments;
     if (__args.length === 4 && typeof __args[0] === 'string' && typeof __args[1] ==='number' && typeof __args[2] ==='number' && typeof __args[3] === 'function') {
-      return utils.convReturnVertxGen(j_redisClient["zremrangebyrank(java.lang.String,long,long,io.vertx.core.Handler)"](key, start, stop, function(ar) {
+      j_redisClient["zremrangebyrank(java.lang.String,long,long,io.vertx.core.Handler)"](key, start, stop, function(ar) {
       if (ar.succeeded()) {
         handler(ar.result(), null);
       } else {
         handler(null, ar.cause());
       }
-    }), RedisClient);
+    });
+      return that;
     } else utils.invalidArgs();
   };
 
@@ -4551,13 +4759,14 @@ var RedisClient = function(j_val) {
   this.zremrangebyscore = function(key, min, max, handler) {
     var __args = arguments;
     if (__args.length === 4 && typeof __args[0] === 'string' && typeof __args[1] === 'string' && typeof __args[2] === 'string' && typeof __args[3] === 'function') {
-      return utils.convReturnVertxGen(j_redisClient["zremrangebyscore(java.lang.String,java.lang.String,java.lang.String,io.vertx.core.Handler)"](key, min, max, function(ar) {
+      j_redisClient["zremrangebyscore(java.lang.String,java.lang.String,java.lang.String,io.vertx.core.Handler)"](key, min, max, function(ar) {
       if (ar.succeeded()) {
         handler(ar.result(), null);
       } else {
         handler(null, ar.cause());
       }
-    }), RedisClient);
+    });
+      return that;
     } else utils.invalidArgs();
   };
 
@@ -4575,13 +4784,14 @@ var RedisClient = function(j_val) {
   this.zrevrange = function(key, start, stop, options, handler) {
     var __args = arguments;
     if (__args.length === 5 && typeof __args[0] === 'string' && typeof __args[1] ==='number' && typeof __args[2] ==='number' && typeof __args[3] === 'string' && typeof __args[4] === 'function') {
-      return utils.convReturnVertxGen(j_redisClient["zrevrange(java.lang.String,long,long,io.vertx.redis.op.RangeOptions,io.vertx.core.Handler)"](key, start, stop, io.vertx.redis.op.RangeOptions.valueOf(__args[3]), function(ar) {
+      j_redisClient["zrevrange(java.lang.String,long,long,io.vertx.redis.op.RangeOptions,io.vertx.core.Handler)"](key, start, stop, io.vertx.redis.op.RangeOptions.valueOf(__args[3]), function(ar) {
       if (ar.succeeded()) {
         handler(utils.convReturnJson(ar.result()), null);
       } else {
         handler(null, ar.cause());
       }
-    }), RedisClient);
+    });
+      return that;
     } else utils.invalidArgs();
   };
 
@@ -4599,13 +4809,14 @@ var RedisClient = function(j_val) {
   this.zrevrangebylex = function(key, max, min, options, handler) {
     var __args = arguments;
     if (__args.length === 5 && typeof __args[0] === 'string' && typeof __args[1] === 'string' && typeof __args[2] === 'string' && typeof __args[3] === 'object' && typeof __args[4] === 'function') {
-      return utils.convReturnVertxGen(j_redisClient["zrevrangebylex(java.lang.String,java.lang.String,java.lang.String,io.vertx.redis.op.LimitOptions,io.vertx.core.Handler)"](key, max, min, options != null ? new LimitOptions(new JsonObject(JSON.stringify(options))) : null, function(ar) {
+      j_redisClient["zrevrangebylex(java.lang.String,java.lang.String,java.lang.String,io.vertx.redis.op.LimitOptions,io.vertx.core.Handler)"](key, max, min, options != null ? new LimitOptions(new JsonObject(JSON.stringify(options))) : null, function(ar) {
       if (ar.succeeded()) {
         handler(utils.convReturnJson(ar.result()), null);
       } else {
         handler(null, ar.cause());
       }
-    }), RedisClient);
+    });
+      return that;
     } else utils.invalidArgs();
   };
 
@@ -4623,13 +4834,14 @@ var RedisClient = function(j_val) {
   this.zrevrangebyscore = function(key, max, min, options, handler) {
     var __args = arguments;
     if (__args.length === 5 && typeof __args[0] === 'string' && typeof __args[1] === 'string' && typeof __args[2] === 'string' && typeof __args[3] === 'object' && typeof __args[4] === 'function') {
-      return utils.convReturnVertxGen(j_redisClient["zrevrangebyscore(java.lang.String,java.lang.String,java.lang.String,io.vertx.redis.op.RangeLimitOptions,io.vertx.core.Handler)"](key, max, min, options != null ? new RangeLimitOptions(new JsonObject(JSON.stringify(options))) : null, function(ar) {
+      j_redisClient["zrevrangebyscore(java.lang.String,java.lang.String,java.lang.String,io.vertx.redis.op.RangeLimitOptions,io.vertx.core.Handler)"](key, max, min, options != null ? new RangeLimitOptions(new JsonObject(JSON.stringify(options))) : null, function(ar) {
       if (ar.succeeded()) {
         handler(utils.convReturnJson(ar.result()), null);
       } else {
         handler(null, ar.cause());
       }
-    }), RedisClient);
+    });
+      return that;
     } else utils.invalidArgs();
   };
 
@@ -4645,13 +4857,14 @@ var RedisClient = function(j_val) {
   this.zrevrank = function(key, member, handler) {
     var __args = arguments;
     if (__args.length === 3 && typeof __args[0] === 'string' && typeof __args[1] === 'string' && typeof __args[2] === 'function') {
-      return utils.convReturnVertxGen(j_redisClient["zrevrank(java.lang.String,java.lang.String,io.vertx.core.Handler)"](key, member, function(ar) {
+      j_redisClient["zrevrank(java.lang.String,java.lang.String,io.vertx.core.Handler)"](key, member, function(ar) {
       if (ar.succeeded()) {
         handler(ar.result(), null);
       } else {
         handler(null, ar.cause());
       }
-    }), RedisClient);
+    });
+      return that;
     } else utils.invalidArgs();
   };
 
@@ -4667,13 +4880,14 @@ var RedisClient = function(j_val) {
   this.zscore = function(key, member, handler) {
     var __args = arguments;
     if (__args.length === 3 && typeof __args[0] === 'string' && typeof __args[1] === 'string' && typeof __args[2] === 'function') {
-      return utils.convReturnVertxGen(j_redisClient["zscore(java.lang.String,java.lang.String,io.vertx.core.Handler)"](key, member, function(ar) {
+      j_redisClient["zscore(java.lang.String,java.lang.String,io.vertx.core.Handler)"](key, member, function(ar) {
       if (ar.succeeded()) {
         handler(ar.result(), null);
       } else {
         handler(null, ar.cause());
       }
-    }), RedisClient);
+    });
+      return that;
     } else utils.invalidArgs();
   };
 
@@ -4690,13 +4904,14 @@ var RedisClient = function(j_val) {
   this.zunionstore = function(destkey, sets, options, handler) {
     var __args = arguments;
     if (__args.length === 4 && typeof __args[0] === 'string' && typeof __args[1] === 'object' && __args[1] instanceof Array && typeof __args[2] === 'string' && typeof __args[3] === 'function') {
-      return utils.convReturnVertxGen(j_redisClient["zunionstore(java.lang.String,java.util.List,io.vertx.redis.op.AggregateOptions,io.vertx.core.Handler)"](destkey, sets, io.vertx.redis.op.AggregateOptions.valueOf(__args[2]), function(ar) {
+      j_redisClient["zunionstore(java.lang.String,java.util.List,io.vertx.redis.op.AggregateOptions,io.vertx.core.Handler)"](destkey, sets, io.vertx.redis.op.AggregateOptions.valueOf(__args[2]), function(ar) {
       if (ar.succeeded()) {
         handler(ar.result(), null);
       } else {
         handler(null, ar.cause());
       }
-    }), RedisClient);
+    });
+      return that;
     } else utils.invalidArgs();
   };
 
@@ -4713,13 +4928,14 @@ var RedisClient = function(j_val) {
   this.zunionstoreWeighed = function(key, sets, options, handler) {
     var __args = arguments;
     if (__args.length === 4 && typeof __args[0] === 'string' && typeof __args[1] === 'object' && typeof __args[2] === 'string' && typeof __args[3] === 'function') {
-      return utils.convReturnVertxGen(j_redisClient["zunionstoreWeighed(java.lang.String,java.util.Map,io.vertx.redis.op.AggregateOptions,io.vertx.core.Handler)"](key, sets, io.vertx.redis.op.AggregateOptions.valueOf(__args[2]), function(ar) {
+      j_redisClient["zunionstoreWeighed(java.lang.String,java.util.Map,io.vertx.redis.op.AggregateOptions,io.vertx.core.Handler)"](key, sets, io.vertx.redis.op.AggregateOptions.valueOf(__args[2]), function(ar) {
       if (ar.succeeded()) {
         handler(ar.result(), null);
       } else {
         handler(null, ar.cause());
       }
-    }), RedisClient);
+    });
+      return that;
     } else utils.invalidArgs();
   };
 
@@ -4735,13 +4951,14 @@ var RedisClient = function(j_val) {
   this.scan = function(cursor, options, handler) {
     var __args = arguments;
     if (__args.length === 3 && typeof __args[0] === 'string' && typeof __args[1] === 'object' && typeof __args[2] === 'function') {
-      return utils.convReturnVertxGen(j_redisClient["scan(java.lang.String,io.vertx.redis.op.ScanOptions,io.vertx.core.Handler)"](cursor, options != null ? new ScanOptions(new JsonObject(JSON.stringify(options))) : null, function(ar) {
+      j_redisClient["scan(java.lang.String,io.vertx.redis.op.ScanOptions,io.vertx.core.Handler)"](cursor, options != null ? new ScanOptions(new JsonObject(JSON.stringify(options))) : null, function(ar) {
       if (ar.succeeded()) {
         handler(null, null);
       } else {
         handler(null, ar.cause());
       }
-    }), RedisClient);
+    });
+      return that;
     } else utils.invalidArgs();
   };
 
@@ -4758,13 +4975,14 @@ var RedisClient = function(j_val) {
   this.sscan = function(key, cursor, options, handler) {
     var __args = arguments;
     if (__args.length === 4 && typeof __args[0] === 'string' && typeof __args[1] === 'string' && typeof __args[2] === 'object' && typeof __args[3] === 'function') {
-      return utils.convReturnVertxGen(j_redisClient["sscan(java.lang.String,java.lang.String,io.vertx.redis.op.ScanOptions,io.vertx.core.Handler)"](key, cursor, options != null ? new ScanOptions(new JsonObject(JSON.stringify(options))) : null, function(ar) {
+      j_redisClient["sscan(java.lang.String,java.lang.String,io.vertx.redis.op.ScanOptions,io.vertx.core.Handler)"](key, cursor, options != null ? new ScanOptions(new JsonObject(JSON.stringify(options))) : null, function(ar) {
       if (ar.succeeded()) {
         handler(null, null);
       } else {
         handler(null, ar.cause());
       }
-    }), RedisClient);
+    });
+      return that;
     } else utils.invalidArgs();
   };
 
@@ -4781,13 +4999,14 @@ var RedisClient = function(j_val) {
   this.hscan = function(key, cursor, options, handler) {
     var __args = arguments;
     if (__args.length === 4 && typeof __args[0] === 'string' && typeof __args[1] === 'string' && typeof __args[2] === 'object' && typeof __args[3] === 'function') {
-      return utils.convReturnVertxGen(j_redisClient["hscan(java.lang.String,java.lang.String,io.vertx.redis.op.ScanOptions,io.vertx.core.Handler)"](key, cursor, options != null ? new ScanOptions(new JsonObject(JSON.stringify(options))) : null, function(ar) {
+      j_redisClient["hscan(java.lang.String,java.lang.String,io.vertx.redis.op.ScanOptions,io.vertx.core.Handler)"](key, cursor, options != null ? new ScanOptions(new JsonObject(JSON.stringify(options))) : null, function(ar) {
       if (ar.succeeded()) {
         handler(utils.convReturnJson(ar.result()), null);
       } else {
         handler(null, ar.cause());
       }
-    }), RedisClient);
+    });
+      return that;
     } else utils.invalidArgs();
   };
 
@@ -4804,13 +5023,14 @@ var RedisClient = function(j_val) {
   this.zscan = function(key, cursor, options, handler) {
     var __args = arguments;
     if (__args.length === 4 && typeof __args[0] === 'string' && typeof __args[1] === 'string' && typeof __args[2] === 'object' && typeof __args[3] === 'function') {
-      return utils.convReturnVertxGen(j_redisClient["zscan(java.lang.String,java.lang.String,io.vertx.redis.op.ScanOptions,io.vertx.core.Handler)"](key, cursor, options != null ? new ScanOptions(new JsonObject(JSON.stringify(options))) : null, function(ar) {
+      j_redisClient["zscan(java.lang.String,java.lang.String,io.vertx.redis.op.ScanOptions,io.vertx.core.Handler)"](key, cursor, options != null ? new ScanOptions(new JsonObject(JSON.stringify(options))) : null, function(ar) {
       if (ar.succeeded()) {
         handler(null, null);
       } else {
         handler(null, ar.cause());
       }
-    }), RedisClient);
+    });
+      return that;
     } else utils.invalidArgs();
   };
 
