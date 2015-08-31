@@ -3335,4 +3335,23 @@ public abstract class RedisClientTestBase extends VertxTestBase {
 
     await();
   }
+
+  @Test
+  public void testSscan() {
+    final String key = makeKey();
+    redis.saddMany(key, toList("1", "2", "3", "foo", "bar", "feelsgood"), reply1 -> {
+      assertTrue(reply1.succeeded());
+      assertEquals(6l, reply1.result().longValue());
+      redis.sscan(key, "0", new ScanOptions().setMatch("f*"), reply2 -> {
+        assertTrue(reply2.succeeded());
+        assertEquals("0", reply2.result().getString(0));
+
+        assertTrue(reply2.result().getJsonArray(1).contains("foo"));
+        assertTrue(reply2.result().getJsonArray(1).contains("feelsgood"));
+
+        testComplete();
+      });
+    });
+    await();
+  }
 }

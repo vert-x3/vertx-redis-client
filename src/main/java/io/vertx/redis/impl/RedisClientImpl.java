@@ -1339,14 +1339,14 @@ public final class RedisClientImpl extends AbstractRedisClient {
   } 
 
   @Override
-  public RedisClient scan(String cursor, ScanOptions options, Handler<AsyncResult<Void>> handler) {
-    sendVoid(SCAN, toPayload(cursor, options != null ? options.toJsonArray() : null), handler);
+  public RedisClient scan(String cursor, ScanOptions options, Handler<AsyncResult<JsonArray>> handler) {
+    sendJsonArray(SCAN, toPayload(cursor, options != null ? options.toJsonArray() : null), handler);
     return this;
   } 
 
   @Override
-  public RedisClient sscan(String key, String cursor, ScanOptions options, Handler<AsyncResult<Void>> handler) {
-    sendVoid(SSCAN, toPayload(key, cursor, options != null ? options.toJsonArray() : null), handler);
+  public RedisClient sscan(String key, String cursor, ScanOptions options, Handler<AsyncResult<JsonArray>> handler) {
+    sendJsonArray(SSCAN, toPayload(key, cursor, options != null ? options.toJsonArray() : null), handler);
     return this;
   } 
 
@@ -1357,8 +1357,8 @@ public final class RedisClientImpl extends AbstractRedisClient {
   } 
 
   @Override
-  public RedisClient zscan(String key, String cursor, ScanOptions options, Handler<AsyncResult<Void>> handler) {
-    sendVoid(ZSCAN, toPayload(key, cursor, options != null ? options.toJsonArray() : null), handler);
+  public RedisClient zscan(String key, String cursor, ScanOptions options, Handler<AsyncResult<JsonArray>> handler) {
+    sendJsonArray(ZSCAN, toPayload(key, cursor, options != null ? options.toJsonArray() : null), handler);
     return this;
   } 
 

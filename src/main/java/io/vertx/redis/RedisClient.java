@@ -2514,7 +2514,7 @@ public interface RedisClient {
    * group: generic
    */
   @Fluent
-  RedisClient scan(String cursor, ScanOptions options, Handler<AsyncResult<Void>> handler);
+  RedisClient scan(String cursor, ScanOptions options, Handler<AsyncResult<JsonArray>> handler);
 
   /**
    * Incrementally iterate Set elements
@@ -2527,7 +2527,7 @@ public interface RedisClient {
    * group: set
    */
   @Fluent
-  RedisClient sscan(String key, String cursor, ScanOptions options, Handler<AsyncResult<Void>> handler);
+  RedisClient sscan(String key, String cursor, ScanOptions options, Handler<AsyncResult<JsonArray>> handler);
 
   /**
    * Incrementally iterate hash fields and associated values
@@ -2553,6 +2553,6 @@ public interface RedisClient {
    * group: sorted_set
    */
   @Fluent
-  RedisClient zscan(String key, String cursor, ScanOptions options, Handler<AsyncResult<Void>> handler);
+  RedisClient zscan(String key, String cursor, ScanOptions options, Handler<AsyncResult<JsonArray>> handler);
 
 }
