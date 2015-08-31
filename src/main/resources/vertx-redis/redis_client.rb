@@ -2545,7 +2545,7 @@ module VertxRedis
     # @return [self]
     def scan(cursor=nil,options=nil)
       if cursor.class == String && options.class == Hash && block_given?
-        @j_del.java_method(:scan, [Java::java.lang.String.java_class,Java::IoVertxRedisOp::ScanOptions.java_class,Java::IoVertxCore::Handler.java_class]).call(cursor,Java::IoVertxRedisOp::ScanOptions.new(::Vertx::Util::Utils.to_json_object(options)),(Proc.new { |ar| yield(ar.failed ? ar.cause : nil) }))
+        @j_del.java_method(:scan, [Java::java.lang.String.java_class,Java::IoVertxRedisOp::ScanOptions.java_class,Java::IoVertxCore::Handler.java_class]).call(cursor,Java::IoVertxRedisOp::ScanOptions.new(::Vertx::Util::Utils.to_json_object(options)),(Proc.new { |ar| yield(ar.failed ? ar.cause : nil, ar.succeeded ? ar.result != nil ? JSON.parse(ar.result.encode) : nil : nil) }))
         return self
       end
       raise ArgumentError, "Invalid arguments when calling scan(cursor,options)"
@@ -2558,7 +2558,7 @@ module VertxRedis
     # @return [self]
     def sscan(key=nil,cursor=nil,options=nil)
       if key.class == String && cursor.class == String && options.class == Hash && block_given?
-        @j_del.java_method(:sscan, [Java::java.lang.String.java_class,Java::java.lang.String.java_class,Java::IoVertxRedisOp::ScanOptions.java_class,Java::IoVertxCore::Handler.java_class]).call(key,cursor,Java::IoVertxRedisOp::ScanOptions.new(::Vertx::Util::Utils.to_json_object(options)),(Proc.new { |ar| yield(ar.failed ? ar.cause : nil) }))
+        @j_del.java_method(:sscan, [Java::java.lang.String.java_class,Java::java.lang.String.java_class,Java::IoVertxRedisOp::ScanOptions.java_class,Java::IoVertxCore::Handler.java_class]).call(key,cursor,Java::IoVertxRedisOp::ScanOptions.new(::Vertx::Util::Utils.to_json_object(options)),(Proc.new { |ar| yield(ar.failed ? ar.cause : nil, ar.succeeded ? ar.result != nil ? JSON.parse(ar.result.encode) : nil : nil) }))
         return self
       end
       raise ArgumentError, "Invalid arguments when calling sscan(key,cursor,options)"
@@ -2584,7 +2584,7 @@ module VertxRedis
     # @return [self]
     def zscan(key=nil,cursor=nil,options=nil)
       if key.class == String && cursor.class == String && options.class == Hash && block_given?
-        @j_del.java_method(:zscan, [Java::java.lang.String.java_class,Java::java.lang.String.java_class,Java::IoVertxRedisOp::ScanOptions.java_class,Java::IoVertxCore::Handler.java_class]).call(key,cursor,Java::IoVertxRedisOp::ScanOptions.new(::Vertx::Util::Utils.to_json_object(options)),(Proc.new { |ar| yield(ar.failed ? ar.cause : nil) }))
+        @j_del.java_method(:zscan, [Java::java.lang.String.java_class,Java::java.lang.String.java_class,Java::IoVertxRedisOp::ScanOptions.java_class,Java::IoVertxCore::Handler.java_class]).call(key,cursor,Java::IoVertxRedisOp::ScanOptions.new(::Vertx::Util::Utils.to_json_object(options)),(Proc.new { |ar| yield(ar.failed ? ar.cause : nil, ar.succeeded ? ar.result != nil ? JSON.parse(ar.result.encode) : nil : nil) }))
         return self
       end
       raise ArgumentError, "Invalid arguments when calling zscan(key,cursor,options)"
