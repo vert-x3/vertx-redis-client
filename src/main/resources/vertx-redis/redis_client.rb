@@ -649,15 +649,26 @@ module VertxRedis
       raise ArgumentError, "Invalid arguments when calling decrby(key,decrement)"
     end
     #  Delete a key
+    # @param [String] key Keys to delete
+    # @yield Handler for the result of this call.
+    # @return [self]
+    def del(key=nil)
+      if key.class == String && block_given?
+        @j_del.java_method(:del, [Java::java.lang.String.java_class,Java::IoVertxCore::Handler.java_class]).call(key,(Proc.new { |ar| yield(ar.failed ? ar.cause : nil, ar.succeeded ? ar.result : nil) }))
+        return self
+      end
+      raise ArgumentError, "Invalid arguments when calling del(key)"
+    end
+    #  Delete many keys
     # @param [Array<String>] keys List of keys to delete
     # @yield Handler for the result of this call.
     # @return [self]
-    def del(keys=nil)
+    def del_many(keys=nil)
       if keys.class == Array && block_given?
-        @j_del.java_method(:del, [Java::JavaUtil::List.java_class,Java::IoVertxCore::Handler.java_class]).call(keys.map { |element| element },(Proc.new { |ar| yield(ar.failed ? ar.cause : nil, ar.succeeded ? ar.result : nil) }))
+        @j_del.java_method(:delMany, [Java::JavaUtil::List.java_class,Java::IoVertxCore::Handler.java_class]).call(keys.map { |element| element },(Proc.new { |ar| yield(ar.failed ? ar.cause : nil, ar.succeeded ? ar.result : nil) }))
         return self
       end
-      raise ArgumentError, "Invalid arguments when calling del(keys)"
+      raise ArgumentError, "Invalid arguments when calling del_many(keys)"
     end
     #  Discard all commands issued after MULTI
     # @yield 
@@ -962,12 +973,12 @@ module VertxRedis
     end
     #  Set multiple hash fields to multiple values
     # @param [String] key Key string
-    # @param [Hash{String => String}] values Map of field:value pairs
+    # @param [Hash{String => Object}] values Map of field:value pairs
     # @yield Handler for the result of this call.
     # @return [self]
     def hmset(key=nil,values=nil)
       if key.class == String && values.class == Hash && block_given?
-        @j_del.java_method(:hmset, [Java::java.lang.String.java_class,Java::JavaUtil::Map.java_class,Java::IoVertxCore::Handler.java_class]).call(key,Hash[values.map { |k,v| [k,v] }],(Proc.new { |ar| yield(ar.failed ? ar.cause : nil, ar.succeeded ? ar.result : nil) }))
+        @j_del.java_method(:hmset, [Java::java.lang.String.java_class,Java::IoVertxCoreJson::JsonObject.java_class,Java::IoVertxCore::Handler.java_class]).call(key,::Vertx::Util::Utils.to_json_object(values),(Proc.new { |ar| yield(ar.failed ? ar.cause : nil, ar.succeeded ? ar.result : nil) }))
         return self
       end
       raise ArgumentError, "Invalid arguments when calling hmset(key,values)"
@@ -1283,23 +1294,23 @@ module VertxRedis
       raise ArgumentError, "Invalid arguments when calling move(key,destdb)"
     end
     #  Set multiple keys to multiple values
-    # @param [Hash{String => String}] keyvals Key value pairs to set
+    # @param [Hash{String => Object}] keyvals Key value pairs to set
     # @yield Handler for the result of this call.
     # @return [self]
     def mset(keyvals=nil)
       if keyvals.class == Hash && block_given?
-        @j_del.java_method(:mset, [Java::JavaUtil::Map.java_class,Java::IoVertxCore::Handler.java_class]).call(Hash[keyvals.map { |k,v| [k,v] }],(Proc.new { |ar| yield(ar.failed ? ar.cause : nil, ar.succeeded ? ar.result : nil) }))
+        @j_del.java_method(:mset, [Java::IoVertxCoreJson::JsonObject.java_class,Java::IoVertxCore::Handler.java_class]).call(::Vertx::Util::Utils.to_json_object(keyvals),(Proc.new { |ar| yield(ar.failed ? ar.cause : nil, ar.succeeded ? ar.result : nil) }))
         return self
       end
       raise ArgumentError, "Invalid arguments when calling mset(keyvals)"
     end
     #  Set multiple keys to multiple values, only if none of the keys exist
-    # @param [Hash{String => String}] keyvals Key value pairs to set
+    # @param [Hash{String => Object}] keyvals Key value pairs to set
     # @yield Handler for the result of this call.
     # @return [self]
     def msetnx(keyvals=nil)
       if keyvals.class == Hash && block_given?
-        @j_del.java_method(:msetnx, [Java::JavaUtil::Map.java_class,Java::IoVertxCore::Handler.java_class]).call(Hash[keyvals.map { |k,v| [k,v] }],(Proc.new { |ar| yield(ar.failed ? ar.cause : nil, ar.succeeded ? ar.result : nil) }))
+        @j_del.java_method(:msetnx, [Java::IoVertxCoreJson::JsonObject.java_class,Java::IoVertxCore::Handler.java_class]).call(::Vertx::Util::Utils.to_json_object(keyvals),(Proc.new { |ar| yield(ar.failed ? ar.cause : nil, ar.succeeded ? ar.result : nil) }))
         return self
       end
       raise ArgumentError, "Invalid arguments when calling msetnx(keyvals)"

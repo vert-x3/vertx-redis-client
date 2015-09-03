@@ -635,13 +635,24 @@ public interface RedisClient {
   /**
    * Delete a key
    *
+   * @param key     Keys to delete
+   * @param handler Handler for the result of this call.
+   * @since 1.0.0
+   * group: generic
+   */
+  @Fluent
+  RedisClient del(String key, Handler<AsyncResult<Long>> handler);
+
+  /**
+   * Delete many keys
+   *
    * @param keys    List of keys to delete
    * @param handler Handler for the result of this call.
    * @since 1.0.0
    * group: generic
    */
   @Fluent
-  RedisClient del(List<String> keys, Handler<AsyncResult<Long>> handler);
+  RedisClient delMany(List<String> keys, Handler<AsyncResult<Long>> handler);
 
   /**
    * Discard all commands issued after MULTI
@@ -950,7 +961,7 @@ public interface RedisClient {
    * group: hash
    */
   @Fluent
-  RedisClient hmset(String key, Map<String, String> values, Handler<AsyncResult<String>> handler);
+  RedisClient hmset(String key, JsonObject values, Handler<AsyncResult<String>> handler);
 
   /**
    * Set the string value of a hash field
@@ -1268,7 +1279,7 @@ public interface RedisClient {
    * group: string
    */
   @Fluent
-  RedisClient mset(Map<String, String> keyvals, Handler<AsyncResult<String>> handler);
+  RedisClient mset(JsonObject keyvals, Handler<AsyncResult<String>> handler);
 
   /**
    * Set multiple keys to multiple values, only if none of the keys exist
@@ -1279,7 +1290,7 @@ public interface RedisClient {
    * group: string
    */
   @Fluent
-  RedisClient msetnx(Map<String, String> keyvals, Handler<AsyncResult<Long>> handler);
+  RedisClient msetnx(JsonObject keyvals, Handler<AsyncResult<Long>> handler);
 
   /**
    * Mark the start of a transaction block

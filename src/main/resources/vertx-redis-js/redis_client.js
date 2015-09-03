@@ -1282,14 +1282,36 @@ var RedisClient = function(j_val) {
    Delete a key
 
    @public
+   @param key {string} Keys to delete 
+   @param handler {function} Handler for the result of this call. 
+   @return {RedisClient}
+   */
+  this.del = function(key, handler) {
+    var __args = arguments;
+    if (__args.length === 2 && typeof __args[0] === 'string' && typeof __args[1] === 'function') {
+      j_redisClient["del(java.lang.String,io.vertx.core.Handler)"](key, function(ar) {
+      if (ar.succeeded()) {
+        handler(ar.result(), null);
+      } else {
+        handler(null, ar.cause());
+      }
+    });
+      return that;
+    } else utils.invalidArgs();
+  };
+
+  /**
+   Delete many keys
+
+   @public
    @param keys {Array.<string>} List of keys to delete 
    @param handler {function} Handler for the result of this call. 
    @return {RedisClient}
    */
-  this.del = function(keys, handler) {
+  this.delMany = function(keys, handler) {
     var __args = arguments;
     if (__args.length === 2 && typeof __args[0] === 'object' && __args[0] instanceof Array && typeof __args[1] === 'function') {
-      j_redisClient["del(java.util.List,io.vertx.core.Handler)"](keys, function(ar) {
+      j_redisClient["delMany(java.util.List,io.vertx.core.Handler)"](keys, function(ar) {
       if (ar.succeeded()) {
         handler(ar.result(), null);
       } else {
@@ -1892,14 +1914,14 @@ var RedisClient = function(j_val) {
 
    @public
    @param key {string} Key string 
-   @param values {Array.<string>} Map of field:value pairs 
+   @param values {Object} Map of field:value pairs 
    @param handler {function} Handler for the result of this call. 
    @return {RedisClient}
    */
   this.hmset = function(key, values, handler) {
     var __args = arguments;
     if (__args.length === 3 && typeof __args[0] === 'string' && typeof __args[1] === 'object' && typeof __args[2] === 'function') {
-      j_redisClient["hmset(java.lang.String,java.util.Map,io.vertx.core.Handler)"](key, values, function(ar) {
+      j_redisClient["hmset(java.lang.String,io.vertx.core.json.JsonObject,io.vertx.core.Handler)"](key, utils.convParamJsonObject(values), function(ar) {
       if (ar.succeeded()) {
         handler(ar.result(), null);
       } else {
@@ -2510,14 +2532,14 @@ var RedisClient = function(j_val) {
    Set multiple keys to multiple values
 
    @public
-   @param keyvals {Array.<string>} Key value pairs to set 
+   @param keyvals {Object} Key value pairs to set 
    @param handler {function} Handler for the result of this call. 
    @return {RedisClient}
    */
   this.mset = function(keyvals, handler) {
     var __args = arguments;
     if (__args.length === 2 && typeof __args[0] === 'object' && typeof __args[1] === 'function') {
-      j_redisClient["mset(java.util.Map,io.vertx.core.Handler)"](keyvals, function(ar) {
+      j_redisClient["mset(io.vertx.core.json.JsonObject,io.vertx.core.Handler)"](utils.convParamJsonObject(keyvals), function(ar) {
       if (ar.succeeded()) {
         handler(ar.result(), null);
       } else {
@@ -2532,14 +2554,14 @@ var RedisClient = function(j_val) {
    Set multiple keys to multiple values, only if none of the keys exist
 
    @public
-   @param keyvals {Array.<string>} Key value pairs to set 
+   @param keyvals {Object} Key value pairs to set 
    @param handler {function} Handler for the result of this call. 
    @return {RedisClient}
    */
   this.msetnx = function(keyvals, handler) {
     var __args = arguments;
     if (__args.length === 2 && typeof __args[0] === 'object' && typeof __args[1] === 'function') {
-      j_redisClient["msetnx(java.util.Map,io.vertx.core.Handler)"](keyvals, function(ar) {
+      j_redisClient["msetnx(io.vertx.core.json.JsonObject,io.vertx.core.Handler)"](utils.convParamJsonObject(keyvals), function(ar) {
       if (ar.succeeded()) {
         handler(ar.result(), null);
       } else {

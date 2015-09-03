@@ -354,10 +354,16 @@ public final class RedisClientImpl extends AbstractRedisClient {
   } 
 
   @Override
-  public RedisClient del(List<String> keys, Handler<AsyncResult<Long>> handler) {
+  public RedisClient del(String key, Handler<AsyncResult<Long>> handler) {
+    sendLong(DEL, toPayload(key), handler);
+    return this;
+  }
+
+  @Override
+  public RedisClient delMany(List<String> keys, Handler<AsyncResult<Long>> handler) {
     sendLong(DEL, toPayload(keys), handler);
     return this;
-  } 
+  }
 
   @Override
   public RedisClient discard(Handler<AsyncResult<String>> handler) {
@@ -530,7 +536,7 @@ public final class RedisClientImpl extends AbstractRedisClient {
   } 
 
   @Override
-  public RedisClient hmset(String key, Map<String, String> values, Handler<AsyncResult<String>> handler) {
+  public RedisClient hmset(String key, JsonObject values, Handler<AsyncResult<String>> handler) {
     sendString(HMSET, toPayload(key, values), handler);
     return this;
   } 
@@ -692,13 +698,13 @@ public final class RedisClientImpl extends AbstractRedisClient {
   } 
 
   @Override
-  public RedisClient mset(Map<String, String> keyvals, Handler<AsyncResult<String>> handler) {
+  public RedisClient mset(JsonObject keyvals, Handler<AsyncResult<String>> handler) {
     sendString(MSET, toPayload(keyvals), handler);
     return this;
   } 
 
   @Override
-  public RedisClient msetnx(Map<String, String> keyvals, Handler<AsyncResult<Long>> handler) {
+  public RedisClient msetnx(JsonObject keyvals, Handler<AsyncResult<Long>> handler) {
     sendLong(MSETNX, toPayload(keyvals), handler);
     return this;
   } 
@@ -1374,9 +1380,15 @@ public final class RedisClientImpl extends AbstractRedisClient {
   private static JsonArray toPayload(Object ... parameters) {
     JsonArray result = new JsonArray();
     for (Object param: parameters) {
+      // unwrap
       if (param instanceof JsonArray) {
         param = ((JsonArray) param).getList();
       }
+      // unwrap
+      if (param instanceof JsonObject) {
+        param = ((JsonObject) param).getMap();
+      }
+
       if (param instanceof Collection) {
         ((Collection) param).stream().filter(el -> el != null).forEach(result::add);
       } else if (param instanceof Map) {
