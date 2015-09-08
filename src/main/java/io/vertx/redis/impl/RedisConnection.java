@@ -10,8 +10,8 @@ import io.vertx.core.net.NetSocket;
 import io.vertx.redis.RedisCommand;
 
 import java.nio.charset.Charset;
-import java.util.LinkedList;
 import java.util.Queue;
+import java.util.concurrent.ConcurrentLinkedQueue;
 
 /**
  * Base class for Redis Vert.x client. Generated client would use the facilities
@@ -23,9 +23,9 @@ class RedisConnection {
 
   // there are 2 queues:
   // pending: commands that have not yet been sent to the server
-  private final Queue<Command<?>> pending = new LinkedList<>();
+  private final Queue<Command<?>> pending = new ConcurrentLinkedQueue<>();
   // waiting: commands that have been sent but not answered
-  private final Queue<Command<?>> waiting = new LinkedList<>();
+  private final Queue<Command<?>> waiting = new ConcurrentLinkedQueue<>();
 
   private final ReplyParser replyParser;
 
