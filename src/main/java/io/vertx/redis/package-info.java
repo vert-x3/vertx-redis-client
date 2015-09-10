@@ -179,9 +179,9 @@
  * </pre>
  *
  */
-@GenModule(name = "vertx-redis")
+@ModuleGen(name = "vertx-redis", groupPackage = "io.vertx")
 @Document(fileName = "index.adoc")
 package io.vertx.redis;
 
-import io.vertx.codegen.annotations.GenModule;
+import io.vertx.codegen.annotations.ModuleGen;
 import io.vertx.docgen.Document;
