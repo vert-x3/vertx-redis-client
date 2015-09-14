@@ -63,10 +63,14 @@ public abstract class AbstractRedisClient implements RedisClient {
 
   private ResponseTransform getResponseTransformFor(RedisCommand command) {
     if (command == RedisCommand.HGETALL) {
-      return ResponseTransform.ARRAY_TO_OBJECT;
+      return ResponseTransform.HASH;
     }
     if (command == RedisCommand.INFO) {
       return ResponseTransform.INFO;
+    }
+
+    if (command == RedisCommand.EVAL || command == RedisCommand.EVALSHA) {
+      return ResponseTransform.ARRAY;
     }
 
     return ResponseTransform.NONE;

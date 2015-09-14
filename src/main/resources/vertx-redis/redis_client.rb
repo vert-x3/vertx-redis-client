@@ -710,7 +710,7 @@ module VertxRedis
     # @return [self]
     def eval(script=nil,keys=nil,args=nil)
       if script.class == String && keys.class == Array && args.class == Array && block_given?
-        @j_del.java_method(:eval, [Java::java.lang.String.java_class,Java::JavaUtil::List.java_class,Java::JavaUtil::List.java_class,Java::IoVertxCore::Handler.java_class]).call(script,keys.map { |element| element },args.map { |element| element },(Proc.new { |ar| yield(ar.failed ? ar.cause : nil) }))
+        @j_del.java_method(:eval, [Java::java.lang.String.java_class,Java::JavaUtil::List.java_class,Java::JavaUtil::List.java_class,Java::IoVertxCore::Handler.java_class]).call(script,keys.map { |element| element },args.map { |element| element },(Proc.new { |ar| yield(ar.failed ? ar.cause : nil, ar.succeeded ? ar.result != nil ? JSON.parse(ar.result.encode) : nil : nil) }))
         return self
       end
       raise ArgumentError, "Invalid arguments when calling eval(script,keys,args)"
@@ -723,7 +723,7 @@ module VertxRedis
     # @return [self]
     def evalsha(sha1=nil,keys=nil,values=nil)
       if sha1.class == String && keys.class == Array && values.class == Array && block_given?
-        @j_del.java_method(:evalsha, [Java::java.lang.String.java_class,Java::JavaUtil::List.java_class,Java::JavaUtil::List.java_class,Java::IoVertxCore::Handler.java_class]).call(sha1,keys.map { |element| element },values.map { |element| element },(Proc.new { |ar| yield(ar.failed ? ar.cause : nil) }))
+        @j_del.java_method(:evalsha, [Java::java.lang.String.java_class,Java::JavaUtil::List.java_class,Java::JavaUtil::List.java_class,Java::IoVertxCore::Handler.java_class]).call(sha1,keys.map { |element| element },values.map { |element| element },(Proc.new { |ar| yield(ar.failed ? ar.cause : nil, ar.succeeded ? ar.result != nil ? JSON.parse(ar.result.encode) : nil : nil) }))
         return self
       end
       raise ArgumentError, "Invalid arguments when calling evalsha(sha1,keys,values)"

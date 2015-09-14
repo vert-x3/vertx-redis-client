@@ -696,7 +696,7 @@ public interface RedisClient {
    * group: scripting
    */
   @Fluent
-  RedisClient eval(String script, List<String> keys, List<String> args, Handler<AsyncResult<Void>> handler);
+  RedisClient eval(String script, List<String> keys, List<String> args, Handler<AsyncResult<JsonArray>> handler);
 
   /**
    * Execute a Lua script server side
@@ -709,7 +709,7 @@ public interface RedisClient {
    * group: scripting
    */
   @Fluent
-  RedisClient evalsha(String sha1, List<String> keys, List<String> values, Handler<AsyncResult<Void>> handler);
+  RedisClient evalsha(String sha1, List<String> keys, List<String> values, Handler<AsyncResult<JsonArray>> handler);
 
   /**
    * Execute all commands issued after MULTI

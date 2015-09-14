@@ -288,56 +288,79 @@ class RedisConnection {
           cmd.handle(Future.failedFuture(reply.asType(String.class)));
           return;
         case '+':   // Status
-          cmd.handle(Future.succeededFuture(reply.asType(cmd.returnType())));
+          switch (cmd.responseTransform()) {
+            case ARRAY:
+              cmd.handle(Future.succeededFuture(new JsonArray().add(reply.asType(String.class))));
+              break;
+            default:
+              cmd.handle(Future.succeededFuture(reply.asType(cmd.returnType())));
+              break;
+          }
           return;
         case '$':  // Bulk
-          if (cmd.responseTransform() == ResponseTransform.INFO) {
-            String info = reply.asType(String.class, cmd.encoding());
+          switch (cmd.responseTransform()) {
+            case ARRAY:
+              cmd.handle(Future.succeededFuture(new JsonArray().add(reply.asType(String.class, cmd.encoding()))));
+              break;
+            case INFO:
+              String info = reply.asType(String.class, cmd.encoding());
 
-            if (info == null) {
-              cmd.handle(Future.succeededFuture(null));
-            } else {
-              String lines[] = info.split("\\r?\\n");
-              JsonObject value = new JsonObject();
+              if (info == null) {
+                cmd.handle(Future.succeededFuture(null));
+              } else {
+                String lines[] = info.split("\\r?\\n");
+                JsonObject value = new JsonObject();
 
-              JsonObject section = null;
-              for (String line : lines) {
-                if (line.length() == 0) {
-                  // end of section
-                  section = null;
-                  continue;
-                }
+                JsonObject section = null;
+                for (String line : lines) {
+                  if (line.length() == 0) {
+                    // end of section
+                    section = null;
+                    continue;
+                  }
 
-                if (line.charAt(0) == '#') {
-                  // begin section
-                  section = new JsonObject();
-                  // create a sub key with the section name
-                  value.put(line.substring(2).toLowerCase(), section);
-                } else {
-                  // entry in section
-                  int split = line.indexOf(':');
-                  if (section == null) {
-                    value.put(line.substring(0, split), line.substring(split + 1));
+                  if (line.charAt(0) == '#') {
+                    // begin section
+                    section = new JsonObject();
+                    // create a sub key with the section name
+                    value.put(line.substring(2).toLowerCase(), section);
                   } else {
-                    section.put(line.substring(0, split), line.substring(split + 1));
+                    // entry in section
+                    int split = line.indexOf(':');
+                    if (section == null) {
+                      value.put(line.substring(0, split), line.substring(split + 1));
+                    } else {
+                      section.put(line.substring(0, split), line.substring(split + 1));
+                    }
                   }
                 }
+                cmd.handle(Future.succeededFuture(value));
               }
-              cmd.handle(Future.succeededFuture(value));
-            }
-          } else {
-            cmd.handle(Future.succeededFuture(reply.asType(cmd.returnType(), cmd.encoding())));
+              break;
+            default:
+              cmd.handle(Future.succeededFuture(reply.asType(cmd.returnType(), cmd.encoding())));
+              break;
           }
           return;
         case '*': // Multi
-          if (cmd.responseTransform() == ResponseTransform.ARRAY_TO_OBJECT) {
-            cmd.handle(Future.succeededFuture(reply.asType(JsonObject.class, cmd.encoding())));
-          } else {
-            cmd.handle(Future.succeededFuture(reply.asType(JsonArray.class, cmd.encoding())));
+          switch (cmd.responseTransform()) {
+            case HASH:
+              cmd.handle(Future.succeededFuture(reply.asType(JsonObject.class, cmd.encoding())));
+              break;
+            default:
+              cmd.handle(Future.succeededFuture(reply.asType(JsonArray.class, cmd.encoding())));
+              break;
           }
           return;
         case ':':   // Integer
-          cmd.handle(Future.succeededFuture(reply.asType(cmd.returnType())));
+          switch (cmd.responseTransform()) {
+            case ARRAY:
+              cmd.handle(Future.succeededFuture(new JsonArray().add(reply.asType(Long.class))));
+              break;
+            default:
+              cmd.handle(Future.succeededFuture(reply.asType(cmd.returnType())));
+              break;
+          }
           return;
         default:
           cmd.handle(Future.failedFuture("Unknown message type"));

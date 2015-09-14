@@ -1402,7 +1402,7 @@ var RedisClient = function(j_val) {
     if (__args.length === 4 && typeof __args[0] === 'string' && typeof __args[1] === 'object' && __args[1] instanceof Array && typeof __args[2] === 'object' && __args[2] instanceof Array && typeof __args[3] === 'function') {
       j_redisClient["eval(java.lang.String,java.util.List,java.util.List,io.vertx.core.Handler)"](script, keys, args, function(ar) {
       if (ar.succeeded()) {
-        handler(null, null);
+        handler(utils.convReturnJson(ar.result()), null);
       } else {
         handler(null, ar.cause());
       }
@@ -1426,7 +1426,7 @@ var RedisClient = function(j_val) {
     if (__args.length === 4 && typeof __args[0] === 'string' && typeof __args[1] === 'object' && __args[1] instanceof Array && typeof __args[2] === 'object' && __args[2] instanceof Array && typeof __args[3] === 'function') {
       j_redisClient["evalsha(java.lang.String,java.util.List,java.util.List,io.vertx.core.Handler)"](sha1, keys, values, function(ar) {
       if (ar.succeeded()) {
-        handler(null, null);
+        handler(utils.convReturnJson(ar.result()), null);
       } else {
         handler(null, ar.cause());
       }
