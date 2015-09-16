@@ -7,7 +7,7 @@ import io.vertx.core.logging.Logger;
 import io.vertx.core.logging.LoggerFactory;
 import io.vertx.core.net.NetClient;
 import io.vertx.core.net.NetSocket;
-import io.vertx.redis.RedisCommand;
+import io.vertx.redis.RedisOptions;
 
 import java.nio.charset.Charset;
 import java.util.Queue;
@@ -30,8 +30,7 @@ public class RedisConnection {
   private final ReplyParser replyParser;
 
   private final NetClient client;
-  private final String host;
-  private final int port;
+  private final RedisOptions config;
 
   private enum State {
     /**
@@ -56,38 +55,24 @@ public class RedisConnection {
   private volatile NetSocket netSocket;
   private volatile Context context;
 
-//  private String auth;
-//  private String select;
-
   /**
    * Create a RedisConnection.
    * <p>
    * A Redis connection should be used for normal actions, i.e.: not for pub/sub
-   *
-   * @param client
-   * @param host
-   * @param port
    */
-  public RedisConnection(NetClient client, String host, int port) {
+  public RedisConnection(NetClient client, RedisOptions config) {
     this.client = client;
-    this.host = host;
-    this.port = port;
+    this.config = config;
 
     this.replyParser = new ReplyParser(this::handleReply);
   }
 
   /**
    * Create a Pub/Sub connection.
-   *
-   * @param client
-   * @param host
-   * @param port
-   * @param subscriptions
    */
-  public RedisConnection(NetClient client, String host, int port, RedisSubscriptions subscriptions) {
+  public RedisConnection(NetClient client, RedisOptions config, RedisSubscriptions subscriptions) {
     this.client = client;
-    this.host = host;
-    this.port = port;
+    this.config = config;
 
     this.replyParser = new ReplyParser(reply -> {
       // Pub/sub messages are always multi-bulk
@@ -124,7 +109,7 @@ public class RedisConnection {
 
       replyParser.reset();
 
-      client.connect(port, host, asyncResult -> {
+      client.connect(config.getPort(), config.getHost(), asyncResult -> {
         context = Vertx.currentContext();
 
         if (asyncResult.failed()) {
@@ -185,8 +170,6 @@ public class RedisConnection {
                 state = State.DISCONNECTED;
               });
 
-          state = State.CONNECTED;
-
           Command<?> command;
 
           // clean up any waiting command
@@ -194,18 +177,10 @@ public class RedisConnection {
             command.handle(Future.failedFuture("Connection lost"));
           }
 
-          // we are connected so clean up the pending queue
-          while ((command = pending.poll()) != null) {
-            // The order read must match the order written, vertx guarantees
-            // that this is only called from a single thread.
-            for (int i = 0; i < command.getExpectedReplies(); ++i) {
-              waiting.add(command);
-            }
+          state = State.CONNECTED;
 
-            // write to the socket in the netSocket context
-            final Command<?> _command = command;
-            context.runOnContext(v -> _command.writeTo(netSocket));
-          }
+          // handle the connection handshake
+          doAuth();
         }
       });
     }
@@ -273,6 +248,88 @@ public class RedisConnection {
         pending.add(command);
         connect();
         break;
+    }
+  }
+
+  /**
+   * Once a socket connection is established one needs to authenticate if there is a password
+   */
+  private synchronized void doAuth() {
+    if (config.getAuth() != null) {
+      // we need to authenticate first
+      Command<String> authCmd = new Command<>(RedisCommand.AUTH, new JsonArray().add(config.getAuth()), Charset.forName(config.getEncoding()), ResponseTransform.NONE, String.class).handler(auth -> {
+        if (auth.failed()) {
+          Command<?> cmd;
+
+          // clean up any pending command
+          while ((cmd = pending.poll()) != null) {
+            cmd.handle(Future.failedFuture(auth.cause()));
+          }
+
+          netSocket.close();
+          state = State.DISCONNECTED;
+          return;
+        }
+
+        // auth success, proceed with select
+        doSelect();
+      });
+
+      // queue it
+      waiting.add(authCmd);
+      // write to the socket in the netSocket context
+      context.runOnContext(v -> authCmd.writeTo(netSocket));
+    } else {
+      // no auth, proceed with select
+      doSelect();
+    }
+  }
+
+  private synchronized void doSelect() {
+    // optionally there could be a select command
+    if (config.getSelect() != null) {
+      Command<String> selectCmd = new Command<>(RedisCommand.SELECT, new JsonArray().add(config.getSelect()), Charset.forName(config.getEncoding()), ResponseTransform.NONE, String.class).handler(select -> {
+        if (select.failed()) {
+          Command<?> cmd;
+
+          // clean up any pending command
+          while ((cmd = pending.poll()) != null) {
+            cmd.handle(Future.failedFuture(select.cause()));
+          }
+
+          netSocket.close();
+          state = State.DISCONNECTED;
+          return;
+        }
+
+        // select success, proceed with resend
+        resendPending();
+      });
+
+      // queue it
+      waiting.add(selectCmd);
+      // write to the socket in the netSocket context
+      context.runOnContext(v -> selectCmd.writeTo(netSocket));
+    } else {
+      // no select, proceed with resend
+      resendPending();
+    }
+  }
+
+  private synchronized void resendPending() {
+    Command<?> command;
+
+    // we are connected so clean up the pending queue
+    while ((command = pending.poll()) != null) {
+      // The order read must match the order written, vertx guarantees
+      // that this is only called from a single thread.
+      for (int i = 0; i < command.getExpectedReplies(); ++i) {
+        waiting.add(command);
+      }
+
+      // write to the socket in the netSocket context
+      final Command<?> _command = command;
+      context.runOnContext(v -> _command.writeTo(netSocket));
     }
   }
 

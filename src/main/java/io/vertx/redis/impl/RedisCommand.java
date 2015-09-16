@@ -1,4 +1,4 @@
-package io.vertx.redis;
+package io.vertx.redis.impl;
 
 import io.vertx.codegen.annotations.VertxGen;
 
