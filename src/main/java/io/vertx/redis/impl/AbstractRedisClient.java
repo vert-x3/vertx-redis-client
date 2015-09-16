@@ -7,7 +7,7 @@ import io.vertx.core.json.JsonObject;
 import io.vertx.core.net.NetClient;
 import io.vertx.core.net.NetClientOptions;
 import io.vertx.redis.RedisClient;
-import io.vertx.redis.RedisCommand;
+import io.vertx.redis.RedisOptions;
 
 import java.nio.charset.Charset;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -25,25 +25,22 @@ public abstract class AbstractRedisClient implements RedisClient {
   private final RedisConnection redis;
   private final RedisConnection pubsub;
 
-  AbstractRedisClient(Vertx vertx, JsonObject config) {
+  AbstractRedisClient(Vertx vertx, RedisOptions config) {
     this.eb = vertx.eventBus();
-    this.encoding = config.getString("encoding", "UTF-8");
+    this.encoding = config.getEncoding();
     this.charset = Charset.forName(encoding);
     this.binaryCharset = Charset.forName("iso-8859-1");
-    this.baseAddress = config.getString("address", "io.vertx.redis");
-
-    final String host = config.getString("host", "localhost");
-    final int port = config.getInteger("port", 6379);
+    this.baseAddress = config.getAddress();
 
     // create a netClient for the connection
     final NetClient client = vertx.createNetClient(new NetClientOptions()
-        .setTcpKeepAlive(config.getBoolean("tcpKeepAlive", true))
-        .setTcpNoDelay(config.getBoolean("tcpNoDelay", true)));
+        .setTcpKeepAlive(config.isTcpKeepAlive())
+        .setTcpNoDelay(config.isTcpNoDelay()));
 
     subscriptions = new RedisSubscriptions(vertx);
 
-    redis = new RedisConnection(client, host, port);
-    pubsub = new RedisConnection(client, host, port, subscriptions);
+    redis = new RedisConnection(client, config);
+    pubsub = new RedisConnection(client, config, subscriptions);
   }
 
   @Override
