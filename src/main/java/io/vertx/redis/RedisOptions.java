@@ -76,7 +76,7 @@ public class RedisOptions {
    * @return self
    */
   public RedisOptions setAddress(String address) {
-    json.put("encoding", address);
+    json.put("address", address);
     return this;
   }
 
