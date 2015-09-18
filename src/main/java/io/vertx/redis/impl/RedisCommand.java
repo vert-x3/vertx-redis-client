@@ -1,5 +1,8 @@
 package io.vertx.redis.impl;
 
+import io.vertx.codegen.annotations.VertxGen;
+
+@VertxGen
 public enum RedisCommand {
 
   APPEND("APPEND"),
