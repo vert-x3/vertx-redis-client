@@ -1,0 +1,125 @@
+= Cheatsheets
+
+[[LimitOptions]]
+== LimitOptions
+
+++++
+ @author <a href="mailto:marko.strukelj@gmail.com">Marko Strukelj</a>
+++++
+'''
+
+[cols=">25%,^25%,50%"]
+[frame="topbot"]
+|===
+^|Name | Type ^| Description
+|===
+
+[[KillFilter]]
+== KillFilter
+
+++++
+ @author <a href="mailto:marko.strukelj@gmail.com">Marko Strukelj</a>
+++++
+'''
+
+[cols=">25%,^25%,50%"]
+[frame="topbot"]
+|===
+^|Name | Type ^| Description
+|[[addr]]`addr`|`String`|
++++
+Set ADDR filter
++++
+|[[id]]`id`|`String`|
++++
+Set ID filter
++++
+|[[skipme]]`skipme`|`Boolean`|
++++
+Set SKIPME filter
++++
+|[[type]]`type`|`link:enums.html#Type[Type]`|
++++
+Set TYPE filter
++++
+|===
+
+[[SortOptions]]
+== SortOptions
+
+++++
+ @author <a href="mailto:marko.strukelj@gmail.com">Marko Strukelj</a>
+++++
+'''
+
+[cols=">25%,^25%,50%"]
+[frame="topbot"]
+|===
+^|Name | Type ^| Description
+|[[by]]`by`|`String`|-
+|[[gets]]`gets`|`Array of String`|-
+|[[store]]`store`|`String`|-
+|===
+
+[[SetOptions]]
+== SetOptions
+
+++++
+ @author <a href="mailto:marko.strukelj@gmail.com">Marko Strukelj</a>
+++++
+'''
+
+[cols=">25%,^25%,50%"]
+[frame="topbot"]
+|===
+^|Name | Type ^| Description
+|[[ex]]`ex`|`Number (long)`|-
+|[[nx]]`nx`|`Boolean`|-
+|[[px]]`px`|`Number (long)`|-
+|[[xx]]`xx`|`Boolean`|-
+|===
+
+[[MigrateOptions]]
+== MigrateOptions
+
+++++
+ @author <a href="mailto:marko.strukelj@gmail.com">Marko Strukelj</a>
+++++
+'''
+
+[cols=">25%,^25%,50%"]
+[frame="topbot"]
+|===
+^|Name | Type ^| Description
+|===
+
+[[ScanOptions]]
+== ScanOptions
+
+++++
+ @author <a href="mailto:marko.strukelj@gmail.com">Marko Strukelj</a>
+++++
+'''
+
+[cols=">25%,^25%,50%"]
+[frame="topbot"]
+|===
+^|Name | Type ^| Description
+|[[count]]`count`|`Number (int)`|-
+|[[match]]`match`|`String`|-
+|===
+
+[[RangeLimitOptions]]
+== RangeLimitOptions
+
+++++
+ @author <a href="mailto:marko.strukelj@gmail.com">Marko Strukelj</a>
+++++
+'''
+
+[cols=">25%,^25%,50%"]
+[frame="topbot"]
+|===
+^|Name | Type ^| Description
+|===
+
