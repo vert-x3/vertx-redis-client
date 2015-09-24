@@ -331,8 +331,7 @@ class RedisConnection {
       }
 
       // write to the socket in the netSocket context
-      final Command<?> _command = command;
-      context.runOnContext(v -> _command.writeTo(netSocket));
+      command.writeTo(netSocket);
     }
   }
 
