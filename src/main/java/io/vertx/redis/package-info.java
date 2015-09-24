@@ -49,7 +49,7 @@
  *
  * == Connecting to Redis
  *
- * In order to connect to Redis there is a config required. This config is provided in the form of {@link io.vertx.core.json.JsonObject}
+ * In order to connect to Redis there is a config required. This config is provided in the form of {@link io.vertx.redis.RedisOptions}
  * containing the following values:
  *
  * * `host`: default is `localhost`
@@ -62,6 +62,17 @@
  * ----
  * {@link examples.Examples#example1}
  * ----
+ *
+ * The client attempts to reconnect to the server on connection errors, for this reason if you are connecting to a server
+ * that requires authentication and/or you are not using the default database you must provide the authentication
+ * password and/or database id to the config object, the properties names are:
+ *
+ * * `auth`
+ * * `select`
+ *
+ * If you do not do this and manually call the {@link io.vertx.redis.RedisClient#auth(java.lang.String, io.vertx.core.Handler)}
+ * or {@link io.vertx.redis.RedisClient#select(int, io.vertx.core.Handler)} then the client will not know how to recover
+ * the connection in case of socket error.
  *
  * == Running commands
  *

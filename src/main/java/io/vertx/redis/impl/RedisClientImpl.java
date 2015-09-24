@@ -7,7 +7,7 @@ import io.vertx.core.Vertx;
 import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;
 import io.vertx.redis.RedisClient;
-import io.vertx.redis.RedisEncoding;
+import io.vertx.redis.RedisOptions;
 import io.vertx.redis.op.*;
 
 import java.util.Collection;
@@ -16,11 +16,11 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Stream;
 
-import static io.vertx.redis.RedisCommand.*;
+import static io.vertx.redis.impl.RedisCommand.*;
 
 public final class RedisClientImpl extends AbstractRedisClient {
 
-  public RedisClientImpl(Vertx vertx, JsonObject config) {
+  public RedisClientImpl(Vertx vertx, RedisOptions config) {
     super(vertx, config);
   }
 

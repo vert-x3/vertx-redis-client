@@ -1,4 +1,4 @@
-package io.vertx.redis;
+package io.vertx.redis.impl;
 
 /**
  * This is how Redis escapes char codes:

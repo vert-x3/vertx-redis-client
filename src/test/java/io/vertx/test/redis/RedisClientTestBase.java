@@ -3,6 +3,7 @@ package io.vertx.test.redis;
 import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;
 import io.vertx.redis.RedisClient;
+import io.vertx.redis.RedisOptions;
 import io.vertx.redis.op.*;
 import io.vertx.test.core.VertxTestBase;
 import org.junit.AfterClass;
@@ -81,16 +82,20 @@ public abstract class RedisClientTestBase extends VertxTestBase {
     }
   }
 
-  protected JsonObject getConfig() {
-    JsonObject config = new JsonObject();
+  protected RedisOptions getConfig() {
     String host = getHost();
     String port = getPort();
+
+    RedisOptions config = new RedisOptions();
+
     if (host != null) {
-      config.put("host", host);
+      config.setHost(host);
     }
+
     if (port != null) {
-      config.put("port", Integer.parseInt(port));
+      config.setPort(Integer.parseInt(port));
     }
+
     return config;
   }
 
@@ -166,7 +171,9 @@ public abstract class RedisClientTestBase extends VertxTestBase {
 
     RedisServer server = RedisServer.builder().port(6381).setting("requirepass foobar").build();
     server.start();
-    JsonObject job = new JsonObject().put("host", "localhost").put("port", 6381);
+    RedisOptions job = new RedisOptions()
+        .setHost("localhost")
+        .setPort(6381);
     RedisClient rdx = RedisClient.create(vertx, job);
 
     rdx.auth("barfoo", reply -> {
@@ -458,7 +465,9 @@ public abstract class RedisClientTestBase extends VertxTestBase {
 
     RedisServer server = RedisServer.builder().port(6381).build();
     server.start();
-    JsonObject job = new JsonObject().put("host", "localhost").put("port", 6381);
+    RedisOptions job = new RedisOptions()
+        .setHost("localhost")
+        .setPort(6381);
     RedisClient rdx = RedisClient.create(vertx, job);
 
     rdx.debugSegfault(reply -> {
@@ -1565,7 +1574,9 @@ public abstract class RedisClientTestBase extends VertxTestBase {
   public void testMigrate() throws Exception {
     RedisServer server = RedisServer.builder().port(6382).build();
     server.start();
-    JsonObject job = new JsonObject().put("host", "localhost").put("port", 6382);
+    RedisOptions job = new RedisOptions()
+        .setHost("localhost")
+        .setPort(6382);
     RedisClient rdx = RedisClient.create(vertx, job);
 
     String key = makeKey();
@@ -2149,7 +2160,9 @@ public abstract class RedisClientTestBase extends VertxTestBase {
       //server should be locked at this point
     });
 
-    JsonObject job = new JsonObject().put("host", "localhost").put("port", 6379);
+    RedisOptions job = new RedisOptions()
+        .setHost("localhost")
+        .setPort(6379);
     RedisClient rdx = RedisClient.create(vertx, job);
 
     rdx.scriptKill(reply -> {

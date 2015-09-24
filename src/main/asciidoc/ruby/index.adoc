@@ -48,7 +48,7 @@ compile {maven-groupId}:{maven-artifactId}:{maven-version}
 
 == Connecting to Redis
 
-In order to connect to Redis there is a config required. This config is provided in the form of `link:unavailable[JsonObject]`
+In order to connect to Redis there is a config required. This config is provided in the form of `link:../dataobjects.html#RedisOptions[RedisOptions]`
 containing the following values:
 
 * `host`: default is `localhost`
@@ -67,6 +67,17 @@ config = {
 redis = VertxRedis::RedisClient.create(vertx, config)
 
 ----
+
+The client attempts to reconnect to the server on connection errors, for this reason if you are connecting to a server
+that requires authentication and/or you are not using the default database you must provide the authentication
+password and/or database id to the config object, the properties names are:
+
+* `auth`
+* `select`
+
+If you do not do this and manually call the `link:yardoc/VertxRedis/RedisClient.html#auth-instance_method[auth]`
+or `link:yardoc/VertxRedis/RedisClient.html#select-instance_method[select]` then the client will not know how to recover
+the connection in case of socket error.
 
 == Running commands
 
