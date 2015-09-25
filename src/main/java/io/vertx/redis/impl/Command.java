@@ -70,6 +70,10 @@ public class Command<T> {
   private Handler<AsyncResult<T>> handler;
 
   public Command(RedisCommand command, final JsonArray args, Charset encoding, ResponseTransform transform, Class<T> returnType) {
+    this(command.getTokens(), args, encoding, transform, returnType);
+  }
+
+  public Command(String[] commandTokens, final JsonArray args, Charset encoding, ResponseTransform transform, Class<T> returnType) {
     this.context = Vertx.currentContext();
     this.encoding = encoding.name();
 
@@ -82,8 +86,6 @@ public class Command<T> {
     } else {
       totalArgs = args.size();
     }
-
-    String[] commandTokens = command.getTokens();
 
     // serialize the request
     buffer = Buffer.buffer();

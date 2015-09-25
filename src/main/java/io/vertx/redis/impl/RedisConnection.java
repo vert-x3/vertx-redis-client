@@ -17,7 +17,7 @@ import java.util.concurrent.ConcurrentLinkedQueue;
  * Base class for Redis Vert.x client. Generated client would use the facilities
  * in this class to implement typed commands.
  */
-class RedisConnection {
+public class RedisConnection {
 
   private static final Logger log = LoggerFactory.getLogger(RedisConnection.class);
 
@@ -211,7 +211,7 @@ class RedisConnection {
     }
   }
 
-  synchronized void disconnect(Handler<AsyncResult<Void>> closeHandler) {
+  public synchronized void disconnect(Handler<AsyncResult<Void>> closeHandler) {
     switch (state) {
       case CONNECTED:
       case CONNECTING:
@@ -231,9 +231,6 @@ class RedisConnection {
           while ((command = pending.poll()) != null) {
             command.handle(Future.failedFuture("Connection closed!"));
           }
-
-          netSocket.close();
-          state = State.DISCONNECTED;
 
           closeHandler.handle(Future.succeededFuture());
         });
@@ -257,7 +254,7 @@ class RedisConnection {
    *
    * @param command
    */
-  void send(final Command<?> command) {
+  public void send(final Command<?> command) {
     switch (state) {
       case CONNECTED:
         // The order read must match the order written, vertx guarantees

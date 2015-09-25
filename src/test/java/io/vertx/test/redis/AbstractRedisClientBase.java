@@ -1,22 +1,16 @@
 package io.vertx.test.redis;
 
-import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;
 import io.vertx.redis.RedisClient;
-import io.vertx.redis.op.*;
 import io.vertx.test.core.VertxTestBase;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
-import org.junit.Ignore;
-import org.junit.Test;
-import org.junit.experimental.categories.Category;
 import redis.embedded.RedisServer;
 
-import java.nio.charset.Charset;
-import java.util.*;
+import java.util.Map;
+import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CountDownLatch;
-import java.util.concurrent.TimeUnit;
 
 public abstract class AbstractRedisClientBase extends VertxTestBase {
 
