@@ -1,6 +1,7 @@
 package io.vertx.test.redis;
 
 import io.vertx.core.json.JsonObject;
+import io.vertx.redis.RedisOptions;
 import io.vertx.redis.sentinel.RedisSentinel;
 import io.vertx.redis.utils.JsonUtils;
 import org.junit.AfterClass;
@@ -66,10 +67,10 @@ public abstract class RedisSentinelClientTestBase extends AbstractRedisSentinelB
         }
     }
 
-    protected JsonObject getSentinelConfig() {
-       JsonObject config = new JsonObject();
-        config.put("host", host);
-        config.put("port", DEFAULT_SENTINEL_PORT);
+    protected RedisOptions getSentinelConfig() {
+       RedisOptions config = new RedisOptions();
+        config.setHost(host);
+        config.setPort(DEFAULT_SENTINEL_PORT);
         return config;
     }
 

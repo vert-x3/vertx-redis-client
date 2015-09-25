@@ -59,7 +59,10 @@ public class RedisFailoverClient {
         // collect the sentinel addresses from configuration
         for (int pos = 0; pos < sentinelsArray.size(); pos++) {
             JsonObject sentinel = sentinelsArray.getJsonObject(pos);
-            sentinels.add(RedisSentinel.create(vertx, sentinel));
+
+            sentinels.add(RedisSentinel.create(vertx,
+                    getRedisOptions(sentinel.getString("host"),
+                            sentinel.getInteger(PORT))));
         }
 
         // force the update for first time and then set up refresher
@@ -92,29 +95,29 @@ public class RedisFailoverClient {
      * @param host - hostname of the redis server
      * @param port - port to connect
      */
-    private JsonObject getConfig(String host, int port) {
-        JsonObject jsonObject = new JsonObject();
+    private RedisOptions getRedisOptions(String host, int port) {
+        RedisOptions options = new RedisOptions();
 
         if (config.containsKey(ConfigConstants.ENCODING)) {
-            jsonObject.put(ConfigConstants.ENCODING, config.getString(ConfigConstants.ENCODING));
+            options.setEncoding(config.getString(ConfigConstants.ENCODING));
         }
 
         if (config.containsKey(ConfigConstants.ADDRESS)) {
-            jsonObject.put(ConfigConstants.ADDRESS, config.getString(ConfigConstants.ADDRESS));
+            options.setAddress(config.getString(ConfigConstants.ADDRESS));
         }
 
         if (config.containsKey(ConfigConstants.TCP_KEEP_ALIVE)) {
-            jsonObject.put(ConfigConstants.TCP_KEEP_ALIVE, config.getBoolean(ConfigConstants.TCP_KEEP_ALIVE));
+            options.setTcpKeepAlive(config.getBoolean(ConfigConstants.TCP_KEEP_ALIVE));
         }
 
         if (config.containsKey(ConfigConstants.TCP_NO_DELAY)) {
-            jsonObject.put(ConfigConstants.TCP_NO_DELAY, config.getBoolean(ConfigConstants.TCP_NO_DELAY));
+            options.setTcpNoDelay(config.getBoolean(ConfigConstants.TCP_NO_DELAY));
         }
 
-        jsonObject.put(ConfigConstants.HOST, host)
-                .put(ConfigConstants.PORT, port);
+        options.setHost(host);
+        options.setPort(port);
 
-        return jsonObject;
+        return options;
     }
 
     /**
@@ -224,7 +227,7 @@ public class RedisFailoverClient {
     }
 
     private RedisClient createClient(Address address) {
-        return RedisClient.create(vertx, getConfig(address.host, address.port));
+        return RedisClient.create(vertx, getRedisOptions(address.host, address.port));
     }
 
     private String getMasterAddressList() {

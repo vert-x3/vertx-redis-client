@@ -5,13 +5,14 @@ import io.vertx.core.Handler;
 import io.vertx.core.Vertx;
 import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;
+import io.vertx.redis.RedisOptions;
 import io.vertx.redis.sentinel.impl.RedisSentinelClientImpl;
 
 /**
  * Interface for sentinel commands
  */
 public interface RedisSentinel {
-    static RedisSentinel create(Vertx vertx, JsonObject config) {
+    static RedisSentinel create(Vertx vertx, RedisOptions config) {
         return new RedisSentinelClientImpl(vertx, config);
     }
     /**

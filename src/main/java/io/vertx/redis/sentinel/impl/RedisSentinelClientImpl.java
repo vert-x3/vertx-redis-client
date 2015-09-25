@@ -5,6 +5,7 @@ import io.vertx.core.Handler;
 import io.vertx.core.Vertx;
 import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;
+import io.vertx.redis.RedisOptions;
 import io.vertx.redis.sentinel.RedisSentinel;
 import io.vertx.redis.sentinel.RedisSentinel;
 import io.vertx.redis.utils.RedisCommandUtils;
@@ -24,7 +25,7 @@ import static io.vertx.redis.sentinel.RedisSentinelCommand.SLAVES;
  * Implementation of {@link AbstractRedisSentinelClient}
  */
 public class RedisSentinelClientImpl extends AbstractRedisSentinelClient {
-    public RedisSentinelClientImpl(Vertx vertx, JsonObject config) {
+    public RedisSentinelClientImpl(Vertx vertx, RedisOptions config) {
         super(vertx, config);
     }
 
