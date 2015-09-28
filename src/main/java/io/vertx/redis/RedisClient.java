@@ -1,6 +1,7 @@
 package io.vertx.redis;
 
 import io.vertx.codegen.annotations.Fluent;
+import io.vertx.codegen.annotations.GenIgnore;
 import io.vertx.codegen.annotations.VertxGen;
 import io.vertx.core.AsyncResult;
 import io.vertx.core.Handler;
@@ -18,6 +19,15 @@ public interface RedisClient {
 
   static RedisClient create(Vertx vertx) {
     return new RedisClientImpl(vertx, new RedisOptions());
+  }
+
+  /**
+   * For type safety please use {@link #create(Vertx, RedisOptions)}.
+   */
+  @Deprecated
+  @GenIgnore
+  static RedisClient create(Vertx vertx, JsonObject config) {
+    return new RedisClientImpl(vertx, new RedisOptions(config));
   }
 
   static RedisClient create(Vertx vertx, RedisOptions config) {
