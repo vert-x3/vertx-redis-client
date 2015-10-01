@@ -22,7 +22,7 @@ public interface RedisClient {
   }
 
   /**
-   * For type safety please use {@link #create(Vertx, RedisOptions)}.
+   * @deprecated For type safety please use {@link #create(Vertx, RedisOptions)}.
    */
   @Deprecated
   @GenIgnore
