@@ -702,7 +702,11 @@ module VertxRedis
       end
       raise ArgumentError, "Invalid arguments when calling echo(message)"
     end
-    #  Execute a Lua script server side
+    #  Execute a Lua script server side. Due to the dynamic nature of this command any response type could be returned
+    #  for This reason and to ensure type safety the reply is always guaranteed to be a JsonArray.
+    # 
+    #  When a reply if for example a String the handler will be called with a JsonArray with a single element containing
+    #  the String.
     # @param [String] script Lua script to evaluate
     # @param [Array<String>] keys List of keys
     # @param [Array<String>] args List of argument values
@@ -715,7 +719,11 @@ module VertxRedis
       end
       raise ArgumentError, "Invalid arguments when calling eval(script,keys,args)"
     end
-    #  Execute a Lua script server side
+    #  Execute a Lua script server side. Due to the dynamic nature of this command any response type could be returned
+    #  for This reason and to ensure type safety the reply is always guaranteed to be a JsonArray.
+    # 
+    #  When a reply if for example a String the handler will be called with a JsonArray with a single element containing
+    #  the String.
     # @param [String] sha1 SHA1 digest of the script cached on the server
     # @param [Array<String>] keys List of keys
     # @param [Array<String>] values List of values

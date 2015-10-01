@@ -1388,7 +1388,11 @@ var RedisClient = function(j_val) {
   };
 
   /**
-   Execute a Lua script server side
+   Execute a Lua script server side. Due to the dynamic nature of this command any response type could be returned
+   for This reason and to ensure type safety the reply is always guaranteed to be a JsonArray.
+  
+   When a reply if for example a String the handler will be called with a JsonArray with a single element containing
+   the String.
 
    @public
    @param script {string} Lua script to evaluate 
@@ -1412,7 +1416,11 @@ var RedisClient = function(j_val) {
   };
 
   /**
-   Execute a Lua script server side
+   Execute a Lua script server side. Due to the dynamic nature of this command any response type could be returned
+   for This reason and to ensure type safety the reply is always guaranteed to be a JsonArray.
+  
+   When a reply if for example a String the handler will be called with a JsonArray with a single element containing
+   the String.
 
    @public
    @param sha1 {string} SHA1 digest of the script cached on the server 

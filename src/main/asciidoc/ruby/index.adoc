@@ -54,6 +54,8 @@ containing the following values:
 * `host`: default is `localhost`
 * `port`: default is `6379`
 * `encoding`: default is `UTF-8`
+* `tcpKeepAlive`: default `true`
+* `tcpNoDelay`: default `true`
 
 An connection example can then be:
 
@@ -221,3 +223,17 @@ at the top level object.
   ...
 }
 </pre>
+
+== Eval and Evalsha
+
+Eval and Evalsha commands are special due to its return value can be any type. Vert.x is built on top of Java and the
+language adheres to strong typing so returning any type turns to be problematic since we want to avoid having `Object`
+type being used. The reason to avoid the type `Object` is that we also are polyglot and the conversion between
+languages would become rather complicated and hard to implement. For all these reasons the commands eval and evalsha
+will always return a JsonArray, even for example for scripts such as:
+
+```
+return 10
+```
+
+In this case the return value will be a json array with the value 10 on index 0.
