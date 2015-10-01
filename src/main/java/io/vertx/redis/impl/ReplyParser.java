@@ -1,3 +1,18 @@
+/**
+ * Copyright 2015 Red Hat, Inc.
+ *
+ *  All rights reserved. This program and the accompanying materials
+ *  are made available under the terms of the Eclipse Public License v1.0
+ *  and Apache License v2.0 which accompanies this distribution.
+ *
+ *  The Eclipse Public License is available at
+ *  http://www.eclipse.org/legal/epl-v10.html
+ *
+ *  The Apache License v2.0 is available at
+ *  http://www.opensource.org/licenses/apache2.0.php
+ *
+ *  You may elect to redistribute this code under either of these licenses.
+ */
 package io.vertx.redis.impl;
 
 import io.vertx.core.Handler;
@@ -223,10 +238,14 @@ public class ReplyParser implements Handler<Buffer> {
   private int packetEndOffset() throws IndexOutOfBoundsException {
     int offset = _offset;
 
+    if (offset + 1 >= _buffer.length()) {
+      throw new IndexOutOfBoundsException("Not enough data.");
+    }
+
     while (_buffer.getByte(offset) != '\r' && _buffer.getByte(offset + 1) != '\n') {
       offset++;
 
-      if (offset == _buffer.length()) {
+      if (offset + 1 == _buffer.length()) {
         throw new IndexOutOfBoundsException("didn't see LF after NL reading multi bulk count (" + offset + " => " + _buffer.length() + ", " + _offset + ")");
       }
     }

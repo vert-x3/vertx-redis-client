@@ -1,3 +1,18 @@
+/**
+ * Copyright 2015 Red Hat, Inc.
+ *
+ *  All rights reserved. This program and the accompanying materials
+ *  are made available under the terms of the Eclipse Public License v1.0
+ *  and Apache License v2.0 which accompanies this distribution.
+ *
+ *  The Eclipse Public License is available at
+ *  http://www.eclipse.org/legal/epl-v10.html
+ *
+ *  The Apache License v2.0 is available at
+ *  http://www.opensource.org/licenses/apache2.0.php
+ *
+ *  You may elect to redistribute this code under either of these licenses.
+ */
 package io.vertx.redis;
 
 import io.vertx.codegen.annotations.Fluent;
@@ -690,7 +705,11 @@ public interface RedisClient {
   RedisClient echo(String message, Handler<AsyncResult<String>> handler);
 
   /**
-   * Execute a Lua script server side
+   * Execute a Lua script server side. Due to the dynamic nature of this command any response type could be returned
+   * for This reason and to ensure type safety the reply is always guaranteed to be a JsonArray.
+   *
+   * When a reply if for example a String the handler will be called with a JsonArray with a single element containing
+   * the String.
    *
    * @param script  Lua script to evaluate
    * @param keys    List of keys
@@ -700,10 +719,14 @@ public interface RedisClient {
    * group: scripting
    */
   @Fluent
-  RedisClient eval(String script, List<String> keys, List<String> args, Handler<AsyncResult<Void>> handler);
+  RedisClient eval(String script, List<String> keys, List<String> args, Handler<AsyncResult<JsonArray>> handler);
 
   /**
-   * Execute a Lua script server side
+   * Execute a Lua script server side. Due to the dynamic nature of this command any response type could be returned
+   * for This reason and to ensure type safety the reply is always guaranteed to be a JsonArray.
+   *
+   * When a reply if for example a String the handler will be called with a JsonArray with a single element containing
+   * the String.
    *
    * @param sha1    SHA1 digest of the script cached on the server
    * @param keys    List of keys
@@ -713,7 +736,7 @@ public interface RedisClient {
    * group: scripting
    */
   @Fluent
-  RedisClient evalsha(String sha1, List<String> keys, List<String> values, Handler<AsyncResult<Void>> handler);
+  RedisClient evalsha(String sha1, List<String> keys, List<String> values, Handler<AsyncResult<JsonArray>> handler);
 
   /**
    * Execute all commands issued after MULTI

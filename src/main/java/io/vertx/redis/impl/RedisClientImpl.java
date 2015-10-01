@@ -1,3 +1,18 @@
+/**
+ * Copyright 2015 Red Hat, Inc.
+ *
+ *  All rights reserved. This program and the accompanying materials
+ *  are made available under the terms of the Eclipse Public License v1.0
+ *  and Apache License v2.0 which accompanies this distribution.
+ *
+ *  The Eclipse Public License is available at
+ *  http://www.eclipse.org/legal/epl-v10.html
+ *
+ *  The Apache License v2.0 is available at
+ *  http://www.opensource.org/licenses/apache2.0.php
+ *
+ *  You may elect to redistribute this code under either of these licenses.
+ */
 package io.vertx.redis.impl;
 
 import io.vertx.core.AsyncResult;
@@ -390,22 +405,18 @@ public final class RedisClientImpl extends AbstractRedisClient {
   } 
 
   @Override
-  public RedisClient eval(String script, List<String> keys, List<String> args, Handler<AsyncResult<Void>> handler) {
+  public RedisClient eval(String script, List<String> keys, List<String> args, Handler<AsyncResult<JsonArray>> handler) {
     keys = (keys != null) ? keys : Collections.emptyList();
     args = (args != null) ? args : Collections.emptyList();
-    if (keys.size() != args.size()) {
-      handler.handle(Future.failedFuture(new IllegalArgumentException("Key list, and argument list are not the same size")));
-    } else {
-      sendVoid(EVAL, toPayload(script, keys.size(), keys, args), handler);
-    }
+    sendJsonArray(EVAL, toPayload(script, keys.size(), keys, args), handler);
     return this;
   } 
 
   @Override
-  public RedisClient evalsha(String sha1, List<String> keys, List<String> args, Handler<AsyncResult<Void>> handler) {
+  public RedisClient evalsha(String sha1, List<String> keys, List<String> args, Handler<AsyncResult<JsonArray>> handler) {
     keys = (keys != null) ? keys : Collections.emptyList();
     args = (args != null) ? args : Collections.emptyList();
-    sendVoid(EVALSHA, toPayload(sha1, keys.size(), keys, args), handler);
+    sendJsonArray(EVALSHA, toPayload(sha1, keys.size(), keys, args), handler);
     return this;
   } 
 
