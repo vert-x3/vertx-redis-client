@@ -13,8 +13,11 @@
  *
  *  You may elect to redistribute this code under either of these licenses.
  */
-package io.vertx.redis;
+package io.vertx.redis.impl;
 
+import io.vertx.codegen.annotations.VertxGen;
+
+@VertxGen
 public enum RedisCommand {
 
   APPEND("APPEND"),

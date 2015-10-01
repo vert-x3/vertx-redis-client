@@ -15,11 +15,13 @@
  */
 package io.vertx.redis.op;
 
+import io.vertx.codegen.annotations.VertxGen;
 import io.vertx.core.json.JsonArray;
 
 /**
  * @author <a href="mailto:marko.strukelj@gmail.com">Marko Strukelj</a>
  */
+@VertxGen
 public enum AggregateOptions {
   NONE,
   SUM,

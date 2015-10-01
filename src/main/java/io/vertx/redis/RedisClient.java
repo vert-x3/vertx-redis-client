@@ -31,7 +31,11 @@ import java.util.Map;
 @VertxGen
 public interface RedisClient {
 
-  static RedisClient create(Vertx vertx, JsonObject config) {
+  static RedisClient create(Vertx vertx) {
+    return new RedisClientImpl(vertx, new RedisOptions());
+  }
+
+  static RedisClient create(Vertx vertx, RedisOptions config) {
     return new RedisClientImpl(vertx, config);
   }
 

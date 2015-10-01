@@ -13,7 +13,7 @@
  *
  *  You may elect to redistribute this code under either of these licenses.
  */
-package io.vertx.redis;
+package io.vertx.redis.impl;
 
 /**
  * This is how Redis escapes char codes:

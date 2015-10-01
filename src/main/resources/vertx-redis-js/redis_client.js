@@ -27,6 +27,7 @@ var SetOptions = io.vertx.redis.op.SetOptions;
 var SortOptions = io.vertx.redis.op.SortOptions;
 var MigrateOptions = io.vertx.redis.op.MigrateOptions;
 var ScanOptions = io.vertx.redis.op.ScanOptions;
+var RedisOptions = io.vertx.redis.RedisOptions;
 var RangeLimitOptions = io.vertx.redis.op.RangeLimitOptions;
 
 /**
@@ -5077,10 +5078,12 @@ var RedisClient = function(j_val) {
  @param config {Object} 
  @return {RedisClient}
  */
-RedisClient.create = function(vertx, config) {
+RedisClient.create = function() {
   var __args = arguments;
-  if (__args.length === 2 && typeof __args[0] === 'object' && __args[0]._jdel && typeof __args[1] === 'object') {
-    return utils.convReturnVertxGen(JRedisClient["create(io.vertx.core.Vertx,io.vertx.core.json.JsonObject)"](vertx._jdel, utils.convParamJsonObject(config)), RedisClient);
+  if (__args.length === 1 && typeof __args[0] === 'object' && __args[0]._jdel) {
+    return utils.convReturnVertxGen(JRedisClient["create(io.vertx.core.Vertx)"](__args[0]._jdel), RedisClient);
+  }else if (__args.length === 2 && typeof __args[0] === 'object' && __args[0]._jdel && typeof __args[1] === 'object') {
+    return utils.convReturnVertxGen(JRedisClient["create(io.vertx.core.Vertx,io.vertx.redis.RedisOptions)"](__args[0]._jdel, __args[1] != null ? new RedisOptions(new JsonObject(JSON.stringify(__args[1]))) : null), RedisClient);
   } else utils.invalidArgs();
 };
 

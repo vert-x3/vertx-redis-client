@@ -1,0 +1,154 @@
+= Enums
+
+[[AggregateOptions]]
+== AggregateOptions
+
+++++
+ @author <a href="mailto:marko.strukelj@gmail.com">Marko Strukelj</a>
+++++
+'''
+
+[cols=">25%,75%"]
+[frame="topbot"]
+|===
+^|Name | Description
+|[[NONE]]`NONE`|-
+|[[SUM]]`SUM`|-
+|[[MIN]]`MIN`|-
+|[[MAX]]`MAX`|-
+|===
+
+[[BitOperation]]
+== BitOperation
+
+++++
+ @author <a href="mailto:marko.strukelj@gmail.com">Marko Strukelj</a>
+++++
+'''
+
+[cols=">25%,75%"]
+[frame="topbot"]
+|===
+^|Name | Description
+|[[AND]]`AND`|-
+|[[OR]]`OR`|-
+|[[XOR]]`XOR`|-
+|[[NOT]]`NOT`|-
+|===
+
+[[ResetOptions]]
+== ResetOptions
+
+++++
+ @author <a href="mailto:pmlopes@gmail.com">Paulo Lopes</a>
+++++
+'''
+
+[cols=">25%,75%"]
+[frame="topbot"]
+|===
+^|Name | Description
+|[[HARD]]`HARD`|-
+|[[SOFT]]`SOFT`|-
+|===
+
+[[ObjectCmd]]
+== ObjectCmd
+
+++++
+ @author <a href="mailto:marko.strukelj@gmail.com">Marko Strukelj</a>
+++++
+'''
+
+[cols=">25%,75%"]
+[frame="topbot"]
+|===
+^|Name | Description
+|[[REFCOUNT]]`REFCOUNT`|-
+|[[ENCODING]]`ENCODING`|-
+|[[IDLETIME]]`IDLETIME`|-
+|===
+
+[[ShutdownOptions]]
+== ShutdownOptions
+
+++++
+ @author <a href="mailto:marko.strukelj@gmail.com">Marko Strukelj</a>
+++++
+'''
+
+[cols=">25%,75%"]
+[frame="topbot"]
+|===
+^|Name | Description
+|[[NONE]]`NONE`|-
+|[[SAVE]]`SAVE`|-
+|[[NOSAVE]]`NOSAVE`|-
+|===
+
+[[FailoverOptions]]
+== FailoverOptions
+
+++++
+ @author <a href="mailto:pmlopes@gmail.com">Paulo Lopes</a>
+++++
+'''
+
+[cols=">25%,75%"]
+[frame="topbot"]
+|===
+^|Name | Description
+|[[FORCE]]`FORCE`|-
+|[[TAKEOVER]]`TAKEOVER`|-
+|===
+
+[[SlotCmd]]
+== SlotCmd
+
+++++
+ @author <a href="mailto:pmlopes@gmail.com">Paulo Lopes</a>
+++++
+'''
+
+[cols=">25%,75%"]
+[frame="topbot"]
+|===
+^|Name | Description
+|[[IMPORTING]]`IMPORTING`|-
+|[[MIGRATING]]`MIGRATING`|-
+|[[STABLE]]`STABLE`|-
+|[[NODE]]`NODE`|-
+|===
+
+[[RangeOptions]]
+== RangeOptions
+
+++++
+ @author <a href="mailto:marko.strukelj@gmail.com">Marko Strukelj</a>
+++++
+'''
+
+[cols=">25%,75%"]
+[frame="topbot"]
+|===
+^|Name | Description
+|[[NONE]]`NONE`|-
+|[[WITHSCORES]]`WITHSCORES`|-
+|===
+
+[[InsertOptions]]
+== InsertOptions
+
+++++
+ @author <a href="mailto:marko.strukelj@gmail.com">Marko Strukelj</a>
+++++
+'''
+
+[cols=">25%,75%"]
+[frame="topbot"]
+|===
+^|Name | Description
+|[[BEFORE]]`BEFORE`|-
+|[[AFTER]]`AFTER`|-
+|===
+

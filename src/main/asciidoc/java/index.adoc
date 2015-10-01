@@ -48,7 +48,7 @@ compile {maven-groupId}:{maven-artifactId}:{maven-version}
 
 == Connecting to Redis
 
-In order to connect to Redis there is a config required. This config is provided in the form of `link:../../apidocs/io/vertx/core/json/JsonObject.html[JsonObject]`
+In order to connect to Redis there is a config required. This config is provided in the form of `link:../../apidocs/io/vertx/redis/RedisOptions.html[RedisOptions]`
 containing the following values:
 
 * `host`: default is `localhost`
@@ -61,11 +61,22 @@ An connection example can then be:
 
 [source,java]
 ----
-JsonObject config = new JsonObject()
-    .put("host", "127.0.0.1");
+RedisOptions config = new RedisOptions()
+    .setHost("127.0.0.1");
 
 RedisClient redis = RedisClient.create(vertx, config);
 ----
+
+The client attempts to reconnect to the server on connection errors, for this reason if you are connecting to a server
+that requires authentication and/or you are not using the default database you must provide the authentication
+password and/or database id to the config object, the properties names are:
+
+* `auth`
+* `select`
+
+If you do not do this and manually call the `link:../../apidocs/io/vertx/redis/RedisClient.html#auth-java.lang.String-io.vertx.core.Handler-[auth]`
+or `link:../../apidocs/io/vertx/redis/RedisClient.html#select-int-io.vertx.core.Handler-[select]` then the client will not know how to recover
+the connection in case of socket error.
 
 == Running commands
 
@@ -75,7 +86,7 @@ if one wants to get a value of a key it can be done as:
 
 [source,java]
 ----
-RedisClient redis = RedisClient.create(vertx, new JsonObject());
+RedisClient redis = RedisClient.create(vertx, new RedisOptions());
 
 redis.get("mykey", res -> {
   if (res.succeeded()) {
@@ -104,7 +115,7 @@ vertx.eventBus().<JsonObject>consumer("redis.sub.channel1", received -> {
   // message - The message payload
 });
 
-RedisClient redis = RedisClient.create(vertx, new JsonObject());
+RedisClient redis = RedisClient.create(vertx, new RedisOptions());
 
 redis.subscribe("channel1", res -> {
     if (res.succeeded()) {
@@ -117,7 +128,7 @@ And from another place in the code publish messages to the queue:
 
 [source,java]
 ----
-RedisClient redis = RedisClient.create(vertx, new JsonObject());
+RedisClient redis = RedisClient.create(vertx, new RedisOptions());
 
 redis.publish("channel1", "Hello World!", res -> {
     if (res.succeeded()) {

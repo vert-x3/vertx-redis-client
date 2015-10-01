@@ -3,6 +3,7 @@ package examples;
 import io.vertx.core.Vertx;
 import io.vertx.core.json.JsonObject;
 import io.vertx.redis.RedisClient;
+import io.vertx.redis.RedisOptions;
 
 import java.util.Arrays;
 
@@ -15,14 +16,14 @@ import java.util.Arrays;
 public class Examples {
 
   public void example1(Vertx vertx) {
-    JsonObject config = new JsonObject()
-        .put("host", "127.0.0.1");
+    RedisOptions config = new RedisOptions()
+        .setHost("127.0.0.1");
 
     RedisClient redis = RedisClient.create(vertx, config);
   }
 
   public void example2(Vertx vertx) {
-    RedisClient redis = RedisClient.create(vertx, new JsonObject());
+    RedisClient redis = RedisClient.create(vertx, new RedisOptions());
 
     redis.get("mykey", res -> {
       if (res.succeeded()) {
@@ -43,7 +44,7 @@ public class Examples {
       // message - The message payload
     });
 
-    RedisClient redis = RedisClient.create(vertx, new JsonObject());
+    RedisClient redis = RedisClient.create(vertx, new RedisOptions());
 
     redis.subscribe("channel1", res -> {
         if (res.succeeded()) {
@@ -54,7 +55,7 @@ public class Examples {
 
   public void example4(Vertx vertx) {
 
-    RedisClient redis = RedisClient.create(vertx, new JsonObject());
+    RedisClient redis = RedisClient.create(vertx, new RedisOptions());
 
     redis.publish("channel1", "Hello World!", res -> {
         if (res.succeeded()) {

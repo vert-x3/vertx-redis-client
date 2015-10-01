@@ -18,6 +18,7 @@ package io.vertx.test.redis;
 import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;
 import io.vertx.redis.RedisClient;
+import io.vertx.redis.RedisOptions;
 import io.vertx.redis.op.*;
 import io.vertx.test.core.VertxTestBase;
 import org.junit.AfterClass;
@@ -111,16 +112,20 @@ public abstract class AbstractRedisClientBase extends VertxTestBase {
     }
   }
 
-  protected JsonObject getConfig() {
-    JsonObject config = new JsonObject();
+  protected RedisOptions getConfig() {
     String host = getHost();
     String port = getPort();
+
+    RedisOptions config = new RedisOptions();
+
     if (host != null) {
-      config.put("host", host);
+      config.setHost(host);
     }
+
     if (port != null) {
-      config.put("port", Integer.parseInt(port));
+      config.setPort(Integer.parseInt(port));
     }
+
     return config;
   }
 

@@ -14,11 +14,13 @@ module VertxRedis
       @j_del
     end
     # @param [::Vertx::Vertx] vertx 
-    # @param [Hash{String => Object}] config 
+    # @param [Hash] config 
     # @return [::VertxRedis::RedisClient]
     def self.create(vertx=nil,config=nil)
-      if vertx.class.method_defined?(:j_del) && config.class == Hash && !block_given?
-        return ::Vertx::Util::Utils.safe_create(Java::IoVertxRedis::RedisClient.java_method(:create, [Java::IoVertxCore::Vertx.java_class,Java::IoVertxCoreJson::JsonObject.java_class]).call(vertx.j_del,::Vertx::Util::Utils.to_json_object(config)),::VertxRedis::RedisClient)
+      if vertx.class.method_defined?(:j_del) && !block_given? && config == nil
+        return ::Vertx::Util::Utils.safe_create(Java::IoVertxRedis::RedisClient.java_method(:create, [Java::IoVertxCore::Vertx.java_class]).call(vertx.j_del),::VertxRedis::RedisClient)
+      elsif vertx.class.method_defined?(:j_del) && config.class == Hash && !block_given?
+        return ::Vertx::Util::Utils.safe_create(Java::IoVertxRedis::RedisClient.java_method(:create, [Java::IoVertxCore::Vertx.java_class,Java::IoVertxRedis::RedisOptions.java_class]).call(vertx.j_del,Java::IoVertxRedis::RedisOptions.new(::Vertx::Util::Utils.to_json_object(config))),::VertxRedis::RedisClient)
       end
       raise ArgumentError, "Invalid arguments when calling create(vertx,config)"
     end
