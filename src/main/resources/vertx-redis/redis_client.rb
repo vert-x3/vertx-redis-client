@@ -704,7 +704,11 @@ module VertxRedis
       end
       raise ArgumentError, "Invalid arguments when calling echo(message)"
     end
-    #  Execute a Lua script server side
+    #  Execute a Lua script server side. Due to the dynamic nature of this command any response type could be returned
+    #  for This reason and to ensure type safety the reply is always guaranteed to be a JsonArray.
+    # 
+    #  When a reply if for example a String the handler will be called with a JsonArray with a single element containing
+    #  the String.
     # @param [String] script Lua script to evaluate
     # @param [Array<String>] keys List of keys
     # @param [Array<String>] args List of argument values
@@ -712,12 +716,16 @@ module VertxRedis
     # @return [self]
     def eval(script=nil,keys=nil,args=nil)
       if script.class == String && keys.class == Array && args.class == Array && block_given?
-        @j_del.java_method(:eval, [Java::java.lang.String.java_class,Java::JavaUtil::List.java_class,Java::JavaUtil::List.java_class,Java::IoVertxCore::Handler.java_class]).call(script,keys.map { |element| element },args.map { |element| element },(Proc.new { |ar| yield(ar.failed ? ar.cause : nil) }))
+        @j_del.java_method(:eval, [Java::java.lang.String.java_class,Java::JavaUtil::List.java_class,Java::JavaUtil::List.java_class,Java::IoVertxCore::Handler.java_class]).call(script,keys.map { |element| element },args.map { |element| element },(Proc.new { |ar| yield(ar.failed ? ar.cause : nil, ar.succeeded ? ar.result != nil ? JSON.parse(ar.result.encode) : nil : nil) }))
         return self
       end
       raise ArgumentError, "Invalid arguments when calling eval(script,keys,args)"
     end
-    #  Execute a Lua script server side
+    #  Execute a Lua script server side. Due to the dynamic nature of this command any response type could be returned
+    #  for This reason and to ensure type safety the reply is always guaranteed to be a JsonArray.
+    # 
+    #  When a reply if for example a String the handler will be called with a JsonArray with a single element containing
+    #  the String.
     # @param [String] sha1 SHA1 digest of the script cached on the server
     # @param [Array<String>] keys List of keys
     # @param [Array<String>] values List of values
@@ -725,7 +733,7 @@ module VertxRedis
     # @return [self]
     def evalsha(sha1=nil,keys=nil,values=nil)
       if sha1.class == String && keys.class == Array && values.class == Array && block_given?
-        @j_del.java_method(:evalsha, [Java::java.lang.String.java_class,Java::JavaUtil::List.java_class,Java::JavaUtil::List.java_class,Java::IoVertxCore::Handler.java_class]).call(sha1,keys.map { |element| element },values.map { |element| element },(Proc.new { |ar| yield(ar.failed ? ar.cause : nil) }))
+        @j_del.java_method(:evalsha, [Java::java.lang.String.java_class,Java::JavaUtil::List.java_class,Java::JavaUtil::List.java_class,Java::IoVertxCore::Handler.java_class]).call(sha1,keys.map { |element| element },values.map { |element| element },(Proc.new { |ar| yield(ar.failed ? ar.cause : nil, ar.succeeded ? ar.result != nil ? JSON.parse(ar.result.encode) : nil : nil) }))
         return self
       end
       raise ArgumentError, "Invalid arguments when calling evalsha(sha1,keys,values)"
