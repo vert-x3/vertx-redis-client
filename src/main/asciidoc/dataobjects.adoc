@@ -1,19 +1,5 @@
 = Cheatsheets
 
-[[LimitOptions]]
-== LimitOptions
-
-++++
- @author <a href="mailto:marko.strukelj@gmail.com">Marko Strukelj</a>
-++++
-'''
-
-[cols=">25%,^25%,50%"]
-[frame="topbot"]
-|===
-^|Name | Type ^| Description
-|===
-
 [[KillFilter]]
 == KillFilter
 
@@ -42,6 +28,20 @@ Set SKIPME filter
 +++
 Set TYPE filter
 +++
+|===
+
+[[LimitOptions]]
+== LimitOptions
+
+++++
+ @author <a href="mailto:marko.strukelj@gmail.com">Marko Strukelj</a>
+++++
+'''
+
+[cols=">25%,^25%,50%"]
+[frame="topbot"]
+|===
+^|Name | Type ^| Description
 |===
 
 [[SortOptions]]
