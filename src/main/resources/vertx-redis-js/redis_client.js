@@ -54,7 +54,7 @@ var RedisClient = function(j_val) {
         handler(null, ar.cause());
       }
     });
-    } else utils.invalidArgs();
+    } else throw new TypeError('function invoked with invalid arguments');
   };
 
   /**
@@ -77,7 +77,7 @@ var RedisClient = function(j_val) {
       }
     });
       return that;
-    } else utils.invalidArgs();
+    } else throw new TypeError('function invoked with invalid arguments');
   };
 
   /**
@@ -99,7 +99,7 @@ var RedisClient = function(j_val) {
       }
     });
       return that;
-    } else utils.invalidArgs();
+    } else throw new TypeError('function invoked with invalid arguments');
   };
 
   /**
@@ -120,7 +120,7 @@ var RedisClient = function(j_val) {
       }
     });
       return that;
-    } else utils.invalidArgs();
+    } else throw new TypeError('function invoked with invalid arguments');
   };
 
   /**
@@ -141,7 +141,7 @@ var RedisClient = function(j_val) {
       }
     });
       return that;
-    } else utils.invalidArgs();
+    } else throw new TypeError('function invoked with invalid arguments');
   };
 
   /**
@@ -163,7 +163,7 @@ var RedisClient = function(j_val) {
       }
     });
       return that;
-    } else utils.invalidArgs();
+    } else throw new TypeError('function invoked with invalid arguments');
   };
 
   /**
@@ -187,7 +187,7 @@ var RedisClient = function(j_val) {
       }
     });
       return that;
-    } else utils.invalidArgs();
+    } else throw new TypeError('function invoked with invalid arguments');
   };
 
   /**
@@ -211,7 +211,7 @@ var RedisClient = function(j_val) {
       }
     });
       return that;
-    } else utils.invalidArgs();
+    } else throw new TypeError('function invoked with invalid arguments');
   };
 
   /**
@@ -234,7 +234,7 @@ var RedisClient = function(j_val) {
       }
     });
       return that;
-    } else utils.invalidArgs();
+    } else throw new TypeError('function invoked with invalid arguments');
   };
 
   /**
@@ -260,7 +260,7 @@ var RedisClient = function(j_val) {
       }
     });
       return that;
-    } else utils.invalidArgs();
+    } else throw new TypeError('function invoked with invalid arguments');
   };
 
   /**
@@ -288,7 +288,7 @@ var RedisClient = function(j_val) {
       }
     });
       return that;
-    } else utils.invalidArgs();
+    } else throw new TypeError('function invoked with invalid arguments');
   };
 
   /**
@@ -311,7 +311,7 @@ var RedisClient = function(j_val) {
       }
     });
       return that;
-    } else utils.invalidArgs();
+    } else throw new TypeError('function invoked with invalid arguments');
   };
 
   /**
@@ -334,7 +334,7 @@ var RedisClient = function(j_val) {
       }
     });
       return that;
-    } else utils.invalidArgs();
+    } else throw new TypeError('function invoked with invalid arguments');
   };
 
   /**
@@ -357,7 +357,7 @@ var RedisClient = function(j_val) {
       }
     });
       return that;
-    } else utils.invalidArgs();
+    } else throw new TypeError('function invoked with invalid arguments');
   };
 
   /**
@@ -380,7 +380,7 @@ var RedisClient = function(j_val) {
       }
     });
       return that;
-    } else utils.invalidArgs();
+    } else throw new TypeError('function invoked with invalid arguments');
   };
 
   /**
@@ -404,7 +404,7 @@ var RedisClient = function(j_val) {
       }
     });
       return that;
-    } else utils.invalidArgs();
+    } else throw new TypeError('function invoked with invalid arguments');
   };
 
   /**
@@ -426,7 +426,7 @@ var RedisClient = function(j_val) {
       }
     });
       return that;
-    } else utils.invalidArgs();
+    } else throw new TypeError('function invoked with invalid arguments');
   };
 
   /**
@@ -447,7 +447,7 @@ var RedisClient = function(j_val) {
       }
     });
       return that;
-    } else utils.invalidArgs();
+    } else throw new TypeError('function invoked with invalid arguments');
   };
 
   /**
@@ -468,7 +468,7 @@ var RedisClient = function(j_val) {
       }
     });
       return that;
-    } else utils.invalidArgs();
+    } else throw new TypeError('function invoked with invalid arguments');
   };
 
   /**
@@ -490,7 +490,7 @@ var RedisClient = function(j_val) {
       }
     });
       return that;
-    } else utils.invalidArgs();
+    } else throw new TypeError('function invoked with invalid arguments');
   };
 
   /**
@@ -512,7 +512,7 @@ var RedisClient = function(j_val) {
       }
     });
       return that;
-    } else utils.invalidArgs();
+    } else throw new TypeError('function invoked with invalid arguments');
   };
 
   /**
@@ -534,7 +534,7 @@ var RedisClient = function(j_val) {
       }
     });
       return that;
-    } else utils.invalidArgs();
+    } else throw new TypeError('function invoked with invalid arguments');
   };
 
   /**
@@ -556,7 +556,7 @@ var RedisClient = function(j_val) {
       }
     });
       return that;
-    } else utils.invalidArgs();
+    } else throw new TypeError('function invoked with invalid arguments');
   };
 
   /**
@@ -578,7 +578,7 @@ var RedisClient = function(j_val) {
       }
     });
       return that;
-    } else utils.invalidArgs();
+    } else throw new TypeError('function invoked with invalid arguments');
   };
 
   /**
@@ -600,7 +600,7 @@ var RedisClient = function(j_val) {
       }
     });
       return that;
-    } else utils.invalidArgs();
+    } else throw new TypeError('function invoked with invalid arguments');
   };
 
   /**
@@ -622,7 +622,7 @@ var RedisClient = function(j_val) {
       }
     });
       return that;
-    } else utils.invalidArgs();
+    } else throw new TypeError('function invoked with invalid arguments');
   };
 
   /**
@@ -643,7 +643,7 @@ var RedisClient = function(j_val) {
       }
     });
       return that;
-    } else utils.invalidArgs();
+    } else throw new TypeError('function invoked with invalid arguments');
   };
 
   /**
@@ -665,7 +665,7 @@ var RedisClient = function(j_val) {
       }
     });
       return that;
-    } else utils.invalidArgs();
+    } else throw new TypeError('function invoked with invalid arguments');
   };
 
   /**
@@ -687,7 +687,7 @@ var RedisClient = function(j_val) {
       }
     });
       return that;
-    } else utils.invalidArgs();
+    } else throw new TypeError('function invoked with invalid arguments');
   };
 
   /**
@@ -710,7 +710,7 @@ var RedisClient = function(j_val) {
       }
     });
       return that;
-    } else utils.invalidArgs();
+    } else throw new TypeError('function invoked with invalid arguments');
   };
 
   /**
@@ -731,7 +731,7 @@ var RedisClient = function(j_val) {
       }
     });
       return that;
-    } else utils.invalidArgs();
+    } else throw new TypeError('function invoked with invalid arguments');
   };
 
   /**
@@ -753,7 +753,7 @@ var RedisClient = function(j_val) {
       }
     });
       return that;
-    } else utils.invalidArgs();
+    } else throw new TypeError('function invoked with invalid arguments');
   };
 
   /**
@@ -776,7 +776,7 @@ var RedisClient = function(j_val) {
       }
     });
       return that;
-    } else utils.invalidArgs();
+    } else throw new TypeError('function invoked with invalid arguments');
   };
 
   /**
@@ -797,7 +797,7 @@ var RedisClient = function(j_val) {
       }
     });
       return that;
-    } else utils.invalidArgs();
+    } else throw new TypeError('function invoked with invalid arguments');
   };
 
   /**
@@ -819,7 +819,7 @@ var RedisClient = function(j_val) {
       }
     });
       return that;
-    } else utils.invalidArgs();
+    } else throw new TypeError('function invoked with invalid arguments');
   };
 
   /**
@@ -840,7 +840,7 @@ var RedisClient = function(j_val) {
       }
     });
       return that;
-    } else utils.invalidArgs();
+    } else throw new TypeError('function invoked with invalid arguments');
   };
 
   /**
@@ -862,7 +862,7 @@ var RedisClient = function(j_val) {
       }
     });
       return that;
-    } else utils.invalidArgs();
+    } else throw new TypeError('function invoked with invalid arguments');
   };
 
   /**
@@ -883,7 +883,7 @@ var RedisClient = function(j_val) {
       }
     });
       return that;
-    } else utils.invalidArgs();
+    } else throw new TypeError('function invoked with invalid arguments');
   };
 
   /**
@@ -905,7 +905,7 @@ var RedisClient = function(j_val) {
       }
     });
       return that;
-    } else utils.invalidArgs();
+    } else throw new TypeError('function invoked with invalid arguments');
   };
 
   /**
@@ -928,7 +928,7 @@ var RedisClient = function(j_val) {
       }
     });
       return that;
-    } else utils.invalidArgs();
+    } else throw new TypeError('function invoked with invalid arguments');
   };
 
   /**
@@ -952,7 +952,7 @@ var RedisClient = function(j_val) {
       }
     });
       return that;
-    } else utils.invalidArgs();
+    } else throw new TypeError('function invoked with invalid arguments');
   };
 
   /**
@@ -974,7 +974,7 @@ var RedisClient = function(j_val) {
       }
     });
       return that;
-    } else utils.invalidArgs();
+    } else throw new TypeError('function invoked with invalid arguments');
   };
 
   /**
@@ -995,7 +995,7 @@ var RedisClient = function(j_val) {
       }
     });
       return that;
-    } else utils.invalidArgs();
+    } else throw new TypeError('function invoked with invalid arguments');
   };
 
   /**
@@ -1016,7 +1016,7 @@ var RedisClient = function(j_val) {
       }
     });
       return that;
-    } else utils.invalidArgs();
+    } else throw new TypeError('function invoked with invalid arguments');
   };
 
   /**
@@ -1037,7 +1037,7 @@ var RedisClient = function(j_val) {
       }
     });
       return that;
-    } else utils.invalidArgs();
+    } else throw new TypeError('function invoked with invalid arguments');
   };
 
   /**
@@ -1058,7 +1058,7 @@ var RedisClient = function(j_val) {
       }
     });
       return that;
-    } else utils.invalidArgs();
+    } else throw new TypeError('function invoked with invalid arguments');
   };
 
   /**
@@ -1080,7 +1080,7 @@ var RedisClient = function(j_val) {
       }
     });
       return that;
-    } else utils.invalidArgs();
+    } else throw new TypeError('function invoked with invalid arguments');
   };
 
   /**
@@ -1102,7 +1102,7 @@ var RedisClient = function(j_val) {
       }
     });
       return that;
-    } else utils.invalidArgs();
+    } else throw new TypeError('function invoked with invalid arguments');
   };
 
   /**
@@ -1123,7 +1123,7 @@ var RedisClient = function(j_val) {
       }
     });
       return that;
-    } else utils.invalidArgs();
+    } else throw new TypeError('function invoked with invalid arguments');
   };
 
   /**
@@ -1146,7 +1146,7 @@ var RedisClient = function(j_val) {
       }
     });
       return that;
-    } else utils.invalidArgs();
+    } else throw new TypeError('function invoked with invalid arguments');
   };
 
   /**
@@ -1167,7 +1167,7 @@ var RedisClient = function(j_val) {
       }
     });
       return that;
-    } else utils.invalidArgs();
+    } else throw new TypeError('function invoked with invalid arguments');
   };
 
   /**
@@ -1188,7 +1188,7 @@ var RedisClient = function(j_val) {
       }
     });
       return that;
-    } else utils.invalidArgs();
+    } else throw new TypeError('function invoked with invalid arguments');
   };
 
   /**
@@ -1210,7 +1210,7 @@ var RedisClient = function(j_val) {
       }
     });
       return that;
-    } else utils.invalidArgs();
+    } else throw new TypeError('function invoked with invalid arguments');
   };
 
   /**
@@ -1231,7 +1231,7 @@ var RedisClient = function(j_val) {
       }
     });
       return that;
-    } else utils.invalidArgs();
+    } else throw new TypeError('function invoked with invalid arguments');
   };
 
   /**
@@ -1253,7 +1253,7 @@ var RedisClient = function(j_val) {
       }
     });
       return that;
-    } else utils.invalidArgs();
+    } else throw new TypeError('function invoked with invalid arguments');
   };
 
   /**
@@ -1276,7 +1276,7 @@ var RedisClient = function(j_val) {
       }
     });
       return that;
-    } else utils.invalidArgs();
+    } else throw new TypeError('function invoked with invalid arguments');
   };
 
   /**
@@ -1298,7 +1298,7 @@ var RedisClient = function(j_val) {
       }
     });
       return that;
-    } else utils.invalidArgs();
+    } else throw new TypeError('function invoked with invalid arguments');
   };
 
   /**
@@ -1320,7 +1320,7 @@ var RedisClient = function(j_val) {
       }
     });
       return that;
-    } else utils.invalidArgs();
+    } else throw new TypeError('function invoked with invalid arguments');
   };
 
   /**
@@ -1341,7 +1341,7 @@ var RedisClient = function(j_val) {
       }
     });
       return that;
-    } else utils.invalidArgs();
+    } else throw new TypeError('function invoked with invalid arguments');
   };
 
   /**
@@ -1363,7 +1363,7 @@ var RedisClient = function(j_val) {
       }
     });
       return that;
-    } else utils.invalidArgs();
+    } else throw new TypeError('function invoked with invalid arguments');
   };
 
   /**
@@ -1385,7 +1385,7 @@ var RedisClient = function(j_val) {
       }
     });
       return that;
-    } else utils.invalidArgs();
+    } else throw new TypeError('function invoked with invalid arguments');
   };
 
   /**
@@ -1413,7 +1413,7 @@ var RedisClient = function(j_val) {
       }
     });
       return that;
-    } else utils.invalidArgs();
+    } else throw new TypeError('function invoked with invalid arguments');
   };
 
   /**
@@ -1441,7 +1441,7 @@ var RedisClient = function(j_val) {
       }
     });
       return that;
-    } else utils.invalidArgs();
+    } else throw new TypeError('function invoked with invalid arguments');
   };
 
   /**
@@ -1462,7 +1462,7 @@ var RedisClient = function(j_val) {
       }
     });
       return that;
-    } else utils.invalidArgs();
+    } else throw new TypeError('function invoked with invalid arguments');
   };
 
   /**
@@ -1484,7 +1484,7 @@ var RedisClient = function(j_val) {
       }
     });
       return that;
-    } else utils.invalidArgs();
+    } else throw new TypeError('function invoked with invalid arguments');
   };
 
   /**
@@ -1507,7 +1507,7 @@ var RedisClient = function(j_val) {
       }
     });
       return that;
-    } else utils.invalidArgs();
+    } else throw new TypeError('function invoked with invalid arguments');
   };
 
   /**
@@ -1530,7 +1530,7 @@ var RedisClient = function(j_val) {
       }
     });
       return that;
-    } else utils.invalidArgs();
+    } else throw new TypeError('function invoked with invalid arguments');
   };
 
   /**
@@ -1551,7 +1551,7 @@ var RedisClient = function(j_val) {
       }
     });
       return that;
-    } else utils.invalidArgs();
+    } else throw new TypeError('function invoked with invalid arguments');
   };
 
   /**
@@ -1572,7 +1572,7 @@ var RedisClient = function(j_val) {
       }
     });
       return that;
-    } else utils.invalidArgs();
+    } else throw new TypeError('function invoked with invalid arguments');
   };
 
   /**
@@ -1594,7 +1594,7 @@ var RedisClient = function(j_val) {
       }
     });
       return that;
-    } else utils.invalidArgs();
+    } else throw new TypeError('function invoked with invalid arguments');
   };
 
   /**
@@ -1616,7 +1616,7 @@ var RedisClient = function(j_val) {
       }
     });
       return that;
-    } else utils.invalidArgs();
+    } else throw new TypeError('function invoked with invalid arguments');
   };
 
   /**
@@ -1639,7 +1639,7 @@ var RedisClient = function(j_val) {
       }
     });
       return that;
-    } else utils.invalidArgs();
+    } else throw new TypeError('function invoked with invalid arguments');
   };
 
   /**
@@ -1663,7 +1663,7 @@ var RedisClient = function(j_val) {
       }
     });
       return that;
-    } else utils.invalidArgs();
+    } else throw new TypeError('function invoked with invalid arguments');
   };
 
   /**
@@ -1686,7 +1686,7 @@ var RedisClient = function(j_val) {
       }
     });
       return that;
-    } else utils.invalidArgs();
+    } else throw new TypeError('function invoked with invalid arguments');
   };
 
   /**
@@ -1709,7 +1709,7 @@ var RedisClient = function(j_val) {
       }
     });
       return that;
-    } else utils.invalidArgs();
+    } else throw new TypeError('function invoked with invalid arguments');
   };
 
   /**
@@ -1732,7 +1732,7 @@ var RedisClient = function(j_val) {
       }
     });
       return that;
-    } else utils.invalidArgs();
+    } else throw new TypeError('function invoked with invalid arguments');
   };
 
   /**
@@ -1755,7 +1755,7 @@ var RedisClient = function(j_val) {
       }
     });
       return that;
-    } else utils.invalidArgs();
+    } else throw new TypeError('function invoked with invalid arguments');
   };
 
   /**
@@ -1778,7 +1778,7 @@ var RedisClient = function(j_val) {
       }
     });
       return that;
-    } else utils.invalidArgs();
+    } else throw new TypeError('function invoked with invalid arguments');
   };
 
   /**
@@ -1800,7 +1800,7 @@ var RedisClient = function(j_val) {
       }
     });
       return that;
-    } else utils.invalidArgs();
+    } else throw new TypeError('function invoked with invalid arguments');
   };
 
   /**
@@ -1824,7 +1824,7 @@ var RedisClient = function(j_val) {
       }
     });
       return that;
-    } else utils.invalidArgs();
+    } else throw new TypeError('function invoked with invalid arguments');
   };
 
   /**
@@ -1848,7 +1848,7 @@ var RedisClient = function(j_val) {
       }
     });
       return that;
-    } else utils.invalidArgs();
+    } else throw new TypeError('function invoked with invalid arguments');
   };
 
   /**
@@ -1870,7 +1870,7 @@ var RedisClient = function(j_val) {
       }
     });
       return that;
-    } else utils.invalidArgs();
+    } else throw new TypeError('function invoked with invalid arguments');
   };
 
   /**
@@ -1892,7 +1892,7 @@ var RedisClient = function(j_val) {
       }
     });
       return that;
-    } else utils.invalidArgs();
+    } else throw new TypeError('function invoked with invalid arguments');
   };
 
   /**
@@ -1915,7 +1915,7 @@ var RedisClient = function(j_val) {
       }
     });
       return that;
-    } else utils.invalidArgs();
+    } else throw new TypeError('function invoked with invalid arguments');
   };
 
   /**
@@ -1938,7 +1938,7 @@ var RedisClient = function(j_val) {
       }
     });
       return that;
-    } else utils.invalidArgs();
+    } else throw new TypeError('function invoked with invalid arguments');
   };
 
   /**
@@ -1962,7 +1962,7 @@ var RedisClient = function(j_val) {
       }
     });
       return that;
-    } else utils.invalidArgs();
+    } else throw new TypeError('function invoked with invalid arguments');
   };
 
   /**
@@ -1986,7 +1986,7 @@ var RedisClient = function(j_val) {
       }
     });
       return that;
-    } else utils.invalidArgs();
+    } else throw new TypeError('function invoked with invalid arguments');
   };
 
   /**
@@ -2008,7 +2008,7 @@ var RedisClient = function(j_val) {
       }
     });
       return that;
-    } else utils.invalidArgs();
+    } else throw new TypeError('function invoked with invalid arguments');
   };
 
   /**
@@ -2030,7 +2030,7 @@ var RedisClient = function(j_val) {
       }
     });
       return that;
-    } else utils.invalidArgs();
+    } else throw new TypeError('function invoked with invalid arguments');
   };
 
   /**
@@ -2053,7 +2053,7 @@ var RedisClient = function(j_val) {
       }
     });
       return that;
-    } else utils.invalidArgs();
+    } else throw new TypeError('function invoked with invalid arguments');
   };
 
   /**
@@ -2076,7 +2076,7 @@ var RedisClient = function(j_val) {
       }
     });
       return that;
-    } else utils.invalidArgs();
+    } else throw new TypeError('function invoked with invalid arguments');
   };
 
   /**
@@ -2097,7 +2097,7 @@ var RedisClient = function(j_val) {
       }
     });
       return that;
-    } else utils.invalidArgs();
+    } else throw new TypeError('function invoked with invalid arguments');
   };
 
   /**
@@ -2119,7 +2119,7 @@ var RedisClient = function(j_val) {
       }
     });
       return that;
-    } else utils.invalidArgs();
+    } else throw new TypeError('function invoked with invalid arguments');
   };
 
   /**
@@ -2141,7 +2141,7 @@ var RedisClient = function(j_val) {
       }
     });
       return that;
-    } else utils.invalidArgs();
+    } else throw new TypeError('function invoked with invalid arguments');
   };
 
   /**
@@ -2162,7 +2162,7 @@ var RedisClient = function(j_val) {
       }
     });
       return that;
-    } else utils.invalidArgs();
+    } else throw new TypeError('function invoked with invalid arguments');
   };
 
   /**
@@ -2185,7 +2185,7 @@ var RedisClient = function(j_val) {
       }
     });
       return that;
-    } else utils.invalidArgs();
+    } else throw new TypeError('function invoked with invalid arguments');
   };
 
   /**
@@ -2210,7 +2210,7 @@ var RedisClient = function(j_val) {
       }
     });
       return that;
-    } else utils.invalidArgs();
+    } else throw new TypeError('function invoked with invalid arguments');
   };
 
   /**
@@ -2232,7 +2232,7 @@ var RedisClient = function(j_val) {
       }
     });
       return that;
-    } else utils.invalidArgs();
+    } else throw new TypeError('function invoked with invalid arguments');
   };
 
   /**
@@ -2254,7 +2254,7 @@ var RedisClient = function(j_val) {
       }
     });
       return that;
-    } else utils.invalidArgs();
+    } else throw new TypeError('function invoked with invalid arguments');
   };
 
   /**
@@ -2277,7 +2277,7 @@ var RedisClient = function(j_val) {
       }
     });
       return that;
-    } else utils.invalidArgs();
+    } else throw new TypeError('function invoked with invalid arguments');
   };
 
   /**
@@ -2300,7 +2300,7 @@ var RedisClient = function(j_val) {
       }
     });
       return that;
-    } else utils.invalidArgs();
+    } else throw new TypeError('function invoked with invalid arguments');
   };
 
   /**
@@ -2323,7 +2323,7 @@ var RedisClient = function(j_val) {
       }
     });
       return that;
-    } else utils.invalidArgs();
+    } else throw new TypeError('function invoked with invalid arguments');
   };
 
   /**
@@ -2347,7 +2347,7 @@ var RedisClient = function(j_val) {
       }
     });
       return that;
-    } else utils.invalidArgs();
+    } else throw new TypeError('function invoked with invalid arguments');
   };
 
   /**
@@ -2371,7 +2371,7 @@ var RedisClient = function(j_val) {
       }
     });
       return that;
-    } else utils.invalidArgs();
+    } else throw new TypeError('function invoked with invalid arguments');
   };
 
   /**
@@ -2395,7 +2395,7 @@ var RedisClient = function(j_val) {
       }
     });
       return that;
-    } else utils.invalidArgs();
+    } else throw new TypeError('function invoked with invalid arguments');
   };
 
   /**
@@ -2419,7 +2419,7 @@ var RedisClient = function(j_val) {
       }
     });
       return that;
-    } else utils.invalidArgs();
+    } else throw new TypeError('function invoked with invalid arguments');
   };
 
   /**
@@ -2441,7 +2441,7 @@ var RedisClient = function(j_val) {
       }
     });
       return that;
-    } else utils.invalidArgs();
+    } else throw new TypeError('function invoked with invalid arguments');
   };
 
   /**
@@ -2463,7 +2463,7 @@ var RedisClient = function(j_val) {
       }
     });
       return that;
-    } else utils.invalidArgs();
+    } else throw new TypeError('function invoked with invalid arguments');
   };
 
   /**
@@ -2490,7 +2490,7 @@ var RedisClient = function(j_val) {
       }
     });
       return that;
-    } else utils.invalidArgs();
+    } else throw new TypeError('function invoked with invalid arguments');
   };
 
   /**
@@ -2511,7 +2511,7 @@ var RedisClient = function(j_val) {
       }
     });
       return that;
-    } else utils.invalidArgs();
+    } else throw new TypeError('function invoked with invalid arguments');
   };
 
   /**
@@ -2534,7 +2534,7 @@ var RedisClient = function(j_val) {
       }
     });
       return that;
-    } else utils.invalidArgs();
+    } else throw new TypeError('function invoked with invalid arguments');
   };
 
   /**
@@ -2556,7 +2556,7 @@ var RedisClient = function(j_val) {
       }
     });
       return that;
-    } else utils.invalidArgs();
+    } else throw new TypeError('function invoked with invalid arguments');
   };
 
   /**
@@ -2578,7 +2578,7 @@ var RedisClient = function(j_val) {
       }
     });
       return that;
-    } else utils.invalidArgs();
+    } else throw new TypeError('function invoked with invalid arguments');
   };
 
   /**
@@ -2599,7 +2599,7 @@ var RedisClient = function(j_val) {
       }
     });
       return that;
-    } else utils.invalidArgs();
+    } else throw new TypeError('function invoked with invalid arguments');
   };
 
   /**
@@ -2622,7 +2622,7 @@ var RedisClient = function(j_val) {
       }
     });
       return that;
-    } else utils.invalidArgs();
+    } else throw new TypeError('function invoked with invalid arguments');
   };
 
   /**
@@ -2644,7 +2644,7 @@ var RedisClient = function(j_val) {
       }
     });
       return that;
-    } else utils.invalidArgs();
+    } else throw new TypeError('function invoked with invalid arguments');
   };
 
   /**
@@ -2667,7 +2667,7 @@ var RedisClient = function(j_val) {
       }
     });
       return that;
-    } else utils.invalidArgs();
+    } else throw new TypeError('function invoked with invalid arguments');
   };
 
   /**
@@ -2690,7 +2690,7 @@ var RedisClient = function(j_val) {
       }
     });
       return that;
-    } else utils.invalidArgs();
+    } else throw new TypeError('function invoked with invalid arguments');
   };
 
   /**
@@ -2713,7 +2713,7 @@ var RedisClient = function(j_val) {
       }
     });
       return that;
-    } else utils.invalidArgs();
+    } else throw new TypeError('function invoked with invalid arguments');
   };
 
   /**
@@ -2736,7 +2736,7 @@ var RedisClient = function(j_val) {
       }
     });
       return that;
-    } else utils.invalidArgs();
+    } else throw new TypeError('function invoked with invalid arguments');
   };
 
   /**
@@ -2758,7 +2758,7 @@ var RedisClient = function(j_val) {
       }
     });
       return that;
-    } else utils.invalidArgs();
+    } else throw new TypeError('function invoked with invalid arguments');
   };
 
   /**
@@ -2780,7 +2780,7 @@ var RedisClient = function(j_val) {
       }
     });
       return that;
-    } else utils.invalidArgs();
+    } else throw new TypeError('function invoked with invalid arguments');
   };
 
   /**
@@ -2803,7 +2803,7 @@ var RedisClient = function(j_val) {
       }
     });
       return that;
-    } else utils.invalidArgs();
+    } else throw new TypeError('function invoked with invalid arguments');
   };
 
   /**
@@ -2824,7 +2824,7 @@ var RedisClient = function(j_val) {
       }
     });
       return that;
-    } else utils.invalidArgs();
+    } else throw new TypeError('function invoked with invalid arguments');
   };
 
   /**
@@ -2848,7 +2848,7 @@ var RedisClient = function(j_val) {
       }
     });
       return that;
-    } else utils.invalidArgs();
+    } else throw new TypeError('function invoked with invalid arguments');
   };
 
   /**
@@ -2870,7 +2870,7 @@ var RedisClient = function(j_val) {
       }
     });
       return that;
-    } else utils.invalidArgs();
+    } else throw new TypeError('function invoked with invalid arguments');
   };
 
   /**
@@ -2892,7 +2892,7 @@ var RedisClient = function(j_val) {
       }
     });
       return that;
-    } else utils.invalidArgs();
+    } else throw new TypeError('function invoked with invalid arguments');
   };
 
   /**
@@ -2914,7 +2914,7 @@ var RedisClient = function(j_val) {
       }
     });
       return that;
-    } else utils.invalidArgs();
+    } else throw new TypeError('function invoked with invalid arguments');
   };
 
   /**
@@ -2936,7 +2936,7 @@ var RedisClient = function(j_val) {
       }
     });
       return that;
-    } else utils.invalidArgs();
+    } else throw new TypeError('function invoked with invalid arguments');
   };
 
   /**
@@ -2957,7 +2957,7 @@ var RedisClient = function(j_val) {
       }
     });
       return that;
-    } else utils.invalidArgs();
+    } else throw new TypeError('function invoked with invalid arguments');
   };
 
   /**
@@ -2979,7 +2979,7 @@ var RedisClient = function(j_val) {
       }
     });
       return that;
-    } else utils.invalidArgs();
+    } else throw new TypeError('function invoked with invalid arguments');
   };
 
   /**
@@ -3002,7 +3002,7 @@ var RedisClient = function(j_val) {
       }
     });
       return that;
-    } else utils.invalidArgs();
+    } else throw new TypeError('function invoked with invalid arguments');
   };
 
   /**
@@ -3024,7 +3024,7 @@ var RedisClient = function(j_val) {
       }
     });
       return that;
-    } else utils.invalidArgs();
+    } else throw new TypeError('function invoked with invalid arguments');
   };
 
   /**
@@ -3045,7 +3045,7 @@ var RedisClient = function(j_val) {
       }
     });
       return that;
-    } else utils.invalidArgs();
+    } else throw new TypeError('function invoked with invalid arguments');
   };
 
   /**
@@ -3068,7 +3068,7 @@ var RedisClient = function(j_val) {
       }
     });
       return that;
-    } else utils.invalidArgs();
+    } else throw new TypeError('function invoked with invalid arguments');
   };
 
   /**
@@ -3091,7 +3091,7 @@ var RedisClient = function(j_val) {
       }
     });
       return that;
-    } else utils.invalidArgs();
+    } else throw new TypeError('function invoked with invalid arguments');
   };
 
   /**
@@ -3115,7 +3115,7 @@ var RedisClient = function(j_val) {
       }
     });
       return that;
-    } else utils.invalidArgs();
+    } else throw new TypeError('function invoked with invalid arguments');
   };
 
   /**
@@ -3136,7 +3136,7 @@ var RedisClient = function(j_val) {
       }
     });
       return that;
-    } else utils.invalidArgs();
+    } else throw new TypeError('function invoked with invalid arguments');
   };
 
   /**
@@ -3158,7 +3158,7 @@ var RedisClient = function(j_val) {
       }
     });
       return that;
-    } else utils.invalidArgs();
+    } else throw new TypeError('function invoked with invalid arguments');
   };
 
   /**
@@ -3181,7 +3181,7 @@ var RedisClient = function(j_val) {
       }
     });
       return that;
-    } else utils.invalidArgs();
+    } else throw new TypeError('function invoked with invalid arguments');
   };
 
   /**
@@ -3204,7 +3204,7 @@ var RedisClient = function(j_val) {
       }
     });
       return that;
-    } else utils.invalidArgs();
+    } else throw new TypeError('function invoked with invalid arguments');
   };
 
   /**
@@ -3227,7 +3227,7 @@ var RedisClient = function(j_val) {
       }
     });
       return that;
-    } else utils.invalidArgs();
+    } else throw new TypeError('function invoked with invalid arguments');
   };
 
   /**
@@ -3250,7 +3250,7 @@ var RedisClient = function(j_val) {
       }
     });
       return that;
-    } else utils.invalidArgs();
+    } else throw new TypeError('function invoked with invalid arguments');
   };
 
   /**
@@ -3273,7 +3273,7 @@ var RedisClient = function(j_val) {
       }
     });
       return that;
-    } else utils.invalidArgs();
+    } else throw new TypeError('function invoked with invalid arguments');
   };
 
   /**
@@ -3296,7 +3296,7 @@ var RedisClient = function(j_val) {
       }
     });
       return that;
-    } else utils.invalidArgs();
+    } else throw new TypeError('function invoked with invalid arguments');
   };
 
   /**
@@ -3317,7 +3317,7 @@ var RedisClient = function(j_val) {
       }
     });
       return that;
-    } else utils.invalidArgs();
+    } else throw new TypeError('function invoked with invalid arguments');
   };
 
   /**
@@ -3339,7 +3339,7 @@ var RedisClient = function(j_val) {
       }
     });
       return that;
-    } else utils.invalidArgs();
+    } else throw new TypeError('function invoked with invalid arguments');
   };
 
   /**
@@ -3361,7 +3361,7 @@ var RedisClient = function(j_val) {
       }
     });
       return that;
-    } else utils.invalidArgs();
+    } else throw new TypeError('function invoked with invalid arguments');
   };
 
   /**
@@ -3383,7 +3383,7 @@ var RedisClient = function(j_val) {
       }
     });
       return that;
-    } else utils.invalidArgs();
+    } else throw new TypeError('function invoked with invalid arguments');
   };
 
   /**
@@ -3404,7 +3404,7 @@ var RedisClient = function(j_val) {
       }
     });
       return that;
-    } else utils.invalidArgs();
+    } else throw new TypeError('function invoked with invalid arguments');
   };
 
   /**
@@ -3425,7 +3425,7 @@ var RedisClient = function(j_val) {
       }
     });
       return that;
-    } else utils.invalidArgs();
+    } else throw new TypeError('function invoked with invalid arguments');
   };
 
   /**
@@ -3447,7 +3447,7 @@ var RedisClient = function(j_val) {
       }
     });
       return that;
-    } else utils.invalidArgs();
+    } else throw new TypeError('function invoked with invalid arguments');
   };
 
   /**
@@ -3470,7 +3470,7 @@ var RedisClient = function(j_val) {
       }
     });
       return that;
-    } else utils.invalidArgs();
+    } else throw new TypeError('function invoked with invalid arguments');
   };
 
   /**
@@ -3494,7 +3494,7 @@ var RedisClient = function(j_val) {
       }
     });
       return that;
-    } else utils.invalidArgs();
+    } else throw new TypeError('function invoked with invalid arguments');
   };
 
   /**
@@ -3516,7 +3516,7 @@ var RedisClient = function(j_val) {
       }
     });
       return that;
-    } else utils.invalidArgs();
+    } else throw new TypeError('function invoked with invalid arguments');
   };
 
   /**
@@ -3539,7 +3539,7 @@ var RedisClient = function(j_val) {
       }
     });
       return that;
-    } else utils.invalidArgs();
+    } else throw new TypeError('function invoked with invalid arguments');
   };
 
   /**
@@ -3563,7 +3563,7 @@ var RedisClient = function(j_val) {
       }
     });
       return that;
-    } else utils.invalidArgs();
+    } else throw new TypeError('function invoked with invalid arguments');
   };
 
   /**
@@ -3586,7 +3586,7 @@ var RedisClient = function(j_val) {
       }
     });
       return that;
-    } else utils.invalidArgs();
+    } else throw new TypeError('function invoked with invalid arguments');
   };
 
   /**
@@ -3610,7 +3610,7 @@ var RedisClient = function(j_val) {
       }
     });
       return that;
-    } else utils.invalidArgs();
+    } else throw new TypeError('function invoked with invalid arguments');
   };
 
   /**
@@ -3634,7 +3634,7 @@ var RedisClient = function(j_val) {
       }
     });
       return that;
-    } else utils.invalidArgs();
+    } else throw new TypeError('function invoked with invalid arguments');
   };
 
   /**
@@ -3657,7 +3657,7 @@ var RedisClient = function(j_val) {
       }
     });
       return that;
-    } else utils.invalidArgs();
+    } else throw new TypeError('function invoked with invalid arguments');
   };
 
   /**
@@ -3681,7 +3681,7 @@ var RedisClient = function(j_val) {
       }
     });
       return that;
-    } else utils.invalidArgs();
+    } else throw new TypeError('function invoked with invalid arguments');
   };
 
   /**
@@ -3703,7 +3703,7 @@ var RedisClient = function(j_val) {
       }
     });
       return that;
-    } else utils.invalidArgs();
+    } else throw new TypeError('function invoked with invalid arguments');
   };
 
   /**
@@ -3726,7 +3726,7 @@ var RedisClient = function(j_val) {
       }
     });
       return that;
-    } else utils.invalidArgs();
+    } else throw new TypeError('function invoked with invalid arguments');
   };
 
   /**
@@ -3749,7 +3749,7 @@ var RedisClient = function(j_val) {
       }
     });
       return that;
-    } else utils.invalidArgs();
+    } else throw new TypeError('function invoked with invalid arguments');
   };
 
   /**
@@ -3772,7 +3772,7 @@ var RedisClient = function(j_val) {
       }
     });
       return that;
-    } else utils.invalidArgs();
+    } else throw new TypeError('function invoked with invalid arguments');
   };
 
   /**
@@ -3793,7 +3793,7 @@ var RedisClient = function(j_val) {
       }
     });
       return that;
-    } else utils.invalidArgs();
+    } else throw new TypeError('function invoked with invalid arguments');
   };
 
   /**
@@ -3815,7 +3815,7 @@ var RedisClient = function(j_val) {
       }
     });
       return that;
-    } else utils.invalidArgs();
+    } else throw new TypeError('function invoked with invalid arguments');
   };
 
   /**
@@ -3836,7 +3836,7 @@ var RedisClient = function(j_val) {
       }
     });
       return that;
-    } else utils.invalidArgs();
+    } else throw new TypeError('function invoked with invalid arguments');
   };
 
   /**
@@ -3857,7 +3857,7 @@ var RedisClient = function(j_val) {
       }
     });
       return that;
-    } else utils.invalidArgs();
+    } else throw new TypeError('function invoked with invalid arguments');
   };
 
   /**
@@ -3879,7 +3879,7 @@ var RedisClient = function(j_val) {
       }
     });
       return that;
-    } else utils.invalidArgs();
+    } else throw new TypeError('function invoked with invalid arguments');
   };
 
   /**
@@ -3903,7 +3903,7 @@ var RedisClient = function(j_val) {
       }
     });
       return that;
-    } else utils.invalidArgs();
+    } else throw new TypeError('function invoked with invalid arguments');
   };
 
   /**
@@ -3926,7 +3926,7 @@ var RedisClient = function(j_val) {
       }
     });
       return that;
-    } else utils.invalidArgs();
+    } else throw new TypeError('function invoked with invalid arguments');
   };
 
   /**
@@ -3948,7 +3948,7 @@ var RedisClient = function(j_val) {
       }
     });
       return that;
-    } else utils.invalidArgs();
+    } else throw new TypeError('function invoked with invalid arguments');
   };
 
   /**
@@ -3971,7 +3971,7 @@ var RedisClient = function(j_val) {
       }
     });
       return that;
-    } else utils.invalidArgs();
+    } else throw new TypeError('function invoked with invalid arguments');
   };
 
   /**
@@ -3993,7 +3993,7 @@ var RedisClient = function(j_val) {
       }
     });
       return that;
-    } else utils.invalidArgs();
+    } else throw new TypeError('function invoked with invalid arguments');
   };
 
   /**
@@ -4016,7 +4016,7 @@ var RedisClient = function(j_val) {
       }
     });
       return that;
-    } else utils.invalidArgs();
+    } else throw new TypeError('function invoked with invalid arguments');
   };
 
   /**
@@ -4039,7 +4039,7 @@ var RedisClient = function(j_val) {
       }
     });
       return that;
-    } else utils.invalidArgs();
+    } else throw new TypeError('function invoked with invalid arguments');
   };
 
   /**
@@ -4062,7 +4062,7 @@ var RedisClient = function(j_val) {
       }
     });
       return that;
-    } else utils.invalidArgs();
+    } else throw new TypeError('function invoked with invalid arguments');
   };
 
   /**
@@ -4084,7 +4084,7 @@ var RedisClient = function(j_val) {
       }
     });
       return that;
-    } else utils.invalidArgs();
+    } else throw new TypeError('function invoked with invalid arguments');
   };
 
   /**
@@ -4106,7 +4106,7 @@ var RedisClient = function(j_val) {
       }
     });
       return that;
-    } else utils.invalidArgs();
+    } else throw new TypeError('function invoked with invalid arguments');
   };
 
   /**
@@ -4128,7 +4128,7 @@ var RedisClient = function(j_val) {
       }
     });
       return that;
-    } else utils.invalidArgs();
+    } else throw new TypeError('function invoked with invalid arguments');
   };
 
   /**
@@ -4150,7 +4150,7 @@ var RedisClient = function(j_val) {
       }
     });
       return that;
-    } else utils.invalidArgs();
+    } else throw new TypeError('function invoked with invalid arguments');
   };
 
   /**
@@ -4173,7 +4173,7 @@ var RedisClient = function(j_val) {
       }
     });
       return that;
-    } else utils.invalidArgs();
+    } else throw new TypeError('function invoked with invalid arguments');
   };
 
   /**
@@ -4194,7 +4194,7 @@ var RedisClient = function(j_val) {
       }
     });
       return that;
-    } else utils.invalidArgs();
+    } else throw new TypeError('function invoked with invalid arguments');
   };
 
   /**
@@ -4215,7 +4215,7 @@ var RedisClient = function(j_val) {
       }
     });
       return that;
-    } else utils.invalidArgs();
+    } else throw new TypeError('function invoked with invalid arguments');
   };
 
   /**
@@ -4237,7 +4237,7 @@ var RedisClient = function(j_val) {
       }
     });
       return that;
-    } else utils.invalidArgs();
+    } else throw new TypeError('function invoked with invalid arguments');
   };
 
   /**
@@ -4259,7 +4259,7 @@ var RedisClient = function(j_val) {
       }
     });
       return that;
-    } else utils.invalidArgs();
+    } else throw new TypeError('function invoked with invalid arguments');
   };
 
   /**
@@ -4281,7 +4281,7 @@ var RedisClient = function(j_val) {
       }
     });
       return that;
-    } else utils.invalidArgs();
+    } else throw new TypeError('function invoked with invalid arguments');
   };
 
   /**
@@ -4302,7 +4302,7 @@ var RedisClient = function(j_val) {
       }
     });
       return that;
-    } else utils.invalidArgs();
+    } else throw new TypeError('function invoked with invalid arguments');
   };
 
   /**
@@ -4325,7 +4325,7 @@ var RedisClient = function(j_val) {
       }
     });
       return that;
-    } else utils.invalidArgs();
+    } else throw new TypeError('function invoked with invalid arguments');
   };
 
   /**
@@ -4347,7 +4347,7 @@ var RedisClient = function(j_val) {
       }
     });
       return that;
-    } else utils.invalidArgs();
+    } else throw new TypeError('function invoked with invalid arguments');
   };
 
   /**
@@ -4369,7 +4369,7 @@ var RedisClient = function(j_val) {
       }
     });
       return that;
-    } else utils.invalidArgs();
+    } else throw new TypeError('function invoked with invalid arguments');
   };
 
   /**
@@ -4393,7 +4393,7 @@ var RedisClient = function(j_val) {
       }
     });
       return that;
-    } else utils.invalidArgs();
+    } else throw new TypeError('function invoked with invalid arguments');
   };
 
   /**
@@ -4416,7 +4416,7 @@ var RedisClient = function(j_val) {
       }
     });
       return that;
-    } else utils.invalidArgs();
+    } else throw new TypeError('function invoked with invalid arguments');
   };
 
   /**
@@ -4438,7 +4438,7 @@ var RedisClient = function(j_val) {
       }
     });
       return that;
-    } else utils.invalidArgs();
+    } else throw new TypeError('function invoked with invalid arguments');
   };
 
   /**
@@ -4462,7 +4462,7 @@ var RedisClient = function(j_val) {
       }
     });
       return that;
-    } else utils.invalidArgs();
+    } else throw new TypeError('function invoked with invalid arguments');
   };
 
   /**
@@ -4486,7 +4486,7 @@ var RedisClient = function(j_val) {
       }
     });
       return that;
-    } else utils.invalidArgs();
+    } else throw new TypeError('function invoked with invalid arguments');
   };
 
   /**
@@ -4510,7 +4510,7 @@ var RedisClient = function(j_val) {
       }
     });
       return that;
-    } else utils.invalidArgs();
+    } else throw new TypeError('function invoked with invalid arguments');
   };
 
   /**
@@ -4534,7 +4534,7 @@ var RedisClient = function(j_val) {
       }
     });
       return that;
-    } else utils.invalidArgs();
+    } else throw new TypeError('function invoked with invalid arguments');
   };
 
   /**
@@ -4558,7 +4558,7 @@ var RedisClient = function(j_val) {
       }
     });
       return that;
-    } else utils.invalidArgs();
+    } else throw new TypeError('function invoked with invalid arguments');
   };
 
   /**
@@ -4582,7 +4582,7 @@ var RedisClient = function(j_val) {
       }
     });
       return that;
-    } else utils.invalidArgs();
+    } else throw new TypeError('function invoked with invalid arguments');
   };
 
   /**
@@ -4607,7 +4607,7 @@ var RedisClient = function(j_val) {
       }
     });
       return that;
-    } else utils.invalidArgs();
+    } else throw new TypeError('function invoked with invalid arguments');
   };
 
   /**
@@ -4632,7 +4632,7 @@ var RedisClient = function(j_val) {
       }
     });
       return that;
-    } else utils.invalidArgs();
+    } else throw new TypeError('function invoked with invalid arguments');
   };
 
   /**
@@ -4657,7 +4657,7 @@ var RedisClient = function(j_val) {
       }
     });
       return that;
-    } else utils.invalidArgs();
+    } else throw new TypeError('function invoked with invalid arguments');
   };
 
   /**
@@ -4680,7 +4680,7 @@ var RedisClient = function(j_val) {
       }
     });
       return that;
-    } else utils.invalidArgs();
+    } else throw new TypeError('function invoked with invalid arguments');
   };
 
   /**
@@ -4703,7 +4703,7 @@ var RedisClient = function(j_val) {
       }
     });
       return that;
-    } else utils.invalidArgs();
+    } else throw new TypeError('function invoked with invalid arguments');
   };
 
   /**
@@ -4726,7 +4726,7 @@ var RedisClient = function(j_val) {
       }
     });
       return that;
-    } else utils.invalidArgs();
+    } else throw new TypeError('function invoked with invalid arguments');
   };
 
   /**
@@ -4750,7 +4750,7 @@ var RedisClient = function(j_val) {
       }
     });
       return that;
-    } else utils.invalidArgs();
+    } else throw new TypeError('function invoked with invalid arguments');
   };
 
   /**
@@ -4774,7 +4774,7 @@ var RedisClient = function(j_val) {
       }
     });
       return that;
-    } else utils.invalidArgs();
+    } else throw new TypeError('function invoked with invalid arguments');
   };
 
   /**
@@ -4798,7 +4798,7 @@ var RedisClient = function(j_val) {
       }
     });
       return that;
-    } else utils.invalidArgs();
+    } else throw new TypeError('function invoked with invalid arguments');
   };
 
   /**
@@ -4823,7 +4823,7 @@ var RedisClient = function(j_val) {
       }
     });
       return that;
-    } else utils.invalidArgs();
+    } else throw new TypeError('function invoked with invalid arguments');
   };
 
   /**
@@ -4848,7 +4848,7 @@ var RedisClient = function(j_val) {
       }
     });
       return that;
-    } else utils.invalidArgs();
+    } else throw new TypeError('function invoked with invalid arguments');
   };
 
   /**
@@ -4873,7 +4873,7 @@ var RedisClient = function(j_val) {
       }
     });
       return that;
-    } else utils.invalidArgs();
+    } else throw new TypeError('function invoked with invalid arguments');
   };
 
   /**
@@ -4896,7 +4896,7 @@ var RedisClient = function(j_val) {
       }
     });
       return that;
-    } else utils.invalidArgs();
+    } else throw new TypeError('function invoked with invalid arguments');
   };
 
   /**
@@ -4919,7 +4919,7 @@ var RedisClient = function(j_val) {
       }
     });
       return that;
-    } else utils.invalidArgs();
+    } else throw new TypeError('function invoked with invalid arguments');
   };
 
   /**
@@ -4943,7 +4943,7 @@ var RedisClient = function(j_val) {
       }
     });
       return that;
-    } else utils.invalidArgs();
+    } else throw new TypeError('function invoked with invalid arguments');
   };
 
   /**
@@ -4967,7 +4967,7 @@ var RedisClient = function(j_val) {
       }
     });
       return that;
-    } else utils.invalidArgs();
+    } else throw new TypeError('function invoked with invalid arguments');
   };
 
   /**
@@ -4990,7 +4990,7 @@ var RedisClient = function(j_val) {
       }
     });
       return that;
-    } else utils.invalidArgs();
+    } else throw new TypeError('function invoked with invalid arguments');
   };
 
   /**
@@ -5014,7 +5014,7 @@ var RedisClient = function(j_val) {
       }
     });
       return that;
-    } else utils.invalidArgs();
+    } else throw new TypeError('function invoked with invalid arguments');
   };
 
   /**
@@ -5038,7 +5038,7 @@ var RedisClient = function(j_val) {
       }
     });
       return that;
-    } else utils.invalidArgs();
+    } else throw new TypeError('function invoked with invalid arguments');
   };
 
   /**
@@ -5062,7 +5062,7 @@ var RedisClient = function(j_val) {
       }
     });
       return that;
-    } else utils.invalidArgs();
+    } else throw new TypeError('function invoked with invalid arguments');
   };
 
   // A reference to the underlying Java delegate
@@ -5084,7 +5084,7 @@ RedisClient.create = function() {
     return utils.convReturnVertxGen(JRedisClient["create(io.vertx.core.Vertx)"](__args[0]._jdel), RedisClient);
   }else if (__args.length === 2 && typeof __args[0] === 'object' && __args[0]._jdel && typeof __args[1] === 'object') {
     return utils.convReturnVertxGen(JRedisClient["create(io.vertx.core.Vertx,io.vertx.redis.RedisOptions)"](__args[0]._jdel, __args[1] != null ? new RedisOptions(new JsonObject(JSON.stringify(__args[1]))) : null), RedisClient);
-  } else utils.invalidArgs();
+  } else throw new TypeError('function invoked with invalid arguments');
 };
 
 // We export the Constructor function
