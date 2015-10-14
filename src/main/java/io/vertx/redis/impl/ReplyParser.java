@@ -128,11 +128,12 @@ public class ReplyParser implements Handler<Buffer> {
       Reply res;
 
       for (int i = 0; i < packetSize; i++) {
-        ntype = _buffer.getByte(_offset++);
-
-        if (_offset > _buffer.length()) {
+        if (_offset + 1 >= _buffer.length()) {
           throw new IndexOutOfBoundsException("Wait for more data.");
         }
+
+        ntype = _buffer.getByte(_offset++);
+
         res = parseResult(ntype);
         reply.set(i, res);
       }
