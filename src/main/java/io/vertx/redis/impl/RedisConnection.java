@@ -25,6 +25,8 @@ import io.vertx.core.net.NetSocket;
 import io.vertx.redis.RedisOptions;
 
 import java.nio.charset.Charset;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Queue;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
@@ -275,7 +277,10 @@ class RedisConnection {
   private synchronized void doAuth() {
     if (config.getAuth() != null) {
       // we need to authenticate first
-      Command<String> authCmd = new Command<>(RedisCommand.AUTH, new JsonArray().add(config.getAuth()), Charset.forName(config.getEncoding()), ResponseTransform.NONE, String.class).handler(auth -> {
+      final List<Object> args = new ArrayList<>();
+      args.add(config.getAuth());
+
+      Command<String> authCmd = new Command<>(RedisCommand.AUTH, args, Charset.forName(config.getEncoding()), ResponseTransform.NONE, String.class).handler(auth -> {
         if (auth.failed()) {
           Command<?> cmd;
 
@@ -306,7 +311,11 @@ class RedisConnection {
   private synchronized void doSelect() {
     // optionally there could be a select command
     if (config.getSelect() != null) {
-      Command<String> selectCmd = new Command<>(RedisCommand.SELECT, new JsonArray().add(config.getSelect()), Charset.forName(config.getEncoding()), ResponseTransform.NONE, String.class).handler(select -> {
+
+      final List<Object> args = new ArrayList<>();
+      args.add(config.getSelect());
+
+      Command<String> selectCmd = new Command<>(RedisCommand.SELECT, args, Charset.forName(config.getEncoding()), ResponseTransform.NONE, String.class).handler(select -> {
         if (select.failed()) {
           Command<?> cmd;
 

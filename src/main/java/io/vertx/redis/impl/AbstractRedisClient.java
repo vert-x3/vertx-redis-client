@@ -16,6 +16,7 @@
 package io.vertx.redis.impl;
 
 import io.vertx.core.*;
+import io.vertx.core.buffer.Buffer;
 import io.vertx.core.eventbus.EventBus;
 import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;
@@ -25,6 +26,7 @@ import io.vertx.redis.RedisClient;
 import io.vertx.redis.RedisOptions;
 
 import java.nio.charset.Charset;
+import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 
 public abstract class AbstractRedisClient implements RedisClient {
@@ -88,34 +90,34 @@ public abstract class AbstractRedisClient implements RedisClient {
     return ResponseTransform.NONE;
   }
 
-  final void sendString(final RedisCommand command, final JsonArray args, final Handler<AsyncResult<String>> resultHandler) {
+  final void sendString(final RedisCommand command, final List<?> args, final Handler<AsyncResult<String>> resultHandler) {
     send(command, args, String.class, resultHandler);
   }
 
-  final void sendLong(final RedisCommand command, final JsonArray args, final Handler<AsyncResult<Long>> resultHandler) {
+  final void sendLong(final RedisCommand command, final List<?> args, final Handler<AsyncResult<Long>> resultHandler) {
     send(command, args, Long.class, resultHandler);
   }
 
-  final void sendVoid(final RedisCommand command, final JsonArray args, final Handler<AsyncResult<Void>> resultHandler) {
+  final void sendVoid(final RedisCommand command, final List<?> args, final Handler<AsyncResult<Void>> resultHandler) {
     send(command, args, Void.class, resultHandler);
   }
 
-  final void sendJsonArray(final RedisCommand command, final JsonArray args, final Handler<AsyncResult<JsonArray>> resultHandler) {
+  final void sendJsonArray(final RedisCommand command, final List<?> args, final Handler<AsyncResult<JsonArray>> resultHandler) {
     send(command, args, JsonArray.class, resultHandler);
   }
 
-  final void sendJsonObject(final RedisCommand command, final JsonArray args, final Handler<AsyncResult<JsonObject>> resultHandler) {
+  final void sendJsonObject(final RedisCommand command, final List<?> args, final Handler<AsyncResult<JsonObject>> resultHandler) {
     send(command, args, JsonObject.class, resultHandler);
   }
 
-  final <T> void send(final RedisCommand command, final JsonArray redisArgs,
+  final <T> void send(final RedisCommand command, final List<?> redisArgs,
                       final Class<T> returnType,
                       final Handler<AsyncResult<T>> resultHandler) {
 
     send(command, redisArgs, returnType, false, resultHandler);
   }
 
-  final <T> void send(final RedisCommand command, final JsonArray redisArgs, final Class<T> returnType,
+  final <T> void send(final RedisCommand command, final List<?> redisArgs, final Class<T> returnType,
                       final boolean binary,
                       final Handler<AsyncResult<T>> resultHandler) {
 

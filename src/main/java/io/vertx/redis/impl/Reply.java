@@ -84,6 +84,10 @@ public final class Reply {
       return null;
     }
 
+    if (type == Buffer.class) {
+      return (T) data;
+    }
+
     if (type == JsonArray.class) {
       final JsonArray multi = new JsonArray();
 

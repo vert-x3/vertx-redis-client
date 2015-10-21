@@ -21,6 +21,7 @@ import io.vertx.codegen.annotations.VertxGen;
 import io.vertx.core.AsyncResult;
 import io.vertx.core.Handler;
 import io.vertx.core.Vertx;
+import io.vertx.core.buffer.Buffer;
 import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;
 import io.vertx.redis.impl.RedisClientImpl;
@@ -830,7 +831,7 @@ public interface RedisClient {
    * group: string
    */
   @Fluent
-  RedisClient getBinary(String key, Handler<AsyncResult<String>> handler);
+  RedisClient getBinary(String key, Handler<AsyncResult<Buffer>> handler);
 
   /**
    * Returns the bit value at offset in the string value stored at key
@@ -1833,7 +1834,7 @@ public interface RedisClient {
    * group: string
    */
   @Fluent
-  RedisClient setBinary(String key, String value, Handler<AsyncResult<Void>> handler);
+  RedisClient setBinary(String key, Buffer value, Handler<AsyncResult<Void>> handler);
 
   /**
    * Set the string value of a key
@@ -1846,7 +1847,7 @@ public interface RedisClient {
    * group: string
    */
   @Fluent
-  RedisClient setBinaryWithOptions(String key, String value, SetOptions options, Handler<AsyncResult<Void>> handler);
+  RedisClient setBinaryWithOptions(String key, Buffer value, SetOptions options, Handler<AsyncResult<Void>> handler);
 
   /**
    * Sets or clears the bit at offset in the string value stored at key

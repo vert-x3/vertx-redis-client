@@ -20,10 +20,10 @@ import io.vertx.core.Context;
 import io.vertx.core.Handler;
 import io.vertx.core.Vertx;
 import io.vertx.core.buffer.Buffer;
-import io.vertx.core.json.JsonArray;
 import io.vertx.core.streams.WriteStream;
 
 import java.nio.charset.Charset;
+import java.util.List;
 
 public class Command<T> {
 
@@ -83,7 +83,7 @@ public class Command<T> {
   private int expectedReplies = 1;
   private Handler<AsyncResult<T>> handler;
 
-  public Command(RedisCommand command, final JsonArray args, Charset encoding, ResponseTransform transform, Class<T> returnType) {
+  public Command(RedisCommand command, final List<?> args, Charset encoding, ResponseTransform transform, Class<T> returnType) {
     this.context = Vertx.currentContext();
     this.encoding = encoding.name();
 
@@ -112,7 +112,7 @@ public class Command<T> {
 
     // serialize arguments
     for (int i = 0; i < totalArgs; i++) {
-      appendToBuffer(args.getValue(i), encoding, buffer);
+      appendToBuffer(args.get(i), encoding, buffer);
     }
   }
 
