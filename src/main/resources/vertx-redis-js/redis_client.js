@@ -3590,6 +3590,30 @@ var RedisClient = function(j_val) {
   };
 
   /**
+   Set the string value of a key
+
+   @public
+   @param key {string} Key of which value to set 
+   @param value {string} New value for the key 
+   @param options {Object} Set options 
+   @param handler {function} Handler for the result of this call. 
+   @return {RedisClient}
+   */
+  this.setBinaryWithOptions = function(key, value, options, handler) {
+    var __args = arguments;
+    if (__args.length === 4 && typeof __args[0] === 'string' && typeof __args[1] === 'string' && typeof __args[2] === 'object' && typeof __args[3] === 'function') {
+      j_redisClient["setBinaryWithOptions(java.lang.String,java.lang.String,io.vertx.redis.op.SetOptions,io.vertx.core.Handler)"](key, value, options != null ? new SetOptions(new JsonObject(JSON.stringify(options))) : null, function(ar) {
+      if (ar.succeeded()) {
+        handler(null, null);
+      } else {
+        handler(null, ar.cause());
+      }
+    });
+      return that;
+    } else throw new TypeError('function invoked with invalid arguments');
+  };
+
+  /**
    Sets or clears the bit at offset in the string value stored at key
 
    @public

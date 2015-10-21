@@ -1836,6 +1836,19 @@ public interface RedisClient {
   RedisClient setBinary(String key, String value, Handler<AsyncResult<Void>> handler);
 
   /**
+   * Set the string value of a key
+   *
+   * @param key     Key of which value to set
+   * @param value   New value for the key
+   * @param options Set options
+   * @param handler Handler for the result of this call.
+   * @since 1.0.0
+   * group: string
+   */
+  @Fluent
+  RedisClient setBinaryWithOptions(String key, String value, SetOptions options, Handler<AsyncResult<Void>> handler);
+
+  /**
    * Sets or clears the bit at offset in the string value stored at key
    *
    * @param key     Key string
