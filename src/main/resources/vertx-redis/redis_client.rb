@@ -1838,6 +1838,19 @@ module VertxRedis
       end
       raise ArgumentError, "Invalid arguments when calling set_binary(key,value)"
     end
+    #  Set the string value of a key
+    # @param [String] key Key of which value to set
+    # @param [String] value New value for the key
+    # @param [Hash] options Set options
+    # @yield Handler for the result of this call.
+    # @return [self]
+    def set_binary_with_options(key=nil,value=nil,options=nil)
+      if key.class == String && value.class == String && options.class == Hash && block_given?
+        @j_del.java_method(:setBinaryWithOptions, [Java::java.lang.String.java_class,Java::java.lang.String.java_class,Java::IoVertxRedisOp::SetOptions.java_class,Java::IoVertxCore::Handler.java_class]).call(key,value,Java::IoVertxRedisOp::SetOptions.new(::Vertx::Util::Utils.to_json_object(options)),(Proc.new { |ar| yield(ar.failed ? ar.cause : nil) }))
+        return self
+      end
+      raise ArgumentError, "Invalid arguments when calling set_binary_with_options(key,value,options)"
+    end
     #  Sets or clears the bit at offset in the string value stored at key
     # @param [String] key Key string
     # @param [Fixnum] offset Bit offset

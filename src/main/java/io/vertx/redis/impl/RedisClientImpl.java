@@ -987,7 +987,13 @@ public final class RedisClientImpl extends AbstractRedisClient {
   public RedisClient setBinary(String key, String value, Handler<AsyncResult<Void>> handler) {
     send(SET, toPayload(key, value), Void.class, true, handler);
     return this;
-  } 
+  }
+
+  @Override
+  public RedisClient setBinaryWithOptions(String key, String value, SetOptions options, Handler<AsyncResult<Void>> handler) {
+    send(SET, toPayload(key, value, options != null ? options.toJsonArray() : null), Void.class, true, handler);
+    return this;
+  }
 
   @Override
   public RedisClient setbit(String key, long offset, int bit, Handler<AsyncResult<Long>> handler) {
