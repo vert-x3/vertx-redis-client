@@ -16,6 +16,7 @@
 
 /** @module vertx-redis-js/redis_client */
 var utils = require('vertx-js/util/utils');
+var Buffer = require('vertx-js/buffer');
 var Vertx = require('vertx-js/vertx');
 
 var io = Packages.io;
@@ -1610,7 +1611,7 @@ var RedisClient = function(j_val) {
     if (__args.length === 2 && typeof __args[0] === 'string' && typeof __args[1] === 'function') {
       j_redisClient["getBinary(java.lang.String,io.vertx.core.Handler)"](key, function(ar) {
       if (ar.succeeded()) {
-        handler(ar.result(), null);
+        handler(utils.convReturnVertxGen(ar.result(), Buffer), null);
       } else {
         handler(null, ar.cause());
       }
@@ -3571,14 +3572,14 @@ var RedisClient = function(j_val) {
 
    @public
    @param key {string} Key of which value to set 
-   @param value {string} New value for the key 
+   @param value {Buffer} New value for the key 
    @param handler {function} Handler for the result of this call. 
    @return {RedisClient}
    */
   this.setBinary = function(key, value, handler) {
     var __args = arguments;
-    if (__args.length === 3 && typeof __args[0] === 'string' && typeof __args[1] === 'string' && typeof __args[2] === 'function') {
-      j_redisClient["setBinary(java.lang.String,java.lang.String,io.vertx.core.Handler)"](key, value, function(ar) {
+    if (__args.length === 3 && typeof __args[0] === 'string' && typeof __args[1] === 'object' && __args[1]._jdel && typeof __args[2] === 'function') {
+      j_redisClient["setBinary(java.lang.String,io.vertx.core.buffer.Buffer,io.vertx.core.Handler)"](key, value._jdel, function(ar) {
       if (ar.succeeded()) {
         handler(null, null);
       } else {
@@ -3594,15 +3595,15 @@ var RedisClient = function(j_val) {
 
    @public
    @param key {string} Key of which value to set 
-   @param value {string} New value for the key 
+   @param value {Buffer} New value for the key 
    @param options {Object} Set options 
    @param handler {function} Handler for the result of this call. 
    @return {RedisClient}
    */
   this.setBinaryWithOptions = function(key, value, options, handler) {
     var __args = arguments;
-    if (__args.length === 4 && typeof __args[0] === 'string' && typeof __args[1] === 'string' && (typeof __args[2] === 'object' && __args[2] != null) && typeof __args[3] === 'function') {
-      j_redisClient["setBinaryWithOptions(java.lang.String,java.lang.String,io.vertx.redis.op.SetOptions,io.vertx.core.Handler)"](key, value, options != null ? new SetOptions(new JsonObject(JSON.stringify(options))) : null, function(ar) {
+    if (__args.length === 4 && typeof __args[0] === 'string' && typeof __args[1] === 'object' && __args[1]._jdel && (typeof __args[2] === 'object' && __args[2] != null) && typeof __args[3] === 'function') {
+      j_redisClient["setBinaryWithOptions(java.lang.String,io.vertx.core.buffer.Buffer,io.vertx.redis.op.SetOptions,io.vertx.core.Handler)"](key, value._jdel, options != null ? new SetOptions(new JsonObject(JSON.stringify(options))) : null, function(ar) {
       if (ar.succeeded()) {
         handler(null, null);
       } else {

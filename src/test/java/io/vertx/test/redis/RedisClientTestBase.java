@@ -15,6 +15,7 @@
  */
 package io.vertx.test.redis;
 
+import io.vertx.core.buffer.Buffer;
 import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;
 import io.vertx.redis.RedisClient;
@@ -1952,7 +1953,7 @@ public abstract class RedisClientTestBase extends VertxTestBase {
   public void testRestore() {
     final String mykey = makeKey();
     final String myotherkey = makeKey();
-    final String value = new String(new char[]{0xff, 0xf0, 0x00, 'A', 'B', 'C'});
+    final Buffer value = Buffer.buffer(new byte[]{(byte) 0xff, (byte) 0xf0, 0x00, 'A', 'B', 'C'});
     redis.setBinary(mykey, value, reply0 -> {
       assertTrue(reply0.succeeded());
       redis.dump(mykey, reply1 -> {
@@ -3264,15 +3265,14 @@ public abstract class RedisClientTestBase extends VertxTestBase {
   public void testBitpos() {
     final String key = makeKey();
     final byte[] value = new byte[]{(byte) 0xff, (byte) 0xf0, (byte) 0x00};
-    Charset charset = Charset.forName("iso-8859-1");
-    redis.setBinary(key, new String(value, charset), reply0 -> {
+    redis.setBinary(key, Buffer.buffer(value), reply0 -> {
       assertTrue(reply0.succeeded());
       redis.bitpos(key, 0, reply1 -> {
         assertTrue(String.valueOf(reply1.cause()), reply1.succeeded());
         assertEquals(12, reply1.result().longValue());
 
         final byte[] value2 = new byte[]{0, 0, 0};
-        redis.setBinary(key, new String(value2, charset), reply2 -> {
+        redis.setBinary(key, Buffer.buffer(value2), reply2 -> {
           assertTrue(reply2.succeeded());
           redis.bitpos(key, 1, reply3 -> {
             assertTrue(String.valueOf(reply3.cause()), reply3.succeeded());
@@ -3291,8 +3291,7 @@ public abstract class RedisClientTestBase extends VertxTestBase {
   public void testBitposFrom() {
     final String key = makeKey();
     final byte[] value = new byte[]{(byte) 0x00, (byte) 0xff, (byte) 0xf0};
-    Charset charset = Charset.forName("iso-8859-1");
-    redis.setBinary(key, new String(value, charset), reply0 -> {
+    redis.setBinary(key, Buffer.buffer(value), reply0 -> {
       assertTrue(reply0.succeeded());
       redis.bitposFrom(key, 1, 0, reply1 -> {
         assertTrue(String.valueOf(reply1.cause()), reply1.succeeded());
@@ -3315,12 +3314,11 @@ public abstract class RedisClientTestBase extends VertxTestBase {
     for (int i = 0; i < value.length; i++) {
       value[i] = (byte) i;
     }
-    Charset charset = Charset.forName("iso-8859-1");
-    redis.setBinary(key, new String(value, charset), reply0 -> {
+    redis.setBinary(key, Buffer.buffer(value), reply0 -> {
       assertTrue(reply0.succeeded());
       redis.getBinary(key, reply1 -> {
         assertTrue(String.valueOf(reply1.cause()), reply1.succeeded());
-        assertArrayEquals(value, reply1.result().getBytes(charset));
+        assertArrayEquals(value, reply1.result().getBytes());
 
         testComplete();
       });

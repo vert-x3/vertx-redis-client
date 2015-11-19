@@ -1,3 +1,4 @@
+require 'vertx/buffer'
 require 'vertx/vertx'
 require 'vertx/util/utils.rb'
 # Generated from io.vertx.redis.RedisClient
@@ -820,7 +821,7 @@ module VertxRedis
     # @return [self]
     def get_binary(key=nil)
       if key.class == String && block_given?
-        @j_del.java_method(:getBinary, [Java::java.lang.String.java_class,Java::IoVertxCore::Handler.java_class]).call(key,(Proc.new { |ar| yield(ar.failed ? ar.cause : nil, ar.succeeded ? ar.result : nil) }))
+        @j_del.java_method(:getBinary, [Java::java.lang.String.java_class,Java::IoVertxCore::Handler.java_class]).call(key,(Proc.new { |ar| yield(ar.failed ? ar.cause : nil, ar.succeeded ? ::Vertx::Util::Utils.safe_create(ar.result,::Vertx::Buffer) : nil) }))
         return self
       end
       raise ArgumentError, "Invalid arguments when calling get_binary(key)"
@@ -1828,25 +1829,25 @@ module VertxRedis
     end
     #  Set the binary string value of a key - without encoding as utf-8
     # @param [String] key Key of which value to set
-    # @param [String] value New value for the key
+    # @param [::Vertx::Buffer] value New value for the key
     # @yield Handler for the result of this call.
     # @return [self]
     def set_binary(key=nil,value=nil)
-      if key.class == String && value.class == String && block_given?
-        @j_del.java_method(:setBinary, [Java::java.lang.String.java_class,Java::java.lang.String.java_class,Java::IoVertxCore::Handler.java_class]).call(key,value,(Proc.new { |ar| yield(ar.failed ? ar.cause : nil) }))
+      if key.class == String && value.class.method_defined?(:j_del) && block_given?
+        @j_del.java_method(:setBinary, [Java::java.lang.String.java_class,Java::IoVertxCoreBuffer::Buffer.java_class,Java::IoVertxCore::Handler.java_class]).call(key,value.j_del,(Proc.new { |ar| yield(ar.failed ? ar.cause : nil) }))
         return self
       end
       raise ArgumentError, "Invalid arguments when calling set_binary(key,value)"
     end
     #  Set the string value of a key
     # @param [String] key Key of which value to set
-    # @param [String] value New value for the key
+    # @param [::Vertx::Buffer] value New value for the key
     # @param [Hash] options Set options
     # @yield Handler for the result of this call.
     # @return [self]
     def set_binary_with_options(key=nil,value=nil,options=nil)
-      if key.class == String && value.class == String && options.class == Hash && block_given?
-        @j_del.java_method(:setBinaryWithOptions, [Java::java.lang.String.java_class,Java::java.lang.String.java_class,Java::IoVertxRedisOp::SetOptions.java_class,Java::IoVertxCore::Handler.java_class]).call(key,value,Java::IoVertxRedisOp::SetOptions.new(::Vertx::Util::Utils.to_json_object(options)),(Proc.new { |ar| yield(ar.failed ? ar.cause : nil) }))
+      if key.class == String && value.class.method_defined?(:j_del) && options.class == Hash && block_given?
+        @j_del.java_method(:setBinaryWithOptions, [Java::java.lang.String.java_class,Java::IoVertxCoreBuffer::Buffer.java_class,Java::IoVertxRedisOp::SetOptions.java_class,Java::IoVertxCore::Handler.java_class]).call(key,value.j_del,Java::IoVertxRedisOp::SetOptions.new(::Vertx::Util::Utils.to_json_object(options)),(Proc.new { |ar| yield(ar.failed ? ar.cause : nil) }))
         return self
       end
       raise ArgumentError, "Invalid arguments when calling set_binary_with_options(key,value,options)"

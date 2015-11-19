@@ -19,16 +19,14 @@ import io.vertx.core.AsyncResult;
 import io.vertx.core.Future;
 import io.vertx.core.Handler;
 import io.vertx.core.Vertx;
+import io.vertx.core.buffer.Buffer;
 import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;
 import io.vertx.redis.RedisClient;
 import io.vertx.redis.RedisOptions;
 import io.vertx.redis.op.*;
 
-import java.util.Collection;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Stream;
 
 import static io.vertx.redis.impl.RedisCommand.*;
@@ -130,7 +128,7 @@ public final class RedisClientImpl extends AbstractRedisClient {
 
   @Override
   public RedisClient clientKill(KillFilter filter, Handler<AsyncResult<Long>> handler) {
-    sendLong(CLIENT_KILL, filter.toJsonArray(), handler);
+    sendLong(CLIENT_KILL, filter.toJsonArray().getList(), handler);
     return this;
   } 
 
@@ -463,8 +461,8 @@ public final class RedisClientImpl extends AbstractRedisClient {
   } 
 
   @Override
-  public RedisClient getBinary(String key, Handler<AsyncResult<String>> handler) {
-    send(GET, toPayload(key), String.class, true, handler);
+  public RedisClient getBinary(String key, Handler<AsyncResult<Buffer>> handler) {
+    send(GET, toPayload(key), Buffer.class, true, handler);
     return this;
   } 
 
@@ -590,7 +588,7 @@ public final class RedisClientImpl extends AbstractRedisClient {
 
   @Override
   public RedisClient info(Handler<AsyncResult<JsonObject>> handler) {
-    sendJsonObject(INFO, new JsonArray(), handler);
+    sendJsonObject(INFO, Collections.emptyList(), handler);
     return this;
   } 
 
@@ -984,13 +982,13 @@ public final class RedisClientImpl extends AbstractRedisClient {
   } 
 
   @Override
-  public RedisClient setBinary(String key, String value, Handler<AsyncResult<Void>> handler) {
+  public RedisClient setBinary(String key, Buffer value, Handler<AsyncResult<Void>> handler) {
     send(SET, toPayload(key, value), Void.class, true, handler);
     return this;
   }
 
   @Override
-  public RedisClient setBinaryWithOptions(String key, String value, SetOptions options, Handler<AsyncResult<Void>> handler) {
+  public RedisClient setBinaryWithOptions(String key, Buffer value, SetOptions options, Handler<AsyncResult<Void>> handler) {
     send(SET, toPayload(key, value, options != null ? options.toJsonArray() : null), Void.class, true, handler);
     return this;
   }
@@ -1394,8 +1392,9 @@ public final class RedisClientImpl extends AbstractRedisClient {
    * @return JsonArray that can be passed to send()
    */
   @SuppressWarnings("unchecked")
-  private static JsonArray toPayload(Object ... parameters) {
-    JsonArray result = new JsonArray();
+  private static List<?> toPayload(Object ... parameters) {
+    List<Object> result = new ArrayList<>(parameters.length);
+
     for (Object param: parameters) {
       // unwrap
       if (param instanceof JsonArray) {
@@ -1423,6 +1422,8 @@ public final class RedisClientImpl extends AbstractRedisClient {
             result.add(e);
           }
         });
+      } else if (param instanceof Buffer) {
+        result.add(((Buffer) param).getBytes());
       } else if (param != null) {
         result.add(param);
       }
