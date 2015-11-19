@@ -185,7 +185,11 @@ public class RedisOptions {
    * @return self
    */
   public RedisOptions setSelect(Integer select) {
-    json.put("select", select);
+    if (select != null) {
+      json.put("select", select);
+    } else {
+      json.remove("select");
+    }
     return this;
   }
 
