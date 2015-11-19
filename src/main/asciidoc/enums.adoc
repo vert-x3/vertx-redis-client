@@ -18,6 +18,22 @@
 |[[MAX]]`MAX`|-
 |===
 
+[[ResetOptions]]
+== ResetOptions
+
+++++
+ @author <a href="mailto:pmlopes@gmail.com">Paulo Lopes</a>
+++++
+'''
+
+[cols=">25%,75%"]
+[frame="topbot"]
+|===
+^|Name | Description
+|[[HARD]]`HARD`|-
+|[[SOFT]]`SOFT`|-
+|===
+
 [[BitOperation]]
 == BitOperation
 
@@ -34,22 +50,6 @@
 |[[OR]]`OR`|-
 |[[XOR]]`XOR`|-
 |[[NOT]]`NOT`|-
-|===
-
-[[ResetOptions]]
-== ResetOptions
-
-++++
- @author <a href="mailto:pmlopes@gmail.com">Paulo Lopes</a>
-++++
-'''
-
-[cols=">25%,75%"]
-[frame="topbot"]
-|===
-^|Name | Description
-|[[HARD]]`HARD`|-
-|[[SOFT]]`SOFT`|-
 |===
 
 [[ObjectCmd]]

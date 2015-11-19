@@ -184,8 +184,12 @@ public class RedisOptions {
    * @param select database id
    * @return self
    */
-  public RedisOptions setSelect(int select) {
-    json.put("select", select);
+  public RedisOptions setSelect(Integer select) {
+    if (select != null) {
+      json.put("select", select);
+    } else {
+      json.remove("select");
+    }
     return this;
   }
 
