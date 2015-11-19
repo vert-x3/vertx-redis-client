@@ -417,7 +417,7 @@ var RedisClient = function(j_val) {
    */
   this.clientKill = function(filter, handler) {
     var __args = arguments;
-    if (__args.length === 2 && typeof __args[0] === 'object' && typeof __args[1] === 'function') {
+    if (__args.length === 2 && (typeof __args[0] === 'object' && __args[0] != null) && typeof __args[1] === 'function') {
       j_redisClient["clientKill(io.vertx.redis.op.KillFilter,io.vertx.core.Handler)"](filter != null ? new KillFilter(new JsonObject(JSON.stringify(filter))) : null, function(ar) {
       if (ar.succeeded()) {
         handler(ar.result(), null);
@@ -1929,7 +1929,7 @@ var RedisClient = function(j_val) {
    */
   this.hmset = function(key, values, handler) {
     var __args = arguments;
-    if (__args.length === 3 && typeof __args[0] === 'string' && typeof __args[1] === 'object' && typeof __args[2] === 'function') {
+    if (__args.length === 3 && typeof __args[0] === 'string' && (typeof __args[1] === 'object' && __args[1] != null) && typeof __args[2] === 'function') {
       j_redisClient["hmset(java.lang.String,io.vertx.core.json.JsonObject,io.vertx.core.Handler)"](key, utils.convParamJsonObject(values), function(ar) {
       if (ar.succeeded()) {
         handler(ar.result(), null);
@@ -2481,7 +2481,7 @@ var RedisClient = function(j_val) {
    */
   this.migrate = function(host, port, key, destdb, timeout, options, handler) {
     var __args = arguments;
-    if (__args.length === 7 && typeof __args[0] === 'string' && typeof __args[1] ==='number' && typeof __args[2] === 'string' && typeof __args[3] ==='number' && typeof __args[4] ==='number' && typeof __args[5] === 'object' && typeof __args[6] === 'function') {
+    if (__args.length === 7 && typeof __args[0] === 'string' && typeof __args[1] ==='number' && typeof __args[2] === 'string' && typeof __args[3] ==='number' && typeof __args[4] ==='number' && (typeof __args[5] === 'object' && __args[5] != null) && typeof __args[6] === 'function') {
       j_redisClient["migrate(java.lang.String,int,java.lang.String,int,long,io.vertx.redis.op.MigrateOptions,io.vertx.core.Handler)"](host, port, key, destdb, timeout, options != null ? new MigrateOptions(new JsonObject(JSON.stringify(options))) : null, function(ar) {
       if (ar.succeeded()) {
         handler(ar.result(), null);
@@ -2547,7 +2547,7 @@ var RedisClient = function(j_val) {
    */
   this.mset = function(keyvals, handler) {
     var __args = arguments;
-    if (__args.length === 2 && typeof __args[0] === 'object' && typeof __args[1] === 'function') {
+    if (__args.length === 2 && (typeof __args[0] === 'object' && __args[0] != null) && typeof __args[1] === 'function') {
       j_redisClient["mset(io.vertx.core.json.JsonObject,io.vertx.core.Handler)"](utils.convParamJsonObject(keyvals), function(ar) {
       if (ar.succeeded()) {
         handler(ar.result(), null);
@@ -2569,7 +2569,7 @@ var RedisClient = function(j_val) {
    */
   this.msetnx = function(keyvals, handler) {
     var __args = arguments;
-    if (__args.length === 2 && typeof __args[0] === 'object' && typeof __args[1] === 'function') {
+    if (__args.length === 2 && (typeof __args[0] === 'object' && __args[0] != null) && typeof __args[1] === 'function') {
       j_redisClient["msetnx(io.vertx.core.json.JsonObject,io.vertx.core.Handler)"](utils.convParamJsonObject(keyvals), function(ar) {
       if (ar.succeeded()) {
         handler(ar.result(), null);
@@ -3554,7 +3554,7 @@ var RedisClient = function(j_val) {
    */
   this.setWithOptions = function(key, value, options, handler) {
     var __args = arguments;
-    if (__args.length === 4 && typeof __args[0] === 'string' && typeof __args[1] === 'string' && typeof __args[2] === 'object' && typeof __args[3] === 'function') {
+    if (__args.length === 4 && typeof __args[0] === 'string' && typeof __args[1] === 'string' && (typeof __args[2] === 'object' && __args[2] != null) && typeof __args[3] === 'function') {
       j_redisClient["setWithOptions(java.lang.String,java.lang.String,io.vertx.redis.op.SetOptions,io.vertx.core.Handler)"](key, value, options != null ? new SetOptions(new JsonObject(JSON.stringify(options))) : null, function(ar) {
       if (ar.succeeded()) {
         handler(null, null);
@@ -3601,7 +3601,7 @@ var RedisClient = function(j_val) {
    */
   this.setBinaryWithOptions = function(key, value, options, handler) {
     var __args = arguments;
-    if (__args.length === 4 && typeof __args[0] === 'string' && typeof __args[1] === 'string' && typeof __args[2] === 'object' && typeof __args[3] === 'function') {
+    if (__args.length === 4 && typeof __args[0] === 'string' && typeof __args[1] === 'string' && (typeof __args[2] === 'object' && __args[2] != null) && typeof __args[3] === 'function') {
       j_redisClient["setBinaryWithOptions(java.lang.String,java.lang.String,io.vertx.redis.op.SetOptions,io.vertx.core.Handler)"](key, value, options != null ? new SetOptions(new JsonObject(JSON.stringify(options))) : null, function(ar) {
       if (ar.succeeded()) {
         handler(null, null);
@@ -3941,7 +3941,7 @@ var RedisClient = function(j_val) {
    */
   this.sort = function(key, options, handler) {
     var __args = arguments;
-    if (__args.length === 3 && typeof __args[0] === 'string' && typeof __args[1] === 'object' && typeof __args[2] === 'function') {
+    if (__args.length === 3 && typeof __args[0] === 'string' && (typeof __args[1] === 'object' && __args[1] != null) && typeof __args[2] === 'function') {
       j_redisClient["sort(java.lang.String,io.vertx.redis.op.SortOptions,io.vertx.core.Handler)"](key, options != null ? new SortOptions(new JsonObject(JSON.stringify(options))) : null, function(ar) {
       if (ar.succeeded()) {
         handler(utils.convReturnJson(ar.result()), null);
@@ -4431,7 +4431,7 @@ var RedisClient = function(j_val) {
    */
   this.zaddMany = function(key, members, handler) {
     var __args = arguments;
-    if (__args.length === 3 && typeof __args[0] === 'string' && typeof __args[1] === 'object' && typeof __args[2] === 'function') {
+    if (__args.length === 3 && typeof __args[0] === 'string' && (typeof __args[1] === 'object' && __args[1] != null) && typeof __args[2] === 'function') {
       j_redisClient["zaddMany(java.lang.String,java.util.Map,io.vertx.core.Handler)"](key, members, function(ar) {
       if (ar.succeeded()) {
         handler(ar.result(), null);
@@ -4549,7 +4549,7 @@ var RedisClient = function(j_val) {
    */
   this.zinterstoreWeighed = function(destkey, sets, options, handler) {
     var __args = arguments;
-    if (__args.length === 4 && typeof __args[0] === 'string' && typeof __args[1] === 'object' && typeof __args[2] === 'string' && typeof __args[3] === 'function') {
+    if (__args.length === 4 && typeof __args[0] === 'string' && (typeof __args[1] === 'object' && __args[1] != null) && typeof __args[2] === 'string' && typeof __args[3] === 'function') {
       j_redisClient["zinterstoreWeighed(java.lang.String,java.util.Map,io.vertx.redis.op.AggregateOptions,io.vertx.core.Handler)"](destkey, sets, io.vertx.redis.op.AggregateOptions.valueOf(__args[2]), function(ar) {
       if (ar.succeeded()) {
         handler(ar.result(), null);
@@ -4647,7 +4647,7 @@ var RedisClient = function(j_val) {
    */
   this.zrangebylex = function(key, min, max, options, handler) {
     var __args = arguments;
-    if (__args.length === 5 && typeof __args[0] === 'string' && typeof __args[1] === 'string' && typeof __args[2] === 'string' && typeof __args[3] === 'object' && typeof __args[4] === 'function') {
+    if (__args.length === 5 && typeof __args[0] === 'string' && typeof __args[1] === 'string' && typeof __args[2] === 'string' && (typeof __args[3] === 'object' && __args[3] != null) && typeof __args[4] === 'function') {
       j_redisClient["zrangebylex(java.lang.String,java.lang.String,java.lang.String,io.vertx.redis.op.LimitOptions,io.vertx.core.Handler)"](key, min, max, options != null ? new LimitOptions(new JsonObject(JSON.stringify(options))) : null, function(ar) {
       if (ar.succeeded()) {
         handler(utils.convReturnJson(ar.result()), null);
@@ -4672,7 +4672,7 @@ var RedisClient = function(j_val) {
    */
   this.zrangebyscore = function(key, min, max, options, handler) {
     var __args = arguments;
-    if (__args.length === 5 && typeof __args[0] === 'string' && typeof __args[1] === 'string' && typeof __args[2] === 'string' && typeof __args[3] === 'object' && typeof __args[4] === 'function') {
+    if (__args.length === 5 && typeof __args[0] === 'string' && typeof __args[1] === 'string' && typeof __args[2] === 'string' && (typeof __args[3] === 'object' && __args[3] != null) && typeof __args[4] === 'function') {
       j_redisClient["zrangebyscore(java.lang.String,java.lang.String,java.lang.String,io.vertx.redis.op.RangeLimitOptions,io.vertx.core.Handler)"](key, min, max, options != null ? new RangeLimitOptions(new JsonObject(JSON.stringify(options))) : null, function(ar) {
       if (ar.succeeded()) {
         handler(utils.convReturnJson(ar.result()), null);
@@ -4863,7 +4863,7 @@ var RedisClient = function(j_val) {
    */
   this.zrevrangebylex = function(key, max, min, options, handler) {
     var __args = arguments;
-    if (__args.length === 5 && typeof __args[0] === 'string' && typeof __args[1] === 'string' && typeof __args[2] === 'string' && typeof __args[3] === 'object' && typeof __args[4] === 'function') {
+    if (__args.length === 5 && typeof __args[0] === 'string' && typeof __args[1] === 'string' && typeof __args[2] === 'string' && (typeof __args[3] === 'object' && __args[3] != null) && typeof __args[4] === 'function') {
       j_redisClient["zrevrangebylex(java.lang.String,java.lang.String,java.lang.String,io.vertx.redis.op.LimitOptions,io.vertx.core.Handler)"](key, max, min, options != null ? new LimitOptions(new JsonObject(JSON.stringify(options))) : null, function(ar) {
       if (ar.succeeded()) {
         handler(utils.convReturnJson(ar.result()), null);
@@ -4888,7 +4888,7 @@ var RedisClient = function(j_val) {
    */
   this.zrevrangebyscore = function(key, max, min, options, handler) {
     var __args = arguments;
-    if (__args.length === 5 && typeof __args[0] === 'string' && typeof __args[1] === 'string' && typeof __args[2] === 'string' && typeof __args[3] === 'object' && typeof __args[4] === 'function') {
+    if (__args.length === 5 && typeof __args[0] === 'string' && typeof __args[1] === 'string' && typeof __args[2] === 'string' && (typeof __args[3] === 'object' && __args[3] != null) && typeof __args[4] === 'function') {
       j_redisClient["zrevrangebyscore(java.lang.String,java.lang.String,java.lang.String,io.vertx.redis.op.RangeLimitOptions,io.vertx.core.Handler)"](key, max, min, options != null ? new RangeLimitOptions(new JsonObject(JSON.stringify(options))) : null, function(ar) {
       if (ar.succeeded()) {
         handler(utils.convReturnJson(ar.result()), null);
@@ -4982,7 +4982,7 @@ var RedisClient = function(j_val) {
    */
   this.zunionstoreWeighed = function(key, sets, options, handler) {
     var __args = arguments;
-    if (__args.length === 4 && typeof __args[0] === 'string' && typeof __args[1] === 'object' && typeof __args[2] === 'string' && typeof __args[3] === 'function') {
+    if (__args.length === 4 && typeof __args[0] === 'string' && (typeof __args[1] === 'object' && __args[1] != null) && typeof __args[2] === 'string' && typeof __args[3] === 'function') {
       j_redisClient["zunionstoreWeighed(java.lang.String,java.util.Map,io.vertx.redis.op.AggregateOptions,io.vertx.core.Handler)"](key, sets, io.vertx.redis.op.AggregateOptions.valueOf(__args[2]), function(ar) {
       if (ar.succeeded()) {
         handler(ar.result(), null);
@@ -5005,7 +5005,7 @@ var RedisClient = function(j_val) {
    */
   this.scan = function(cursor, options, handler) {
     var __args = arguments;
-    if (__args.length === 3 && typeof __args[0] === 'string' && typeof __args[1] === 'object' && typeof __args[2] === 'function') {
+    if (__args.length === 3 && typeof __args[0] === 'string' && (typeof __args[1] === 'object' && __args[1] != null) && typeof __args[2] === 'function') {
       j_redisClient["scan(java.lang.String,io.vertx.redis.op.ScanOptions,io.vertx.core.Handler)"](cursor, options != null ? new ScanOptions(new JsonObject(JSON.stringify(options))) : null, function(ar) {
       if (ar.succeeded()) {
         handler(utils.convReturnJson(ar.result()), null);
@@ -5029,7 +5029,7 @@ var RedisClient = function(j_val) {
    */
   this.sscan = function(key, cursor, options, handler) {
     var __args = arguments;
-    if (__args.length === 4 && typeof __args[0] === 'string' && typeof __args[1] === 'string' && typeof __args[2] === 'object' && typeof __args[3] === 'function') {
+    if (__args.length === 4 && typeof __args[0] === 'string' && typeof __args[1] === 'string' && (typeof __args[2] === 'object' && __args[2] != null) && typeof __args[3] === 'function') {
       j_redisClient["sscan(java.lang.String,java.lang.String,io.vertx.redis.op.ScanOptions,io.vertx.core.Handler)"](key, cursor, options != null ? new ScanOptions(new JsonObject(JSON.stringify(options))) : null, function(ar) {
       if (ar.succeeded()) {
         handler(utils.convReturnJson(ar.result()), null);
@@ -5053,7 +5053,7 @@ var RedisClient = function(j_val) {
    */
   this.hscan = function(key, cursor, options, handler) {
     var __args = arguments;
-    if (__args.length === 4 && typeof __args[0] === 'string' && typeof __args[1] === 'string' && typeof __args[2] === 'object' && typeof __args[3] === 'function') {
+    if (__args.length === 4 && typeof __args[0] === 'string' && typeof __args[1] === 'string' && (typeof __args[2] === 'object' && __args[2] != null) && typeof __args[3] === 'function') {
       j_redisClient["hscan(java.lang.String,java.lang.String,io.vertx.redis.op.ScanOptions,io.vertx.core.Handler)"](key, cursor, options != null ? new ScanOptions(new JsonObject(JSON.stringify(options))) : null, function(ar) {
       if (ar.succeeded()) {
         handler(utils.convReturnJson(ar.result()), null);
@@ -5077,7 +5077,7 @@ var RedisClient = function(j_val) {
    */
   this.zscan = function(key, cursor, options, handler) {
     var __args = arguments;
-    if (__args.length === 4 && typeof __args[0] === 'string' && typeof __args[1] === 'string' && typeof __args[2] === 'object' && typeof __args[3] === 'function') {
+    if (__args.length === 4 && typeof __args[0] === 'string' && typeof __args[1] === 'string' && (typeof __args[2] === 'object' && __args[2] != null) && typeof __args[3] === 'function') {
       j_redisClient["zscan(java.lang.String,java.lang.String,io.vertx.redis.op.ScanOptions,io.vertx.core.Handler)"](key, cursor, options != null ? new ScanOptions(new JsonObject(JSON.stringify(options))) : null, function(ar) {
       if (ar.succeeded()) {
         handler(utils.convReturnJson(ar.result()), null);
@@ -5106,7 +5106,7 @@ RedisClient.create = function() {
   var __args = arguments;
   if (__args.length === 1 && typeof __args[0] === 'object' && __args[0]._jdel) {
     return utils.convReturnVertxGen(JRedisClient["create(io.vertx.core.Vertx)"](__args[0]._jdel), RedisClient);
-  }else if (__args.length === 2 && typeof __args[0] === 'object' && __args[0]._jdel && typeof __args[1] === 'object') {
+  }else if (__args.length === 2 && typeof __args[0] === 'object' && __args[0]._jdel && (typeof __args[1] === 'object' && __args[1] != null)) {
     return utils.convReturnVertxGen(JRedisClient["create(io.vertx.core.Vertx,io.vertx.redis.RedisOptions)"](__args[0]._jdel, __args[1] != null ? new RedisOptions(new JsonObject(JSON.stringify(__args[1]))) : null), RedisClient);
   } else throw new TypeError('function invoked with invalid arguments');
 };

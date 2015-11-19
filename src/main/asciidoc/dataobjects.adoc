@@ -44,23 +44,6 @@ Set TYPE filter
 +++
 |===
 
-[[SortOptions]]
-== SortOptions
-
-++++
- @author <a href="mailto:marko.strukelj@gmail.com">Marko Strukelj</a>
-++++
-'''
-
-[cols=">25%,^25%,50%"]
-[frame="topbot"]
-|===
-^|Name | Type ^| Description
-|[[by]]`by`|`String`|-
-|[[gets]]`gets`|`Array of String`|-
-|[[store]]`store`|`String`|-
-|===
-
 [[SetOptions]]
 == SetOptions
 
@@ -77,6 +60,23 @@ Set TYPE filter
 |[[nx]]`nx`|`Boolean`|-
 |[[px]]`px`|`Number (long)`|-
 |[[xx]]`xx`|`Boolean`|-
+|===
+
+[[SortOptions]]
+== SortOptions
+
+++++
+ @author <a href="mailto:marko.strukelj@gmail.com">Marko Strukelj</a>
+++++
+'''
+
+[cols=">25%,^25%,50%"]
+[frame="topbot"]
+|===
+^|Name | Type ^| Description
+|[[by]]`by`|`String`|-
+|[[gets]]`gets`|`Array of String`|-
+|[[store]]`store`|`String`|-
 |===
 
 [[MigrateOptions]]
@@ -140,35 +140,35 @@ Set TYPE filter
 ^|Name | Type ^| Description
 |[[address]]`address`|`String`|
 +++
-Set the eventbus address prefix for `PUB/SUB`.
+Get the default `PUB/SUB` eventbus address prefix, default `io.vertx.redis`.
 +++
 |[[auth]]`auth`|`String`|
 +++
-Set the password for authentication at connection time.
+Get the password for authentication at connection time.
 +++
 |[[encoding]]`encoding`|`String`|
 +++
-Set the user defined character encoding, e.g.: `iso-8859-1`.
+Return the character encoding for Strings, default `UTF-8`.
 +++
 |[[host]]`host`|`String`|
 +++
-Set the host name where the Redis server is listening.
+Get the host name for the Redis server, default `localhost`.
 +++
 |[[port]]`port`|`Number (int)`|
 +++
-Set the tcp port where the Redis server is listening.
+Get the tcp port where the Redis server is listening, default 6379.
 +++
-|[[select]]`select`|`Number (int)`|
+|[[select]]`select`|`Number (Integer)`|
 +++
-Set the database to select at connection time.
+Get the database to select at connection time.
 +++
 |[[tcpKeepAlive]]`tcpKeepAlive`|`Boolean`|
 +++
-Set the TCP KeepAlive option
+Get wheather TCP KeepAlive option should be enabled, default true.
 +++
 |[[tcpNoDelay]]`tcpNoDelay`|`Boolean`|
 +++
-Set the TCP NoDelay at the socket level.
+Get wheather TCP NoDelay should be enabled, default true
 +++
 |===
 

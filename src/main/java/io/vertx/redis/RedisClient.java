@@ -62,7 +62,7 @@ public interface RedisClient {
    * @param key     Key string
    * @param value   Value to append
    * @param handler Handler for the result of this call.
-   * @since 2.0.0
+   * @since Redis 2.0.0
    * group: string
    */
   @Fluent
@@ -73,7 +73,7 @@ public interface RedisClient {
    *
    * @param password Password for authentication
    * @param handler  Handler for the result of this call.
-   * @since 1.0.0
+   * @since Redis 1.0.0
    * group: connection
    */
   @Fluent
@@ -82,7 +82,7 @@ public interface RedisClient {
   /**
    * Asynchronously rewrite the append-only file
    *
-   * @since 1.0.0
+   * @since Redis 1.0.0
    * group: server
    */
   @Fluent
@@ -91,7 +91,7 @@ public interface RedisClient {
   /**
    * Asynchronously save the dataset to disk
    *
-   * @since 1.0.0
+   * @since Redis 1.0.0
    * group: server
    */
   @Fluent
@@ -102,7 +102,7 @@ public interface RedisClient {
    *
    * @param key     Key string
    * @param handler Handler for the result of this call.
-   * @since 2.6.0
+   * @since Redis 2.6.0
    * group: string
    */
   @Fluent
@@ -115,7 +115,7 @@ public interface RedisClient {
    * @param start   Start index
    * @param end     End index
    * @param handler Handler for the result of this call.
-   * @since 2.6.0
+   * @since Redis 2.6.0
    * group: string
    */
   @Fluent
@@ -128,7 +128,7 @@ public interface RedisClient {
    * @param destkey   Destination key where result is stored
    * @param keys      List of keys on which to perform the operation
    * @param handler   Handler for the result of this call.
-   * @since 2.6.0
+   * @since Redis 2.6.0
    * group: string
    */
   @Fluent
@@ -140,7 +140,7 @@ public interface RedisClient {
    * @param key     Key string
    * @param bit     What bit value to look for - must be 1, or 0
    * @param handler Handler for the result of this call.
-   * @since 2.8.7
+   * @since Redis 2.8.7
    * group: string
    */
   @Fluent
@@ -155,7 +155,7 @@ public interface RedisClient {
    * @param bit     What bit value to look for - must be 1, or 0
    * @param start   Start offset
    * @param handler Handler for the result of this call.
-   * @since 2.8.7
+   * @since Redis 2.8.7
    * group: string
    */
   @Fluent
@@ -172,7 +172,7 @@ public interface RedisClient {
    * @param start   Start offset
    * @param stop    End offset - inclusive
    * @param handler Handler for the result of this call.
-   * @since 2.8.7
+   * @since Redis 2.8.7
    * group: string
    */
   @Fluent
@@ -184,7 +184,7 @@ public interface RedisClient {
    * @param key     Key string identifying a list to watch
    * @param seconds Timeout in seconds
    * @param handler Handler for the result of this call.
-   * @since 2.0.0
+   * @since Redis 2.0.0
    * group: list
    */
   @Fluent
@@ -196,7 +196,7 @@ public interface RedisClient {
    * @param keys    List of key strings identifying lists to watch
    * @param seconds Timeout in seconds
    * @param handler Handler for the result of this call.
-   * @since 2.0.0
+   * @since Redis 2.0.0
    * group: list
    */
   @Fluent
@@ -208,7 +208,7 @@ public interface RedisClient {
    * @param key     Key string identifying a list to watch
    * @param seconds Timeout in seconds
    * @param handler Handler for the result of this call.
-   * @since 2.0.0
+   * @since Redis 2.0.0
    * group: list
    */
   @Fluent
@@ -220,7 +220,7 @@ public interface RedisClient {
    * @param keys    List of key strings identifying lists to watch
    * @param seconds Timeout in seconds
    * @param handler Handler for the result of this call.
-   * @since 2.0.0
+   * @since Redis 2.0.0
    * group: list
    */
   @Fluent
@@ -233,7 +233,7 @@ public interface RedisClient {
    * @param destkey Key string identifying the destination list
    * @param seconds Timeout in seconds
    * @param handler Handler for the result of this call.
-   * @since 2.2.0
+   * @since Redis 2.2.0
    * group: list
    */
   @Fluent
@@ -244,7 +244,7 @@ public interface RedisClient {
    *
    * @param filter  Filter options
    * @param handler Handler for the result of this call.
-   * @since 2.4.0
+   * @since Redis 2.4.0
    * group: server
    */
   @Fluent
@@ -253,7 +253,7 @@ public interface RedisClient {
   /**
    * Get the list of client connections
    *
-   * @since 2.4.0
+   * @since Redis 2.4.0
    * group: server
    */
   @Fluent
@@ -262,7 +262,7 @@ public interface RedisClient {
   /**
    * Get the current connection name
    *
-   * @since 2.6.9
+   * @since Redis 2.6.9
    * group: server
    */
   @Fluent
@@ -273,7 +273,7 @@ public interface RedisClient {
    *
    * @param millis  Pause time in milliseconds
    * @param handler Handler for the result of this call.
-   * @since 2.9.50
+   * @since Redis 2.9.50
    * group: server
    */
   @Fluent
@@ -284,7 +284,7 @@ public interface RedisClient {
    *
    * @param name    New name for current connection
    * @param handler Handler for the result of this call.
-   * @since 2.6.9
+   * @since Redis 2.6.9
    * group: server
    */
   @Fluent
@@ -295,7 +295,7 @@ public interface RedisClient {
    *
    * @param slots
    * @param handler Handler for the result of this call.
-   * @since 3.0.0
+   * @since Redis 3.0.0
    * group: server
    */
   @Fluent
@@ -306,7 +306,7 @@ public interface RedisClient {
    *
    * @param nodeId
    * @param handler Handler for the result of this call.
-   * @since 3.0.0
+   * @since Redis 3.0.0
    * group: cluster
    */
   @Fluent
@@ -317,7 +317,7 @@ public interface RedisClient {
    *
    * @param slot
    * @param handler Handler for the result of this call.
-   * @since 3.0.0
+   * @since Redis 3.0.0
    * group: cluster
    */
   @Fluent
@@ -328,7 +328,7 @@ public interface RedisClient {
    *
    * @param slot
    * @param handler Handler for the result of this call.
-   * @since 3.0.0
+   * @since Redis 3.0.0
    * group: cluster
    */
   @Fluent
@@ -339,7 +339,7 @@ public interface RedisClient {
    *
    * @param slots
    * @param handler Handler for the result of this call.
-   * @since 3.0.0
+   * @since Redis 3.0.0
    * group: cluster
    */
   @Fluent
@@ -349,7 +349,7 @@ public interface RedisClient {
    * Forces a slave to perform a manual failover of its master.
    *
    * @param handler Handler for the result of this call.
-   * @since 3.0.0
+   * @since Redis 3.0.0
    * group: cluster
    */
   @Fluent
@@ -360,7 +360,7 @@ public interface RedisClient {
    *
    * @param options
    * @param handler Handler for the result of this call.
-   * @since 3.0.0
+   * @since Redis 3.0.0
    * group: cluster
    */
   @Fluent
@@ -371,7 +371,7 @@ public interface RedisClient {
    *
    * @param nodeId
    * @param handler Handler for the result of this call.
-   * @since 3.0.0
+   * @since Redis 3.0.0
    * group: cluster
    */
   @Fluent
@@ -383,7 +383,7 @@ public interface RedisClient {
    * @param slot
    * @param count
    * @param handler Handler for the result of this call.
-   * @since 3.0.0
+   * @since Redis 3.0.0
    * group: cluster
    */
   @Fluent
@@ -393,7 +393,7 @@ public interface RedisClient {
    * Provides info about Redis Cluster node state.
    *
    * @param handler Handler for the result of this call.
-   * @since 3.0.0
+   * @since Redis 3.0.0
    * group: cluster
    */
   @Fluent
@@ -404,7 +404,7 @@ public interface RedisClient {
    *
    * @param key
    * @param handler Handler for the result of this call.
-   * @since 3.0.0
+   * @since Redis 3.0.0
    * group: cluster
    */
   @Fluent
@@ -416,7 +416,7 @@ public interface RedisClient {
    * @param ip
    * @param port
    * @param handler Handler for the result of this call.
-   * @since 3.0.0
+   * @since Redis 3.0.0
    * group: cluster
    */
   @Fluent
@@ -426,7 +426,7 @@ public interface RedisClient {
    * Get Cluster config for the node.
    *
    * @param handler Handler for the result of this call.
-   * @since 3.0.0
+   * @since Redis 3.0.0
    * group: cluster
    */
   @Fluent
@@ -437,7 +437,7 @@ public interface RedisClient {
    *
    * @param nodeId
    * @param handler Handler for the result of this call.
-   * @since 3.0.0
+   * @since Redis 3.0.0
    * group: cluster
    */
   @Fluent
@@ -447,7 +447,7 @@ public interface RedisClient {
    * Reset a Redis Cluster node.
    *
    * @param handler Handler for the result of this call.
-   * @since 3.0.0
+   * @since Redis 3.0.0
    * group: cluster
    */
   @Fluent
@@ -458,7 +458,7 @@ public interface RedisClient {
    *
    * @param options
    * @param handler Handler for the result of this call.
-   * @since 3.0.0
+   * @since Redis 3.0.0
    * group: cluster
    */
   @Fluent
@@ -468,7 +468,7 @@ public interface RedisClient {
    * Forces the node to save cluster state on disk.
    *
    * @param handler Handler for the result of this call.
-   * @since 3.0.0
+   * @since Redis 3.0.0
    * group: cluster
    */
   @Fluent
@@ -479,7 +479,7 @@ public interface RedisClient {
    *
    * @param epoch
    * @param handler Handler for the result of this call.
-   * @since 3.0.0
+   * @since Redis 3.0.0
    * group: cluster
    */
   @Fluent
@@ -491,7 +491,7 @@ public interface RedisClient {
    * @param slot
    * @param subcommand
    * @param handler Handler for the result of this call.
-   * @since 3.0.0
+   * @since Redis 3.0.0
    * group: cluster
    */
   @Fluent
@@ -504,7 +504,7 @@ public interface RedisClient {
    * @param subcommand
    * @param nodeId
    * @param handler Handler for the result of this call.
-   * @since 3.0.0
+   * @since Redis 3.0.0
    * group: cluster
    */
   @Fluent
@@ -515,7 +515,7 @@ public interface RedisClient {
    *
    * @param nodeId
    * @param handler Handler for the result of this call.
-   * @since 3.0.0
+   * @since Redis 3.0.0
    * group: cluster
    */
   @Fluent
@@ -524,7 +524,7 @@ public interface RedisClient {
   /**
    * Get array of Cluster slot to node mappings
    *
-   * @since 3.0.0
+   * @since Redis 3.0.0
    * group: server
    */
   @Fluent
@@ -533,7 +533,7 @@ public interface RedisClient {
   /**
    * Get array of Redis command details
    *
-   * @since 2.8.13
+   * @since Redis 2.8.13
    * group: server
    */
   @Fluent
@@ -542,7 +542,7 @@ public interface RedisClient {
   /**
    * Get total number of Redis commands
    *
-   * @since 2.8.13
+   * @since Redis 2.8.13
    * group: server
    */
   @Fluent
@@ -551,7 +551,7 @@ public interface RedisClient {
   /**
    * Extract keys given a full Redis command
    *
-   * @since 2.8.13
+   * @since Redis 2.8.13
    * group: server
    */
   @Fluent
@@ -562,7 +562,7 @@ public interface RedisClient {
    *
    * @param commands List of commands to get info for
    * @param handler  Handler for the result of this call.
-   * @since 2.8.13
+   * @since Redis 2.8.13
    * group: server
    */
   @Fluent
@@ -573,7 +573,7 @@ public interface RedisClient {
    *
    * @param parameter Configuration parameter
    * @param handler   Handler for the result of this call.
-   * @since 2.0.0
+   * @since Redis 2.0.0
    * group: server
    */
   @Fluent
@@ -582,7 +582,7 @@ public interface RedisClient {
   /**
    * Rewrite the configuration file with the in memory configuration
    *
-   * @since 2.8.0
+   * @since Redis 2.8.0
    * group: server
    */
   @Fluent
@@ -594,7 +594,7 @@ public interface RedisClient {
    * @param parameter Configuration parameter
    * @param value     New value
    * @param handler   Handler for the result of this call.
-   * @since 2.0.0
+   * @since Redis 2.0.0
    * group: server
    */
   @Fluent
@@ -603,7 +603,7 @@ public interface RedisClient {
   /**
    * Reset the stats returned by INFO
    *
-   * @since 2.0.0
+   * @since Redis 2.0.0
    * group: server
    */
   @Fluent
@@ -612,7 +612,7 @@ public interface RedisClient {
   /**
    * Return the number of keys in the selected database
    *
-   * @since 1.0.0
+   * @since Redis 1.0.0
    * group: server
    */
   @Fluent
@@ -623,7 +623,7 @@ public interface RedisClient {
    *
    * @param key     Key string
    * @param handler Handler for the result of this call.
-   * @since 1.0.0
+   * @since Redis 1.0.0
    * group: server
    */
   @Fluent
@@ -632,7 +632,7 @@ public interface RedisClient {
   /**
    * Make the server crash
    *
-   * @since 1.0.0
+   * @since Redis 1.0.0
    * group: server
    */
   @Fluent
@@ -643,7 +643,7 @@ public interface RedisClient {
    *
    * @param key     Key string
    * @param handler Handler for the result of this call.
-   * @since 1.0.0
+   * @since Redis 1.0.0
    * group: string
    */
   @Fluent
@@ -655,7 +655,7 @@ public interface RedisClient {
    * @param key       Key string
    * @param decrement Value by which to decrement
    * @param handler   Handler for the result of this call.
-   * @since 1.0.0
+   * @since Redis 1.0.0
    * group: string
    */
   @Fluent
@@ -666,7 +666,7 @@ public interface RedisClient {
    *
    * @param key     Keys to delete
    * @param handler Handler for the result of this call.
-   * @since 1.0.0
+   * @since Redis 1.0.0
    * group: generic
    */
   @Fluent
@@ -677,7 +677,7 @@ public interface RedisClient {
    *
    * @param keys    List of keys to delete
    * @param handler Handler for the result of this call.
-   * @since 1.0.0
+   * @since Redis 1.0.0
    * group: generic
    */
   @Fluent
@@ -686,7 +686,7 @@ public interface RedisClient {
   /**
    * Discard all commands issued after MULTI
    *
-   * @since 2.0.0
+   * @since Redis 2.0.0
    * group: transactions
    */
   @Fluent
@@ -697,7 +697,7 @@ public interface RedisClient {
    *
    * @param key     Key string
    * @param handler Handler for the result of this call.
-   * @since 2.6.0
+   * @since Redis 2.6.0
    * group: generic
    */
   @Fluent
@@ -708,7 +708,7 @@ public interface RedisClient {
    *
    * @param message String to echo
    * @param handler Handler for the result of this call.
-   * @since 1.0.0
+   * @since Redis 1.0.0
    * group: connection
    */
   @Fluent
@@ -725,7 +725,7 @@ public interface RedisClient {
    * @param keys    List of keys
    * @param args    List of argument values
    * @param handler Handler for the result of this call.
-   * @since 2.6.0
+   * @since Redis 2.6.0
    * group: scripting
    */
   @Fluent
@@ -742,7 +742,7 @@ public interface RedisClient {
    * @param keys    List of keys
    * @param values  List of values
    * @param handler Handler for the result of this call.
-   * @since 2.6.0
+   * @since Redis 2.6.0
    * group: scripting
    */
   @Fluent
@@ -751,7 +751,7 @@ public interface RedisClient {
   /**
    * Execute all commands issued after MULTI
    *
-   * @since 1.2.0
+   * @since Redis 1.2.0
    * group: transactions
    */
   @Fluent
@@ -762,7 +762,7 @@ public interface RedisClient {
    *
    * @param key     Key string
    * @param handler Handler for the result of this call.
-   * @since 1.0.0
+   * @since Redis 1.0.0
    * group: generic
    */
   @Fluent
@@ -774,7 +774,7 @@ public interface RedisClient {
    * @param key     Key string
    * @param seconds Time to live in seconds
    * @param handler Handler for the result of this call.
-   * @since 1.0.0
+   * @since Redis 1.0.0
    * group: generic
    */
   @Fluent
@@ -786,7 +786,7 @@ public interface RedisClient {
    * @param key       Key string
    * @param seconds   Expiry time as Unix timestamp in seconds
    * @param handler   Handler for the result of this call.
-   * @since 1.2.0
+   * @since Redis 1.2.0
    * group: generic
    */
   @Fluent
@@ -795,7 +795,7 @@ public interface RedisClient {
   /**
    * Remove all keys from all databases
    *
-   * @since 1.0.0
+   * @since Redis 1.0.0
    * group: server
    */
   @Fluent
@@ -804,7 +804,7 @@ public interface RedisClient {
   /**
    * Remove all keys from the current database
    *
-   * @since 1.0.0
+   * @since Redis 1.0.0
    * group: server
    */
   @Fluent
@@ -815,7 +815,7 @@ public interface RedisClient {
    *
    * @param key     Key string
    * @param handler Handler for the result of this call.
-   * @since 1.0.0
+   * @since Redis 1.0.0
    * group: string
    */
   @Fluent
@@ -826,7 +826,7 @@ public interface RedisClient {
    *
    * @param key     Key string
    * @param handler Handler for the result of this call.
-   * @since 1.0.0
+   * @since Redis 1.0.0
    * group: string
    */
   @Fluent
@@ -838,7 +838,7 @@ public interface RedisClient {
    * @param key     Key string
    * @param offset  Offset in bits
    * @param handler Handler for the result of this call.
-   * @since 2.2.0
+   * @since Redis 2.2.0
    * group: string
    */
   @Fluent
@@ -851,7 +851,7 @@ public interface RedisClient {
    * @param start   Start offset
    * @param end     End offset - inclusive
    * @param handler Handler for the result of this call.
-   * @since 2.4.0
+   * @since Redis 2.4.0
    * group: string
    */
   @Fluent
@@ -863,7 +863,7 @@ public interface RedisClient {
    * @param key     Key of which value to set
    * @param value   New value for the key
    * @param handler Handler for the result of this call.
-   * @since 1.0.0
+   * @since Redis 1.0.0
    * group: string
    */
   @Fluent
@@ -875,7 +875,7 @@ public interface RedisClient {
    * @param key     Key string
    * @param field   Field name
    * @param handler Handler for the result of this call.
-   * @since 2.0.0
+   * @since Redis 2.0.0
    * group: hash
    */
   @Fluent
@@ -887,7 +887,7 @@ public interface RedisClient {
    * @param key     Key string
    * @param fields  Field names
    * @param handler Handler for the result of this call.
-   * @since 2.0.0
+   * @since Redis 2.0.0
    * group: hash
    */
   @Fluent
@@ -899,7 +899,7 @@ public interface RedisClient {
    * @param key     Key string
    * @param field   Field name
    * @param handler Handler for the result of this call.
-   * @since 2.0.0
+   * @since Redis 2.0.0
    * group: hash
    */
   @Fluent
@@ -911,7 +911,7 @@ public interface RedisClient {
    * @param key     Key string
    * @param field   Field name
    * @param handler Handler for the result of this call.
-   * @since 2.0.0
+   * @since Redis 2.0.0
    * group: hash
    */
   @Fluent
@@ -922,7 +922,7 @@ public interface RedisClient {
    *
    * @param key     Key string
    * @param handler Handler for the result of this call.
-   * @since 2.0.0
+   * @since Redis 2.0.0
    * group: hash
    */
   @Fluent
@@ -935,7 +935,7 @@ public interface RedisClient {
    * @param field     Field name
    * @param increment Value by which to increment
    * @param handler   Handler for the result of this call.
-   * @since 2.0.0
+   * @since Redis 2.0.0
    * group: hash
    */
   @Fluent
@@ -948,7 +948,7 @@ public interface RedisClient {
    * @param field     Field name
    * @param increment Value by which to increment
    * @param handler   Handler for the result of this call.
-   * @since 2.6.0
+   * @since Redis 2.6.0
    * group: hash
    */
   @Fluent
@@ -959,7 +959,7 @@ public interface RedisClient {
    *
    * @param key     Key string
    * @param handler Handler for the result of this call.
-   * @since 2.0.0
+   * @since Redis 2.0.0
    * group: hash
    */
   @Fluent
@@ -970,7 +970,7 @@ public interface RedisClient {
    *
    * @param key     Key string
    * @param handler Handler for the result of this call.
-   * @since 2.0.0
+   * @since Redis 2.0.0
    * group: hash
    */
   @Fluent
@@ -982,7 +982,7 @@ public interface RedisClient {
    * @param key     Key string
    * @param fields  Field names
    * @param handler Handler for the result of this call.
-   * @since 2.0.0
+   * @since Redis 2.0.0
    * group: hash
    */
   @Fluent
@@ -994,7 +994,7 @@ public interface RedisClient {
    * @param key     Key string
    * @param values  Map of field:value pairs
    * @param handler Handler for the result of this call.
-   * @since 2.0.0
+   * @since Redis 2.0.0
    * group: hash
    */
   @Fluent
@@ -1007,7 +1007,7 @@ public interface RedisClient {
    * @param field   Field name
    * @param value   New value
    * @param handler Handler for the result of this call.
-   * @since 2.0.0
+   * @since Redis 2.0.0
    * group: hash
    */
   @Fluent
@@ -1020,7 +1020,7 @@ public interface RedisClient {
    * @param field   Field name
    * @param value   New value
    * @param handler Handler for the result of this call.
-   * @since 2.0.0
+   * @since Redis 2.0.0
    * group: hash
    */
   @Fluent
@@ -1031,7 +1031,7 @@ public interface RedisClient {
    *
    * @param key     Key string
    * @param handler Handler for the result of this call.
-   * @since 2.0.0
+   * @since Redis 2.0.0
    * group: hash
    */
   @Fluent
@@ -1042,7 +1042,7 @@ public interface RedisClient {
    *
    * @param key     Key string
    * @param handler Handler for the result of this call.
-   * @since 1.0.0
+   * @since Redis 1.0.0
    * group: string
    */
   @Fluent
@@ -1054,7 +1054,7 @@ public interface RedisClient {
    * @param key       Key string
    * @param increment Value by which to increment
    * @param handler   Handler for the result of this call.
-   * @since 1.0.0
+   * @since Redis 1.0.0
    * group: string
    */
   @Fluent
@@ -1066,7 +1066,7 @@ public interface RedisClient {
    * @param key       Key string
    * @param increment Value by which to increment
    * @param handler   Handler for the result of this call.
-   * @since 2.6.0
+   * @since Redis 2.6.0
    * group: string
    */
   @Fluent
@@ -1076,7 +1076,7 @@ public interface RedisClient {
    * Get information and statistics about the server
    *
    * @param handler Handler for the result of this call.
-   * @since 1.0.0
+   * @since Redis 1.0.0
    * group: server
    */
   @Fluent
@@ -1087,7 +1087,7 @@ public interface RedisClient {
    *
    * @param section Specific section of information to return
    * @param handler Handler for the result of this call.
-   * @since 1.0.0
+   * @since Redis 1.0.0
    * group: server
    */
   @Fluent
@@ -1098,7 +1098,7 @@ public interface RedisClient {
    *
    * @param pattern Pattern to limit the keys returned
    * @param handler Handler for the result of this call.
-   * @since 1.0.0
+   * @since Redis 1.0.0
    * group: generic
    */
   @Fluent
@@ -1107,7 +1107,7 @@ public interface RedisClient {
   /**
    * Get the UNIX time stamp of the last successful save to disk
    *
-   * @since 1.0.0
+   * @since Redis 1.0.0
    * group: server
    */
   @Fluent
@@ -1119,7 +1119,7 @@ public interface RedisClient {
    * @param key     Key string
    * @param index   Index of list element to get
    * @param handler Handler for the result of this call.
-   * @since 1.0.0
+   * @since Redis 1.0.0
    * group: list
    */
   @Fluent
@@ -1133,7 +1133,7 @@ public interface RedisClient {
    * @param pivot   Key to use as a pivot
    * @param value   Value to be inserted before or after the pivot
    * @param handler Handler for the result of this call.
-   * @since 2.2.0
+   * @since Redis 2.2.0
    * group: list
    */
   @Fluent
@@ -1144,7 +1144,7 @@ public interface RedisClient {
    *
    * @param key     String key
    * @param handler Handler for the result of this call.
-   * @since 1.0.0
+   * @since Redis 1.0.0
    * group: list
    */
   @Fluent
@@ -1155,7 +1155,7 @@ public interface RedisClient {
    *
    * @param key     String key
    * @param handler Handler for the result of this call.
-   * @since 1.0.0
+   * @since Redis 1.0.0
    * group: list
    */
   @Fluent
@@ -1167,7 +1167,7 @@ public interface RedisClient {
    * @param key     Key string
    * @param values  Values to be added at the beginning of the list, one by one
    * @param handler Handler for the result of this call.
-   * @since 1.0.0
+   * @since Redis 1.0.0
    * group: list
    */
   @Fluent
@@ -1179,7 +1179,7 @@ public interface RedisClient {
    * @param key     Key string
    * @param value   Value to be added at the beginning of the list
    * @param handler Handler for the result of this call.
-   * @since 1.0.0
+   * @since Redis 1.0.0
    * group: list
    */
   @Fluent
@@ -1191,7 +1191,7 @@ public interface RedisClient {
    * @param key     Key string
    * @param value   Value to add at the beginning of the list
    * @param handler Handler for the result of this call.
-   * @since 2.2.0
+   * @since Redis 2.2.0
    * group: list
    */
   @Fluent
@@ -1204,7 +1204,7 @@ public interface RedisClient {
    * @param from    Start index
    * @param to      Stop index
    * @param handler Handler for the result of this call.
-   * @since 1.0.0
+   * @since Redis 1.0.0
    * group: list
    */
   @Fluent
@@ -1217,7 +1217,7 @@ public interface RedisClient {
    * @param count   Number of first found occurrences equal to $value to remove from the list
    * @param value   Value to be removed
    * @param handler Handler for the result of this call.
-   * @since 1.0.0
+   * @since Redis 1.0.0
    * group: list
    */
   @Fluent
@@ -1230,7 +1230,7 @@ public interface RedisClient {
    * @param index   Position within list
    * @param value   New value
    * @param handler Handler for the result of this call.
-   * @since 1.0.0
+   * @since Redis 1.0.0
    * group: list
    */
   @Fluent
@@ -1243,7 +1243,7 @@ public interface RedisClient {
    * @param from    Start index
    * @param to      Stop index
    * @param handler Handler for the result of this call.
-   * @since 1.0.0
+   * @since Redis 1.0.0
    * group: list
    */
   @Fluent
@@ -1254,7 +1254,7 @@ public interface RedisClient {
    *
    * @param key     Key string
    * @param handler Handler for the result of this call.
-   * @since 1.0.0
+   * @since Redis 1.0.0
    * group: string
    */
   @Fluent
@@ -1265,7 +1265,7 @@ public interface RedisClient {
    *
    * @param keys    List of keys to get
    * @param handler Handler for the result of this call.
-   * @since 1.0.0
+   * @since Redis 1.0.0
    * group: string
    */
   @Fluent
@@ -1280,7 +1280,7 @@ public interface RedisClient {
    * @param destdb  Destination database index
    * @param options Migrate options
    * @param handler Handler for the result of this call.
-   * @since 2.6.0
+   * @since Redis 2.6.0
    * group: generic
    */
   @Fluent
@@ -1289,7 +1289,7 @@ public interface RedisClient {
   /**
    * Listen for all requests received by the server in real time
    *
-   * @since 1.0.0
+   * @since Redis 1.0.0
    * group: server
    */
   @Fluent
@@ -1301,7 +1301,7 @@ public interface RedisClient {
    * @param key     Key to migrate
    * @param destdb  Destination database index
    * @param handler Handler for the result of this call.
-   * @since 1.0.0
+   * @since Redis 1.0.0
    * group: generic
    */
   @Fluent
@@ -1312,7 +1312,7 @@ public interface RedisClient {
    *
    * @param keyvals Key value pairs to set
    * @param handler Handler for the result of this call.
-   * @since 1.0.1
+   * @since Redis 1.0.1
    * group: string
    */
   @Fluent
@@ -1323,7 +1323,7 @@ public interface RedisClient {
    *
    * @param keyvals Key value pairs to set
    * @param handler Handler for the result of this call.
-   * @since 1.0.1
+   * @since Redis 1.0.1
    * group: string
    */
   @Fluent
@@ -1332,7 +1332,7 @@ public interface RedisClient {
   /**
    * Mark the start of a transaction block
    *
-   * @since 1.2.0
+   * @since Redis 1.2.0
    * group: transactions
    */
   @Fluent
@@ -1344,7 +1344,7 @@ public interface RedisClient {
    * @param key     Key string
    * @param cmd     Object sub command
    * @param handler Handler for the result of this call.
-   * @since 2.2.3
+   * @since Redis 2.2.3
    * group: generic
    */
   @Fluent
@@ -1355,7 +1355,7 @@ public interface RedisClient {
    *
    * @param key     Key string
    * @param handler Handler for the result of this call.
-   * @since 2.2.0
+   * @since Redis 2.2.0
    * group: generic
    */
   @Fluent
@@ -1367,7 +1367,7 @@ public interface RedisClient {
    * @param key     String key
    * @param millis  Time to live in milliseconds
    * @param handler Handler for the result of this call.
-   * @since 2.6.0
+   * @since Redis 2.6.0
    * group: generic
    */
   @Fluent
@@ -1379,7 +1379,7 @@ public interface RedisClient {
    * @param key     Key string
    * @param millis  Expiry time as Unix timestamp in milliseconds
    * @param handler Handler for the result of this call.
-   * @since 2.6.0
+   * @since Redis 2.6.0
    * group: generic
    */
   @Fluent
@@ -1391,7 +1391,7 @@ public interface RedisClient {
    * @param key     Key string
    * @param element Element to add
    * @param handler Handler for the result of this call.
-   * @since 2.8.9
+   * @since Redis 2.8.9
    * group: hyperloglog
    */
   @Fluent
@@ -1403,7 +1403,7 @@ public interface RedisClient {
    * @param key      Key string
    * @param elements Elementa to add
    * @param handler  Handler for the result of this call.
-   * @since 2.8.9
+   * @since Redis 2.8.9
    * group: hyperloglog
    */
   @Fluent
@@ -1414,7 +1414,7 @@ public interface RedisClient {
    *
    * @param key     Key string
    * @param handler Handler for the result of this call.
-   * @since 2.8.9
+   * @since Redis 2.8.9
    * group: hyperloglog
    */
   @Fluent
@@ -1425,7 +1425,7 @@ public interface RedisClient {
    *
    * @param keys    List of keys
    * @param handler Handler for the result of this call.
-   * @since 2.8.9
+   * @since Redis 2.8.9
    * group: hyperloglog
    */
   @Fluent
@@ -1437,7 +1437,7 @@ public interface RedisClient {
    * @param destkey Destination key
    * @param keys    List of source keys
    * @param handler Handler for the result of this call.
-   * @since 2.8.9
+   * @since Redis 2.8.9
    * group: hyperloglog
    */
   @Fluent
@@ -1446,7 +1446,7 @@ public interface RedisClient {
   /**
    * Ping the server
    *
-   * @since 1.0.0
+   * @since Redis 1.0.0
    * group: connection
    */
   @Fluent
@@ -1459,7 +1459,7 @@ public interface RedisClient {
    * @param millis  Number of milliseconds until the key expires
    * @param value   New value for key
    * @param handler Handler for the result of this call.
-   * @since 2.6.0
+   * @since Redis 2.6.0
    * group: string
    */
   @Fluent
@@ -1470,7 +1470,7 @@ public interface RedisClient {
    *
    * @param pattern Pattern string
    * @param handler Handler for the result of this call.
-   * @since 2.0.0
+   * @since Redis 2.0.0
    * group: pubsub
    */
   @Fluent
@@ -1481,7 +1481,7 @@ public interface RedisClient {
    *
    * @param patterns List of patterns
    * @param handler  Handler for the result of this call.
-   * @since 2.0.0
+   * @since Redis 2.0.0
    * group: pubsub
    */
   @Fluent
@@ -1492,7 +1492,7 @@ public interface RedisClient {
    *
    * @param pattern A glob-style pattern - an empty string means no pattern
    * @param handler Handler for the result of this call.
-   * @since 2.8.0
+   * @since Redis 2.8.0
    * group: pubsub
    */
   @Fluent
@@ -1503,7 +1503,7 @@ public interface RedisClient {
    *
    * @param channels List of channels
    * @param handler  Handler for the result of this call.
-   * @since 2.8.0
+   * @since Redis 2.8.0
    * group: pubsub
    */
   @Fluent
@@ -1513,7 +1513,7 @@ public interface RedisClient {
    * Returns the number of subscriptions to patterns (that are performed using the PSUBSCRIBE command)
    *
    * @param handler Handler for the result of this call.
-   * @since 2.8.0
+   * @since Redis 2.8.0
    * group: pubsub
    */
   @Fluent
@@ -1524,7 +1524,7 @@ public interface RedisClient {
    *
    * @param key     Key string
    * @param handler Handler for the result of this call.
-   * @since 2.6.0
+   * @since Redis 2.6.0
    * group: generic
    */
   @Fluent
@@ -1536,7 +1536,7 @@ public interface RedisClient {
    * @param channel Channel key
    * @param message Message to send to channel
    * @param handler Handler for the result of this call.
-   * @since 2.0.0
+   * @since Redis 2.0.0
    * group: pubsub
    */
   @Fluent
@@ -1547,7 +1547,7 @@ public interface RedisClient {
    *
    * @param patterns List of patterns to match against
    * @param handler  Handler for the result of this call.
-   * @since 2.0.0
+   * @since Redis 2.0.0
    * group: pubsub
    */
   @Fluent
@@ -1556,7 +1556,7 @@ public interface RedisClient {
   /**
    * Return a random key from the keyspace
    *
-   * @since 1.0.0
+   * @since Redis 1.0.0
    * group: generic
    */
   @Fluent
@@ -1568,7 +1568,7 @@ public interface RedisClient {
    * @param key  Key string to be renamed
    * @param newkey  New key string
    * @param handler Handler for the result of this call.
-   * @since 1.0.0
+   * @since Redis 1.0.0
    * group: generic
    */
   @Fluent
@@ -1580,7 +1580,7 @@ public interface RedisClient {
    * @param key  Key string to be renamed
    * @param newkey  New key string
    * @param handler Handler for the result of this call.
-   * @since 1.0.0
+   * @since Redis 1.0.0
    * group: generic
    */
   @Fluent
@@ -1593,7 +1593,7 @@ public interface RedisClient {
    * @param millis     Expiry time in milliseconds to set on the key
    * @param serialized Serialized form of the key value as obtained using DUMP
    * @param handler    Handler for the result of this call.
-   * @since 2.6.0
+   * @since Redis 2.6.0
    * group: generic
    */
   @Fluent
@@ -1602,7 +1602,7 @@ public interface RedisClient {
   /**
    * Return the role of the instance in the context of replication
    *
-   * @since 2.8.12
+   * @since Redis 2.8.12
    * group: server
    */
   @Fluent
@@ -1613,7 +1613,7 @@ public interface RedisClient {
    *
    * @param key     Key string
    * @param handler Handler for the result of this call.
-   * @since 1.0.0
+   * @since Redis 1.0.0
    * group: list
    */
   @Fluent
@@ -1625,7 +1625,7 @@ public interface RedisClient {
    * @param key     Key string identifying source list
    * @param destkey Key string identifying destination list
    * @param handler Handler for the result of this call.
-   * @since 1.2.0
+   * @since Redis 1.2.0
    * group: list
    */
   @Fluent
@@ -1637,7 +1637,7 @@ public interface RedisClient {
    * @param key     Key string
    * @param values  List of values to add to the end of the list
    * @param handler Handler for the result of this call.
-   * @since 1.0.0
+   * @since Redis 1.0.0
    * group: list
    */
   @Fluent
@@ -1649,7 +1649,7 @@ public interface RedisClient {
    * @param key     Key string
    * @param value   Value to be added to the end of the list
    * @param handler Handler for the result of this call.
-   * @since 1.0.0
+   * @since Redis 1.0.0
    * group: list
    */
   @Fluent
@@ -1661,7 +1661,7 @@ public interface RedisClient {
    * @param key     Key string
    * @param value   Value to be added to the end of the list
    * @param handler Handler for the result of this call.
-   * @since 2.2.0
+   * @since Redis 2.2.0
    * group: list
    */
   @Fluent
@@ -1673,7 +1673,7 @@ public interface RedisClient {
    * @param key     Key string
    * @param member  Value to be added to the set
    * @param handler Handler for the result of this call.
-   * @since 1.0.0
+   * @since Redis 1.0.0
    * group: set
    */
   @Fluent
@@ -1685,7 +1685,7 @@ public interface RedisClient {
    * @param key     Key string
    * @param members Values to be added to the set
    * @param handler Handler for the result of this call.
-   * @since 1.0.0
+   * @since Redis 1.0.0
    * group: set
    */
   @Fluent
@@ -1694,7 +1694,7 @@ public interface RedisClient {
   /**
    * Synchronously save the dataset to disk
    *
-   * @since 1.0.0
+   * @since Redis 1.0.0
    * group: server
    */
   @Fluent
@@ -1705,7 +1705,7 @@ public interface RedisClient {
    *
    * @param key     Key string
    * @param handler Handler for the result of this call.
-   * @since 1.0.0
+   * @since Redis 1.0.0
    * group: set
    */
   @Fluent
@@ -1716,7 +1716,7 @@ public interface RedisClient {
    *
    * @param script  SHA1 digest identifying a script in the script cache
    * @param handler Handler for the result of this call.
-   * @since 2.6.0
+   * @since Redis 2.6.0
    * group: scripting
    */
   @Fluent
@@ -1727,7 +1727,7 @@ public interface RedisClient {
    *
    * @param scripts List of SHA1 digests identifying scripts in the script cache
    * @param handler Handler for the result of this call.
-   * @since 2.6.0
+   * @since Redis 2.6.0
    * group: scripting
    */
   @Fluent
@@ -1736,7 +1736,7 @@ public interface RedisClient {
   /**
    * Remove all the scripts from the script cache.
    *
-   * @since 2.6.0
+   * @since Redis 2.6.0
    * group: scripting
    */
   @Fluent
@@ -1745,7 +1745,7 @@ public interface RedisClient {
   /**
    * Kill the script currently in execution.
    *
-   * @since 2.6.0
+   * @since Redis 2.6.0
    * group: scripting
    */
   @Fluent
@@ -1756,7 +1756,7 @@ public interface RedisClient {
    *
    * @param script  Lua script
    * @param handler Handler for the result of this call.
-   * @since 2.6.0
+   * @since Redis 2.6.0
    * group: scripting
    */
   @Fluent
@@ -1768,7 +1768,7 @@ public interface RedisClient {
    * @param key     Key identifying the set to compare with all other sets combined
    * @param cmpkeys List of keys identifying sets to subtract from the key set
    * @param handler Handler for the result of this call.
-   * @since 1.0.0
+   * @since Redis 1.0.0
    * group: set
    */
   @Fluent
@@ -1781,7 +1781,7 @@ public interface RedisClient {
    * @param key     Key identifying the set to compare with all other sets combined
    * @param cmpkeys List of keys identifying sets to subtract from the key set
    * @param handler Handler for the result of this call.
-   * @since 1.0.0
+   * @since Redis 1.0.0
    * group: set
    */
   @Fluent
@@ -1792,7 +1792,7 @@ public interface RedisClient {
    *
    * @param dbindex Index identifying the new active database
    * @param handler Handler for the result of this call.
-   * @since 1.0.0
+   * @since Redis 1.0.0
    * group: connection
    */
   @Fluent
@@ -1804,7 +1804,7 @@ public interface RedisClient {
    * @param key     Key of which value to set
    * @param value   New value for the key
    * @param handler Handler for the result of this call.
-   * @since 1.0.0
+   * @since Redis 1.0.0
    * group: string
    */
   @Fluent
@@ -1817,7 +1817,7 @@ public interface RedisClient {
    * @param value   New value for the key
    * @param options Set options
    * @param handler Handler for the result of this call.
-   * @since 1.0.0
+   * @since Redis 1.0.0
    * group: string
    */
   @Fluent
@@ -1829,7 +1829,7 @@ public interface RedisClient {
    * @param key     Key of which value to set
    * @param value   New value for the key
    * @param handler Handler for the result of this call.
-   * @since 1.0.0
+   * @since Redis 1.0.0
    * group: string
    */
   @Fluent
@@ -1842,7 +1842,7 @@ public interface RedisClient {
    * @param value   New value for the key
    * @param options Set options
    * @param handler Handler for the result of this call.
-   * @since 1.0.0
+   * @since Redis 1.0.0
    * group: string
    */
   @Fluent
@@ -1855,7 +1855,7 @@ public interface RedisClient {
    * @param offset  Bit offset
    * @param bit     New value - must be 1 or 0
    * @param handler Handler for the result of this call.
-   * @since 2.2.0
+   * @since Redis 2.2.0
    * group: string
    */
   @Fluent
@@ -1868,7 +1868,7 @@ public interface RedisClient {
    * @param seconds Number of seconds until the key expires
    * @param value   New value for key
    * @param handler Handler for the result of this call.
-   * @since 2.0.0
+   * @since Redis 2.0.0
    * group: string
    */
   @Fluent
@@ -1880,7 +1880,7 @@ public interface RedisClient {
    * @param key     Key of which value to set
    * @param value   New value for the key
    * @param handler Handler for the result of this call.
-   * @since 1.0.0
+   * @since Redis 1.0.0
    * group: string
    */
   @Fluent
@@ -1893,7 +1893,7 @@ public interface RedisClient {
    * @param offset  Offset - the maximum offset that you can set is 2^29 -1 (536870911), as Redis Strings are limited to 512 megabytes
    * @param value   Value to overwrite with
    * @param handler Handler for the result of this call.
-   * @since 2.2.0
+   * @since Redis 2.2.0
    * group: string
    */
   @Fluent
@@ -1904,7 +1904,7 @@ public interface RedisClient {
    *
    * @param keys    List of keys to perform intersection on
    * @param handler Handler for the result of this call.
-   * @since 1.0.0
+   * @since Redis 1.0.0
    * group: set
    */
   @Fluent
@@ -1916,7 +1916,7 @@ public interface RedisClient {
    * @param destkey Key where to store the results
    * @param keys    List of keys to perform intersection on
    * @param handler Handler for the result of this call.
-   * @since 1.0.0
+   * @since Redis 1.0.0
    * group: set
    */
   @Fluent
@@ -1928,7 +1928,7 @@ public interface RedisClient {
    * @param key     Key string
    * @param member  Member to look for
    * @param handler Handler for the result of this call.
-   * @since 1.0.0
+   * @since Redis 1.0.0
    * group: set
    */
   @Fluent
@@ -1940,7 +1940,7 @@ public interface RedisClient {
    * @param host    Host to become this server's master
    * @param port    Port of our new master
    * @param handler Handler for the result of this call.
-   * @since 1.0.0
+   * @since Redis 1.0.0
    * group: server
    */
   @Fluent
@@ -1950,7 +1950,7 @@ public interface RedisClient {
    * Make this server a master
    *
    * @param handler Handler for the result of this call.
-   * @since 1.0.0
+   * @since Redis 1.0.0
    * group: server
    */
   @Fluent
@@ -1961,7 +1961,7 @@ public interface RedisClient {
    *
    * @param limit   Number of log entries to return. If value is less than zero all entries are returned
    * @param handler Handler for the result of this call.
-   * @since 2.2.12
+   * @since Redis 2.2.12
    * group: server
    */
   @Fluent
@@ -1971,7 +1971,7 @@ public interface RedisClient {
    * Get the length of the Redis slow queries log
    *
    * @param handler Handler for the result of this call.
-   * @since 2.2.12
+   * @since Redis 2.2.12
    * group: server
    */
   @Fluent
@@ -1981,7 +1981,7 @@ public interface RedisClient {
    * Reset the Redis slow queries log
    *
    * @param handler Handler for the result of this call.
-   * @since 2.2.12
+   * @since Redis 2.2.12
    * group: server
    */
   @Fluent
@@ -1992,7 +1992,7 @@ public interface RedisClient {
    *
    * @param key     Key string
    * @param handler Handler for the result of this call.
-   * @since 1.0.0
+   * @since Redis 1.0.0
    * group: set
    */
   @Fluent
@@ -2005,7 +2005,7 @@ public interface RedisClient {
    * @param destkey Key identifying the destination set
    * @param member   Member to move
    * @param handler Handler for the result of this call.
-   * @since 1.0.0
+   * @since Redis 1.0.0
    * group: set
    */
   @Fluent
@@ -2017,7 +2017,7 @@ public interface RedisClient {
    * @param key     Key string
    * @param options Sort options
    * @param handler Handler for the result of this call.
-   * @since 1.0.0
+   * @since Redis 1.0.0
    * group: generic
    */
   @Fluent
@@ -2028,7 +2028,7 @@ public interface RedisClient {
    *
    * @param key     Key string
    * @param handler Handler for the result of this call.
-   * @since 1.0.0
+   * @since Redis 1.0.0
    * group: set
    */
   @Fluent
@@ -2040,7 +2040,7 @@ public interface RedisClient {
    * @param key     Key string
    * @param count   Number of members to remove
    * @param handler Handler for the result of this call.
-   * @since 1.0.0
+   * @since Redis 1.0.0
    * group: set
    */
   @Fluent
@@ -2051,7 +2051,7 @@ public interface RedisClient {
    *
    * @param key     Key string
    * @param handler Handler for the result of this call.
-   * @since 1.0.0
+   * @since Redis 1.0.0
    * group: set
    */
   @Fluent
@@ -2063,7 +2063,7 @@ public interface RedisClient {
    * @param key     Key string
    * @param count   Number of members to get
    * @param handler Handler for the result of this call.
-   * @since 1.0.0
+   * @since Redis 1.0.0
    * group: set
    */
   @Fluent
@@ -2075,7 +2075,7 @@ public interface RedisClient {
    * @param key     Key string
    * @param member  Member to remove
    * @param handler Handler for the result of this call.
-   * @since 1.0.0
+   * @since Redis 1.0.0
    * group: set
    */
   @Fluent
@@ -2087,7 +2087,7 @@ public interface RedisClient {
    * @param key     Key string
    * @param members Members to remove
    * @param handler Handler for the result of this call.
-   * @since 1.0.0
+   * @since Redis 1.0.0
    * group: set
    */
   @Fluent
@@ -2098,7 +2098,7 @@ public interface RedisClient {
    *
    * @param key     Key string
    * @param handler Handler for the result of this call.
-   * @since 2.2.0
+   * @since Redis 2.2.0
    * group: string
    */
   @Fluent
@@ -2109,7 +2109,7 @@ public interface RedisClient {
    *
    * @param channel Channel to subscribe to
    * @param handler  Handler for the result of this call.
-   * @since 2.0.0
+   * @since Redis 2.0.0
    * group: pubsub
    */
   @Fluent
@@ -2120,7 +2120,7 @@ public interface RedisClient {
    *
    * @param channels List of channels to subscribe to
    * @param handler  Handler for the result of this call.
-   * @since 2.0.0
+   * @since Redis 2.0.0
    * group: pubsub
    */
   @Fluent
@@ -2131,7 +2131,7 @@ public interface RedisClient {
    *
    * @param keys    List of keys identifying sets to add up
    * @param handler Handler for the result of this call.
-   * @since 1.0.0
+   * @since Redis 1.0.0
    * group: set
    */
   @Fluent
@@ -2143,7 +2143,7 @@ public interface RedisClient {
    * @param destkey Destination key
    * @param keys    List of keys identifying sets to add up
    * @param handler Handler for the result of this call.
-   * @since 1.0.0
+   * @since Redis 1.0.0
    * group: set
    */
   @Fluent
@@ -2152,7 +2152,7 @@ public interface RedisClient {
   /**
    * Internal command used for replication
    *
-   * @since 1.0.0
+   * @since Redis 1.0.0
    * group: server
    */
   @Fluent
@@ -2161,7 +2161,7 @@ public interface RedisClient {
   /**
    * Return the current server time
    *
-   * @since 2.6.0
+   * @since Redis 2.6.0
    * group: server
    */
   @Fluent
@@ -2172,7 +2172,7 @@ public interface RedisClient {
    *
    * @param key     Key string
    * @param handler Handler for the result of this call.
-   * @since 1.0.0
+   * @since Redis 1.0.0
    * group: generic
    */
   @Fluent
@@ -2183,7 +2183,7 @@ public interface RedisClient {
    *
    * @param key     Key string
    * @param handler Handler for the result of this call.
-   * @since 1.0.0
+   * @since Redis 1.0.0
    * group: generic
    */
   @Fluent
@@ -2194,7 +2194,7 @@ public interface RedisClient {
    *
    * @param channels List of channels to subscribe to
    * @param handler  Handler for the result of this call.
-   * @since 2.0.0
+   * @since Redis 2.0.0
    * group: pubsub
    */
   @Fluent
@@ -2203,7 +2203,7 @@ public interface RedisClient {
   /**
    * Forget about all watched keys
    *
-   * @since 2.2.0
+   * @since Redis 2.2.0
    * group: transactions
    */
   @Fluent
@@ -2215,7 +2215,7 @@ public interface RedisClient {
    * @param numSlaves
    * @param timeout
    * @param handler Handler for the result of this call.
-   * @since 3.0.0
+   * @since Redis 3.0.0
    * group: generic
    */
   @Fluent
@@ -2226,7 +2226,7 @@ public interface RedisClient {
    *
    * @param key    Key to watch
    * @param handler Handler for the result of this call.
-   * @since 2.2.0
+   * @since Redis 2.2.0
    * group: transactions
    */
   @Fluent
@@ -2237,7 +2237,7 @@ public interface RedisClient {
    *
    * @param keys    List of keys to watch
    * @param handler Handler for the result of this call.
-   * @since 2.2.0
+   * @since Redis 2.2.0
    * group: transactions
    */
   @Fluent
@@ -2250,7 +2250,7 @@ public interface RedisClient {
    * @param score   Score used for sorting
    * @param member  New member key
    * @param handler Handler for the result of this call.
-   * @since 1.2.0
+   * @since Redis 1.2.0
    * group: sorted_set
    */
   @Fluent
@@ -2262,7 +2262,7 @@ public interface RedisClient {
    * @param key     Key string
    * @param members New member keys and their scores
    * @param handler Handler for the result of this call.
-   * @since 1.2.0
+   * @since Redis 1.2.0
    * group: sorted_set
    */
   @Fluent
@@ -2273,7 +2273,7 @@ public interface RedisClient {
    *
    * @param key     Key string
    * @param handler Handler for the result of this call.
-   * @since 1.2.0
+   * @since Redis 1.2.0
    * group: sorted_set
    */
   @Fluent
@@ -2286,7 +2286,7 @@ public interface RedisClient {
    * @param min     Minimum score
    * @param max     Maximum score
    * @param handler Handler for the result of this call.
-   * @since 2.0.0
+   * @since Redis 2.0.0
    * group: sorted_set
    */
   @Fluent
@@ -2299,7 +2299,7 @@ public interface RedisClient {
    * @param increment Increment amount
    * @param member    Member key
    * @param handler   Handler for the result of this call.
-   * @since 1.2.0
+   * @since Redis 1.2.0
    * group: sorted_set
    */
   @Fluent
@@ -2312,7 +2312,7 @@ public interface RedisClient {
    * @param sets    List of keys identifying sorted sets to intersect
    * @param options Aggregation options
    * @param handler Handler for the result of this call.
-   * @since 2.0.0
+   * @since Redis 2.0.0
    * group: sorted_set
    */
   @Fluent
@@ -2325,7 +2325,7 @@ public interface RedisClient {
    * @param sets    List of keys identifying sorted sets to intersect
    * @param options Aggregation options
    * @param handler Handler for the result of this call.
-   * @since 2.0.0
+   * @since Redis 2.0.0
    * group: sorted_set
    */
   @Fluent
@@ -2338,7 +2338,7 @@ public interface RedisClient {
    * @param min     Pattern to compare against for minimum value
    * @param max     Pattern to compare against for maximum value
    * @param handler Handler for the result of this call.
-   * @since 2.8.9
+   * @since Redis 2.8.9
    * group: sorted_set
    */
   @Fluent
@@ -2351,7 +2351,7 @@ public interface RedisClient {
    * @param start   Start index for the range
    * @param stop    Stop index for the range - inclusive
    * @param handler Handler for the result of this call.
-   * @since 1.2.0
+   * @since Redis 1.2.0
    * group: sorted_set
    */
   @Fluent
@@ -2365,7 +2365,7 @@ public interface RedisClient {
    * @param stop    Stop index for the range - inclusive
    * @param options Range options
    * @param handler Handler for the result of this call.
-   * @since 1.2.0
+   * @since Redis 1.2.0
    * group: sorted_set
    */
   @Fluent
@@ -2379,7 +2379,7 @@ public interface RedisClient {
    * @param max     Pattern representing a maximum allowed value
    * @param options Limit options where limit can be specified
    * @param handler Handler for the result of this call.
-   * @since 2.8.9
+   * @since Redis 2.8.9
    * group: sorted_set
    */
   @Fluent
@@ -2393,7 +2393,7 @@ public interface RedisClient {
    * @param max     Pattern defining a maximum value
    * @param options Range and limit options
    * @param handler Handler for the result of this call.
-   * @since 1.0.5
+   * @since Redis 1.0.5
    * group: sorted_set
    */
   @Fluent
@@ -2405,7 +2405,7 @@ public interface RedisClient {
    * @param key     Key string
    * @param member  Member in the sorted set identified by key
    * @param handler Handler for the result of this call.
-   * @since 2.0.0
+   * @since Redis 2.0.0
    * group: sorted_set
    */
   @Fluent
@@ -2417,7 +2417,7 @@ public interface RedisClient {
    * @param key     Key string
    * @param member  Member in the sorted set identified by key
    * @param handler Handler for the result of this call.
-   * @since 1.2.0
+   * @since Redis 1.2.0
    * group: sorted_set
    */
   @Fluent
@@ -2429,7 +2429,7 @@ public interface RedisClient {
    * @param key     Key string
    * @param members Members in the sorted set identified by key
    * @param handler Handler for the result of this call.
-   * @since 1.2.0
+   * @since Redis 1.2.0
    * group: sorted_set
    */
   @Fluent
@@ -2442,7 +2442,7 @@ public interface RedisClient {
    * @param min     Pattern defining a minimum value
    * @param max     Pattern defining a maximum value
    * @param handler Handler for the result of this call.
-   * @since 2.8.9
+   * @since Redis 2.8.9
    * group: sorted_set
    */
   @Fluent
@@ -2455,7 +2455,7 @@ public interface RedisClient {
    * @param start   Start index
    * @param stop    Stop index
    * @param handler Handler for the result of this call.
-   * @since 2.0.0
+   * @since Redis 2.0.0
    * group: sorted_set
    */
   @Fluent
@@ -2467,7 +2467,7 @@ public interface RedisClient {
    * @param key     Key string
    * @param min     Pattern defining a minimum value
    * @param max     Pattern defining a maximum value
-   * @since 1.2.0
+   * @since Redis 1.2.0
    * group: sorted_set
    */
   @Fluent
@@ -2481,7 +2481,7 @@ public interface RedisClient {
    * @param stop    Stop index for the range - inclusive
    * @param options Range options
    * @param handler Handler for the result of this call.
-   * @since 1.2.0
+   * @since Redis 1.2.0
    * group: sorted_set
    */
   @Fluent
@@ -2495,7 +2495,7 @@ public interface RedisClient {
    * @param min     Pattern defining a minimum value
    * @param options Limit options
    * @param handler Handler for the result of this call.
-   * @since 2.8.9
+   * @since Redis 2.8.9
    * group: sorted_set
    */
   @Fluent
@@ -2509,7 +2509,7 @@ public interface RedisClient {
    * @param min     Pattern defining a minimum value
    * @param options Range and limit options
    * @param handler Handler for the result of this call.
-   * @since 2.2.0
+   * @since Redis 2.2.0
    * group: sorted_set
    */
   @Fluent
@@ -2521,7 +2521,7 @@ public interface RedisClient {
    * @param key     Key string
    * @param member  Member in the sorted set identified by key
    * @param handler Handler for the result of this call.
-   * @since 2.0.0
+   * @since Redis 2.0.0
    * group: sorted_set
    */
   @Fluent
@@ -2533,7 +2533,7 @@ public interface RedisClient {
    * @param key     Key string
    * @param member  Member in the sorted set identified by key
    * @param handler Handler for the result of this call.
-   * @since 1.2.0
+   * @since Redis 1.2.0
    * group: sorted_set
    */
   @Fluent
@@ -2546,7 +2546,7 @@ public interface RedisClient {
    * @param sets    List of keys identifying sorted sets
    * @param options Aggregation options
    * @param handler Handler for the result of this call.
-   * @since 2.0.0
+   * @since Redis 2.0.0
    * group: sorted_set
    */
   @Fluent
@@ -2559,7 +2559,7 @@ public interface RedisClient {
    * @param sets    Map containing set-key:weight pairs
    * @param options Aggregation options
    * @param handler Handler for the result of this call.
-   * @since 2.0.0
+   * @since Redis 2.0.0
    * group: sorted_set
    */
   @Fluent
@@ -2571,7 +2571,7 @@ public interface RedisClient {
    * @param cursor  Cursor id
    * @param options Scan options
    * @param handler Handler for the result of this call.
-   * @since 2.8.0
+   * @since Redis 2.8.0
    * group: generic
    */
   @Fluent
@@ -2584,7 +2584,7 @@ public interface RedisClient {
    * @param cursor  Cursor id
    * @param options Scan options
    * @param handler Handler for the result of this call.
-   * @since 2.8.0
+   * @since Redis 2.8.0
    * group: set
    */
   @Fluent
@@ -2597,7 +2597,7 @@ public interface RedisClient {
    * @param cursor  Cursor id
    * @param options Scan options
    * @param handler Handler for the result of this call.
-   * @since 2.8.0
+   * @since Redis 2.8.0
    * group: hash
    */
   @Fluent
@@ -2610,7 +2610,7 @@ public interface RedisClient {
    * @param cursor  Cursor id
    * @param options Scan options
    * @param handler Handler for the result of this call.
-   * @since 2.8.0
+   * @since Redis 2.8.0
    * group: sorted_set
    */
   @Fluent
