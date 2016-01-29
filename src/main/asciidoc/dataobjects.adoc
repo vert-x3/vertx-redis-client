@@ -1,5 +1,19 @@
 = Cheatsheets
 
+[[LimitOptions]]
+== LimitOptions
+
+++++
+ @author <a href="mailto:marko.strukelj@gmail.com">Marko Strukelj</a>
+++++
+'''
+
+[cols=">25%,^25%,50%"]
+[frame="topbot"]
+|===
+^|Name | Type ^| Description
+|===
+
 [[KillFilter]]
 == KillFilter
 
@@ -30,8 +44,8 @@ Set TYPE filter
 +++
 |===
 
-[[LimitOptions]]
-== LimitOptions
+[[SetOptions]]
+== SetOptions
 
 ++++
  @author <a href="mailto:marko.strukelj@gmail.com">Marko Strukelj</a>
@@ -42,6 +56,10 @@ Set TYPE filter
 [frame="topbot"]
 |===
 ^|Name | Type ^| Description
+|[[ex]]`ex`|`Number (long)`|-
+|[[nx]]`nx`|`Boolean`|-
+|[[px]]`px`|`Number (long)`|-
+|[[xx]]`xx`|`Boolean`|-
 |===
 
 [[SortOptions]]
@@ -59,24 +77,6 @@ Set TYPE filter
 |[[by]]`by`|`String`|-
 |[[gets]]`gets`|`Array of String`|-
 |[[store]]`store`|`String`|-
-|===
-
-[[SetOptions]]
-== SetOptions
-
-++++
- @author <a href="mailto:marko.strukelj@gmail.com">Marko Strukelj</a>
-++++
-'''
-
-[cols=">25%,^25%,50%"]
-[frame="topbot"]
-|===
-^|Name | Type ^| Description
-|[[ex]]`ex`|`Number (long)`|-
-|[[nx]]`nx`|`Boolean`|-
-|[[px]]`px`|`Number (long)`|-
-|[[xx]]`xx`|`Boolean`|-
 |===
 
 [[MigrateOptions]]
@@ -170,6 +170,41 @@ Set the TCP KeepAlive option
 +++
 Set the TCP NoDelay at the socket level.
 +++
+|===
+
+[[GeoMember]]
+== GeoMember
+
+++++
+ @author <a href="mailto:plopes@redhat.com">Paulo Lopes</a>
+++++
+'''
+
+[cols=">25%,^25%,50%"]
+[frame="topbot"]
+|===
+^|Name | Type ^| Description
+|[[latitude]]`latitude`|`Number (Double)`|-
+|[[longitude]]`longitude`|`Number (Double)`|-
+|[[member]]`member`|`String`|-
+|===
+
+[[GeoRadiusOptions]]
+== GeoRadiusOptions
+
+++++
+ @author <a href="mailto:plopes@redhat.com">Paulo Lopes</a>
+++++
+'''
+
+[cols=">25%,^25%,50%"]
+[frame="topbot"]
+|===
+^|Name | Type ^| Description
+|[[count]]`count`|`Number (Long)`|-
+|[[withCoord]]`withCoord`|`Boolean`|-
+|[[withDist]]`withDist`|`Boolean`|-
+|[[withHash]]`withHash`|`Boolean`|-
 |===
 
 [[RangeLimitOptions]]

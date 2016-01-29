@@ -205,7 +205,13 @@ public enum RedisCommand {
   SCAN("SCAN"),
   SSCAN("SSCAN"),
   HSCAN("HSCAN"),
-  ZSCAN("ZSCAN");
+  ZSCAN("ZSCAN"),
+  GEOADD("GEOADD"),
+  GEOHASH("GEOHASH"),
+  GEOPOS("GEOPOS"),
+  GEODIST("GEODIST"),
+  GEORADIUS("GEORADIUS"),
+  GEORADIUSBYMEMBER("GEORADIUSBYMEMBER");
 
   private final String[] tokens;
 

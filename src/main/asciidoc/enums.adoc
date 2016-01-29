@@ -18,6 +18,22 @@
 |[[MAX]]`MAX`|-
 |===
 
+[[ResetOptions]]
+== ResetOptions
+
+++++
+ @author <a href="mailto:pmlopes@gmail.com">Paulo Lopes</a>
+++++
+'''
+
+[cols=">25%,75%"]
+[frame="topbot"]
+|===
+^|Name | Description
+|[[HARD]]`HARD`|-
+|[[SOFT]]`SOFT`|-
+|===
+
 [[BitOperation]]
 == BitOperation
 
@@ -36,22 +52,6 @@
 |[[NOT]]`NOT`|-
 |===
 
-[[ResetOptions]]
-== ResetOptions
-
-++++
- @author <a href="mailto:pmlopes@gmail.com">Paulo Lopes</a>
-++++
-'''
-
-[cols=">25%,75%"]
-[frame="topbot"]
-|===
-^|Name | Description
-|[[HARD]]`HARD`|-
-|[[SOFT]]`SOFT`|-
-|===
-
 [[ObjectCmd]]
 == ObjectCmd
 
@@ -67,6 +67,24 @@
 |[[REFCOUNT]]`REFCOUNT`|-
 |[[ENCODING]]`ENCODING`|-
 |[[IDLETIME]]`IDLETIME`|-
+|===
+
+[[GeoUnit]]
+== GeoUnit
+
+++++
+ @author <a href="mailto:plopes@redhat.com">Paulo Lopes</a>
+++++
+'''
+
+[cols=">25%,75%"]
+[frame="topbot"]
+|===
+^|Name | Description
+|[[m]]`m`|-
+|[[km]]`km`|-
+|[[mi]]`mi`|-
+|[[ft]]`ft`|-
 |===
 
 [[ShutdownOptions]]

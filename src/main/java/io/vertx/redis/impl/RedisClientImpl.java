@@ -1381,7 +1381,79 @@ public final class RedisClientImpl extends AbstractRedisClient {
   public RedisClient zscan(String key, String cursor, ScanOptions options, Handler<AsyncResult<JsonArray>> handler) {
     sendJsonArray(ZSCAN, toPayload(key, cursor, options != null ? options.toJsonArray() : null), handler);
     return this;
-  } 
+  }
+
+  @Override
+  public RedisClient geoadd(String key, double longitude, double latitude, String member, Handler<AsyncResult<Long>> handler) {
+    sendLong(GEOADD, toPayload(key, longitude, latitude, member), handler);
+    return this;
+  }
+
+  @Override
+  public RedisClient geoaddMany(String key, List<GeoMember> members, Handler<AsyncResult<Long>> handler) {
+    sendLong(GEOADD, toPayload(key, members), handler);
+    return this;
+  }
+
+  @Override
+  public RedisClient geohash(String key, String member, Handler<AsyncResult<JsonArray>> handler) {
+    sendJsonArray(GEOHASH, toPayload(key, member), handler);
+    return this;
+  }
+
+  @Override
+  public RedisClient geohashMany(String key, List<String> members, Handler<AsyncResult<JsonArray>> handler) {
+    sendJsonArray(GEOHASH, toPayload(key, members), handler);
+    return this;
+  }
+
+  @Override
+  public RedisClient geopos(String key, String member, Handler<AsyncResult<JsonArray>> handler) {
+    sendJsonArray(GEOPOS, toPayload(key, member), handler);
+    return this;
+  }
+
+  @Override
+  public RedisClient geoposMany(String key, List<String> members, Handler<AsyncResult<JsonArray>> handler) {
+    sendJsonArray(GEOPOS, toPayload(key, members), handler);
+    return this;
+  }
+
+  @Override
+  public RedisClient geodist(String key, String member1, String member2, Handler<AsyncResult<String>> handler) {
+    sendString(GEODIST, toPayload(key, member1, member2), handler);
+    return this;
+  }
+
+  @Override
+  public RedisClient geodistWithUnit(String key, String member1, String member2, GeoUnit unit, Handler<AsyncResult<String>> handler) {
+    sendString(GEODIST, toPayload(key, member1, member2, unit), handler);
+    return this;
+  }
+
+  @Override
+  public RedisClient georadius(String key, double longitude, double latitude, double radius, GeoUnit unit, Handler<AsyncResult<JsonArray>> handler) {
+    sendJsonArray(GEORADIUS, toPayload(key, longitude, latitude, radius, unit), handler);
+    return this;
+  }
+
+  @Override
+  public RedisClient georadiusWithOptions(String key, double longitude, double latitude, double radius, GeoUnit unit, GeoRadiusOptions options, Handler<AsyncResult<JsonArray>> handler) {
+    sendJsonArray(GEORADIUS, toPayload(key, longitude, latitude, radius, unit, options != null ? options.toJsonArray() : null), handler);
+    return this;
+  }
+
+  @Override
+  public RedisClient georadiusbymember(String key, String member, double radius, GeoUnit unit, Handler<AsyncResult<JsonArray>> handler) {
+    sendJsonArray(GEORADIUSBYMEMBER, toPayload(key, member, radius, unit), handler);
+    return this;
+  }
+
+  @Override
+  public RedisClient georadiusbymemberWithOptions(String key, String member, double radius, GeoUnit unit, GeoRadiusOptions options, Handler<AsyncResult<JsonArray>> handler) {
+    sendJsonArray(GEORADIUSBYMEMBER, toPayload(key, member, radius, unit, options != null ? options.toJsonArray() : null), handler);
+    return this;
+  }
 
   /**
    * A helper method to package method parameters into JsonArray payload.

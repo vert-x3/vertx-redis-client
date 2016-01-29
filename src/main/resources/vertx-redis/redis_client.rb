@@ -2624,5 +2624,176 @@ module VertxRedis
       end
       raise ArgumentError, "Invalid arguments when calling zscan(key,cursor,options)"
     end
+    #  Add one or more geospatial items in the geospatial index represented using a sorted set.
+    # @param [String] key Key string
+    # @param [Float] longitude longitude
+    # @param [Float] latitude latitude
+    # @param [String] member member
+    # @yield Handler for the result of this call.
+    # @return [self]
+    def geoadd(key=nil,longitude=nil,latitude=nil,member=nil)
+      if key.class == String && longitude.class == Float && latitude.class == Float && member.class == String && block_given?
+        @j_del.java_method(:geoadd, [Java::java.lang.String.java_class,Java::double.java_class,Java::double.java_class,Java::java.lang.String.java_class,Java::IoVertxCore::Handler.java_class]).call(key,::Vertx::Util::Utils.to_double(longitude),::Vertx::Util::Utils.to_double(latitude),member,(Proc.new { |ar| yield(ar.failed ? ar.cause : nil, ar.succeeded ? ar.result : nil) }))
+        return self
+      end
+      raise ArgumentError, "Invalid arguments when calling geoadd(key,longitude,latitude,member)"
+    end
+    #  Add one or more geospatial items in the geospatial index represented using a sorted set.
+    # @param [String] key Key string
+    # @param [Array<Hash>] members list of &lt;lon, lat, member&gt;
+    # @yield Handler for the result of this call.
+    # @return [self]
+    def geoadd_many(key=nil,members=nil)
+      if key.class == String && members.class == Array && block_given?
+        @j_del.java_method(:geoaddMany, [Java::java.lang.String.java_class,Java::JavaUtil::List.java_class,Java::IoVertxCore::Handler.java_class]).call(key,members.map { |element| Java::IoVertxRedisOp::GeoMember.new(::Vertx::Util::Utils.to_json_object(element)) },(Proc.new { |ar| yield(ar.failed ? ar.cause : nil, ar.succeeded ? ar.result : nil) }))
+        return self
+      end
+      raise ArgumentError, "Invalid arguments when calling geoadd_many(key,members)"
+    end
+    #  Return valid Geohash strings representing the position of one or more elements in a sorted set value representing
+    #  a geospatial index (where elements were added using GEOADD).
+    # @param [String] key Key string
+    # @param [String] member member
+    # @yield Handler for the result of this call.
+    # @return [self]
+    def geohash(key=nil,member=nil)
+      if key.class == String && member.class == String && block_given?
+        @j_del.java_method(:geohash, [Java::java.lang.String.java_class,Java::java.lang.String.java_class,Java::IoVertxCore::Handler.java_class]).call(key,member,(Proc.new { |ar| yield(ar.failed ? ar.cause : nil, ar.succeeded ? ar.result != nil ? JSON.parse(ar.result.encode) : nil : nil) }))
+        return self
+      end
+      raise ArgumentError, "Invalid arguments when calling geohash(key,member)"
+    end
+    #  Return valid Geohash strings representing the position of one or more elements in a sorted set value representing
+    #  a geospatial index (where elements were added using GEOADD).
+    # @param [String] key Key string
+    # @param [Array<String>] members list of members
+    # @yield Handler for the result of this call.
+    # @return [self]
+    def geohash_many(key=nil,members=nil)
+      if key.class == String && members.class == Array && block_given?
+        @j_del.java_method(:geohashMany, [Java::java.lang.String.java_class,Java::JavaUtil::List.java_class,Java::IoVertxCore::Handler.java_class]).call(key,members.map { |element| element },(Proc.new { |ar| yield(ar.failed ? ar.cause : nil, ar.succeeded ? ar.result != nil ? JSON.parse(ar.result.encode) : nil : nil) }))
+        return self
+      end
+      raise ArgumentError, "Invalid arguments when calling geohash_many(key,members)"
+    end
+    #  Return the positions (longitude,latitude) of all the specified members of the geospatial index represented by the
+    #  sorted set at key.
+    # @param [String] key Key string
+    # @param [String] member member
+    # @yield Handler for the result of this call.
+    # @return [self]
+    def geopos(key=nil,member=nil)
+      if key.class == String && member.class == String && block_given?
+        @j_del.java_method(:geopos, [Java::java.lang.String.java_class,Java::java.lang.String.java_class,Java::IoVertxCore::Handler.java_class]).call(key,member,(Proc.new { |ar| yield(ar.failed ? ar.cause : nil, ar.succeeded ? ar.result != nil ? JSON.parse(ar.result.encode) : nil : nil) }))
+        return self
+      end
+      raise ArgumentError, "Invalid arguments when calling geopos(key,member)"
+    end
+    #  Return the positions (longitude,latitude) of all the specified members of the geospatial index represented by the
+    #  sorted set at key.
+    # @param [String] key Key string
+    # @param [Array<String>] members list of members
+    # @yield Handler for the result of this call.
+    # @return [self]
+    def geopos_many(key=nil,members=nil)
+      if key.class == String && members.class == Array && block_given?
+        @j_del.java_method(:geoposMany, [Java::java.lang.String.java_class,Java::JavaUtil::List.java_class,Java::IoVertxCore::Handler.java_class]).call(key,members.map { |element| element },(Proc.new { |ar| yield(ar.failed ? ar.cause : nil, ar.succeeded ? ar.result != nil ? JSON.parse(ar.result.encode) : nil : nil) }))
+        return self
+      end
+      raise ArgumentError, "Invalid arguments when calling geopos_many(key,members)"
+    end
+    #  Return the distance between two members in the geospatial index represented by the sorted set.
+    # @param [String] key Key string
+    # @param [String] member1 member 1
+    # @param [String] member2 member 2
+    # @yield Handler for the result of this call.
+    # @return [self]
+    def geodist(key=nil,member1=nil,member2=nil)
+      if key.class == String && member1.class == String && member2.class == String && block_given?
+        @j_del.java_method(:geodist, [Java::java.lang.String.java_class,Java::java.lang.String.java_class,Java::java.lang.String.java_class,Java::IoVertxCore::Handler.java_class]).call(key,member1,member2,(Proc.new { |ar| yield(ar.failed ? ar.cause : nil, ar.succeeded ? ar.result : nil) }))
+        return self
+      end
+      raise ArgumentError, "Invalid arguments when calling geodist(key,member1,member2)"
+    end
+    #  Return the distance between two members in the geospatial index represented by the sorted set.
+    # @param [String] key Key string
+    # @param [String] member1 member 1
+    # @param [String] member2 member 2
+    # @param [:m,:km,:mi,:ft] unit geo unit
+    # @yield Handler for the result of this call.
+    # @return [self]
+    def geodist_with_unit(key=nil,member1=nil,member2=nil,unit=nil)
+      if key.class == String && member1.class == String && member2.class == String && unit.class == Symbol && block_given?
+        @j_del.java_method(:geodistWithUnit, [Java::java.lang.String.java_class,Java::java.lang.String.java_class,Java::java.lang.String.java_class,Java::IoVertxRedisOp::GeoUnit.java_class,Java::IoVertxCore::Handler.java_class]).call(key,member1,member2,Java::IoVertxRedisOp::GeoUnit.valueOf(unit),(Proc.new { |ar| yield(ar.failed ? ar.cause : nil, ar.succeeded ? ar.result : nil) }))
+        return self
+      end
+      raise ArgumentError, "Invalid arguments when calling geodist_with_unit(key,member1,member2,unit)"
+    end
+    #  Return the members of a sorted set populated with geospatial information using GEOADD, which are within the borders
+    #  of the area specified with the center location and the maximum distance from the center (the radius).
+    # @param [String] key Key string
+    # @param [Float] longitude longitude
+    # @param [Float] latitude latitude
+    # @param [Float] radius radius
+    # @param [:m,:km,:mi,:ft] unit geo unit
+    # @yield Handler for the result of this call.
+    # @return [self]
+    def georadius(key=nil,longitude=nil,latitude=nil,radius=nil,unit=nil)
+      if key.class == String && longitude.class == Float && latitude.class == Float && radius.class == Float && unit.class == Symbol && block_given?
+        @j_del.java_method(:georadius, [Java::java.lang.String.java_class,Java::double.java_class,Java::double.java_class,Java::double.java_class,Java::IoVertxRedisOp::GeoUnit.java_class,Java::IoVertxCore::Handler.java_class]).call(key,::Vertx::Util::Utils.to_double(longitude),::Vertx::Util::Utils.to_double(latitude),::Vertx::Util::Utils.to_double(radius),Java::IoVertxRedisOp::GeoUnit.valueOf(unit),(Proc.new { |ar| yield(ar.failed ? ar.cause : nil, ar.succeeded ? ar.result != nil ? JSON.parse(ar.result.encode) : nil : nil) }))
+        return self
+      end
+      raise ArgumentError, "Invalid arguments when calling georadius(key,longitude,latitude,radius,unit)"
+    end
+    #  Return the members of a sorted set populated with geospatial information using GEOADD, which are within the borders
+    #  of the area specified with the center location and the maximum distance from the center (the radius).
+    # @param [String] key Key string
+    # @param [Float] longitude longitude
+    # @param [Float] latitude latitude
+    # @param [Float] radius radius
+    # @param [:m,:km,:mi,:ft] unit geo unit
+    # @param [Hash] options geo radius options
+    # @yield Handler for the result of this call.
+    # @return [self]
+    def georadius_with_options(key=nil,longitude=nil,latitude=nil,radius=nil,unit=nil,options=nil)
+      if key.class == String && longitude.class == Float && latitude.class == Float && radius.class == Float && unit.class == Symbol && options.class == Hash && block_given?
+        @j_del.java_method(:georadiusWithOptions, [Java::java.lang.String.java_class,Java::double.java_class,Java::double.java_class,Java::double.java_class,Java::IoVertxRedisOp::GeoUnit.java_class,Java::IoVertxRedisOp::GeoRadiusOptions.java_class,Java::IoVertxCore::Handler.java_class]).call(key,::Vertx::Util::Utils.to_double(longitude),::Vertx::Util::Utils.to_double(latitude),::Vertx::Util::Utils.to_double(radius),Java::IoVertxRedisOp::GeoUnit.valueOf(unit),Java::IoVertxRedisOp::GeoRadiusOptions.new(::Vertx::Util::Utils.to_json_object(options)),(Proc.new { |ar| yield(ar.failed ? ar.cause : nil, ar.succeeded ? ar.result != nil ? JSON.parse(ar.result.encode) : nil : nil) }))
+        return self
+      end
+      raise ArgumentError, "Invalid arguments when calling georadius_with_options(key,longitude,latitude,radius,unit,options)"
+    end
+    #  This command is exactly like GEORADIUS with the sole difference that instead of taking, as the center of the area
+    #  to query, a longitude and latitude value, it takes the name of a member already existing inside the geospatial
+    #  index represented by the sorted set.
+    # @param [String] key Key string
+    # @param [String] member member
+    # @param [Float] radius radius
+    # @param [:m,:km,:mi,:ft] unit geo unit
+    # @yield Handler for the result of this call.
+    # @return [self]
+    def georadiusbymember(key=nil,member=nil,radius=nil,unit=nil)
+      if key.class == String && member.class == String && radius.class == Float && unit.class == Symbol && block_given?
+        @j_del.java_method(:georadiusbymember, [Java::java.lang.String.java_class,Java::java.lang.String.java_class,Java::double.java_class,Java::IoVertxRedisOp::GeoUnit.java_class,Java::IoVertxCore::Handler.java_class]).call(key,member,::Vertx::Util::Utils.to_double(radius),Java::IoVertxRedisOp::GeoUnit.valueOf(unit),(Proc.new { |ar| yield(ar.failed ? ar.cause : nil, ar.succeeded ? ar.result != nil ? JSON.parse(ar.result.encode) : nil : nil) }))
+        return self
+      end
+      raise ArgumentError, "Invalid arguments when calling georadiusbymember(key,member,radius,unit)"
+    end
+    #  This command is exactly like GEORADIUS with the sole difference that instead of taking, as the center of the area
+    #  to query, a longitude and latitude value, it takes the name of a member already existing inside the geospatial
+    #  index represented by the sorted set.
+    # @param [String] key Key string
+    # @param [String] member member
+    # @param [Float] radius radius
+    # @param [:m,:km,:mi,:ft] unit geo unit
+    # @param [Hash] options geo radius options
+    # @yield Handler for the result of this call.
+    # @return [self]
+    def georadiusbymember_with_options(key=nil,member=nil,radius=nil,unit=nil,options=nil)
+      if key.class == String && member.class == String && radius.class == Float && unit.class == Symbol && options.class == Hash && block_given?
+        @j_del.java_method(:georadiusbymemberWithOptions, [Java::java.lang.String.java_class,Java::java.lang.String.java_class,Java::double.java_class,Java::IoVertxRedisOp::GeoUnit.java_class,Java::IoVertxRedisOp::GeoRadiusOptions.java_class,Java::IoVertxCore::Handler.java_class]).call(key,member,::Vertx::Util::Utils.to_double(radius),Java::IoVertxRedisOp::GeoUnit.valueOf(unit),Java::IoVertxRedisOp::GeoRadiusOptions.new(::Vertx::Util::Utils.to_json_object(options)),(Proc.new { |ar| yield(ar.failed ? ar.cause : nil, ar.succeeded ? ar.result != nil ? JSON.parse(ar.result.encode) : nil : nil) }))
+        return self
+      end
+      raise ArgumentError, "Invalid arguments when calling georadiusbymember_with_options(key,member,radius,unit,options)"
+    end
   end
 end

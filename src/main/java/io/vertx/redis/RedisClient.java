@@ -2617,4 +2617,174 @@ public interface RedisClient {
   @Fluent
   RedisClient zscan(String key, String cursor, ScanOptions options, Handler<AsyncResult<JsonArray>> handler);
 
+  /**
+   * Add one or more geospatial items in the geospatial index represented using a sorted set.
+   *
+   * @param key     Key string
+   * @param longitude  longitude
+   * @param latitude latitude
+   * @param member member
+   * @param handler Handler for the result of this call.
+   * @since Beta
+   * group: geo
+   */
+  @Fluent
+  RedisClient geoadd(String key, double longitude, double latitude, String member, Handler<AsyncResult<Long>> handler);
+
+  /**
+   * Add one or more geospatial items in the geospatial index represented using a sorted set.
+   *
+   * @param key     Key string
+   * @param members  list of &lt;lon, lat, member&gt;
+   * @param handler Handler for the result of this call.
+   * @since Beta
+   * group: geo
+   */
+  @Fluent
+  RedisClient geoaddMany(String key, List<GeoMember> members, Handler<AsyncResult<Long>> handler);
+
+  /**
+   * Return valid Geohash strings representing the position of one or more elements in a sorted set value representing
+   * a geospatial index (where elements were added using GEOADD).
+   *
+   * @param key     Key string
+   * @param member member
+   * @param handler Handler for the result of this call.
+   * @since Beta
+   * group: geo
+   */
+  @Fluent
+  RedisClient geohash(String key, String member, Handler<AsyncResult<JsonArray>> handler);
+
+  /**
+   * Return valid Geohash strings representing the position of one or more elements in a sorted set value representing
+   * a geospatial index (where elements were added using GEOADD).
+   *
+   * @param key     Key string
+   * @param members  list of members
+   * @param handler Handler for the result of this call.
+   * @since Beta
+   * group: geo
+   */
+  @Fluent
+  RedisClient geohashMany(String key, List<String> members, Handler<AsyncResult<JsonArray>> handler);
+
+  /**
+   * Return the positions (longitude,latitude) of all the specified members of the geospatial index represented by the
+   * sorted set at key.
+   *
+   * @param key     Key string
+   * @param member member
+   * @param handler Handler for the result of this call.
+   * @since Beta
+   * group: geo
+   */
+  @Fluent
+  RedisClient geopos(String key, String member, Handler<AsyncResult<JsonArray>> handler);
+
+  /**
+   * Return the positions (longitude,latitude) of all the specified members of the geospatial index represented by the
+   * sorted set at key.
+   *
+   * @param key     Key string
+   * @param members  list of members
+   * @param handler Handler for the result of this call.
+   * @since Beta
+   * group: geo
+   */
+  @Fluent
+  RedisClient geoposMany(String key, List<String> members, Handler<AsyncResult<JsonArray>> handler);
+
+  /**
+   * Return the distance between two members in the geospatial index represented by the sorted set.
+   *
+   * @param key     Key string
+   * @param member1 member 1
+   * @param member2 member 2
+   * @param handler Handler for the result of this call.
+   * @since Beta
+   * group: geo
+   */
+  @Fluent
+  RedisClient geodist(String key, String member1, String member2, Handler<AsyncResult<String>> handler);
+
+  /**
+   * Return the distance between two members in the geospatial index represented by the sorted set.
+   *
+   * @param key     Key string
+   * @param member1 member 1
+   * @param member2 member 2
+   * @param unit geo unit
+   * @param handler Handler for the result of this call.
+   * @since Beta
+   * group: geo
+   */
+  @Fluent
+  RedisClient geodistWithUnit(String key, String member1, String member2, GeoUnit unit, Handler<AsyncResult<String>> handler);
+
+  /**
+   * Return the members of a sorted set populated with geospatial information using GEOADD, which are within the borders
+   * of the area specified with the center location and the maximum distance from the center (the radius).
+   *
+   * @param key     Key string
+   * @param longitude longitude
+   * @param latitude latitude
+   * @param radius radius
+   * @param unit geo unit
+   * @param handler Handler for the result of this call.
+   * @since Beta
+   * group: geo
+   */
+  @Fluent
+  RedisClient georadius(String key, double longitude, double latitude, double radius, GeoUnit unit, Handler<AsyncResult<JsonArray>> handler);
+
+  /**
+   * Return the members of a sorted set populated with geospatial information using GEOADD, which are within the borders
+   * of the area specified with the center location and the maximum distance from the center (the radius).
+   *
+   * @param key     Key string
+   * @param longitude longitude
+   * @param latitude latitude
+   * @param radius radius
+   * @param unit geo unit
+   * @param options geo radius options
+   * @param handler Handler for the result of this call.
+   * @since Beta
+   * group: geo
+   */
+  @Fluent
+  RedisClient georadiusWithOptions(String key, double longitude, double latitude, double radius, GeoUnit unit, GeoRadiusOptions options, Handler<AsyncResult<JsonArray>> handler);
+
+  /**
+   * This command is exactly like GEORADIUS with the sole difference that instead of taking, as the center of the area
+   * to query, a longitude and latitude value, it takes the name of a member already existing inside the geospatial
+   * index represented by the sorted set.
+   *
+   * @param key     Key string
+   * @param member member
+   * @param radius radius
+   * @param unit geo unit
+   * @param handler Handler for the result of this call.
+   * @since Beta
+   * group: geo
+   */
+  @Fluent
+  RedisClient georadiusbymember(String key, String member, double radius, GeoUnit unit, Handler<AsyncResult<JsonArray>> handler);
+
+  /**
+   * This command is exactly like GEORADIUS with the sole difference that instead of taking, as the center of the area
+   * to query, a longitude and latitude value, it takes the name of a member already existing inside the geospatial
+   * index represented by the sorted set.
+   *
+   * @param key     Key string
+   * @param member member
+   * @param radius radius
+   * @param unit geo unit
+   * @param options geo radius options
+   * @param handler Handler for the result of this call.
+   * @since Beta
+   * group: geo
+   */
+  @Fluent
+  RedisClient georadiusbymemberWithOptions(String key, String member, double radius, GeoUnit unit, GeoRadiusOptions options, Handler<AsyncResult<JsonArray>> handler);
 }

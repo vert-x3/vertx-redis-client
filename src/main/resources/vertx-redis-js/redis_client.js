@@ -29,6 +29,8 @@ var SortOptions = io.vertx.redis.op.SortOptions;
 var MigrateOptions = io.vertx.redis.op.MigrateOptions;
 var ScanOptions = io.vertx.redis.op.ScanOptions;
 var RedisOptions = io.vertx.redis.RedisOptions;
+var GeoMember = io.vertx.redis.op.GeoMember;
+var GeoRadiusOptions = io.vertx.redis.op.GeoRadiusOptions;
 var RangeLimitOptions = io.vertx.redis.op.RangeLimitOptions;
 
 /**
@@ -5080,6 +5082,309 @@ var RedisClient = function(j_val) {
     var __args = arguments;
     if (__args.length === 4 && typeof __args[0] === 'string' && typeof __args[1] === 'string' && (typeof __args[2] === 'object' && __args[2] != null) && typeof __args[3] === 'function') {
       j_redisClient["zscan(java.lang.String,java.lang.String,io.vertx.redis.op.ScanOptions,io.vertx.core.Handler)"](key, cursor, options != null ? new ScanOptions(new JsonObject(JSON.stringify(options))) : null, function(ar) {
+      if (ar.succeeded()) {
+        handler(utils.convReturnJson(ar.result()), null);
+      } else {
+        handler(null, ar.cause());
+      }
+    });
+      return that;
+    } else throw new TypeError('function invoked with invalid arguments');
+  };
+
+  /**
+   Add one or more geospatial items in the geospatial index represented using a sorted set.
+
+   @public
+   @param key {string} Key string 
+   @param longitude {number} longitude 
+   @param latitude {number} latitude 
+   @param member {string} member 
+   @param handler {function} Handler for the result of this call. 
+   @return {RedisClient}
+   */
+  this.geoadd = function(key, longitude, latitude, member, handler) {
+    var __args = arguments;
+    if (__args.length === 5 && typeof __args[0] === 'string' && typeof __args[1] ==='number' && typeof __args[2] ==='number' && typeof __args[3] === 'string' && typeof __args[4] === 'function') {
+      j_redisClient["geoadd(java.lang.String,double,double,java.lang.String,io.vertx.core.Handler)"](key, longitude, latitude, member, function(ar) {
+      if (ar.succeeded()) {
+        handler(ar.result(), null);
+      } else {
+        handler(null, ar.cause());
+      }
+    });
+      return that;
+    } else throw new TypeError('function invoked with invalid arguments');
+  };
+
+  /**
+   Add one or more geospatial items in the geospatial index represented using a sorted set.
+
+   @public
+   @param key {string} Key string 
+   @param members {Array.<Object>} list of &lt;lon, lat, member&gt; 
+   @param handler {function} Handler for the result of this call. 
+   @return {RedisClient}
+   */
+  this.geoaddMany = function(key, members, handler) {
+    var __args = arguments;
+    if (__args.length === 3 && typeof __args[0] === 'string' && typeof __args[1] === 'object' && __args[1] instanceof Array && typeof __args[2] === 'function') {
+      j_redisClient["geoaddMany(java.lang.String,java.util.List,io.vertx.core.Handler)"](key, utils.convParamListDataObject(members, function(json) { return new GeoMember(json); }), function(ar) {
+      if (ar.succeeded()) {
+        handler(ar.result(), null);
+      } else {
+        handler(null, ar.cause());
+      }
+    });
+      return that;
+    } else throw new TypeError('function invoked with invalid arguments');
+  };
+
+  /**
+   Return valid Geohash strings representing the position of one or more elements in a sorted set value representing
+   a geospatial index (where elements were added using GEOADD).
+
+   @public
+   @param key {string} Key string 
+   @param member {string} member 
+   @param handler {function} Handler for the result of this call. 
+   @return {RedisClient}
+   */
+  this.geohash = function(key, member, handler) {
+    var __args = arguments;
+    if (__args.length === 3 && typeof __args[0] === 'string' && typeof __args[1] === 'string' && typeof __args[2] === 'function') {
+      j_redisClient["geohash(java.lang.String,java.lang.String,io.vertx.core.Handler)"](key, member, function(ar) {
+      if (ar.succeeded()) {
+        handler(utils.convReturnJson(ar.result()), null);
+      } else {
+        handler(null, ar.cause());
+      }
+    });
+      return that;
+    } else throw new TypeError('function invoked with invalid arguments');
+  };
+
+  /**
+   Return valid Geohash strings representing the position of one or more elements in a sorted set value representing
+   a geospatial index (where elements were added using GEOADD).
+
+   @public
+   @param key {string} Key string 
+   @param members {Array.<string>} list of members 
+   @param handler {function} Handler for the result of this call. 
+   @return {RedisClient}
+   */
+  this.geohashMany = function(key, members, handler) {
+    var __args = arguments;
+    if (__args.length === 3 && typeof __args[0] === 'string' && typeof __args[1] === 'object' && __args[1] instanceof Array && typeof __args[2] === 'function') {
+      j_redisClient["geohashMany(java.lang.String,java.util.List,io.vertx.core.Handler)"](key, members, function(ar) {
+      if (ar.succeeded()) {
+        handler(utils.convReturnJson(ar.result()), null);
+      } else {
+        handler(null, ar.cause());
+      }
+    });
+      return that;
+    } else throw new TypeError('function invoked with invalid arguments');
+  };
+
+  /**
+   Return the positions (longitude,latitude) of all the specified members of the geospatial index represented by the
+   sorted set at key.
+
+   @public
+   @param key {string} Key string 
+   @param member {string} member 
+   @param handler {function} Handler for the result of this call. 
+   @return {RedisClient}
+   */
+  this.geopos = function(key, member, handler) {
+    var __args = arguments;
+    if (__args.length === 3 && typeof __args[0] === 'string' && typeof __args[1] === 'string' && typeof __args[2] === 'function') {
+      j_redisClient["geopos(java.lang.String,java.lang.String,io.vertx.core.Handler)"](key, member, function(ar) {
+      if (ar.succeeded()) {
+        handler(utils.convReturnJson(ar.result()), null);
+      } else {
+        handler(null, ar.cause());
+      }
+    });
+      return that;
+    } else throw new TypeError('function invoked with invalid arguments');
+  };
+
+  /**
+   Return the positions (longitude,latitude) of all the specified members of the geospatial index represented by the
+   sorted set at key.
+
+   @public
+   @param key {string} Key string 
+   @param members {Array.<string>} list of members 
+   @param handler {function} Handler for the result of this call. 
+   @return {RedisClient}
+   */
+  this.geoposMany = function(key, members, handler) {
+    var __args = arguments;
+    if (__args.length === 3 && typeof __args[0] === 'string' && typeof __args[1] === 'object' && __args[1] instanceof Array && typeof __args[2] === 'function') {
+      j_redisClient["geoposMany(java.lang.String,java.util.List,io.vertx.core.Handler)"](key, members, function(ar) {
+      if (ar.succeeded()) {
+        handler(utils.convReturnJson(ar.result()), null);
+      } else {
+        handler(null, ar.cause());
+      }
+    });
+      return that;
+    } else throw new TypeError('function invoked with invalid arguments');
+  };
+
+  /**
+   Return the distance between two members in the geospatial index represented by the sorted set.
+
+   @public
+   @param key {string} Key string 
+   @param member1 {string} member 1 
+   @param member2 {string} member 2 
+   @param handler {function} Handler for the result of this call. 
+   @return {RedisClient}
+   */
+  this.geodist = function(key, member1, member2, handler) {
+    var __args = arguments;
+    if (__args.length === 4 && typeof __args[0] === 'string' && typeof __args[1] === 'string' && typeof __args[2] === 'string' && typeof __args[3] === 'function') {
+      j_redisClient["geodist(java.lang.String,java.lang.String,java.lang.String,io.vertx.core.Handler)"](key, member1, member2, function(ar) {
+      if (ar.succeeded()) {
+        handler(ar.result(), null);
+      } else {
+        handler(null, ar.cause());
+      }
+    });
+      return that;
+    } else throw new TypeError('function invoked with invalid arguments');
+  };
+
+  /**
+   Return the distance between two members in the geospatial index represented by the sorted set.
+
+   @public
+   @param key {string} Key string 
+   @param member1 {string} member 1 
+   @param member2 {string} member 2 
+   @param unit {Object} geo unit 
+   @param handler {function} Handler for the result of this call. 
+   @return {RedisClient}
+   */
+  this.geodistWithUnit = function(key, member1, member2, unit, handler) {
+    var __args = arguments;
+    if (__args.length === 5 && typeof __args[0] === 'string' && typeof __args[1] === 'string' && typeof __args[2] === 'string' && typeof __args[3] === 'string' && typeof __args[4] === 'function') {
+      j_redisClient["geodistWithUnit(java.lang.String,java.lang.String,java.lang.String,io.vertx.redis.op.GeoUnit,io.vertx.core.Handler)"](key, member1, member2, io.vertx.redis.op.GeoUnit.valueOf(__args[3]), function(ar) {
+      if (ar.succeeded()) {
+        handler(ar.result(), null);
+      } else {
+        handler(null, ar.cause());
+      }
+    });
+      return that;
+    } else throw new TypeError('function invoked with invalid arguments');
+  };
+
+  /**
+   Return the members of a sorted set populated with geospatial information using GEOADD, which are within the borders
+   of the area specified with the center location and the maximum distance from the center (the radius).
+
+   @public
+   @param key {string} Key string 
+   @param longitude {number} longitude 
+   @param latitude {number} latitude 
+   @param radius {number} radius 
+   @param unit {Object} geo unit 
+   @param handler {function} Handler for the result of this call. 
+   @return {RedisClient}
+   */
+  this.georadius = function(key, longitude, latitude, radius, unit, handler) {
+    var __args = arguments;
+    if (__args.length === 6 && typeof __args[0] === 'string' && typeof __args[1] ==='number' && typeof __args[2] ==='number' && typeof __args[3] ==='number' && typeof __args[4] === 'string' && typeof __args[5] === 'function') {
+      j_redisClient["georadius(java.lang.String,double,double,double,io.vertx.redis.op.GeoUnit,io.vertx.core.Handler)"](key, longitude, latitude, radius, io.vertx.redis.op.GeoUnit.valueOf(__args[4]), function(ar) {
+      if (ar.succeeded()) {
+        handler(utils.convReturnJson(ar.result()), null);
+      } else {
+        handler(null, ar.cause());
+      }
+    });
+      return that;
+    } else throw new TypeError('function invoked with invalid arguments');
+  };
+
+  /**
+   Return the members of a sorted set populated with geospatial information using GEOADD, which are within the borders
+   of the area specified with the center location and the maximum distance from the center (the radius).
+
+   @public
+   @param key {string} Key string 
+   @param longitude {number} longitude 
+   @param latitude {number} latitude 
+   @param radius {number} radius 
+   @param unit {Object} geo unit 
+   @param options {Object} geo radius options 
+   @param handler {function} Handler for the result of this call. 
+   @return {RedisClient}
+   */
+  this.georadiusWithOptions = function(key, longitude, latitude, radius, unit, options, handler) {
+    var __args = arguments;
+    if (__args.length === 7 && typeof __args[0] === 'string' && typeof __args[1] ==='number' && typeof __args[2] ==='number' && typeof __args[3] ==='number' && typeof __args[4] === 'string' && (typeof __args[5] === 'object' && __args[5] != null) && typeof __args[6] === 'function') {
+      j_redisClient["georadiusWithOptions(java.lang.String,double,double,double,io.vertx.redis.op.GeoUnit,io.vertx.redis.op.GeoRadiusOptions,io.vertx.core.Handler)"](key, longitude, latitude, radius, io.vertx.redis.op.GeoUnit.valueOf(__args[4]), options != null ? new GeoRadiusOptions(new JsonObject(JSON.stringify(options))) : null, function(ar) {
+      if (ar.succeeded()) {
+        handler(utils.convReturnJson(ar.result()), null);
+      } else {
+        handler(null, ar.cause());
+      }
+    });
+      return that;
+    } else throw new TypeError('function invoked with invalid arguments');
+  };
+
+  /**
+   This command is exactly like GEORADIUS with the sole difference that instead of taking, as the center of the area
+   to query, a longitude and latitude value, it takes the name of a member already existing inside the geospatial
+   index represented by the sorted set.
+
+   @public
+   @param key {string} Key string 
+   @param member {string} member 
+   @param radius {number} radius 
+   @param unit {Object} geo unit 
+   @param handler {function} Handler for the result of this call. 
+   @return {RedisClient}
+   */
+  this.georadiusbymember = function(key, member, radius, unit, handler) {
+    var __args = arguments;
+    if (__args.length === 5 && typeof __args[0] === 'string' && typeof __args[1] === 'string' && typeof __args[2] ==='number' && typeof __args[3] === 'string' && typeof __args[4] === 'function') {
+      j_redisClient["georadiusbymember(java.lang.String,java.lang.String,double,io.vertx.redis.op.GeoUnit,io.vertx.core.Handler)"](key, member, radius, io.vertx.redis.op.GeoUnit.valueOf(__args[3]), function(ar) {
+      if (ar.succeeded()) {
+        handler(utils.convReturnJson(ar.result()), null);
+      } else {
+        handler(null, ar.cause());
+      }
+    });
+      return that;
+    } else throw new TypeError('function invoked with invalid arguments');
+  };
+
+  /**
+   This command is exactly like GEORADIUS with the sole difference that instead of taking, as the center of the area
+   to query, a longitude and latitude value, it takes the name of a member already existing inside the geospatial
+   index represented by the sorted set.
+
+   @public
+   @param key {string} Key string 
+   @param member {string} member 
+   @param radius {number} radius 
+   @param unit {Object} geo unit 
+   @param options {Object} geo radius options 
+   @param handler {function} Handler for the result of this call. 
+   @return {RedisClient}
+   */
+  this.georadiusbymemberWithOptions = function(key, member, radius, unit, options, handler) {
+    var __args = arguments;
+    if (__args.length === 6 && typeof __args[0] === 'string' && typeof __args[1] === 'string' && typeof __args[2] ==='number' && typeof __args[3] === 'string' && (typeof __args[4] === 'object' && __args[4] != null) && typeof __args[5] === 'function') {
+      j_redisClient["georadiusbymemberWithOptions(java.lang.String,java.lang.String,double,io.vertx.redis.op.GeoUnit,io.vertx.redis.op.GeoRadiusOptions,io.vertx.core.Handler)"](key, member, radius, io.vertx.redis.op.GeoUnit.valueOf(__args[3]), options != null ? new GeoRadiusOptions(new JsonObject(JSON.stringify(options))) : null, function(ar) {
       if (ar.succeeded()) {
         handler(utils.convReturnJson(ar.result()), null);
       } else {
