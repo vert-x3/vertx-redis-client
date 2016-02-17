@@ -43,7 +43,7 @@ To use the Vert.x Redis client, add the following dependency to the _dependencie
 
 [source,groovy,subs="+attributes"]
 ----
-compile io.vertx:vertx-redis-client:3.3.0-SNAPSHOT
+compile 'io.vertx:vertx-redis-client:3.3.0-SNAPSHOT'
 ----
 
 == Connecting to Redis
