@@ -54,6 +54,10 @@ public abstract class RedisClientTestBase extends VertxTestBase {
     return getProperty("port");
   }
 
+  private static boolean isStandalone() {
+    return Boolean.getBoolean("standalone");
+  }
+
   private static String getProperty(String name) {
     String s = System.getProperty(name);
     return (s != null && s.trim().length() > 0) ? s : null;
@@ -63,7 +67,7 @@ public abstract class RedisClientTestBase extends VertxTestBase {
 
   @BeforeClass
   static public void startRedis() throws Exception {
-    if (getHost() == null && getPort() == null) {
+    if (getHost() == null && getPort() == null  && ! isStandalone()) {
       createRedisInstance(DEFAULT_PORT);
       instances.get(DEFAULT_PORT).start();
       System.out.println("** Using embedded redis");
@@ -111,6 +115,8 @@ public abstract class RedisClientTestBase extends VertxTestBase {
     if (port != null) {
       config.setPort(Integer.parseInt(port));
     }
+
+    System.out.println("Connecting on " + host + ":" + port);
 
     return config;
   }
