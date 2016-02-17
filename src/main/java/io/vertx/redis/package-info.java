@@ -123,47 +123,47 @@
  * Multiple values in a hash can be set by supplying an object. Note however that key and value will be coerced to
  * strings.
  *
- * <pre>
+ * ----
  * {
  *   keyName: "value",
  *   otherKeyName: "other value"
  * }
- * </pre>
+ * ----
  *
  * === command msetnx
  *
  * Multiple values in a hash can be set by supplying an object. Note however that key and value will be coerced to
  * strings.
  *
- * <pre>
+ * ----
  * {
  *   keyName: "value",
  *   otherKeyName: "other value"
  * }
- * </pre>
+ * ----
  *
  * === command hmset
  *
  * Multiple values in a hash can be set by supplying an object. Note however that key and value will be coerced to
  * strings.
  *
- * <pre>
+ * ----
  * {
  *   keyName: "value",
  *   otherKeyName: "other value"
  * }
- * </pre>
+ * ----
  *
  * === command zadd
  * Multiple values in a hash can be set by supplying an object. Note however that key and value will be coerced to
  * strings.
  *
- * <pre>
+ * ----
  * {
  *   score: "member",
  *   otherScore: "other member"
  * }
- * </pre>
+ * ----
  *
  * == Server Info
  *
@@ -172,7 +172,7 @@
  * with properties that belong to that section. If for some reason there is no section the properties will be visible
  * at the top level object.
  *
- * <pre>
+ * ----
  * {
  *   server: {
  *     redis_version: "2.5.13",
@@ -189,7 +189,7 @@
  *   client: {...},
  *   ...
  * }
- * </pre>
+ * ----
  *
  * == Eval and Evalsha
  *
