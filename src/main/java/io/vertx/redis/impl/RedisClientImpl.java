@@ -976,8 +976,8 @@ public final class RedisClientImpl extends AbstractRedisClient {
   } 
 
   @Override
-  public RedisClient setWithOptions(String key, String value, SetOptions options, Handler<AsyncResult<Void>> handler) {
-    sendVoid(SET, toPayload(key, value, options != null ? options.toJsonArray() : null), handler);
+  public RedisClient setWithOptions(String key, String value, SetOptions options, Handler<AsyncResult<String>> handler) {
+    sendString(SET, toPayload(key, value, options != null ? options.toJsonArray() : null), handler);
     return this;
   } 
 

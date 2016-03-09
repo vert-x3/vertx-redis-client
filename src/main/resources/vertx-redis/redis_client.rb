@@ -1822,7 +1822,7 @@ module VertxRedis
     # @return [self]
     def set_with_options(key=nil,value=nil,options=nil)
       if key.class == String && value.class == String && options.class == Hash && block_given?
-        @j_del.java_method(:setWithOptions, [Java::java.lang.String.java_class,Java::java.lang.String.java_class,Java::IoVertxRedisOp::SetOptions.java_class,Java::IoVertxCore::Handler.java_class]).call(key,value,Java::IoVertxRedisOp::SetOptions.new(::Vertx::Util::Utils.to_json_object(options)),(Proc.new { |ar| yield(ar.failed ? ar.cause : nil) }))
+        @j_del.java_method(:setWithOptions, [Java::java.lang.String.java_class,Java::java.lang.String.java_class,Java::IoVertxRedisOp::SetOptions.java_class,Java::IoVertxCore::Handler.java_class]).call(key,value,Java::IoVertxRedisOp::SetOptions.new(::Vertx::Util::Utils.to_json_object(options)),(Proc.new { |ar| yield(ar.failed ? ar.cause : nil, ar.succeeded ? ar.result : nil) }))
         return self
       end
       raise ArgumentError, "Invalid arguments when calling set_with_options(key,value,options)"

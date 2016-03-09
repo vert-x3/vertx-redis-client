@@ -1,5 +1,19 @@
 = Cheatsheets
 
+[[LimitOptions]]
+== LimitOptions
+
+++++
+ @author <a href="mailto:marko.strukelj@gmail.com">Marko Strukelj</a>
+++++
+'''
+
+[cols=">25%,^25%,50%"]
+[frame="topbot"]
+|===
+^|Name | Type ^| Description
+|===
+
 [[KillFilter]]
 == KillFilter
 
@@ -30,8 +44,8 @@ Set TYPE filter
 +++
 |===
 
-[[LimitOptions]]
-== LimitOptions
+[[SetOptions]]
+== SetOptions
 
 ++++
  @author <a href="mailto:marko.strukelj@gmail.com">Marko Strukelj</a>
@@ -42,6 +56,10 @@ Set TYPE filter
 [frame="topbot"]
 |===
 ^|Name | Type ^| Description
+|[[ex]]`ex`|`Number (long)`|-
+|[[nx]]`nx`|`Boolean`|-
+|[[px]]`px`|`Number (long)`|-
+|[[xx]]`xx`|`Boolean`|-
 |===
 
 [[SortOptions]]
@@ -59,24 +77,6 @@ Set TYPE filter
 |[[by]]`by`|`String`|-
 |[[gets]]`gets`|`Array of String`|-
 |[[store]]`store`|`String`|-
-|===
-
-[[SetOptions]]
-== SetOptions
-
-++++
- @author <a href="mailto:marko.strukelj@gmail.com">Marko Strukelj</a>
-++++
-'''
-
-[cols=">25%,^25%,50%"]
-[frame="topbot"]
-|===
-^|Name | Type ^| Description
-|[[ex]]`ex`|`Number (long)`|-
-|[[nx]]`nx`|`Boolean`|-
-|[[px]]`px`|`Number (long)`|-
-|[[xx]]`xx`|`Boolean`|-
 |===
 
 [[MigrateOptions]]
