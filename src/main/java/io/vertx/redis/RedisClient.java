@@ -1822,7 +1822,7 @@ public interface RedisClient {
    * group: string
    */
   @Fluent
-  RedisClient setWithOptions(String key, String value, SetOptions options, Handler<AsyncResult<Void>> handler);
+  RedisClient setWithOptions(String key, String value, SetOptions options, Handler<AsyncResult<String>> handler);
 
   /**
    * Set the binary string value of a key - without encoding as utf-8

@@ -2321,6 +2321,22 @@ public abstract class RedisClientTestBase extends VertxTestBase {
   }
 
   @Test
+  public void testSetWithOptions2() {
+    final String mykey = makeKey();
+    // 1st case SET k v NX -> OK
+    redis.setWithOptions(mykey, "Hello!", new SetOptions().setNX(true), reply0 -> {
+      assertTrue(reply0.succeeded());
+      // 2nd case SET k v NX -> nil (was already set)
+      redis.setWithOptions(mykey, "Hello again!", new SetOptions().setNX(true), reply2 -> {
+        assertTrue(reply2.succeeded());
+        assertNull(reply2.result());
+        testComplete();
+      });
+    });
+    await();
+  }
+
+  @Test
   public void testSetbit() {
     final String mykey = makeKey();
     redis.setbit(mykey, 7, 1, reply0 -> {
