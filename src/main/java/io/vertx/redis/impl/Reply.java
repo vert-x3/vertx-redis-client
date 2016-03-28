@@ -31,6 +31,7 @@ public final class Reply {
 
   public Reply(byte type, int size) {
     this.type = type;
+
     this.data = new Reply[size];
   }
 
