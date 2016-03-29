@@ -63,7 +63,7 @@ public final class Reply {
   @SuppressWarnings("unchecked")
   public <T> T asType(final Class<T> type, final String encoding) throws ClassCastException {
 
-    if (data == null || "QUEUED".equals(data)) {
+    if (data == null) {
       return null;
     }
 
