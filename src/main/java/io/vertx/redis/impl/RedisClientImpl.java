@@ -24,6 +24,7 @@ import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;
 import io.vertx.redis.RedisClient;
 import io.vertx.redis.RedisOptions;
+import io.vertx.redis.RedisTransaction;
 import io.vertx.redis.op.*;
 
 import java.util.*;

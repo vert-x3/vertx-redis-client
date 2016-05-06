@@ -16,6 +16,7 @@
 
 /** @module vertx-redis-js/redis_client */
 var utils = require('vertx-js/util/utils');
+var RedisTransaction = require('vertx-redis-js/redis_transaction');
 var Buffer = require('vertx-js/buffer');
 var Vertx = require('vertx-js/vertx');
 
@@ -1325,27 +1326,6 @@ var RedisClient = function(j_val) {
   };
 
   /**
-   Discard all commands issued after MULTI
-
-   @public
-   @param handler {function} 
-   @return {RedisClient}
-   */
-  this.discard = function(handler) {
-    var __args = arguments;
-    if (__args.length === 1 && typeof __args[0] === 'function') {
-      j_redisClient["discard(io.vertx.core.Handler)"](function(ar) {
-      if (ar.succeeded()) {
-        handler(ar.result(), null);
-      } else {
-        handler(null, ar.cause());
-      }
-    });
-      return that;
-    } else throw new TypeError('function invoked with invalid arguments');
-  };
-
-  /**
    Return a serialized version of the value stored at the specified key.
 
    @public
@@ -1435,27 +1415,6 @@ var RedisClient = function(j_val) {
     var __args = arguments;
     if (__args.length === 4 && typeof __args[0] === 'string' && typeof __args[1] === 'object' && __args[1] instanceof Array && typeof __args[2] === 'object' && __args[2] instanceof Array && typeof __args[3] === 'function') {
       j_redisClient["evalsha(java.lang.String,java.util.List,java.util.List,io.vertx.core.Handler)"](sha1, utils.convParamListBasicOther(keys), utils.convParamListBasicOther(values), function(ar) {
-      if (ar.succeeded()) {
-        handler(utils.convReturnJson(ar.result()), null);
-      } else {
-        handler(null, ar.cause());
-      }
-    });
-      return that;
-    } else throw new TypeError('function invoked with invalid arguments');
-  };
-
-  /**
-   Execute all commands issued after MULTI
-
-   @public
-   @param handler {function} 
-   @return {RedisClient}
-   */
-  this.exec = function(handler) {
-    var __args = arguments;
-    if (__args.length === 1 && typeof __args[0] === 'function') {
-      j_redisClient["exec(io.vertx.core.Handler)"](function(ar) {
       if (ar.succeeded()) {
         handler(utils.convReturnJson(ar.result()), null);
       } else {
@@ -2572,27 +2531,6 @@ var RedisClient = function(j_val) {
     var __args = arguments;
     if (__args.length === 2 && (typeof __args[0] === 'object' && __args[0] != null) && typeof __args[1] === 'function') {
       j_redisClient["msetnx(io.vertx.core.json.JsonObject,io.vertx.core.Handler)"](utils.convParamJsonObject(keyvals), function(ar) {
-      if (ar.succeeded()) {
-        handler(ar.result(), null);
-      } else {
-        handler(null, ar.cause());
-      }
-    });
-      return that;
-    } else throw new TypeError('function invoked with invalid arguments');
-  };
-
-  /**
-   Mark the start of a transaction block
-
-   @public
-   @param handler {function} 
-   @return {RedisClient}
-   */
-  this.multi = function(handler) {
-    var __args = arguments;
-    if (__args.length === 1 && typeof __args[0] === 'function') {
-      j_redisClient["multi(io.vertx.core.Handler)"](function(ar) {
       if (ar.succeeded()) {
         handler(ar.result(), null);
       } else {
@@ -4244,6 +4182,20 @@ var RedisClient = function(j_val) {
   };
 
   /**
+   Return a RedisTransaction instance
+
+   @public
+
+   @return {RedisTransaction} transaction instance
+   */
+  this.transaction = function() {
+    var __args = arguments;
+    if (__args.length === 0) {
+      return utils.convReturnVertxGen(j_redisClient["transaction()"](), RedisTransaction);
+    } else throw new TypeError('function invoked with invalid arguments');
+  };
+
+  /**
    Get the time to live for a key
 
    @public
@@ -4310,27 +4262,6 @@ var RedisClient = function(j_val) {
   };
 
   /**
-   Forget about all watched keys
-
-   @public
-   @param handler {function} 
-   @return {RedisClient}
-   */
-  this.unwatch = function(handler) {
-    var __args = arguments;
-    if (__args.length === 1 && typeof __args[0] === 'function') {
-      j_redisClient["unwatch(io.vertx.core.Handler)"](function(ar) {
-      if (ar.succeeded()) {
-        handler(ar.result(), null);
-      } else {
-        handler(null, ar.cause());
-      }
-    });
-      return that;
-    } else throw new TypeError('function invoked with invalid arguments');
-  };
-
-  /**
    Wait for the synchronous replication of all the write commands sent in the context of the current connection.
 
    @public
@@ -4343,50 +4274,6 @@ var RedisClient = function(j_val) {
     var __args = arguments;
     if (__args.length === 3 && typeof __args[0] ==='number' && typeof __args[1] ==='number' && typeof __args[2] === 'function') {
       j_redisClient["wait(long,long,io.vertx.core.Handler)"](numSlaves, timeout, function(ar) {
-      if (ar.succeeded()) {
-        handler(ar.result(), null);
-      } else {
-        handler(null, ar.cause());
-      }
-    });
-      return that;
-    } else throw new TypeError('function invoked with invalid arguments');
-  };
-
-  /**
-   Watch the given keys to determine execution of the MULTI/EXEC block
-
-   @public
-   @param key {string} Key to watch 
-   @param handler {function} Handler for the result of this call. 
-   @return {RedisClient}
-   */
-  this.watch = function(key, handler) {
-    var __args = arguments;
-    if (__args.length === 2 && typeof __args[0] === 'string' && typeof __args[1] === 'function') {
-      j_redisClient["watch(java.lang.String,io.vertx.core.Handler)"](key, function(ar) {
-      if (ar.succeeded()) {
-        handler(ar.result(), null);
-      } else {
-        handler(null, ar.cause());
-      }
-    });
-      return that;
-    } else throw new TypeError('function invoked with invalid arguments');
-  };
-
-  /**
-   Watch the given keys to determine execution of the MULTI/EXEC block
-
-   @public
-   @param keys {Array.<string>} List of keys to watch 
-   @param handler {function} Handler for the result of this call. 
-   @return {RedisClient}
-   */
-  this.watchMany = function(keys, handler) {
-    var __args = arguments;
-    if (__args.length === 2 && typeof __args[0] === 'object' && __args[0] instanceof Array && typeof __args[1] === 'function') {
-      j_redisClient["watchMany(java.util.List,io.vertx.core.Handler)"](utils.convParamListBasicOther(keys), function(ar) {
       if (ar.succeeded()) {
         handler(ar.result(), null);
       } else {

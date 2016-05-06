@@ -4,6 +4,7 @@ import io.vertx.core.Vertx;
 import io.vertx.core.json.JsonObject;
 import io.vertx.redis.RedisClient;
 import io.vertx.redis.RedisOptions;
+import io.vertx.redis.RedisTransaction;
 
 /**
  * These are the examples used in the documentation.
@@ -63,7 +64,7 @@ public class Examples {
 
   public void example5() {
     RedisClient client = RedisClient.create(Vertx.vertx(), new RedisOptions().setAddress("127.0.0.1").setPort(6379));
-    RedisClient.RedisTransaction transaction = client.transaction();
+    RedisTransaction transaction = client.transaction();
     transaction.multi(event -> {
       transaction.hgetall("mykey", getAllEvent -> {
         if (getAllEvent.succeeded() && "QUEUED".equals(getAllEvent.result())) {

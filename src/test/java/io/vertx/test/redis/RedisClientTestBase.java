@@ -20,6 +20,7 @@ import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;
 import io.vertx.redis.RedisClient;
 import io.vertx.redis.RedisOptions;
+import io.vertx.redis.RedisTransaction;
 import io.vertx.redis.op.*;
 import io.vertx.test.core.VertxTestBase;
 import org.junit.AfterClass;
@@ -29,7 +30,6 @@ import org.junit.Test;
 import org.junit.experimental.categories.Category;
 import redis.embedded.RedisServer;
 
-import java.nio.charset.Charset;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CountDownLatch;
@@ -554,7 +554,7 @@ public abstract class RedisClientTestBase extends VertxTestBase {
     String key = makeKey();
     redis.set(key, "0", reply -> {
       assertTrue(reply.succeeded());
-      RedisClient.RedisTransaction transaction = redis.transaction();
+      RedisTransaction transaction = redis.transaction();
       transaction.multi(reply2 -> {
         assertTrue(reply2.succeeded());
         transaction.incr(key, reply3 -> {
@@ -671,7 +671,7 @@ public abstract class RedisClientTestBase extends VertxTestBase {
   @Test
   //Note same test as testMulti, kept for consistency
   public void testExec() {
-    RedisClient.RedisTransaction transaction = redis.transaction();
+    RedisTransaction transaction = redis.transaction();
     transaction.multi(reply -> {
       assertTrue(reply.succeeded());
       transaction.set("multi-key", "first", reply2 -> {
@@ -1689,7 +1689,7 @@ public abstract class RedisClientTestBase extends VertxTestBase {
   public void testMulti() throws Exception {
 
     String key = makeKey();
-    RedisClient.RedisTransaction transaction = redis.transaction();
+    RedisTransaction transaction = redis.transaction();
     redis.set(key, "0", rep -> {
       assertTrue(rep.succeeded());
       transaction.multi(reply -> {
@@ -2847,7 +2847,7 @@ public abstract class RedisClientTestBase extends VertxTestBase {
     String key = makeKey();
 
     RedisClient rdx = RedisClient.create(vertx, getConfig());
-    RedisClient.RedisTransaction transaction = redis.transaction();
+    RedisTransaction transaction = redis.transaction();
     redis.set(key, "0", reply -> {
       assertTrue(reply.succeeded());
       transaction.watch(key, reply2 -> {

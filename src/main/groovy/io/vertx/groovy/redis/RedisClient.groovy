@@ -753,15 +753,6 @@ public class RedisClient {
     return this;
   }
   /**
-   * Discard all commands issued after MULTI
-   * @param handler 
-   * @return 
-   */
-  public RedisClient discard(Handler<AsyncResult<String>> handler) {
-    delegate.discard(handler);
-    return this;
-  }
-  /**
    * Return a serialized version of the value stored at the specified key.
    * @param key Key string
    * @param handler Handler for the result of this call.
@@ -819,23 +810,6 @@ public class RedisClient {
    */
   public RedisClient evalsha(String sha1, List<String> keys, List<String> values, Handler<AsyncResult<List<Object>>> handler) {
     delegate.evalsha(sha1, keys != null ? (List)keys.collect({it}) : null, values != null ? (List)values.collect({it}) : null, handler != null ? new Handler<AsyncResult<io.vertx.core.json.JsonArray>>() {
-      public void handle(AsyncResult<io.vertx.core.json.JsonArray> ar) {
-        if (ar.succeeded()) {
-          handler.handle(io.vertx.core.Future.succeededFuture((List<Object>)InternalHelper.wrapObject(ar.result())));
-        } else {
-          handler.handle(io.vertx.core.Future.failedFuture(ar.cause()));
-        }
-      }
-    } : null);
-    return this;
-  }
-  /**
-   * Execute all commands issued after MULTI
-   * @param handler 
-   * @return 
-   */
-  public RedisClient exec(Handler<AsyncResult<List<Object>>> handler) {
-    delegate.exec(handler != null ? new Handler<AsyncResult<io.vertx.core.json.JsonArray>>() {
       public void handle(AsyncResult<io.vertx.core.json.JsonArray> ar) {
         if (ar.succeeded()) {
           handler.handle(io.vertx.core.Future.succeededFuture((List<Object>)InternalHelper.wrapObject(ar.result())));
@@ -1460,15 +1434,6 @@ public class RedisClient {
    */
   public RedisClient msetnx(Map<String, Object> keyvals, Handler<AsyncResult<Long>> handler) {
     delegate.msetnx(keyvals != null ? new io.vertx.core.json.JsonObject(keyvals) : null, handler);
-    return this;
-  }
-  /**
-   * Mark the start of a transaction block
-   * @param handler 
-   * @return 
-   */
-  public RedisClient multi(Handler<AsyncResult<String>> handler) {
-    delegate.multi(handler);
     return this;
   }
   /**
@@ -2372,6 +2337,14 @@ public class RedisClient {
     return this;
   }
   /**
+   * Return a RedisTransaction instance
+   * @return transaction instance
+   */
+  public RedisTransaction transaction() {
+    def ret = InternalHelper.safeCreate(delegate.transaction(), io.vertx.groovy.redis.RedisTransaction.class);
+    return ret;
+  }
+  /**
    * Get the time to live for a key
    * @param key Key string
    * @param handler Handler for the result of this call.
@@ -2402,15 +2375,6 @@ public class RedisClient {
     return this;
   }
   /**
-   * Forget about all watched keys
-   * @param handler 
-   * @return 
-   */
-  public RedisClient unwatch(Handler<AsyncResult<String>> handler) {
-    delegate.unwatch(handler);
-    return this;
-  }
-  /**
    * Wait for the synchronous replication of all the write commands sent in the context of the current connection.
    * @param numSlaves 
    * @param timeout 
@@ -2419,26 +2383,6 @@ public class RedisClient {
    */
   public RedisClient wait(long numSlaves, long timeout, Handler<AsyncResult<String>> handler) {
     delegate.wait(numSlaves, timeout, handler);
-    return this;
-  }
-  /**
-   * Watch the given keys to determine execution of the MULTI/EXEC block
-   * @param key Key to watch
-   * @param handler Handler for the result of this call.
-   * @return 
-   */
-  public RedisClient watch(String key, Handler<AsyncResult<String>> handler) {
-    delegate.watch(key, handler);
-    return this;
-  }
-  /**
-   * Watch the given keys to determine execution of the MULTI/EXEC block
-   * @param keys List of keys to watch
-   * @param handler Handler for the result of this call.
-   * @return 
-   */
-  public RedisClient watchMany(List<String> keys, Handler<AsyncResult<String>> handler) {
-    delegate.watchMany(keys != null ? (List)keys.collect({it}) : null, handler);
     return this;
   }
   /**
