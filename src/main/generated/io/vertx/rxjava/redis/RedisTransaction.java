@@ -35,7 +35,6 @@ import io.vertx.redis.op.SetOptions;
 import io.vertx.redis.op.SortOptions;
 import io.vertx.redis.op.MigrateOptions;
 import io.vertx.redis.op.ScanOptions;
-import io.vertx.rxjava.core.Vertx;
 import io.vertx.redis.op.FailoverOptions;
 import io.vertx.redis.op.SlotCmd;
 import io.vertx.redis.op.RangeLimitOptions;
@@ -43,30 +42,25 @@ import io.vertx.redis.op.LimitOptions;
 import io.vertx.core.json.JsonArray;
 import java.util.List;
 import io.vertx.rxjava.core.buffer.Buffer;
-import io.vertx.redis.RedisOptions;
 import io.vertx.core.Handler;
 
+/**
+ * This Interface represents a TX
+ *
+ * <p/>
+ * NOTE: This class has been automatically generated from the {@link io.vertx.redis.RedisTransaction original} non RX-ified interface using Vert.x codegen.
+ */
 
-public class RedisClient {
+public class RedisTransaction {
 
-  final io.vertx.redis.RedisClient delegate;
+  final io.vertx.redis.RedisTransaction delegate;
 
-  public RedisClient(io.vertx.redis.RedisClient delegate) {
+  public RedisTransaction(io.vertx.redis.RedisTransaction delegate) {
     this.delegate = delegate;
   }
 
   public Object getDelegate() {
     return delegate;
-  }
-
-  public static RedisClient create(Vertx vertx) { 
-    RedisClient ret = RedisClient.newInstance(io.vertx.redis.RedisClient.create((io.vertx.core.Vertx)vertx.getDelegate()));
-    return ret;
-  }
-
-  public static RedisClient create(Vertx vertx, RedisOptions config) { 
-    RedisClient ret = RedisClient.newInstance(io.vertx.redis.RedisClient.create((io.vertx.core.Vertx)vertx.getDelegate(), config));
-    return ret;
   }
 
   /**
@@ -102,7 +96,7 @@ public class RedisClient {
    * @param handler Handler for the result of this call.
    * @return 
    */
-  public RedisClient append(String key, String value, Handler<AsyncResult<Long>> handler) { 
+  public RedisTransaction append(String key, String value, Handler<AsyncResult<String>> handler) { 
     delegate.append(key, value, handler);
     return this;
   }
@@ -113,8 +107,8 @@ public class RedisClient {
    * @param value Value to append
    * @return 
    */
-  public Observable<Long> appendObservable(String key, String value) { 
-    io.vertx.rx.java.ObservableFuture<Long> handler = io.vertx.rx.java.RxHelper.observableFuture();
+  public Observable<String> appendObservable(String key, String value) { 
+    io.vertx.rx.java.ObservableFuture<String> handler = io.vertx.rx.java.RxHelper.observableFuture();
     append(key, value, handler.toHandler());
     return handler;
   }
@@ -125,7 +119,7 @@ public class RedisClient {
    * @param handler Handler for the result of this call.
    * @return 
    */
-  public RedisClient auth(String password, Handler<AsyncResult<String>> handler) { 
+  public RedisTransaction auth(String password, Handler<AsyncResult<String>> handler) { 
     delegate.auth(password, handler);
     return this;
   }
@@ -146,7 +140,7 @@ public class RedisClient {
    * @param handler 
    * @return 
    */
-  public RedisClient bgrewriteaof(Handler<AsyncResult<String>> handler) { 
+  public RedisTransaction bgrewriteaof(Handler<AsyncResult<String>> handler) { 
     delegate.bgrewriteaof(handler);
     return this;
   }
@@ -166,7 +160,7 @@ public class RedisClient {
    * @param handler 
    * @return 
    */
-  public RedisClient bgsave(Handler<AsyncResult<String>> handler) { 
+  public RedisTransaction bgsave(Handler<AsyncResult<String>> handler) { 
     delegate.bgsave(handler);
     return this;
   }
@@ -187,7 +181,7 @@ public class RedisClient {
    * @param handler Handler for the result of this call.
    * @return 
    */
-  public RedisClient bitcount(String key, Handler<AsyncResult<Long>> handler) { 
+  public RedisTransaction bitcount(String key, Handler<AsyncResult<String>> handler) { 
     delegate.bitcount(key, handler);
     return this;
   }
@@ -197,8 +191,8 @@ public class RedisClient {
    * @param key Key string
    * @return 
    */
-  public Observable<Long> bitcountObservable(String key) { 
-    io.vertx.rx.java.ObservableFuture<Long> handler = io.vertx.rx.java.RxHelper.observableFuture();
+  public Observable<String> bitcountObservable(String key) { 
+    io.vertx.rx.java.ObservableFuture<String> handler = io.vertx.rx.java.RxHelper.observableFuture();
     bitcount(key, handler.toHandler());
     return handler;
   }
@@ -211,7 +205,7 @@ public class RedisClient {
    * @param handler Handler for the result of this call.
    * @return 
    */
-  public RedisClient bitcountRange(String key, long start, long end, Handler<AsyncResult<Long>> handler) { 
+  public RedisTransaction bitcountRange(String key, long start, long end, Handler<AsyncResult<String>> handler) { 
     delegate.bitcountRange(key, start, end, handler);
     return this;
   }
@@ -223,8 +217,8 @@ public class RedisClient {
    * @param end End index
    * @return 
    */
-  public Observable<Long> bitcountRangeObservable(String key, long start, long end) { 
-    io.vertx.rx.java.ObservableFuture<Long> handler = io.vertx.rx.java.RxHelper.observableFuture();
+  public Observable<String> bitcountRangeObservable(String key, long start, long end) { 
+    io.vertx.rx.java.ObservableFuture<String> handler = io.vertx.rx.java.RxHelper.observableFuture();
     bitcountRange(key, start, end, handler.toHandler());
     return handler;
   }
@@ -237,7 +231,7 @@ public class RedisClient {
    * @param handler Handler for the result of this call.
    * @return 
    */
-  public RedisClient bitop(BitOperation operation, String destkey, List<String> keys, Handler<AsyncResult<Long>> handler) { 
+  public RedisTransaction bitop(BitOperation operation, String destkey, List<String> keys, Handler<AsyncResult<String>> handler) { 
     delegate.bitop(operation, destkey, keys, handler);
     return this;
   }
@@ -249,8 +243,8 @@ public class RedisClient {
    * @param keys List of keys on which to perform the operation
    * @return 
    */
-  public Observable<Long> bitopObservable(BitOperation operation, String destkey, List<String> keys) { 
-    io.vertx.rx.java.ObservableFuture<Long> handler = io.vertx.rx.java.RxHelper.observableFuture();
+  public Observable<String> bitopObservable(BitOperation operation, String destkey, List<String> keys) { 
+    io.vertx.rx.java.ObservableFuture<String> handler = io.vertx.rx.java.RxHelper.observableFuture();
     bitop(operation, destkey, keys, handler.toHandler());
     return handler;
   }
@@ -262,7 +256,7 @@ public class RedisClient {
    * @param handler Handler for the result of this call.
    * @return 
    */
-  public RedisClient bitpos(String key, int bit, Handler<AsyncResult<Long>> handler) { 
+  public RedisTransaction bitpos(String key, int bit, Handler<AsyncResult<String>> handler) { 
     delegate.bitpos(key, bit, handler);
     return this;
   }
@@ -273,15 +267,15 @@ public class RedisClient {
    * @param bit What bit value to look for - must be 1, or 0
    * @return 
    */
-  public Observable<Long> bitposObservable(String key, int bit) { 
-    io.vertx.rx.java.ObservableFuture<Long> handler = io.vertx.rx.java.RxHelper.observableFuture();
+  public Observable<String> bitposObservable(String key, int bit) { 
+    io.vertx.rx.java.ObservableFuture<String> handler = io.vertx.rx.java.RxHelper.observableFuture();
     bitpos(key, bit, handler.toHandler());
     return handler;
   }
 
   /**
    * Find first bit set or clear in a string
-   *
+   * <p>
    * See also bitposRange() method, which takes start, and stop offset.
    * @param key Key string
    * @param bit What bit value to look for - must be 1, or 0
@@ -289,29 +283,29 @@ public class RedisClient {
    * @param handler Handler for the result of this call.
    * @return 
    */
-  public RedisClient bitposFrom(String key, int bit, int start, Handler<AsyncResult<Long>> handler) { 
+  public RedisTransaction bitposFrom(String key, int bit, int start, Handler<AsyncResult<String>> handler) { 
     delegate.bitposFrom(key, bit, start, handler);
     return this;
   }
 
   /**
    * Find first bit set or clear in a string
-   *
+   * <p>
    * See also bitposRange() method, which takes start, and stop offset.
    * @param key Key string
    * @param bit What bit value to look for - must be 1, or 0
    * @param start Start offset
    * @return 
    */
-  public Observable<Long> bitposFromObservable(String key, int bit, int start) { 
-    io.vertx.rx.java.ObservableFuture<Long> handler = io.vertx.rx.java.RxHelper.observableFuture();
+  public Observable<String> bitposFromObservable(String key, int bit, int start) { 
+    io.vertx.rx.java.ObservableFuture<String> handler = io.vertx.rx.java.RxHelper.observableFuture();
     bitposFrom(key, bit, start, handler.toHandler());
     return handler;
   }
 
   /**
    * Find first bit set or clear in a string
-   *
+   * <p>
    * Note: when both start, and stop offsets are specified,
    * behaviour is slightly different than if only start is specified
    * @param key Key string
@@ -321,14 +315,14 @@ public class RedisClient {
    * @param handler Handler for the result of this call.
    * @return 
    */
-  public RedisClient bitposRange(String key, int bit, int start, int stop, Handler<AsyncResult<Long>> handler) { 
+  public RedisTransaction bitposRange(String key, int bit, int start, int stop, Handler<AsyncResult<String>> handler) { 
     delegate.bitposRange(key, bit, start, stop, handler);
     return this;
   }
 
   /**
    * Find first bit set or clear in a string
-   *
+   * <p>
    * Note: when both start, and stop offsets are specified,
    * behaviour is slightly different than if only start is specified
    * @param key Key string
@@ -337,8 +331,8 @@ public class RedisClient {
    * @param stop End offset - inclusive
    * @return 
    */
-  public Observable<Long> bitposRangeObservable(String key, int bit, int start, int stop) { 
-    io.vertx.rx.java.ObservableFuture<Long> handler = io.vertx.rx.java.RxHelper.observableFuture();
+  public Observable<String> bitposRangeObservable(String key, int bit, int start, int stop) { 
+    io.vertx.rx.java.ObservableFuture<String> handler = io.vertx.rx.java.RxHelper.observableFuture();
     bitposRange(key, bit, start, stop, handler.toHandler());
     return handler;
   }
@@ -350,7 +344,7 @@ public class RedisClient {
    * @param handler Handler for the result of this call.
    * @return 
    */
-  public RedisClient blpop(String key, int seconds, Handler<AsyncResult<JsonArray>> handler) { 
+  public RedisTransaction blpop(String key, int seconds, Handler<AsyncResult<String>> handler) { 
     delegate.blpop(key, seconds, handler);
     return this;
   }
@@ -361,8 +355,8 @@ public class RedisClient {
    * @param seconds Timeout in seconds
    * @return 
    */
-  public Observable<JsonArray> blpopObservable(String key, int seconds) { 
-    io.vertx.rx.java.ObservableFuture<JsonArray> handler = io.vertx.rx.java.RxHelper.observableFuture();
+  public Observable<String> blpopObservable(String key, int seconds) { 
+    io.vertx.rx.java.ObservableFuture<String> handler = io.vertx.rx.java.RxHelper.observableFuture();
     blpop(key, seconds, handler.toHandler());
     return handler;
   }
@@ -374,7 +368,7 @@ public class RedisClient {
    * @param handler Handler for the result of this call.
    * @return 
    */
-  public RedisClient blpopMany(List<String> keys, int seconds, Handler<AsyncResult<JsonArray>> handler) { 
+  public RedisTransaction blpopMany(List<String> keys, int seconds, Handler<AsyncResult<String>> handler) { 
     delegate.blpopMany(keys, seconds, handler);
     return this;
   }
@@ -385,8 +379,8 @@ public class RedisClient {
    * @param seconds Timeout in seconds
    * @return 
    */
-  public Observable<JsonArray> blpopManyObservable(List<String> keys, int seconds) { 
-    io.vertx.rx.java.ObservableFuture<JsonArray> handler = io.vertx.rx.java.RxHelper.observableFuture();
+  public Observable<String> blpopManyObservable(List<String> keys, int seconds) { 
+    io.vertx.rx.java.ObservableFuture<String> handler = io.vertx.rx.java.RxHelper.observableFuture();
     blpopMany(keys, seconds, handler.toHandler());
     return handler;
   }
@@ -398,7 +392,7 @@ public class RedisClient {
    * @param handler Handler for the result of this call.
    * @return 
    */
-  public RedisClient brpop(String key, int seconds, Handler<AsyncResult<JsonArray>> handler) { 
+  public RedisTransaction brpop(String key, int seconds, Handler<AsyncResult<String>> handler) { 
     delegate.brpop(key, seconds, handler);
     return this;
   }
@@ -409,8 +403,8 @@ public class RedisClient {
    * @param seconds Timeout in seconds
    * @return 
    */
-  public Observable<JsonArray> brpopObservable(String key, int seconds) { 
-    io.vertx.rx.java.ObservableFuture<JsonArray> handler = io.vertx.rx.java.RxHelper.observableFuture();
+  public Observable<String> brpopObservable(String key, int seconds) { 
+    io.vertx.rx.java.ObservableFuture<String> handler = io.vertx.rx.java.RxHelper.observableFuture();
     brpop(key, seconds, handler.toHandler());
     return handler;
   }
@@ -422,7 +416,7 @@ public class RedisClient {
    * @param handler Handler for the result of this call.
    * @return 
    */
-  public RedisClient brpopMany(List<String> keys, int seconds, Handler<AsyncResult<JsonArray>> handler) { 
+  public RedisTransaction brpopMany(List<String> keys, int seconds, Handler<AsyncResult<String>> handler) { 
     delegate.brpopMany(keys, seconds, handler);
     return this;
   }
@@ -433,8 +427,8 @@ public class RedisClient {
    * @param seconds Timeout in seconds
    * @return 
    */
-  public Observable<JsonArray> brpopManyObservable(List<String> keys, int seconds) { 
-    io.vertx.rx.java.ObservableFuture<JsonArray> handler = io.vertx.rx.java.RxHelper.observableFuture();
+  public Observable<String> brpopManyObservable(List<String> keys, int seconds) { 
+    io.vertx.rx.java.ObservableFuture<String> handler = io.vertx.rx.java.RxHelper.observableFuture();
     brpopMany(keys, seconds, handler.toHandler());
     return handler;
   }
@@ -447,7 +441,7 @@ public class RedisClient {
    * @param handler Handler for the result of this call.
    * @return 
    */
-  public RedisClient brpoplpush(String key, String destkey, int seconds, Handler<AsyncResult<String>> handler) { 
+  public RedisTransaction brpoplpush(String key, String destkey, int seconds, Handler<AsyncResult<String>> handler) { 
     delegate.brpoplpush(key, destkey, seconds, handler);
     return this;
   }
@@ -471,7 +465,7 @@ public class RedisClient {
    * @param handler Handler for the result of this call.
    * @return 
    */
-  public RedisClient clientKill(KillFilter filter, Handler<AsyncResult<Long>> handler) { 
+  public RedisTransaction clientKill(KillFilter filter, Handler<AsyncResult<String>> handler) { 
     delegate.clientKill(filter, handler);
     return this;
   }
@@ -481,8 +475,8 @@ public class RedisClient {
    * @param filter Filter options
    * @return 
    */
-  public Observable<Long> clientKillObservable(KillFilter filter) { 
-    io.vertx.rx.java.ObservableFuture<Long> handler = io.vertx.rx.java.RxHelper.observableFuture();
+  public Observable<String> clientKillObservable(KillFilter filter) { 
+    io.vertx.rx.java.ObservableFuture<String> handler = io.vertx.rx.java.RxHelper.observableFuture();
     clientKill(filter, handler.toHandler());
     return handler;
   }
@@ -492,7 +486,7 @@ public class RedisClient {
    * @param handler 
    * @return 
    */
-  public RedisClient clientList(Handler<AsyncResult<String>> handler) { 
+  public RedisTransaction clientList(Handler<AsyncResult<String>> handler) { 
     delegate.clientList(handler);
     return this;
   }
@@ -512,7 +506,7 @@ public class RedisClient {
    * @param handler 
    * @return 
    */
-  public RedisClient clientGetname(Handler<AsyncResult<String>> handler) { 
+  public RedisTransaction clientGetname(Handler<AsyncResult<String>> handler) { 
     delegate.clientGetname(handler);
     return this;
   }
@@ -533,7 +527,7 @@ public class RedisClient {
    * @param handler Handler for the result of this call.
    * @return 
    */
-  public RedisClient clientPause(long millis, Handler<AsyncResult<String>> handler) { 
+  public RedisTransaction clientPause(long millis, Handler<AsyncResult<String>> handler) { 
     delegate.clientPause(millis, handler);
     return this;
   }
@@ -555,7 +549,7 @@ public class RedisClient {
    * @param handler Handler for the result of this call.
    * @return 
    */
-  public RedisClient clientSetname(String name, Handler<AsyncResult<String>> handler) { 
+  public RedisTransaction clientSetname(String name, Handler<AsyncResult<String>> handler) { 
     delegate.clientSetname(name, handler);
     return this;
   }
@@ -577,16 +571,8 @@ public class RedisClient {
    * @param handler Handler for the result of this call.
    * @return 
    */
-  public RedisClient clusterAddslots(List<Long> slots, Handler<AsyncResult<Void>> handler) { 
-    delegate.clusterAddslots(slots, new Handler<AsyncResult<java.lang.Void>>() {
-      public void handle(AsyncResult<java.lang.Void> ar) {
-        if (ar.succeeded()) {
-          handler.handle(io.vertx.core.Future.succeededFuture(ar.result()));
-        } else {
-          handler.handle(io.vertx.core.Future.failedFuture(ar.cause()));
-        }
-      }
-    });
+  public RedisTransaction clusterAddslots(List<String> slots, Handler<AsyncResult<String>> handler) { 
+    delegate.clusterAddslots(slots, handler);
     return this;
   }
 
@@ -595,8 +581,8 @@ public class RedisClient {
    * @param slots 
    * @return 
    */
-  public Observable<Void> clusterAddslotsObservable(List<Long> slots) { 
-    io.vertx.rx.java.ObservableFuture<Void> handler = io.vertx.rx.java.RxHelper.observableFuture();
+  public Observable<String> clusterAddslotsObservable(List<String> slots) { 
+    io.vertx.rx.java.ObservableFuture<String> handler = io.vertx.rx.java.RxHelper.observableFuture();
     clusterAddslots(slots, handler.toHandler());
     return handler;
   }
@@ -607,7 +593,7 @@ public class RedisClient {
    * @param handler Handler for the result of this call.
    * @return 
    */
-  public RedisClient clusterCountFailureReports(String nodeId, Handler<AsyncResult<Long>> handler) { 
+  public RedisTransaction clusterCountFailureReports(String nodeId, Handler<AsyncResult<String>> handler) { 
     delegate.clusterCountFailureReports(nodeId, handler);
     return this;
   }
@@ -617,8 +603,8 @@ public class RedisClient {
    * @param nodeId 
    * @return 
    */
-  public Observable<Long> clusterCountFailureReportsObservable(String nodeId) { 
-    io.vertx.rx.java.ObservableFuture<Long> handler = io.vertx.rx.java.RxHelper.observableFuture();
+  public Observable<String> clusterCountFailureReportsObservable(String nodeId) { 
+    io.vertx.rx.java.ObservableFuture<String> handler = io.vertx.rx.java.RxHelper.observableFuture();
     clusterCountFailureReports(nodeId, handler.toHandler());
     return handler;
   }
@@ -629,7 +615,7 @@ public class RedisClient {
    * @param handler Handler for the result of this call.
    * @return 
    */
-  public RedisClient clusterCountkeysinslot(long slot, Handler<AsyncResult<Long>> handler) { 
+  public RedisTransaction clusterCountkeysinslot(long slot, Handler<AsyncResult<String>> handler) { 
     delegate.clusterCountkeysinslot(slot, handler);
     return this;
   }
@@ -639,8 +625,8 @@ public class RedisClient {
    * @param slot 
    * @return 
    */
-  public Observable<Long> clusterCountkeysinslotObservable(long slot) { 
-    io.vertx.rx.java.ObservableFuture<Long> handler = io.vertx.rx.java.RxHelper.observableFuture();
+  public Observable<String> clusterCountkeysinslotObservable(long slot) { 
+    io.vertx.rx.java.ObservableFuture<String> handler = io.vertx.rx.java.RxHelper.observableFuture();
     clusterCountkeysinslot(slot, handler.toHandler());
     return handler;
   }
@@ -651,16 +637,8 @@ public class RedisClient {
    * @param handler Handler for the result of this call.
    * @return 
    */
-  public RedisClient clusterDelslots(long slot, Handler<AsyncResult<Void>> handler) { 
-    delegate.clusterDelslots(slot, new Handler<AsyncResult<java.lang.Void>>() {
-      public void handle(AsyncResult<java.lang.Void> ar) {
-        if (ar.succeeded()) {
-          handler.handle(io.vertx.core.Future.succeededFuture(ar.result()));
-        } else {
-          handler.handle(io.vertx.core.Future.failedFuture(ar.cause()));
-        }
-      }
-    });
+  public RedisTransaction clusterDelslots(long slot, Handler<AsyncResult<String>> handler) { 
+    delegate.clusterDelslots(slot, handler);
     return this;
   }
 
@@ -669,8 +647,8 @@ public class RedisClient {
    * @param slot 
    * @return 
    */
-  public Observable<Void> clusterDelslotsObservable(long slot) { 
-    io.vertx.rx.java.ObservableFuture<Void> handler = io.vertx.rx.java.RxHelper.observableFuture();
+  public Observable<String> clusterDelslotsObservable(long slot) { 
+    io.vertx.rx.java.ObservableFuture<String> handler = io.vertx.rx.java.RxHelper.observableFuture();
     clusterDelslots(slot, handler.toHandler());
     return handler;
   }
@@ -681,16 +659,8 @@ public class RedisClient {
    * @param handler Handler for the result of this call.
    * @return 
    */
-  public RedisClient clusterDelslotsMany(List<Long> slots, Handler<AsyncResult<Void>> handler) { 
-    delegate.clusterDelslotsMany(slots, new Handler<AsyncResult<java.lang.Void>>() {
-      public void handle(AsyncResult<java.lang.Void> ar) {
-        if (ar.succeeded()) {
-          handler.handle(io.vertx.core.Future.succeededFuture(ar.result()));
-        } else {
-          handler.handle(io.vertx.core.Future.failedFuture(ar.cause()));
-        }
-      }
-    });
+  public RedisTransaction clusterDelslotsMany(List<String> slots, Handler<AsyncResult<String>> handler) { 
+    delegate.clusterDelslotsMany(slots, handler);
     return this;
   }
 
@@ -699,8 +669,8 @@ public class RedisClient {
    * @param slots 
    * @return 
    */
-  public Observable<Void> clusterDelslotsManyObservable(List<Long> slots) { 
-    io.vertx.rx.java.ObservableFuture<Void> handler = io.vertx.rx.java.RxHelper.observableFuture();
+  public Observable<String> clusterDelslotsManyObservable(List<String> slots) { 
+    io.vertx.rx.java.ObservableFuture<String> handler = io.vertx.rx.java.RxHelper.observableFuture();
     clusterDelslotsMany(slots, handler.toHandler());
     return handler;
   }
@@ -710,16 +680,8 @@ public class RedisClient {
    * @param handler Handler for the result of this call.
    * @return 
    */
-  public RedisClient clusterFailover(Handler<AsyncResult<Void>> handler) { 
-    delegate.clusterFailover(new Handler<AsyncResult<java.lang.Void>>() {
-      public void handle(AsyncResult<java.lang.Void> ar) {
-        if (ar.succeeded()) {
-          handler.handle(io.vertx.core.Future.succeededFuture(ar.result()));
-        } else {
-          handler.handle(io.vertx.core.Future.failedFuture(ar.cause()));
-        }
-      }
-    });
+  public RedisTransaction clusterFailover(Handler<AsyncResult<String>> handler) { 
+    delegate.clusterFailover(handler);
     return this;
   }
 
@@ -727,8 +689,8 @@ public class RedisClient {
    * Forces a slave to perform a manual failover of its master.
    * @return 
    */
-  public Observable<Void> clusterFailoverObservable() { 
-    io.vertx.rx.java.ObservableFuture<Void> handler = io.vertx.rx.java.RxHelper.observableFuture();
+  public Observable<String> clusterFailoverObservable() { 
+    io.vertx.rx.java.ObservableFuture<String> handler = io.vertx.rx.java.RxHelper.observableFuture();
     clusterFailover(handler.toHandler());
     return handler;
   }
@@ -739,16 +701,8 @@ public class RedisClient {
    * @param handler Handler for the result of this call.
    * @return 
    */
-  public RedisClient clusterFailOverWithOptions(FailoverOptions options, Handler<AsyncResult<Void>> handler) { 
-    delegate.clusterFailOverWithOptions(options, new Handler<AsyncResult<java.lang.Void>>() {
-      public void handle(AsyncResult<java.lang.Void> ar) {
-        if (ar.succeeded()) {
-          handler.handle(io.vertx.core.Future.succeededFuture(ar.result()));
-        } else {
-          handler.handle(io.vertx.core.Future.failedFuture(ar.cause()));
-        }
-      }
-    });
+  public RedisTransaction clusterFailOverWithOptions(FailoverOptions options, Handler<AsyncResult<String>> handler) { 
+    delegate.clusterFailOverWithOptions(options, handler);
     return this;
   }
 
@@ -757,8 +711,8 @@ public class RedisClient {
    * @param options 
    * @return 
    */
-  public Observable<Void> clusterFailOverWithOptionsObservable(FailoverOptions options) { 
-    io.vertx.rx.java.ObservableFuture<Void> handler = io.vertx.rx.java.RxHelper.observableFuture();
+  public Observable<String> clusterFailOverWithOptionsObservable(FailoverOptions options) { 
+    io.vertx.rx.java.ObservableFuture<String> handler = io.vertx.rx.java.RxHelper.observableFuture();
     clusterFailOverWithOptions(options, handler.toHandler());
     return handler;
   }
@@ -769,16 +723,8 @@ public class RedisClient {
    * @param handler Handler for the result of this call.
    * @return 
    */
-  public RedisClient clusterForget(String nodeId, Handler<AsyncResult<Void>> handler) { 
-    delegate.clusterForget(nodeId, new Handler<AsyncResult<java.lang.Void>>() {
-      public void handle(AsyncResult<java.lang.Void> ar) {
-        if (ar.succeeded()) {
-          handler.handle(io.vertx.core.Future.succeededFuture(ar.result()));
-        } else {
-          handler.handle(io.vertx.core.Future.failedFuture(ar.cause()));
-        }
-      }
-    });
+  public RedisTransaction clusterForget(String nodeId, Handler<AsyncResult<String>> handler) { 
+    delegate.clusterForget(nodeId, handler);
     return this;
   }
 
@@ -787,8 +733,8 @@ public class RedisClient {
    * @param nodeId 
    * @return 
    */
-  public Observable<Void> clusterForgetObservable(String nodeId) { 
-    io.vertx.rx.java.ObservableFuture<Void> handler = io.vertx.rx.java.RxHelper.observableFuture();
+  public Observable<String> clusterForgetObservable(String nodeId) { 
+    io.vertx.rx.java.ObservableFuture<String> handler = io.vertx.rx.java.RxHelper.observableFuture();
     clusterForget(nodeId, handler.toHandler());
     return handler;
   }
@@ -800,7 +746,7 @@ public class RedisClient {
    * @param handler Handler for the result of this call.
    * @return 
    */
-  public RedisClient clusterGetkeysinslot(long slot, long count, Handler<AsyncResult<JsonArray>> handler) { 
+  public RedisTransaction clusterGetkeysinslot(long slot, long count, Handler<AsyncResult<String>> handler) { 
     delegate.clusterGetkeysinslot(slot, count, handler);
     return this;
   }
@@ -811,8 +757,8 @@ public class RedisClient {
    * @param count 
    * @return 
    */
-  public Observable<JsonArray> clusterGetkeysinslotObservable(long slot, long count) { 
-    io.vertx.rx.java.ObservableFuture<JsonArray> handler = io.vertx.rx.java.RxHelper.observableFuture();
+  public Observable<String> clusterGetkeysinslotObservable(long slot, long count) { 
+    io.vertx.rx.java.ObservableFuture<String> handler = io.vertx.rx.java.RxHelper.observableFuture();
     clusterGetkeysinslot(slot, count, handler.toHandler());
     return handler;
   }
@@ -822,7 +768,7 @@ public class RedisClient {
    * @param handler Handler for the result of this call.
    * @return 
    */
-  public RedisClient clusterInfo(Handler<AsyncResult<JsonArray>> handler) { 
+  public RedisTransaction clusterInfo(Handler<AsyncResult<String>> handler) { 
     delegate.clusterInfo(handler);
     return this;
   }
@@ -831,8 +777,8 @@ public class RedisClient {
    * Provides info about Redis Cluster node state.
    * @return 
    */
-  public Observable<JsonArray> clusterInfoObservable() { 
-    io.vertx.rx.java.ObservableFuture<JsonArray> handler = io.vertx.rx.java.RxHelper.observableFuture();
+  public Observable<String> clusterInfoObservable() { 
+    io.vertx.rx.java.ObservableFuture<String> handler = io.vertx.rx.java.RxHelper.observableFuture();
     clusterInfo(handler.toHandler());
     return handler;
   }
@@ -843,7 +789,7 @@ public class RedisClient {
    * @param handler Handler for the result of this call.
    * @return 
    */
-  public RedisClient clusterKeyslot(String key, Handler<AsyncResult<Long>> handler) { 
+  public RedisTransaction clusterKeyslot(String key, Handler<AsyncResult<String>> handler) { 
     delegate.clusterKeyslot(key, handler);
     return this;
   }
@@ -853,8 +799,8 @@ public class RedisClient {
    * @param key 
    * @return 
    */
-  public Observable<Long> clusterKeyslotObservable(String key) { 
-    io.vertx.rx.java.ObservableFuture<Long> handler = io.vertx.rx.java.RxHelper.observableFuture();
+  public Observable<String> clusterKeyslotObservable(String key) { 
+    io.vertx.rx.java.ObservableFuture<String> handler = io.vertx.rx.java.RxHelper.observableFuture();
     clusterKeyslot(key, handler.toHandler());
     return handler;
   }
@@ -866,16 +812,8 @@ public class RedisClient {
    * @param handler Handler for the result of this call.
    * @return 
    */
-  public RedisClient clusterMeet(String ip, long port, Handler<AsyncResult<Void>> handler) { 
-    delegate.clusterMeet(ip, port, new Handler<AsyncResult<java.lang.Void>>() {
-      public void handle(AsyncResult<java.lang.Void> ar) {
-        if (ar.succeeded()) {
-          handler.handle(io.vertx.core.Future.succeededFuture(ar.result()));
-        } else {
-          handler.handle(io.vertx.core.Future.failedFuture(ar.cause()));
-        }
-      }
-    });
+  public RedisTransaction clusterMeet(String ip, long port, Handler<AsyncResult<String>> handler) { 
+    delegate.clusterMeet(ip, port, handler);
     return this;
   }
 
@@ -885,8 +823,8 @@ public class RedisClient {
    * @param port 
    * @return 
    */
-  public Observable<Void> clusterMeetObservable(String ip, long port) { 
-    io.vertx.rx.java.ObservableFuture<Void> handler = io.vertx.rx.java.RxHelper.observableFuture();
+  public Observable<String> clusterMeetObservable(String ip, long port) { 
+    io.vertx.rx.java.ObservableFuture<String> handler = io.vertx.rx.java.RxHelper.observableFuture();
     clusterMeet(ip, port, handler.toHandler());
     return handler;
   }
@@ -896,7 +834,7 @@ public class RedisClient {
    * @param handler Handler for the result of this call.
    * @return 
    */
-  public RedisClient clusterNodes(Handler<AsyncResult<JsonArray>> handler) { 
+  public RedisTransaction clusterNodes(Handler<AsyncResult<String>> handler) { 
     delegate.clusterNodes(handler);
     return this;
   }
@@ -905,8 +843,8 @@ public class RedisClient {
    * Get Cluster config for the node.
    * @return 
    */
-  public Observable<JsonArray> clusterNodesObservable() { 
-    io.vertx.rx.java.ObservableFuture<JsonArray> handler = io.vertx.rx.java.RxHelper.observableFuture();
+  public Observable<String> clusterNodesObservable() { 
+    io.vertx.rx.java.ObservableFuture<String> handler = io.vertx.rx.java.RxHelper.observableFuture();
     clusterNodes(handler.toHandler());
     return handler;
   }
@@ -917,16 +855,8 @@ public class RedisClient {
    * @param handler Handler for the result of this call.
    * @return 
    */
-  public RedisClient clusterReplicate(String nodeId, Handler<AsyncResult<Void>> handler) { 
-    delegate.clusterReplicate(nodeId, new Handler<AsyncResult<java.lang.Void>>() {
-      public void handle(AsyncResult<java.lang.Void> ar) {
-        if (ar.succeeded()) {
-          handler.handle(io.vertx.core.Future.succeededFuture(ar.result()));
-        } else {
-          handler.handle(io.vertx.core.Future.failedFuture(ar.cause()));
-        }
-      }
-    });
+  public RedisTransaction clusterReplicate(String nodeId, Handler<AsyncResult<String>> handler) { 
+    delegate.clusterReplicate(nodeId, handler);
     return this;
   }
 
@@ -935,8 +865,8 @@ public class RedisClient {
    * @param nodeId 
    * @return 
    */
-  public Observable<Void> clusterReplicateObservable(String nodeId) { 
-    io.vertx.rx.java.ObservableFuture<Void> handler = io.vertx.rx.java.RxHelper.observableFuture();
+  public Observable<String> clusterReplicateObservable(String nodeId) { 
+    io.vertx.rx.java.ObservableFuture<String> handler = io.vertx.rx.java.RxHelper.observableFuture();
     clusterReplicate(nodeId, handler.toHandler());
     return handler;
   }
@@ -946,16 +876,8 @@ public class RedisClient {
    * @param handler Handler for the result of this call.
    * @return 
    */
-  public RedisClient clusterReset(Handler<AsyncResult<Void>> handler) { 
-    delegate.clusterReset(new Handler<AsyncResult<java.lang.Void>>() {
-      public void handle(AsyncResult<java.lang.Void> ar) {
-        if (ar.succeeded()) {
-          handler.handle(io.vertx.core.Future.succeededFuture(ar.result()));
-        } else {
-          handler.handle(io.vertx.core.Future.failedFuture(ar.cause()));
-        }
-      }
-    });
+  public RedisTransaction clusterReset(Handler<AsyncResult<String>> handler) { 
+    delegate.clusterReset(handler);
     return this;
   }
 
@@ -963,8 +885,8 @@ public class RedisClient {
    * Reset a Redis Cluster node.
    * @return 
    */
-  public Observable<Void> clusterResetObservable() { 
-    io.vertx.rx.java.ObservableFuture<Void> handler = io.vertx.rx.java.RxHelper.observableFuture();
+  public Observable<String> clusterResetObservable() { 
+    io.vertx.rx.java.ObservableFuture<String> handler = io.vertx.rx.java.RxHelper.observableFuture();
     clusterReset(handler.toHandler());
     return handler;
   }
@@ -975,16 +897,8 @@ public class RedisClient {
    * @param handler Handler for the result of this call.
    * @return 
    */
-  public RedisClient clusterResetWithOptions(ResetOptions options, Handler<AsyncResult<Void>> handler) { 
-    delegate.clusterResetWithOptions(options, new Handler<AsyncResult<java.lang.Void>>() {
-      public void handle(AsyncResult<java.lang.Void> ar) {
-        if (ar.succeeded()) {
-          handler.handle(io.vertx.core.Future.succeededFuture(ar.result()));
-        } else {
-          handler.handle(io.vertx.core.Future.failedFuture(ar.cause()));
-        }
-      }
-    });
+  public RedisTransaction clusterResetWithOptions(ResetOptions options, Handler<AsyncResult<String>> handler) { 
+    delegate.clusterResetWithOptions(options, handler);
     return this;
   }
 
@@ -993,8 +907,8 @@ public class RedisClient {
    * @param options 
    * @return 
    */
-  public Observable<Void> clusterResetWithOptionsObservable(ResetOptions options) { 
-    io.vertx.rx.java.ObservableFuture<Void> handler = io.vertx.rx.java.RxHelper.observableFuture();
+  public Observable<String> clusterResetWithOptionsObservable(ResetOptions options) { 
+    io.vertx.rx.java.ObservableFuture<String> handler = io.vertx.rx.java.RxHelper.observableFuture();
     clusterResetWithOptions(options, handler.toHandler());
     return handler;
   }
@@ -1004,16 +918,8 @@ public class RedisClient {
    * @param handler Handler for the result of this call.
    * @return 
    */
-  public RedisClient clusterSaveconfig(Handler<AsyncResult<Void>> handler) { 
-    delegate.clusterSaveconfig(new Handler<AsyncResult<java.lang.Void>>() {
-      public void handle(AsyncResult<java.lang.Void> ar) {
-        if (ar.succeeded()) {
-          handler.handle(io.vertx.core.Future.succeededFuture(ar.result()));
-        } else {
-          handler.handle(io.vertx.core.Future.failedFuture(ar.cause()));
-        }
-      }
-    });
+  public RedisTransaction clusterSaveconfig(Handler<AsyncResult<String>> handler) { 
+    delegate.clusterSaveconfig(handler);
     return this;
   }
 
@@ -1021,8 +927,8 @@ public class RedisClient {
    * Forces the node to save cluster state on disk.
    * @return 
    */
-  public Observable<Void> clusterSaveconfigObservable() { 
-    io.vertx.rx.java.ObservableFuture<Void> handler = io.vertx.rx.java.RxHelper.observableFuture();
+  public Observable<String> clusterSaveconfigObservable() { 
+    io.vertx.rx.java.ObservableFuture<String> handler = io.vertx.rx.java.RxHelper.observableFuture();
     clusterSaveconfig(handler.toHandler());
     return handler;
   }
@@ -1033,16 +939,8 @@ public class RedisClient {
    * @param handler Handler for the result of this call.
    * @return 
    */
-  public RedisClient clusterSetConfigEpoch(long epoch, Handler<AsyncResult<Void>> handler) { 
-    delegate.clusterSetConfigEpoch(epoch, new Handler<AsyncResult<java.lang.Void>>() {
-      public void handle(AsyncResult<java.lang.Void> ar) {
-        if (ar.succeeded()) {
-          handler.handle(io.vertx.core.Future.succeededFuture(ar.result()));
-        } else {
-          handler.handle(io.vertx.core.Future.failedFuture(ar.cause()));
-        }
-      }
-    });
+  public RedisTransaction clusterSetConfigEpoch(long epoch, Handler<AsyncResult<String>> handler) { 
+    delegate.clusterSetConfigEpoch(epoch, handler);
     return this;
   }
 
@@ -1051,8 +949,8 @@ public class RedisClient {
    * @param epoch 
    * @return 
    */
-  public Observable<Void> clusterSetConfigEpochObservable(long epoch) { 
-    io.vertx.rx.java.ObservableFuture<Void> handler = io.vertx.rx.java.RxHelper.observableFuture();
+  public Observable<String> clusterSetConfigEpochObservable(long epoch) { 
+    io.vertx.rx.java.ObservableFuture<String> handler = io.vertx.rx.java.RxHelper.observableFuture();
     clusterSetConfigEpoch(epoch, handler.toHandler());
     return handler;
   }
@@ -1064,16 +962,8 @@ public class RedisClient {
    * @param handler Handler for the result of this call.
    * @return 
    */
-  public RedisClient clusterSetslot(long slot, SlotCmd subcommand, Handler<AsyncResult<Void>> handler) { 
-    delegate.clusterSetslot(slot, subcommand, new Handler<AsyncResult<java.lang.Void>>() {
-      public void handle(AsyncResult<java.lang.Void> ar) {
-        if (ar.succeeded()) {
-          handler.handle(io.vertx.core.Future.succeededFuture(ar.result()));
-        } else {
-          handler.handle(io.vertx.core.Future.failedFuture(ar.cause()));
-        }
-      }
-    });
+  public RedisTransaction clusterSetslot(long slot, SlotCmd subcommand, Handler<AsyncResult<String>> handler) { 
+    delegate.clusterSetslot(slot, subcommand, handler);
     return this;
   }
 
@@ -1083,8 +973,8 @@ public class RedisClient {
    * @param subcommand 
    * @return 
    */
-  public Observable<Void> clusterSetslotObservable(long slot, SlotCmd subcommand) { 
-    io.vertx.rx.java.ObservableFuture<Void> handler = io.vertx.rx.java.RxHelper.observableFuture();
+  public Observable<String> clusterSetslotObservable(long slot, SlotCmd subcommand) { 
+    io.vertx.rx.java.ObservableFuture<String> handler = io.vertx.rx.java.RxHelper.observableFuture();
     clusterSetslot(slot, subcommand, handler.toHandler());
     return handler;
   }
@@ -1097,16 +987,8 @@ public class RedisClient {
    * @param handler Handler for the result of this call.
    * @return 
    */
-  public RedisClient clusterSetslotWithNode(long slot, SlotCmd subcommand, String nodeId, Handler<AsyncResult<Void>> handler) { 
-    delegate.clusterSetslotWithNode(slot, subcommand, nodeId, new Handler<AsyncResult<java.lang.Void>>() {
-      public void handle(AsyncResult<java.lang.Void> ar) {
-        if (ar.succeeded()) {
-          handler.handle(io.vertx.core.Future.succeededFuture(ar.result()));
-        } else {
-          handler.handle(io.vertx.core.Future.failedFuture(ar.cause()));
-        }
-      }
-    });
+  public RedisTransaction clusterSetslotWithNode(long slot, SlotCmd subcommand, String nodeId, Handler<AsyncResult<String>> handler) { 
+    delegate.clusterSetslotWithNode(slot, subcommand, nodeId, handler);
     return this;
   }
 
@@ -1117,8 +999,8 @@ public class RedisClient {
    * @param nodeId 
    * @return 
    */
-  public Observable<Void> clusterSetslotWithNodeObservable(long slot, SlotCmd subcommand, String nodeId) { 
-    io.vertx.rx.java.ObservableFuture<Void> handler = io.vertx.rx.java.RxHelper.observableFuture();
+  public Observable<String> clusterSetslotWithNodeObservable(long slot, SlotCmd subcommand, String nodeId) { 
+    io.vertx.rx.java.ObservableFuture<String> handler = io.vertx.rx.java.RxHelper.observableFuture();
     clusterSetslotWithNode(slot, subcommand, nodeId, handler.toHandler());
     return handler;
   }
@@ -1129,7 +1011,7 @@ public class RedisClient {
    * @param handler Handler for the result of this call.
    * @return 
    */
-  public RedisClient clusterSlaves(String nodeId, Handler<AsyncResult<JsonArray>> handler) { 
+  public RedisTransaction clusterSlaves(String nodeId, Handler<AsyncResult<String>> handler) { 
     delegate.clusterSlaves(nodeId, handler);
     return this;
   }
@@ -1139,8 +1021,8 @@ public class RedisClient {
    * @param nodeId 
    * @return 
    */
-  public Observable<JsonArray> clusterSlavesObservable(String nodeId) { 
-    io.vertx.rx.java.ObservableFuture<JsonArray> handler = io.vertx.rx.java.RxHelper.observableFuture();
+  public Observable<String> clusterSlavesObservable(String nodeId) { 
+    io.vertx.rx.java.ObservableFuture<String> handler = io.vertx.rx.java.RxHelper.observableFuture();
     clusterSlaves(nodeId, handler.toHandler());
     return handler;
   }
@@ -1150,7 +1032,7 @@ public class RedisClient {
    * @param handler 
    * @return 
    */
-  public RedisClient clusterSlots(Handler<AsyncResult<JsonArray>> handler) { 
+  public RedisTransaction clusterSlots(Handler<AsyncResult<String>> handler) { 
     delegate.clusterSlots(handler);
     return this;
   }
@@ -1159,8 +1041,8 @@ public class RedisClient {
    * Get array of Cluster slot to node mappings
    * @return 
    */
-  public Observable<JsonArray> clusterSlotsObservable() { 
-    io.vertx.rx.java.ObservableFuture<JsonArray> handler = io.vertx.rx.java.RxHelper.observableFuture();
+  public Observable<String> clusterSlotsObservable() { 
+    io.vertx.rx.java.ObservableFuture<String> handler = io.vertx.rx.java.RxHelper.observableFuture();
     clusterSlots(handler.toHandler());
     return handler;
   }
@@ -1170,7 +1052,7 @@ public class RedisClient {
    * @param handler 
    * @return 
    */
-  public RedisClient command(Handler<AsyncResult<JsonArray>> handler) { 
+  public RedisTransaction command(Handler<AsyncResult<String>> handler) { 
     delegate.command(handler);
     return this;
   }
@@ -1179,8 +1061,8 @@ public class RedisClient {
    * Get array of Redis command details
    * @return 
    */
-  public Observable<JsonArray> commandObservable() { 
-    io.vertx.rx.java.ObservableFuture<JsonArray> handler = io.vertx.rx.java.RxHelper.observableFuture();
+  public Observable<String> commandObservable() { 
+    io.vertx.rx.java.ObservableFuture<String> handler = io.vertx.rx.java.RxHelper.observableFuture();
     command(handler.toHandler());
     return handler;
   }
@@ -1190,7 +1072,7 @@ public class RedisClient {
    * @param handler 
    * @return 
    */
-  public RedisClient commandCount(Handler<AsyncResult<Long>> handler) { 
+  public RedisTransaction commandCount(Handler<AsyncResult<String>> handler) { 
     delegate.commandCount(handler);
     return this;
   }
@@ -1199,8 +1081,8 @@ public class RedisClient {
    * Get total number of Redis commands
    * @return 
    */
-  public Observable<Long> commandCountObservable() { 
-    io.vertx.rx.java.ObservableFuture<Long> handler = io.vertx.rx.java.RxHelper.observableFuture();
+  public Observable<String> commandCountObservable() { 
+    io.vertx.rx.java.ObservableFuture<String> handler = io.vertx.rx.java.RxHelper.observableFuture();
     commandCount(handler.toHandler());
     return handler;
   }
@@ -1210,7 +1092,7 @@ public class RedisClient {
    * @param handler 
    * @return 
    */
-  public RedisClient commandGetkeys(Handler<AsyncResult<JsonArray>> handler) { 
+  public RedisTransaction commandGetkeys(Handler<AsyncResult<String>> handler) { 
     delegate.commandGetkeys(handler);
     return this;
   }
@@ -1219,8 +1101,8 @@ public class RedisClient {
    * Extract keys given a full Redis command
    * @return 
    */
-  public Observable<JsonArray> commandGetkeysObservable() { 
-    io.vertx.rx.java.ObservableFuture<JsonArray> handler = io.vertx.rx.java.RxHelper.observableFuture();
+  public Observable<String> commandGetkeysObservable() { 
+    io.vertx.rx.java.ObservableFuture<String> handler = io.vertx.rx.java.RxHelper.observableFuture();
     commandGetkeys(handler.toHandler());
     return handler;
   }
@@ -1231,7 +1113,7 @@ public class RedisClient {
    * @param handler Handler for the result of this call.
    * @return 
    */
-  public RedisClient commandInfo(List<String> commands, Handler<AsyncResult<JsonArray>> handler) { 
+  public RedisTransaction commandInfo(List<String> commands, Handler<AsyncResult<String>> handler) { 
     delegate.commandInfo(commands, handler);
     return this;
   }
@@ -1241,8 +1123,8 @@ public class RedisClient {
    * @param commands List of commands to get info for
    * @return 
    */
-  public Observable<JsonArray> commandInfoObservable(List<String> commands) { 
-    io.vertx.rx.java.ObservableFuture<JsonArray> handler = io.vertx.rx.java.RxHelper.observableFuture();
+  public Observable<String> commandInfoObservable(List<String> commands) { 
+    io.vertx.rx.java.ObservableFuture<String> handler = io.vertx.rx.java.RxHelper.observableFuture();
     commandInfo(commands, handler.toHandler());
     return handler;
   }
@@ -1253,7 +1135,7 @@ public class RedisClient {
    * @param handler Handler for the result of this call.
    * @return 
    */
-  public RedisClient configGet(String parameter, Handler<AsyncResult<JsonArray>> handler) { 
+  public RedisTransaction configGet(String parameter, Handler<AsyncResult<String>> handler) { 
     delegate.configGet(parameter, handler);
     return this;
   }
@@ -1263,8 +1145,8 @@ public class RedisClient {
    * @param parameter Configuration parameter
    * @return 
    */
-  public Observable<JsonArray> configGetObservable(String parameter) { 
-    io.vertx.rx.java.ObservableFuture<JsonArray> handler = io.vertx.rx.java.RxHelper.observableFuture();
+  public Observable<String> configGetObservable(String parameter) { 
+    io.vertx.rx.java.ObservableFuture<String> handler = io.vertx.rx.java.RxHelper.observableFuture();
     configGet(parameter, handler.toHandler());
     return handler;
   }
@@ -1274,7 +1156,7 @@ public class RedisClient {
    * @param handler 
    * @return 
    */
-  public RedisClient configRewrite(Handler<AsyncResult<String>> handler) { 
+  public RedisTransaction configRewrite(Handler<AsyncResult<String>> handler) { 
     delegate.configRewrite(handler);
     return this;
   }
@@ -1296,7 +1178,7 @@ public class RedisClient {
    * @param handler Handler for the result of this call.
    * @return 
    */
-  public RedisClient configSet(String parameter, String value, Handler<AsyncResult<String>> handler) { 
+  public RedisTransaction configSet(String parameter, String value, Handler<AsyncResult<String>> handler) { 
     delegate.configSet(parameter, value, handler);
     return this;
   }
@@ -1318,7 +1200,7 @@ public class RedisClient {
    * @param handler 
    * @return 
    */
-  public RedisClient configResetstat(Handler<AsyncResult<String>> handler) { 
+  public RedisTransaction configResetstat(Handler<AsyncResult<String>> handler) { 
     delegate.configResetstat(handler);
     return this;
   }
@@ -1338,7 +1220,7 @@ public class RedisClient {
    * @param handler 
    * @return 
    */
-  public RedisClient dbsize(Handler<AsyncResult<Long>> handler) { 
+  public RedisTransaction dbsize(Handler<AsyncResult<String>> handler) { 
     delegate.dbsize(handler);
     return this;
   }
@@ -1347,8 +1229,8 @@ public class RedisClient {
    * Return the number of keys in the selected database
    * @return 
    */
-  public Observable<Long> dbsizeObservable() { 
-    io.vertx.rx.java.ObservableFuture<Long> handler = io.vertx.rx.java.RxHelper.observableFuture();
+  public Observable<String> dbsizeObservable() { 
+    io.vertx.rx.java.ObservableFuture<String> handler = io.vertx.rx.java.RxHelper.observableFuture();
     dbsize(handler.toHandler());
     return handler;
   }
@@ -1359,7 +1241,7 @@ public class RedisClient {
    * @param handler Handler for the result of this call.
    * @return 
    */
-  public RedisClient debugObject(String key, Handler<AsyncResult<String>> handler) { 
+  public RedisTransaction debugObject(String key, Handler<AsyncResult<String>> handler) { 
     delegate.debugObject(key, handler);
     return this;
   }
@@ -1380,7 +1262,7 @@ public class RedisClient {
    * @param handler 
    * @return 
    */
-  public RedisClient debugSegfault(Handler<AsyncResult<String>> handler) { 
+  public RedisTransaction debugSegfault(Handler<AsyncResult<String>> handler) { 
     delegate.debugSegfault(handler);
     return this;
   }
@@ -1401,7 +1283,7 @@ public class RedisClient {
    * @param handler Handler for the result of this call.
    * @return 
    */
-  public RedisClient decr(String key, Handler<AsyncResult<Long>> handler) { 
+  public RedisTransaction decr(String key, Handler<AsyncResult<String>> handler) { 
     delegate.decr(key, handler);
     return this;
   }
@@ -1411,8 +1293,8 @@ public class RedisClient {
    * @param key Key string
    * @return 
    */
-  public Observable<Long> decrObservable(String key) { 
-    io.vertx.rx.java.ObservableFuture<Long> handler = io.vertx.rx.java.RxHelper.observableFuture();
+  public Observable<String> decrObservable(String key) { 
+    io.vertx.rx.java.ObservableFuture<String> handler = io.vertx.rx.java.RxHelper.observableFuture();
     decr(key, handler.toHandler());
     return handler;
   }
@@ -1424,7 +1306,7 @@ public class RedisClient {
    * @param handler Handler for the result of this call.
    * @return 
    */
-  public RedisClient decrby(String key, long decrement, Handler<AsyncResult<Long>> handler) { 
+  public RedisTransaction decrby(String key, long decrement, Handler<AsyncResult<String>> handler) { 
     delegate.decrby(key, decrement, handler);
     return this;
   }
@@ -1435,8 +1317,8 @@ public class RedisClient {
    * @param decrement Value by which to decrement
    * @return 
    */
-  public Observable<Long> decrbyObservable(String key, long decrement) { 
-    io.vertx.rx.java.ObservableFuture<Long> handler = io.vertx.rx.java.RxHelper.observableFuture();
+  public Observable<String> decrbyObservable(String key, long decrement) { 
+    io.vertx.rx.java.ObservableFuture<String> handler = io.vertx.rx.java.RxHelper.observableFuture();
     decrby(key, decrement, handler.toHandler());
     return handler;
   }
@@ -1447,7 +1329,7 @@ public class RedisClient {
    * @param handler Handler for the result of this call.
    * @return 
    */
-  public RedisClient del(String key, Handler<AsyncResult<Long>> handler) { 
+  public RedisTransaction del(String key, Handler<AsyncResult<String>> handler) { 
     delegate.del(key, handler);
     return this;
   }
@@ -1457,8 +1339,8 @@ public class RedisClient {
    * @param key Keys to delete
    * @return 
    */
-  public Observable<Long> delObservable(String key) { 
-    io.vertx.rx.java.ObservableFuture<Long> handler = io.vertx.rx.java.RxHelper.observableFuture();
+  public Observable<String> delObservable(String key) { 
+    io.vertx.rx.java.ObservableFuture<String> handler = io.vertx.rx.java.RxHelper.observableFuture();
     del(key, handler.toHandler());
     return handler;
   }
@@ -1469,7 +1351,7 @@ public class RedisClient {
    * @param handler Handler for the result of this call.
    * @return 
    */
-  public RedisClient delMany(List<String> keys, Handler<AsyncResult<Long>> handler) { 
+  public RedisTransaction delMany(List<String> keys, Handler<AsyncResult<String>> handler) { 
     delegate.delMany(keys, handler);
     return this;
   }
@@ -1479,9 +1361,29 @@ public class RedisClient {
    * @param keys List of keys to delete
    * @return 
    */
-  public Observable<Long> delManyObservable(List<String> keys) { 
-    io.vertx.rx.java.ObservableFuture<Long> handler = io.vertx.rx.java.RxHelper.observableFuture();
+  public Observable<String> delManyObservable(List<String> keys) { 
+    io.vertx.rx.java.ObservableFuture<String> handler = io.vertx.rx.java.RxHelper.observableFuture();
     delMany(keys, handler.toHandler());
+    return handler;
+  }
+
+  /**
+   * Discard all commands issued after MULTI
+   * @param handler 
+   * @return 
+   */
+  public RedisTransaction discard(Handler<AsyncResult<String>> handler) { 
+    delegate.discard(handler);
+    return this;
+  }
+
+  /**
+   * Discard all commands issued after MULTI
+   * @return 
+   */
+  public Observable<String> discardObservable() { 
+    io.vertx.rx.java.ObservableFuture<String> handler = io.vertx.rx.java.RxHelper.observableFuture();
+    discard(handler.toHandler());
     return handler;
   }
 
@@ -1491,7 +1393,7 @@ public class RedisClient {
    * @param handler Handler for the result of this call.
    * @return 
    */
-  public RedisClient dump(String key, Handler<AsyncResult<String>> handler) { 
+  public RedisTransaction dump(String key, Handler<AsyncResult<String>> handler) { 
     delegate.dump(key, handler);
     return this;
   }
@@ -1513,7 +1415,7 @@ public class RedisClient {
    * @param handler Handler for the result of this call.
    * @return 
    */
-  public RedisClient echo(String message, Handler<AsyncResult<String>> handler) { 
+  public RedisTransaction echo(String message, Handler<AsyncResult<String>> handler) { 
     delegate.echo(message, handler);
     return this;
   }
@@ -1532,7 +1434,7 @@ public class RedisClient {
   /**
    * Execute a Lua script server side. Due to the dynamic nature of this command any response type could be returned
    * for This reason and to ensure type safety the reply is always guaranteed to be a JsonArray.
-   *
+   * <p>
    * When a reply if for example a String the handler will be called with a JsonArray with a single element containing
    * the String.
    * @param script Lua script to evaluate
@@ -1541,7 +1443,7 @@ public class RedisClient {
    * @param handler Handler for the result of this call.
    * @return 
    */
-  public RedisClient eval(String script, List<String> keys, List<String> args, Handler<AsyncResult<JsonArray>> handler) { 
+  public RedisTransaction eval(String script, List<String> keys, List<String> args, Handler<AsyncResult<String>> handler) { 
     delegate.eval(script, keys, args, handler);
     return this;
   }
@@ -1549,7 +1451,7 @@ public class RedisClient {
   /**
    * Execute a Lua script server side. Due to the dynamic nature of this command any response type could be returned
    * for This reason and to ensure type safety the reply is always guaranteed to be a JsonArray.
-   *
+   * <p>
    * When a reply if for example a String the handler will be called with a JsonArray with a single element containing
    * the String.
    * @param script Lua script to evaluate
@@ -1557,8 +1459,8 @@ public class RedisClient {
    * @param args List of argument values
    * @return 
    */
-  public Observable<JsonArray> evalObservable(String script, List<String> keys, List<String> args) { 
-    io.vertx.rx.java.ObservableFuture<JsonArray> handler = io.vertx.rx.java.RxHelper.observableFuture();
+  public Observable<String> evalObservable(String script, List<String> keys, List<String> args) { 
+    io.vertx.rx.java.ObservableFuture<String> handler = io.vertx.rx.java.RxHelper.observableFuture();
     eval(script, keys, args, handler.toHandler());
     return handler;
   }
@@ -1566,7 +1468,7 @@ public class RedisClient {
   /**
    * Execute a Lua script server side. Due to the dynamic nature of this command any response type could be returned
    * for This reason and to ensure type safety the reply is always guaranteed to be a JsonArray.
-   *
+   * <p>
    * When a reply if for example a String the handler will be called with a JsonArray with a single element containing
    * the String.
    * @param sha1 SHA1 digest of the script cached on the server
@@ -1575,7 +1477,7 @@ public class RedisClient {
    * @param handler Handler for the result of this call.
    * @return 
    */
-  public RedisClient evalsha(String sha1, List<String> keys, List<String> values, Handler<AsyncResult<JsonArray>> handler) { 
+  public RedisTransaction evalsha(String sha1, List<String> keys, List<String> values, Handler<AsyncResult<String>> handler) { 
     delegate.evalsha(sha1, keys, values, handler);
     return this;
   }
@@ -1583,7 +1485,7 @@ public class RedisClient {
   /**
    * Execute a Lua script server side. Due to the dynamic nature of this command any response type could be returned
    * for This reason and to ensure type safety the reply is always guaranteed to be a JsonArray.
-   *
+   * <p>
    * When a reply if for example a String the handler will be called with a JsonArray with a single element containing
    * the String.
    * @param sha1 SHA1 digest of the script cached on the server
@@ -1591,9 +1493,29 @@ public class RedisClient {
    * @param values List of values
    * @return 
    */
-  public Observable<JsonArray> evalshaObservable(String sha1, List<String> keys, List<String> values) { 
-    io.vertx.rx.java.ObservableFuture<JsonArray> handler = io.vertx.rx.java.RxHelper.observableFuture();
+  public Observable<String> evalshaObservable(String sha1, List<String> keys, List<String> values) { 
+    io.vertx.rx.java.ObservableFuture<String> handler = io.vertx.rx.java.RxHelper.observableFuture();
     evalsha(sha1, keys, values, handler.toHandler());
+    return handler;
+  }
+
+  /**
+   * Execute all commands issued after MULTI
+   * @param handler 
+   * @return 
+   */
+  public RedisTransaction exec(Handler<AsyncResult<JsonArray>> handler) { 
+    delegate.exec(handler);
+    return this;
+  }
+
+  /**
+   * Execute all commands issued after MULTI
+   * @return 
+   */
+  public Observable<JsonArray> execObservable() { 
+    io.vertx.rx.java.ObservableFuture<JsonArray> handler = io.vertx.rx.java.RxHelper.observableFuture();
+    exec(handler.toHandler());
     return handler;
   }
 
@@ -1603,7 +1525,7 @@ public class RedisClient {
    * @param handler Handler for the result of this call.
    * @return 
    */
-  public RedisClient exists(String key, Handler<AsyncResult<Long>> handler) { 
+  public RedisTransaction exists(String key, Handler<AsyncResult<String>> handler) { 
     delegate.exists(key, handler);
     return this;
   }
@@ -1613,8 +1535,8 @@ public class RedisClient {
    * @param key Key string
    * @return 
    */
-  public Observable<Long> existsObservable(String key) { 
-    io.vertx.rx.java.ObservableFuture<Long> handler = io.vertx.rx.java.RxHelper.observableFuture();
+  public Observable<String> existsObservable(String key) { 
+    io.vertx.rx.java.ObservableFuture<String> handler = io.vertx.rx.java.RxHelper.observableFuture();
     exists(key, handler.toHandler());
     return handler;
   }
@@ -1626,7 +1548,7 @@ public class RedisClient {
    * @param handler Handler for the result of this call.
    * @return 
    */
-  public RedisClient expire(String key, int seconds, Handler<AsyncResult<Long>> handler) { 
+  public RedisTransaction expire(String key, int seconds, Handler<AsyncResult<String>> handler) { 
     delegate.expire(key, seconds, handler);
     return this;
   }
@@ -1637,8 +1559,8 @@ public class RedisClient {
    * @param seconds Time to live in seconds
    * @return 
    */
-  public Observable<Long> expireObservable(String key, int seconds) { 
-    io.vertx.rx.java.ObservableFuture<Long> handler = io.vertx.rx.java.RxHelper.observableFuture();
+  public Observable<String> expireObservable(String key, int seconds) { 
+    io.vertx.rx.java.ObservableFuture<String> handler = io.vertx.rx.java.RxHelper.observableFuture();
     expire(key, seconds, handler.toHandler());
     return handler;
   }
@@ -1650,7 +1572,7 @@ public class RedisClient {
    * @param handler Handler for the result of this call.
    * @return 
    */
-  public RedisClient expireat(String key, long seconds, Handler<AsyncResult<Long>> handler) { 
+  public RedisTransaction expireat(String key, long seconds, Handler<AsyncResult<String>> handler) { 
     delegate.expireat(key, seconds, handler);
     return this;
   }
@@ -1661,8 +1583,8 @@ public class RedisClient {
    * @param seconds Expiry time as Unix timestamp in seconds
    * @return 
    */
-  public Observable<Long> expireatObservable(String key, long seconds) { 
-    io.vertx.rx.java.ObservableFuture<Long> handler = io.vertx.rx.java.RxHelper.observableFuture();
+  public Observable<String> expireatObservable(String key, long seconds) { 
+    io.vertx.rx.java.ObservableFuture<String> handler = io.vertx.rx.java.RxHelper.observableFuture();
     expireat(key, seconds, handler.toHandler());
     return handler;
   }
@@ -1672,7 +1594,7 @@ public class RedisClient {
    * @param handler 
    * @return 
    */
-  public RedisClient flushall(Handler<AsyncResult<String>> handler) { 
+  public RedisTransaction flushall(Handler<AsyncResult<String>> handler) { 
     delegate.flushall(handler);
     return this;
   }
@@ -1692,7 +1614,7 @@ public class RedisClient {
    * @param handler 
    * @return 
    */
-  public RedisClient flushdb(Handler<AsyncResult<String>> handler) { 
+  public RedisTransaction flushdb(Handler<AsyncResult<String>> handler) { 
     delegate.flushdb(handler);
     return this;
   }
@@ -1713,7 +1635,7 @@ public class RedisClient {
    * @param handler Handler for the result of this call.
    * @return 
    */
-  public RedisClient get(String key, Handler<AsyncResult<String>> handler) { 
+  public RedisTransaction get(String key, Handler<AsyncResult<String>> handler) { 
     delegate.get(key, handler);
     return this;
   }
@@ -1735,16 +1657,8 @@ public class RedisClient {
    * @param handler Handler for the result of this call.
    * @return 
    */
-  public RedisClient getBinary(String key, Handler<AsyncResult<Buffer>> handler) { 
-    delegate.getBinary(key, new Handler<AsyncResult<io.vertx.core.buffer.Buffer>>() {
-      public void handle(AsyncResult<io.vertx.core.buffer.Buffer> ar) {
-        if (ar.succeeded()) {
-          handler.handle(io.vertx.core.Future.succeededFuture(Buffer.newInstance(ar.result())));
-        } else {
-          handler.handle(io.vertx.core.Future.failedFuture(ar.cause()));
-        }
-      }
-    });
+  public RedisTransaction getBinary(String key, Handler<AsyncResult<String>> handler) { 
+    delegate.getBinary(key, handler);
     return this;
   }
 
@@ -1753,8 +1667,8 @@ public class RedisClient {
    * @param key Key string
    * @return 
    */
-  public Observable<Buffer> getBinaryObservable(String key) { 
-    io.vertx.rx.java.ObservableFuture<Buffer> handler = io.vertx.rx.java.RxHelper.observableFuture();
+  public Observable<String> getBinaryObservable(String key) { 
+    io.vertx.rx.java.ObservableFuture<String> handler = io.vertx.rx.java.RxHelper.observableFuture();
     getBinary(key, handler.toHandler());
     return handler;
   }
@@ -1766,7 +1680,7 @@ public class RedisClient {
    * @param handler Handler for the result of this call.
    * @return 
    */
-  public RedisClient getbit(String key, long offset, Handler<AsyncResult<Long>> handler) { 
+  public RedisTransaction getbit(String key, long offset, Handler<AsyncResult<String>> handler) { 
     delegate.getbit(key, offset, handler);
     return this;
   }
@@ -1777,8 +1691,8 @@ public class RedisClient {
    * @param offset Offset in bits
    * @return 
    */
-  public Observable<Long> getbitObservable(String key, long offset) { 
-    io.vertx.rx.java.ObservableFuture<Long> handler = io.vertx.rx.java.RxHelper.observableFuture();
+  public Observable<String> getbitObservable(String key, long offset) { 
+    io.vertx.rx.java.ObservableFuture<String> handler = io.vertx.rx.java.RxHelper.observableFuture();
     getbit(key, offset, handler.toHandler());
     return handler;
   }
@@ -1791,7 +1705,7 @@ public class RedisClient {
    * @param handler Handler for the result of this call.
    * @return 
    */
-  public RedisClient getrange(String key, long start, long end, Handler<AsyncResult<String>> handler) { 
+  public RedisTransaction getrange(String key, long start, long end, Handler<AsyncResult<String>> handler) { 
     delegate.getrange(key, start, end, handler);
     return this;
   }
@@ -1816,7 +1730,7 @@ public class RedisClient {
    * @param handler Handler for the result of this call.
    * @return 
    */
-  public RedisClient getset(String key, String value, Handler<AsyncResult<String>> handler) { 
+  public RedisTransaction getset(String key, String value, Handler<AsyncResult<String>> handler) { 
     delegate.getset(key, value, handler);
     return this;
   }
@@ -1840,7 +1754,7 @@ public class RedisClient {
    * @param handler Handler for the result of this call.
    * @return 
    */
-  public RedisClient hdel(String key, String field, Handler<AsyncResult<Long>> handler) { 
+  public RedisTransaction hdel(String key, String field, Handler<AsyncResult<String>> handler) { 
     delegate.hdel(key, field, handler);
     return this;
   }
@@ -1851,8 +1765,8 @@ public class RedisClient {
    * @param field Field name
    * @return 
    */
-  public Observable<Long> hdelObservable(String key, String field) { 
-    io.vertx.rx.java.ObservableFuture<Long> handler = io.vertx.rx.java.RxHelper.observableFuture();
+  public Observable<String> hdelObservable(String key, String field) { 
+    io.vertx.rx.java.ObservableFuture<String> handler = io.vertx.rx.java.RxHelper.observableFuture();
     hdel(key, field, handler.toHandler());
     return handler;
   }
@@ -1864,7 +1778,7 @@ public class RedisClient {
    * @param handler Handler for the result of this call.
    * @return 
    */
-  public RedisClient hdelMany(String key, List<String> fields, Handler<AsyncResult<Long>> handler) { 
+  public RedisTransaction hdelMany(String key, List<String> fields, Handler<AsyncResult<String>> handler) { 
     delegate.hdelMany(key, fields, handler);
     return this;
   }
@@ -1875,8 +1789,8 @@ public class RedisClient {
    * @param fields Field names
    * @return 
    */
-  public Observable<Long> hdelManyObservable(String key, List<String> fields) { 
-    io.vertx.rx.java.ObservableFuture<Long> handler = io.vertx.rx.java.RxHelper.observableFuture();
+  public Observable<String> hdelManyObservable(String key, List<String> fields) { 
+    io.vertx.rx.java.ObservableFuture<String> handler = io.vertx.rx.java.RxHelper.observableFuture();
     hdelMany(key, fields, handler.toHandler());
     return handler;
   }
@@ -1888,7 +1802,7 @@ public class RedisClient {
    * @param handler Handler for the result of this call.
    * @return 
    */
-  public RedisClient hexists(String key, String field, Handler<AsyncResult<Long>> handler) { 
+  public RedisTransaction hexists(String key, String field, Handler<AsyncResult<String>> handler) { 
     delegate.hexists(key, field, handler);
     return this;
   }
@@ -1899,8 +1813,8 @@ public class RedisClient {
    * @param field Field name
    * @return 
    */
-  public Observable<Long> hexistsObservable(String key, String field) { 
-    io.vertx.rx.java.ObservableFuture<Long> handler = io.vertx.rx.java.RxHelper.observableFuture();
+  public Observable<String> hexistsObservable(String key, String field) { 
+    io.vertx.rx.java.ObservableFuture<String> handler = io.vertx.rx.java.RxHelper.observableFuture();
     hexists(key, field, handler.toHandler());
     return handler;
   }
@@ -1912,7 +1826,7 @@ public class RedisClient {
    * @param handler Handler for the result of this call.
    * @return 
    */
-  public RedisClient hget(String key, String field, Handler<AsyncResult<String>> handler) { 
+  public RedisTransaction hget(String key, String field, Handler<AsyncResult<String>> handler) { 
     delegate.hget(key, field, handler);
     return this;
   }
@@ -1935,7 +1849,7 @@ public class RedisClient {
    * @param handler Handler for the result of this call.
    * @return 
    */
-  public RedisClient hgetall(String key, Handler<AsyncResult<JsonObject>> handler) { 
+  public RedisTransaction hgetall(String key, Handler<AsyncResult<String>> handler) { 
     delegate.hgetall(key, handler);
     return this;
   }
@@ -1945,8 +1859,8 @@ public class RedisClient {
    * @param key Key string
    * @return 
    */
-  public Observable<JsonObject> hgetallObservable(String key) { 
-    io.vertx.rx.java.ObservableFuture<JsonObject> handler = io.vertx.rx.java.RxHelper.observableFuture();
+  public Observable<String> hgetallObservable(String key) { 
+    io.vertx.rx.java.ObservableFuture<String> handler = io.vertx.rx.java.RxHelper.observableFuture();
     hgetall(key, handler.toHandler());
     return handler;
   }
@@ -1959,7 +1873,7 @@ public class RedisClient {
    * @param handler Handler for the result of this call.
    * @return 
    */
-  public RedisClient hincrby(String key, String field, long increment, Handler<AsyncResult<Long>> handler) { 
+  public RedisTransaction hincrby(String key, String field, long increment, Handler<AsyncResult<String>> handler) { 
     delegate.hincrby(key, field, increment, handler);
     return this;
   }
@@ -1971,8 +1885,8 @@ public class RedisClient {
    * @param increment Value by which to increment
    * @return 
    */
-  public Observable<Long> hincrbyObservable(String key, String field, long increment) { 
-    io.vertx.rx.java.ObservableFuture<Long> handler = io.vertx.rx.java.RxHelper.observableFuture();
+  public Observable<String> hincrbyObservable(String key, String field, long increment) { 
+    io.vertx.rx.java.ObservableFuture<String> handler = io.vertx.rx.java.RxHelper.observableFuture();
     hincrby(key, field, increment, handler.toHandler());
     return handler;
   }
@@ -1985,7 +1899,7 @@ public class RedisClient {
    * @param handler Handler for the result of this call.
    * @return 
    */
-  public RedisClient hincrbyfloat(String key, String field, double increment, Handler<AsyncResult<String>> handler) { 
+  public RedisTransaction hincrbyfloat(String key, String field, double increment, Handler<AsyncResult<String>> handler) { 
     delegate.hincrbyfloat(key, field, increment, handler);
     return this;
   }
@@ -2009,7 +1923,7 @@ public class RedisClient {
    * @param handler Handler for the result of this call.
    * @return 
    */
-  public RedisClient hkeys(String key, Handler<AsyncResult<JsonArray>> handler) { 
+  public RedisTransaction hkeys(String key, Handler<AsyncResult<String>> handler) { 
     delegate.hkeys(key, handler);
     return this;
   }
@@ -2019,8 +1933,8 @@ public class RedisClient {
    * @param key Key string
    * @return 
    */
-  public Observable<JsonArray> hkeysObservable(String key) { 
-    io.vertx.rx.java.ObservableFuture<JsonArray> handler = io.vertx.rx.java.RxHelper.observableFuture();
+  public Observable<String> hkeysObservable(String key) { 
+    io.vertx.rx.java.ObservableFuture<String> handler = io.vertx.rx.java.RxHelper.observableFuture();
     hkeys(key, handler.toHandler());
     return handler;
   }
@@ -2031,7 +1945,7 @@ public class RedisClient {
    * @param handler Handler for the result of this call.
    * @return 
    */
-  public RedisClient hlen(String key, Handler<AsyncResult<Long>> handler) { 
+  public RedisTransaction hlen(String key, Handler<AsyncResult<String>> handler) { 
     delegate.hlen(key, handler);
     return this;
   }
@@ -2041,8 +1955,8 @@ public class RedisClient {
    * @param key Key string
    * @return 
    */
-  public Observable<Long> hlenObservable(String key) { 
-    io.vertx.rx.java.ObservableFuture<Long> handler = io.vertx.rx.java.RxHelper.observableFuture();
+  public Observable<String> hlenObservable(String key) { 
+    io.vertx.rx.java.ObservableFuture<String> handler = io.vertx.rx.java.RxHelper.observableFuture();
     hlen(key, handler.toHandler());
     return handler;
   }
@@ -2054,7 +1968,7 @@ public class RedisClient {
    * @param handler Handler for the result of this call.
    * @return 
    */
-  public RedisClient hmget(String key, List<String> fields, Handler<AsyncResult<JsonArray>> handler) { 
+  public RedisTransaction hmget(String key, List<String> fields, Handler<AsyncResult<String>> handler) { 
     delegate.hmget(key, fields, handler);
     return this;
   }
@@ -2065,8 +1979,8 @@ public class RedisClient {
    * @param fields Field names
    * @return 
    */
-  public Observable<JsonArray> hmgetObservable(String key, List<String> fields) { 
-    io.vertx.rx.java.ObservableFuture<JsonArray> handler = io.vertx.rx.java.RxHelper.observableFuture();
+  public Observable<String> hmgetObservable(String key, List<String> fields) { 
+    io.vertx.rx.java.ObservableFuture<String> handler = io.vertx.rx.java.RxHelper.observableFuture();
     hmget(key, fields, handler.toHandler());
     return handler;
   }
@@ -2078,7 +1992,7 @@ public class RedisClient {
    * @param handler Handler for the result of this call.
    * @return 
    */
-  public RedisClient hmset(String key, JsonObject values, Handler<AsyncResult<String>> handler) { 
+  public RedisTransaction hmset(String key, JsonObject values, Handler<AsyncResult<String>> handler) { 
     delegate.hmset(key, values, handler);
     return this;
   }
@@ -2103,7 +2017,7 @@ public class RedisClient {
    * @param handler Handler for the result of this call.
    * @return 
    */
-  public RedisClient hset(String key, String field, String value, Handler<AsyncResult<Long>> handler) { 
+  public RedisTransaction hset(String key, String field, String value, Handler<AsyncResult<String>> handler) { 
     delegate.hset(key, field, value, handler);
     return this;
   }
@@ -2115,8 +2029,8 @@ public class RedisClient {
    * @param value New value
    * @return 
    */
-  public Observable<Long> hsetObservable(String key, String field, String value) { 
-    io.vertx.rx.java.ObservableFuture<Long> handler = io.vertx.rx.java.RxHelper.observableFuture();
+  public Observable<String> hsetObservable(String key, String field, String value) { 
+    io.vertx.rx.java.ObservableFuture<String> handler = io.vertx.rx.java.RxHelper.observableFuture();
     hset(key, field, value, handler.toHandler());
     return handler;
   }
@@ -2129,7 +2043,7 @@ public class RedisClient {
    * @param handler Handler for the result of this call.
    * @return 
    */
-  public RedisClient hsetnx(String key, String field, String value, Handler<AsyncResult<Long>> handler) { 
+  public RedisTransaction hsetnx(String key, String field, String value, Handler<AsyncResult<String>> handler) { 
     delegate.hsetnx(key, field, value, handler);
     return this;
   }
@@ -2141,8 +2055,8 @@ public class RedisClient {
    * @param value New value
    * @return 
    */
-  public Observable<Long> hsetnxObservable(String key, String field, String value) { 
-    io.vertx.rx.java.ObservableFuture<Long> handler = io.vertx.rx.java.RxHelper.observableFuture();
+  public Observable<String> hsetnxObservable(String key, String field, String value) { 
+    io.vertx.rx.java.ObservableFuture<String> handler = io.vertx.rx.java.RxHelper.observableFuture();
     hsetnx(key, field, value, handler.toHandler());
     return handler;
   }
@@ -2153,7 +2067,7 @@ public class RedisClient {
    * @param handler Handler for the result of this call.
    * @return 
    */
-  public RedisClient hvals(String key, Handler<AsyncResult<JsonArray>> handler) { 
+  public RedisTransaction hvals(String key, Handler<AsyncResult<String>> handler) { 
     delegate.hvals(key, handler);
     return this;
   }
@@ -2163,8 +2077,8 @@ public class RedisClient {
    * @param key Key string
    * @return 
    */
-  public Observable<JsonArray> hvalsObservable(String key) { 
-    io.vertx.rx.java.ObservableFuture<JsonArray> handler = io.vertx.rx.java.RxHelper.observableFuture();
+  public Observable<String> hvalsObservable(String key) { 
+    io.vertx.rx.java.ObservableFuture<String> handler = io.vertx.rx.java.RxHelper.observableFuture();
     hvals(key, handler.toHandler());
     return handler;
   }
@@ -2175,7 +2089,7 @@ public class RedisClient {
    * @param handler Handler for the result of this call.
    * @return 
    */
-  public RedisClient incr(String key, Handler<AsyncResult<Long>> handler) { 
+  public RedisTransaction incr(String key, Handler<AsyncResult<String>> handler) { 
     delegate.incr(key, handler);
     return this;
   }
@@ -2185,8 +2099,8 @@ public class RedisClient {
    * @param key Key string
    * @return 
    */
-  public Observable<Long> incrObservable(String key) { 
-    io.vertx.rx.java.ObservableFuture<Long> handler = io.vertx.rx.java.RxHelper.observableFuture();
+  public Observable<String> incrObservable(String key) { 
+    io.vertx.rx.java.ObservableFuture<String> handler = io.vertx.rx.java.RxHelper.observableFuture();
     incr(key, handler.toHandler());
     return handler;
   }
@@ -2198,7 +2112,7 @@ public class RedisClient {
    * @param handler Handler for the result of this call.
    * @return 
    */
-  public RedisClient incrby(String key, long increment, Handler<AsyncResult<Long>> handler) { 
+  public RedisTransaction incrby(String key, long increment, Handler<AsyncResult<String>> handler) { 
     delegate.incrby(key, increment, handler);
     return this;
   }
@@ -2209,8 +2123,8 @@ public class RedisClient {
    * @param increment Value by which to increment
    * @return 
    */
-  public Observable<Long> incrbyObservable(String key, long increment) { 
-    io.vertx.rx.java.ObservableFuture<Long> handler = io.vertx.rx.java.RxHelper.observableFuture();
+  public Observable<String> incrbyObservable(String key, long increment) { 
+    io.vertx.rx.java.ObservableFuture<String> handler = io.vertx.rx.java.RxHelper.observableFuture();
     incrby(key, increment, handler.toHandler());
     return handler;
   }
@@ -2222,7 +2136,7 @@ public class RedisClient {
    * @param handler Handler for the result of this call.
    * @return 
    */
-  public RedisClient incrbyfloat(String key, double increment, Handler<AsyncResult<String>> handler) { 
+  public RedisTransaction incrbyfloat(String key, double increment, Handler<AsyncResult<String>> handler) { 
     delegate.incrbyfloat(key, increment, handler);
     return this;
   }
@@ -2244,7 +2158,7 @@ public class RedisClient {
    * @param handler Handler for the result of this call.
    * @return 
    */
-  public RedisClient info(Handler<AsyncResult<JsonObject>> handler) { 
+  public RedisTransaction info(Handler<AsyncResult<String>> handler) { 
     delegate.info(handler);
     return this;
   }
@@ -2253,8 +2167,8 @@ public class RedisClient {
    * Get information and statistics about the server
    * @return 
    */
-  public Observable<JsonObject> infoObservable() { 
-    io.vertx.rx.java.ObservableFuture<JsonObject> handler = io.vertx.rx.java.RxHelper.observableFuture();
+  public Observable<String> infoObservable() { 
+    io.vertx.rx.java.ObservableFuture<String> handler = io.vertx.rx.java.RxHelper.observableFuture();
     info(handler.toHandler());
     return handler;
   }
@@ -2265,7 +2179,7 @@ public class RedisClient {
    * @param handler Handler for the result of this call.
    * @return 
    */
-  public RedisClient infoSection(String section, Handler<AsyncResult<JsonObject>> handler) { 
+  public RedisTransaction infoSection(String section, Handler<AsyncResult<String>> handler) { 
     delegate.infoSection(section, handler);
     return this;
   }
@@ -2275,8 +2189,8 @@ public class RedisClient {
    * @param section Specific section of information to return
    * @return 
    */
-  public Observable<JsonObject> infoSectionObservable(String section) { 
-    io.vertx.rx.java.ObservableFuture<JsonObject> handler = io.vertx.rx.java.RxHelper.observableFuture();
+  public Observable<String> infoSectionObservable(String section) { 
+    io.vertx.rx.java.ObservableFuture<String> handler = io.vertx.rx.java.RxHelper.observableFuture();
     infoSection(section, handler.toHandler());
     return handler;
   }
@@ -2287,7 +2201,7 @@ public class RedisClient {
    * @param handler Handler for the result of this call.
    * @return 
    */
-  public RedisClient keys(String pattern, Handler<AsyncResult<JsonArray>> handler) { 
+  public RedisTransaction keys(String pattern, Handler<AsyncResult<String>> handler) { 
     delegate.keys(pattern, handler);
     return this;
   }
@@ -2297,8 +2211,8 @@ public class RedisClient {
    * @param pattern Pattern to limit the keys returned
    * @return 
    */
-  public Observable<JsonArray> keysObservable(String pattern) { 
-    io.vertx.rx.java.ObservableFuture<JsonArray> handler = io.vertx.rx.java.RxHelper.observableFuture();
+  public Observable<String> keysObservable(String pattern) { 
+    io.vertx.rx.java.ObservableFuture<String> handler = io.vertx.rx.java.RxHelper.observableFuture();
     keys(pattern, handler.toHandler());
     return handler;
   }
@@ -2308,7 +2222,7 @@ public class RedisClient {
    * @param handler 
    * @return 
    */
-  public RedisClient lastsave(Handler<AsyncResult<Long>> handler) { 
+  public RedisTransaction lastsave(Handler<AsyncResult<String>> handler) { 
     delegate.lastsave(handler);
     return this;
   }
@@ -2317,8 +2231,8 @@ public class RedisClient {
    * Get the UNIX time stamp of the last successful save to disk
    * @return 
    */
-  public Observable<Long> lastsaveObservable() { 
-    io.vertx.rx.java.ObservableFuture<Long> handler = io.vertx.rx.java.RxHelper.observableFuture();
+  public Observable<String> lastsaveObservable() { 
+    io.vertx.rx.java.ObservableFuture<String> handler = io.vertx.rx.java.RxHelper.observableFuture();
     lastsave(handler.toHandler());
     return handler;
   }
@@ -2330,7 +2244,7 @@ public class RedisClient {
    * @param handler Handler for the result of this call.
    * @return 
    */
-  public RedisClient lindex(String key, int index, Handler<AsyncResult<String>> handler) { 
+  public RedisTransaction lindex(String key, int index, Handler<AsyncResult<String>> handler) { 
     delegate.lindex(key, index, handler);
     return this;
   }
@@ -2356,7 +2270,7 @@ public class RedisClient {
    * @param handler Handler for the result of this call.
    * @return 
    */
-  public RedisClient linsert(String key, InsertOptions option, String pivot, String value, Handler<AsyncResult<Long>> handler) { 
+  public RedisTransaction linsert(String key, InsertOptions option, String pivot, String value, Handler<AsyncResult<String>> handler) { 
     delegate.linsert(key, option, pivot, value, handler);
     return this;
   }
@@ -2369,8 +2283,8 @@ public class RedisClient {
    * @param value Value to be inserted before or after the pivot
    * @return 
    */
-  public Observable<Long> linsertObservable(String key, InsertOptions option, String pivot, String value) { 
-    io.vertx.rx.java.ObservableFuture<Long> handler = io.vertx.rx.java.RxHelper.observableFuture();
+  public Observable<String> linsertObservable(String key, InsertOptions option, String pivot, String value) { 
+    io.vertx.rx.java.ObservableFuture<String> handler = io.vertx.rx.java.RxHelper.observableFuture();
     linsert(key, option, pivot, value, handler.toHandler());
     return handler;
   }
@@ -2381,7 +2295,7 @@ public class RedisClient {
    * @param handler Handler for the result of this call.
    * @return 
    */
-  public RedisClient llen(String key, Handler<AsyncResult<Long>> handler) { 
+  public RedisTransaction llen(String key, Handler<AsyncResult<String>> handler) { 
     delegate.llen(key, handler);
     return this;
   }
@@ -2391,8 +2305,8 @@ public class RedisClient {
    * @param key String key
    * @return 
    */
-  public Observable<Long> llenObservable(String key) { 
-    io.vertx.rx.java.ObservableFuture<Long> handler = io.vertx.rx.java.RxHelper.observableFuture();
+  public Observable<String> llenObservable(String key) { 
+    io.vertx.rx.java.ObservableFuture<String> handler = io.vertx.rx.java.RxHelper.observableFuture();
     llen(key, handler.toHandler());
     return handler;
   }
@@ -2403,7 +2317,7 @@ public class RedisClient {
    * @param handler Handler for the result of this call.
    * @return 
    */
-  public RedisClient lpop(String key, Handler<AsyncResult<String>> handler) { 
+  public RedisTransaction lpop(String key, Handler<AsyncResult<String>> handler) { 
     delegate.lpop(key, handler);
     return this;
   }
@@ -2426,7 +2340,7 @@ public class RedisClient {
    * @param handler Handler for the result of this call.
    * @return 
    */
-  public RedisClient lpushMany(String key, List<String> values, Handler<AsyncResult<Long>> handler) { 
+  public RedisTransaction lpushMany(String key, List<String> values, Handler<AsyncResult<String>> handler) { 
     delegate.lpushMany(key, values, handler);
     return this;
   }
@@ -2437,8 +2351,8 @@ public class RedisClient {
    * @param values Values to be added at the beginning of the list, one by one
    * @return 
    */
-  public Observable<Long> lpushManyObservable(String key, List<String> values) { 
-    io.vertx.rx.java.ObservableFuture<Long> handler = io.vertx.rx.java.RxHelper.observableFuture();
+  public Observable<String> lpushManyObservable(String key, List<String> values) { 
+    io.vertx.rx.java.ObservableFuture<String> handler = io.vertx.rx.java.RxHelper.observableFuture();
     lpushMany(key, values, handler.toHandler());
     return handler;
   }
@@ -2450,7 +2364,7 @@ public class RedisClient {
    * @param handler Handler for the result of this call.
    * @return 
    */
-  public RedisClient lpush(String key, String value, Handler<AsyncResult<Long>> handler) { 
+  public RedisTransaction lpush(String key, String value, Handler<AsyncResult<String>> handler) { 
     delegate.lpush(key, value, handler);
     return this;
   }
@@ -2461,8 +2375,8 @@ public class RedisClient {
    * @param value Value to be added at the beginning of the list
    * @return 
    */
-  public Observable<Long> lpushObservable(String key, String value) { 
-    io.vertx.rx.java.ObservableFuture<Long> handler = io.vertx.rx.java.RxHelper.observableFuture();
+  public Observable<String> lpushObservable(String key, String value) { 
+    io.vertx.rx.java.ObservableFuture<String> handler = io.vertx.rx.java.RxHelper.observableFuture();
     lpush(key, value, handler.toHandler());
     return handler;
   }
@@ -2474,7 +2388,7 @@ public class RedisClient {
    * @param handler Handler for the result of this call.
    * @return 
    */
-  public RedisClient lpushx(String key, String value, Handler<AsyncResult<Long>> handler) { 
+  public RedisTransaction lpushx(String key, String value, Handler<AsyncResult<String>> handler) { 
     delegate.lpushx(key, value, handler);
     return this;
   }
@@ -2485,8 +2399,8 @@ public class RedisClient {
    * @param value Value to add at the beginning of the list
    * @return 
    */
-  public Observable<Long> lpushxObservable(String key, String value) { 
-    io.vertx.rx.java.ObservableFuture<Long> handler = io.vertx.rx.java.RxHelper.observableFuture();
+  public Observable<String> lpushxObservable(String key, String value) { 
+    io.vertx.rx.java.ObservableFuture<String> handler = io.vertx.rx.java.RxHelper.observableFuture();
     lpushx(key, value, handler.toHandler());
     return handler;
   }
@@ -2499,7 +2413,7 @@ public class RedisClient {
    * @param handler Handler for the result of this call.
    * @return 
    */
-  public RedisClient lrange(String key, long from, long to, Handler<AsyncResult<JsonArray>> handler) { 
+  public RedisTransaction lrange(String key, long from, long to, Handler<AsyncResult<String>> handler) { 
     delegate.lrange(key, from, to, handler);
     return this;
   }
@@ -2511,8 +2425,8 @@ public class RedisClient {
    * @param to Stop index
    * @return 
    */
-  public Observable<JsonArray> lrangeObservable(String key, long from, long to) { 
-    io.vertx.rx.java.ObservableFuture<JsonArray> handler = io.vertx.rx.java.RxHelper.observableFuture();
+  public Observable<String> lrangeObservable(String key, long from, long to) { 
+    io.vertx.rx.java.ObservableFuture<String> handler = io.vertx.rx.java.RxHelper.observableFuture();
     lrange(key, from, to, handler.toHandler());
     return handler;
   }
@@ -2525,7 +2439,7 @@ public class RedisClient {
    * @param handler Handler for the result of this call.
    * @return 
    */
-  public RedisClient lrem(String key, long count, String value, Handler<AsyncResult<Long>> handler) { 
+  public RedisTransaction lrem(String key, long count, String value, Handler<AsyncResult<String>> handler) { 
     delegate.lrem(key, count, value, handler);
     return this;
   }
@@ -2537,8 +2451,8 @@ public class RedisClient {
    * @param value Value to be removed
    * @return 
    */
-  public Observable<Long> lremObservable(String key, long count, String value) { 
-    io.vertx.rx.java.ObservableFuture<Long> handler = io.vertx.rx.java.RxHelper.observableFuture();
+  public Observable<String> lremObservable(String key, long count, String value) { 
+    io.vertx.rx.java.ObservableFuture<String> handler = io.vertx.rx.java.RxHelper.observableFuture();
     lrem(key, count, value, handler.toHandler());
     return handler;
   }
@@ -2551,7 +2465,7 @@ public class RedisClient {
    * @param handler Handler for the result of this call.
    * @return 
    */
-  public RedisClient lset(String key, long index, String value, Handler<AsyncResult<String>> handler) { 
+  public RedisTransaction lset(String key, long index, String value, Handler<AsyncResult<String>> handler) { 
     delegate.lset(key, index, value, handler);
     return this;
   }
@@ -2577,7 +2491,7 @@ public class RedisClient {
    * @param handler Handler for the result of this call.
    * @return 
    */
-  public RedisClient ltrim(String key, long from, long to, Handler<AsyncResult<String>> handler) { 
+  public RedisTransaction ltrim(String key, long from, long to, Handler<AsyncResult<String>> handler) { 
     delegate.ltrim(key, from, to, handler);
     return this;
   }
@@ -2601,7 +2515,7 @@ public class RedisClient {
    * @param handler Handler for the result of this call.
    * @return 
    */
-  public RedisClient mget(String key, Handler<AsyncResult<JsonArray>> handler) { 
+  public RedisTransaction mget(String key, Handler<AsyncResult<String>> handler) { 
     delegate.mget(key, handler);
     return this;
   }
@@ -2611,8 +2525,8 @@ public class RedisClient {
    * @param key Key string
    * @return 
    */
-  public Observable<JsonArray> mgetObservable(String key) { 
-    io.vertx.rx.java.ObservableFuture<JsonArray> handler = io.vertx.rx.java.RxHelper.observableFuture();
+  public Observable<String> mgetObservable(String key) { 
+    io.vertx.rx.java.ObservableFuture<String> handler = io.vertx.rx.java.RxHelper.observableFuture();
     mget(key, handler.toHandler());
     return handler;
   }
@@ -2623,7 +2537,7 @@ public class RedisClient {
    * @param handler Handler for the result of this call.
    * @return 
    */
-  public RedisClient mgetMany(List<String> keys, Handler<AsyncResult<JsonArray>> handler) { 
+  public RedisTransaction mgetMany(List<String> keys, Handler<AsyncResult<String>> handler) { 
     delegate.mgetMany(keys, handler);
     return this;
   }
@@ -2633,8 +2547,8 @@ public class RedisClient {
    * @param keys List of keys to get
    * @return 
    */
-  public Observable<JsonArray> mgetManyObservable(List<String> keys) { 
-    io.vertx.rx.java.ObservableFuture<JsonArray> handler = io.vertx.rx.java.RxHelper.observableFuture();
+  public Observable<String> mgetManyObservable(List<String> keys) { 
+    io.vertx.rx.java.ObservableFuture<String> handler = io.vertx.rx.java.RxHelper.observableFuture();
     mgetMany(keys, handler.toHandler());
     return handler;
   }
@@ -2650,7 +2564,7 @@ public class RedisClient {
    * @param handler Handler for the result of this call.
    * @return 
    */
-  public RedisClient migrate(String host, int port, String key, int destdb, long timeout, MigrateOptions options, Handler<AsyncResult<String>> handler) { 
+  public RedisTransaction migrate(String host, int port, String key, int destdb, long timeout, MigrateOptions options, Handler<AsyncResult<String>> handler) { 
     delegate.migrate(host, port, key, destdb, timeout, options, handler);
     return this;
   }
@@ -2676,16 +2590,8 @@ public class RedisClient {
    * @param handler 
    * @return 
    */
-  public RedisClient monitor(Handler<AsyncResult<Void>> handler) { 
-    delegate.monitor(new Handler<AsyncResult<java.lang.Void>>() {
-      public void handle(AsyncResult<java.lang.Void> ar) {
-        if (ar.succeeded()) {
-          handler.handle(io.vertx.core.Future.succeededFuture(ar.result()));
-        } else {
-          handler.handle(io.vertx.core.Future.failedFuture(ar.cause()));
-        }
-      }
-    });
+  public RedisTransaction monitor(Handler<AsyncResult<String>> handler) { 
+    delegate.monitor(handler);
     return this;
   }
 
@@ -2693,8 +2599,8 @@ public class RedisClient {
    * Listen for all requests received by the server in real time
    * @return 
    */
-  public Observable<Void> monitorObservable() { 
-    io.vertx.rx.java.ObservableFuture<Void> handler = io.vertx.rx.java.RxHelper.observableFuture();
+  public Observable<String> monitorObservable() { 
+    io.vertx.rx.java.ObservableFuture<String> handler = io.vertx.rx.java.RxHelper.observableFuture();
     monitor(handler.toHandler());
     return handler;
   }
@@ -2706,7 +2612,7 @@ public class RedisClient {
    * @param handler Handler for the result of this call.
    * @return 
    */
-  public RedisClient move(String key, int destdb, Handler<AsyncResult<Long>> handler) { 
+  public RedisTransaction move(String key, int destdb, Handler<AsyncResult<String>> handler) { 
     delegate.move(key, destdb, handler);
     return this;
   }
@@ -2717,8 +2623,8 @@ public class RedisClient {
    * @param destdb Destination database index
    * @return 
    */
-  public Observable<Long> moveObservable(String key, int destdb) { 
-    io.vertx.rx.java.ObservableFuture<Long> handler = io.vertx.rx.java.RxHelper.observableFuture();
+  public Observable<String> moveObservable(String key, int destdb) { 
+    io.vertx.rx.java.ObservableFuture<String> handler = io.vertx.rx.java.RxHelper.observableFuture();
     move(key, destdb, handler.toHandler());
     return handler;
   }
@@ -2729,7 +2635,7 @@ public class RedisClient {
    * @param handler Handler for the result of this call.
    * @return 
    */
-  public RedisClient mset(JsonObject keyvals, Handler<AsyncResult<String>> handler) { 
+  public RedisTransaction mset(JsonObject keyvals, Handler<AsyncResult<String>> handler) { 
     delegate.mset(keyvals, handler);
     return this;
   }
@@ -2751,7 +2657,7 @@ public class RedisClient {
    * @param handler Handler for the result of this call.
    * @return 
    */
-  public RedisClient msetnx(JsonObject keyvals, Handler<AsyncResult<Long>> handler) { 
+  public RedisTransaction msetnx(JsonObject keyvals, Handler<AsyncResult<String>> handler) { 
     delegate.msetnx(keyvals, handler);
     return this;
   }
@@ -2761,9 +2667,29 @@ public class RedisClient {
    * @param keyvals Key value pairs to set
    * @return 
    */
-  public Observable<Long> msetnxObservable(JsonObject keyvals) { 
-    io.vertx.rx.java.ObservableFuture<Long> handler = io.vertx.rx.java.RxHelper.observableFuture();
+  public Observable<String> msetnxObservable(JsonObject keyvals) { 
+    io.vertx.rx.java.ObservableFuture<String> handler = io.vertx.rx.java.RxHelper.observableFuture();
     msetnx(keyvals, handler.toHandler());
+    return handler;
+  }
+
+  /**
+   * Mark the start of a RedisTransaction block
+   * @param handler 
+   * @return 
+   */
+  public RedisTransaction multi(Handler<AsyncResult<String>> handler) { 
+    delegate.multi(handler);
+    return this;
+  }
+
+  /**
+   * Mark the start of a RedisTransaction block
+   * @return 
+   */
+  public Observable<String> multiObservable() { 
+    io.vertx.rx.java.ObservableFuture<String> handler = io.vertx.rx.java.RxHelper.observableFuture();
+    multi(handler.toHandler());
     return handler;
   }
 
@@ -2774,16 +2700,8 @@ public class RedisClient {
    * @param handler Handler for the result of this call.
    * @return 
    */
-  public RedisClient object(String key, ObjectCmd cmd, Handler<AsyncResult<Void>> handler) { 
-    delegate.object(key, cmd, new Handler<AsyncResult<java.lang.Void>>() {
-      public void handle(AsyncResult<java.lang.Void> ar) {
-        if (ar.succeeded()) {
-          handler.handle(io.vertx.core.Future.succeededFuture(ar.result()));
-        } else {
-          handler.handle(io.vertx.core.Future.failedFuture(ar.cause()));
-        }
-      }
-    });
+  public RedisTransaction object(String key, ObjectCmd cmd, Handler<AsyncResult<String>> handler) { 
+    delegate.object(key, cmd, handler);
     return this;
   }
 
@@ -2793,8 +2711,8 @@ public class RedisClient {
    * @param cmd Object sub command
    * @return 
    */
-  public Observable<Void> objectObservable(String key, ObjectCmd cmd) { 
-    io.vertx.rx.java.ObservableFuture<Void> handler = io.vertx.rx.java.RxHelper.observableFuture();
+  public Observable<String> objectObservable(String key, ObjectCmd cmd) { 
+    io.vertx.rx.java.ObservableFuture<String> handler = io.vertx.rx.java.RxHelper.observableFuture();
     object(key, cmd, handler.toHandler());
     return handler;
   }
@@ -2805,7 +2723,7 @@ public class RedisClient {
    * @param handler Handler for the result of this call.
    * @return 
    */
-  public RedisClient persist(String key, Handler<AsyncResult<Long>> handler) { 
+  public RedisTransaction persist(String key, Handler<AsyncResult<String>> handler) { 
     delegate.persist(key, handler);
     return this;
   }
@@ -2815,8 +2733,8 @@ public class RedisClient {
    * @param key Key string
    * @return 
    */
-  public Observable<Long> persistObservable(String key) { 
-    io.vertx.rx.java.ObservableFuture<Long> handler = io.vertx.rx.java.RxHelper.observableFuture();
+  public Observable<String> persistObservable(String key) { 
+    io.vertx.rx.java.ObservableFuture<String> handler = io.vertx.rx.java.RxHelper.observableFuture();
     persist(key, handler.toHandler());
     return handler;
   }
@@ -2828,7 +2746,7 @@ public class RedisClient {
    * @param handler Handler for the result of this call.
    * @return 
    */
-  public RedisClient pexpire(String key, long millis, Handler<AsyncResult<Long>> handler) { 
+  public RedisTransaction pexpire(String key, long millis, Handler<AsyncResult<String>> handler) { 
     delegate.pexpire(key, millis, handler);
     return this;
   }
@@ -2839,8 +2757,8 @@ public class RedisClient {
    * @param millis Time to live in milliseconds
    * @return 
    */
-  public Observable<Long> pexpireObservable(String key, long millis) { 
-    io.vertx.rx.java.ObservableFuture<Long> handler = io.vertx.rx.java.RxHelper.observableFuture();
+  public Observable<String> pexpireObservable(String key, long millis) { 
+    io.vertx.rx.java.ObservableFuture<String> handler = io.vertx.rx.java.RxHelper.observableFuture();
     pexpire(key, millis, handler.toHandler());
     return handler;
   }
@@ -2852,7 +2770,7 @@ public class RedisClient {
    * @param handler Handler for the result of this call.
    * @return 
    */
-  public RedisClient pexpireat(String key, long millis, Handler<AsyncResult<Long>> handler) { 
+  public RedisTransaction pexpireat(String key, long millis, Handler<AsyncResult<String>> handler) { 
     delegate.pexpireat(key, millis, handler);
     return this;
   }
@@ -2863,8 +2781,8 @@ public class RedisClient {
    * @param millis Expiry time as Unix timestamp in milliseconds
    * @return 
    */
-  public Observable<Long> pexpireatObservable(String key, long millis) { 
-    io.vertx.rx.java.ObservableFuture<Long> handler = io.vertx.rx.java.RxHelper.observableFuture();
+  public Observable<String> pexpireatObservable(String key, long millis) { 
+    io.vertx.rx.java.ObservableFuture<String> handler = io.vertx.rx.java.RxHelper.observableFuture();
     pexpireat(key, millis, handler.toHandler());
     return handler;
   }
@@ -2876,7 +2794,7 @@ public class RedisClient {
    * @param handler Handler for the result of this call.
    * @return 
    */
-  public RedisClient pfadd(String key, String element, Handler<AsyncResult<Long>> handler) { 
+  public RedisTransaction pfadd(String key, String element, Handler<AsyncResult<String>> handler) { 
     delegate.pfadd(key, element, handler);
     return this;
   }
@@ -2887,8 +2805,8 @@ public class RedisClient {
    * @param element Element to add
    * @return 
    */
-  public Observable<Long> pfaddObservable(String key, String element) { 
-    io.vertx.rx.java.ObservableFuture<Long> handler = io.vertx.rx.java.RxHelper.observableFuture();
+  public Observable<String> pfaddObservable(String key, String element) { 
+    io.vertx.rx.java.ObservableFuture<String> handler = io.vertx.rx.java.RxHelper.observableFuture();
     pfadd(key, element, handler.toHandler());
     return handler;
   }
@@ -2900,7 +2818,7 @@ public class RedisClient {
    * @param handler Handler for the result of this call.
    * @return 
    */
-  public RedisClient pfaddMany(String key, List<String> elements, Handler<AsyncResult<Long>> handler) { 
+  public RedisTransaction pfaddMany(String key, List<String> elements, Handler<AsyncResult<String>> handler) { 
     delegate.pfaddMany(key, elements, handler);
     return this;
   }
@@ -2911,8 +2829,8 @@ public class RedisClient {
    * @param elements Elementa to add
    * @return 
    */
-  public Observable<Long> pfaddManyObservable(String key, List<String> elements) { 
-    io.vertx.rx.java.ObservableFuture<Long> handler = io.vertx.rx.java.RxHelper.observableFuture();
+  public Observable<String> pfaddManyObservable(String key, List<String> elements) { 
+    io.vertx.rx.java.ObservableFuture<String> handler = io.vertx.rx.java.RxHelper.observableFuture();
     pfaddMany(key, elements, handler.toHandler());
     return handler;
   }
@@ -2923,7 +2841,7 @@ public class RedisClient {
    * @param handler Handler for the result of this call.
    * @return 
    */
-  public RedisClient pfcount(String key, Handler<AsyncResult<Long>> handler) { 
+  public RedisTransaction pfcount(String key, Handler<AsyncResult<String>> handler) { 
     delegate.pfcount(key, handler);
     return this;
   }
@@ -2933,8 +2851,8 @@ public class RedisClient {
    * @param key Key string
    * @return 
    */
-  public Observable<Long> pfcountObservable(String key) { 
-    io.vertx.rx.java.ObservableFuture<Long> handler = io.vertx.rx.java.RxHelper.observableFuture();
+  public Observable<String> pfcountObservable(String key) { 
+    io.vertx.rx.java.ObservableFuture<String> handler = io.vertx.rx.java.RxHelper.observableFuture();
     pfcount(key, handler.toHandler());
     return handler;
   }
@@ -2945,7 +2863,7 @@ public class RedisClient {
    * @param handler Handler for the result of this call.
    * @return 
    */
-  public RedisClient pfcountMany(List<String> keys, Handler<AsyncResult<Long>> handler) { 
+  public RedisTransaction pfcountMany(List<String> keys, Handler<AsyncResult<String>> handler) { 
     delegate.pfcountMany(keys, handler);
     return this;
   }
@@ -2955,8 +2873,8 @@ public class RedisClient {
    * @param keys List of keys
    * @return 
    */
-  public Observable<Long> pfcountManyObservable(List<String> keys) { 
-    io.vertx.rx.java.ObservableFuture<Long> handler = io.vertx.rx.java.RxHelper.observableFuture();
+  public Observable<String> pfcountManyObservable(List<String> keys) { 
+    io.vertx.rx.java.ObservableFuture<String> handler = io.vertx.rx.java.RxHelper.observableFuture();
     pfcountMany(keys, handler.toHandler());
     return handler;
   }
@@ -2968,7 +2886,7 @@ public class RedisClient {
    * @param handler Handler for the result of this call.
    * @return 
    */
-  public RedisClient pfmerge(String destkey, List<String> keys, Handler<AsyncResult<String>> handler) { 
+  public RedisTransaction pfmerge(String destkey, List<String> keys, Handler<AsyncResult<String>> handler) { 
     delegate.pfmerge(destkey, keys, handler);
     return this;
   }
@@ -2990,7 +2908,7 @@ public class RedisClient {
    * @param handler 
    * @return 
    */
-  public RedisClient ping(Handler<AsyncResult<String>> handler) { 
+  public RedisTransaction ping(Handler<AsyncResult<String>> handler) { 
     delegate.ping(handler);
     return this;
   }
@@ -3013,16 +2931,8 @@ public class RedisClient {
    * @param handler Handler for the result of this call.
    * @return 
    */
-  public RedisClient psetex(String key, long millis, String value, Handler<AsyncResult<Void>> handler) { 
-    delegate.psetex(key, millis, value, new Handler<AsyncResult<java.lang.Void>>() {
-      public void handle(AsyncResult<java.lang.Void> ar) {
-        if (ar.succeeded()) {
-          handler.handle(io.vertx.core.Future.succeededFuture(ar.result()));
-        } else {
-          handler.handle(io.vertx.core.Future.failedFuture(ar.cause()));
-        }
-      }
-    });
+  public RedisTransaction psetex(String key, long millis, String value, Handler<AsyncResult<String>> handler) { 
+    delegate.psetex(key, millis, value, handler);
     return this;
   }
 
@@ -3033,8 +2943,8 @@ public class RedisClient {
    * @param value New value for key
    * @return 
    */
-  public Observable<Void> psetexObservable(String key, long millis, String value) { 
-    io.vertx.rx.java.ObservableFuture<Void> handler = io.vertx.rx.java.RxHelper.observableFuture();
+  public Observable<String> psetexObservable(String key, long millis, String value) { 
+    io.vertx.rx.java.ObservableFuture<String> handler = io.vertx.rx.java.RxHelper.observableFuture();
     psetex(key, millis, value, handler.toHandler());
     return handler;
   }
@@ -3045,7 +2955,7 @@ public class RedisClient {
    * @param handler Handler for the result of this call.
    * @return 
    */
-  public RedisClient psubscribe(String pattern, Handler<AsyncResult<JsonArray>> handler) { 
+  public RedisTransaction psubscribe(String pattern, Handler<AsyncResult<String>> handler) { 
     delegate.psubscribe(pattern, handler);
     return this;
   }
@@ -3055,8 +2965,8 @@ public class RedisClient {
    * @param pattern Pattern string
    * @return 
    */
-  public Observable<JsonArray> psubscribeObservable(String pattern) { 
-    io.vertx.rx.java.ObservableFuture<JsonArray> handler = io.vertx.rx.java.RxHelper.observableFuture();
+  public Observable<String> psubscribeObservable(String pattern) { 
+    io.vertx.rx.java.ObservableFuture<String> handler = io.vertx.rx.java.RxHelper.observableFuture();
     psubscribe(pattern, handler.toHandler());
     return handler;
   }
@@ -3067,7 +2977,7 @@ public class RedisClient {
    * @param handler Handler for the result of this call.
    * @return 
    */
-  public RedisClient psubscribeMany(List<String> patterns, Handler<AsyncResult<JsonArray>> handler) { 
+  public RedisTransaction psubscribeMany(List<String> patterns, Handler<AsyncResult<String>> handler) { 
     delegate.psubscribeMany(patterns, handler);
     return this;
   }
@@ -3077,8 +2987,8 @@ public class RedisClient {
    * @param patterns List of patterns
    * @return 
    */
-  public Observable<JsonArray> psubscribeManyObservable(List<String> patterns) { 
-    io.vertx.rx.java.ObservableFuture<JsonArray> handler = io.vertx.rx.java.RxHelper.observableFuture();
+  public Observable<String> psubscribeManyObservable(List<String> patterns) { 
+    io.vertx.rx.java.ObservableFuture<String> handler = io.vertx.rx.java.RxHelper.observableFuture();
     psubscribeMany(patterns, handler.toHandler());
     return handler;
   }
@@ -3089,7 +2999,7 @@ public class RedisClient {
    * @param handler Handler for the result of this call.
    * @return 
    */
-  public RedisClient pubsubChannels(String pattern, Handler<AsyncResult<JsonArray>> handler) { 
+  public RedisTransaction pubsubChannels(String pattern, Handler<AsyncResult<String>> handler) { 
     delegate.pubsubChannels(pattern, handler);
     return this;
   }
@@ -3099,8 +3009,8 @@ public class RedisClient {
    * @param pattern A glob-style pattern - an empty string means no pattern
    * @return 
    */
-  public Observable<JsonArray> pubsubChannelsObservable(String pattern) { 
-    io.vertx.rx.java.ObservableFuture<JsonArray> handler = io.vertx.rx.java.RxHelper.observableFuture();
+  public Observable<String> pubsubChannelsObservable(String pattern) { 
+    io.vertx.rx.java.ObservableFuture<String> handler = io.vertx.rx.java.RxHelper.observableFuture();
     pubsubChannels(pattern, handler.toHandler());
     return handler;
   }
@@ -3111,7 +3021,7 @@ public class RedisClient {
    * @param handler Handler for the result of this call.
    * @return 
    */
-  public RedisClient pubsubNumsub(List<String> channels, Handler<AsyncResult<JsonArray>> handler) { 
+  public RedisTransaction pubsubNumsub(List<String> channels, Handler<AsyncResult<String>> handler) { 
     delegate.pubsubNumsub(channels, handler);
     return this;
   }
@@ -3121,8 +3031,8 @@ public class RedisClient {
    * @param channels List of channels
    * @return 
    */
-  public Observable<JsonArray> pubsubNumsubObservable(List<String> channels) { 
-    io.vertx.rx.java.ObservableFuture<JsonArray> handler = io.vertx.rx.java.RxHelper.observableFuture();
+  public Observable<String> pubsubNumsubObservable(List<String> channels) { 
+    io.vertx.rx.java.ObservableFuture<String> handler = io.vertx.rx.java.RxHelper.observableFuture();
     pubsubNumsub(channels, handler.toHandler());
     return handler;
   }
@@ -3132,7 +3042,7 @@ public class RedisClient {
    * @param handler Handler for the result of this call.
    * @return 
    */
-  public RedisClient pubsubNumpat(Handler<AsyncResult<Long>> handler) { 
+  public RedisTransaction pubsubNumpat(Handler<AsyncResult<String>> handler) { 
     delegate.pubsubNumpat(handler);
     return this;
   }
@@ -3141,8 +3051,8 @@ public class RedisClient {
    * Returns the number of subscriptions to patterns (that are performed using the PSUBSCRIBE command)
    * @return 
    */
-  public Observable<Long> pubsubNumpatObservable() { 
-    io.vertx.rx.java.ObservableFuture<Long> handler = io.vertx.rx.java.RxHelper.observableFuture();
+  public Observable<String> pubsubNumpatObservable() { 
+    io.vertx.rx.java.ObservableFuture<String> handler = io.vertx.rx.java.RxHelper.observableFuture();
     pubsubNumpat(handler.toHandler());
     return handler;
   }
@@ -3153,7 +3063,7 @@ public class RedisClient {
    * @param handler Handler for the result of this call.
    * @return 
    */
-  public RedisClient pttl(String key, Handler<AsyncResult<Long>> handler) { 
+  public RedisTransaction pttl(String key, Handler<AsyncResult<String>> handler) { 
     delegate.pttl(key, handler);
     return this;
   }
@@ -3163,8 +3073,8 @@ public class RedisClient {
    * @param key Key string
    * @return 
    */
-  public Observable<Long> pttlObservable(String key) { 
-    io.vertx.rx.java.ObservableFuture<Long> handler = io.vertx.rx.java.RxHelper.observableFuture();
+  public Observable<String> pttlObservable(String key) { 
+    io.vertx.rx.java.ObservableFuture<String> handler = io.vertx.rx.java.RxHelper.observableFuture();
     pttl(key, handler.toHandler());
     return handler;
   }
@@ -3176,7 +3086,7 @@ public class RedisClient {
    * @param handler Handler for the result of this call.
    * @return 
    */
-  public RedisClient publish(String channel, String message, Handler<AsyncResult<Long>> handler) { 
+  public RedisTransaction publish(String channel, String message, Handler<AsyncResult<String>> handler) { 
     delegate.publish(channel, message, handler);
     return this;
   }
@@ -3187,8 +3097,8 @@ public class RedisClient {
    * @param message Message to send to channel
    * @return 
    */
-  public Observable<Long> publishObservable(String channel, String message) { 
-    io.vertx.rx.java.ObservableFuture<Long> handler = io.vertx.rx.java.RxHelper.observableFuture();
+  public Observable<String> publishObservable(String channel, String message) { 
+    io.vertx.rx.java.ObservableFuture<String> handler = io.vertx.rx.java.RxHelper.observableFuture();
     publish(channel, message, handler.toHandler());
     return handler;
   }
@@ -3199,16 +3109,8 @@ public class RedisClient {
    * @param handler Handler for the result of this call.
    * @return 
    */
-  public RedisClient punsubscribe(List<String> patterns, Handler<AsyncResult<Void>> handler) { 
-    delegate.punsubscribe(patterns, new Handler<AsyncResult<java.lang.Void>>() {
-      public void handle(AsyncResult<java.lang.Void> ar) {
-        if (ar.succeeded()) {
-          handler.handle(io.vertx.core.Future.succeededFuture(ar.result()));
-        } else {
-          handler.handle(io.vertx.core.Future.failedFuture(ar.cause()));
-        }
-      }
-    });
+  public RedisTransaction punsubscribe(List<String> patterns, Handler<AsyncResult<String>> handler) { 
+    delegate.punsubscribe(patterns, handler);
     return this;
   }
 
@@ -3217,8 +3119,8 @@ public class RedisClient {
    * @param patterns List of patterns to match against
    * @return 
    */
-  public Observable<Void> punsubscribeObservable(List<String> patterns) { 
-    io.vertx.rx.java.ObservableFuture<Void> handler = io.vertx.rx.java.RxHelper.observableFuture();
+  public Observable<String> punsubscribeObservable(List<String> patterns) { 
+    io.vertx.rx.java.ObservableFuture<String> handler = io.vertx.rx.java.RxHelper.observableFuture();
     punsubscribe(patterns, handler.toHandler());
     return handler;
   }
@@ -3228,7 +3130,7 @@ public class RedisClient {
    * @param handler 
    * @return 
    */
-  public RedisClient randomkey(Handler<AsyncResult<String>> handler) { 
+  public RedisTransaction randomkey(Handler<AsyncResult<String>> handler) { 
     delegate.randomkey(handler);
     return this;
   }
@@ -3250,7 +3152,7 @@ public class RedisClient {
    * @param handler Handler for the result of this call.
    * @return 
    */
-  public RedisClient rename(String key, String newkey, Handler<AsyncResult<String>> handler) { 
+  public RedisTransaction rename(String key, String newkey, Handler<AsyncResult<String>> handler) { 
     delegate.rename(key, newkey, handler);
     return this;
   }
@@ -3274,7 +3176,7 @@ public class RedisClient {
    * @param handler Handler for the result of this call.
    * @return 
    */
-  public RedisClient renamenx(String key, String newkey, Handler<AsyncResult<Long>> handler) { 
+  public RedisTransaction renamenx(String key, String newkey, Handler<AsyncResult<String>> handler) { 
     delegate.renamenx(key, newkey, handler);
     return this;
   }
@@ -3285,8 +3187,8 @@ public class RedisClient {
    * @param newkey New key string
    * @return 
    */
-  public Observable<Long> renamenxObservable(String key, String newkey) { 
-    io.vertx.rx.java.ObservableFuture<Long> handler = io.vertx.rx.java.RxHelper.observableFuture();
+  public Observable<String> renamenxObservable(String key, String newkey) { 
+    io.vertx.rx.java.ObservableFuture<String> handler = io.vertx.rx.java.RxHelper.observableFuture();
     renamenx(key, newkey, handler.toHandler());
     return handler;
   }
@@ -3299,7 +3201,7 @@ public class RedisClient {
    * @param handler Handler for the result of this call.
    * @return 
    */
-  public RedisClient restore(String key, long millis, String serialized, Handler<AsyncResult<String>> handler) { 
+  public RedisTransaction restore(String key, long millis, String serialized, Handler<AsyncResult<String>> handler) { 
     delegate.restore(key, millis, serialized, handler);
     return this;
   }
@@ -3322,7 +3224,7 @@ public class RedisClient {
    * @param handler 
    * @return 
    */
-  public RedisClient role(Handler<AsyncResult<JsonArray>> handler) { 
+  public RedisTransaction role(Handler<AsyncResult<String>> handler) { 
     delegate.role(handler);
     return this;
   }
@@ -3331,8 +3233,8 @@ public class RedisClient {
    * Return the role of the instance in the context of replication
    * @return 
    */
-  public Observable<JsonArray> roleObservable() { 
-    io.vertx.rx.java.ObservableFuture<JsonArray> handler = io.vertx.rx.java.RxHelper.observableFuture();
+  public Observable<String> roleObservable() { 
+    io.vertx.rx.java.ObservableFuture<String> handler = io.vertx.rx.java.RxHelper.observableFuture();
     role(handler.toHandler());
     return handler;
   }
@@ -3343,7 +3245,7 @@ public class RedisClient {
    * @param handler Handler for the result of this call.
    * @return 
    */
-  public RedisClient rpop(String key, Handler<AsyncResult<String>> handler) { 
+  public RedisTransaction rpop(String key, Handler<AsyncResult<String>> handler) { 
     delegate.rpop(key, handler);
     return this;
   }
@@ -3366,7 +3268,7 @@ public class RedisClient {
    * @param handler Handler for the result of this call.
    * @return 
    */
-  public RedisClient rpoplpush(String key, String destkey, Handler<AsyncResult<String>> handler) { 
+  public RedisTransaction rpoplpush(String key, String destkey, Handler<AsyncResult<String>> handler) { 
     delegate.rpoplpush(key, destkey, handler);
     return this;
   }
@@ -3390,7 +3292,7 @@ public class RedisClient {
    * @param handler Handler for the result of this call.
    * @return 
    */
-  public RedisClient rpushMany(String key, List<String> values, Handler<AsyncResult<Long>> handler) { 
+  public RedisTransaction rpushMany(String key, List<String> values, Handler<AsyncResult<String>> handler) { 
     delegate.rpushMany(key, values, handler);
     return this;
   }
@@ -3401,8 +3303,8 @@ public class RedisClient {
    * @param values List of values to add to the end of the list
    * @return 
    */
-  public Observable<Long> rpushManyObservable(String key, List<String> values) { 
-    io.vertx.rx.java.ObservableFuture<Long> handler = io.vertx.rx.java.RxHelper.observableFuture();
+  public Observable<String> rpushManyObservable(String key, List<String> values) { 
+    io.vertx.rx.java.ObservableFuture<String> handler = io.vertx.rx.java.RxHelper.observableFuture();
     rpushMany(key, values, handler.toHandler());
     return handler;
   }
@@ -3414,7 +3316,7 @@ public class RedisClient {
    * @param handler Handler for the result of this call.
    * @return 
    */
-  public RedisClient rpush(String key, String value, Handler<AsyncResult<Long>> handler) { 
+  public RedisTransaction rpush(String key, String value, Handler<AsyncResult<String>> handler) { 
     delegate.rpush(key, value, handler);
     return this;
   }
@@ -3425,8 +3327,8 @@ public class RedisClient {
    * @param value Value to be added to the end of the list
    * @return 
    */
-  public Observable<Long> rpushObservable(String key, String value) { 
-    io.vertx.rx.java.ObservableFuture<Long> handler = io.vertx.rx.java.RxHelper.observableFuture();
+  public Observable<String> rpushObservable(String key, String value) { 
+    io.vertx.rx.java.ObservableFuture<String> handler = io.vertx.rx.java.RxHelper.observableFuture();
     rpush(key, value, handler.toHandler());
     return handler;
   }
@@ -3438,7 +3340,7 @@ public class RedisClient {
    * @param handler Handler for the result of this call.
    * @return 
    */
-  public RedisClient rpushx(String key, String value, Handler<AsyncResult<Long>> handler) { 
+  public RedisTransaction rpushx(String key, String value, Handler<AsyncResult<String>> handler) { 
     delegate.rpushx(key, value, handler);
     return this;
   }
@@ -3449,8 +3351,8 @@ public class RedisClient {
    * @param value Value to be added to the end of the list
    * @return 
    */
-  public Observable<Long> rpushxObservable(String key, String value) { 
-    io.vertx.rx.java.ObservableFuture<Long> handler = io.vertx.rx.java.RxHelper.observableFuture();
+  public Observable<String> rpushxObservable(String key, String value) { 
+    io.vertx.rx.java.ObservableFuture<String> handler = io.vertx.rx.java.RxHelper.observableFuture();
     rpushx(key, value, handler.toHandler());
     return handler;
   }
@@ -3462,7 +3364,7 @@ public class RedisClient {
    * @param handler Handler for the result of this call.
    * @return 
    */
-  public RedisClient sadd(String key, String member, Handler<AsyncResult<Long>> handler) { 
+  public RedisTransaction sadd(String key, String member, Handler<AsyncResult<String>> handler) { 
     delegate.sadd(key, member, handler);
     return this;
   }
@@ -3473,8 +3375,8 @@ public class RedisClient {
    * @param member Value to be added to the set
    * @return 
    */
-  public Observable<Long> saddObservable(String key, String member) { 
-    io.vertx.rx.java.ObservableFuture<Long> handler = io.vertx.rx.java.RxHelper.observableFuture();
+  public Observable<String> saddObservable(String key, String member) { 
+    io.vertx.rx.java.ObservableFuture<String> handler = io.vertx.rx.java.RxHelper.observableFuture();
     sadd(key, member, handler.toHandler());
     return handler;
   }
@@ -3486,7 +3388,7 @@ public class RedisClient {
    * @param handler Handler for the result of this call.
    * @return 
    */
-  public RedisClient saddMany(String key, List<String> members, Handler<AsyncResult<Long>> handler) { 
+  public RedisTransaction saddMany(String key, List<String> members, Handler<AsyncResult<String>> handler) { 
     delegate.saddMany(key, members, handler);
     return this;
   }
@@ -3497,8 +3399,8 @@ public class RedisClient {
    * @param members Values to be added to the set
    * @return 
    */
-  public Observable<Long> saddManyObservable(String key, List<String> members) { 
-    io.vertx.rx.java.ObservableFuture<Long> handler = io.vertx.rx.java.RxHelper.observableFuture();
+  public Observable<String> saddManyObservable(String key, List<String> members) { 
+    io.vertx.rx.java.ObservableFuture<String> handler = io.vertx.rx.java.RxHelper.observableFuture();
     saddMany(key, members, handler.toHandler());
     return handler;
   }
@@ -3508,7 +3410,7 @@ public class RedisClient {
    * @param handler 
    * @return 
    */
-  public RedisClient save(Handler<AsyncResult<String>> handler) { 
+  public RedisTransaction save(Handler<AsyncResult<String>> handler) { 
     delegate.save(handler);
     return this;
   }
@@ -3529,7 +3431,7 @@ public class RedisClient {
    * @param handler Handler for the result of this call.
    * @return 
    */
-  public RedisClient scard(String key, Handler<AsyncResult<Long>> handler) { 
+  public RedisTransaction scard(String key, Handler<AsyncResult<String>> handler) { 
     delegate.scard(key, handler);
     return this;
   }
@@ -3539,8 +3441,8 @@ public class RedisClient {
    * @param key Key string
    * @return 
    */
-  public Observable<Long> scardObservable(String key) { 
-    io.vertx.rx.java.ObservableFuture<Long> handler = io.vertx.rx.java.RxHelper.observableFuture();
+  public Observable<String> scardObservable(String key) { 
+    io.vertx.rx.java.ObservableFuture<String> handler = io.vertx.rx.java.RxHelper.observableFuture();
     scard(key, handler.toHandler());
     return handler;
   }
@@ -3551,7 +3453,7 @@ public class RedisClient {
    * @param handler Handler for the result of this call.
    * @return 
    */
-  public RedisClient scriptExists(String script, Handler<AsyncResult<JsonArray>> handler) { 
+  public RedisTransaction scriptExists(String script, Handler<AsyncResult<String>> handler) { 
     delegate.scriptExists(script, handler);
     return this;
   }
@@ -3561,8 +3463,8 @@ public class RedisClient {
    * @param script SHA1 digest identifying a script in the script cache
    * @return 
    */
-  public Observable<JsonArray> scriptExistsObservable(String script) { 
-    io.vertx.rx.java.ObservableFuture<JsonArray> handler = io.vertx.rx.java.RxHelper.observableFuture();
+  public Observable<String> scriptExistsObservable(String script) { 
+    io.vertx.rx.java.ObservableFuture<String> handler = io.vertx.rx.java.RxHelper.observableFuture();
     scriptExists(script, handler.toHandler());
     return handler;
   }
@@ -3573,7 +3475,7 @@ public class RedisClient {
    * @param handler Handler for the result of this call.
    * @return 
    */
-  public RedisClient scriptExistsMany(List<String> scripts, Handler<AsyncResult<JsonArray>> handler) { 
+  public RedisTransaction scriptExistsMany(List<String> scripts, Handler<AsyncResult<String>> handler) { 
     delegate.scriptExistsMany(scripts, handler);
     return this;
   }
@@ -3583,8 +3485,8 @@ public class RedisClient {
    * @param scripts List of SHA1 digests identifying scripts in the script cache
    * @return 
    */
-  public Observable<JsonArray> scriptExistsManyObservable(List<String> scripts) { 
-    io.vertx.rx.java.ObservableFuture<JsonArray> handler = io.vertx.rx.java.RxHelper.observableFuture();
+  public Observable<String> scriptExistsManyObservable(List<String> scripts) { 
+    io.vertx.rx.java.ObservableFuture<String> handler = io.vertx.rx.java.RxHelper.observableFuture();
     scriptExistsMany(scripts, handler.toHandler());
     return handler;
   }
@@ -3594,7 +3496,7 @@ public class RedisClient {
    * @param handler 
    * @return 
    */
-  public RedisClient scriptFlush(Handler<AsyncResult<String>> handler) { 
+  public RedisTransaction scriptFlush(Handler<AsyncResult<String>> handler) { 
     delegate.scriptFlush(handler);
     return this;
   }
@@ -3614,7 +3516,7 @@ public class RedisClient {
    * @param handler 
    * @return 
    */
-  public RedisClient scriptKill(Handler<AsyncResult<String>> handler) { 
+  public RedisTransaction scriptKill(Handler<AsyncResult<String>> handler) { 
     delegate.scriptKill(handler);
     return this;
   }
@@ -3635,7 +3537,7 @@ public class RedisClient {
    * @param handler Handler for the result of this call.
    * @return 
    */
-  public RedisClient scriptLoad(String script, Handler<AsyncResult<String>> handler) { 
+  public RedisTransaction scriptLoad(String script, Handler<AsyncResult<String>> handler) { 
     delegate.scriptLoad(script, handler);
     return this;
   }
@@ -3658,7 +3560,7 @@ public class RedisClient {
    * @param handler Handler for the result of this call.
    * @return 
    */
-  public RedisClient sdiff(String key, List<String> cmpkeys, Handler<AsyncResult<JsonArray>> handler) { 
+  public RedisTransaction sdiff(String key, List<String> cmpkeys, Handler<AsyncResult<String>> handler) { 
     delegate.sdiff(key, cmpkeys, handler);
     return this;
   }
@@ -3669,8 +3571,8 @@ public class RedisClient {
    * @param cmpkeys List of keys identifying sets to subtract from the key set
    * @return 
    */
-  public Observable<JsonArray> sdiffObservable(String key, List<String> cmpkeys) { 
-    io.vertx.rx.java.ObservableFuture<JsonArray> handler = io.vertx.rx.java.RxHelper.observableFuture();
+  public Observable<String> sdiffObservable(String key, List<String> cmpkeys) { 
+    io.vertx.rx.java.ObservableFuture<String> handler = io.vertx.rx.java.RxHelper.observableFuture();
     sdiff(key, cmpkeys, handler.toHandler());
     return handler;
   }
@@ -3683,7 +3585,7 @@ public class RedisClient {
    * @param handler Handler for the result of this call.
    * @return 
    */
-  public RedisClient sdiffstore(String destkey, String key, List<String> cmpkeys, Handler<AsyncResult<Long>> handler) { 
+  public RedisTransaction sdiffstore(String destkey, String key, List<String> cmpkeys, Handler<AsyncResult<String>> handler) { 
     delegate.sdiffstore(destkey, key, cmpkeys, handler);
     return this;
   }
@@ -3695,8 +3597,8 @@ public class RedisClient {
    * @param cmpkeys List of keys identifying sets to subtract from the key set
    * @return 
    */
-  public Observable<Long> sdiffstoreObservable(String destkey, String key, List<String> cmpkeys) { 
-    io.vertx.rx.java.ObservableFuture<Long> handler = io.vertx.rx.java.RxHelper.observableFuture();
+  public Observable<String> sdiffstoreObservable(String destkey, String key, List<String> cmpkeys) { 
+    io.vertx.rx.java.ObservableFuture<String> handler = io.vertx.rx.java.RxHelper.observableFuture();
     sdiffstore(destkey, key, cmpkeys, handler.toHandler());
     return handler;
   }
@@ -3707,7 +3609,7 @@ public class RedisClient {
    * @param handler Handler for the result of this call.
    * @return 
    */
-  public RedisClient select(int dbindex, Handler<AsyncResult<String>> handler) { 
+  public RedisTransaction select(int dbindex, Handler<AsyncResult<String>> handler) { 
     delegate.select(dbindex, handler);
     return this;
   }
@@ -3730,16 +3632,8 @@ public class RedisClient {
    * @param handler Handler for the result of this call.
    * @return 
    */
-  public RedisClient set(String key, String value, Handler<AsyncResult<Void>> handler) { 
-    delegate.set(key, value, new Handler<AsyncResult<java.lang.Void>>() {
-      public void handle(AsyncResult<java.lang.Void> ar) {
-        if (ar.succeeded()) {
-          handler.handle(io.vertx.core.Future.succeededFuture(ar.result()));
-        } else {
-          handler.handle(io.vertx.core.Future.failedFuture(ar.cause()));
-        }
-      }
-    });
+  public RedisTransaction set(String key, String value, Handler<AsyncResult<String>> handler) { 
+    delegate.set(key, value, handler);
     return this;
   }
 
@@ -3749,8 +3643,8 @@ public class RedisClient {
    * @param value New value for the key
    * @return 
    */
-  public Observable<Void> setObservable(String key, String value) { 
-    io.vertx.rx.java.ObservableFuture<Void> handler = io.vertx.rx.java.RxHelper.observableFuture();
+  public Observable<String> setObservable(String key, String value) { 
+    io.vertx.rx.java.ObservableFuture<String> handler = io.vertx.rx.java.RxHelper.observableFuture();
     set(key, value, handler.toHandler());
     return handler;
   }
@@ -3763,7 +3657,7 @@ public class RedisClient {
    * @param handler Handler for the result of this call.
    * @return 
    */
-  public RedisClient setWithOptions(String key, String value, SetOptions options, Handler<AsyncResult<String>> handler) { 
+  public RedisTransaction setWithOptions(String key, String value, SetOptions options, Handler<AsyncResult<String>> handler) { 
     delegate.setWithOptions(key, value, options, handler);
     return this;
   }
@@ -3788,16 +3682,8 @@ public class RedisClient {
    * @param handler Handler for the result of this call.
    * @return 
    */
-  public RedisClient setBinary(String key, Buffer value, Handler<AsyncResult<Void>> handler) { 
-    delegate.setBinary(key, (io.vertx.core.buffer.Buffer)value.getDelegate(), new Handler<AsyncResult<java.lang.Void>>() {
-      public void handle(AsyncResult<java.lang.Void> ar) {
-        if (ar.succeeded()) {
-          handler.handle(io.vertx.core.Future.succeededFuture(ar.result()));
-        } else {
-          handler.handle(io.vertx.core.Future.failedFuture(ar.cause()));
-        }
-      }
-    });
+  public RedisTransaction setBinary(String key, Buffer value, Handler<AsyncResult<String>> handler) { 
+    delegate.setBinary(key, (io.vertx.core.buffer.Buffer)value.getDelegate(), handler);
     return this;
   }
 
@@ -3807,8 +3693,8 @@ public class RedisClient {
    * @param value New value for the key
    * @return 
    */
-  public Observable<Void> setBinaryObservable(String key, Buffer value) { 
-    io.vertx.rx.java.ObservableFuture<Void> handler = io.vertx.rx.java.RxHelper.observableFuture();
+  public Observable<String> setBinaryObservable(String key, Buffer value) { 
+    io.vertx.rx.java.ObservableFuture<String> handler = io.vertx.rx.java.RxHelper.observableFuture();
     setBinary(key, value, handler.toHandler());
     return handler;
   }
@@ -3821,16 +3707,8 @@ public class RedisClient {
    * @param handler Handler for the result of this call.
    * @return 
    */
-  public RedisClient setBinaryWithOptions(String key, Buffer value, SetOptions options, Handler<AsyncResult<Void>> handler) { 
-    delegate.setBinaryWithOptions(key, (io.vertx.core.buffer.Buffer)value.getDelegate(), options, new Handler<AsyncResult<java.lang.Void>>() {
-      public void handle(AsyncResult<java.lang.Void> ar) {
-        if (ar.succeeded()) {
-          handler.handle(io.vertx.core.Future.succeededFuture(ar.result()));
-        } else {
-          handler.handle(io.vertx.core.Future.failedFuture(ar.cause()));
-        }
-      }
-    });
+  public RedisTransaction setBinaryWithOptions(String key, Buffer value, SetOptions options, Handler<AsyncResult<String>> handler) { 
+    delegate.setBinaryWithOptions(key, (io.vertx.core.buffer.Buffer)value.getDelegate(), options, handler);
     return this;
   }
 
@@ -3841,8 +3719,8 @@ public class RedisClient {
    * @param options Set options
    * @return 
    */
-  public Observable<Void> setBinaryWithOptionsObservable(String key, Buffer value, SetOptions options) { 
-    io.vertx.rx.java.ObservableFuture<Void> handler = io.vertx.rx.java.RxHelper.observableFuture();
+  public Observable<String> setBinaryWithOptionsObservable(String key, Buffer value, SetOptions options) { 
+    io.vertx.rx.java.ObservableFuture<String> handler = io.vertx.rx.java.RxHelper.observableFuture();
     setBinaryWithOptions(key, value, options, handler.toHandler());
     return handler;
   }
@@ -3855,7 +3733,7 @@ public class RedisClient {
    * @param handler Handler for the result of this call.
    * @return 
    */
-  public RedisClient setbit(String key, long offset, int bit, Handler<AsyncResult<Long>> handler) { 
+  public RedisTransaction setbit(String key, long offset, int bit, Handler<AsyncResult<String>> handler) { 
     delegate.setbit(key, offset, bit, handler);
     return this;
   }
@@ -3867,8 +3745,8 @@ public class RedisClient {
    * @param bit New value - must be 1 or 0
    * @return 
    */
-  public Observable<Long> setbitObservable(String key, long offset, int bit) { 
-    io.vertx.rx.java.ObservableFuture<Long> handler = io.vertx.rx.java.RxHelper.observableFuture();
+  public Observable<String> setbitObservable(String key, long offset, int bit) { 
+    io.vertx.rx.java.ObservableFuture<String> handler = io.vertx.rx.java.RxHelper.observableFuture();
     setbit(key, offset, bit, handler.toHandler());
     return handler;
   }
@@ -3881,7 +3759,7 @@ public class RedisClient {
    * @param handler Handler for the result of this call.
    * @return 
    */
-  public RedisClient setex(String key, long seconds, String value, Handler<AsyncResult<String>> handler) { 
+  public RedisTransaction setex(String key, long seconds, String value, Handler<AsyncResult<String>> handler) { 
     delegate.setex(key, seconds, value, handler);
     return this;
   }
@@ -3906,7 +3784,7 @@ public class RedisClient {
    * @param handler Handler for the result of this call.
    * @return 
    */
-  public RedisClient setnx(String key, String value, Handler<AsyncResult<Long>> handler) { 
+  public RedisTransaction setnx(String key, String value, Handler<AsyncResult<String>> handler) { 
     delegate.setnx(key, value, handler);
     return this;
   }
@@ -3917,8 +3795,8 @@ public class RedisClient {
    * @param value New value for the key
    * @return 
    */
-  public Observable<Long> setnxObservable(String key, String value) { 
-    io.vertx.rx.java.ObservableFuture<Long> handler = io.vertx.rx.java.RxHelper.observableFuture();
+  public Observable<String> setnxObservable(String key, String value) { 
+    io.vertx.rx.java.ObservableFuture<String> handler = io.vertx.rx.java.RxHelper.observableFuture();
     setnx(key, value, handler.toHandler());
     return handler;
   }
@@ -3931,7 +3809,7 @@ public class RedisClient {
    * @param handler Handler for the result of this call.
    * @return 
    */
-  public RedisClient setrange(String key, int offset, String value, Handler<AsyncResult<Long>> handler) { 
+  public RedisTransaction setrange(String key, int offset, String value, Handler<AsyncResult<String>> handler) { 
     delegate.setrange(key, offset, value, handler);
     return this;
   }
@@ -3943,8 +3821,8 @@ public class RedisClient {
    * @param value Value to overwrite with
    * @return 
    */
-  public Observable<Long> setrangeObservable(String key, int offset, String value) { 
-    io.vertx.rx.java.ObservableFuture<Long> handler = io.vertx.rx.java.RxHelper.observableFuture();
+  public Observable<String> setrangeObservable(String key, int offset, String value) { 
+    io.vertx.rx.java.ObservableFuture<String> handler = io.vertx.rx.java.RxHelper.observableFuture();
     setrange(key, offset, value, handler.toHandler());
     return handler;
   }
@@ -3955,7 +3833,7 @@ public class RedisClient {
    * @param handler Handler for the result of this call.
    * @return 
    */
-  public RedisClient sinter(List<String> keys, Handler<AsyncResult<JsonArray>> handler) { 
+  public RedisTransaction sinter(List<String> keys, Handler<AsyncResult<String>> handler) { 
     delegate.sinter(keys, handler);
     return this;
   }
@@ -3965,8 +3843,8 @@ public class RedisClient {
    * @param keys List of keys to perform intersection on
    * @return 
    */
-  public Observable<JsonArray> sinterObservable(List<String> keys) { 
-    io.vertx.rx.java.ObservableFuture<JsonArray> handler = io.vertx.rx.java.RxHelper.observableFuture();
+  public Observable<String> sinterObservable(List<String> keys) { 
+    io.vertx.rx.java.ObservableFuture<String> handler = io.vertx.rx.java.RxHelper.observableFuture();
     sinter(keys, handler.toHandler());
     return handler;
   }
@@ -3978,7 +3856,7 @@ public class RedisClient {
    * @param handler Handler for the result of this call.
    * @return 
    */
-  public RedisClient sinterstore(String destkey, List<String> keys, Handler<AsyncResult<Long>> handler) { 
+  public RedisTransaction sinterstore(String destkey, List<String> keys, Handler<AsyncResult<String>> handler) { 
     delegate.sinterstore(destkey, keys, handler);
     return this;
   }
@@ -3989,8 +3867,8 @@ public class RedisClient {
    * @param keys List of keys to perform intersection on
    * @return 
    */
-  public Observable<Long> sinterstoreObservable(String destkey, List<String> keys) { 
-    io.vertx.rx.java.ObservableFuture<Long> handler = io.vertx.rx.java.RxHelper.observableFuture();
+  public Observable<String> sinterstoreObservable(String destkey, List<String> keys) { 
+    io.vertx.rx.java.ObservableFuture<String> handler = io.vertx.rx.java.RxHelper.observableFuture();
     sinterstore(destkey, keys, handler.toHandler());
     return handler;
   }
@@ -4002,7 +3880,7 @@ public class RedisClient {
    * @param handler Handler for the result of this call.
    * @return 
    */
-  public RedisClient sismember(String key, String member, Handler<AsyncResult<Long>> handler) { 
+  public RedisTransaction sismember(String key, String member, Handler<AsyncResult<String>> handler) { 
     delegate.sismember(key, member, handler);
     return this;
   }
@@ -4013,8 +3891,8 @@ public class RedisClient {
    * @param member Member to look for
    * @return 
    */
-  public Observable<Long> sismemberObservable(String key, String member) { 
-    io.vertx.rx.java.ObservableFuture<Long> handler = io.vertx.rx.java.RxHelper.observableFuture();
+  public Observable<String> sismemberObservable(String key, String member) { 
+    io.vertx.rx.java.ObservableFuture<String> handler = io.vertx.rx.java.RxHelper.observableFuture();
     sismember(key, member, handler.toHandler());
     return handler;
   }
@@ -4026,7 +3904,7 @@ public class RedisClient {
    * @param handler Handler for the result of this call.
    * @return 
    */
-  public RedisClient slaveof(String host, int port, Handler<AsyncResult<String>> handler) { 
+  public RedisTransaction slaveof(String host, int port, Handler<AsyncResult<String>> handler) { 
     delegate.slaveof(host, port, handler);
     return this;
   }
@@ -4048,7 +3926,7 @@ public class RedisClient {
    * @param handler Handler for the result of this call.
    * @return 
    */
-  public RedisClient slaveofNoone(Handler<AsyncResult<String>> handler) { 
+  public RedisTransaction slaveofNoone(Handler<AsyncResult<String>> handler) { 
     delegate.slaveofNoone(handler);
     return this;
   }
@@ -4069,7 +3947,7 @@ public class RedisClient {
    * @param handler Handler for the result of this call.
    * @return 
    */
-  public RedisClient slowlogGet(int limit, Handler<AsyncResult<JsonArray>> handler) { 
+  public RedisTransaction slowlogGet(int limit, Handler<AsyncResult<String>> handler) { 
     delegate.slowlogGet(limit, handler);
     return this;
   }
@@ -4079,8 +3957,8 @@ public class RedisClient {
    * @param limit Number of log entries to return. If value is less than zero all entries are returned
    * @return 
    */
-  public Observable<JsonArray> slowlogGetObservable(int limit) { 
-    io.vertx.rx.java.ObservableFuture<JsonArray> handler = io.vertx.rx.java.RxHelper.observableFuture();
+  public Observable<String> slowlogGetObservable(int limit) { 
+    io.vertx.rx.java.ObservableFuture<String> handler = io.vertx.rx.java.RxHelper.observableFuture();
     slowlogGet(limit, handler.toHandler());
     return handler;
   }
@@ -4090,7 +3968,7 @@ public class RedisClient {
    * @param handler Handler for the result of this call.
    * @return 
    */
-  public RedisClient slowlogLen(Handler<AsyncResult<Long>> handler) { 
+  public RedisTransaction slowlogLen(Handler<AsyncResult<String>> handler) { 
     delegate.slowlogLen(handler);
     return this;
   }
@@ -4099,8 +3977,8 @@ public class RedisClient {
    * Get the length of the Redis slow queries log
    * @return 
    */
-  public Observable<Long> slowlogLenObservable() { 
-    io.vertx.rx.java.ObservableFuture<Long> handler = io.vertx.rx.java.RxHelper.observableFuture();
+  public Observable<String> slowlogLenObservable() { 
+    io.vertx.rx.java.ObservableFuture<String> handler = io.vertx.rx.java.RxHelper.observableFuture();
     slowlogLen(handler.toHandler());
     return handler;
   }
@@ -4110,16 +3988,8 @@ public class RedisClient {
    * @param handler Handler for the result of this call.
    * @return 
    */
-  public RedisClient slowlogReset(Handler<AsyncResult<Void>> handler) { 
-    delegate.slowlogReset(new Handler<AsyncResult<java.lang.Void>>() {
-      public void handle(AsyncResult<java.lang.Void> ar) {
-        if (ar.succeeded()) {
-          handler.handle(io.vertx.core.Future.succeededFuture(ar.result()));
-        } else {
-          handler.handle(io.vertx.core.Future.failedFuture(ar.cause()));
-        }
-      }
-    });
+  public RedisTransaction slowlogReset(Handler<AsyncResult<String>> handler) { 
+    delegate.slowlogReset(handler);
     return this;
   }
 
@@ -4127,8 +3997,8 @@ public class RedisClient {
    * Reset the Redis slow queries log
    * @return 
    */
-  public Observable<Void> slowlogResetObservable() { 
-    io.vertx.rx.java.ObservableFuture<Void> handler = io.vertx.rx.java.RxHelper.observableFuture();
+  public Observable<String> slowlogResetObservable() { 
+    io.vertx.rx.java.ObservableFuture<String> handler = io.vertx.rx.java.RxHelper.observableFuture();
     slowlogReset(handler.toHandler());
     return handler;
   }
@@ -4139,7 +4009,7 @@ public class RedisClient {
    * @param handler Handler for the result of this call.
    * @return 
    */
-  public RedisClient smembers(String key, Handler<AsyncResult<JsonArray>> handler) { 
+  public RedisTransaction smembers(String key, Handler<AsyncResult<String>> handler) { 
     delegate.smembers(key, handler);
     return this;
   }
@@ -4149,8 +4019,8 @@ public class RedisClient {
    * @param key Key string
    * @return 
    */
-  public Observable<JsonArray> smembersObservable(String key) { 
-    io.vertx.rx.java.ObservableFuture<JsonArray> handler = io.vertx.rx.java.RxHelper.observableFuture();
+  public Observable<String> smembersObservable(String key) { 
+    io.vertx.rx.java.ObservableFuture<String> handler = io.vertx.rx.java.RxHelper.observableFuture();
     smembers(key, handler.toHandler());
     return handler;
   }
@@ -4163,7 +4033,7 @@ public class RedisClient {
    * @param handler Handler for the result of this call.
    * @return 
    */
-  public RedisClient smove(String key, String destkey, String member, Handler<AsyncResult<Long>> handler) { 
+  public RedisTransaction smove(String key, String destkey, String member, Handler<AsyncResult<String>> handler) { 
     delegate.smove(key, destkey, member, handler);
     return this;
   }
@@ -4175,8 +4045,8 @@ public class RedisClient {
    * @param member Member to move
    * @return 
    */
-  public Observable<Long> smoveObservable(String key, String destkey, String member) { 
-    io.vertx.rx.java.ObservableFuture<Long> handler = io.vertx.rx.java.RxHelper.observableFuture();
+  public Observable<String> smoveObservable(String key, String destkey, String member) { 
+    io.vertx.rx.java.ObservableFuture<String> handler = io.vertx.rx.java.RxHelper.observableFuture();
     smove(key, destkey, member, handler.toHandler());
     return handler;
   }
@@ -4188,7 +4058,7 @@ public class RedisClient {
    * @param handler Handler for the result of this call.
    * @return 
    */
-  public RedisClient sort(String key, SortOptions options, Handler<AsyncResult<JsonArray>> handler) { 
+  public RedisTransaction sort(String key, SortOptions options, Handler<AsyncResult<String>> handler) { 
     delegate.sort(key, options, handler);
     return this;
   }
@@ -4199,8 +4069,8 @@ public class RedisClient {
    * @param options Sort options
    * @return 
    */
-  public Observable<JsonArray> sortObservable(String key, SortOptions options) { 
-    io.vertx.rx.java.ObservableFuture<JsonArray> handler = io.vertx.rx.java.RxHelper.observableFuture();
+  public Observable<String> sortObservable(String key, SortOptions options) { 
+    io.vertx.rx.java.ObservableFuture<String> handler = io.vertx.rx.java.RxHelper.observableFuture();
     sort(key, options, handler.toHandler());
     return handler;
   }
@@ -4211,7 +4081,7 @@ public class RedisClient {
    * @param handler Handler for the result of this call.
    * @return 
    */
-  public RedisClient spop(String key, Handler<AsyncResult<String>> handler) { 
+  public RedisTransaction spop(String key, Handler<AsyncResult<String>> handler) { 
     delegate.spop(key, handler);
     return this;
   }
@@ -4234,7 +4104,7 @@ public class RedisClient {
    * @param handler Handler for the result of this call.
    * @return 
    */
-  public RedisClient spopMany(String key, int count, Handler<AsyncResult<String>> handler) { 
+  public RedisTransaction spopMany(String key, int count, Handler<AsyncResult<String>> handler) { 
     delegate.spopMany(key, count, handler);
     return this;
   }
@@ -4257,7 +4127,7 @@ public class RedisClient {
    * @param handler Handler for the result of this call.
    * @return 
    */
-  public RedisClient srandmember(String key, Handler<AsyncResult<String>> handler) { 
+  public RedisTransaction srandmember(String key, Handler<AsyncResult<String>> handler) { 
     delegate.srandmember(key, handler);
     return this;
   }
@@ -4280,7 +4150,7 @@ public class RedisClient {
    * @param handler Handler for the result of this call.
    * @return 
    */
-  public RedisClient srandmemberCount(String key, int count, Handler<AsyncResult<JsonArray>> handler) { 
+  public RedisTransaction srandmemberCount(String key, int count, Handler<AsyncResult<String>> handler) { 
     delegate.srandmemberCount(key, count, handler);
     return this;
   }
@@ -4291,8 +4161,8 @@ public class RedisClient {
    * @param count Number of members to get
    * @return 
    */
-  public Observable<JsonArray> srandmemberCountObservable(String key, int count) { 
-    io.vertx.rx.java.ObservableFuture<JsonArray> handler = io.vertx.rx.java.RxHelper.observableFuture();
+  public Observable<String> srandmemberCountObservable(String key, int count) { 
+    io.vertx.rx.java.ObservableFuture<String> handler = io.vertx.rx.java.RxHelper.observableFuture();
     srandmemberCount(key, count, handler.toHandler());
     return handler;
   }
@@ -4304,7 +4174,7 @@ public class RedisClient {
    * @param handler Handler for the result of this call.
    * @return 
    */
-  public RedisClient srem(String key, String member, Handler<AsyncResult<Long>> handler) { 
+  public RedisTransaction srem(String key, String member, Handler<AsyncResult<String>> handler) { 
     delegate.srem(key, member, handler);
     return this;
   }
@@ -4315,8 +4185,8 @@ public class RedisClient {
    * @param member Member to remove
    * @return 
    */
-  public Observable<Long> sremObservable(String key, String member) { 
-    io.vertx.rx.java.ObservableFuture<Long> handler = io.vertx.rx.java.RxHelper.observableFuture();
+  public Observable<String> sremObservable(String key, String member) { 
+    io.vertx.rx.java.ObservableFuture<String> handler = io.vertx.rx.java.RxHelper.observableFuture();
     srem(key, member, handler.toHandler());
     return handler;
   }
@@ -4328,7 +4198,7 @@ public class RedisClient {
    * @param handler Handler for the result of this call.
    * @return 
    */
-  public RedisClient sremMany(String key, List<String> members, Handler<AsyncResult<Long>> handler) { 
+  public RedisTransaction sremMany(String key, List<String> members, Handler<AsyncResult<String>> handler) { 
     delegate.sremMany(key, members, handler);
     return this;
   }
@@ -4339,8 +4209,8 @@ public class RedisClient {
    * @param members Members to remove
    * @return 
    */
-  public Observable<Long> sremManyObservable(String key, List<String> members) { 
-    io.vertx.rx.java.ObservableFuture<Long> handler = io.vertx.rx.java.RxHelper.observableFuture();
+  public Observable<String> sremManyObservable(String key, List<String> members) { 
+    io.vertx.rx.java.ObservableFuture<String> handler = io.vertx.rx.java.RxHelper.observableFuture();
     sremMany(key, members, handler.toHandler());
     return handler;
   }
@@ -4351,7 +4221,7 @@ public class RedisClient {
    * @param handler Handler for the result of this call.
    * @return 
    */
-  public RedisClient strlen(String key, Handler<AsyncResult<Long>> handler) { 
+  public RedisTransaction strlen(String key, Handler<AsyncResult<String>> handler) { 
     delegate.strlen(key, handler);
     return this;
   }
@@ -4361,8 +4231,8 @@ public class RedisClient {
    * @param key Key string
    * @return 
    */
-  public Observable<Long> strlenObservable(String key) { 
-    io.vertx.rx.java.ObservableFuture<Long> handler = io.vertx.rx.java.RxHelper.observableFuture();
+  public Observable<String> strlenObservable(String key) { 
+    io.vertx.rx.java.ObservableFuture<String> handler = io.vertx.rx.java.RxHelper.observableFuture();
     strlen(key, handler.toHandler());
     return handler;
   }
@@ -4373,7 +4243,7 @@ public class RedisClient {
    * @param handler Handler for the result of this call.
    * @return 
    */
-  public RedisClient subscribe(String channel, Handler<AsyncResult<JsonArray>> handler) { 
+  public RedisTransaction subscribe(String channel, Handler<AsyncResult<String>> handler) { 
     delegate.subscribe(channel, handler);
     return this;
   }
@@ -4383,8 +4253,8 @@ public class RedisClient {
    * @param channel Channel to subscribe to
    * @return 
    */
-  public Observable<JsonArray> subscribeObservable(String channel) { 
-    io.vertx.rx.java.ObservableFuture<JsonArray> handler = io.vertx.rx.java.RxHelper.observableFuture();
+  public Observable<String> subscribeObservable(String channel) { 
+    io.vertx.rx.java.ObservableFuture<String> handler = io.vertx.rx.java.RxHelper.observableFuture();
     subscribe(channel, handler.toHandler());
     return handler;
   }
@@ -4395,7 +4265,7 @@ public class RedisClient {
    * @param handler Handler for the result of this call.
    * @return 
    */
-  public RedisClient subscribeMany(List<String> channels, Handler<AsyncResult<JsonArray>> handler) { 
+  public RedisTransaction subscribeMany(List<String> channels, Handler<AsyncResult<String>> handler) { 
     delegate.subscribeMany(channels, handler);
     return this;
   }
@@ -4405,8 +4275,8 @@ public class RedisClient {
    * @param channels List of channels to subscribe to
    * @return 
    */
-  public Observable<JsonArray> subscribeManyObservable(List<String> channels) { 
-    io.vertx.rx.java.ObservableFuture<JsonArray> handler = io.vertx.rx.java.RxHelper.observableFuture();
+  public Observable<String> subscribeManyObservable(List<String> channels) { 
+    io.vertx.rx.java.ObservableFuture<String> handler = io.vertx.rx.java.RxHelper.observableFuture();
     subscribeMany(channels, handler.toHandler());
     return handler;
   }
@@ -4417,7 +4287,7 @@ public class RedisClient {
    * @param handler Handler for the result of this call.
    * @return 
    */
-  public RedisClient sunion(List<String> keys, Handler<AsyncResult<JsonArray>> handler) { 
+  public RedisTransaction sunion(List<String> keys, Handler<AsyncResult<String>> handler) { 
     delegate.sunion(keys, handler);
     return this;
   }
@@ -4427,8 +4297,8 @@ public class RedisClient {
    * @param keys List of keys identifying sets to add up
    * @return 
    */
-  public Observable<JsonArray> sunionObservable(List<String> keys) { 
-    io.vertx.rx.java.ObservableFuture<JsonArray> handler = io.vertx.rx.java.RxHelper.observableFuture();
+  public Observable<String> sunionObservable(List<String> keys) { 
+    io.vertx.rx.java.ObservableFuture<String> handler = io.vertx.rx.java.RxHelper.observableFuture();
     sunion(keys, handler.toHandler());
     return handler;
   }
@@ -4440,7 +4310,7 @@ public class RedisClient {
    * @param handler Handler for the result of this call.
    * @return 
    */
-  public RedisClient sunionstore(String destkey, List<String> keys, Handler<AsyncResult<Long>> handler) { 
+  public RedisTransaction sunionstore(String destkey, List<String> keys, Handler<AsyncResult<String>> handler) { 
     delegate.sunionstore(destkey, keys, handler);
     return this;
   }
@@ -4451,8 +4321,8 @@ public class RedisClient {
    * @param keys List of keys identifying sets to add up
    * @return 
    */
-  public Observable<Long> sunionstoreObservable(String destkey, List<String> keys) { 
-    io.vertx.rx.java.ObservableFuture<Long> handler = io.vertx.rx.java.RxHelper.observableFuture();
+  public Observable<String> sunionstoreObservable(String destkey, List<String> keys) { 
+    io.vertx.rx.java.ObservableFuture<String> handler = io.vertx.rx.java.RxHelper.observableFuture();
     sunionstore(destkey, keys, handler.toHandler());
     return handler;
   }
@@ -4462,16 +4332,8 @@ public class RedisClient {
    * @param handler 
    * @return 
    */
-  public RedisClient sync(Handler<AsyncResult<Void>> handler) { 
-    delegate.sync(new Handler<AsyncResult<java.lang.Void>>() {
-      public void handle(AsyncResult<java.lang.Void> ar) {
-        if (ar.succeeded()) {
-          handler.handle(io.vertx.core.Future.succeededFuture(ar.result()));
-        } else {
-          handler.handle(io.vertx.core.Future.failedFuture(ar.cause()));
-        }
-      }
-    });
+  public RedisTransaction sync(Handler<AsyncResult<String>> handler) { 
+    delegate.sync(handler);
     return this;
   }
 
@@ -4479,8 +4341,8 @@ public class RedisClient {
    * Internal command used for replication
    * @return 
    */
-  public Observable<Void> syncObservable() { 
-    io.vertx.rx.java.ObservableFuture<Void> handler = io.vertx.rx.java.RxHelper.observableFuture();
+  public Observable<String> syncObservable() { 
+    io.vertx.rx.java.ObservableFuture<String> handler = io.vertx.rx.java.RxHelper.observableFuture();
     sync(handler.toHandler());
     return handler;
   }
@@ -4490,7 +4352,7 @@ public class RedisClient {
    * @param handler 
    * @return 
    */
-  public RedisClient time(Handler<AsyncResult<JsonArray>> handler) { 
+  public RedisTransaction time(Handler<AsyncResult<String>> handler) { 
     delegate.time(handler);
     return this;
   }
@@ -4499,19 +4361,10 @@ public class RedisClient {
    * Return the current server time
    * @return 
    */
-  public Observable<JsonArray> timeObservable() { 
-    io.vertx.rx.java.ObservableFuture<JsonArray> handler = io.vertx.rx.java.RxHelper.observableFuture();
+  public Observable<String> timeObservable() { 
+    io.vertx.rx.java.ObservableFuture<String> handler = io.vertx.rx.java.RxHelper.observableFuture();
     time(handler.toHandler());
     return handler;
-  }
-
-  /**
-   * Return a RedisTransaction instance
-   * @return transaction instance
-   */
-  public RedisTransaction transaction() { 
-    RedisTransaction ret = RedisTransaction.newInstance(delegate.transaction());
-    return ret;
   }
 
   /**
@@ -4520,7 +4373,7 @@ public class RedisClient {
    * @param handler Handler for the result of this call.
    * @return 
    */
-  public RedisClient ttl(String key, Handler<AsyncResult<Long>> handler) { 
+  public RedisTransaction ttl(String key, Handler<AsyncResult<String>> handler) { 
     delegate.ttl(key, handler);
     return this;
   }
@@ -4530,8 +4383,8 @@ public class RedisClient {
    * @param key Key string
    * @return 
    */
-  public Observable<Long> ttlObservable(String key) { 
-    io.vertx.rx.java.ObservableFuture<Long> handler = io.vertx.rx.java.RxHelper.observableFuture();
+  public Observable<String> ttlObservable(String key) { 
+    io.vertx.rx.java.ObservableFuture<String> handler = io.vertx.rx.java.RxHelper.observableFuture();
     ttl(key, handler.toHandler());
     return handler;
   }
@@ -4542,7 +4395,7 @@ public class RedisClient {
    * @param handler Handler for the result of this call.
    * @return 
    */
-  public RedisClient type(String key, Handler<AsyncResult<String>> handler) { 
+  public RedisTransaction type(String key, Handler<AsyncResult<String>> handler) { 
     delegate.type(key, handler);
     return this;
   }
@@ -4564,16 +4417,8 @@ public class RedisClient {
    * @param handler Handler for the result of this call.
    * @return 
    */
-  public RedisClient unsubscribe(List<String> channels, Handler<AsyncResult<Void>> handler) { 
-    delegate.unsubscribe(channels, new Handler<AsyncResult<java.lang.Void>>() {
-      public void handle(AsyncResult<java.lang.Void> ar) {
-        if (ar.succeeded()) {
-          handler.handle(io.vertx.core.Future.succeededFuture(ar.result()));
-        } else {
-          handler.handle(io.vertx.core.Future.failedFuture(ar.cause()));
-        }
-      }
-    });
+  public RedisTransaction unsubscribe(List<String> channels, Handler<AsyncResult<String>> handler) { 
+    delegate.unsubscribe(channels, handler);
     return this;
   }
 
@@ -4582,9 +4427,29 @@ public class RedisClient {
    * @param channels List of channels to subscribe to
    * @return 
    */
-  public Observable<Void> unsubscribeObservable(List<String> channels) { 
-    io.vertx.rx.java.ObservableFuture<Void> handler = io.vertx.rx.java.RxHelper.observableFuture();
+  public Observable<String> unsubscribeObservable(List<String> channels) { 
+    io.vertx.rx.java.ObservableFuture<String> handler = io.vertx.rx.java.RxHelper.observableFuture();
     unsubscribe(channels, handler.toHandler());
+    return handler;
+  }
+
+  /**
+   * Forget about all watched keys
+   * @param handler 
+   * @return 
+   */
+  public RedisTransaction unwatch(Handler<AsyncResult<String>> handler) { 
+    delegate.unwatch(handler);
+    return this;
+  }
+
+  /**
+   * Forget about all watched keys
+   * @return 
+   */
+  public Observable<String> unwatchObservable() { 
+    io.vertx.rx.java.ObservableFuture<String> handler = io.vertx.rx.java.RxHelper.observableFuture();
+    unwatch(handler.toHandler());
     return handler;
   }
 
@@ -4595,7 +4460,7 @@ public class RedisClient {
    * @param handler Handler for the result of this call.
    * @return 
    */
-  public RedisClient wait(long numSlaves, long timeout, Handler<AsyncResult<String>> handler) { 
+  public RedisTransaction wait(long numSlaves, long timeout, Handler<AsyncResult<String>> handler) { 
     delegate.wait(numSlaves, timeout, handler);
     return this;
   }
@@ -4613,6 +4478,50 @@ public class RedisClient {
   }
 
   /**
+   * Watch the given keys to determine execution of the MULTI/EXEC block
+   * @param key Key to watch
+   * @param handler Handler for the result of this call.
+   * @return 
+   */
+  public RedisTransaction watch(String key, Handler<AsyncResult<String>> handler) { 
+    delegate.watch(key, handler);
+    return this;
+  }
+
+  /**
+   * Watch the given keys to determine execution of the MULTI/EXEC block
+   * @param key Key to watch
+   * @return 
+   */
+  public Observable<String> watchObservable(String key) { 
+    io.vertx.rx.java.ObservableFuture<String> handler = io.vertx.rx.java.RxHelper.observableFuture();
+    watch(key, handler.toHandler());
+    return handler;
+  }
+
+  /**
+   * Watch the given keys to determine execution of the MULTI/EXEC block
+   * @param keys List of keys to watch
+   * @param handler Handler for the result of this call.
+   * @return 
+   */
+  public RedisTransaction watchMany(List<String> keys, Handler<AsyncResult<String>> handler) { 
+    delegate.watchMany(keys, handler);
+    return this;
+  }
+
+  /**
+   * Watch the given keys to determine execution of the MULTI/EXEC block
+   * @param keys List of keys to watch
+   * @return 
+   */
+  public Observable<String> watchManyObservable(List<String> keys) { 
+    io.vertx.rx.java.ObservableFuture<String> handler = io.vertx.rx.java.RxHelper.observableFuture();
+    watchMany(keys, handler.toHandler());
+    return handler;
+  }
+
+  /**
    * Add one or more members to a sorted set, or update its score if it already exists
    * @param key Key string
    * @param score Score used for sorting
@@ -4620,7 +4529,7 @@ public class RedisClient {
    * @param handler Handler for the result of this call.
    * @return 
    */
-  public RedisClient zadd(String key, double score, String member, Handler<AsyncResult<Long>> handler) { 
+  public RedisTransaction zadd(String key, double score, String member, Handler<AsyncResult<String>> handler) { 
     delegate.zadd(key, score, member, handler);
     return this;
   }
@@ -4632,8 +4541,8 @@ public class RedisClient {
    * @param member New member key
    * @return 
    */
-  public Observable<Long> zaddObservable(String key, double score, String member) { 
-    io.vertx.rx.java.ObservableFuture<Long> handler = io.vertx.rx.java.RxHelper.observableFuture();
+  public Observable<String> zaddObservable(String key, double score, String member) { 
+    io.vertx.rx.java.ObservableFuture<String> handler = io.vertx.rx.java.RxHelper.observableFuture();
     zadd(key, score, member, handler.toHandler());
     return handler;
   }
@@ -4645,7 +4554,7 @@ public class RedisClient {
    * @param handler Handler for the result of this call.
    * @return 
    */
-  public RedisClient zaddMany(String key, Map<String,Double> members, Handler<AsyncResult<Long>> handler) { 
+  public RedisTransaction zaddMany(String key, Map<String,Double> members, Handler<AsyncResult<String>> handler) { 
     delegate.zaddMany(key, members, handler);
     return this;
   }
@@ -4656,8 +4565,8 @@ public class RedisClient {
    * @param members New member keys and their scores
    * @return 
    */
-  public Observable<Long> zaddManyObservable(String key, Map<String,Double> members) { 
-    io.vertx.rx.java.ObservableFuture<Long> handler = io.vertx.rx.java.RxHelper.observableFuture();
+  public Observable<String> zaddManyObservable(String key, Map<String,Double> members) { 
+    io.vertx.rx.java.ObservableFuture<String> handler = io.vertx.rx.java.RxHelper.observableFuture();
     zaddMany(key, members, handler.toHandler());
     return handler;
   }
@@ -4668,7 +4577,7 @@ public class RedisClient {
    * @param handler Handler for the result of this call.
    * @return 
    */
-  public RedisClient zcard(String key, Handler<AsyncResult<Long>> handler) { 
+  public RedisTransaction zcard(String key, Handler<AsyncResult<String>> handler) { 
     delegate.zcard(key, handler);
     return this;
   }
@@ -4678,8 +4587,8 @@ public class RedisClient {
    * @param key Key string
    * @return 
    */
-  public Observable<Long> zcardObservable(String key) { 
-    io.vertx.rx.java.ObservableFuture<Long> handler = io.vertx.rx.java.RxHelper.observableFuture();
+  public Observable<String> zcardObservable(String key) { 
+    io.vertx.rx.java.ObservableFuture<String> handler = io.vertx.rx.java.RxHelper.observableFuture();
     zcard(key, handler.toHandler());
     return handler;
   }
@@ -4692,7 +4601,7 @@ public class RedisClient {
    * @param handler Handler for the result of this call.
    * @return 
    */
-  public RedisClient zcount(String key, double min, double max, Handler<AsyncResult<Long>> handler) { 
+  public RedisTransaction zcount(String key, double min, double max, Handler<AsyncResult<String>> handler) { 
     delegate.zcount(key, min, max, handler);
     return this;
   }
@@ -4704,8 +4613,8 @@ public class RedisClient {
    * @param max Maximum score
    * @return 
    */
-  public Observable<Long> zcountObservable(String key, double min, double max) { 
-    io.vertx.rx.java.ObservableFuture<Long> handler = io.vertx.rx.java.RxHelper.observableFuture();
+  public Observable<String> zcountObservable(String key, double min, double max) { 
+    io.vertx.rx.java.ObservableFuture<String> handler = io.vertx.rx.java.RxHelper.observableFuture();
     zcount(key, min, max, handler.toHandler());
     return handler;
   }
@@ -4718,7 +4627,7 @@ public class RedisClient {
    * @param handler Handler for the result of this call.
    * @return 
    */
-  public RedisClient zincrby(String key, double increment, String member, Handler<AsyncResult<String>> handler) { 
+  public RedisTransaction zincrby(String key, double increment, String member, Handler<AsyncResult<String>> handler) { 
     delegate.zincrby(key, increment, member, handler);
     return this;
   }
@@ -4744,7 +4653,7 @@ public class RedisClient {
    * @param handler Handler for the result of this call.
    * @return 
    */
-  public RedisClient zinterstore(String destkey, List<String> sets, AggregateOptions options, Handler<AsyncResult<Long>> handler) { 
+  public RedisTransaction zinterstore(String destkey, List<String> sets, AggregateOptions options, Handler<AsyncResult<String>> handler) { 
     delegate.zinterstore(destkey, sets, options, handler);
     return this;
   }
@@ -4756,8 +4665,8 @@ public class RedisClient {
    * @param options Aggregation options
    * @return 
    */
-  public Observable<Long> zinterstoreObservable(String destkey, List<String> sets, AggregateOptions options) { 
-    io.vertx.rx.java.ObservableFuture<Long> handler = io.vertx.rx.java.RxHelper.observableFuture();
+  public Observable<String> zinterstoreObservable(String destkey, List<String> sets, AggregateOptions options) { 
+    io.vertx.rx.java.ObservableFuture<String> handler = io.vertx.rx.java.RxHelper.observableFuture();
     zinterstore(destkey, sets, options, handler.toHandler());
     return handler;
   }
@@ -4770,7 +4679,7 @@ public class RedisClient {
    * @param handler Handler for the result of this call.
    * @return 
    */
-  public RedisClient zinterstoreWeighed(String destkey, Map<String,Double> sets, AggregateOptions options, Handler<AsyncResult<Long>> handler) { 
+  public RedisTransaction zinterstoreWeighed(String destkey, Map<String,Double> sets, AggregateOptions options, Handler<AsyncResult<String>> handler) { 
     delegate.zinterstoreWeighed(destkey, sets, options, handler);
     return this;
   }
@@ -4782,8 +4691,8 @@ public class RedisClient {
    * @param options Aggregation options
    * @return 
    */
-  public Observable<Long> zinterstoreWeighedObservable(String destkey, Map<String,Double> sets, AggregateOptions options) { 
-    io.vertx.rx.java.ObservableFuture<Long> handler = io.vertx.rx.java.RxHelper.observableFuture();
+  public Observable<String> zinterstoreWeighedObservable(String destkey, Map<String,Double> sets, AggregateOptions options) { 
+    io.vertx.rx.java.ObservableFuture<String> handler = io.vertx.rx.java.RxHelper.observableFuture();
     zinterstoreWeighed(destkey, sets, options, handler.toHandler());
     return handler;
   }
@@ -4796,7 +4705,7 @@ public class RedisClient {
    * @param handler Handler for the result of this call.
    * @return 
    */
-  public RedisClient zlexcount(String key, String min, String max, Handler<AsyncResult<Long>> handler) { 
+  public RedisTransaction zlexcount(String key, String min, String max, Handler<AsyncResult<String>> handler) { 
     delegate.zlexcount(key, min, max, handler);
     return this;
   }
@@ -4808,8 +4717,8 @@ public class RedisClient {
    * @param max Pattern to compare against for maximum value
    * @return 
    */
-  public Observable<Long> zlexcountObservable(String key, String min, String max) { 
-    io.vertx.rx.java.ObservableFuture<Long> handler = io.vertx.rx.java.RxHelper.observableFuture();
+  public Observable<String> zlexcountObservable(String key, String min, String max) { 
+    io.vertx.rx.java.ObservableFuture<String> handler = io.vertx.rx.java.RxHelper.observableFuture();
     zlexcount(key, min, max, handler.toHandler());
     return handler;
   }
@@ -4822,7 +4731,7 @@ public class RedisClient {
    * @param handler Handler for the result of this call.
    * @return 
    */
-  public RedisClient zrange(String key, long start, long stop, Handler<AsyncResult<JsonArray>> handler) { 
+  public RedisTransaction zrange(String key, long start, long stop, Handler<AsyncResult<String>> handler) { 
     delegate.zrange(key, start, stop, handler);
     return this;
   }
@@ -4834,8 +4743,8 @@ public class RedisClient {
    * @param stop Stop index for the range - inclusive
    * @return 
    */
-  public Observable<JsonArray> zrangeObservable(String key, long start, long stop) { 
-    io.vertx.rx.java.ObservableFuture<JsonArray> handler = io.vertx.rx.java.RxHelper.observableFuture();
+  public Observable<String> zrangeObservable(String key, long start, long stop) { 
+    io.vertx.rx.java.ObservableFuture<String> handler = io.vertx.rx.java.RxHelper.observableFuture();
     zrange(key, start, stop, handler.toHandler());
     return handler;
   }
@@ -4849,7 +4758,7 @@ public class RedisClient {
    * @param handler Handler for the result of this call.
    * @return 
    */
-  public RedisClient zrangeWithOptions(String key, long start, long stop, RangeOptions options, Handler<AsyncResult<JsonArray>> handler) { 
+  public RedisTransaction zrangeWithOptions(String key, long start, long stop, RangeOptions options, Handler<AsyncResult<String>> handler) { 
     delegate.zrangeWithOptions(key, start, stop, options, handler);
     return this;
   }
@@ -4862,8 +4771,8 @@ public class RedisClient {
    * @param options Range options
    * @return 
    */
-  public Observable<JsonArray> zrangeWithOptionsObservable(String key, long start, long stop, RangeOptions options) { 
-    io.vertx.rx.java.ObservableFuture<JsonArray> handler = io.vertx.rx.java.RxHelper.observableFuture();
+  public Observable<String> zrangeWithOptionsObservable(String key, long start, long stop, RangeOptions options) { 
+    io.vertx.rx.java.ObservableFuture<String> handler = io.vertx.rx.java.RxHelper.observableFuture();
     zrangeWithOptions(key, start, stop, options, handler.toHandler());
     return handler;
   }
@@ -4877,7 +4786,7 @@ public class RedisClient {
    * @param handler Handler for the result of this call.
    * @return 
    */
-  public RedisClient zrangebylex(String key, String min, String max, LimitOptions options, Handler<AsyncResult<JsonArray>> handler) { 
+  public RedisTransaction zrangebylex(String key, String min, String max, LimitOptions options, Handler<AsyncResult<String>> handler) { 
     delegate.zrangebylex(key, min, max, options, handler);
     return this;
   }
@@ -4890,8 +4799,8 @@ public class RedisClient {
    * @param options Limit options where limit can be specified
    * @return 
    */
-  public Observable<JsonArray> zrangebylexObservable(String key, String min, String max, LimitOptions options) { 
-    io.vertx.rx.java.ObservableFuture<JsonArray> handler = io.vertx.rx.java.RxHelper.observableFuture();
+  public Observable<String> zrangebylexObservable(String key, String min, String max, LimitOptions options) { 
+    io.vertx.rx.java.ObservableFuture<String> handler = io.vertx.rx.java.RxHelper.observableFuture();
     zrangebylex(key, min, max, options, handler.toHandler());
     return handler;
   }
@@ -4905,7 +4814,7 @@ public class RedisClient {
    * @param handler Handler for the result of this call.
    * @return 
    */
-  public RedisClient zrangebyscore(String key, String min, String max, RangeLimitOptions options, Handler<AsyncResult<JsonArray>> handler) { 
+  public RedisTransaction zrangebyscore(String key, String min, String max, RangeLimitOptions options, Handler<AsyncResult<String>> handler) { 
     delegate.zrangebyscore(key, min, max, options, handler);
     return this;
   }
@@ -4918,8 +4827,8 @@ public class RedisClient {
    * @param options Range and limit options
    * @return 
    */
-  public Observable<JsonArray> zrangebyscoreObservable(String key, String min, String max, RangeLimitOptions options) { 
-    io.vertx.rx.java.ObservableFuture<JsonArray> handler = io.vertx.rx.java.RxHelper.observableFuture();
+  public Observable<String> zrangebyscoreObservable(String key, String min, String max, RangeLimitOptions options) { 
+    io.vertx.rx.java.ObservableFuture<String> handler = io.vertx.rx.java.RxHelper.observableFuture();
     zrangebyscore(key, min, max, options, handler.toHandler());
     return handler;
   }
@@ -4931,7 +4840,7 @@ public class RedisClient {
    * @param handler Handler for the result of this call.
    * @return 
    */
-  public RedisClient zrank(String key, String member, Handler<AsyncResult<Long>> handler) { 
+  public RedisTransaction zrank(String key, String member, Handler<AsyncResult<String>> handler) { 
     delegate.zrank(key, member, handler);
     return this;
   }
@@ -4942,8 +4851,8 @@ public class RedisClient {
    * @param member Member in the sorted set identified by key
    * @return 
    */
-  public Observable<Long> zrankObservable(String key, String member) { 
-    io.vertx.rx.java.ObservableFuture<Long> handler = io.vertx.rx.java.RxHelper.observableFuture();
+  public Observable<String> zrankObservable(String key, String member) { 
+    io.vertx.rx.java.ObservableFuture<String> handler = io.vertx.rx.java.RxHelper.observableFuture();
     zrank(key, member, handler.toHandler());
     return handler;
   }
@@ -4955,7 +4864,7 @@ public class RedisClient {
    * @param handler Handler for the result of this call.
    * @return 
    */
-  public RedisClient zrem(String key, String member, Handler<AsyncResult<Long>> handler) { 
+  public RedisTransaction zrem(String key, String member, Handler<AsyncResult<String>> handler) { 
     delegate.zrem(key, member, handler);
     return this;
   }
@@ -4966,8 +4875,8 @@ public class RedisClient {
    * @param member Member in the sorted set identified by key
    * @return 
    */
-  public Observable<Long> zremObservable(String key, String member) { 
-    io.vertx.rx.java.ObservableFuture<Long> handler = io.vertx.rx.java.RxHelper.observableFuture();
+  public Observable<String> zremObservable(String key, String member) { 
+    io.vertx.rx.java.ObservableFuture<String> handler = io.vertx.rx.java.RxHelper.observableFuture();
     zrem(key, member, handler.toHandler());
     return handler;
   }
@@ -4979,7 +4888,7 @@ public class RedisClient {
    * @param handler Handler for the result of this call.
    * @return 
    */
-  public RedisClient zremMany(String key, List<String> members, Handler<AsyncResult<Long>> handler) { 
+  public RedisTransaction zremMany(String key, List<String> members, Handler<AsyncResult<String>> handler) { 
     delegate.zremMany(key, members, handler);
     return this;
   }
@@ -4990,8 +4899,8 @@ public class RedisClient {
    * @param members Members in the sorted set identified by key
    * @return 
    */
-  public Observable<Long> zremManyObservable(String key, List<String> members) { 
-    io.vertx.rx.java.ObservableFuture<Long> handler = io.vertx.rx.java.RxHelper.observableFuture();
+  public Observable<String> zremManyObservable(String key, List<String> members) { 
+    io.vertx.rx.java.ObservableFuture<String> handler = io.vertx.rx.java.RxHelper.observableFuture();
     zremMany(key, members, handler.toHandler());
     return handler;
   }
@@ -5004,7 +4913,7 @@ public class RedisClient {
    * @param handler Handler for the result of this call.
    * @return 
    */
-  public RedisClient zremrangebylex(String key, String min, String max, Handler<AsyncResult<Long>> handler) { 
+  public RedisTransaction zremrangebylex(String key, String min, String max, Handler<AsyncResult<String>> handler) { 
     delegate.zremrangebylex(key, min, max, handler);
     return this;
   }
@@ -5016,8 +4925,8 @@ public class RedisClient {
    * @param max Pattern defining a maximum value
    * @return 
    */
-  public Observable<Long> zremrangebylexObservable(String key, String min, String max) { 
-    io.vertx.rx.java.ObservableFuture<Long> handler = io.vertx.rx.java.RxHelper.observableFuture();
+  public Observable<String> zremrangebylexObservable(String key, String min, String max) { 
+    io.vertx.rx.java.ObservableFuture<String> handler = io.vertx.rx.java.RxHelper.observableFuture();
     zremrangebylex(key, min, max, handler.toHandler());
     return handler;
   }
@@ -5030,7 +4939,7 @@ public class RedisClient {
    * @param handler Handler for the result of this call.
    * @return 
    */
-  public RedisClient zremrangebyrank(String key, long start, long stop, Handler<AsyncResult<Long>> handler) { 
+  public RedisTransaction zremrangebyrank(String key, long start, long stop, Handler<AsyncResult<String>> handler) { 
     delegate.zremrangebyrank(key, start, stop, handler);
     return this;
   }
@@ -5042,8 +4951,8 @@ public class RedisClient {
    * @param stop Stop index
    * @return 
    */
-  public Observable<Long> zremrangebyrankObservable(String key, long start, long stop) { 
-    io.vertx.rx.java.ObservableFuture<Long> handler = io.vertx.rx.java.RxHelper.observableFuture();
+  public Observable<String> zremrangebyrankObservable(String key, long start, long stop) { 
+    io.vertx.rx.java.ObservableFuture<String> handler = io.vertx.rx.java.RxHelper.observableFuture();
     zremrangebyrank(key, start, stop, handler.toHandler());
     return handler;
   }
@@ -5056,7 +4965,7 @@ public class RedisClient {
    * @param handler 
    * @return 
    */
-  public RedisClient zremrangebyscore(String key, String min, String max, Handler<AsyncResult<Long>> handler) { 
+  public RedisTransaction zremrangebyscore(String key, String min, String max, Handler<AsyncResult<String>> handler) { 
     delegate.zremrangebyscore(key, min, max, handler);
     return this;
   }
@@ -5068,8 +4977,8 @@ public class RedisClient {
    * @param max Pattern defining a maximum value
    * @return 
    */
-  public Observable<Long> zremrangebyscoreObservable(String key, String min, String max) { 
-    io.vertx.rx.java.ObservableFuture<Long> handler = io.vertx.rx.java.RxHelper.observableFuture();
+  public Observable<String> zremrangebyscoreObservable(String key, String min, String max) { 
+    io.vertx.rx.java.ObservableFuture<String> handler = io.vertx.rx.java.RxHelper.observableFuture();
     zremrangebyscore(key, min, max, handler.toHandler());
     return handler;
   }
@@ -5083,7 +4992,7 @@ public class RedisClient {
    * @param handler Handler for the result of this call.
    * @return 
    */
-  public RedisClient zrevrange(String key, long start, long stop, RangeOptions options, Handler<AsyncResult<JsonArray>> handler) { 
+  public RedisTransaction zrevrange(String key, long start, long stop, RangeOptions options, Handler<AsyncResult<String>> handler) { 
     delegate.zrevrange(key, start, stop, options, handler);
     return this;
   }
@@ -5096,8 +5005,8 @@ public class RedisClient {
    * @param options Range options
    * @return 
    */
-  public Observable<JsonArray> zrevrangeObservable(String key, long start, long stop, RangeOptions options) { 
-    io.vertx.rx.java.ObservableFuture<JsonArray> handler = io.vertx.rx.java.RxHelper.observableFuture();
+  public Observable<String> zrevrangeObservable(String key, long start, long stop, RangeOptions options) { 
+    io.vertx.rx.java.ObservableFuture<String> handler = io.vertx.rx.java.RxHelper.observableFuture();
     zrevrange(key, start, stop, options, handler.toHandler());
     return handler;
   }
@@ -5111,7 +5020,7 @@ public class RedisClient {
    * @param handler Handler for the result of this call.
    * @return 
    */
-  public RedisClient zrevrangebylex(String key, String max, String min, LimitOptions options, Handler<AsyncResult<JsonArray>> handler) { 
+  public RedisTransaction zrevrangebylex(String key, String max, String min, LimitOptions options, Handler<AsyncResult<String>> handler) { 
     delegate.zrevrangebylex(key, max, min, options, handler);
     return this;
   }
@@ -5124,8 +5033,8 @@ public class RedisClient {
    * @param options Limit options
    * @return 
    */
-  public Observable<JsonArray> zrevrangebylexObservable(String key, String max, String min, LimitOptions options) { 
-    io.vertx.rx.java.ObservableFuture<JsonArray> handler = io.vertx.rx.java.RxHelper.observableFuture();
+  public Observable<String> zrevrangebylexObservable(String key, String max, String min, LimitOptions options) { 
+    io.vertx.rx.java.ObservableFuture<String> handler = io.vertx.rx.java.RxHelper.observableFuture();
     zrevrangebylex(key, max, min, options, handler.toHandler());
     return handler;
   }
@@ -5139,7 +5048,7 @@ public class RedisClient {
    * @param handler Handler for the result of this call.
    * @return 
    */
-  public RedisClient zrevrangebyscore(String key, String max, String min, RangeLimitOptions options, Handler<AsyncResult<JsonArray>> handler) { 
+  public RedisTransaction zrevrangebyscore(String key, String max, String min, RangeLimitOptions options, Handler<AsyncResult<String>> handler) { 
     delegate.zrevrangebyscore(key, max, min, options, handler);
     return this;
   }
@@ -5152,8 +5061,8 @@ public class RedisClient {
    * @param options Range and limit options
    * @return 
    */
-  public Observable<JsonArray> zrevrangebyscoreObservable(String key, String max, String min, RangeLimitOptions options) { 
-    io.vertx.rx.java.ObservableFuture<JsonArray> handler = io.vertx.rx.java.RxHelper.observableFuture();
+  public Observable<String> zrevrangebyscoreObservable(String key, String max, String min, RangeLimitOptions options) { 
+    io.vertx.rx.java.ObservableFuture<String> handler = io.vertx.rx.java.RxHelper.observableFuture();
     zrevrangebyscore(key, max, min, options, handler.toHandler());
     return handler;
   }
@@ -5165,7 +5074,7 @@ public class RedisClient {
    * @param handler Handler for the result of this call.
    * @return 
    */
-  public RedisClient zrevrank(String key, String member, Handler<AsyncResult<Long>> handler) { 
+  public RedisTransaction zrevrank(String key, String member, Handler<AsyncResult<String>> handler) { 
     delegate.zrevrank(key, member, handler);
     return this;
   }
@@ -5176,8 +5085,8 @@ public class RedisClient {
    * @param member Member in the sorted set identified by key
    * @return 
    */
-  public Observable<Long> zrevrankObservable(String key, String member) { 
-    io.vertx.rx.java.ObservableFuture<Long> handler = io.vertx.rx.java.RxHelper.observableFuture();
+  public Observable<String> zrevrankObservable(String key, String member) { 
+    io.vertx.rx.java.ObservableFuture<String> handler = io.vertx.rx.java.RxHelper.observableFuture();
     zrevrank(key, member, handler.toHandler());
     return handler;
   }
@@ -5189,7 +5098,7 @@ public class RedisClient {
    * @param handler Handler for the result of this call.
    * @return 
    */
-  public RedisClient zscore(String key, String member, Handler<AsyncResult<String>> handler) { 
+  public RedisTransaction zscore(String key, String member, Handler<AsyncResult<String>> handler) { 
     delegate.zscore(key, member, handler);
     return this;
   }
@@ -5214,7 +5123,7 @@ public class RedisClient {
    * @param handler Handler for the result of this call.
    * @return 
    */
-  public RedisClient zunionstore(String destkey, List<String> sets, AggregateOptions options, Handler<AsyncResult<Long>> handler) { 
+  public RedisTransaction zunionstore(String destkey, List<String> sets, AggregateOptions options, Handler<AsyncResult<String>> handler) { 
     delegate.zunionstore(destkey, sets, options, handler);
     return this;
   }
@@ -5226,8 +5135,8 @@ public class RedisClient {
    * @param options Aggregation options
    * @return 
    */
-  public Observable<Long> zunionstoreObservable(String destkey, List<String> sets, AggregateOptions options) { 
-    io.vertx.rx.java.ObservableFuture<Long> handler = io.vertx.rx.java.RxHelper.observableFuture();
+  public Observable<String> zunionstoreObservable(String destkey, List<String> sets, AggregateOptions options) { 
+    io.vertx.rx.java.ObservableFuture<String> handler = io.vertx.rx.java.RxHelper.observableFuture();
     zunionstore(destkey, sets, options, handler.toHandler());
     return handler;
   }
@@ -5240,7 +5149,7 @@ public class RedisClient {
    * @param handler Handler for the result of this call.
    * @return 
    */
-  public RedisClient zunionstoreWeighed(String key, Map<String,Double> sets, AggregateOptions options, Handler<AsyncResult<Long>> handler) { 
+  public RedisTransaction zunionstoreWeighed(String key, Map<String,Double> sets, AggregateOptions options, Handler<AsyncResult<String>> handler) { 
     delegate.zunionstoreWeighed(key, sets, options, handler);
     return this;
   }
@@ -5252,8 +5161,8 @@ public class RedisClient {
    * @param options Aggregation options
    * @return 
    */
-  public Observable<Long> zunionstoreWeighedObservable(String key, Map<String,Double> sets, AggregateOptions options) { 
-    io.vertx.rx.java.ObservableFuture<Long> handler = io.vertx.rx.java.RxHelper.observableFuture();
+  public Observable<String> zunionstoreWeighedObservable(String key, Map<String,Double> sets, AggregateOptions options) { 
+    io.vertx.rx.java.ObservableFuture<String> handler = io.vertx.rx.java.RxHelper.observableFuture();
     zunionstoreWeighed(key, sets, options, handler.toHandler());
     return handler;
   }
@@ -5265,7 +5174,7 @@ public class RedisClient {
    * @param handler Handler for the result of this call.
    * @return 
    */
-  public RedisClient scan(String cursor, ScanOptions options, Handler<AsyncResult<JsonArray>> handler) { 
+  public RedisTransaction scan(String cursor, ScanOptions options, Handler<AsyncResult<String>> handler) { 
     delegate.scan(cursor, options, handler);
     return this;
   }
@@ -5276,8 +5185,8 @@ public class RedisClient {
    * @param options Scan options
    * @return 
    */
-  public Observable<JsonArray> scanObservable(String cursor, ScanOptions options) { 
-    io.vertx.rx.java.ObservableFuture<JsonArray> handler = io.vertx.rx.java.RxHelper.observableFuture();
+  public Observable<String> scanObservable(String cursor, ScanOptions options) { 
+    io.vertx.rx.java.ObservableFuture<String> handler = io.vertx.rx.java.RxHelper.observableFuture();
     scan(cursor, options, handler.toHandler());
     return handler;
   }
@@ -5290,7 +5199,7 @@ public class RedisClient {
    * @param handler Handler for the result of this call.
    * @return 
    */
-  public RedisClient sscan(String key, String cursor, ScanOptions options, Handler<AsyncResult<JsonArray>> handler) { 
+  public RedisTransaction sscan(String key, String cursor, ScanOptions options, Handler<AsyncResult<String>> handler) { 
     delegate.sscan(key, cursor, options, handler);
     return this;
   }
@@ -5302,8 +5211,8 @@ public class RedisClient {
    * @param options Scan options
    * @return 
    */
-  public Observable<JsonArray> sscanObservable(String key, String cursor, ScanOptions options) { 
-    io.vertx.rx.java.ObservableFuture<JsonArray> handler = io.vertx.rx.java.RxHelper.observableFuture();
+  public Observable<String> sscanObservable(String key, String cursor, ScanOptions options) { 
+    io.vertx.rx.java.ObservableFuture<String> handler = io.vertx.rx.java.RxHelper.observableFuture();
     sscan(key, cursor, options, handler.toHandler());
     return handler;
   }
@@ -5316,7 +5225,7 @@ public class RedisClient {
    * @param handler Handler for the result of this call.
    * @return 
    */
-  public RedisClient hscan(String key, String cursor, ScanOptions options, Handler<AsyncResult<JsonArray>> handler) { 
+  public RedisTransaction hscan(String key, String cursor, ScanOptions options, Handler<AsyncResult<String>> handler) { 
     delegate.hscan(key, cursor, options, handler);
     return this;
   }
@@ -5328,8 +5237,8 @@ public class RedisClient {
    * @param options Scan options
    * @return 
    */
-  public Observable<JsonArray> hscanObservable(String key, String cursor, ScanOptions options) { 
-    io.vertx.rx.java.ObservableFuture<JsonArray> handler = io.vertx.rx.java.RxHelper.observableFuture();
+  public Observable<String> hscanObservable(String key, String cursor, ScanOptions options) { 
+    io.vertx.rx.java.ObservableFuture<String> handler = io.vertx.rx.java.RxHelper.observableFuture();
     hscan(key, cursor, options, handler.toHandler());
     return handler;
   }
@@ -5342,7 +5251,7 @@ public class RedisClient {
    * @param handler Handler for the result of this call.
    * @return 
    */
-  public RedisClient zscan(String key, String cursor, ScanOptions options, Handler<AsyncResult<JsonArray>> handler) { 
+  public RedisTransaction zscan(String key, String cursor, ScanOptions options, Handler<AsyncResult<String>> handler) { 
     delegate.zscan(key, cursor, options, handler);
     return this;
   }
@@ -5354,8 +5263,8 @@ public class RedisClient {
    * @param options Scan options
    * @return 
    */
-  public Observable<JsonArray> zscanObservable(String key, String cursor, ScanOptions options) { 
-    io.vertx.rx.java.ObservableFuture<JsonArray> handler = io.vertx.rx.java.RxHelper.observableFuture();
+  public Observable<String> zscanObservable(String key, String cursor, ScanOptions options) { 
+    io.vertx.rx.java.ObservableFuture<String> handler = io.vertx.rx.java.RxHelper.observableFuture();
     zscan(key, cursor, options, handler.toHandler());
     return handler;
   }
@@ -5369,7 +5278,7 @@ public class RedisClient {
    * @param handler Handler for the result of this call.
    * @return 
    */
-  public RedisClient geoadd(String key, double longitude, double latitude, String member, Handler<AsyncResult<Long>> handler) { 
+  public RedisTransaction geoadd(String key, double longitude, double latitude, String member, Handler<AsyncResult<String>> handler) { 
     delegate.geoadd(key, longitude, latitude, member, handler);
     return this;
   }
@@ -5382,8 +5291,8 @@ public class RedisClient {
    * @param member member
    * @return 
    */
-  public Observable<Long> geoaddObservable(String key, double longitude, double latitude, String member) { 
-    io.vertx.rx.java.ObservableFuture<Long> handler = io.vertx.rx.java.RxHelper.observableFuture();
+  public Observable<String> geoaddObservable(String key, double longitude, double latitude, String member) { 
+    io.vertx.rx.java.ObservableFuture<String> handler = io.vertx.rx.java.RxHelper.observableFuture();
     geoadd(key, longitude, latitude, member, handler.toHandler());
     return handler;
   }
@@ -5395,7 +5304,7 @@ public class RedisClient {
    * @param handler Handler for the result of this call.
    * @return 
    */
-  public RedisClient geoaddMany(String key, List<GeoMember> members, Handler<AsyncResult<Long>> handler) { 
+  public RedisTransaction geoaddMany(String key, List<GeoMember> members, Handler<AsyncResult<String>> handler) { 
     delegate.geoaddMany(key, members, handler);
     return this;
   }
@@ -5406,8 +5315,8 @@ public class RedisClient {
    * @param members list of &lt;lon, lat, member&gt;
    * @return 
    */
-  public Observable<Long> geoaddManyObservable(String key, List<GeoMember> members) { 
-    io.vertx.rx.java.ObservableFuture<Long> handler = io.vertx.rx.java.RxHelper.observableFuture();
+  public Observable<String> geoaddManyObservable(String key, List<GeoMember> members) { 
+    io.vertx.rx.java.ObservableFuture<String> handler = io.vertx.rx.java.RxHelper.observableFuture();
     geoaddMany(key, members, handler.toHandler());
     return handler;
   }
@@ -5420,7 +5329,7 @@ public class RedisClient {
    * @param handler Handler for the result of this call.
    * @return 
    */
-  public RedisClient geohash(String key, String member, Handler<AsyncResult<JsonArray>> handler) { 
+  public RedisTransaction geohash(String key, String member, Handler<AsyncResult<String>> handler) { 
     delegate.geohash(key, member, handler);
     return this;
   }
@@ -5432,8 +5341,8 @@ public class RedisClient {
    * @param member member
    * @return 
    */
-  public Observable<JsonArray> geohashObservable(String key, String member) { 
-    io.vertx.rx.java.ObservableFuture<JsonArray> handler = io.vertx.rx.java.RxHelper.observableFuture();
+  public Observable<String> geohashObservable(String key, String member) { 
+    io.vertx.rx.java.ObservableFuture<String> handler = io.vertx.rx.java.RxHelper.observableFuture();
     geohash(key, member, handler.toHandler());
     return handler;
   }
@@ -5446,7 +5355,7 @@ public class RedisClient {
    * @param handler Handler for the result of this call.
    * @return 
    */
-  public RedisClient geohashMany(String key, List<String> members, Handler<AsyncResult<JsonArray>> handler) { 
+  public RedisTransaction geohashMany(String key, List<String> members, Handler<AsyncResult<String>> handler) { 
     delegate.geohashMany(key, members, handler);
     return this;
   }
@@ -5458,8 +5367,8 @@ public class RedisClient {
    * @param members list of members
    * @return 
    */
-  public Observable<JsonArray> geohashManyObservable(String key, List<String> members) { 
-    io.vertx.rx.java.ObservableFuture<JsonArray> handler = io.vertx.rx.java.RxHelper.observableFuture();
+  public Observable<String> geohashManyObservable(String key, List<String> members) { 
+    io.vertx.rx.java.ObservableFuture<String> handler = io.vertx.rx.java.RxHelper.observableFuture();
     geohashMany(key, members, handler.toHandler());
     return handler;
   }
@@ -5472,7 +5381,7 @@ public class RedisClient {
    * @param handler Handler for the result of this call.
    * @return 
    */
-  public RedisClient geopos(String key, String member, Handler<AsyncResult<JsonArray>> handler) { 
+  public RedisTransaction geopos(String key, String member, Handler<AsyncResult<String>> handler) { 
     delegate.geopos(key, member, handler);
     return this;
   }
@@ -5484,8 +5393,8 @@ public class RedisClient {
    * @param member member
    * @return 
    */
-  public Observable<JsonArray> geoposObservable(String key, String member) { 
-    io.vertx.rx.java.ObservableFuture<JsonArray> handler = io.vertx.rx.java.RxHelper.observableFuture();
+  public Observable<String> geoposObservable(String key, String member) { 
+    io.vertx.rx.java.ObservableFuture<String> handler = io.vertx.rx.java.RxHelper.observableFuture();
     geopos(key, member, handler.toHandler());
     return handler;
   }
@@ -5498,7 +5407,7 @@ public class RedisClient {
    * @param handler Handler for the result of this call.
    * @return 
    */
-  public RedisClient geoposMany(String key, List<String> members, Handler<AsyncResult<JsonArray>> handler) { 
+  public RedisTransaction geoposMany(String key, List<String> members, Handler<AsyncResult<String>> handler) { 
     delegate.geoposMany(key, members, handler);
     return this;
   }
@@ -5510,8 +5419,8 @@ public class RedisClient {
    * @param members list of members
    * @return 
    */
-  public Observable<JsonArray> geoposManyObservable(String key, List<String> members) { 
-    io.vertx.rx.java.ObservableFuture<JsonArray> handler = io.vertx.rx.java.RxHelper.observableFuture();
+  public Observable<String> geoposManyObservable(String key, List<String> members) { 
+    io.vertx.rx.java.ObservableFuture<String> handler = io.vertx.rx.java.RxHelper.observableFuture();
     geoposMany(key, members, handler.toHandler());
     return handler;
   }
@@ -5524,7 +5433,7 @@ public class RedisClient {
    * @param handler Handler for the result of this call.
    * @return 
    */
-  public RedisClient geodist(String key, String member1, String member2, Handler<AsyncResult<String>> handler) { 
+  public RedisTransaction geodist(String key, String member1, String member2, Handler<AsyncResult<String>> handler) { 
     delegate.geodist(key, member1, member2, handler);
     return this;
   }
@@ -5551,7 +5460,7 @@ public class RedisClient {
    * @param handler Handler for the result of this call.
    * @return 
    */
-  public RedisClient geodistWithUnit(String key, String member1, String member2, GeoUnit unit, Handler<AsyncResult<String>> handler) { 
+  public RedisTransaction geodistWithUnit(String key, String member1, String member2, GeoUnit unit, Handler<AsyncResult<String>> handler) { 
     delegate.geodistWithUnit(key, member1, member2, unit, handler);
     return this;
   }
@@ -5581,7 +5490,7 @@ public class RedisClient {
    * @param handler Handler for the result of this call.
    * @return 
    */
-  public RedisClient georadius(String key, double longitude, double latitude, double radius, GeoUnit unit, Handler<AsyncResult<JsonArray>> handler) { 
+  public RedisTransaction georadius(String key, double longitude, double latitude, double radius, GeoUnit unit, Handler<AsyncResult<String>> handler) { 
     delegate.georadius(key, longitude, latitude, radius, unit, handler);
     return this;
   }
@@ -5596,8 +5505,8 @@ public class RedisClient {
    * @param unit geo unit
    * @return 
    */
-  public Observable<JsonArray> georadiusObservable(String key, double longitude, double latitude, double radius, GeoUnit unit) { 
-    io.vertx.rx.java.ObservableFuture<JsonArray> handler = io.vertx.rx.java.RxHelper.observableFuture();
+  public Observable<String> georadiusObservable(String key, double longitude, double latitude, double radius, GeoUnit unit) { 
+    io.vertx.rx.java.ObservableFuture<String> handler = io.vertx.rx.java.RxHelper.observableFuture();
     georadius(key, longitude, latitude, radius, unit, handler.toHandler());
     return handler;
   }
@@ -5614,7 +5523,7 @@ public class RedisClient {
    * @param handler Handler for the result of this call.
    * @return 
    */
-  public RedisClient georadiusWithOptions(String key, double longitude, double latitude, double radius, GeoUnit unit, GeoRadiusOptions options, Handler<AsyncResult<JsonArray>> handler) { 
+  public RedisTransaction georadiusWithOptions(String key, double longitude, double latitude, double radius, GeoUnit unit, GeoRadiusOptions options, Handler<AsyncResult<String>> handler) { 
     delegate.georadiusWithOptions(key, longitude, latitude, radius, unit, options, handler);
     return this;
   }
@@ -5630,8 +5539,8 @@ public class RedisClient {
    * @param options geo radius options
    * @return 
    */
-  public Observable<JsonArray> georadiusWithOptionsObservable(String key, double longitude, double latitude, double radius, GeoUnit unit, GeoRadiusOptions options) { 
-    io.vertx.rx.java.ObservableFuture<JsonArray> handler = io.vertx.rx.java.RxHelper.observableFuture();
+  public Observable<String> georadiusWithOptionsObservable(String key, double longitude, double latitude, double radius, GeoUnit unit, GeoRadiusOptions options) { 
+    io.vertx.rx.java.ObservableFuture<String> handler = io.vertx.rx.java.RxHelper.observableFuture();
     georadiusWithOptions(key, longitude, latitude, radius, unit, options, handler.toHandler());
     return handler;
   }
@@ -5647,7 +5556,7 @@ public class RedisClient {
    * @param handler Handler for the result of this call.
    * @return 
    */
-  public RedisClient georadiusbymember(String key, String member, double radius, GeoUnit unit, Handler<AsyncResult<JsonArray>> handler) { 
+  public RedisTransaction georadiusbymember(String key, String member, double radius, GeoUnit unit, Handler<AsyncResult<String>> handler) { 
     delegate.georadiusbymember(key, member, radius, unit, handler);
     return this;
   }
@@ -5662,8 +5571,8 @@ public class RedisClient {
    * @param unit geo unit
    * @return 
    */
-  public Observable<JsonArray> georadiusbymemberObservable(String key, String member, double radius, GeoUnit unit) { 
-    io.vertx.rx.java.ObservableFuture<JsonArray> handler = io.vertx.rx.java.RxHelper.observableFuture();
+  public Observable<String> georadiusbymemberObservable(String key, String member, double radius, GeoUnit unit) { 
+    io.vertx.rx.java.ObservableFuture<String> handler = io.vertx.rx.java.RxHelper.observableFuture();
     georadiusbymember(key, member, radius, unit, handler.toHandler());
     return handler;
   }
@@ -5680,7 +5589,7 @@ public class RedisClient {
    * @param handler Handler for the result of this call.
    * @return 
    */
-  public RedisClient georadiusbymemberWithOptions(String key, String member, double radius, GeoUnit unit, GeoRadiusOptions options, Handler<AsyncResult<JsonArray>> handler) { 
+  public RedisTransaction georadiusbymemberWithOptions(String key, String member, double radius, GeoUnit unit, GeoRadiusOptions options, Handler<AsyncResult<String>> handler) { 
     delegate.georadiusbymemberWithOptions(key, member, radius, unit, options, handler);
     return this;
   }
@@ -5696,14 +5605,14 @@ public class RedisClient {
    * @param options geo radius options
    * @return 
    */
-  public Observable<JsonArray> georadiusbymemberWithOptionsObservable(String key, String member, double radius, GeoUnit unit, GeoRadiusOptions options) { 
-    io.vertx.rx.java.ObservableFuture<JsonArray> handler = io.vertx.rx.java.RxHelper.observableFuture();
+  public Observable<String> georadiusbymemberWithOptionsObservable(String key, String member, double radius, GeoUnit unit, GeoRadiusOptions options) { 
+    io.vertx.rx.java.ObservableFuture<String> handler = io.vertx.rx.java.RxHelper.observableFuture();
     georadiusbymemberWithOptions(key, member, radius, unit, options, handler.toHandler());
     return handler;
   }
 
 
-  public static RedisClient newInstance(io.vertx.redis.RedisClient arg) {
-    return arg != null ? new RedisClient(arg) : null;
+  public static RedisTransaction newInstance(io.vertx.redis.RedisTransaction arg) {
+    return arg != null ? new RedisTransaction(arg) : null;
   }
 }

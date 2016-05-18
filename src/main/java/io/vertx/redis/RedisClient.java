@@ -2573,7 +2573,7 @@ public interface RedisClient {
    * @param latitude latitude
    * @param member member
    * @param handler Handler for the result of this call.
-   * @since Beta
+   * @since Redis 3.2.0
    * group: geo
    */
   @Fluent
@@ -2585,7 +2585,7 @@ public interface RedisClient {
    * @param key     Key string
    * @param members  list of &lt;lon, lat, member&gt;
    * @param handler Handler for the result of this call.
-   * @since Beta
+   * @since Redis 3.2.0
    * group: geo
    */
   @Fluent
@@ -2598,7 +2598,7 @@ public interface RedisClient {
    * @param key     Key string
    * @param member member
    * @param handler Handler for the result of this call.
-   * @since Beta
+   * @since Redis 3.2.0
    * group: geo
    */
   @Fluent
@@ -2611,7 +2611,7 @@ public interface RedisClient {
    * @param key     Key string
    * @param members  list of members
    * @param handler Handler for the result of this call.
-   * @since Beta
+   * @since Redis 3.2.0
    * group: geo
    */
   @Fluent
@@ -2624,7 +2624,7 @@ public interface RedisClient {
    * @param key     Key string
    * @param member member
    * @param handler Handler for the result of this call.
-   * @since Beta
+   * @since Redis 3.2.0
    * group: geo
    */
   @Fluent
@@ -2637,7 +2637,7 @@ public interface RedisClient {
    * @param key     Key string
    * @param members  list of members
    * @param handler Handler for the result of this call.
-   * @since Beta
+   * @since Redis 3.2.0
    * group: geo
    */
   @Fluent
@@ -2650,7 +2650,7 @@ public interface RedisClient {
    * @param member1 member 1
    * @param member2 member 2
    * @param handler Handler for the result of this call.
-   * @since Beta
+   * @since Redis 3.2.0
    * group: geo
    */
   @Fluent
@@ -2664,7 +2664,7 @@ public interface RedisClient {
    * @param member2 member 2
    * @param unit geo unit
    * @param handler Handler for the result of this call.
-   * @since Beta
+   * @since Redis 3.2.0
    * group: geo
    */
   @Fluent
@@ -2680,7 +2680,7 @@ public interface RedisClient {
    * @param radius radius
    * @param unit geo unit
    * @param handler Handler for the result of this call.
-   * @since Beta
+   * @since Redis 3.2.0
    * group: geo
    */
   @Fluent
@@ -2697,7 +2697,7 @@ public interface RedisClient {
    * @param unit geo unit
    * @param options geo radius options
    * @param handler Handler for the result of this call.
-   * @since Beta
+   * @since Redis 3.2.0
    * group: geo
    */
   @Fluent
@@ -2713,7 +2713,7 @@ public interface RedisClient {
    * @param radius radius
    * @param unit geo unit
    * @param handler Handler for the result of this call.
-   * @since Beta
+   * @since Redis 3.2.0
    * group: geo
    */
   @Fluent
@@ -2730,7 +2730,7 @@ public interface RedisClient {
    * @param unit geo unit
    * @param options geo radius options
    * @param handler Handler for the result of this call.
-   * @since Beta
+   * @since Redis 3.2.0
    * group: geo
    */
   @Fluent

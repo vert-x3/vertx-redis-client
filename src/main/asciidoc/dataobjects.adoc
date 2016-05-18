@@ -1,5 +1,40 @@
 = Cheatsheets
 
+[[GeoMember]]
+== GeoMember
+
+++++
+ @author <a href="mailto:plopes@redhat.com">Paulo Lopes</a>
+++++
+'''
+
+[cols=">25%,^25%,50%"]
+[frame="topbot"]
+|===
+^|Name | Type ^| Description
+|[[latitude]]`latitude`|`Number (Double)`|-
+|[[longitude]]`longitude`|`Number (Double)`|-
+|[[member]]`member`|`String`|-
+|===
+
+[[GeoRadiusOptions]]
+== GeoRadiusOptions
+
+++++
+ @author <a href="mailto:plopes@redhat.com">Paulo Lopes</a>
+++++
+'''
+
+[cols=">25%,^25%,50%"]
+[frame="topbot"]
+|===
+^|Name | Type ^| Description
+|[[count]]`count`|`Number (Long)`|-
+|[[withCoord]]`withCoord`|`Boolean`|-
+|[[withDist]]`withDist`|`Boolean`|-
+|[[withHash]]`withHash`|`Boolean`|-
+|===
+
 [[KillFilter]]
 == KillFilter
 

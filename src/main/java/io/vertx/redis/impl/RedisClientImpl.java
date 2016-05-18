@@ -1388,6 +1388,78 @@ public final class RedisClientImpl extends AbstractRedisClient {
       sendString(ZSCAN, toPayload(key, cursor, options != null ? options.toJsonArray() : null), handler);
       return this;
     }
+
+    @Override
+    public RedisTransaction geoadd(String key, double longitude, double latitude, String member, Handler<AsyncResult<String>> handler) {
+      sendString(GEOADD, toPayload(key, longitude, latitude, member), handler);
+      return this;
+    }
+
+    @Override
+    public RedisTransaction geoaddMany(String key, List<GeoMember> members, Handler<AsyncResult<String>> handler) {
+      sendString(GEOADD, toPayload(key, members), handler);
+      return this;
+    }
+
+    @Override
+    public RedisTransaction geohash(String key, String member, Handler<AsyncResult<String>> handler) {
+      sendString(GEOHASH, toPayload(key, member), handler);
+      return this;
+    }
+
+    @Override
+    public RedisTransaction geohashMany(String key, List<String> members, Handler<AsyncResult<String>> handler) {
+      sendString(GEOHASH, toPayload(key, members), handler);
+      return this;
+    }
+
+    @Override
+    public RedisTransaction geopos(String key, String member, Handler<AsyncResult<String>> handler) {
+      sendString(GEOPOS, toPayload(key, member), handler);
+      return this;
+    }
+
+    @Override
+    public RedisTransaction geoposMany(String key, List<String> members, Handler<AsyncResult<String>> handler) {
+      sendString(GEOPOS, toPayload(key, members), handler);
+      return this;
+    }
+
+    @Override
+    public RedisTransaction geodist(String key, String member1, String member2, Handler<AsyncResult<String>> handler) {
+      sendString(GEODIST, toPayload(key, member1, member2), handler);
+      return this;
+    }
+
+    @Override
+    public RedisTransaction geodistWithUnit(String key, String member1, String member2, GeoUnit unit, Handler<AsyncResult<String>> handler) {
+      sendString(GEODIST, toPayload(key, member1, member2, unit), handler);
+      return this;
+    }
+
+    @Override
+    public RedisTransaction georadius(String key, double longitude, double latitude, double radius, GeoUnit unit, Handler<AsyncResult<String>> handler) {
+      sendString(GEORADIUS, toPayload(key, longitude, latitude, radius, unit), handler);
+      return this;
+    }
+
+    @Override
+    public RedisTransaction georadiusWithOptions(String key, double longitude, double latitude, double radius, GeoUnit unit, GeoRadiusOptions options, Handler<AsyncResult<String>> handler) {
+      sendString(GEORADIUS, toPayload(key, longitude, latitude, radius, unit, options != null ? options.toJsonArray() : null), handler);
+      return this;
+    }
+
+    @Override
+    public RedisTransaction georadiusbymember(String key, String member, double radius, GeoUnit unit, Handler<AsyncResult<String>> handler) {
+      sendString(GEORADIUSBYMEMBER, toPayload(key, member, radius, unit), handler);
+      return this;
+    }
+
+    @Override
+    public RedisTransaction georadiusbymemberWithOptions(String key, String member, double radius, GeoUnit unit, GeoRadiusOptions options, Handler<AsyncResult<String>> handler) {
+      sendString(GEORADIUSBYMEMBER, toPayload(key, member, radius, unit, options != null ? options.toJsonArray() : null), handler);
+      return this;
+    }
   }
 
   public RedisClientImpl(Vertx vertx, RedisOptions config) {

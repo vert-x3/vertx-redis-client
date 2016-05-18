@@ -52,6 +52,24 @@
 |[[TAKEOVER]]`TAKEOVER`|-
 |===
 
+[[GeoUnit]]
+== GeoUnit
+
+++++
+ @author <a href="mailto:plopes@redhat.com">Paulo Lopes</a>
+++++
+'''
+
+[cols=">25%,75%"]
+[frame="topbot"]
+|===
+^|Name | Description
+|[[m]]`m`|-
+|[[km]]`km`|-
+|[[mi]]`mi`|-
+|[[ft]]`ft`|-
+|===
+
 [[InsertOptions]]
 == InsertOptions
 
