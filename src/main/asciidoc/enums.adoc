@@ -18,22 +18,6 @@
 |[[MAX]]`MAX`|-
 |===
 
-[[ResetOptions]]
-== ResetOptions
-
-++++
- @author <a href="mailto:pmlopes@gmail.com">Paulo Lopes</a>
-++++
-'''
-
-[cols=">25%,75%"]
-[frame="topbot"]
-|===
-^|Name | Description
-|[[HARD]]`HARD`|-
-|[[SOFT]]`SOFT`|-
-|===
-
 [[BitOperation]]
 == BitOperation
 
@@ -50,6 +34,38 @@
 |[[OR]]`OR`|-
 |[[XOR]]`XOR`|-
 |[[NOT]]`NOT`|-
+|===
+
+[[FailoverOptions]]
+== FailoverOptions
+
+++++
+ @author <a href="mailto:pmlopes@gmail.com">Paulo Lopes</a>
+++++
+'''
+
+[cols=">25%,75%"]
+[frame="topbot"]
+|===
+^|Name | Description
+|[[FORCE]]`FORCE`|-
+|[[TAKEOVER]]`TAKEOVER`|-
+|===
+
+[[InsertOptions]]
+== InsertOptions
+
+++++
+ @author <a href="mailto:marko.strukelj@gmail.com">Marko Strukelj</a>
+++++
+'''
+
+[cols=">25%,75%"]
+[frame="topbot"]
+|===
+^|Name | Description
+|[[BEFORE]]`BEFORE`|-
+|[[AFTER]]`AFTER`|-
 |===
 
 [[ObjectCmd]]
@@ -69,11 +85,11 @@
 |[[IDLETIME]]`IDLETIME`|-
 |===
 
-[[GeoUnit]]
-== GeoUnit
+[[RangeOptions]]
+== RangeOptions
 
 ++++
- @author <a href="mailto:plopes@redhat.com">Paulo Lopes</a>
+ @author <a href="mailto:marko.strukelj@gmail.com">Marko Strukelj</a>
 ++++
 '''
 
@@ -81,10 +97,24 @@
 [frame="topbot"]
 |===
 ^|Name | Description
-|[[m]]`m`|-
-|[[km]]`km`|-
-|[[mi]]`mi`|-
-|[[ft]]`ft`|-
+|[[NONE]]`NONE`|-
+|[[WITHSCORES]]`WITHSCORES`|-
+|===
+
+[[ResetOptions]]
+== ResetOptions
+
+++++
+ @author <a href="mailto:pmlopes@gmail.com">Paulo Lopes</a>
+++++
+'''
+
+[cols=">25%,75%"]
+[frame="topbot"]
+|===
+^|Name | Description
+|[[HARD]]`HARD`|-
+|[[SOFT]]`SOFT`|-
 |===
 
 [[ShutdownOptions]]
@@ -104,22 +134,6 @@
 |[[NOSAVE]]`NOSAVE`|-
 |===
 
-[[FailoverOptions]]
-== FailoverOptions
-
-++++
- @author <a href="mailto:pmlopes@gmail.com">Paulo Lopes</a>
-++++
-'''
-
-[cols=">25%,75%"]
-[frame="topbot"]
-|===
-^|Name | Description
-|[[FORCE]]`FORCE`|-
-|[[TAKEOVER]]`TAKEOVER`|-
-|===
-
 [[SlotCmd]]
 == SlotCmd
 
@@ -136,37 +150,5 @@
 |[[MIGRATING]]`MIGRATING`|-
 |[[STABLE]]`STABLE`|-
 |[[NODE]]`NODE`|-
-|===
-
-[[RangeOptions]]
-== RangeOptions
-
-++++
- @author <a href="mailto:marko.strukelj@gmail.com">Marko Strukelj</a>
-++++
-'''
-
-[cols=">25%,75%"]
-[frame="topbot"]
-|===
-^|Name | Description
-|[[NONE]]`NONE`|-
-|[[WITHSCORES]]`WITHSCORES`|-
-|===
-
-[[InsertOptions]]
-== InsertOptions
-
-++++
- @author <a href="mailto:marko.strukelj@gmail.com">Marko Strukelj</a>
-++++
-'''
-
-[cols=">25%,75%"]
-[frame="topbot"]
-|===
-^|Name | Description
-|[[BEFORE]]`BEFORE`|-
-|[[AFTER]]`AFTER`|-
 |===
 

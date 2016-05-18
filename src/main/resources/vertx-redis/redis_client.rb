@@ -1,3 +1,4 @@
+require 'vertx-redis/redis_transaction'
 require 'vertx/buffer'
 require 'vertx/vertx'
 require 'vertx/util/utils.rb'
@@ -673,16 +674,6 @@ module VertxRedis
       end
       raise ArgumentError, "Invalid arguments when calling del_many(keys)"
     end
-    #  Discard all commands issued after MULTI
-    # @yield 
-    # @return [self]
-    def discard
-      if block_given?
-        @j_del.java_method(:discard, [Java::IoVertxCore::Handler.java_class]).call((Proc.new { |ar| yield(ar.failed ? ar.cause : nil, ar.succeeded ? ar.result : nil) }))
-        return self
-      end
-      raise ArgumentError, "Invalid arguments when calling discard()"
-    end
     #  Return a serialized version of the value stored at the specified key.
     # @param [String] key Key string
     # @yield Handler for the result of this call.
@@ -738,16 +729,6 @@ module VertxRedis
         return self
       end
       raise ArgumentError, "Invalid arguments when calling evalsha(sha1,keys,values)"
-    end
-    #  Execute all commands issued after MULTI
-    # @yield 
-    # @return [self]
-    def exec
-      if block_given?
-        @j_del.java_method(:exec, [Java::IoVertxCore::Handler.java_class]).call((Proc.new { |ar| yield(ar.failed ? ar.cause : nil, ar.succeeded ? ar.result != nil ? JSON.parse(ar.result.encode) : nil : nil) }))
-        return self
-      end
-      raise ArgumentError, "Invalid arguments when calling exec()"
     end
     #  Determine if a key exists
     # @param [String] key Key string
@@ -1326,16 +1307,6 @@ module VertxRedis
       end
       raise ArgumentError, "Invalid arguments when calling msetnx(keyvals)"
     end
-    #  Mark the start of a transaction block
-    # @yield 
-    # @return [self]
-    def multi
-      if block_given?
-        @j_del.java_method(:multi, [Java::IoVertxCore::Handler.java_class]).call((Proc.new { |ar| yield(ar.failed ? ar.cause : nil, ar.succeeded ? ar.result : nil) }))
-        return self
-      end
-      raise ArgumentError, "Invalid arguments when calling multi()"
-    end
     #  Inspect the internals of Redis objects
     # @param [String] key Key string
     # @param [:REFCOUNT,:ENCODING,:IDLETIME] cmd Object sub command
@@ -1822,7 +1793,7 @@ module VertxRedis
     # @return [self]
     def set_with_options(key=nil,value=nil,options=nil)
       if key.class == String && value.class == String && options.class == Hash && block_given?
-        @j_del.java_method(:setWithOptions, [Java::java.lang.String.java_class,Java::java.lang.String.java_class,Java::IoVertxRedisOp::SetOptions.java_class,Java::IoVertxCore::Handler.java_class]).call(key,value,Java::IoVertxRedisOp::SetOptions.new(::Vertx::Util::Utils.to_json_object(options)),(Proc.new { |ar| yield(ar.failed ? ar.cause : nil) }))
+        @j_del.java_method(:setWithOptions, [Java::java.lang.String.java_class,Java::java.lang.String.java_class,Java::IoVertxRedisOp::SetOptions.java_class,Java::IoVertxCore::Handler.java_class]).call(key,value,Java::IoVertxRedisOp::SetOptions.new(::Vertx::Util::Utils.to_json_object(options)),(Proc.new { |ar| yield(ar.failed ? ar.cause : nil, ar.succeeded ? ar.result : nil) }))
         return self
       end
       raise ArgumentError, "Invalid arguments when calling set_with_options(key,value,options)"
@@ -2173,6 +2144,14 @@ module VertxRedis
       end
       raise ArgumentError, "Invalid arguments when calling time()"
     end
+    #  Return a RedisTransaction instance
+    # @return [::VertxRedis::RedisTransaction] transaction instance
+    def transaction
+      if !block_given?
+        return ::Vertx::Util::Utils.safe_create(@j_del.java_method(:transaction, []).call(),::VertxRedis::RedisTransaction)
+      end
+      raise ArgumentError, "Invalid arguments when calling transaction()"
+    end
     #  Get the time to live for a key
     # @param [String] key Key string
     # @yield Handler for the result of this call.
@@ -2206,16 +2185,6 @@ module VertxRedis
       end
       raise ArgumentError, "Invalid arguments when calling unsubscribe(channels)"
     end
-    #  Forget about all watched keys
-    # @yield 
-    # @return [self]
-    def unwatch
-      if block_given?
-        @j_del.java_method(:unwatch, [Java::IoVertxCore::Handler.java_class]).call((Proc.new { |ar| yield(ar.failed ? ar.cause : nil, ar.succeeded ? ar.result : nil) }))
-        return self
-      end
-      raise ArgumentError, "Invalid arguments when calling unwatch()"
-    end
     #  Wait for the synchronous replication of all the write commands sent in the context of the current connection.
     # @param [Fixnum] numSlaves 
     # @param [Fixnum] timeout 
@@ -2227,28 +2196,6 @@ module VertxRedis
         return self
       end
       raise ArgumentError, "Invalid arguments when calling wait(numSlaves,timeout)"
-    end
-    #  Watch the given keys to determine execution of the MULTI/EXEC block
-    # @param [String] key Key to watch
-    # @yield Handler for the result of this call.
-    # @return [self]
-    def watch(key=nil)
-      if key.class == String && block_given?
-        @j_del.java_method(:watch, [Java::java.lang.String.java_class,Java::IoVertxCore::Handler.java_class]).call(key,(Proc.new { |ar| yield(ar.failed ? ar.cause : nil, ar.succeeded ? ar.result : nil) }))
-        return self
-      end
-      raise ArgumentError, "Invalid arguments when calling watch(key)"
-    end
-    #  Watch the given keys to determine execution of the MULTI/EXEC block
-    # @param [Array<String>] keys List of keys to watch
-    # @yield Handler for the result of this call.
-    # @return [self]
-    def watch_many(keys=nil)
-      if keys.class == Array && block_given?
-        @j_del.java_method(:watchMany, [Java::JavaUtil::List.java_class,Java::IoVertxCore::Handler.java_class]).call(keys.map { |element| element },(Proc.new { |ar| yield(ar.failed ? ar.cause : nil, ar.succeeded ? ar.result : nil) }))
-        return self
-      end
-      raise ArgumentError, "Invalid arguments when calling watch_many(keys)"
     end
     #  Add one or more members to a sorted set, or update its score if it already exists
     # @param [String] key Key string

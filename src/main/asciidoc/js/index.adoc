@@ -43,7 +43,7 @@ To use the Vert.x Redis client, add the following dependency to the _dependencie
 
 [source,groovy,subs="+attributes"]
 ----
-compile io.vertx:vertx-redis-client:3.3.0-SNAPSHOT
+compile 'io.vertx:vertx-redis-client:3.3.0-SNAPSHOT'
 ----
 
 == Connecting to Redis
@@ -167,47 +167,47 @@ using JSON syntax which is handy for the EventBus communication.
 Multiple values in a hash can be set by supplying an object. Note however that key and value will be coerced to
 strings.
 
-<pre>
+----
 {
   keyName: "value",
   otherKeyName: "other value"
 }
-</pre>
+----
 
 === command msetnx
 
 Multiple values in a hash can be set by supplying an object. Note however that key and value will be coerced to
 strings.
 
-<pre>
+----
 {
   keyName: "value",
   otherKeyName: "other value"
 }
-</pre>
+----
 
 === command hmset
 
 Multiple values in a hash can be set by supplying an object. Note however that key and value will be coerced to
 strings.
 
-<pre>
+----
 {
   keyName: "value",
   otherKeyName: "other value"
 }
-</pre>
+----
 
 === command zadd
 Multiple values in a hash can be set by supplying an object. Note however that key and value will be coerced to
 strings.
 
-<pre>
+----
 {
   score: "member",
   otherScore: "other member"
 }
-</pre>
+----
 
 == Server Info
 
@@ -216,7 +216,7 @@ will return it in a easy to understand JSON format. The format is as follows: A 
 with properties that belong to that section. If for some reason there is no section the properties will be visible
 at the top level object.
 
-<pre>
+----
 {
   server: {
     redis_version: "2.5.13",
@@ -233,7 +233,7 @@ at the top level object.
   client: {...},
   ...
 }
-</pre>
+----
 
 == Eval and Evalsha
 

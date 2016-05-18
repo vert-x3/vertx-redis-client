@@ -20,6 +20,7 @@ import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;
 import io.vertx.redis.RedisClient;
 import io.vertx.redis.RedisOptions;
+import io.vertx.redis.RedisTransaction;
 import io.vertx.redis.op.*;
 import io.vertx.test.core.VertxTestBase;
 import org.junit.AfterClass;
@@ -29,7 +30,6 @@ import org.junit.Test;
 import org.junit.experimental.categories.Category;
 import redis.embedded.RedisServer;
 
-import java.nio.charset.Charset;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CountDownLatch;
@@ -554,13 +554,14 @@ public abstract class RedisClientTestBase extends VertxTestBase {
     String key = makeKey();
     redis.set(key, "0", reply -> {
       assertTrue(reply.succeeded());
-      redis.multi(reply2 -> {
+      RedisTransaction transaction = redis.transaction();
+      transaction.multi(reply2 -> {
         assertTrue(reply2.succeeded());
-        redis.incr(key, reply3 -> {
+        transaction.incr(key, reply3 -> {
           assertTrue(reply3.succeeded());
-          redis.discard(reply4 -> {
+          transaction.discard(reply4 -> {
             assertTrue(reply4.succeeded());
-            redis.get(key, reply5 -> {
+            transaction.get(key, reply5 -> {
               assertTrue(reply5.succeeded());
               assertTrue(Integer.valueOf(reply5.result()) == 0);
               testComplete();
@@ -670,18 +671,19 @@ public abstract class RedisClientTestBase extends VertxTestBase {
   @Test
   //Note same test as testMulti, kept for consistency
   public void testExec() {
-    redis.multi(reply -> {
+    RedisTransaction transaction = redis.transaction();
+    transaction.multi(reply -> {
       assertTrue(reply.succeeded());
-      redis.set("multi-key", "first", reply2 -> {
+      transaction.set("multi-key", "first", reply2 -> {
         assertTrue(reply2.succeeded());
-        redis.set("multi-key2", "second", reply3 -> {
+        transaction.set("multi-key2", "second", reply3 -> {
           assertTrue(reply3.succeeded());
         });
-        redis.get("multi-key", reply4 -> {
+        transaction.get("multi-key", reply4 -> {
           assertTrue(reply4.succeeded());
           assertTrue("QUEUED".equalsIgnoreCase(reply4.result()));
         });
-        redis.exec(reply5 -> {
+        transaction.exec(reply5 -> {
           assertTrue(reply5.succeeded());
           testComplete();
         });
@@ -1687,17 +1689,17 @@ public abstract class RedisClientTestBase extends VertxTestBase {
   public void testMulti() throws Exception {
 
     String key = makeKey();
-
+    RedisTransaction transaction = redis.transaction();
     redis.set(key, "0", rep -> {
       assertTrue(rep.succeeded());
-      redis.multi(reply -> {
+      transaction.multi(reply -> {
         assertTrue(reply.succeeded());
-        redis.set(makeKey(), "0", reply2 -> {
+        transaction.set(makeKey(), "0", reply2 -> {
           assertTrue(reply2.succeeded());
-          redis.set(makeKey(), "0", reply3 -> {
+          transaction.set(makeKey(), "0", reply3 -> {
             assertTrue(reply3.succeeded());
           });
-          redis.exec(reply4 -> {
+          transaction.exec(reply4 -> {
             assertTrue(reply4.succeeded());
             testComplete();
           });
@@ -2321,6 +2323,22 @@ public abstract class RedisClientTestBase extends VertxTestBase {
   }
 
   @Test
+  public void testSetWithOptions2() {
+    final String mykey = makeKey();
+    // 1st case SET k v NX -> OK
+    redis.setWithOptions(mykey, "Hello!", new SetOptions().setNX(true), reply0 -> {
+      assertTrue(reply0.succeeded());
+      // 2nd case SET k v NX -> nil (was already set)
+      redis.setWithOptions(mykey, "Hello again!", new SetOptions().setNX(true), reply2 -> {
+        assertTrue(reply2.succeeded());
+        assertNull(reply2.result());
+        testComplete();
+      });
+    });
+    await();
+  }
+
+  @Test
   public void testSetbit() {
     final String mykey = makeKey();
     redis.setbit(mykey, 7, 1, reply0 -> {
@@ -2829,26 +2847,26 @@ public abstract class RedisClientTestBase extends VertxTestBase {
     String key = makeKey();
 
     RedisClient rdx = RedisClient.create(vertx, getConfig());
-
+    RedisTransaction transaction = redis.transaction();
     redis.set(key, "0", reply -> {
       assertTrue(reply.succeeded());
-      redis.watch(key, reply2 -> {
+      transaction.watch(key, reply2 -> {
         assertTrue(reply2.succeeded());
 
-        redis.multi(reply3 -> {
+        transaction.multi(reply3 -> {
           assertTrue(reply3.succeeded());
-          redis.incr(key, reply4 -> {
+          transaction.incr(key, reply4 -> {
             assertTrue(reply4.succeeded());
 
             rdx.incr(key, reply1 -> {
               assertTrue(reply1.succeeded());
               assertEquals(Long.valueOf(1l), reply1.result());
 
-              redis.incr(key, reply5 -> {
+              transaction.incr(key, reply5 -> {
                 assertTrue(reply5.succeeded());
-                redis.incrby(key, 10, reply6 -> {
+                transaction.incrby(key, 10, reply6 -> {
                   assertTrue(reply6.succeeded());
-                  redis.exec(reply7 -> {
+                  transaction.exec(reply7 -> {
                     assertTrue(reply7.succeeded());
                     assertNull(reply7.result());
                     redis.get(key, reply8 -> {
