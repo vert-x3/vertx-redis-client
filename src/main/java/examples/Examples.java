@@ -33,7 +33,7 @@ public class Examples {
   public void example3(Vertx vertx) {
 
     // register a handler for the incoming message the naming the Redis module will use is base address + '.' + redis channel
-    vertx.eventBus().<JsonObject>consumer("redis.sub.channel1", received -> {
+    vertx.eventBus().<JsonObject>consumer("io.vertx.redis.channel1", received -> {
       // do whatever you need to do with your message
       JsonObject value = received.body().getJsonObject("value");
       // the value is a JSON doc with the following properties

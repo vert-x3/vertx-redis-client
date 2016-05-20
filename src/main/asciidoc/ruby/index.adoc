@@ -115,7 +115,7 @@ To start a subscriber one would do:
 require 'vertx-redis/redis_client'
 
 # register a handler for the incoming message the naming the Redis module will use is base address + '.' + redis channel
-vertx.event_bus().consumer("redis.sub.channel1") { |received|
+vertx.event_bus().consumer("io.vertx.redis.channel1") { |received|
   # do whatever you need to do with your message
   value = received.body()['value']
   # the value is a JSON doc with the following properties
