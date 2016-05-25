@@ -56,7 +56,7 @@
 == GeoUnit
 
 ++++
- @author <a href="mailto:plopes@redhat.com">Paulo Lopes</a>
+ GeoUnit represents a geo spatial unit it covers both the metric and imperial systems.
 ++++
 '''
 
