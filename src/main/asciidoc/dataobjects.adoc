@@ -12,9 +12,18 @@
 [frame="topbot"]
 |===
 ^|Name | Type ^| Description
-|[[latitude]]`latitude`|`Number (Double)`|-
-|[[longitude]]`longitude`|`Number (Double)`|-
-|[[member]]`member`|`String`|-
+|[[latitude]]`latitude`|`Number (Double)`|
++++
+Set Latitude as per EPSG:900913 / EPSG:3785 / OSGEO:41001
++++
+|[[longitude]]`longitude`|`Number (Double)`|
++++
+Set Longitude as per EPSG:900913 / EPSG:3785 / OSGEO:41001
++++
+|[[member]]`member`|`String`|
++++
+Set the member name.
++++
 |===
 
 [[GeoRadiusOptions]]
@@ -29,10 +38,22 @@
 [frame="topbot"]
 |===
 ^|Name | Type ^| Description
-|[[count]]`count`|`Number (Long)`|-
-|[[withCoord]]`withCoord`|`Boolean`|-
-|[[withDist]]`withDist`|`Boolean`|-
-|[[withHash]]`withHash`|`Boolean`|-
+|[[count]]`count`|`Number (Long)`|
++++
+Set the radius options limit the result count.
++++
+|[[withCoord]]`withCoord`|`Boolean`|
++++
+Set the radius options to be coordinate based.
++++
+|[[withDist]]`withDist`|`Boolean`|
++++
+Set the radius options to be distance based.
++++
+|[[withHash]]`withHash`|`Boolean`|
++++
+Set the radius options to be hash based.
++++
 |===
 
 [[KillFilter]]

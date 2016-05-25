@@ -1,5 +1,5 @@
 /**
- * Copyright 2015 Red Hat, Inc.
+ * Copyright (c) 2011-2016 The original author or authors
  *
  *  All rights reserved. This program and the accompanying materials
  *  are made available under the terms of the Eclipse Public License v1.0
@@ -22,8 +22,24 @@ import io.vertx.codegen.annotations.VertxGen;
  */
 @VertxGen
 public enum GeoUnit {
+
+  /**
+   * Meter
+   */
   m,
+
+  /**
+   * Kilometer
+   */
   km,
+
+  /**
+   * Mile
+   */
   mi,
+
+  /**
+   * Feet
+   */
   ft
 }

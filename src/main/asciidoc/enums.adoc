@@ -64,10 +64,22 @@
 [frame="topbot"]
 |===
 ^|Name | Description
-|[[m]]`m`|-
-|[[km]]`km`|-
-|[[mi]]`mi`|-
-|[[ft]]`ft`|-
+|[[m]]`m`|
++++
+Meter
++++
+|[[km]]`km`|
++++
+Kilometer
++++
+|[[mi]]`mi`|
++++
+Mile
++++
+|[[ft]]`ft`|
++++
+Feet
++++
 |===
 
 [[InsertOptions]]

@@ -1,5 +1,5 @@
 /**
- * Copyright 2015 Red Hat, Inc.
+ * Copyright (c) 2011-2016 The original author or authors
  *
  *  All rights reserved. This program and the accompanying materials
  *  are made available under the terms of the Eclipse Public License v1.0
@@ -43,16 +43,33 @@ public class GeoMember {
     member = obj.getString("member");
   }
 
+  /**
+   * Set Longitude as per EPSG:900913 / EPSG:3785 / OSGEO:41001
+   *
+   * @param val Valid longitudes are from -180 to 180 degrees
+   * @return self
+   */
   public GeoMember setLongitude(Double val) {
     this.longitude = val;
     return this;
   }
 
+  /**
+   * Set Latitude as per EPSG:900913 / EPSG:3785 / OSGEO:41001
+   *
+   * @param val Valid latitudes are from -85.05112878 to 85.05112878 degrees.
+   * @return self
+   */
   public GeoMember setLatitude(Double val) {
     this.latitude = val;
     return this;
   }
 
+  /**
+   * Set the member name.
+   * @param val the name given
+   * @return self
+   */
   public GeoMember setMember(String val) {
     this.member = val;
     return this;

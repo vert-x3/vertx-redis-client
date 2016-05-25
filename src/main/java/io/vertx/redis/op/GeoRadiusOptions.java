@@ -1,5 +1,5 @@
 /**
- * Copyright 2015 Red Hat, Inc.
+ * Copyright (c) 2011-2016 The original author or authors
  *
  *  All rights reserved. This program and the accompanying materials
  *  are made available under the terms of the Eclipse Public License v1.0
@@ -46,21 +46,41 @@ public class GeoRadiusOptions {
     count = obj.getLong("count");
   }
 
+  /**
+   * Set the radius options to be coordinate based.
+   * @param bool true for coordinate base
+   * @return self
+   */
   public GeoRadiusOptions setWithCoord(boolean bool) {
     this.withcoord = bool;
     return this;
   }
 
+  /**
+   * Set the radius options to be distance based.
+   * @param bool true for distance base
+   * @return self
+   */
   public GeoRadiusOptions setWithDist(boolean bool) {
     this.withdist = bool;
     return this;
   }
 
+  /**
+   * Set the radius options to be hash based.
+   * @param bool true for hash base
+   * @return self
+   */
   public GeoRadiusOptions setWithHash(boolean bool) {
     this.withhash = bool;
     return this;
   }
 
+  /**
+   * Set the radius options limit the result count.
+   * @param value the count
+   * @return self
+   */
   public GeoRadiusOptions setCount(Long value) {
     this.count = value;
     return this;
@@ -103,5 +123,4 @@ public class GeoRadiusOptions {
 
     return result;
   }
-
 }
