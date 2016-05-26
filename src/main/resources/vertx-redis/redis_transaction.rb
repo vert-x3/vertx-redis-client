@@ -1,30 +1,18 @@
-require 'vertx-redis/redis_transaction'
 require 'vertx/buffer'
-require 'vertx/vertx'
 require 'vertx/util/utils.rb'
-# Generated from io.vertx.redis.RedisClient
+# Generated from io.vertx.redis.RedisTransaction
 module VertxRedis
-  class RedisClient
+  #  This Interface represents a TX
+  class RedisTransaction
     # @private
-    # @param j_del [::VertxRedis::RedisClient] the java delegate
+    # @param j_del [::VertxRedis::RedisTransaction] the java delegate
     def initialize(j_del)
       @j_del = j_del
     end
     # @private
-    # @return [::VertxRedis::RedisClient] the underlying java delegate
+    # @return [::VertxRedis::RedisTransaction] the underlying java delegate
     def j_del
       @j_del
-    end
-    # @param [::Vertx::Vertx] vertx 
-    # @param [Hash] config 
-    # @return [::VertxRedis::RedisClient]
-    def self.create(vertx=nil,config=nil)
-      if vertx.class.method_defined?(:j_del) && !block_given? && config == nil
-        return ::Vertx::Util::Utils.safe_create(Java::IoVertxRedis::RedisClient.java_method(:create, [Java::IoVertxCore::Vertx.java_class]).call(vertx.j_del),::VertxRedis::RedisClient)
-      elsif vertx.class.method_defined?(:j_del) && config.class == Hash && !block_given?
-        return ::Vertx::Util::Utils.safe_create(Java::IoVertxRedis::RedisClient.java_method(:create, [Java::IoVertxCore::Vertx.java_class,Java::IoVertxRedis::RedisOptions.java_class]).call(vertx.j_del,Java::IoVertxRedis::RedisOptions.new(::Vertx::Util::Utils.to_json_object(config))),::VertxRedis::RedisClient)
-      end
-      raise ArgumentError, "Invalid arguments when calling create(vertx,config)"
     end
     #  Close the client - when it is fully closed the handler will be called.
     # @yield 
@@ -128,7 +116,7 @@ module VertxRedis
       raise ArgumentError, "Invalid arguments when calling bitpos(key,bit)"
     end
     #  Find first bit set or clear in a string
-    # 
+    #  <p>
     #  See also bitposRange() method, which takes start, and stop offset.
     # @param [String] key Key string
     # @param [Fixnum] bit What bit value to look for - must be 1, or 0
@@ -143,7 +131,7 @@ module VertxRedis
       raise ArgumentError, "Invalid arguments when calling bitpos_from(key,bit,start)"
     end
     #  Find first bit set or clear in a string
-    # 
+    #  <p>
     #  Note: when both start, and stop offsets are specified,
     #  behaviour is slightly different than if only start is specified
     # @param [String] key Key string
@@ -166,7 +154,7 @@ module VertxRedis
     # @return [self]
     def blpop(key=nil,seconds=nil)
       if key.class == String && seconds.class == Fixnum && block_given?
-        @j_del.java_method(:blpop, [Java::java.lang.String.java_class,Java::int.java_class,Java::IoVertxCore::Handler.java_class]).call(key,seconds,(Proc.new { |ar| yield(ar.failed ? ar.cause : nil, ar.succeeded ? ar.result != nil ? JSON.parse(ar.result.encode) : nil : nil) }))
+        @j_del.java_method(:blpop, [Java::java.lang.String.java_class,Java::int.java_class,Java::IoVertxCore::Handler.java_class]).call(key,seconds,(Proc.new { |ar| yield(ar.failed ? ar.cause : nil, ar.succeeded ? ar.result : nil) }))
         return self
       end
       raise ArgumentError, "Invalid arguments when calling blpop(key,seconds)"
@@ -178,7 +166,7 @@ module VertxRedis
     # @return [self]
     def blpop_many(keys=nil,seconds=nil)
       if keys.class == Array && seconds.class == Fixnum && block_given?
-        @j_del.java_method(:blpopMany, [Java::JavaUtil::List.java_class,Java::int.java_class,Java::IoVertxCore::Handler.java_class]).call(keys.map { |element| element },seconds,(Proc.new { |ar| yield(ar.failed ? ar.cause : nil, ar.succeeded ? ar.result != nil ? JSON.parse(ar.result.encode) : nil : nil) }))
+        @j_del.java_method(:blpopMany, [Java::JavaUtil::List.java_class,Java::int.java_class,Java::IoVertxCore::Handler.java_class]).call(keys.map { |element| element },seconds,(Proc.new { |ar| yield(ar.failed ? ar.cause : nil, ar.succeeded ? ar.result : nil) }))
         return self
       end
       raise ArgumentError, "Invalid arguments when calling blpop_many(keys,seconds)"
@@ -190,7 +178,7 @@ module VertxRedis
     # @return [self]
     def brpop(key=nil,seconds=nil)
       if key.class == String && seconds.class == Fixnum && block_given?
-        @j_del.java_method(:brpop, [Java::java.lang.String.java_class,Java::int.java_class,Java::IoVertxCore::Handler.java_class]).call(key,seconds,(Proc.new { |ar| yield(ar.failed ? ar.cause : nil, ar.succeeded ? ar.result != nil ? JSON.parse(ar.result.encode) : nil : nil) }))
+        @j_del.java_method(:brpop, [Java::java.lang.String.java_class,Java::int.java_class,Java::IoVertxCore::Handler.java_class]).call(key,seconds,(Proc.new { |ar| yield(ar.failed ? ar.cause : nil, ar.succeeded ? ar.result : nil) }))
         return self
       end
       raise ArgumentError, "Invalid arguments when calling brpop(key,seconds)"
@@ -202,7 +190,7 @@ module VertxRedis
     # @return [self]
     def brpop_many(keys=nil,seconds=nil)
       if keys.class == Array && seconds.class == Fixnum && block_given?
-        @j_del.java_method(:brpopMany, [Java::JavaUtil::List.java_class,Java::int.java_class,Java::IoVertxCore::Handler.java_class]).call(keys.map { |element| element },seconds,(Proc.new { |ar| yield(ar.failed ? ar.cause : nil, ar.succeeded ? ar.result != nil ? JSON.parse(ar.result.encode) : nil : nil) }))
+        @j_del.java_method(:brpopMany, [Java::JavaUtil::List.java_class,Java::int.java_class,Java::IoVertxCore::Handler.java_class]).call(keys.map { |element| element },seconds,(Proc.new { |ar| yield(ar.failed ? ar.cause : nil, ar.succeeded ? ar.result : nil) }))
         return self
       end
       raise ArgumentError, "Invalid arguments when calling brpop_many(keys,seconds)"
@@ -274,12 +262,12 @@ module VertxRedis
       raise ArgumentError, "Invalid arguments when calling client_setname(name)"
     end
     #  Assign new hash slots to receiving node.
-    # @param [Array<Fixnum>] slots 
+    # @param [Array<String>] slots 
     # @yield Handler for the result of this call.
     # @return [self]
     def cluster_addslots(slots=nil)
       if slots.class == Array && block_given?
-        @j_del.java_method(:clusterAddslots, [Java::JavaUtil::List.java_class,Java::IoVertxCore::Handler.java_class]).call(slots.map { |element| element },(Proc.new { |ar| yield(ar.failed ? ar.cause : nil) }))
+        @j_del.java_method(:clusterAddslots, [Java::JavaUtil::List.java_class,Java::IoVertxCore::Handler.java_class]).call(slots.map { |element| element },(Proc.new { |ar| yield(ar.failed ? ar.cause : nil, ar.succeeded ? ar.result : nil) }))
         return self
       end
       raise ArgumentError, "Invalid arguments when calling cluster_addslots(slots)"
@@ -312,18 +300,18 @@ module VertxRedis
     # @return [self]
     def cluster_delslots(slot=nil)
       if slot.class == Fixnum && block_given?
-        @j_del.java_method(:clusterDelslots, [Java::long.java_class,Java::IoVertxCore::Handler.java_class]).call(slot,(Proc.new { |ar| yield(ar.failed ? ar.cause : nil) }))
+        @j_del.java_method(:clusterDelslots, [Java::long.java_class,Java::IoVertxCore::Handler.java_class]).call(slot,(Proc.new { |ar| yield(ar.failed ? ar.cause : nil, ar.succeeded ? ar.result : nil) }))
         return self
       end
       raise ArgumentError, "Invalid arguments when calling cluster_delslots(slot)"
     end
     #  Set hash slots as unbound in receiving node.
-    # @param [Array<Fixnum>] slots 
+    # @param [Array<String>] slots 
     # @yield Handler for the result of this call.
     # @return [self]
     def cluster_delslots_many(slots=nil)
       if slots.class == Array && block_given?
-        @j_del.java_method(:clusterDelslotsMany, [Java::JavaUtil::List.java_class,Java::IoVertxCore::Handler.java_class]).call(slots.map { |element| element },(Proc.new { |ar| yield(ar.failed ? ar.cause : nil) }))
+        @j_del.java_method(:clusterDelslotsMany, [Java::JavaUtil::List.java_class,Java::IoVertxCore::Handler.java_class]).call(slots.map { |element| element },(Proc.new { |ar| yield(ar.failed ? ar.cause : nil, ar.succeeded ? ar.result : nil) }))
         return self
       end
       raise ArgumentError, "Invalid arguments when calling cluster_delslots_many(slots)"
@@ -333,7 +321,7 @@ module VertxRedis
     # @return [self]
     def cluster_failover
       if block_given?
-        @j_del.java_method(:clusterFailover, [Java::IoVertxCore::Handler.java_class]).call((Proc.new { |ar| yield(ar.failed ? ar.cause : nil) }))
+        @j_del.java_method(:clusterFailover, [Java::IoVertxCore::Handler.java_class]).call((Proc.new { |ar| yield(ar.failed ? ar.cause : nil, ar.succeeded ? ar.result : nil) }))
         return self
       end
       raise ArgumentError, "Invalid arguments when calling cluster_failover()"
@@ -344,7 +332,7 @@ module VertxRedis
     # @return [self]
     def cluster_fail_over_with_options(options=nil)
       if options.class == Symbol && block_given?
-        @j_del.java_method(:clusterFailOverWithOptions, [Java::IoVertxRedisOp::FailoverOptions.java_class,Java::IoVertxCore::Handler.java_class]).call(Java::IoVertxRedisOp::FailoverOptions.valueOf(options),(Proc.new { |ar| yield(ar.failed ? ar.cause : nil) }))
+        @j_del.java_method(:clusterFailOverWithOptions, [Java::IoVertxRedisOp::FailoverOptions.java_class,Java::IoVertxCore::Handler.java_class]).call(Java::IoVertxRedisOp::FailoverOptions.valueOf(options),(Proc.new { |ar| yield(ar.failed ? ar.cause : nil, ar.succeeded ? ar.result : nil) }))
         return self
       end
       raise ArgumentError, "Invalid arguments when calling cluster_fail_over_with_options(options)"
@@ -355,7 +343,7 @@ module VertxRedis
     # @return [self]
     def cluster_forget(nodeId=nil)
       if nodeId.class == String && block_given?
-        @j_del.java_method(:clusterForget, [Java::java.lang.String.java_class,Java::IoVertxCore::Handler.java_class]).call(nodeId,(Proc.new { |ar| yield(ar.failed ? ar.cause : nil) }))
+        @j_del.java_method(:clusterForget, [Java::java.lang.String.java_class,Java::IoVertxCore::Handler.java_class]).call(nodeId,(Proc.new { |ar| yield(ar.failed ? ar.cause : nil, ar.succeeded ? ar.result : nil) }))
         return self
       end
       raise ArgumentError, "Invalid arguments when calling cluster_forget(nodeId)"
@@ -367,7 +355,7 @@ module VertxRedis
     # @return [self]
     def cluster_getkeysinslot(slot=nil,count=nil)
       if slot.class == Fixnum && count.class == Fixnum && block_given?
-        @j_del.java_method(:clusterGetkeysinslot, [Java::long.java_class,Java::long.java_class,Java::IoVertxCore::Handler.java_class]).call(slot,count,(Proc.new { |ar| yield(ar.failed ? ar.cause : nil, ar.succeeded ? ar.result != nil ? JSON.parse(ar.result.encode) : nil : nil) }))
+        @j_del.java_method(:clusterGetkeysinslot, [Java::long.java_class,Java::long.java_class,Java::IoVertxCore::Handler.java_class]).call(slot,count,(Proc.new { |ar| yield(ar.failed ? ar.cause : nil, ar.succeeded ? ar.result : nil) }))
         return self
       end
       raise ArgumentError, "Invalid arguments when calling cluster_getkeysinslot(slot,count)"
@@ -377,7 +365,7 @@ module VertxRedis
     # @return [self]
     def cluster_info
       if block_given?
-        @j_del.java_method(:clusterInfo, [Java::IoVertxCore::Handler.java_class]).call((Proc.new { |ar| yield(ar.failed ? ar.cause : nil, ar.succeeded ? ar.result != nil ? JSON.parse(ar.result.encode) : nil : nil) }))
+        @j_del.java_method(:clusterInfo, [Java::IoVertxCore::Handler.java_class]).call((Proc.new { |ar| yield(ar.failed ? ar.cause : nil, ar.succeeded ? ar.result : nil) }))
         return self
       end
       raise ArgumentError, "Invalid arguments when calling cluster_info()"
@@ -400,7 +388,7 @@ module VertxRedis
     # @return [self]
     def cluster_meet(ip=nil,port=nil)
       if ip.class == String && port.class == Fixnum && block_given?
-        @j_del.java_method(:clusterMeet, [Java::java.lang.String.java_class,Java::long.java_class,Java::IoVertxCore::Handler.java_class]).call(ip,port,(Proc.new { |ar| yield(ar.failed ? ar.cause : nil) }))
+        @j_del.java_method(:clusterMeet, [Java::java.lang.String.java_class,Java::long.java_class,Java::IoVertxCore::Handler.java_class]).call(ip,port,(Proc.new { |ar| yield(ar.failed ? ar.cause : nil, ar.succeeded ? ar.result : nil) }))
         return self
       end
       raise ArgumentError, "Invalid arguments when calling cluster_meet(ip,port)"
@@ -410,7 +398,7 @@ module VertxRedis
     # @return [self]
     def cluster_nodes
       if block_given?
-        @j_del.java_method(:clusterNodes, [Java::IoVertxCore::Handler.java_class]).call((Proc.new { |ar| yield(ar.failed ? ar.cause : nil, ar.succeeded ? ar.result != nil ? JSON.parse(ar.result.encode) : nil : nil) }))
+        @j_del.java_method(:clusterNodes, [Java::IoVertxCore::Handler.java_class]).call((Proc.new { |ar| yield(ar.failed ? ar.cause : nil, ar.succeeded ? ar.result : nil) }))
         return self
       end
       raise ArgumentError, "Invalid arguments when calling cluster_nodes()"
@@ -421,7 +409,7 @@ module VertxRedis
     # @return [self]
     def cluster_replicate(nodeId=nil)
       if nodeId.class == String && block_given?
-        @j_del.java_method(:clusterReplicate, [Java::java.lang.String.java_class,Java::IoVertxCore::Handler.java_class]).call(nodeId,(Proc.new { |ar| yield(ar.failed ? ar.cause : nil) }))
+        @j_del.java_method(:clusterReplicate, [Java::java.lang.String.java_class,Java::IoVertxCore::Handler.java_class]).call(nodeId,(Proc.new { |ar| yield(ar.failed ? ar.cause : nil, ar.succeeded ? ar.result : nil) }))
         return self
       end
       raise ArgumentError, "Invalid arguments when calling cluster_replicate(nodeId)"
@@ -431,7 +419,7 @@ module VertxRedis
     # @return [self]
     def cluster_reset
       if block_given?
-        @j_del.java_method(:clusterReset, [Java::IoVertxCore::Handler.java_class]).call((Proc.new { |ar| yield(ar.failed ? ar.cause : nil) }))
+        @j_del.java_method(:clusterReset, [Java::IoVertxCore::Handler.java_class]).call((Proc.new { |ar| yield(ar.failed ? ar.cause : nil, ar.succeeded ? ar.result : nil) }))
         return self
       end
       raise ArgumentError, "Invalid arguments when calling cluster_reset()"
@@ -442,7 +430,7 @@ module VertxRedis
     # @return [self]
     def cluster_reset_with_options(options=nil)
       if options.class == Symbol && block_given?
-        @j_del.java_method(:clusterResetWithOptions, [Java::IoVertxRedisOp::ResetOptions.java_class,Java::IoVertxCore::Handler.java_class]).call(Java::IoVertxRedisOp::ResetOptions.valueOf(options),(Proc.new { |ar| yield(ar.failed ? ar.cause : nil) }))
+        @j_del.java_method(:clusterResetWithOptions, [Java::IoVertxRedisOp::ResetOptions.java_class,Java::IoVertxCore::Handler.java_class]).call(Java::IoVertxRedisOp::ResetOptions.valueOf(options),(Proc.new { |ar| yield(ar.failed ? ar.cause : nil, ar.succeeded ? ar.result : nil) }))
         return self
       end
       raise ArgumentError, "Invalid arguments when calling cluster_reset_with_options(options)"
@@ -452,7 +440,7 @@ module VertxRedis
     # @return [self]
     def cluster_saveconfig
       if block_given?
-        @j_del.java_method(:clusterSaveconfig, [Java::IoVertxCore::Handler.java_class]).call((Proc.new { |ar| yield(ar.failed ? ar.cause : nil) }))
+        @j_del.java_method(:clusterSaveconfig, [Java::IoVertxCore::Handler.java_class]).call((Proc.new { |ar| yield(ar.failed ? ar.cause : nil, ar.succeeded ? ar.result : nil) }))
         return self
       end
       raise ArgumentError, "Invalid arguments when calling cluster_saveconfig()"
@@ -463,7 +451,7 @@ module VertxRedis
     # @return [self]
     def cluster_set_config_epoch(epoch=nil)
       if epoch.class == Fixnum && block_given?
-        @j_del.java_method(:clusterSetConfigEpoch, [Java::long.java_class,Java::IoVertxCore::Handler.java_class]).call(epoch,(Proc.new { |ar| yield(ar.failed ? ar.cause : nil) }))
+        @j_del.java_method(:clusterSetConfigEpoch, [Java::long.java_class,Java::IoVertxCore::Handler.java_class]).call(epoch,(Proc.new { |ar| yield(ar.failed ? ar.cause : nil, ar.succeeded ? ar.result : nil) }))
         return self
       end
       raise ArgumentError, "Invalid arguments when calling cluster_set_config_epoch(epoch)"
@@ -475,7 +463,7 @@ module VertxRedis
     # @return [self]
     def cluster_setslot(slot=nil,subcommand=nil)
       if slot.class == Fixnum && subcommand.class == Symbol && block_given?
-        @j_del.java_method(:clusterSetslot, [Java::long.java_class,Java::IoVertxRedisOp::SlotCmd.java_class,Java::IoVertxCore::Handler.java_class]).call(slot,Java::IoVertxRedisOp::SlotCmd.valueOf(subcommand),(Proc.new { |ar| yield(ar.failed ? ar.cause : nil) }))
+        @j_del.java_method(:clusterSetslot, [Java::long.java_class,Java::IoVertxRedisOp::SlotCmd.java_class,Java::IoVertxCore::Handler.java_class]).call(slot,Java::IoVertxRedisOp::SlotCmd.valueOf(subcommand),(Proc.new { |ar| yield(ar.failed ? ar.cause : nil, ar.succeeded ? ar.result : nil) }))
         return self
       end
       raise ArgumentError, "Invalid arguments when calling cluster_setslot(slot,subcommand)"
@@ -488,7 +476,7 @@ module VertxRedis
     # @return [self]
     def cluster_setslot_with_node(slot=nil,subcommand=nil,nodeId=nil)
       if slot.class == Fixnum && subcommand.class == Symbol && nodeId.class == String && block_given?
-        @j_del.java_method(:clusterSetslotWithNode, [Java::long.java_class,Java::IoVertxRedisOp::SlotCmd.java_class,Java::java.lang.String.java_class,Java::IoVertxCore::Handler.java_class]).call(slot,Java::IoVertxRedisOp::SlotCmd.valueOf(subcommand),nodeId,(Proc.new { |ar| yield(ar.failed ? ar.cause : nil) }))
+        @j_del.java_method(:clusterSetslotWithNode, [Java::long.java_class,Java::IoVertxRedisOp::SlotCmd.java_class,Java::java.lang.String.java_class,Java::IoVertxCore::Handler.java_class]).call(slot,Java::IoVertxRedisOp::SlotCmd.valueOf(subcommand),nodeId,(Proc.new { |ar| yield(ar.failed ? ar.cause : nil, ar.succeeded ? ar.result : nil) }))
         return self
       end
       raise ArgumentError, "Invalid arguments when calling cluster_setslot_with_node(slot,subcommand,nodeId)"
@@ -499,7 +487,7 @@ module VertxRedis
     # @return [self]
     def cluster_slaves(nodeId=nil)
       if nodeId.class == String && block_given?
-        @j_del.java_method(:clusterSlaves, [Java::java.lang.String.java_class,Java::IoVertxCore::Handler.java_class]).call(nodeId,(Proc.new { |ar| yield(ar.failed ? ar.cause : nil, ar.succeeded ? ar.result != nil ? JSON.parse(ar.result.encode) : nil : nil) }))
+        @j_del.java_method(:clusterSlaves, [Java::java.lang.String.java_class,Java::IoVertxCore::Handler.java_class]).call(nodeId,(Proc.new { |ar| yield(ar.failed ? ar.cause : nil, ar.succeeded ? ar.result : nil) }))
         return self
       end
       raise ArgumentError, "Invalid arguments when calling cluster_slaves(nodeId)"
@@ -509,7 +497,7 @@ module VertxRedis
     # @return [self]
     def cluster_slots
       if block_given?
-        @j_del.java_method(:clusterSlots, [Java::IoVertxCore::Handler.java_class]).call((Proc.new { |ar| yield(ar.failed ? ar.cause : nil, ar.succeeded ? ar.result != nil ? JSON.parse(ar.result.encode) : nil : nil) }))
+        @j_del.java_method(:clusterSlots, [Java::IoVertxCore::Handler.java_class]).call((Proc.new { |ar| yield(ar.failed ? ar.cause : nil, ar.succeeded ? ar.result : nil) }))
         return self
       end
       raise ArgumentError, "Invalid arguments when calling cluster_slots()"
@@ -519,7 +507,7 @@ module VertxRedis
     # @return [self]
     def command
       if block_given?
-        @j_del.java_method(:command, [Java::IoVertxCore::Handler.java_class]).call((Proc.new { |ar| yield(ar.failed ? ar.cause : nil, ar.succeeded ? ar.result != nil ? JSON.parse(ar.result.encode) : nil : nil) }))
+        @j_del.java_method(:command, [Java::IoVertxCore::Handler.java_class]).call((Proc.new { |ar| yield(ar.failed ? ar.cause : nil, ar.succeeded ? ar.result : nil) }))
         return self
       end
       raise ArgumentError, "Invalid arguments when calling command()"
@@ -539,7 +527,7 @@ module VertxRedis
     # @return [self]
     def command_getkeys
       if block_given?
-        @j_del.java_method(:commandGetkeys, [Java::IoVertxCore::Handler.java_class]).call((Proc.new { |ar| yield(ar.failed ? ar.cause : nil, ar.succeeded ? ar.result != nil ? JSON.parse(ar.result.encode) : nil : nil) }))
+        @j_del.java_method(:commandGetkeys, [Java::IoVertxCore::Handler.java_class]).call((Proc.new { |ar| yield(ar.failed ? ar.cause : nil, ar.succeeded ? ar.result : nil) }))
         return self
       end
       raise ArgumentError, "Invalid arguments when calling command_getkeys()"
@@ -550,7 +538,7 @@ module VertxRedis
     # @return [self]
     def command_info(commands=nil)
       if commands.class == Array && block_given?
-        @j_del.java_method(:commandInfo, [Java::JavaUtil::List.java_class,Java::IoVertxCore::Handler.java_class]).call(commands.map { |element| element },(Proc.new { |ar| yield(ar.failed ? ar.cause : nil, ar.succeeded ? ar.result != nil ? JSON.parse(ar.result.encode) : nil : nil) }))
+        @j_del.java_method(:commandInfo, [Java::JavaUtil::List.java_class,Java::IoVertxCore::Handler.java_class]).call(commands.map { |element| element },(Proc.new { |ar| yield(ar.failed ? ar.cause : nil, ar.succeeded ? ar.result : nil) }))
         return self
       end
       raise ArgumentError, "Invalid arguments when calling command_info(commands)"
@@ -561,7 +549,7 @@ module VertxRedis
     # @return [self]
     def config_get(parameter=nil)
       if parameter.class == String && block_given?
-        @j_del.java_method(:configGet, [Java::java.lang.String.java_class,Java::IoVertxCore::Handler.java_class]).call(parameter,(Proc.new { |ar| yield(ar.failed ? ar.cause : nil, ar.succeeded ? ar.result != nil ? JSON.parse(ar.result.encode) : nil : nil) }))
+        @j_del.java_method(:configGet, [Java::java.lang.String.java_class,Java::IoVertxCore::Handler.java_class]).call(parameter,(Proc.new { |ar| yield(ar.failed ? ar.cause : nil, ar.succeeded ? ar.result : nil) }))
         return self
       end
       raise ArgumentError, "Invalid arguments when calling config_get(parameter)"
@@ -674,6 +662,16 @@ module VertxRedis
       end
       raise ArgumentError, "Invalid arguments when calling del_many(keys)"
     end
+    #  Discard all commands issued after MULTI
+    # @yield 
+    # @return [self]
+    def discard
+      if block_given?
+        @j_del.java_method(:discard, [Java::IoVertxCore::Handler.java_class]).call((Proc.new { |ar| yield(ar.failed ? ar.cause : nil, ar.succeeded ? ar.result : nil) }))
+        return self
+      end
+      raise ArgumentError, "Invalid arguments when calling discard()"
+    end
     #  Return a serialized version of the value stored at the specified key.
     # @param [String] key Key string
     # @yield Handler for the result of this call.
@@ -698,7 +696,7 @@ module VertxRedis
     end
     #  Execute a Lua script server side. Due to the dynamic nature of this command any response type could be returned
     #  for This reason and to ensure type safety the reply is always guaranteed to be a JsonArray.
-    # 
+    #  <p>
     #  When a reply if for example a String the handler will be called with a JsonArray with a single element containing
     #  the String.
     # @param [String] script Lua script to evaluate
@@ -708,14 +706,14 @@ module VertxRedis
     # @return [self]
     def eval(script=nil,keys=nil,args=nil)
       if script.class == String && keys.class == Array && args.class == Array && block_given?
-        @j_del.java_method(:eval, [Java::java.lang.String.java_class,Java::JavaUtil::List.java_class,Java::JavaUtil::List.java_class,Java::IoVertxCore::Handler.java_class]).call(script,keys.map { |element| element },args.map { |element| element },(Proc.new { |ar| yield(ar.failed ? ar.cause : nil, ar.succeeded ? ar.result != nil ? JSON.parse(ar.result.encode) : nil : nil) }))
+        @j_del.java_method(:eval, [Java::java.lang.String.java_class,Java::JavaUtil::List.java_class,Java::JavaUtil::List.java_class,Java::IoVertxCore::Handler.java_class]).call(script,keys.map { |element| element },args.map { |element| element },(Proc.new { |ar| yield(ar.failed ? ar.cause : nil, ar.succeeded ? ar.result : nil) }))
         return self
       end
       raise ArgumentError, "Invalid arguments when calling eval(script,keys,args)"
     end
     #  Execute a Lua script server side. Due to the dynamic nature of this command any response type could be returned
     #  for This reason and to ensure type safety the reply is always guaranteed to be a JsonArray.
-    # 
+    #  <p>
     #  When a reply if for example a String the handler will be called with a JsonArray with a single element containing
     #  the String.
     # @param [String] sha1 SHA1 digest of the script cached on the server
@@ -725,10 +723,20 @@ module VertxRedis
     # @return [self]
     def evalsha(sha1=nil,keys=nil,values=nil)
       if sha1.class == String && keys.class == Array && values.class == Array && block_given?
-        @j_del.java_method(:evalsha, [Java::java.lang.String.java_class,Java::JavaUtil::List.java_class,Java::JavaUtil::List.java_class,Java::IoVertxCore::Handler.java_class]).call(sha1,keys.map { |element| element },values.map { |element| element },(Proc.new { |ar| yield(ar.failed ? ar.cause : nil, ar.succeeded ? ar.result != nil ? JSON.parse(ar.result.encode) : nil : nil) }))
+        @j_del.java_method(:evalsha, [Java::java.lang.String.java_class,Java::JavaUtil::List.java_class,Java::JavaUtil::List.java_class,Java::IoVertxCore::Handler.java_class]).call(sha1,keys.map { |element| element },values.map { |element| element },(Proc.new { |ar| yield(ar.failed ? ar.cause : nil, ar.succeeded ? ar.result : nil) }))
         return self
       end
       raise ArgumentError, "Invalid arguments when calling evalsha(sha1,keys,values)"
+    end
+    #  Execute all commands issued after MULTI
+    # @yield 
+    # @return [self]
+    def exec
+      if block_given?
+        @j_del.java_method(:exec, [Java::IoVertxCore::Handler.java_class]).call((Proc.new { |ar| yield(ar.failed ? ar.cause : nil, ar.succeeded ? ar.result != nil ? JSON.parse(ar.result.encode) : nil : nil) }))
+        return self
+      end
+      raise ArgumentError, "Invalid arguments when calling exec()"
     end
     #  Determine if a key exists
     # @param [String] key Key string
@@ -802,7 +810,7 @@ module VertxRedis
     # @return [self]
     def get_binary(key=nil)
       if key.class == String && block_given?
-        @j_del.java_method(:getBinary, [Java::java.lang.String.java_class,Java::IoVertxCore::Handler.java_class]).call(key,(Proc.new { |ar| yield(ar.failed ? ar.cause : nil, ar.succeeded ? ::Vertx::Util::Utils.safe_create(ar.result,::Vertx::Buffer) : nil) }))
+        @j_del.java_method(:getBinary, [Java::java.lang.String.java_class,Java::IoVertxCore::Handler.java_class]).call(key,(Proc.new { |ar| yield(ar.failed ? ar.cause : nil, ar.succeeded ? ar.result : nil) }))
         return self
       end
       raise ArgumentError, "Invalid arguments when calling get_binary(key)"
@@ -898,7 +906,7 @@ module VertxRedis
     # @return [self]
     def hgetall(key=nil)
       if key.class == String && block_given?
-        @j_del.java_method(:hgetall, [Java::java.lang.String.java_class,Java::IoVertxCore::Handler.java_class]).call(key,(Proc.new { |ar| yield(ar.failed ? ar.cause : nil, ar.succeeded ? ar.result != nil ? JSON.parse(ar.result.encode) : nil : nil) }))
+        @j_del.java_method(:hgetall, [Java::java.lang.String.java_class,Java::IoVertxCore::Handler.java_class]).call(key,(Proc.new { |ar| yield(ar.failed ? ar.cause : nil, ar.succeeded ? ar.result : nil) }))
         return self
       end
       raise ArgumentError, "Invalid arguments when calling hgetall(key)"
@@ -935,7 +943,7 @@ module VertxRedis
     # @return [self]
     def hkeys(key=nil)
       if key.class == String && block_given?
-        @j_del.java_method(:hkeys, [Java::java.lang.String.java_class,Java::IoVertxCore::Handler.java_class]).call(key,(Proc.new { |ar| yield(ar.failed ? ar.cause : nil, ar.succeeded ? ar.result != nil ? JSON.parse(ar.result.encode) : nil : nil) }))
+        @j_del.java_method(:hkeys, [Java::java.lang.String.java_class,Java::IoVertxCore::Handler.java_class]).call(key,(Proc.new { |ar| yield(ar.failed ? ar.cause : nil, ar.succeeded ? ar.result : nil) }))
         return self
       end
       raise ArgumentError, "Invalid arguments when calling hkeys(key)"
@@ -958,7 +966,7 @@ module VertxRedis
     # @return [self]
     def hmget(key=nil,fields=nil)
       if key.class == String && fields.class == Array && block_given?
-        @j_del.java_method(:hmget, [Java::java.lang.String.java_class,Java::JavaUtil::List.java_class,Java::IoVertxCore::Handler.java_class]).call(key,fields.map { |element| element },(Proc.new { |ar| yield(ar.failed ? ar.cause : nil, ar.succeeded ? ar.result != nil ? JSON.parse(ar.result.encode) : nil : nil) }))
+        @j_del.java_method(:hmget, [Java::java.lang.String.java_class,Java::JavaUtil::List.java_class,Java::IoVertxCore::Handler.java_class]).call(key,fields.map { |element| element },(Proc.new { |ar| yield(ar.failed ? ar.cause : nil, ar.succeeded ? ar.result : nil) }))
         return self
       end
       raise ArgumentError, "Invalid arguments when calling hmget(key,fields)"
@@ -1007,7 +1015,7 @@ module VertxRedis
     # @return [self]
     def hvals(key=nil)
       if key.class == String && block_given?
-        @j_del.java_method(:hvals, [Java::java.lang.String.java_class,Java::IoVertxCore::Handler.java_class]).call(key,(Proc.new { |ar| yield(ar.failed ? ar.cause : nil, ar.succeeded ? ar.result != nil ? JSON.parse(ar.result.encode) : nil : nil) }))
+        @j_del.java_method(:hvals, [Java::java.lang.String.java_class,Java::IoVertxCore::Handler.java_class]).call(key,(Proc.new { |ar| yield(ar.failed ? ar.cause : nil, ar.succeeded ? ar.result : nil) }))
         return self
       end
       raise ArgumentError, "Invalid arguments when calling hvals(key)"
@@ -1052,7 +1060,7 @@ module VertxRedis
     # @return [self]
     def info
       if block_given?
-        @j_del.java_method(:info, [Java::IoVertxCore::Handler.java_class]).call((Proc.new { |ar| yield(ar.failed ? ar.cause : nil, ar.succeeded ? ar.result != nil ? JSON.parse(ar.result.encode) : nil : nil) }))
+        @j_del.java_method(:info, [Java::IoVertxCore::Handler.java_class]).call((Proc.new { |ar| yield(ar.failed ? ar.cause : nil, ar.succeeded ? ar.result : nil) }))
         return self
       end
       raise ArgumentError, "Invalid arguments when calling info()"
@@ -1063,7 +1071,7 @@ module VertxRedis
     # @return [self]
     def info_section(section=nil)
       if section.class == String && block_given?
-        @j_del.java_method(:infoSection, [Java::java.lang.String.java_class,Java::IoVertxCore::Handler.java_class]).call(section,(Proc.new { |ar| yield(ar.failed ? ar.cause : nil, ar.succeeded ? ar.result != nil ? JSON.parse(ar.result.encode) : nil : nil) }))
+        @j_del.java_method(:infoSection, [Java::java.lang.String.java_class,Java::IoVertxCore::Handler.java_class]).call(section,(Proc.new { |ar| yield(ar.failed ? ar.cause : nil, ar.succeeded ? ar.result : nil) }))
         return self
       end
       raise ArgumentError, "Invalid arguments when calling info_section(section)"
@@ -1074,7 +1082,7 @@ module VertxRedis
     # @return [self]
     def keys(pattern=nil)
       if pattern.class == String && block_given?
-        @j_del.java_method(:keys, [Java::java.lang.String.java_class,Java::IoVertxCore::Handler.java_class]).call(pattern,(Proc.new { |ar| yield(ar.failed ? ar.cause : nil, ar.succeeded ? ar.result != nil ? JSON.parse(ar.result.encode) : nil : nil) }))
+        @j_del.java_method(:keys, [Java::java.lang.String.java_class,Java::IoVertxCore::Handler.java_class]).call(pattern,(Proc.new { |ar| yield(ar.failed ? ar.cause : nil, ar.succeeded ? ar.result : nil) }))
         return self
       end
       raise ArgumentError, "Invalid arguments when calling keys(pattern)"
@@ -1181,7 +1189,7 @@ module VertxRedis
     # @return [self]
     def lrange(key=nil,from=nil,to=nil)
       if key.class == String && from.class == Fixnum && to.class == Fixnum && block_given?
-        @j_del.java_method(:lrange, [Java::java.lang.String.java_class,Java::long.java_class,Java::long.java_class,Java::IoVertxCore::Handler.java_class]).call(key,from,to,(Proc.new { |ar| yield(ar.failed ? ar.cause : nil, ar.succeeded ? ar.result != nil ? JSON.parse(ar.result.encode) : nil : nil) }))
+        @j_del.java_method(:lrange, [Java::java.lang.String.java_class,Java::long.java_class,Java::long.java_class,Java::IoVertxCore::Handler.java_class]).call(key,from,to,(Proc.new { |ar| yield(ar.failed ? ar.cause : nil, ar.succeeded ? ar.result : nil) }))
         return self
       end
       raise ArgumentError, "Invalid arguments when calling lrange(key,from,to)"
@@ -1231,7 +1239,7 @@ module VertxRedis
     # @return [self]
     def mget(key=nil)
       if key.class == String && block_given?
-        @j_del.java_method(:mget, [Java::java.lang.String.java_class,Java::IoVertxCore::Handler.java_class]).call(key,(Proc.new { |ar| yield(ar.failed ? ar.cause : nil, ar.succeeded ? ar.result != nil ? JSON.parse(ar.result.encode) : nil : nil) }))
+        @j_del.java_method(:mget, [Java::java.lang.String.java_class,Java::IoVertxCore::Handler.java_class]).call(key,(Proc.new { |ar| yield(ar.failed ? ar.cause : nil, ar.succeeded ? ar.result : nil) }))
         return self
       end
       raise ArgumentError, "Invalid arguments when calling mget(key)"
@@ -1242,7 +1250,7 @@ module VertxRedis
     # @return [self]
     def mget_many(keys=nil)
       if keys.class == Array && block_given?
-        @j_del.java_method(:mgetMany, [Java::JavaUtil::List.java_class,Java::IoVertxCore::Handler.java_class]).call(keys.map { |element| element },(Proc.new { |ar| yield(ar.failed ? ar.cause : nil, ar.succeeded ? ar.result != nil ? JSON.parse(ar.result.encode) : nil : nil) }))
+        @j_del.java_method(:mgetMany, [Java::JavaUtil::List.java_class,Java::IoVertxCore::Handler.java_class]).call(keys.map { |element| element },(Proc.new { |ar| yield(ar.failed ? ar.cause : nil, ar.succeeded ? ar.result : nil) }))
         return self
       end
       raise ArgumentError, "Invalid arguments when calling mget_many(keys)"
@@ -1268,7 +1276,7 @@ module VertxRedis
     # @return [self]
     def monitor
       if block_given?
-        @j_del.java_method(:monitor, [Java::IoVertxCore::Handler.java_class]).call((Proc.new { |ar| yield(ar.failed ? ar.cause : nil) }))
+        @j_del.java_method(:monitor, [Java::IoVertxCore::Handler.java_class]).call((Proc.new { |ar| yield(ar.failed ? ar.cause : nil, ar.succeeded ? ar.result : nil) }))
         return self
       end
       raise ArgumentError, "Invalid arguments when calling monitor()"
@@ -1307,6 +1315,16 @@ module VertxRedis
       end
       raise ArgumentError, "Invalid arguments when calling msetnx(keyvals)"
     end
+    #  Mark the start of a RedisTransaction block
+    # @yield 
+    # @return [self]
+    def multi
+      if block_given?
+        @j_del.java_method(:multi, [Java::IoVertxCore::Handler.java_class]).call((Proc.new { |ar| yield(ar.failed ? ar.cause : nil, ar.succeeded ? ar.result : nil) }))
+        return self
+      end
+      raise ArgumentError, "Invalid arguments when calling multi()"
+    end
     #  Inspect the internals of Redis objects
     # @param [String] key Key string
     # @param [:REFCOUNT,:ENCODING,:IDLETIME] cmd Object sub command
@@ -1314,7 +1332,7 @@ module VertxRedis
     # @return [self]
     def object(key=nil,cmd=nil)
       if key.class == String && cmd.class == Symbol && block_given?
-        @j_del.java_method(:object, [Java::java.lang.String.java_class,Java::IoVertxRedisOp::ObjectCmd.java_class,Java::IoVertxCore::Handler.java_class]).call(key,Java::IoVertxRedisOp::ObjectCmd.valueOf(cmd),(Proc.new { |ar| yield(ar.failed ? ar.cause : nil) }))
+        @j_del.java_method(:object, [Java::java.lang.String.java_class,Java::IoVertxRedisOp::ObjectCmd.java_class,Java::IoVertxCore::Handler.java_class]).call(key,Java::IoVertxRedisOp::ObjectCmd.valueOf(cmd),(Proc.new { |ar| yield(ar.failed ? ar.cause : nil, ar.succeeded ? ar.result : nil) }))
         return self
       end
       raise ArgumentError, "Invalid arguments when calling object(key,cmd)"
@@ -1430,7 +1448,7 @@ module VertxRedis
     # @return [self]
     def psetex(key=nil,millis=nil,value=nil)
       if key.class == String && millis.class == Fixnum && value.class == String && block_given?
-        @j_del.java_method(:psetex, [Java::java.lang.String.java_class,Java::long.java_class,Java::java.lang.String.java_class,Java::IoVertxCore::Handler.java_class]).call(key,millis,value,(Proc.new { |ar| yield(ar.failed ? ar.cause : nil) }))
+        @j_del.java_method(:psetex, [Java::java.lang.String.java_class,Java::long.java_class,Java::java.lang.String.java_class,Java::IoVertxCore::Handler.java_class]).call(key,millis,value,(Proc.new { |ar| yield(ar.failed ? ar.cause : nil, ar.succeeded ? ar.result : nil) }))
         return self
       end
       raise ArgumentError, "Invalid arguments when calling psetex(key,millis,value)"
@@ -1441,7 +1459,7 @@ module VertxRedis
     # @return [self]
     def psubscribe(pattern=nil)
       if pattern.class == String && block_given?
-        @j_del.java_method(:psubscribe, [Java::java.lang.String.java_class,Java::IoVertxCore::Handler.java_class]).call(pattern,(Proc.new { |ar| yield(ar.failed ? ar.cause : nil, ar.succeeded ? ar.result != nil ? JSON.parse(ar.result.encode) : nil : nil) }))
+        @j_del.java_method(:psubscribe, [Java::java.lang.String.java_class,Java::IoVertxCore::Handler.java_class]).call(pattern,(Proc.new { |ar| yield(ar.failed ? ar.cause : nil, ar.succeeded ? ar.result : nil) }))
         return self
       end
       raise ArgumentError, "Invalid arguments when calling psubscribe(pattern)"
@@ -1452,7 +1470,7 @@ module VertxRedis
     # @return [self]
     def psubscribe_many(patterns=nil)
       if patterns.class == Array && block_given?
-        @j_del.java_method(:psubscribeMany, [Java::JavaUtil::List.java_class,Java::IoVertxCore::Handler.java_class]).call(patterns.map { |element| element },(Proc.new { |ar| yield(ar.failed ? ar.cause : nil, ar.succeeded ? ar.result != nil ? JSON.parse(ar.result.encode) : nil : nil) }))
+        @j_del.java_method(:psubscribeMany, [Java::JavaUtil::List.java_class,Java::IoVertxCore::Handler.java_class]).call(patterns.map { |element| element },(Proc.new { |ar| yield(ar.failed ? ar.cause : nil, ar.succeeded ? ar.result : nil) }))
         return self
       end
       raise ArgumentError, "Invalid arguments when calling psubscribe_many(patterns)"
@@ -1463,7 +1481,7 @@ module VertxRedis
     # @return [self]
     def pubsub_channels(pattern=nil)
       if pattern.class == String && block_given?
-        @j_del.java_method(:pubsubChannels, [Java::java.lang.String.java_class,Java::IoVertxCore::Handler.java_class]).call(pattern,(Proc.new { |ar| yield(ar.failed ? ar.cause : nil, ar.succeeded ? ar.result != nil ? JSON.parse(ar.result.encode) : nil : nil) }))
+        @j_del.java_method(:pubsubChannels, [Java::java.lang.String.java_class,Java::IoVertxCore::Handler.java_class]).call(pattern,(Proc.new { |ar| yield(ar.failed ? ar.cause : nil, ar.succeeded ? ar.result : nil) }))
         return self
       end
       raise ArgumentError, "Invalid arguments when calling pubsub_channels(pattern)"
@@ -1474,7 +1492,7 @@ module VertxRedis
     # @return [self]
     def pubsub_numsub(channels=nil)
       if channels.class == Array && block_given?
-        @j_del.java_method(:pubsubNumsub, [Java::JavaUtil::List.java_class,Java::IoVertxCore::Handler.java_class]).call(channels.map { |element| element },(Proc.new { |ar| yield(ar.failed ? ar.cause : nil, ar.succeeded ? ar.result != nil ? JSON.parse(ar.result.encode) : nil : nil) }))
+        @j_del.java_method(:pubsubNumsub, [Java::JavaUtil::List.java_class,Java::IoVertxCore::Handler.java_class]).call(channels.map { |element| element },(Proc.new { |ar| yield(ar.failed ? ar.cause : nil, ar.succeeded ? ar.result : nil) }))
         return self
       end
       raise ArgumentError, "Invalid arguments when calling pubsub_numsub(channels)"
@@ -1518,7 +1536,7 @@ module VertxRedis
     # @return [self]
     def punsubscribe(patterns=nil)
       if patterns.class == Array && block_given?
-        @j_del.java_method(:punsubscribe, [Java::JavaUtil::List.java_class,Java::IoVertxCore::Handler.java_class]).call(patterns.map { |element| element },(Proc.new { |ar| yield(ar.failed ? ar.cause : nil) }))
+        @j_del.java_method(:punsubscribe, [Java::JavaUtil::List.java_class,Java::IoVertxCore::Handler.java_class]).call(patterns.map { |element| element },(Proc.new { |ar| yield(ar.failed ? ar.cause : nil, ar.succeeded ? ar.result : nil) }))
         return self
       end
       raise ArgumentError, "Invalid arguments when calling punsubscribe(patterns)"
@@ -1575,7 +1593,7 @@ module VertxRedis
     # @return [self]
     def role
       if block_given?
-        @j_del.java_method(:role, [Java::IoVertxCore::Handler.java_class]).call((Proc.new { |ar| yield(ar.failed ? ar.cause : nil, ar.succeeded ? ar.result != nil ? JSON.parse(ar.result.encode) : nil : nil) }))
+        @j_del.java_method(:role, [Java::IoVertxCore::Handler.java_class]).call((Proc.new { |ar| yield(ar.failed ? ar.cause : nil, ar.succeeded ? ar.result : nil) }))
         return self
       end
       raise ArgumentError, "Invalid arguments when calling role()"
@@ -1690,7 +1708,7 @@ module VertxRedis
     # @return [self]
     def script_exists(script=nil)
       if script.class == String && block_given?
-        @j_del.java_method(:scriptExists, [Java::java.lang.String.java_class,Java::IoVertxCore::Handler.java_class]).call(script,(Proc.new { |ar| yield(ar.failed ? ar.cause : nil, ar.succeeded ? ar.result != nil ? JSON.parse(ar.result.encode) : nil : nil) }))
+        @j_del.java_method(:scriptExists, [Java::java.lang.String.java_class,Java::IoVertxCore::Handler.java_class]).call(script,(Proc.new { |ar| yield(ar.failed ? ar.cause : nil, ar.succeeded ? ar.result : nil) }))
         return self
       end
       raise ArgumentError, "Invalid arguments when calling script_exists(script)"
@@ -1701,7 +1719,7 @@ module VertxRedis
     # @return [self]
     def script_exists_many(scripts=nil)
       if scripts.class == Array && block_given?
-        @j_del.java_method(:scriptExistsMany, [Java::JavaUtil::List.java_class,Java::IoVertxCore::Handler.java_class]).call(scripts.map { |element| element },(Proc.new { |ar| yield(ar.failed ? ar.cause : nil, ar.succeeded ? ar.result != nil ? JSON.parse(ar.result.encode) : nil : nil) }))
+        @j_del.java_method(:scriptExistsMany, [Java::JavaUtil::List.java_class,Java::IoVertxCore::Handler.java_class]).call(scripts.map { |element| element },(Proc.new { |ar| yield(ar.failed ? ar.cause : nil, ar.succeeded ? ar.result : nil) }))
         return self
       end
       raise ArgumentError, "Invalid arguments when calling script_exists_many(scripts)"
@@ -1744,7 +1762,7 @@ module VertxRedis
     # @return [self]
     def sdiff(key=nil,cmpkeys=nil)
       if key.class == String && cmpkeys.class == Array && block_given?
-        @j_del.java_method(:sdiff, [Java::java.lang.String.java_class,Java::JavaUtil::List.java_class,Java::IoVertxCore::Handler.java_class]).call(key,cmpkeys.map { |element| element },(Proc.new { |ar| yield(ar.failed ? ar.cause : nil, ar.succeeded ? ar.result != nil ? JSON.parse(ar.result.encode) : nil : nil) }))
+        @j_del.java_method(:sdiff, [Java::java.lang.String.java_class,Java::JavaUtil::List.java_class,Java::IoVertxCore::Handler.java_class]).call(key,cmpkeys.map { |element| element },(Proc.new { |ar| yield(ar.failed ? ar.cause : nil, ar.succeeded ? ar.result : nil) }))
         return self
       end
       raise ArgumentError, "Invalid arguments when calling sdiff(key,cmpkeys)"
@@ -1780,7 +1798,7 @@ module VertxRedis
     # @return [self]
     def set(key=nil,value=nil)
       if key.class == String && value.class == String && block_given?
-        @j_del.java_method(:set, [Java::java.lang.String.java_class,Java::java.lang.String.java_class,Java::IoVertxCore::Handler.java_class]).call(key,value,(Proc.new { |ar| yield(ar.failed ? ar.cause : nil) }))
+        @j_del.java_method(:set, [Java::java.lang.String.java_class,Java::java.lang.String.java_class,Java::IoVertxCore::Handler.java_class]).call(key,value,(Proc.new { |ar| yield(ar.failed ? ar.cause : nil, ar.succeeded ? ar.result : nil) }))
         return self
       end
       raise ArgumentError, "Invalid arguments when calling set(key,value)"
@@ -1805,7 +1823,7 @@ module VertxRedis
     # @return [self]
     def set_binary(key=nil,value=nil)
       if key.class == String && value.class.method_defined?(:j_del) && block_given?
-        @j_del.java_method(:setBinary, [Java::java.lang.String.java_class,Java::IoVertxCoreBuffer::Buffer.java_class,Java::IoVertxCore::Handler.java_class]).call(key,value.j_del,(Proc.new { |ar| yield(ar.failed ? ar.cause : nil) }))
+        @j_del.java_method(:setBinary, [Java::java.lang.String.java_class,Java::IoVertxCoreBuffer::Buffer.java_class,Java::IoVertxCore::Handler.java_class]).call(key,value.j_del,(Proc.new { |ar| yield(ar.failed ? ar.cause : nil, ar.succeeded ? ar.result : nil) }))
         return self
       end
       raise ArgumentError, "Invalid arguments when calling set_binary(key,value)"
@@ -1818,7 +1836,7 @@ module VertxRedis
     # @return [self]
     def set_binary_with_options(key=nil,value=nil,options=nil)
       if key.class == String && value.class.method_defined?(:j_del) && options.class == Hash && block_given?
-        @j_del.java_method(:setBinaryWithOptions, [Java::java.lang.String.java_class,Java::IoVertxCoreBuffer::Buffer.java_class,Java::IoVertxRedisOp::SetOptions.java_class,Java::IoVertxCore::Handler.java_class]).call(key,value.j_del,Java::IoVertxRedisOp::SetOptions.new(::Vertx::Util::Utils.to_json_object(options)),(Proc.new { |ar| yield(ar.failed ? ar.cause : nil) }))
+        @j_del.java_method(:setBinaryWithOptions, [Java::java.lang.String.java_class,Java::IoVertxCoreBuffer::Buffer.java_class,Java::IoVertxRedisOp::SetOptions.java_class,Java::IoVertxCore::Handler.java_class]).call(key,value.j_del,Java::IoVertxRedisOp::SetOptions.new(::Vertx::Util::Utils.to_json_object(options)),(Proc.new { |ar| yield(ar.failed ? ar.cause : nil, ar.succeeded ? ar.result : nil) }))
         return self
       end
       raise ArgumentError, "Invalid arguments when calling set_binary_with_options(key,value,options)"
@@ -1880,7 +1898,7 @@ module VertxRedis
     # @return [self]
     def sinter(keys=nil)
       if keys.class == Array && block_given?
-        @j_del.java_method(:sinter, [Java::JavaUtil::List.java_class,Java::IoVertxCore::Handler.java_class]).call(keys.map { |element| element },(Proc.new { |ar| yield(ar.failed ? ar.cause : nil, ar.succeeded ? ar.result != nil ? JSON.parse(ar.result.encode) : nil : nil) }))
+        @j_del.java_method(:sinter, [Java::JavaUtil::List.java_class,Java::IoVertxCore::Handler.java_class]).call(keys.map { |element| element },(Proc.new { |ar| yield(ar.failed ? ar.cause : nil, ar.succeeded ? ar.result : nil) }))
         return self
       end
       raise ArgumentError, "Invalid arguments when calling sinter(keys)"
@@ -1937,7 +1955,7 @@ module VertxRedis
     # @return [self]
     def slowlog_get(limit=nil)
       if limit.class == Fixnum && block_given?
-        @j_del.java_method(:slowlogGet, [Java::int.java_class,Java::IoVertxCore::Handler.java_class]).call(limit,(Proc.new { |ar| yield(ar.failed ? ar.cause : nil, ar.succeeded ? ar.result != nil ? JSON.parse(ar.result.encode) : nil : nil) }))
+        @j_del.java_method(:slowlogGet, [Java::int.java_class,Java::IoVertxCore::Handler.java_class]).call(limit,(Proc.new { |ar| yield(ar.failed ? ar.cause : nil, ar.succeeded ? ar.result : nil) }))
         return self
       end
       raise ArgumentError, "Invalid arguments when calling slowlog_get(limit)"
@@ -1957,7 +1975,7 @@ module VertxRedis
     # @return [self]
     def slowlog_reset
       if block_given?
-        @j_del.java_method(:slowlogReset, [Java::IoVertxCore::Handler.java_class]).call((Proc.new { |ar| yield(ar.failed ? ar.cause : nil) }))
+        @j_del.java_method(:slowlogReset, [Java::IoVertxCore::Handler.java_class]).call((Proc.new { |ar| yield(ar.failed ? ar.cause : nil, ar.succeeded ? ar.result : nil) }))
         return self
       end
       raise ArgumentError, "Invalid arguments when calling slowlog_reset()"
@@ -1968,7 +1986,7 @@ module VertxRedis
     # @return [self]
     def smembers(key=nil)
       if key.class == String && block_given?
-        @j_del.java_method(:smembers, [Java::java.lang.String.java_class,Java::IoVertxCore::Handler.java_class]).call(key,(Proc.new { |ar| yield(ar.failed ? ar.cause : nil, ar.succeeded ? ar.result != nil ? JSON.parse(ar.result.encode) : nil : nil) }))
+        @j_del.java_method(:smembers, [Java::java.lang.String.java_class,Java::IoVertxCore::Handler.java_class]).call(key,(Proc.new { |ar| yield(ar.failed ? ar.cause : nil, ar.succeeded ? ar.result : nil) }))
         return self
       end
       raise ArgumentError, "Invalid arguments when calling smembers(key)"
@@ -1993,7 +2011,7 @@ module VertxRedis
     # @return [self]
     def sort(key=nil,options=nil)
       if key.class == String && options.class == Hash && block_given?
-        @j_del.java_method(:sort, [Java::java.lang.String.java_class,Java::IoVertxRedisOp::SortOptions.java_class,Java::IoVertxCore::Handler.java_class]).call(key,Java::IoVertxRedisOp::SortOptions.new(::Vertx::Util::Utils.to_json_object(options)),(Proc.new { |ar| yield(ar.failed ? ar.cause : nil, ar.succeeded ? ar.result != nil ? JSON.parse(ar.result.encode) : nil : nil) }))
+        @j_del.java_method(:sort, [Java::java.lang.String.java_class,Java::IoVertxRedisOp::SortOptions.java_class,Java::IoVertxCore::Handler.java_class]).call(key,Java::IoVertxRedisOp::SortOptions.new(::Vertx::Util::Utils.to_json_object(options)),(Proc.new { |ar| yield(ar.failed ? ar.cause : nil, ar.succeeded ? ar.result : nil) }))
         return self
       end
       raise ArgumentError, "Invalid arguments when calling sort(key,options)"
@@ -2039,7 +2057,7 @@ module VertxRedis
     # @return [self]
     def srandmember_count(key=nil,count=nil)
       if key.class == String && count.class == Fixnum && block_given?
-        @j_del.java_method(:srandmemberCount, [Java::java.lang.String.java_class,Java::int.java_class,Java::IoVertxCore::Handler.java_class]).call(key,count,(Proc.new { |ar| yield(ar.failed ? ar.cause : nil, ar.succeeded ? ar.result != nil ? JSON.parse(ar.result.encode) : nil : nil) }))
+        @j_del.java_method(:srandmemberCount, [Java::java.lang.String.java_class,Java::int.java_class,Java::IoVertxCore::Handler.java_class]).call(key,count,(Proc.new { |ar| yield(ar.failed ? ar.cause : nil, ar.succeeded ? ar.result : nil) }))
         return self
       end
       raise ArgumentError, "Invalid arguments when calling srandmember_count(key,count)"
@@ -2085,7 +2103,7 @@ module VertxRedis
     # @return [self]
     def subscribe(channel=nil)
       if channel.class == String && block_given?
-        @j_del.java_method(:subscribe, [Java::java.lang.String.java_class,Java::IoVertxCore::Handler.java_class]).call(channel,(Proc.new { |ar| yield(ar.failed ? ar.cause : nil, ar.succeeded ? ar.result != nil ? JSON.parse(ar.result.encode) : nil : nil) }))
+        @j_del.java_method(:subscribe, [Java::java.lang.String.java_class,Java::IoVertxCore::Handler.java_class]).call(channel,(Proc.new { |ar| yield(ar.failed ? ar.cause : nil, ar.succeeded ? ar.result : nil) }))
         return self
       end
       raise ArgumentError, "Invalid arguments when calling subscribe(channel)"
@@ -2096,7 +2114,7 @@ module VertxRedis
     # @return [self]
     def subscribe_many(channels=nil)
       if channels.class == Array && block_given?
-        @j_del.java_method(:subscribeMany, [Java::JavaUtil::List.java_class,Java::IoVertxCore::Handler.java_class]).call(channels.map { |element| element },(Proc.new { |ar| yield(ar.failed ? ar.cause : nil, ar.succeeded ? ar.result != nil ? JSON.parse(ar.result.encode) : nil : nil) }))
+        @j_del.java_method(:subscribeMany, [Java::JavaUtil::List.java_class,Java::IoVertxCore::Handler.java_class]).call(channels.map { |element| element },(Proc.new { |ar| yield(ar.failed ? ar.cause : nil, ar.succeeded ? ar.result : nil) }))
         return self
       end
       raise ArgumentError, "Invalid arguments when calling subscribe_many(channels)"
@@ -2107,7 +2125,7 @@ module VertxRedis
     # @return [self]
     def sunion(keys=nil)
       if keys.class == Array && block_given?
-        @j_del.java_method(:sunion, [Java::JavaUtil::List.java_class,Java::IoVertxCore::Handler.java_class]).call(keys.map { |element| element },(Proc.new { |ar| yield(ar.failed ? ar.cause : nil, ar.succeeded ? ar.result != nil ? JSON.parse(ar.result.encode) : nil : nil) }))
+        @j_del.java_method(:sunion, [Java::JavaUtil::List.java_class,Java::IoVertxCore::Handler.java_class]).call(keys.map { |element| element },(Proc.new { |ar| yield(ar.failed ? ar.cause : nil, ar.succeeded ? ar.result : nil) }))
         return self
       end
       raise ArgumentError, "Invalid arguments when calling sunion(keys)"
@@ -2129,7 +2147,7 @@ module VertxRedis
     # @return [self]
     def sync
       if block_given?
-        @j_del.java_method(:sync, [Java::IoVertxCore::Handler.java_class]).call((Proc.new { |ar| yield(ar.failed ? ar.cause : nil) }))
+        @j_del.java_method(:sync, [Java::IoVertxCore::Handler.java_class]).call((Proc.new { |ar| yield(ar.failed ? ar.cause : nil, ar.succeeded ? ar.result : nil) }))
         return self
       end
       raise ArgumentError, "Invalid arguments when calling sync()"
@@ -2139,18 +2157,10 @@ module VertxRedis
     # @return [self]
     def time
       if block_given?
-        @j_del.java_method(:time, [Java::IoVertxCore::Handler.java_class]).call((Proc.new { |ar| yield(ar.failed ? ar.cause : nil, ar.succeeded ? ar.result != nil ? JSON.parse(ar.result.encode) : nil : nil) }))
+        @j_del.java_method(:time, [Java::IoVertxCore::Handler.java_class]).call((Proc.new { |ar| yield(ar.failed ? ar.cause : nil, ar.succeeded ? ar.result : nil) }))
         return self
       end
       raise ArgumentError, "Invalid arguments when calling time()"
-    end
-    #  Return a RedisTransaction instance
-    # @return [::VertxRedis::RedisTransaction] transaction instance
-    def transaction
-      if !block_given?
-        return ::Vertx::Util::Utils.safe_create(@j_del.java_method(:transaction, []).call(),::VertxRedis::RedisTransaction)
-      end
-      raise ArgumentError, "Invalid arguments when calling transaction()"
     end
     #  Get the time to live for a key
     # @param [String] key Key string
@@ -2180,10 +2190,20 @@ module VertxRedis
     # @return [self]
     def unsubscribe(channels=nil)
       if channels.class == Array && block_given?
-        @j_del.java_method(:unsubscribe, [Java::JavaUtil::List.java_class,Java::IoVertxCore::Handler.java_class]).call(channels.map { |element| element },(Proc.new { |ar| yield(ar.failed ? ar.cause : nil) }))
+        @j_del.java_method(:unsubscribe, [Java::JavaUtil::List.java_class,Java::IoVertxCore::Handler.java_class]).call(channels.map { |element| element },(Proc.new { |ar| yield(ar.failed ? ar.cause : nil, ar.succeeded ? ar.result : nil) }))
         return self
       end
       raise ArgumentError, "Invalid arguments when calling unsubscribe(channels)"
+    end
+    #  Forget about all watched keys
+    # @yield 
+    # @return [self]
+    def unwatch
+      if block_given?
+        @j_del.java_method(:unwatch, [Java::IoVertxCore::Handler.java_class]).call((Proc.new { |ar| yield(ar.failed ? ar.cause : nil, ar.succeeded ? ar.result : nil) }))
+        return self
+      end
+      raise ArgumentError, "Invalid arguments when calling unwatch()"
     end
     #  Wait for the synchronous replication of all the write commands sent in the context of the current connection.
     # @param [Fixnum] numSlaves 
@@ -2196,6 +2216,28 @@ module VertxRedis
         return self
       end
       raise ArgumentError, "Invalid arguments when calling wait(numSlaves,timeout)"
+    end
+    #  Watch the given keys to determine execution of the MULTI/EXEC block
+    # @param [String] key Key to watch
+    # @yield Handler for the result of this call.
+    # @return [self]
+    def watch(key=nil)
+      if key.class == String && block_given?
+        @j_del.java_method(:watch, [Java::java.lang.String.java_class,Java::IoVertxCore::Handler.java_class]).call(key,(Proc.new { |ar| yield(ar.failed ? ar.cause : nil, ar.succeeded ? ar.result : nil) }))
+        return self
+      end
+      raise ArgumentError, "Invalid arguments when calling watch(key)"
+    end
+    #  Watch the given keys to determine execution of the MULTI/EXEC block
+    # @param [Array<String>] keys List of keys to watch
+    # @yield Handler for the result of this call.
+    # @return [self]
+    def watch_many(keys=nil)
+      if keys.class == Array && block_given?
+        @j_del.java_method(:watchMany, [Java::JavaUtil::List.java_class,Java::IoVertxCore::Handler.java_class]).call(keys.map { |element| element },(Proc.new { |ar| yield(ar.failed ? ar.cause : nil, ar.succeeded ? ar.result : nil) }))
+        return self
+      end
+      raise ArgumentError, "Invalid arguments when calling watch_many(keys)"
     end
     #  Add one or more members to a sorted set, or update its score if it already exists
     # @param [String] key Key string
@@ -2306,7 +2348,7 @@ module VertxRedis
     # @return [self]
     def zrange(key=nil,start=nil,stop=nil)
       if key.class == String && start.class == Fixnum && stop.class == Fixnum && block_given?
-        @j_del.java_method(:zrange, [Java::java.lang.String.java_class,Java::long.java_class,Java::long.java_class,Java::IoVertxCore::Handler.java_class]).call(key,start,stop,(Proc.new { |ar| yield(ar.failed ? ar.cause : nil, ar.succeeded ? ar.result != nil ? JSON.parse(ar.result.encode) : nil : nil) }))
+        @j_del.java_method(:zrange, [Java::java.lang.String.java_class,Java::long.java_class,Java::long.java_class,Java::IoVertxCore::Handler.java_class]).call(key,start,stop,(Proc.new { |ar| yield(ar.failed ? ar.cause : nil, ar.succeeded ? ar.result : nil) }))
         return self
       end
       raise ArgumentError, "Invalid arguments when calling zrange(key,start,stop)"
@@ -2320,7 +2362,7 @@ module VertxRedis
     # @return [self]
     def zrange_with_options(key=nil,start=nil,stop=nil,options=nil)
       if key.class == String && start.class == Fixnum && stop.class == Fixnum && options.class == Symbol && block_given?
-        @j_del.java_method(:zrangeWithOptions, [Java::java.lang.String.java_class,Java::long.java_class,Java::long.java_class,Java::IoVertxRedisOp::RangeOptions.java_class,Java::IoVertxCore::Handler.java_class]).call(key,start,stop,Java::IoVertxRedisOp::RangeOptions.valueOf(options),(Proc.new { |ar| yield(ar.failed ? ar.cause : nil, ar.succeeded ? ar.result != nil ? JSON.parse(ar.result.encode) : nil : nil) }))
+        @j_del.java_method(:zrangeWithOptions, [Java::java.lang.String.java_class,Java::long.java_class,Java::long.java_class,Java::IoVertxRedisOp::RangeOptions.java_class,Java::IoVertxCore::Handler.java_class]).call(key,start,stop,Java::IoVertxRedisOp::RangeOptions.valueOf(options),(Proc.new { |ar| yield(ar.failed ? ar.cause : nil, ar.succeeded ? ar.result : nil) }))
         return self
       end
       raise ArgumentError, "Invalid arguments when calling zrange_with_options(key,start,stop,options)"
@@ -2334,7 +2376,7 @@ module VertxRedis
     # @return [self]
     def zrangebylex(key=nil,min=nil,max=nil,options=nil)
       if key.class == String && min.class == String && max.class == String && options.class == Hash && block_given?
-        @j_del.java_method(:zrangebylex, [Java::java.lang.String.java_class,Java::java.lang.String.java_class,Java::java.lang.String.java_class,Java::IoVertxRedisOp::LimitOptions.java_class,Java::IoVertxCore::Handler.java_class]).call(key,min,max,Java::IoVertxRedisOp::LimitOptions.new(::Vertx::Util::Utils.to_json_object(options)),(Proc.new { |ar| yield(ar.failed ? ar.cause : nil, ar.succeeded ? ar.result != nil ? JSON.parse(ar.result.encode) : nil : nil) }))
+        @j_del.java_method(:zrangebylex, [Java::java.lang.String.java_class,Java::java.lang.String.java_class,Java::java.lang.String.java_class,Java::IoVertxRedisOp::LimitOptions.java_class,Java::IoVertxCore::Handler.java_class]).call(key,min,max,Java::IoVertxRedisOp::LimitOptions.new(::Vertx::Util::Utils.to_json_object(options)),(Proc.new { |ar| yield(ar.failed ? ar.cause : nil, ar.succeeded ? ar.result : nil) }))
         return self
       end
       raise ArgumentError, "Invalid arguments when calling zrangebylex(key,min,max,options)"
@@ -2348,7 +2390,7 @@ module VertxRedis
     # @return [self]
     def zrangebyscore(key=nil,min=nil,max=nil,options=nil)
       if key.class == String && min.class == String && max.class == String && options.class == Hash && block_given?
-        @j_del.java_method(:zrangebyscore, [Java::java.lang.String.java_class,Java::java.lang.String.java_class,Java::java.lang.String.java_class,Java::IoVertxRedisOp::RangeLimitOptions.java_class,Java::IoVertxCore::Handler.java_class]).call(key,min,max,Java::IoVertxRedisOp::RangeLimitOptions.new(::Vertx::Util::Utils.to_json_object(options)),(Proc.new { |ar| yield(ar.failed ? ar.cause : nil, ar.succeeded ? ar.result != nil ? JSON.parse(ar.result.encode) : nil : nil) }))
+        @j_del.java_method(:zrangebyscore, [Java::java.lang.String.java_class,Java::java.lang.String.java_class,Java::java.lang.String.java_class,Java::IoVertxRedisOp::RangeLimitOptions.java_class,Java::IoVertxCore::Handler.java_class]).call(key,min,max,Java::IoVertxRedisOp::RangeLimitOptions.new(::Vertx::Util::Utils.to_json_object(options)),(Proc.new { |ar| yield(ar.failed ? ar.cause : nil, ar.succeeded ? ar.result : nil) }))
         return self
       end
       raise ArgumentError, "Invalid arguments when calling zrangebyscore(key,min,max,options)"
@@ -2437,7 +2479,7 @@ module VertxRedis
     # @return [self]
     def zrevrange(key=nil,start=nil,stop=nil,options=nil)
       if key.class == String && start.class == Fixnum && stop.class == Fixnum && options.class == Symbol && block_given?
-        @j_del.java_method(:zrevrange, [Java::java.lang.String.java_class,Java::long.java_class,Java::long.java_class,Java::IoVertxRedisOp::RangeOptions.java_class,Java::IoVertxCore::Handler.java_class]).call(key,start,stop,Java::IoVertxRedisOp::RangeOptions.valueOf(options),(Proc.new { |ar| yield(ar.failed ? ar.cause : nil, ar.succeeded ? ar.result != nil ? JSON.parse(ar.result.encode) : nil : nil) }))
+        @j_del.java_method(:zrevrange, [Java::java.lang.String.java_class,Java::long.java_class,Java::long.java_class,Java::IoVertxRedisOp::RangeOptions.java_class,Java::IoVertxCore::Handler.java_class]).call(key,start,stop,Java::IoVertxRedisOp::RangeOptions.valueOf(options),(Proc.new { |ar| yield(ar.failed ? ar.cause : nil, ar.succeeded ? ar.result : nil) }))
         return self
       end
       raise ArgumentError, "Invalid arguments when calling zrevrange(key,start,stop,options)"
@@ -2451,7 +2493,7 @@ module VertxRedis
     # @return [self]
     def zrevrangebylex(key=nil,max=nil,min=nil,options=nil)
       if key.class == String && max.class == String && min.class == String && options.class == Hash && block_given?
-        @j_del.java_method(:zrevrangebylex, [Java::java.lang.String.java_class,Java::java.lang.String.java_class,Java::java.lang.String.java_class,Java::IoVertxRedisOp::LimitOptions.java_class,Java::IoVertxCore::Handler.java_class]).call(key,max,min,Java::IoVertxRedisOp::LimitOptions.new(::Vertx::Util::Utils.to_json_object(options)),(Proc.new { |ar| yield(ar.failed ? ar.cause : nil, ar.succeeded ? ar.result != nil ? JSON.parse(ar.result.encode) : nil : nil) }))
+        @j_del.java_method(:zrevrangebylex, [Java::java.lang.String.java_class,Java::java.lang.String.java_class,Java::java.lang.String.java_class,Java::IoVertxRedisOp::LimitOptions.java_class,Java::IoVertxCore::Handler.java_class]).call(key,max,min,Java::IoVertxRedisOp::LimitOptions.new(::Vertx::Util::Utils.to_json_object(options)),(Proc.new { |ar| yield(ar.failed ? ar.cause : nil, ar.succeeded ? ar.result : nil) }))
         return self
       end
       raise ArgumentError, "Invalid arguments when calling zrevrangebylex(key,max,min,options)"
@@ -2465,7 +2507,7 @@ module VertxRedis
     # @return [self]
     def zrevrangebyscore(key=nil,max=nil,min=nil,options=nil)
       if key.class == String && max.class == String && min.class == String && options.class == Hash && block_given?
-        @j_del.java_method(:zrevrangebyscore, [Java::java.lang.String.java_class,Java::java.lang.String.java_class,Java::java.lang.String.java_class,Java::IoVertxRedisOp::RangeLimitOptions.java_class,Java::IoVertxCore::Handler.java_class]).call(key,max,min,Java::IoVertxRedisOp::RangeLimitOptions.new(::Vertx::Util::Utils.to_json_object(options)),(Proc.new { |ar| yield(ar.failed ? ar.cause : nil, ar.succeeded ? ar.result != nil ? JSON.parse(ar.result.encode) : nil : nil) }))
+        @j_del.java_method(:zrevrangebyscore, [Java::java.lang.String.java_class,Java::java.lang.String.java_class,Java::java.lang.String.java_class,Java::IoVertxRedisOp::RangeLimitOptions.java_class,Java::IoVertxCore::Handler.java_class]).call(key,max,min,Java::IoVertxRedisOp::RangeLimitOptions.new(::Vertx::Util::Utils.to_json_object(options)),(Proc.new { |ar| yield(ar.failed ? ar.cause : nil, ar.succeeded ? ar.result : nil) }))
         return self
       end
       raise ArgumentError, "Invalid arguments when calling zrevrangebyscore(key,max,min,options)"
@@ -2527,7 +2569,7 @@ module VertxRedis
     # @return [self]
     def scan(cursor=nil,options=nil)
       if cursor.class == String && options.class == Hash && block_given?
-        @j_del.java_method(:scan, [Java::java.lang.String.java_class,Java::IoVertxRedisOp::ScanOptions.java_class,Java::IoVertxCore::Handler.java_class]).call(cursor,Java::IoVertxRedisOp::ScanOptions.new(::Vertx::Util::Utils.to_json_object(options)),(Proc.new { |ar| yield(ar.failed ? ar.cause : nil, ar.succeeded ? ar.result != nil ? JSON.parse(ar.result.encode) : nil : nil) }))
+        @j_del.java_method(:scan, [Java::java.lang.String.java_class,Java::IoVertxRedisOp::ScanOptions.java_class,Java::IoVertxCore::Handler.java_class]).call(cursor,Java::IoVertxRedisOp::ScanOptions.new(::Vertx::Util::Utils.to_json_object(options)),(Proc.new { |ar| yield(ar.failed ? ar.cause : nil, ar.succeeded ? ar.result : nil) }))
         return self
       end
       raise ArgumentError, "Invalid arguments when calling scan(cursor,options)"
@@ -2540,7 +2582,7 @@ module VertxRedis
     # @return [self]
     def sscan(key=nil,cursor=nil,options=nil)
       if key.class == String && cursor.class == String && options.class == Hash && block_given?
-        @j_del.java_method(:sscan, [Java::java.lang.String.java_class,Java::java.lang.String.java_class,Java::IoVertxRedisOp::ScanOptions.java_class,Java::IoVertxCore::Handler.java_class]).call(key,cursor,Java::IoVertxRedisOp::ScanOptions.new(::Vertx::Util::Utils.to_json_object(options)),(Proc.new { |ar| yield(ar.failed ? ar.cause : nil, ar.succeeded ? ar.result != nil ? JSON.parse(ar.result.encode) : nil : nil) }))
+        @j_del.java_method(:sscan, [Java::java.lang.String.java_class,Java::java.lang.String.java_class,Java::IoVertxRedisOp::ScanOptions.java_class,Java::IoVertxCore::Handler.java_class]).call(key,cursor,Java::IoVertxRedisOp::ScanOptions.new(::Vertx::Util::Utils.to_json_object(options)),(Proc.new { |ar| yield(ar.failed ? ar.cause : nil, ar.succeeded ? ar.result : nil) }))
         return self
       end
       raise ArgumentError, "Invalid arguments when calling sscan(key,cursor,options)"
@@ -2553,7 +2595,7 @@ module VertxRedis
     # @return [self]
     def hscan(key=nil,cursor=nil,options=nil)
       if key.class == String && cursor.class == String && options.class == Hash && block_given?
-        @j_del.java_method(:hscan, [Java::java.lang.String.java_class,Java::java.lang.String.java_class,Java::IoVertxRedisOp::ScanOptions.java_class,Java::IoVertxCore::Handler.java_class]).call(key,cursor,Java::IoVertxRedisOp::ScanOptions.new(::Vertx::Util::Utils.to_json_object(options)),(Proc.new { |ar| yield(ar.failed ? ar.cause : nil, ar.succeeded ? ar.result != nil ? JSON.parse(ar.result.encode) : nil : nil) }))
+        @j_del.java_method(:hscan, [Java::java.lang.String.java_class,Java::java.lang.String.java_class,Java::IoVertxRedisOp::ScanOptions.java_class,Java::IoVertxCore::Handler.java_class]).call(key,cursor,Java::IoVertxRedisOp::ScanOptions.new(::Vertx::Util::Utils.to_json_object(options)),(Proc.new { |ar| yield(ar.failed ? ar.cause : nil, ar.succeeded ? ar.result : nil) }))
         return self
       end
       raise ArgumentError, "Invalid arguments when calling hscan(key,cursor,options)"
@@ -2566,7 +2608,7 @@ module VertxRedis
     # @return [self]
     def zscan(key=nil,cursor=nil,options=nil)
       if key.class == String && cursor.class == String && options.class == Hash && block_given?
-        @j_del.java_method(:zscan, [Java::java.lang.String.java_class,Java::java.lang.String.java_class,Java::IoVertxRedisOp::ScanOptions.java_class,Java::IoVertxCore::Handler.java_class]).call(key,cursor,Java::IoVertxRedisOp::ScanOptions.new(::Vertx::Util::Utils.to_json_object(options)),(Proc.new { |ar| yield(ar.failed ? ar.cause : nil, ar.succeeded ? ar.result != nil ? JSON.parse(ar.result.encode) : nil : nil) }))
+        @j_del.java_method(:zscan, [Java::java.lang.String.java_class,Java::java.lang.String.java_class,Java::IoVertxRedisOp::ScanOptions.java_class,Java::IoVertxCore::Handler.java_class]).call(key,cursor,Java::IoVertxRedisOp::ScanOptions.new(::Vertx::Util::Utils.to_json_object(options)),(Proc.new { |ar| yield(ar.failed ? ar.cause : nil, ar.succeeded ? ar.result : nil) }))
         return self
       end
       raise ArgumentError, "Invalid arguments when calling zscan(key,cursor,options)"
@@ -2605,7 +2647,7 @@ module VertxRedis
     # @return [self]
     def geohash(key=nil,member=nil)
       if key.class == String && member.class == String && block_given?
-        @j_del.java_method(:geohash, [Java::java.lang.String.java_class,Java::java.lang.String.java_class,Java::IoVertxCore::Handler.java_class]).call(key,member,(Proc.new { |ar| yield(ar.failed ? ar.cause : nil, ar.succeeded ? ar.result != nil ? JSON.parse(ar.result.encode) : nil : nil) }))
+        @j_del.java_method(:geohash, [Java::java.lang.String.java_class,Java::java.lang.String.java_class,Java::IoVertxCore::Handler.java_class]).call(key,member,(Proc.new { |ar| yield(ar.failed ? ar.cause : nil, ar.succeeded ? ar.result : nil) }))
         return self
       end
       raise ArgumentError, "Invalid arguments when calling geohash(key,member)"
@@ -2618,7 +2660,7 @@ module VertxRedis
     # @return [self]
     def geohash_many(key=nil,members=nil)
       if key.class == String && members.class == Array && block_given?
-        @j_del.java_method(:geohashMany, [Java::java.lang.String.java_class,Java::JavaUtil::List.java_class,Java::IoVertxCore::Handler.java_class]).call(key,members.map { |element| element },(Proc.new { |ar| yield(ar.failed ? ar.cause : nil, ar.succeeded ? ar.result != nil ? JSON.parse(ar.result.encode) : nil : nil) }))
+        @j_del.java_method(:geohashMany, [Java::java.lang.String.java_class,Java::JavaUtil::List.java_class,Java::IoVertxCore::Handler.java_class]).call(key,members.map { |element| element },(Proc.new { |ar| yield(ar.failed ? ar.cause : nil, ar.succeeded ? ar.result : nil) }))
         return self
       end
       raise ArgumentError, "Invalid arguments when calling geohash_many(key,members)"
@@ -2631,7 +2673,7 @@ module VertxRedis
     # @return [self]
     def geopos(key=nil,member=nil)
       if key.class == String && member.class == String && block_given?
-        @j_del.java_method(:geopos, [Java::java.lang.String.java_class,Java::java.lang.String.java_class,Java::IoVertxCore::Handler.java_class]).call(key,member,(Proc.new { |ar| yield(ar.failed ? ar.cause : nil, ar.succeeded ? ar.result != nil ? JSON.parse(ar.result.encode) : nil : nil) }))
+        @j_del.java_method(:geopos, [Java::java.lang.String.java_class,Java::java.lang.String.java_class,Java::IoVertxCore::Handler.java_class]).call(key,member,(Proc.new { |ar| yield(ar.failed ? ar.cause : nil, ar.succeeded ? ar.result : nil) }))
         return self
       end
       raise ArgumentError, "Invalid arguments when calling geopos(key,member)"
@@ -2644,7 +2686,7 @@ module VertxRedis
     # @return [self]
     def geopos_many(key=nil,members=nil)
       if key.class == String && members.class == Array && block_given?
-        @j_del.java_method(:geoposMany, [Java::java.lang.String.java_class,Java::JavaUtil::List.java_class,Java::IoVertxCore::Handler.java_class]).call(key,members.map { |element| element },(Proc.new { |ar| yield(ar.failed ? ar.cause : nil, ar.succeeded ? ar.result != nil ? JSON.parse(ar.result.encode) : nil : nil) }))
+        @j_del.java_method(:geoposMany, [Java::java.lang.String.java_class,Java::JavaUtil::List.java_class,Java::IoVertxCore::Handler.java_class]).call(key,members.map { |element| element },(Proc.new { |ar| yield(ar.failed ? ar.cause : nil, ar.succeeded ? ar.result : nil) }))
         return self
       end
       raise ArgumentError, "Invalid arguments when calling geopos_many(key,members)"
@@ -2687,7 +2729,7 @@ module VertxRedis
     # @return [self]
     def georadius(key=nil,longitude=nil,latitude=nil,radius=nil,unit=nil)
       if key.class == String && longitude.class == Float && latitude.class == Float && radius.class == Float && unit.class == Symbol && block_given?
-        @j_del.java_method(:georadius, [Java::java.lang.String.java_class,Java::double.java_class,Java::double.java_class,Java::double.java_class,Java::IoVertxRedisOp::GeoUnit.java_class,Java::IoVertxCore::Handler.java_class]).call(key,::Vertx::Util::Utils.to_double(longitude),::Vertx::Util::Utils.to_double(latitude),::Vertx::Util::Utils.to_double(radius),Java::IoVertxRedisOp::GeoUnit.valueOf(unit),(Proc.new { |ar| yield(ar.failed ? ar.cause : nil, ar.succeeded ? ar.result != nil ? JSON.parse(ar.result.encode) : nil : nil) }))
+        @j_del.java_method(:georadius, [Java::java.lang.String.java_class,Java::double.java_class,Java::double.java_class,Java::double.java_class,Java::IoVertxRedisOp::GeoUnit.java_class,Java::IoVertxCore::Handler.java_class]).call(key,::Vertx::Util::Utils.to_double(longitude),::Vertx::Util::Utils.to_double(latitude),::Vertx::Util::Utils.to_double(radius),Java::IoVertxRedisOp::GeoUnit.valueOf(unit),(Proc.new { |ar| yield(ar.failed ? ar.cause : nil, ar.succeeded ? ar.result : nil) }))
         return self
       end
       raise ArgumentError, "Invalid arguments when calling georadius(key,longitude,latitude,radius,unit)"
@@ -2704,7 +2746,7 @@ module VertxRedis
     # @return [self]
     def georadius_with_options(key=nil,longitude=nil,latitude=nil,radius=nil,unit=nil,options=nil)
       if key.class == String && longitude.class == Float && latitude.class == Float && radius.class == Float && unit.class == Symbol && options.class == Hash && block_given?
-        @j_del.java_method(:georadiusWithOptions, [Java::java.lang.String.java_class,Java::double.java_class,Java::double.java_class,Java::double.java_class,Java::IoVertxRedisOp::GeoUnit.java_class,Java::IoVertxRedisOp::GeoRadiusOptions.java_class,Java::IoVertxCore::Handler.java_class]).call(key,::Vertx::Util::Utils.to_double(longitude),::Vertx::Util::Utils.to_double(latitude),::Vertx::Util::Utils.to_double(radius),Java::IoVertxRedisOp::GeoUnit.valueOf(unit),Java::IoVertxRedisOp::GeoRadiusOptions.new(::Vertx::Util::Utils.to_json_object(options)),(Proc.new { |ar| yield(ar.failed ? ar.cause : nil, ar.succeeded ? ar.result != nil ? JSON.parse(ar.result.encode) : nil : nil) }))
+        @j_del.java_method(:georadiusWithOptions, [Java::java.lang.String.java_class,Java::double.java_class,Java::double.java_class,Java::double.java_class,Java::IoVertxRedisOp::GeoUnit.java_class,Java::IoVertxRedisOp::GeoRadiusOptions.java_class,Java::IoVertxCore::Handler.java_class]).call(key,::Vertx::Util::Utils.to_double(longitude),::Vertx::Util::Utils.to_double(latitude),::Vertx::Util::Utils.to_double(radius),Java::IoVertxRedisOp::GeoUnit.valueOf(unit),Java::IoVertxRedisOp::GeoRadiusOptions.new(::Vertx::Util::Utils.to_json_object(options)),(Proc.new { |ar| yield(ar.failed ? ar.cause : nil, ar.succeeded ? ar.result : nil) }))
         return self
       end
       raise ArgumentError, "Invalid arguments when calling georadius_with_options(key,longitude,latitude,radius,unit,options)"
@@ -2720,7 +2762,7 @@ module VertxRedis
     # @return [self]
     def georadiusbymember(key=nil,member=nil,radius=nil,unit=nil)
       if key.class == String && member.class == String && radius.class == Float && unit.class == Symbol && block_given?
-        @j_del.java_method(:georadiusbymember, [Java::java.lang.String.java_class,Java::java.lang.String.java_class,Java::double.java_class,Java::IoVertxRedisOp::GeoUnit.java_class,Java::IoVertxCore::Handler.java_class]).call(key,member,::Vertx::Util::Utils.to_double(radius),Java::IoVertxRedisOp::GeoUnit.valueOf(unit),(Proc.new { |ar| yield(ar.failed ? ar.cause : nil, ar.succeeded ? ar.result != nil ? JSON.parse(ar.result.encode) : nil : nil) }))
+        @j_del.java_method(:georadiusbymember, [Java::java.lang.String.java_class,Java::java.lang.String.java_class,Java::double.java_class,Java::IoVertxRedisOp::GeoUnit.java_class,Java::IoVertxCore::Handler.java_class]).call(key,member,::Vertx::Util::Utils.to_double(radius),Java::IoVertxRedisOp::GeoUnit.valueOf(unit),(Proc.new { |ar| yield(ar.failed ? ar.cause : nil, ar.succeeded ? ar.result : nil) }))
         return self
       end
       raise ArgumentError, "Invalid arguments when calling georadiusbymember(key,member,radius,unit)"
@@ -2737,7 +2779,7 @@ module VertxRedis
     # @return [self]
     def georadiusbymember_with_options(key=nil,member=nil,radius=nil,unit=nil,options=nil)
       if key.class == String && member.class == String && radius.class == Float && unit.class == Symbol && options.class == Hash && block_given?
-        @j_del.java_method(:georadiusbymemberWithOptions, [Java::java.lang.String.java_class,Java::java.lang.String.java_class,Java::double.java_class,Java::IoVertxRedisOp::GeoUnit.java_class,Java::IoVertxRedisOp::GeoRadiusOptions.java_class,Java::IoVertxCore::Handler.java_class]).call(key,member,::Vertx::Util::Utils.to_double(radius),Java::IoVertxRedisOp::GeoUnit.valueOf(unit),Java::IoVertxRedisOp::GeoRadiusOptions.new(::Vertx::Util::Utils.to_json_object(options)),(Proc.new { |ar| yield(ar.failed ? ar.cause : nil, ar.succeeded ? ar.result != nil ? JSON.parse(ar.result.encode) : nil : nil) }))
+        @j_del.java_method(:georadiusbymemberWithOptions, [Java::java.lang.String.java_class,Java::java.lang.String.java_class,Java::double.java_class,Java::IoVertxRedisOp::GeoUnit.java_class,Java::IoVertxRedisOp::GeoRadiusOptions.java_class,Java::IoVertxCore::Handler.java_class]).call(key,member,::Vertx::Util::Utils.to_double(radius),Java::IoVertxRedisOp::GeoUnit.valueOf(unit),Java::IoVertxRedisOp::GeoRadiusOptions.new(::Vertx::Util::Utils.to_json_object(options)),(Proc.new { |ar| yield(ar.failed ? ar.cause : nil, ar.succeeded ? ar.result : nil) }))
         return self
       end
       raise ArgumentError, "Invalid arguments when calling georadiusbymember_with_options(key,member,radius,unit,options)"
