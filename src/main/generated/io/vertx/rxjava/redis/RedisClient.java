@@ -4234,7 +4234,7 @@ public class RedisClient {
    * @param handler Handler for the result of this call.
    * @return 
    */
-  public RedisClient spopMany(String key, int count, Handler<AsyncResult<String>> handler) { 
+  public RedisClient spopMany(String key, int count, Handler<AsyncResult<JsonArray>> handler) { 
     delegate.spopMany(key, count, handler);
     return this;
   }
@@ -4245,8 +4245,8 @@ public class RedisClient {
    * @param count Number of members to remove
    * @return 
    */
-  public Observable<String> spopManyObservable(String key, int count) { 
-    io.vertx.rx.java.ObservableFuture<String> handler = io.vertx.rx.java.RxHelper.observableFuture();
+  public Observable<JsonArray> spopManyObservable(String key, int count) { 
+    io.vertx.rx.java.ObservableFuture<JsonArray> handler = io.vertx.rx.java.RxHelper.observableFuture();
     spopMany(key, count, handler.toHandler());
     return handler;
   }

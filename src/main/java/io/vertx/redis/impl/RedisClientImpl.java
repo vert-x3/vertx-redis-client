@@ -2502,8 +2502,8 @@ public final class RedisClientImpl extends AbstractRedisClient {
   } 
 
   @Override
-  public RedisClient spopMany(String key, int count, Handler<AsyncResult<String>> handler) {
-    sendString(SPOP, toPayload(key, count), handler);
+  public RedisClient spopMany(String key, int count, Handler<AsyncResult<JsonArray>> handler) {
+    sendJsonArray(SPOP, toPayload(key, count), handler);
     return this;
   } 
 

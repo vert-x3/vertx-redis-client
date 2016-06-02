@@ -2018,7 +2018,7 @@ public interface RedisClient {
    * group: set
    */
   @Fluent
-  RedisClient spopMany(String key, int count, Handler<AsyncResult<String>> handler);
+  RedisClient spopMany(String key, int count, Handler<AsyncResult<JsonArray>> handler);
 
   /**
    * Get one or multiple random members from a set

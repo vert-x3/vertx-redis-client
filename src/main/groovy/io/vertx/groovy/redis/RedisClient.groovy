@@ -2183,8 +2183,16 @@ public class RedisClient {
    * @param handler Handler for the result of this call.
    * @return 
    */
-  public RedisClient spopMany(String key, int count, Handler<AsyncResult<String>> handler) {
-    delegate.spopMany(key, count, handler);
+  public RedisClient spopMany(String key, int count, Handler<AsyncResult<List<Object>>> handler) {
+    delegate.spopMany(key, count, handler != null ? new Handler<AsyncResult<io.vertx.core.json.JsonArray>>() {
+      public void handle(AsyncResult<io.vertx.core.json.JsonArray> ar) {
+        if (ar.succeeded()) {
+          handler.handle(io.vertx.core.Future.succeededFuture((List<Object>)InternalHelper.wrapObject(ar.result())));
+        } else {
+          handler.handle(io.vertx.core.Future.failedFuture(ar.cause()));
+        }
+      }
+    } : null);
     return this;
   }
   /**
