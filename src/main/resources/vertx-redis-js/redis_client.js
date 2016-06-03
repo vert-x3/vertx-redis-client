@@ -3930,7 +3930,7 @@ var RedisClient = function(j_val) {
     if (__args.length === 3 && typeof __args[0] === 'string' && typeof __args[1] ==='number' && typeof __args[2] === 'function') {
       j_redisClient["spopMany(java.lang.String,int,io.vertx.core.Handler)"](key, count, function(ar) {
       if (ar.succeeded()) {
-        handler(ar.result(), null);
+        handler(utils.convReturnJson(ar.result()), null);
       } else {
         handler(null, ar.cause());
       }

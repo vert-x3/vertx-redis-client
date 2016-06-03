@@ -2603,6 +2603,22 @@ public abstract class RedisClientTestBase extends VertxTestBase {
   }
 
   @Test
+  @Ignore /* We need redis 3.2 */
+  public void testSpopMany() {
+    final String mykey = makeKey();
+    redis.saddMany(mykey, toList("one", "two", "three"), reply0 -> {
+      assertTrue(reply0.succeeded());
+      assertEquals(3, reply0.result().longValue());
+      redis.spopMany(mykey, 3, reply1 -> {
+        assertTrue(String.valueOf(reply1.cause()), reply1.succeeded());
+        JsonArray ret = reply1.result();
+        testComplete();
+      });
+    });
+    await();
+  }
+
+  @Test
   public void testSrandmember() {
     final String mykey = makeKey();
     redis.saddMany(mykey, toList("one", "two", "three"), reply0 -> {

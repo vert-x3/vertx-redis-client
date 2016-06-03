@@ -2016,7 +2016,7 @@ module VertxRedis
     # @return [self]
     def spop_many(key=nil,count=nil)
       if key.class == String && count.class == Fixnum && block_given?
-        @j_del.java_method(:spopMany, [Java::java.lang.String.java_class,Java::int.java_class,Java::IoVertxCore::Handler.java_class]).call(key,count,(Proc.new { |ar| yield(ar.failed ? ar.cause : nil, ar.succeeded ? ar.result : nil) }))
+        @j_del.java_method(:spopMany, [Java::java.lang.String.java_class,Java::int.java_class,Java::IoVertxCore::Handler.java_class]).call(key,count,(Proc.new { |ar| yield(ar.failed ? ar.cause : nil, ar.succeeded ? ar.result != nil ? JSON.parse(ar.result.encode) : nil : nil) }))
         return self
       end
       raise ArgumentError, "Invalid arguments when calling spop_many(key,count)"
