@@ -239,7 +239,7 @@ public class RedisTransaction {
    * @return 
    */
   public RedisTransaction clientKill(Map<String, Object> filter = [:], Handler<AsyncResult<String>> handler) {
-    delegate.clientKill(filter != null ? new io.vertx.redis.op.KillFilter(new io.vertx.core.json.JsonObject(filter)) : null, handler);
+    delegate.clientKill(filter != null ? new io.vertx.redis.op.KillFilter(io.vertx.lang.groovy.InternalHelper.toJsonObject(filter)) : null, handler);
     return this;
   }
   /**
@@ -1207,7 +1207,7 @@ public class RedisTransaction {
    * @return 
    */
   public RedisTransaction migrate(String host, int port, String key, int destdb, long timeout, Map<String, Object> options, Handler<AsyncResult<String>> handler) {
-    delegate.migrate(host, port, key, destdb, timeout, options != null ? new io.vertx.redis.op.MigrateOptions(new io.vertx.core.json.JsonObject(options)) : null, handler);
+    delegate.migrate(host, port, key, destdb, timeout, options != null ? new io.vertx.redis.op.MigrateOptions(io.vertx.lang.groovy.InternalHelper.toJsonObject(options)) : null, handler);
     return this;
   }
   /**
@@ -1704,7 +1704,7 @@ public class RedisTransaction {
    * @return 
    */
   public RedisTransaction setWithOptions(String key, String value, Map<String, Object> options, Handler<AsyncResult<String>> handler) {
-    delegate.setWithOptions(key, value, options != null ? new io.vertx.redis.op.SetOptions(new io.vertx.core.json.JsonObject(options)) : null, handler);
+    delegate.setWithOptions(key, value, options != null ? new io.vertx.redis.op.SetOptions(io.vertx.lang.groovy.InternalHelper.toJsonObject(options)) : null, handler);
     return this;
   }
   /**
@@ -1727,7 +1727,7 @@ public class RedisTransaction {
    * @return 
    */
   public RedisTransaction setBinaryWithOptions(String key, Buffer value, Map<String, Object> options, Handler<AsyncResult<String>> handler) {
-    delegate.setBinaryWithOptions(key, value != null ? (io.vertx.core.buffer.Buffer)value.getDelegate() : null, options != null ? new io.vertx.redis.op.SetOptions(new io.vertx.core.json.JsonObject(options)) : null, handler);
+    delegate.setBinaryWithOptions(key, value != null ? (io.vertx.core.buffer.Buffer)value.getDelegate() : null, options != null ? new io.vertx.redis.op.SetOptions(io.vertx.lang.groovy.InternalHelper.toJsonObject(options)) : null, handler);
     return this;
   }
   /**
@@ -1887,7 +1887,7 @@ public class RedisTransaction {
    * @return 
    */
   public RedisTransaction sort(String key, Map<String, Object> options, Handler<AsyncResult<String>> handler) {
-    delegate.sort(key, options != null ? new io.vertx.redis.op.SortOptions(new io.vertx.core.json.JsonObject(options)) : null, handler);
+    delegate.sort(key, options != null ? new io.vertx.redis.op.SortOptions(io.vertx.lang.groovy.InternalHelper.toJsonObject(options)) : null, handler);
     return this;
   }
   /**
@@ -2221,7 +2221,7 @@ public class RedisTransaction {
    * @return 
    */
   public RedisTransaction zrangebylex(String key, String min, String max, Map<String, Object> options, Handler<AsyncResult<String>> handler) {
-    delegate.zrangebylex(key, min, max, options != null ? new io.vertx.redis.op.LimitOptions(new io.vertx.core.json.JsonObject(options)) : null, handler);
+    delegate.zrangebylex(key, min, max, options != null ? new io.vertx.redis.op.LimitOptions(io.vertx.lang.groovy.InternalHelper.toJsonObject(options)) : null, handler);
     return this;
   }
   /**
@@ -2234,7 +2234,7 @@ public class RedisTransaction {
    * @return 
    */
   public RedisTransaction zrangebyscore(String key, String min, String max, Map<String, Object> options, Handler<AsyncResult<String>> handler) {
-    delegate.zrangebyscore(key, min, max, options != null ? new io.vertx.redis.op.RangeLimitOptions(new io.vertx.core.json.JsonObject(options)) : null, handler);
+    delegate.zrangebyscore(key, min, max, options != null ? new io.vertx.redis.op.RangeLimitOptions(io.vertx.lang.groovy.InternalHelper.toJsonObject(options)) : null, handler);
     return this;
   }
   /**
@@ -2329,7 +2329,7 @@ public class RedisTransaction {
    * @return 
    */
   public RedisTransaction zrevrangebylex(String key, String max, String min, Map<String, Object> options, Handler<AsyncResult<String>> handler) {
-    delegate.zrevrangebylex(key, max, min, options != null ? new io.vertx.redis.op.LimitOptions(new io.vertx.core.json.JsonObject(options)) : null, handler);
+    delegate.zrevrangebylex(key, max, min, options != null ? new io.vertx.redis.op.LimitOptions(io.vertx.lang.groovy.InternalHelper.toJsonObject(options)) : null, handler);
     return this;
   }
   /**
@@ -2342,7 +2342,7 @@ public class RedisTransaction {
    * @return 
    */
   public RedisTransaction zrevrangebyscore(String key, String max, String min, Map<String, Object> options, Handler<AsyncResult<String>> handler) {
-    delegate.zrevrangebyscore(key, max, min, options != null ? new io.vertx.redis.op.RangeLimitOptions(new io.vertx.core.json.JsonObject(options)) : null, handler);
+    delegate.zrevrangebyscore(key, max, min, options != null ? new io.vertx.redis.op.RangeLimitOptions(io.vertx.lang.groovy.InternalHelper.toJsonObject(options)) : null, handler);
     return this;
   }
   /**
@@ -2399,7 +2399,7 @@ public class RedisTransaction {
    * @return 
    */
   public RedisTransaction scan(String cursor, Map<String, Object> options, Handler<AsyncResult<String>> handler) {
-    delegate.scan(cursor, options != null ? new io.vertx.redis.op.ScanOptions(new io.vertx.core.json.JsonObject(options)) : null, handler);
+    delegate.scan(cursor, options != null ? new io.vertx.redis.op.ScanOptions(io.vertx.lang.groovy.InternalHelper.toJsonObject(options)) : null, handler);
     return this;
   }
   /**
@@ -2411,7 +2411,7 @@ public class RedisTransaction {
    * @return 
    */
   public RedisTransaction sscan(String key, String cursor, Map<String, Object> options, Handler<AsyncResult<String>> handler) {
-    delegate.sscan(key, cursor, options != null ? new io.vertx.redis.op.ScanOptions(new io.vertx.core.json.JsonObject(options)) : null, handler);
+    delegate.sscan(key, cursor, options != null ? new io.vertx.redis.op.ScanOptions(io.vertx.lang.groovy.InternalHelper.toJsonObject(options)) : null, handler);
     return this;
   }
   /**
@@ -2423,7 +2423,7 @@ public class RedisTransaction {
    * @return 
    */
   public RedisTransaction hscan(String key, String cursor, Map<String, Object> options, Handler<AsyncResult<String>> handler) {
-    delegate.hscan(key, cursor, options != null ? new io.vertx.redis.op.ScanOptions(new io.vertx.core.json.JsonObject(options)) : null, handler);
+    delegate.hscan(key, cursor, options != null ? new io.vertx.redis.op.ScanOptions(io.vertx.lang.groovy.InternalHelper.toJsonObject(options)) : null, handler);
     return this;
   }
   /**
@@ -2435,7 +2435,7 @@ public class RedisTransaction {
    * @return 
    */
   public RedisTransaction zscan(String key, String cursor, Map<String, Object> options, Handler<AsyncResult<String>> handler) {
-    delegate.zscan(key, cursor, options != null ? new io.vertx.redis.op.ScanOptions(new io.vertx.core.json.JsonObject(options)) : null, handler);
+    delegate.zscan(key, cursor, options != null ? new io.vertx.redis.op.ScanOptions(io.vertx.lang.groovy.InternalHelper.toJsonObject(options)) : null, handler);
     return this;
   }
   /**
@@ -2459,7 +2459,7 @@ public class RedisTransaction {
    * @return 
    */
   public RedisTransaction geoaddMany(String key, List<Map<String, Object>> members, Handler<AsyncResult<String>> handler) {
-    delegate.geoaddMany(key, members != null ? (List)members.collect({new io.vertx.redis.op.GeoMember(new io.vertx.core.json.JsonObject(it))}) : null, handler);
+    delegate.geoaddMany(key, members != null ? (List)members.collect({new io.vertx.redis.op.GeoMember(io.vertx.lang.groovy.InternalHelper.toJsonObject(it))}) : null, handler);
     return this;
   }
   /**
@@ -2563,7 +2563,7 @@ public class RedisTransaction {
    * @return 
    */
   public RedisTransaction georadiusWithOptions(String key, double longitude, double latitude, double radius, GeoUnit unit, Map<String, Object> options, Handler<AsyncResult<String>> handler) {
-    delegate.georadiusWithOptions(key, longitude, latitude, radius, unit, options != null ? new io.vertx.redis.op.GeoRadiusOptions(new io.vertx.core.json.JsonObject(options)) : null, handler);
+    delegate.georadiusWithOptions(key, longitude, latitude, radius, unit, options != null ? new io.vertx.redis.op.GeoRadiusOptions(io.vertx.lang.groovy.InternalHelper.toJsonObject(options)) : null, handler);
     return this;
   }
   /**
@@ -2594,7 +2594,7 @@ public class RedisTransaction {
    * @return 
    */
   public RedisTransaction georadiusbymemberWithOptions(String key, String member, double radius, GeoUnit unit, Map<String, Object> options, Handler<AsyncResult<String>> handler) {
-    delegate.georadiusbymemberWithOptions(key, member, radius, unit, options != null ? new io.vertx.redis.op.GeoRadiusOptions(new io.vertx.core.json.JsonObject(options)) : null, handler);
+    delegate.georadiusbymemberWithOptions(key, member, radius, unit, options != null ? new io.vertx.redis.op.GeoRadiusOptions(io.vertx.lang.groovy.InternalHelper.toJsonObject(options)) : null, handler);
     return this;
   }
 }

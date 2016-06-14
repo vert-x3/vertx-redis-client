@@ -59,7 +59,7 @@ public class RedisClient {
     return ret;
   }
   public static RedisClient create(Vertx vertx, Map<String, Object> config) {
-    def ret = InternalHelper.safeCreate(io.vertx.redis.RedisClient.create(vertx != null ? (io.vertx.core.Vertx)vertx.getDelegate() : null, config != null ? new io.vertx.redis.RedisOptions(new io.vertx.core.json.JsonObject(config)) : null), io.vertx.groovy.redis.RedisClient.class);
+    def ret = InternalHelper.safeCreate(io.vertx.redis.RedisClient.create(vertx != null ? (io.vertx.core.Vertx)vertx.getDelegate() : null, config != null ? new io.vertx.redis.RedisOptions(io.vertx.lang.groovy.InternalHelper.toJsonObject(config)) : null), io.vertx.groovy.redis.RedisClient.class);
     return ret;
   }
   /**
@@ -278,7 +278,7 @@ public class RedisClient {
    * @return 
    */
   public RedisClient clientKill(Map<String, Object> filter = [:], Handler<AsyncResult<Long>> handler) {
-    delegate.clientKill(filter != null ? new io.vertx.redis.op.KillFilter(new io.vertx.core.json.JsonObject(filter)) : null, handler);
+    delegate.clientKill(filter != null ? new io.vertx.redis.op.KillFilter(io.vertx.lang.groovy.InternalHelper.toJsonObject(filter)) : null, handler);
     return this;
   }
   /**
@@ -1396,7 +1396,7 @@ public class RedisClient {
    * @return 
    */
   public RedisClient migrate(String host, int port, String key, int destdb, long timeout, Map<String, Object> options, Handler<AsyncResult<String>> handler) {
-    delegate.migrate(host, port, key, destdb, timeout, options != null ? new io.vertx.redis.op.MigrateOptions(new io.vertx.core.json.JsonObject(options)) : null, handler);
+    delegate.migrate(host, port, key, destdb, timeout, options != null ? new io.vertx.redis.op.MigrateOptions(io.vertx.lang.groovy.InternalHelper.toJsonObject(options)) : null, handler);
     return this;
   }
   /**
@@ -1948,7 +1948,7 @@ public class RedisClient {
    * @return 
    */
   public RedisClient setWithOptions(String key, String value, Map<String, Object> options, Handler<AsyncResult<String>> handler) {
-    delegate.setWithOptions(key, value, options != null ? new io.vertx.redis.op.SetOptions(new io.vertx.core.json.JsonObject(options)) : null, handler);
+    delegate.setWithOptions(key, value, options != null ? new io.vertx.redis.op.SetOptions(io.vertx.lang.groovy.InternalHelper.toJsonObject(options)) : null, handler);
     return this;
   }
   /**
@@ -1971,7 +1971,7 @@ public class RedisClient {
    * @return 
    */
   public RedisClient setBinaryWithOptions(String key, Buffer value, Map<String, Object> options, Handler<AsyncResult<Void>> handler) {
-    delegate.setBinaryWithOptions(key, value != null ? (io.vertx.core.buffer.Buffer)value.getDelegate() : null, options != null ? new io.vertx.redis.op.SetOptions(new io.vertx.core.json.JsonObject(options)) : null, handler);
+    delegate.setBinaryWithOptions(key, value != null ? (io.vertx.core.buffer.Buffer)value.getDelegate() : null, options != null ? new io.vertx.redis.op.SetOptions(io.vertx.lang.groovy.InternalHelper.toJsonObject(options)) : null, handler);
     return this;
   }
   /**
@@ -2155,7 +2155,7 @@ public class RedisClient {
    * @return 
    */
   public RedisClient sort(String key, Map<String, Object> options, Handler<AsyncResult<List<Object>>> handler) {
-    delegate.sort(key, options != null ? new io.vertx.redis.op.SortOptions(new io.vertx.core.json.JsonObject(options)) : null, handler != null ? new Handler<AsyncResult<io.vertx.core.json.JsonArray>>() {
+    delegate.sort(key, options != null ? new io.vertx.redis.op.SortOptions(io.vertx.lang.groovy.InternalHelper.toJsonObject(options)) : null, handler != null ? new Handler<AsyncResult<io.vertx.core.json.JsonArray>>() {
       public void handle(AsyncResult<io.vertx.core.json.JsonArray> ar) {
         if (ar.succeeded()) {
           handler.handle(io.vertx.core.Future.succeededFuture((List<Object>)InternalHelper.wrapObject(ar.result())));
@@ -2540,7 +2540,7 @@ public class RedisClient {
    * @return 
    */
   public RedisClient zrangebylex(String key, String min, String max, Map<String, Object> options, Handler<AsyncResult<List<Object>>> handler) {
-    delegate.zrangebylex(key, min, max, options != null ? new io.vertx.redis.op.LimitOptions(new io.vertx.core.json.JsonObject(options)) : null, handler != null ? new Handler<AsyncResult<io.vertx.core.json.JsonArray>>() {
+    delegate.zrangebylex(key, min, max, options != null ? new io.vertx.redis.op.LimitOptions(io.vertx.lang.groovy.InternalHelper.toJsonObject(options)) : null, handler != null ? new Handler<AsyncResult<io.vertx.core.json.JsonArray>>() {
       public void handle(AsyncResult<io.vertx.core.json.JsonArray> ar) {
         if (ar.succeeded()) {
           handler.handle(io.vertx.core.Future.succeededFuture((List<Object>)InternalHelper.wrapObject(ar.result())));
@@ -2561,7 +2561,7 @@ public class RedisClient {
    * @return 
    */
   public RedisClient zrangebyscore(String key, String min, String max, Map<String, Object> options, Handler<AsyncResult<List<Object>>> handler) {
-    delegate.zrangebyscore(key, min, max, options != null ? new io.vertx.redis.op.RangeLimitOptions(new io.vertx.core.json.JsonObject(options)) : null, handler != null ? new Handler<AsyncResult<io.vertx.core.json.JsonArray>>() {
+    delegate.zrangebyscore(key, min, max, options != null ? new io.vertx.redis.op.RangeLimitOptions(io.vertx.lang.groovy.InternalHelper.toJsonObject(options)) : null, handler != null ? new Handler<AsyncResult<io.vertx.core.json.JsonArray>>() {
       public void handle(AsyncResult<io.vertx.core.json.JsonArray> ar) {
         if (ar.succeeded()) {
           handler.handle(io.vertx.core.Future.succeededFuture((List<Object>)InternalHelper.wrapObject(ar.result())));
@@ -2672,7 +2672,7 @@ public class RedisClient {
    * @return 
    */
   public RedisClient zrevrangebylex(String key, String max, String min, Map<String, Object> options, Handler<AsyncResult<List<Object>>> handler) {
-    delegate.zrevrangebylex(key, max, min, options != null ? new io.vertx.redis.op.LimitOptions(new io.vertx.core.json.JsonObject(options)) : null, handler != null ? new Handler<AsyncResult<io.vertx.core.json.JsonArray>>() {
+    delegate.zrevrangebylex(key, max, min, options != null ? new io.vertx.redis.op.LimitOptions(io.vertx.lang.groovy.InternalHelper.toJsonObject(options)) : null, handler != null ? new Handler<AsyncResult<io.vertx.core.json.JsonArray>>() {
       public void handle(AsyncResult<io.vertx.core.json.JsonArray> ar) {
         if (ar.succeeded()) {
           handler.handle(io.vertx.core.Future.succeededFuture((List<Object>)InternalHelper.wrapObject(ar.result())));
@@ -2693,7 +2693,7 @@ public class RedisClient {
    * @return 
    */
   public RedisClient zrevrangebyscore(String key, String max, String min, Map<String, Object> options, Handler<AsyncResult<List<Object>>> handler) {
-    delegate.zrevrangebyscore(key, max, min, options != null ? new io.vertx.redis.op.RangeLimitOptions(new io.vertx.core.json.JsonObject(options)) : null, handler != null ? new Handler<AsyncResult<io.vertx.core.json.JsonArray>>() {
+    delegate.zrevrangebyscore(key, max, min, options != null ? new io.vertx.redis.op.RangeLimitOptions(io.vertx.lang.groovy.InternalHelper.toJsonObject(options)) : null, handler != null ? new Handler<AsyncResult<io.vertx.core.json.JsonArray>>() {
       public void handle(AsyncResult<io.vertx.core.json.JsonArray> ar) {
         if (ar.succeeded()) {
           handler.handle(io.vertx.core.Future.succeededFuture((List<Object>)InternalHelper.wrapObject(ar.result())));
@@ -2758,7 +2758,7 @@ public class RedisClient {
    * @return 
    */
   public RedisClient scan(String cursor, Map<String, Object> options, Handler<AsyncResult<List<Object>>> handler) {
-    delegate.scan(cursor, options != null ? new io.vertx.redis.op.ScanOptions(new io.vertx.core.json.JsonObject(options)) : null, handler != null ? new Handler<AsyncResult<io.vertx.core.json.JsonArray>>() {
+    delegate.scan(cursor, options != null ? new io.vertx.redis.op.ScanOptions(io.vertx.lang.groovy.InternalHelper.toJsonObject(options)) : null, handler != null ? new Handler<AsyncResult<io.vertx.core.json.JsonArray>>() {
       public void handle(AsyncResult<io.vertx.core.json.JsonArray> ar) {
         if (ar.succeeded()) {
           handler.handle(io.vertx.core.Future.succeededFuture((List<Object>)InternalHelper.wrapObject(ar.result())));
@@ -2778,7 +2778,7 @@ public class RedisClient {
    * @return 
    */
   public RedisClient sscan(String key, String cursor, Map<String, Object> options, Handler<AsyncResult<List<Object>>> handler) {
-    delegate.sscan(key, cursor, options != null ? new io.vertx.redis.op.ScanOptions(new io.vertx.core.json.JsonObject(options)) : null, handler != null ? new Handler<AsyncResult<io.vertx.core.json.JsonArray>>() {
+    delegate.sscan(key, cursor, options != null ? new io.vertx.redis.op.ScanOptions(io.vertx.lang.groovy.InternalHelper.toJsonObject(options)) : null, handler != null ? new Handler<AsyncResult<io.vertx.core.json.JsonArray>>() {
       public void handle(AsyncResult<io.vertx.core.json.JsonArray> ar) {
         if (ar.succeeded()) {
           handler.handle(io.vertx.core.Future.succeededFuture((List<Object>)InternalHelper.wrapObject(ar.result())));
@@ -2798,7 +2798,7 @@ public class RedisClient {
    * @return 
    */
   public RedisClient hscan(String key, String cursor, Map<String, Object> options, Handler<AsyncResult<List<Object>>> handler) {
-    delegate.hscan(key, cursor, options != null ? new io.vertx.redis.op.ScanOptions(new io.vertx.core.json.JsonObject(options)) : null, handler != null ? new Handler<AsyncResult<io.vertx.core.json.JsonArray>>() {
+    delegate.hscan(key, cursor, options != null ? new io.vertx.redis.op.ScanOptions(io.vertx.lang.groovy.InternalHelper.toJsonObject(options)) : null, handler != null ? new Handler<AsyncResult<io.vertx.core.json.JsonArray>>() {
       public void handle(AsyncResult<io.vertx.core.json.JsonArray> ar) {
         if (ar.succeeded()) {
           handler.handle(io.vertx.core.Future.succeededFuture((List<Object>)InternalHelper.wrapObject(ar.result())));
@@ -2818,7 +2818,7 @@ public class RedisClient {
    * @return 
    */
   public RedisClient zscan(String key, String cursor, Map<String, Object> options, Handler<AsyncResult<List<Object>>> handler) {
-    delegate.zscan(key, cursor, options != null ? new io.vertx.redis.op.ScanOptions(new io.vertx.core.json.JsonObject(options)) : null, handler != null ? new Handler<AsyncResult<io.vertx.core.json.JsonArray>>() {
+    delegate.zscan(key, cursor, options != null ? new io.vertx.redis.op.ScanOptions(io.vertx.lang.groovy.InternalHelper.toJsonObject(options)) : null, handler != null ? new Handler<AsyncResult<io.vertx.core.json.JsonArray>>() {
       public void handle(AsyncResult<io.vertx.core.json.JsonArray> ar) {
         if (ar.succeeded()) {
           handler.handle(io.vertx.core.Future.succeededFuture((List<Object>)InternalHelper.wrapObject(ar.result())));
@@ -2850,7 +2850,7 @@ public class RedisClient {
    * @return 
    */
   public RedisClient geoaddMany(String key, List<Map<String, Object>> members, Handler<AsyncResult<Long>> handler) {
-    delegate.geoaddMany(key, members != null ? (List)members.collect({new io.vertx.redis.op.GeoMember(new io.vertx.core.json.JsonObject(it))}) : null, handler);
+    delegate.geoaddMany(key, members != null ? (List)members.collect({new io.vertx.redis.op.GeoMember(io.vertx.lang.groovy.InternalHelper.toJsonObject(it))}) : null, handler);
     return this;
   }
   /**
@@ -2994,7 +2994,7 @@ public class RedisClient {
    * @return 
    */
   public RedisClient georadiusWithOptions(String key, double longitude, double latitude, double radius, GeoUnit unit, Map<String, Object> options, Handler<AsyncResult<List<Object>>> handler) {
-    delegate.georadiusWithOptions(key, longitude, latitude, radius, unit, options != null ? new io.vertx.redis.op.GeoRadiusOptions(new io.vertx.core.json.JsonObject(options)) : null, handler != null ? new Handler<AsyncResult<io.vertx.core.json.JsonArray>>() {
+    delegate.georadiusWithOptions(key, longitude, latitude, radius, unit, options != null ? new io.vertx.redis.op.GeoRadiusOptions(io.vertx.lang.groovy.InternalHelper.toJsonObject(options)) : null, handler != null ? new Handler<AsyncResult<io.vertx.core.json.JsonArray>>() {
       public void handle(AsyncResult<io.vertx.core.json.JsonArray> ar) {
         if (ar.succeeded()) {
           handler.handle(io.vertx.core.Future.succeededFuture((List<Object>)InternalHelper.wrapObject(ar.result())));
@@ -3041,7 +3041,7 @@ public class RedisClient {
    * @return 
    */
   public RedisClient georadiusbymemberWithOptions(String key, String member, double radius, GeoUnit unit, Map<String, Object> options, Handler<AsyncResult<List<Object>>> handler) {
-    delegate.georadiusbymemberWithOptions(key, member, radius, unit, options != null ? new io.vertx.redis.op.GeoRadiusOptions(new io.vertx.core.json.JsonObject(options)) : null, handler != null ? new Handler<AsyncResult<io.vertx.core.json.JsonArray>>() {
+    delegate.georadiusbymemberWithOptions(key, member, radius, unit, options != null ? new io.vertx.redis.op.GeoRadiusOptions(io.vertx.lang.groovy.InternalHelper.toJsonObject(options)) : null, handler != null ? new Handler<AsyncResult<io.vertx.core.json.JsonArray>>() {
       public void handle(AsyncResult<io.vertx.core.json.JsonArray> ar) {
         if (ar.succeeded()) {
           handler.handle(io.vertx.core.Future.succeededFuture((List<Object>)InternalHelper.wrapObject(ar.result())));
