@@ -74,15 +74,7 @@ public class RedisClient {
    * @param handler 
    */
   public void close(Handler<AsyncResult<Void>> handler) { 
-    delegate.close(new Handler<AsyncResult<java.lang.Void>>() {
-      public void handle(AsyncResult<java.lang.Void> ar) {
-        if (ar.succeeded()) {
-          handler.handle(io.vertx.core.Future.succeededFuture(ar.result()));
-        } else {
-          handler.handle(io.vertx.core.Future.failedFuture(ar.cause()));
-        }
-      }
-    });
+    delegate.close(handler);
   }
 
   /**
@@ -578,15 +570,7 @@ public class RedisClient {
    * @return 
    */
   public RedisClient clusterAddslots(List<Long> slots, Handler<AsyncResult<Void>> handler) { 
-    delegate.clusterAddslots(slots, new Handler<AsyncResult<java.lang.Void>>() {
-      public void handle(AsyncResult<java.lang.Void> ar) {
-        if (ar.succeeded()) {
-          handler.handle(io.vertx.core.Future.succeededFuture(ar.result()));
-        } else {
-          handler.handle(io.vertx.core.Future.failedFuture(ar.cause()));
-        }
-      }
-    });
+    delegate.clusterAddslots(slots, handler);
     return this;
   }
 
@@ -652,15 +636,7 @@ public class RedisClient {
    * @return 
    */
   public RedisClient clusterDelslots(long slot, Handler<AsyncResult<Void>> handler) { 
-    delegate.clusterDelslots(slot, new Handler<AsyncResult<java.lang.Void>>() {
-      public void handle(AsyncResult<java.lang.Void> ar) {
-        if (ar.succeeded()) {
-          handler.handle(io.vertx.core.Future.succeededFuture(ar.result()));
-        } else {
-          handler.handle(io.vertx.core.Future.failedFuture(ar.cause()));
-        }
-      }
-    });
+    delegate.clusterDelslots(slot, handler);
     return this;
   }
 
@@ -682,15 +658,7 @@ public class RedisClient {
    * @return 
    */
   public RedisClient clusterDelslotsMany(List<Long> slots, Handler<AsyncResult<Void>> handler) { 
-    delegate.clusterDelslotsMany(slots, new Handler<AsyncResult<java.lang.Void>>() {
-      public void handle(AsyncResult<java.lang.Void> ar) {
-        if (ar.succeeded()) {
-          handler.handle(io.vertx.core.Future.succeededFuture(ar.result()));
-        } else {
-          handler.handle(io.vertx.core.Future.failedFuture(ar.cause()));
-        }
-      }
-    });
+    delegate.clusterDelslotsMany(slots, handler);
     return this;
   }
 
@@ -711,15 +679,7 @@ public class RedisClient {
    * @return 
    */
   public RedisClient clusterFailover(Handler<AsyncResult<Void>> handler) { 
-    delegate.clusterFailover(new Handler<AsyncResult<java.lang.Void>>() {
-      public void handle(AsyncResult<java.lang.Void> ar) {
-        if (ar.succeeded()) {
-          handler.handle(io.vertx.core.Future.succeededFuture(ar.result()));
-        } else {
-          handler.handle(io.vertx.core.Future.failedFuture(ar.cause()));
-        }
-      }
-    });
+    delegate.clusterFailover(handler);
     return this;
   }
 
@@ -740,15 +700,7 @@ public class RedisClient {
    * @return 
    */
   public RedisClient clusterFailOverWithOptions(FailoverOptions options, Handler<AsyncResult<Void>> handler) { 
-    delegate.clusterFailOverWithOptions(options, new Handler<AsyncResult<java.lang.Void>>() {
-      public void handle(AsyncResult<java.lang.Void> ar) {
-        if (ar.succeeded()) {
-          handler.handle(io.vertx.core.Future.succeededFuture(ar.result()));
-        } else {
-          handler.handle(io.vertx.core.Future.failedFuture(ar.cause()));
-        }
-      }
-    });
+    delegate.clusterFailOverWithOptions(options, handler);
     return this;
   }
 
@@ -770,15 +722,7 @@ public class RedisClient {
    * @return 
    */
   public RedisClient clusterForget(String nodeId, Handler<AsyncResult<Void>> handler) { 
-    delegate.clusterForget(nodeId, new Handler<AsyncResult<java.lang.Void>>() {
-      public void handle(AsyncResult<java.lang.Void> ar) {
-        if (ar.succeeded()) {
-          handler.handle(io.vertx.core.Future.succeededFuture(ar.result()));
-        } else {
-          handler.handle(io.vertx.core.Future.failedFuture(ar.cause()));
-        }
-      }
-    });
+    delegate.clusterForget(nodeId, handler);
     return this;
   }
 
@@ -867,15 +811,7 @@ public class RedisClient {
    * @return 
    */
   public RedisClient clusterMeet(String ip, long port, Handler<AsyncResult<Void>> handler) { 
-    delegate.clusterMeet(ip, port, new Handler<AsyncResult<java.lang.Void>>() {
-      public void handle(AsyncResult<java.lang.Void> ar) {
-        if (ar.succeeded()) {
-          handler.handle(io.vertx.core.Future.succeededFuture(ar.result()));
-        } else {
-          handler.handle(io.vertx.core.Future.failedFuture(ar.cause()));
-        }
-      }
-    });
+    delegate.clusterMeet(ip, port, handler);
     return this;
   }
 
@@ -918,15 +854,7 @@ public class RedisClient {
    * @return 
    */
   public RedisClient clusterReplicate(String nodeId, Handler<AsyncResult<Void>> handler) { 
-    delegate.clusterReplicate(nodeId, new Handler<AsyncResult<java.lang.Void>>() {
-      public void handle(AsyncResult<java.lang.Void> ar) {
-        if (ar.succeeded()) {
-          handler.handle(io.vertx.core.Future.succeededFuture(ar.result()));
-        } else {
-          handler.handle(io.vertx.core.Future.failedFuture(ar.cause()));
-        }
-      }
-    });
+    delegate.clusterReplicate(nodeId, handler);
     return this;
   }
 
@@ -947,15 +875,7 @@ public class RedisClient {
    * @return 
    */
   public RedisClient clusterReset(Handler<AsyncResult<Void>> handler) { 
-    delegate.clusterReset(new Handler<AsyncResult<java.lang.Void>>() {
-      public void handle(AsyncResult<java.lang.Void> ar) {
-        if (ar.succeeded()) {
-          handler.handle(io.vertx.core.Future.succeededFuture(ar.result()));
-        } else {
-          handler.handle(io.vertx.core.Future.failedFuture(ar.cause()));
-        }
-      }
-    });
+    delegate.clusterReset(handler);
     return this;
   }
 
@@ -976,15 +896,7 @@ public class RedisClient {
    * @return 
    */
   public RedisClient clusterResetWithOptions(ResetOptions options, Handler<AsyncResult<Void>> handler) { 
-    delegate.clusterResetWithOptions(options, new Handler<AsyncResult<java.lang.Void>>() {
-      public void handle(AsyncResult<java.lang.Void> ar) {
-        if (ar.succeeded()) {
-          handler.handle(io.vertx.core.Future.succeededFuture(ar.result()));
-        } else {
-          handler.handle(io.vertx.core.Future.failedFuture(ar.cause()));
-        }
-      }
-    });
+    delegate.clusterResetWithOptions(options, handler);
     return this;
   }
 
@@ -1005,15 +917,7 @@ public class RedisClient {
    * @return 
    */
   public RedisClient clusterSaveconfig(Handler<AsyncResult<Void>> handler) { 
-    delegate.clusterSaveconfig(new Handler<AsyncResult<java.lang.Void>>() {
-      public void handle(AsyncResult<java.lang.Void> ar) {
-        if (ar.succeeded()) {
-          handler.handle(io.vertx.core.Future.succeededFuture(ar.result()));
-        } else {
-          handler.handle(io.vertx.core.Future.failedFuture(ar.cause()));
-        }
-      }
-    });
+    delegate.clusterSaveconfig(handler);
     return this;
   }
 
@@ -1034,15 +938,7 @@ public class RedisClient {
    * @return 
    */
   public RedisClient clusterSetConfigEpoch(long epoch, Handler<AsyncResult<Void>> handler) { 
-    delegate.clusterSetConfigEpoch(epoch, new Handler<AsyncResult<java.lang.Void>>() {
-      public void handle(AsyncResult<java.lang.Void> ar) {
-        if (ar.succeeded()) {
-          handler.handle(io.vertx.core.Future.succeededFuture(ar.result()));
-        } else {
-          handler.handle(io.vertx.core.Future.failedFuture(ar.cause()));
-        }
-      }
-    });
+    delegate.clusterSetConfigEpoch(epoch, handler);
     return this;
   }
 
@@ -1065,15 +961,7 @@ public class RedisClient {
    * @return 
    */
   public RedisClient clusterSetslot(long slot, SlotCmd subcommand, Handler<AsyncResult<Void>> handler) { 
-    delegate.clusterSetslot(slot, subcommand, new Handler<AsyncResult<java.lang.Void>>() {
-      public void handle(AsyncResult<java.lang.Void> ar) {
-        if (ar.succeeded()) {
-          handler.handle(io.vertx.core.Future.succeededFuture(ar.result()));
-        } else {
-          handler.handle(io.vertx.core.Future.failedFuture(ar.cause()));
-        }
-      }
-    });
+    delegate.clusterSetslot(slot, subcommand, handler);
     return this;
   }
 
@@ -1098,15 +986,7 @@ public class RedisClient {
    * @return 
    */
   public RedisClient clusterSetslotWithNode(long slot, SlotCmd subcommand, String nodeId, Handler<AsyncResult<Void>> handler) { 
-    delegate.clusterSetslotWithNode(slot, subcommand, nodeId, new Handler<AsyncResult<java.lang.Void>>() {
-      public void handle(AsyncResult<java.lang.Void> ar) {
-        if (ar.succeeded()) {
-          handler.handle(io.vertx.core.Future.succeededFuture(ar.result()));
-        } else {
-          handler.handle(io.vertx.core.Future.failedFuture(ar.cause()));
-        }
-      }
-    });
+    delegate.clusterSetslotWithNode(slot, subcommand, nodeId, handler);
     return this;
   }
 
@@ -2677,15 +2557,7 @@ public class RedisClient {
    * @return 
    */
   public RedisClient monitor(Handler<AsyncResult<Void>> handler) { 
-    delegate.monitor(new Handler<AsyncResult<java.lang.Void>>() {
-      public void handle(AsyncResult<java.lang.Void> ar) {
-        if (ar.succeeded()) {
-          handler.handle(io.vertx.core.Future.succeededFuture(ar.result()));
-        } else {
-          handler.handle(io.vertx.core.Future.failedFuture(ar.cause()));
-        }
-      }
-    });
+    delegate.monitor(handler);
     return this;
   }
 
@@ -2775,15 +2647,7 @@ public class RedisClient {
    * @return 
    */
   public RedisClient object(String key, ObjectCmd cmd, Handler<AsyncResult<Void>> handler) { 
-    delegate.object(key, cmd, new Handler<AsyncResult<java.lang.Void>>() {
-      public void handle(AsyncResult<java.lang.Void> ar) {
-        if (ar.succeeded()) {
-          handler.handle(io.vertx.core.Future.succeededFuture(ar.result()));
-        } else {
-          handler.handle(io.vertx.core.Future.failedFuture(ar.cause()));
-        }
-      }
-    });
+    delegate.object(key, cmd, handler);
     return this;
   }
 
@@ -3014,15 +2878,7 @@ public class RedisClient {
    * @return 
    */
   public RedisClient psetex(String key, long millis, String value, Handler<AsyncResult<Void>> handler) { 
-    delegate.psetex(key, millis, value, new Handler<AsyncResult<java.lang.Void>>() {
-      public void handle(AsyncResult<java.lang.Void> ar) {
-        if (ar.succeeded()) {
-          handler.handle(io.vertx.core.Future.succeededFuture(ar.result()));
-        } else {
-          handler.handle(io.vertx.core.Future.failedFuture(ar.cause()));
-        }
-      }
-    });
+    delegate.psetex(key, millis, value, handler);
     return this;
   }
 
@@ -3200,15 +3056,7 @@ public class RedisClient {
    * @return 
    */
   public RedisClient punsubscribe(List<String> patterns, Handler<AsyncResult<Void>> handler) { 
-    delegate.punsubscribe(patterns, new Handler<AsyncResult<java.lang.Void>>() {
-      public void handle(AsyncResult<java.lang.Void> ar) {
-        if (ar.succeeded()) {
-          handler.handle(io.vertx.core.Future.succeededFuture(ar.result()));
-        } else {
-          handler.handle(io.vertx.core.Future.failedFuture(ar.cause()));
-        }
-      }
-    });
+    delegate.punsubscribe(patterns, handler);
     return this;
   }
 
@@ -3731,15 +3579,7 @@ public class RedisClient {
    * @return 
    */
   public RedisClient set(String key, String value, Handler<AsyncResult<Void>> handler) { 
-    delegate.set(key, value, new Handler<AsyncResult<java.lang.Void>>() {
-      public void handle(AsyncResult<java.lang.Void> ar) {
-        if (ar.succeeded()) {
-          handler.handle(io.vertx.core.Future.succeededFuture(ar.result()));
-        } else {
-          handler.handle(io.vertx.core.Future.failedFuture(ar.cause()));
-        }
-      }
-    });
+    delegate.set(key, value, handler);
     return this;
   }
 
@@ -3789,15 +3629,7 @@ public class RedisClient {
    * @return 
    */
   public RedisClient setBinary(String key, Buffer value, Handler<AsyncResult<Void>> handler) { 
-    delegate.setBinary(key, (io.vertx.core.buffer.Buffer)value.getDelegate(), new Handler<AsyncResult<java.lang.Void>>() {
-      public void handle(AsyncResult<java.lang.Void> ar) {
-        if (ar.succeeded()) {
-          handler.handle(io.vertx.core.Future.succeededFuture(ar.result()));
-        } else {
-          handler.handle(io.vertx.core.Future.failedFuture(ar.cause()));
-        }
-      }
-    });
+    delegate.setBinary(key, (io.vertx.core.buffer.Buffer)value.getDelegate(), handler);
     return this;
   }
 
@@ -3822,15 +3654,7 @@ public class RedisClient {
    * @return 
    */
   public RedisClient setBinaryWithOptions(String key, Buffer value, SetOptions options, Handler<AsyncResult<Void>> handler) { 
-    delegate.setBinaryWithOptions(key, (io.vertx.core.buffer.Buffer)value.getDelegate(), options, new Handler<AsyncResult<java.lang.Void>>() {
-      public void handle(AsyncResult<java.lang.Void> ar) {
-        if (ar.succeeded()) {
-          handler.handle(io.vertx.core.Future.succeededFuture(ar.result()));
-        } else {
-          handler.handle(io.vertx.core.Future.failedFuture(ar.cause()));
-        }
-      }
-    });
+    delegate.setBinaryWithOptions(key, (io.vertx.core.buffer.Buffer)value.getDelegate(), options, handler);
     return this;
   }
 
@@ -4111,15 +3935,7 @@ public class RedisClient {
    * @return 
    */
   public RedisClient slowlogReset(Handler<AsyncResult<Void>> handler) { 
-    delegate.slowlogReset(new Handler<AsyncResult<java.lang.Void>>() {
-      public void handle(AsyncResult<java.lang.Void> ar) {
-        if (ar.succeeded()) {
-          handler.handle(io.vertx.core.Future.succeededFuture(ar.result()));
-        } else {
-          handler.handle(io.vertx.core.Future.failedFuture(ar.cause()));
-        }
-      }
-    });
+    delegate.slowlogReset(handler);
     return this;
   }
 
@@ -4463,15 +4279,7 @@ public class RedisClient {
    * @return 
    */
   public RedisClient sync(Handler<AsyncResult<Void>> handler) { 
-    delegate.sync(new Handler<AsyncResult<java.lang.Void>>() {
-      public void handle(AsyncResult<java.lang.Void> ar) {
-        if (ar.succeeded()) {
-          handler.handle(io.vertx.core.Future.succeededFuture(ar.result()));
-        } else {
-          handler.handle(io.vertx.core.Future.failedFuture(ar.cause()));
-        }
-      }
-    });
+    delegate.sync(handler);
     return this;
   }
 
@@ -4565,15 +4373,7 @@ public class RedisClient {
    * @return 
    */
   public RedisClient unsubscribe(List<String> channels, Handler<AsyncResult<Void>> handler) { 
-    delegate.unsubscribe(channels, new Handler<AsyncResult<java.lang.Void>>() {
-      public void handle(AsyncResult<java.lang.Void> ar) {
-        if (ar.succeeded()) {
-          handler.handle(io.vertx.core.Future.succeededFuture(ar.result()));
-        } else {
-          handler.handle(io.vertx.core.Future.failedFuture(ar.cause()));
-        }
-      }
-    });
+    delegate.unsubscribe(channels, handler);
     return this;
   }
 
