@@ -30,6 +30,7 @@ import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Queue;
+import java.util.concurrent.atomic.AtomicReference;
 
 /**
  * Base class for Redis Vert.x client. Generated client would use the facilities
@@ -81,7 +82,8 @@ class RedisConnection {
     ERROR
   }
 
-  private volatile State state = State.DISCONNECTED;
+  private final AtomicReference<State> state = new AtomicReference<>(State.DISCONNECTED);
+
   private volatile NetSocket netSocket;
 
   /**
@@ -131,9 +133,7 @@ class RedisConnection {
   }
 
   private void connect() {
-    if (state == State.DISCONNECTED) {
-      state = State.CONNECTING;
-
+    if (state.compareAndSet(State.DISCONNECTED, State.CONNECTING)) {
       replyParser.reset();
 
       client.connect(config.getPort(), config.getHost(), asyncResult -> {
@@ -141,7 +141,7 @@ class RedisConnection {
 
         if (asyncResult.failed()) {
           runOnContext(v -> {
-            state = State.ERROR;
+            state.set(State.ERROR);
 
             // clean up any waiting command
             clearQueue(waiting, asyncResult.cause());
@@ -153,32 +153,29 @@ class RedisConnection {
               netSocket.close();
             }
 
-            state = State.DISCONNECTED;
+            state.set(State.DISCONNECTED);
           });
         } else {
           netSocket = asyncResult.result()
               .handler(replyParser)
-              .closeHandler(v -> {
-                runOnContext(v0 -> {
-                  state = State.ERROR;
-                  // clean up any waiting command
-                  clearQueue(waiting, "Connection closed");
-                  // clean up any pending command
-                  clearQueue(pending, "Connection closed");
+              .closeHandler(v -> runOnContext(v0 -> {
+                state.set(State.ERROR);
+                // clean up any waiting command
+                clearQueue(waiting, "Connection closed");
+                // clean up any pending command
+                clearQueue(pending, "Connection closed");
 
-                  netSocket.close();
-                  state = State.DISCONNECTED;
-                });
-              })
+                state.set(State.DISCONNECTED);
+              }))
               .exceptionHandler(e -> runOnContext(v0 -> {
-                state = State.ERROR;
+                state.set(State.ERROR);
                 // clean up any waiting command
                 clearQueue(waiting, e);
                 // clean up any pending command
                 clearQueue(pending, e);
 
                 netSocket.close();
-                state = State.DISCONNECTED;
+                state.set(State.DISCONNECTED);
               }));
 
           runOnContext(v -> {
@@ -194,7 +191,7 @@ class RedisConnection {
   }
 
   void disconnect(Handler<AsyncResult<Void>> closeHandler) {
-    switch (state) {
+    switch (state.get()) {
       case CONNECTED:
       case CONNECTING:
         final Command<Void> cmd = new Command<>(context, RedisCommand.QUIT, null, Charset.defaultCharset(), ResponseTransform.NONE, Void.class);
@@ -202,7 +199,7 @@ class RedisConnection {
         cmd.handler(v -> {
           // at this we force the state to error so any incoming command will not start a connection
           runOnContext(v0 -> {
-            state = State.ERROR;
+            state.set(State.ERROR);
 
             // clean up any waiting command
             clearQueue(waiting, "Connection closed");
@@ -210,7 +207,7 @@ class RedisConnection {
             clearQueue(pending, "Connection closed");
 
             netSocket.close();
-            state = State.DISCONNECTED;
+            state.set(State.DISCONNECTED);
 
             closeHandler.handle(Future.succeededFuture());
           });
@@ -236,7 +233,7 @@ class RedisConnection {
    * @param command the redis command to send
    */
   void send(final Command<?> command) {
-    switch (state) {
+    switch (state.get()) {
       case CONNECTED:
         // write to the socket in the netSocket context
         runOnContext(v -> {
@@ -274,7 +271,7 @@ class RedisConnection {
           // clean up any waiting command
           clearQueue(pending, auth.cause());
           netSocket.close();
-          state = State.DISCONNECTED;
+          state.set(State.DISCONNECTED);
         } else {
           // auth success, proceed with select
           doSelect();
@@ -306,7 +303,7 @@ class RedisConnection {
           clearQueue(pending, select.cause());
 
           netSocket.close();
-          state = State.DISCONNECTED;
+          state.set(State.DISCONNECTED);
         } else {
           // select success, proceed with resend
           resendPending();
@@ -328,7 +325,7 @@ class RedisConnection {
   private void resendPending() {
     runOnContext(v -> {
       Command<?> command;
-      state = State.CONNECTED;
+      state.set(State.CONNECTED);
 
       // we are connected so clean up the pending queue
       while ((command = pending.poll()) != null) {
