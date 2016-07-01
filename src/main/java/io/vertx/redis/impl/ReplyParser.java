@@ -21,7 +21,7 @@ import io.vertx.core.buffer.Buffer;
 public class ReplyParser implements Handler<Buffer> {
   
   private static class IndexOutOfBoundsException extends Exception {
-    public IndexOutOfBoundsException(String message) {
+    IndexOutOfBoundsException(String message) {
       super(message);
     }
     
@@ -41,9 +41,11 @@ public class ReplyParser implements Handler<Buffer> {
     this.handler = handler;
   }
 
-  public void reset() {
+  public ReplyParser reset() {
     _buffer = null;
     _offset = 0;
+
+    return this;
   }
 
 

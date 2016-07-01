@@ -18,7 +18,6 @@ package io.vertx.redis.impl;
 import io.vertx.core.AsyncResult;
 import io.vertx.core.Context;
 import io.vertx.core.Handler;
-import io.vertx.core.Vertx;
 import io.vertx.core.buffer.Buffer;
 import io.vertx.core.streams.WriteStream;
 
@@ -83,8 +82,8 @@ public class Command<T> {
   private int expectedReplies = 1;
   private Handler<AsyncResult<T>> handler;
 
-  public Command(RedisCommand command, final List<?> args, Charset encoding, ResponseTransform transform, Class<T> returnType) {
-    this.context = Vertx.currentContext();
+  public Command(Context context, RedisCommand command, final List<?> args, Charset encoding, ResponseTransform transform, Class<T> returnType) {
+    this.context = context;
     this.encoding = encoding.name();
 
     this.transform = transform;

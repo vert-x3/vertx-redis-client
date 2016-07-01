@@ -19,8 +19,6 @@ import io.vertx.core.*;
 import io.vertx.core.eventbus.EventBus;
 import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;
-import io.vertx.core.net.NetClient;
-import io.vertx.core.net.NetClientOptions;
 import io.vertx.redis.RedisClient;
 import io.vertx.redis.RedisOptions;
 
@@ -30,6 +28,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 public abstract class AbstractRedisClient implements RedisClient {
 
+  private final Vertx vertx;
   private final EventBus eb;
   private final RedisSubscriptions subscriptions;
   private final String encoding;
@@ -42,21 +41,17 @@ public abstract class AbstractRedisClient implements RedisClient {
   private final RedisConnection pubsub;
 
   AbstractRedisClient(Vertx vertx, RedisOptions config) {
+    this.vertx = vertx;
     this.eb = vertx.eventBus();
     this.encoding = config.getEncoding();
     this.charset = Charset.forName(encoding);
     this.binaryCharset = Charset.forName("iso-8859-1");
     this.baseAddress = config.getAddress();
 
-    // create a netClient for the connection
-    final NetClient client = vertx.createNetClient(new NetClientOptions()
-        .setTcpKeepAlive(config.isTcpKeepAlive())
-        .setTcpNoDelay(config.isTcpNoDelay()));
-
     subscriptions = new RedisSubscriptions(vertx);
 
-    redis = new RedisConnection(client, config);
-    pubsub = new RedisConnection(client, config, subscriptions);
+    redis = new RedisConnection(vertx, config, null);
+    pubsub = new RedisConnection(vertx, config, subscriptions);
   }
 
   @Override
@@ -120,7 +115,7 @@ public abstract class AbstractRedisClient implements RedisClient {
                       final boolean binary,
                       final Handler<AsyncResult<T>> resultHandler) {
 
-    final Command<T> cmd = new Command<>(command, redisArgs, binary ? binaryCharset : charset, getResponseTransformFor(command), returnType).handler(resultHandler);
+    final Command<T> cmd = new Command<>(vertx.getOrCreateContext(), command, redisArgs, binary ? binaryCharset : charset, getResponseTransformFor(command), returnType).handler(resultHandler);
 
     switch (command) {
       case PSUBSCRIBE:
