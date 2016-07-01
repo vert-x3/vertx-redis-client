@@ -18,6 +18,7 @@ package io.vertx.redis.impl;
 import io.vertx.core.AsyncResult;
 import io.vertx.core.Context;
 import io.vertx.core.Handler;
+import io.vertx.core.Vertx;
 import io.vertx.core.buffer.Buffer;
 import io.vertx.core.streams.WriteStream;
 
@@ -150,7 +151,11 @@ public class Command<T> {
   public void handle(AsyncResult<T> asyncResult) {
     if (handler != null) {
       if (context != null) {
-        context.runOnContext(v -> handler.handle(asyncResult));
+        if (Vertx.currentContext() == context) {
+          handler.handle(asyncResult);
+        } else {
+          context.runOnContext(v -> handler.handle(asyncResult));
+        }
       } else {
         handler.handle(asyncResult);
       }

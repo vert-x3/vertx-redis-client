@@ -37,7 +37,8 @@ import java.util.Queue;
  */
 class RedisConnection {
 
-  private final Vertx vertx;
+  private final Context context;
+
   private static final Logger log = LoggerFactory.getLogger(RedisConnection.class);
 
   /**
@@ -82,13 +83,12 @@ class RedisConnection {
 
   private volatile State state = State.DISCONNECTED;
   private volatile NetSocket netSocket;
-  private volatile Context context;
 
   /**
    * Create a RedisConnection.
    */
   public RedisConnection(Vertx vertx, RedisOptions config, RedisSubscriptions subscriptions) {
-    this.vertx = vertx;
+    this.context = vertx.getOrCreateContext();
     this.config = config;
 
     // create a netClient for the connection
@@ -137,59 +137,57 @@ class RedisConnection {
       replyParser.reset();
 
       client.connect(config.getPort(), config.getHost(), asyncResult -> {
-        context = vertx.getOrCreateContext();
+        //context = vertx.getOrCreateContext();
 
         if (asyncResult.failed()) {
-          state = State.ERROR;
+          runOnContext(v -> {
+            state = State.ERROR;
 
-          synchronized (client) {
             // clean up any waiting command
             clearQueue(waiting, asyncResult.cause());
             // clean up any pending command
             clearQueue(pending, asyncResult.cause());
-          }
 
-          // close the socket if previously connected
-          if (netSocket != null) {
-            netSocket.close();
-          }
+            // close the socket if previously connected
+            if (netSocket != null) {
+              netSocket.close();
+            }
 
-          state = State.DISCONNECTED;
-
+            state = State.DISCONNECTED;
+          });
         } else {
           netSocket = asyncResult.result()
               .handler(replyParser)
               .closeHandler(v -> {
-                state = State.ERROR;
-                synchronized (client) {
+                runOnContext(v0 -> {
+                  state = State.ERROR;
                   // clean up any waiting command
                   clearQueue(waiting, "Connection closed");
                   // clean up any pending command
                   clearQueue(pending, "Connection closed");
-                }
-                netSocket.close();
-                state = State.DISCONNECTED;
-              })
-              .exceptionHandler(e -> {
-                state = State.ERROR;
-                synchronized (client) {
-                  // clean up any waiting command
-                  clearQueue(waiting, e);
-                  // clean up any pending command
-                  clearQueue(pending, e);
-                }
-                netSocket.close();
-                state = State.DISCONNECTED;
-              });
 
-          synchronized (client) {
+                  netSocket.close();
+                  state = State.DISCONNECTED;
+                });
+              })
+              .exceptionHandler(e -> runOnContext(v0 -> {
+                state = State.ERROR;
+                // clean up any waiting command
+                clearQueue(waiting, e);
+                // clean up any pending command
+                clearQueue(pending, e);
+
+                netSocket.close();
+                state = State.DISCONNECTED;
+              }));
+
+          runOnContext(v -> {
             // clean up any waiting command
             clearQueue(waiting, "Connection lost");
-          }
-          state = State.CONNECTED;
 
-          // handle the connection handshake
-          doAuth();
+            // handle the connection handshake
+            doAuth();
+          });
         }
       });
     }
@@ -199,23 +197,23 @@ class RedisConnection {
     switch (state) {
       case CONNECTED:
       case CONNECTING:
-        final Command<Void> cmd = new Command<>(vertx.getOrCreateContext(), RedisCommand.QUIT, null, Charset.defaultCharset(), ResponseTransform.NONE, Void.class);
+        final Command<Void> cmd = new Command<>(context, RedisCommand.QUIT, null, Charset.defaultCharset(), ResponseTransform.NONE, Void.class);
 
         cmd.handler(v -> {
           // at this we force the state to error so any incoming command will not start a connection
-          state = State.ERROR;
+          runOnContext(v0 -> {
+            state = State.ERROR;
 
-          synchronized (client) {
             // clean up any waiting command
             clearQueue(waiting, "Connection closed");
             // clean up any pending command
             clearQueue(pending, "Connection closed");
-          }
 
-          netSocket.close();
-          state = State.DISCONNECTED;
+            netSocket.close();
+            state = State.DISCONNECTED;
 
-          closeHandler.handle(Future.succeededFuture());
+            closeHandler.handle(Future.succeededFuture());
+          });
         });
 
         send(cmd);
@@ -241,28 +239,22 @@ class RedisConnection {
     switch (state) {
       case CONNECTED:
         // write to the socket in the netSocket context
-        context.runOnContext(v -> {
-          synchronized (client) {
-            // The order read must match the order written, vertx guarantees
-            // that this is only called from a single thread.
-            for (int i = 0; i < command.getExpectedReplies(); ++i) {
-              waiting.add(command);
-            }
-
-            command.writeTo(netSocket);
+        runOnContext(v -> {
+          // The order read must match the order written, vertx guarantees
+          // that this is only called from a single thread.
+          for (int i = 0; i < command.getExpectedReplies(); ++i) {
+            waiting.add(command);
           }
+
+          command.writeTo(netSocket);
         });
         break;
       case CONNECTING:
       case ERROR:
-        synchronized (client) {
-          pending.add(command);
-        }
+        pending.add(command);
         break;
       case DISCONNECTED:
-        synchronized (client) {
-          pending.add(command);
-        }
+        pending.add(command);
         connect();
         break;
     }
@@ -277,29 +269,23 @@ class RedisConnection {
       final List<Object> args = new ArrayList<>();
       args.add(config.getAuth());
 
-      Command<String> authCmd = new Command<>(vertx.getOrCreateContext(), RedisCommand.AUTH, args, Charset.forName(config.getEncoding()), ResponseTransform.NONE, String.class).handler(auth -> {
+      Command<String> authCmd = new Command<>(context, RedisCommand.AUTH, args, Charset.forName(config.getEncoding()), ResponseTransform.NONE, String.class).handler(auth -> {
         if (auth.failed()) {
-          synchronized (client) {
-            // clean up any waiting command
-            clearQueue(pending, auth.cause());
-          }
-
+          // clean up any waiting command
+          clearQueue(pending, auth.cause());
           netSocket.close();
           state = State.DISCONNECTED;
-          return;
+        } else {
+          // auth success, proceed with select
+          doSelect();
         }
-
-        // auth success, proceed with select
-        doSelect();
       });
 
       // write to the socket in the netSocket context
-      context.runOnContext(v -> {
-        synchronized (client) {
-          // queue it
-          waiting.add(authCmd);
-          authCmd.writeTo(netSocket);
-        }
+      runOnContext(v -> {
+        // queue it
+        waiting.add(authCmd);
+        authCmd.writeTo(netSocket);
       });
     } else {
       // no auth, proceed with select
@@ -314,29 +300,24 @@ class RedisConnection {
       final List<Object> args = new ArrayList<>();
       args.add(config.getSelect());
 
-      Command<String> selectCmd = new Command<>(vertx.getOrCreateContext(), RedisCommand.SELECT, args, Charset.forName(config.getEncoding()), ResponseTransform.NONE, String.class).handler(select -> {
+      Command<String> selectCmd = new Command<>(context, RedisCommand.SELECT, args, Charset.forName(config.getEncoding()), ResponseTransform.NONE, String.class).handler(select -> {
         if (select.failed()) {
-          synchronized (client) {
-            // clean up any waiting command
-            clearQueue(pending, select.cause());
-          }
+          // clean up any waiting command
+          clearQueue(pending, select.cause());
 
           netSocket.close();
           state = State.DISCONNECTED;
-          return;
+        } else {
+          // select success, proceed with resend
+          resendPending();
         }
-
-        // select success, proceed with resend
-        resendPending();
       });
 
       // write to the socket in the netSocket context
-      context.runOnContext(v -> {
-        synchronized (client) {
-          // queue it
-          waiting.add(selectCmd);
-          selectCmd.writeTo(netSocket);
-        }
+      runOnContext(v -> {
+        // queue it
+        waiting.add(selectCmd);
+        selectCmd.writeTo(netSocket);
       });
     } else {
       // no select, proceed with resend
@@ -345,9 +326,10 @@ class RedisConnection {
   }
 
   private void resendPending() {
-    Command<?> command;
+    runOnContext(v -> {
+      Command<?> command;
+      state = State.CONNECTED;
 
-    synchronized (client) {
       // we are connected so clean up the pending queue
       while ((command = pending.poll()) != null) {
         // The order read must match the order written, vertx guarantees
@@ -359,108 +341,112 @@ class RedisConnection {
         // write to the socket in the netSocket context
         command.writeTo(netSocket);
       }
-    }
+    });
   }
 
   @SuppressWarnings("unchecked")
   private void handleReply(Reply reply) {
-    final Command cmd;
 
-    synchronized (client) {
-      cmd = waiting.poll();
-    }
+    runOnContext(v -> {
+      final Command cmd = waiting.poll();
 
-    if (cmd != null) {
-      switch (reply.type()) {
-        case '-': // Error
-          cmd.handle(Future.failedFuture(reply.asType(String.class)));
-          return;
-        case '+':   // Status
-          switch (cmd.responseTransform()) {
-            case ARRAY:
-              cmd.handle(Future.succeededFuture(new JsonArray().add(reply.asType(String.class))));
-              break;
-            default:
-              cmd.handle(Future.succeededFuture(reply.asType(cmd.returnType())));
-              break;
-          }
-          return;
-        case '$':  // Bulk
-          switch (cmd.responseTransform()) {
-            case ARRAY:
-              cmd.handle(Future.succeededFuture(new JsonArray().add(reply.asType(String.class, cmd.encoding()))));
-              break;
-            case INFO:
-              String info = reply.asType(String.class, cmd.encoding());
+      if (cmd != null) {
+        switch (reply.type()) {
+          case '-': // Error
+            cmd.handle(Future.failedFuture(reply.asType(String.class)));
+            return;
+          case '+':   // Status
+            switch (cmd.responseTransform()) {
+              case ARRAY:
+                cmd.handle(Future.succeededFuture(new JsonArray().add(reply.asType(String.class))));
+                break;
+              default:
+                cmd.handle(Future.succeededFuture(reply.asType(cmd.returnType())));
+                break;
+            }
+            return;
+          case '$':  // Bulk
+            switch (cmd.responseTransform()) {
+              case ARRAY:
+                cmd.handle(Future.succeededFuture(new JsonArray().add(reply.asType(String.class, cmd.encoding()))));
+                break;
+              case INFO:
+                String info = reply.asType(String.class, cmd.encoding());
 
-              if (info == null) {
-                cmd.handle(Future.succeededFuture(null));
-              } else {
-                String lines[] = info.split("\\r?\\n");
-                JsonObject value = new JsonObject();
+                if (info == null) {
+                  cmd.handle(Future.succeededFuture(null));
+                } else {
+                  String lines[] = info.split("\\r?\\n");
+                  JsonObject value = new JsonObject();
 
-                JsonObject section = null;
-                for (String line : lines) {
-                  if (line.length() == 0) {
-                    // end of section
-                    section = null;
-                    continue;
-                  }
+                  JsonObject section = null;
+                  for (String line : lines) {
+                    if (line.length() == 0) {
+                      // end of section
+                      section = null;
+                      continue;
+                    }
 
-                  if (line.charAt(0) == '#') {
-                    // begin section
-                    section = new JsonObject();
-                    // create a sub key with the section name
-                    value.put(line.substring(2).toLowerCase(), section);
-                  } else {
-                    // entry in section
-                    int split = line.indexOf(':');
-                    if (section == null) {
-                      value.put(line.substring(0, split), line.substring(split + 1));
+                    if (line.charAt(0) == '#') {
+                      // begin section
+                      section = new JsonObject();
+                      // create a sub key with the section name
+                      value.put(line.substring(2).toLowerCase(), section);
                     } else {
-                      section.put(line.substring(0, split), line.substring(split + 1));
+                      // entry in section
+                      int split = line.indexOf(':');
+                      if (section == null) {
+                        value.put(line.substring(0, split), line.substring(split + 1));
+                      } else {
+                        section.put(line.substring(0, split), line.substring(split + 1));
+                      }
                     }
                   }
+                  cmd.handle(Future.succeededFuture(value));
                 }
-                cmd.handle(Future.succeededFuture(value));
-              }
-              break;
-            default:
-              cmd.handle(Future.succeededFuture(reply.asType(cmd.returnType(), cmd.encoding())));
-              break;
-          }
-          return;
-        case '*': // Multi
-          switch (cmd.responseTransform()) {
-            case HASH:
-              cmd.handle(Future.succeededFuture(reply.asType(JsonObject.class, cmd.encoding())));
-              break;
-            default:
-              cmd.handle(Future.succeededFuture(reply.asType(JsonArray.class, cmd.encoding())));
-              break;
-          }
-          return;
-        case ':':   // Integer
-          switch (cmd.responseTransform()) {
-            case ARRAY:
-              cmd.handle(Future.succeededFuture(new JsonArray().add(reply.asType(Long.class))));
-              break;
-            default:
-              cmd.handle(Future.succeededFuture(reply.asType(cmd.returnType())));
-              break;
-          }
-          return;
-        default:
-          cmd.handle(Future.failedFuture("Unknown message type"));
+                break;
+              default:
+                cmd.handle(Future.succeededFuture(reply.asType(cmd.returnType(), cmd.encoding())));
+                break;
+            }
+            return;
+          case '*': // Multi
+            switch (cmd.responseTransform()) {
+              case HASH:
+                cmd.handle(Future.succeededFuture(reply.asType(JsonObject.class, cmd.encoding())));
+                break;
+              default:
+                cmd.handle(Future.succeededFuture(reply.asType(JsonArray.class, cmd.encoding())));
+                break;
+            }
+            return;
+          case ':':   // Integer
+            switch (cmd.responseTransform()) {
+              case ARRAY:
+                cmd.handle(Future.succeededFuture(new JsonArray().add(reply.asType(Long.class))));
+                break;
+              default:
+                cmd.handle(Future.succeededFuture(reply.asType(cmd.returnType())));
+                break;
+            }
+            return;
+          default:
+            cmd.handle(Future.failedFuture("Unknown message type"));
+        }
+      } else {
+        log.error("No handler waiting for message: " + reply.asType(String.class));
       }
+    });
+  }
+
+  private void runOnContext(Handler<Void> handler) {
+    if (Vertx.currentContext() == context) {
+      handler.handle(null);
     } else {
-      log.error("No handler waiting for message: " + reply.asType(String.class));
+      context.runOnContext(handler);
     }
   }
 
-  /**
-   * Calls to this method **MUST** be done inside the synchronized block on the client
-   */
   private static void clearQueue(Queue<Command<?>> q, String message) {
     Command<?> cmd;
 
@@ -470,9 +456,6 @@ class RedisConnection {
     }
   }
 
-  /**
-   * Calls to this method **MUST** be done inside the synchronized block on the client
-   */
   private static void clearQueue(Queue<Command<?>> q, Throwable cause) {
     Command<?> cmd;
 

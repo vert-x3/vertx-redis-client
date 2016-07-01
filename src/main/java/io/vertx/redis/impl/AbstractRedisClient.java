@@ -28,7 +28,6 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 public abstract class AbstractRedisClient implements RedisClient {
 
-  private final Vertx vertx;
   private final EventBus eb;
   private final RedisSubscriptions subscriptions;
   private final String encoding;
@@ -41,7 +40,6 @@ public abstract class AbstractRedisClient implements RedisClient {
   private final RedisConnection pubsub;
 
   AbstractRedisClient(Vertx vertx, RedisOptions config) {
-    this.vertx = vertx;
     this.eb = vertx.eventBus();
     this.encoding = config.getEncoding();
     this.charset = Charset.forName(encoding);
@@ -85,37 +83,30 @@ public abstract class AbstractRedisClient implements RedisClient {
   }
 
   final void sendString(final RedisCommand command, final List<?> args, final Handler<AsyncResult<String>> resultHandler) {
-    send(command, args, String.class, resultHandler);
+    send(command, args, String.class, false, resultHandler);
   }
 
   final void sendLong(final RedisCommand command, final List<?> args, final Handler<AsyncResult<Long>> resultHandler) {
-    send(command, args, Long.class, resultHandler);
+    send(command, args, Long.class, false, resultHandler);
   }
 
   final void sendVoid(final RedisCommand command, final List<?> args, final Handler<AsyncResult<Void>> resultHandler) {
-    send(command, args, Void.class, resultHandler);
+    send(command, args, Void.class, false, resultHandler);
   }
 
   final void sendJsonArray(final RedisCommand command, final List<?> args, final Handler<AsyncResult<JsonArray>> resultHandler) {
-    send(command, args, JsonArray.class, resultHandler);
+    send(command, args, JsonArray.class, false, resultHandler);
   }
 
   final void sendJsonObject(final RedisCommand command, final List<?> args, final Handler<AsyncResult<JsonObject>> resultHandler) {
-    send(command, args, JsonObject.class, resultHandler);
-  }
-
-  final <T> void send(final RedisCommand command, final List<?> redisArgs,
-                      final Class<T> returnType,
-                      final Handler<AsyncResult<T>> resultHandler) {
-
-    send(command, redisArgs, returnType, false, resultHandler);
+    send(command, args, JsonObject.class, false, resultHandler);
   }
 
   final <T> void send(final RedisCommand command, final List<?> redisArgs, final Class<T> returnType,
                       final boolean binary,
                       final Handler<AsyncResult<T>> resultHandler) {
 
-    final Command<T> cmd = new Command<>(vertx.getOrCreateContext(), command, redisArgs, binary ? binaryCharset : charset, getResponseTransformFor(command), returnType).handler(resultHandler);
+    final Command<T> cmd = new Command<>(Vertx.currentContext(), command, redisArgs, binary ? binaryCharset : charset, getResponseTransformFor(command), returnType).handler(resultHandler);
 
     switch (command) {
       case PSUBSCRIBE:
