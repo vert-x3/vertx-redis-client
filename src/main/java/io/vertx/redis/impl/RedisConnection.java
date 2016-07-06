@@ -137,23 +137,21 @@ class RedisConnection {
       replyParser.reset();
 
       client.connect(config.getPort(), config.getHost(), asyncResult -> {
-        //context = vertx.getOrCreateContext();
-
         if (asyncResult.failed()) {
           runOnContext(v -> {
-            state.set(State.ERROR);
+            if (state.compareAndSet(State.CONNECTING, State.ERROR)) {
+              // clean up any waiting command
+              clearQueue(waiting, asyncResult.cause());
+              // clean up any pending command
+              clearQueue(pending, asyncResult.cause());
 
-            // clean up any waiting command
-            clearQueue(waiting, asyncResult.cause());
-            // clean up any pending command
-            clearQueue(pending, asyncResult.cause());
+              // close the socket if previously connected
+              if (netSocket != null) {
+                netSocket.close();
+              }
 
-            // close the socket if previously connected
-            if (netSocket != null) {
-              netSocket.close();
+              state.set(State.DISCONNECTED);
             }
-
-            state.set(State.DISCONNECTED);
           });
         } else {
           netSocket = asyncResult.result()
@@ -192,24 +190,25 @@ class RedisConnection {
 
   void disconnect(Handler<AsyncResult<Void>> closeHandler) {
     switch (state.get()) {
-      case CONNECTED:
       case CONNECTING:
+        // eventually will become connected
+      case CONNECTED:
         final Command<Void> cmd = new Command<>(context, RedisCommand.QUIT, null, Charset.defaultCharset(), ResponseTransform.NONE, Void.class);
 
         cmd.handler(v -> {
           // at this we force the state to error so any incoming command will not start a connection
           runOnContext(v0 -> {
-            state.set(State.ERROR);
+            if (state.compareAndSet(State.CONNECTED, State.ERROR)) {
+              // clean up any waiting command
+              clearQueue(waiting, "Connection closed");
+              // clean up any pending command
+              clearQueue(pending, "Connection closed");
 
-            // clean up any waiting command
-            clearQueue(waiting, "Connection closed");
-            // clean up any pending command
-            clearQueue(pending, "Connection closed");
+              netSocket.close();
+              state.set(State.DISCONNECTED);
 
-            netSocket.close();
-            state.set(State.DISCONNECTED);
-
-            closeHandler.handle(Future.succeededFuture());
+              closeHandler.handle(Future.succeededFuture());
+            }
           });
         });
 
@@ -233,10 +232,15 @@ class RedisConnection {
    * @param command the redis command to send
    */
   void send(final Command<?> command) {
-    switch (state.get()) {
-      case CONNECTED:
-        // write to the socket in the netSocket context
-        runOnContext(v -> {
+    // start the handshake if not connected
+    if (state.get() == State.DISCONNECTED) {
+      connect();
+    }
+
+    // write to the socket in the netSocket context
+    runOnContext(v -> {
+      switch (state.get()) {
+        case CONNECTED:
           // The order read must match the order written, vertx guarantees
           // that this is only called from a single thread.
           for (int i = 0; i < command.getExpectedReplies(); ++i) {
@@ -244,21 +248,19 @@ class RedisConnection {
           }
 
           command.writeTo(netSocket);
-        });
-        break;
-      case CONNECTING:
-      case ERROR:
-        runOnContext(v -> {
-          pending.add(command);
-        });
-        break;
-      case DISCONNECTED:
-        runOnContext(v -> {
-          pending.add(command);
-        });
-        connect();
-        break;
-    }
+          break;
+        case CONNECTING:
+        case ERROR:
+        case DISCONNECTED:
+          if (state.get() != State.CONNECTED) {
+            pending.add(command);
+          } else {
+            // state changed so start over...
+            send(command);
+          }
+          break;
+      }
+    });
   }
 
   /**
@@ -329,18 +331,18 @@ class RedisConnection {
   private void resendPending() {
     runOnContext(v -> {
       Command<?> command;
-      state.set(State.CONNECTED);
+      if (state.compareAndSet(State.CONNECTING, State.CONNECTED)) {
+        // we are connected so clean up the pending queue
+        while ((command = pending.poll()) != null) {
+          // The order read must match the order written, vertx guarantees
+          // that this is only called from a single thread.
+          for (int i = 0; i < command.getExpectedReplies(); ++i) {
+            waiting.add(command);
+          }
 
-      // we are connected so clean up the pending queue
-      while ((command = pending.poll()) != null) {
-        // The order read must match the order written, vertx guarantees
-        // that this is only called from a single thread.
-        for (int i = 0; i < command.getExpectedReplies(); ++i) {
-          waiting.add(command);
+          // write to the socket in the netSocket context
+          command.writeTo(netSocket);
         }
-
-        // write to the socket in the netSocket context
-        command.writeTo(netSocket);
       }
     });
   }
