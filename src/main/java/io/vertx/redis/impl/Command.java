@@ -83,8 +83,8 @@ public class Command<T> {
   private int expectedReplies = 1;
   private Handler<AsyncResult<T>> handler;
 
-  public Command(RedisCommand command, final List<?> args, Charset encoding, ResponseTransform transform, Class<T> returnType) {
-    this.context = Vertx.currentContext();
+  public Command(Context context, RedisCommand command, final List<?> args, Charset encoding, ResponseTransform transform, Class<T> returnType) {
+    this.context = context;
     this.encoding = encoding.name();
 
     this.transform = transform;
@@ -151,7 +151,11 @@ public class Command<T> {
   public void handle(AsyncResult<T> asyncResult) {
     if (handler != null) {
       if (context != null) {
-        context.runOnContext(v -> handler.handle(asyncResult));
+        if (Vertx.currentContext() == context) {
+          handler.handle(asyncResult);
+        } else {
+          context.runOnContext(v -> handler.handle(asyncResult));
+        }
       } else {
         handler.handle(asyncResult);
       }

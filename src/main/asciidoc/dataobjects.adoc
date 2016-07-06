@@ -140,6 +140,7 @@ Set TYPE filter
  * `port`: 6379
  * `tcpKeepAlive`: true
  * `tcpNoDelay`: true
+ * `binary`: false
 
  However there are two extra properties that have no defaults since they are optional:
 
@@ -164,6 +165,10 @@ Set the eventbus address prefix for `PUB/SUB`.
 |[[auth]]`auth`|`String`|
 +++
 Set the password for authentication at connection time.
++++
+|[[binary]]`binary`|`Boolean`|
++++
+Set the user defined character encoding, e.g.: `iso-8859-1`.
 +++
 |[[encoding]]`encoding`|`String`|
 +++

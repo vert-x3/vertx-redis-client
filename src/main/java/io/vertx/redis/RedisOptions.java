@@ -28,6 +28,7 @@ import io.vertx.core.json.JsonObject;
  * * `port`: 6379
  * * `tcpKeepAlive`: true
  * * `tcpNoDelay`: true
+ * * `binary`: false
  *
  * However there are two extra properties that have no defaults since they are optional:
  *
@@ -59,6 +60,28 @@ public class RedisOptions {
    */
   public RedisOptions setEncoding(String encoding) {
     json.put("encoding", encoding);
+    if ("iso-8859-1".equalsIgnoreCase(encoding)) {
+      json.put("binary", true);
+    }
+    return this;
+  }
+
+  /**
+   * Return if the messages to/from redis are binary, default `false`.
+   * @return are messages binary
+   */
+  public boolean isBinary() {
+    return json.getBoolean("binary", false);
+  }
+
+  /**
+   * Set the user defined character encoding, e.g.: `iso-8859-1`.
+   * @param binary use binary messages
+   * @return self
+   */
+  public RedisOptions setBinary(boolean binary) {
+    json.put("binary", binary);
+    json.put("encoding", "iso-8859-1");
     return this;
   }
 
@@ -199,6 +222,16 @@ public class RedisOptions {
 
   public RedisOptions(JsonObject json) {
     this.json = json.copy();
+
+    // process the binary support
+    if (getEncoding().equalsIgnoreCase("iso-8859-1")) {
+      setBinary(true);
+      return;
+    }
+
+    if (isBinary()) {
+      setEncoding("iso-8859-1");
+    }
   }
 
   public RedisOptions(RedisOptions options) {

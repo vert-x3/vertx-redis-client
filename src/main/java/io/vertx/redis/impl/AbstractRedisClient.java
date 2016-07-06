@@ -19,8 +19,6 @@ import io.vertx.core.*;
 import io.vertx.core.eventbus.EventBus;
 import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;
-import io.vertx.core.net.NetClient;
-import io.vertx.core.net.NetClientOptions;
 import io.vertx.redis.RedisClient;
 import io.vertx.redis.RedisOptions;
 
@@ -48,15 +46,10 @@ public abstract class AbstractRedisClient implements RedisClient {
     this.binaryCharset = Charset.forName("iso-8859-1");
     this.baseAddress = config.getAddress();
 
-    // create a netClient for the connection
-    final NetClient client = vertx.createNetClient(new NetClientOptions()
-        .setTcpKeepAlive(config.isTcpKeepAlive())
-        .setTcpNoDelay(config.isTcpNoDelay()));
-
     subscriptions = new RedisSubscriptions(vertx);
 
-    redis = new RedisConnection(client, config);
-    pubsub = new RedisConnection(client, config, subscriptions);
+    redis = new RedisConnection(vertx, config, null);
+    pubsub = new RedisConnection(vertx, config, subscriptions);
   }
 
   @Override
@@ -90,37 +83,30 @@ public abstract class AbstractRedisClient implements RedisClient {
   }
 
   final void sendString(final RedisCommand command, final List<?> args, final Handler<AsyncResult<String>> resultHandler) {
-    send(command, args, String.class, resultHandler);
+    send(command, args, String.class, false, resultHandler);
   }
 
   final void sendLong(final RedisCommand command, final List<?> args, final Handler<AsyncResult<Long>> resultHandler) {
-    send(command, args, Long.class, resultHandler);
+    send(command, args, Long.class, false, resultHandler);
   }
 
   final void sendVoid(final RedisCommand command, final List<?> args, final Handler<AsyncResult<Void>> resultHandler) {
-    send(command, args, Void.class, resultHandler);
+    send(command, args, Void.class, false, resultHandler);
   }
 
   final void sendJsonArray(final RedisCommand command, final List<?> args, final Handler<AsyncResult<JsonArray>> resultHandler) {
-    send(command, args, JsonArray.class, resultHandler);
+    send(command, args, JsonArray.class, false, resultHandler);
   }
 
   final void sendJsonObject(final RedisCommand command, final List<?> args, final Handler<AsyncResult<JsonObject>> resultHandler) {
-    send(command, args, JsonObject.class, resultHandler);
-  }
-
-  final <T> void send(final RedisCommand command, final List<?> redisArgs,
-                      final Class<T> returnType,
-                      final Handler<AsyncResult<T>> resultHandler) {
-
-    send(command, redisArgs, returnType, false, resultHandler);
+    send(command, args, JsonObject.class, false, resultHandler);
   }
 
   final <T> void send(final RedisCommand command, final List<?> redisArgs, final Class<T> returnType,
                       final boolean binary,
                       final Handler<AsyncResult<T>> resultHandler) {
 
-    final Command<T> cmd = new Command<>(command, redisArgs, binary ? binaryCharset : charset, getResponseTransformFor(command), returnType).handler(resultHandler);
+    final Command<T> cmd = new Command<>(Vertx.currentContext(), command, redisArgs, binary ? binaryCharset : charset, getResponseTransformFor(command), returnType).handler(resultHandler);
 
     switch (command) {
       case PSUBSCRIBE:
