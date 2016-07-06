@@ -248,10 +248,14 @@ class RedisConnection {
         break;
       case CONNECTING:
       case ERROR:
-        pending.add(command);
+        runOnContext(v -> {
+          pending.add(command);
+        });
         break;
       case DISCONNECTED:
-        pending.add(command);
+        runOnContext(v -> {
+          pending.add(command);
+        });
         connect();
         break;
     }
