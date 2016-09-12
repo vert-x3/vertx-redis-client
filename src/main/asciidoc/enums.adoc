@@ -4,7 +4,6 @@
 == AggregateOptions
 
 ++++
- @author <a href="mailto:marko.strukelj@gmail.com">Marko Strukelj</a>
 ++++
 '''
 
@@ -22,7 +21,6 @@
 == BitOperation
 
 ++++
- @author <a href="mailto:marko.strukelj@gmail.com">Marko Strukelj</a>
 ++++
 '''
 
@@ -40,7 +38,6 @@
 == FailoverOptions
 
 ++++
- @author <a href="mailto:pmlopes@gmail.com">Paulo Lopes</a>
 ++++
 '''
 
@@ -86,7 +83,6 @@ Feet
 == InsertOptions
 
 ++++
- @author <a href="mailto:marko.strukelj@gmail.com">Marko Strukelj</a>
 ++++
 '''
 
@@ -102,7 +98,6 @@ Feet
 == ObjectCmd
 
 ++++
- @author <a href="mailto:marko.strukelj@gmail.com">Marko Strukelj</a>
 ++++
 '''
 
@@ -119,7 +114,6 @@ Feet
 == RangeOptions
 
 ++++
- @author <a href="mailto:marko.strukelj@gmail.com">Marko Strukelj</a>
 ++++
 '''
 
@@ -135,7 +129,6 @@ Feet
 == ResetOptions
 
 ++++
- @author <a href="mailto:pmlopes@gmail.com">Paulo Lopes</a>
 ++++
 '''
 
@@ -151,7 +144,6 @@ Feet
 == ShutdownOptions
 
 ++++
- @author <a href="mailto:marko.strukelj@gmail.com">Marko Strukelj</a>
 ++++
 '''
 
@@ -168,7 +160,6 @@ Feet
 == SlotCmd
 
 ++++
- @author <a href="mailto:pmlopes@gmail.com">Paulo Lopes</a>
 ++++
 '''
 

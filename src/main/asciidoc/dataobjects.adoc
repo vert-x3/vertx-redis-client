@@ -4,7 +4,6 @@
 == GeoMember
 
 ++++
- @author <a href="mailto:plopes@redhat.com">Paulo Lopes</a>
 ++++
 '''
 
@@ -30,7 +29,6 @@ Set the member name.
 == GeoRadiusOptions
 
 ++++
- @author <a href="mailto:plopes@redhat.com">Paulo Lopes</a>
 ++++
 '''
 
@@ -60,7 +58,6 @@ Set the radius options to be hash based.
 == KillFilter
 
 ++++
- @author <a href="mailto:marko.strukelj@gmail.com">Marko Strukelj</a>
 ++++
 '''
 
@@ -90,7 +87,6 @@ Set TYPE filter
 == LimitOptions
 
 ++++
- @author <a href="mailto:marko.strukelj@gmail.com">Marko Strukelj</a>
 ++++
 '''
 
@@ -104,7 +100,6 @@ Set TYPE filter
 == MigrateOptions
 
 ++++
- @author <a href="mailto:marko.strukelj@gmail.com">Marko Strukelj</a>
 ++++
 '''
 
@@ -118,7 +113,6 @@ Set TYPE filter
 == RangeLimitOptions
 
 ++++
- @author <a href="mailto:marko.strukelj@gmail.com">Marko Strukelj</a>
 ++++
 '''
 
@@ -200,7 +194,6 @@ Set the TCP NoDelay at the socket level.
 == ScanOptions
 
 ++++
- @author <a href="mailto:marko.strukelj@gmail.com">Marko Strukelj</a>
 ++++
 '''
 
@@ -216,7 +209,6 @@ Set the TCP NoDelay at the socket level.
 == SetOptions
 
 ++++
- @author <a href="mailto:marko.strukelj@gmail.com">Marko Strukelj</a>
 ++++
 '''
 
@@ -234,7 +226,6 @@ Set the TCP NoDelay at the socket level.
 == SortOptions
 
 ++++
- @author <a href="mailto:marko.strukelj@gmail.com">Marko Strukelj</a>
 ++++
 '''
 
