@@ -478,7 +478,8 @@ class RedisConnection {
           break;
       }
     } else {
-      log.error("No handler waiting for message: " + reply.asType(String.class));
+//      log.error("No handler waiting for message: " + reply.asType(String.class));
+      trace("no handler waiting for message: " + reply.asType(String.class));
     }
   }
 
