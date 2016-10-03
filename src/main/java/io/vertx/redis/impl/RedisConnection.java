@@ -16,6 +16,7 @@
 package io.vertx.redis.impl;
 
 import io.vertx.core.*;
+import io.vertx.core.impl.VertxInternal;
 import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;
 import io.vertx.core.logging.Logger;
@@ -90,7 +91,17 @@ class RedisConnection {
    * Create a RedisConnection.
    */
   public RedisConnection(Vertx vertx, RedisOptions config, RedisSubscriptions subscriptions) {
-    this.context = vertx.getOrCreateContext();
+
+    // Make sure we have an event loop context for serializability of the commands
+    Context ctx = Vertx.currentContext();
+    if (ctx == null) {
+      ctx = vertx.getOrCreateContext();
+    } else if (!ctx.isEventLoopContext()) {
+      VertxInternal vi = (VertxInternal) vertx;
+      ctx = vi.createEventLoopContext(null, null, new JsonObject(), Thread.currentThread().getContextClassLoader());
+    }
+
+    this.context = ctx;
     this.config = config;
 
     // create a netClient for the connection
@@ -423,7 +434,8 @@ class RedisConnection {
   }
 
   private void runOnContext(Handler<Void> handler) {
-    if (Vertx.currentContext() == context) {
+    // Use only if it's the same context and we are on the event loop thread
+    if (Vertx.currentContext() == context && Context.isOnEventLoopThread()) {
       handler.handle(null);
     } else {
       context.runOnContext(handler);
