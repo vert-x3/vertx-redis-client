@@ -38,6 +38,9 @@ import java.util.concurrent.atomic.AtomicReference;
  */
 class RedisConnection {
 
+  private static long seq = 0;
+  private final long serial = seq++;
+
   private final Context context;
 
   private static final Logger log = LoggerFactory.getLogger(RedisConnection.class);
@@ -56,6 +59,7 @@ class RedisConnection {
   // pending: commands that have not yet been sent to the server
   private final Queue<Command<?>> pending = new LinkedList<>();
   // waiting: commands that have been sent but not answered
+
   private final Queue<Command<?>> waiting = new LinkedList<>();
 
   private final ReplyParser replyParser;
@@ -80,6 +84,18 @@ class RedisConnection {
      * Connection problem
      */
     ERROR
+  }
+
+  private void trace(String msg) {
+    if (log.isTraceEnabled()) {
+      log.trace("conn=" + serial + " thread=" + Thread.currentThread() + ": " + msg);
+    }
+  }
+
+  private void trace(String msg, Throwable cause) {
+    if (log.isTraceEnabled()) {
+      log.trace("conn=" + serial + "thread=" + Thread.currentThread() + ": " + msg, cause);
+    }
   }
 
   private final AtomicReference<State> state = new AtomicReference<>(State.DISCONNECTED);
@@ -134,42 +150,62 @@ class RedisConnection {
 
   private void connect() {
     if (state.compareAndSet(State.DISCONNECTED, State.CONNECTING)) {
-
+      trace("connecting");
+      trace(State.DISCONNECTED + "->" + State.CONNECTING);
       runOnContext(v -> {
         replyParser.reset();
         client.connect(config.getPort(), config.getHost(), asyncResult -> {
           if (asyncResult.failed()) {
+            trace("connect failed ", asyncResult.cause());
             if (state.compareAndSet(State.CONNECTING, State.ERROR)) {
+              trace(State.CONNECTED + "->" + State.ERROR);
               // clean up any waiting command
+              trace("failed - start clearing waiting queue count=" + waiting.size());
               clearQueue(waiting, asyncResult.cause());
+              trace("failed - end clearing waiting queue count=" + waiting.size());
               // clean up any pending command
+              trace("failed - start clearing pending queue count=" + pending.size());
               clearQueue(pending, asyncResult.cause());
+              trace("failed - end clearing pending queue count=" + pending.size());
 
               // close the socket if previously connected
               if (netSocket != null) {
+                log.trace("closing socket");
                 netSocket.close();
               }
 
+              trace(State.ERROR + "->" + State.DISCONNECTED);
               state.set(State.DISCONNECTED);
             }
           } else {
+            log.trace("connected");
             netSocket = asyncResult.result()
                 .handler(replyParser)
                 .closeHandler(v2 -> {
-                  state.set(State.ERROR);
+                  trace("socket closed");
+                  State prev = state.getAndSet(State.ERROR);
+                  trace(prev + "->" + State.ERROR);
                   // clean up any waiting command
+                  trace("closed - start clearing waiting queue count=" + waiting.size());
                   clearQueue(waiting, "Connection closed");
+                  trace("closed - end clearing waiting queue count=" + waiting.size());
                   // clean up any pending command
+                  trace("closed - start clearing pending queue count=" + pending.size());
                   clearQueue(pending, "Connection closed");
+                  trace("closed - end clearing pending queue count=" + pending.size());
 
+                  trace(State.ERROR + "->" + State.ERROR);
                   state.set(State.DISCONNECTED);
                 })
                 .exceptionHandler(e -> {
+                  trace("exception - closing socket " + e.getMessage(), e);
                   netSocket.close();
                 });
 
             // clean up any waiting command
+            trace("connected - start clearing waiting queue");
             clearQueue(waiting, "Connection lost");
+            trace("connected - end clearing waiting queue");
 
             // handle the connection handshake
             doAuth();
@@ -180,7 +216,9 @@ class RedisConnection {
   }
 
   void disconnect(Handler<AsyncResult<Void>> closeHandler) {
-    switch (state.get()) {
+    State state = this.state.get();
+    trace("disconnecting from " + state);
+    switch (state) {
       case CONNECTING:
         // eventually will become connected
       case CONNECTED:
@@ -188,14 +226,22 @@ class RedisConnection {
 
         cmd.handler(v -> {
           // at this we force the state to error so any incoming command will not start a connection
-          if (state.compareAndSet(State.CONNECTED, State.ERROR)) {
+          if (this.state.compareAndSet(State.CONNECTED, State.ERROR)) {
+            trace("disconnect");
+            trace(State.CONNECTED + "->" + State.ERROR);
             // clean up any waiting command
+            trace("disconnect - start clearing waiting queue count=" + waiting.size());
             clearQueue(waiting, "Connection closed");
+            trace("disconnect - end clearing waiting queue count=" + waiting.size());
             // clean up any pending command
-            clearQueue(pending, "Connection closed");
+            trace("disconnect - start clearing pending queue count=" + pending.size());
+            clearQueue(pending, "cleaing closed");
+            trace("disconnect - end pending pending queue count=" + pending.size());
 
+            trace("disconnect - closing socket");
             netSocket.close();
-            state.set(State.DISCONNECTED);
+            trace(State.ERROR + "->" + State.DISCONNECTED);
+            this.state.set(State.DISCONNECTED);
 
             closeHandler.handle(Future.succeededFuture());
           }
@@ -223,6 +269,7 @@ class RedisConnection {
   void send(final Command<?> command) {
     // start the handshake if not connected
     if (state.get() == State.DISCONNECTED) {
+      trace("want to connect");
       connect();
     }
 
@@ -232,16 +279,13 @@ class RedisConnection {
         case CONNECTED:
           // The order read must match the order written, vertx guarantees
           // that this is only called from a single thread.
-          for (int i = 0; i < command.getExpectedReplies(); ++i) {
-            waiting.add(command);
-          }
-
-          command.writeTo(netSocket);
+          writeCommand(command);
           break;
         case CONNECTING:
         case ERROR:
         case DISCONNECTED:
           if (state.get() != State.CONNECTED) {
+            trace("adding command=" + command.serial + " to pending");
             pending.add(command);
           } else {
             // state changed so start over...
@@ -252,11 +296,22 @@ class RedisConnection {
     });
   }
 
+  private void writeCommand(Command<?> command) {
+    int replies = command.getExpectedReplies();
+    for (int i = 0; i < replies; ++i) {
+      waiting.add(command);
+    }
+    trace("sending command=" + command.serial + " with " + replies + " replies count=" + waiting.size());
+    command.writeTo(netSocket);
+  }
+
   /**
    * Once a socket connection is established one needs to authenticate if there is a password
    */
   private void doAuth() {
     if (config.getAuth() != null) {
+      trace("doing auth");
+
       // we need to authenticate first
       final List<Object> args = new ArrayList<>();
       args.add(config.getAuth());
@@ -264,9 +319,13 @@ class RedisConnection {
       Command<String> authCmd = new Command<>(context, RedisCommand.AUTH, args, Charset.forName(config.getEncoding()), ResponseTransform.NONE, String.class).handler(auth -> {
         if (auth.failed()) {
           // clean up any waiting command
+          trace("auth failed - start clearing pending queue count=" + pending.size());
           clearQueue(pending, auth.cause());
+          trace("auth failed - end clearing pending queue count=" + pending.size());
+          trace("auth failed - closing socket");
           netSocket.close();
-          state.set(State.DISCONNECTED);
+          State old = state.getAndSet(State.DISCONNECTED);
+          trace(old + "->" + State.DISCONNECTED);
         } else {
           // auth success, proceed with select
           doSelect();
@@ -275,8 +334,7 @@ class RedisConnection {
 
       // write to the socket in the netSocket context
       // queue it
-      waiting.add(authCmd);
-      authCmd.writeTo(netSocket);
+      writeCommand(authCmd);
     } else {
       // no auth, proceed with select
       doSelect();
@@ -286,6 +344,7 @@ class RedisConnection {
   private void doSelect() {
     // optionally there could be a select command
     if (config.getSelect() != null) {
+      trace("doing select");
 
       final List<Object> args = new ArrayList<>();
       args.add(config.getSelect());
@@ -305,8 +364,7 @@ class RedisConnection {
 
       // write to the socket in the netSocket context
       // queue it
-      waiting.add(selectCmd);
-      selectCmd.writeTo(netSocket);
+      writeCommand(selectCmd);
     } else {
       // no select, proceed with resend
       resendPending();
@@ -314,20 +372,20 @@ class RedisConnection {
   }
 
   private void resendPending() {
+    trace("start sending pending count=" + pending.size());
+
     Command<?> command;
     if (state.compareAndSet(State.CONNECTING, State.CONNECTED)) {
       // we are connected so clean up the pending queue
       while ((command = pending.poll()) != null) {
         // The order read must match the order written, vertx guarantees
         // that this is only called from a single thread.
-        for (int i = 0; i < command.getExpectedReplies(); ++i) {
-          waiting.add(command);
-        }
-
-        // write to the socket in the netSocket context
-        command.writeTo(netSocket);
+        trace("sending pending command=" + command.serial);
+        writeCommand(command);
       }
     }
+
+    trace("end sending pending=" + pending.size());
   }
 
   @SuppressWarnings("unchecked")
@@ -335,6 +393,7 @@ class RedisConnection {
     final Command cmd = waiting.poll();
 
     if (cmd != null) {
+      trace("poll command=" + cmd.serial + " count=" + waiting.size() + " state=" + state);
       switch (reply.type()) {
         case '-': // Error
           cmd.handle(Future.failedFuture(reply.asType(String.class)));
@@ -416,6 +475,7 @@ class RedisConnection {
           return;
         default:
           cmd.handle(Future.failedFuture("Unknown message type"));
+          break;
       }
     } else {
       log.error("No handler waiting for message: " + reply.asType(String.class));

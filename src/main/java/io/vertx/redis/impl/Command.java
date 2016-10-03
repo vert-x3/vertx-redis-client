@@ -27,6 +27,8 @@ import java.util.List;
 
 public class Command<T> {
 
+  private static volatile long sequence = 0;
+
   private static final byte ARGS_PREFIX = '*';
   private static final byte[] CRLF = "\r\n".getBytes();
   private static final byte BYTES_PREFIX = '$';
@@ -74,6 +76,7 @@ public class Command<T> {
     return bytes;
   }
 
+  final long serial = sequence++;
   private final Context context;
   private final Buffer buffer;
   private final ResponseTransform transform;
