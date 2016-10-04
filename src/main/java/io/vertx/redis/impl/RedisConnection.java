@@ -156,11 +156,6 @@ class RedisConnection {
               // clean up any pending command
               clearQueue(pending, asyncResult.cause());
 
-              // close the socket if previously connected
-              if (netSocket != null) {
-                netSocket.close();
-              }
-
               state.set(State.DISCONNECTED);
             }
           } else {
@@ -206,7 +201,6 @@ class RedisConnection {
             clearQueue(pending, "Connection closed");
 
             netSocket.close();
-            state.set(State.DISCONNECTED);
 
             closeHandler.handle(Future.succeededFuture());
           }
@@ -277,7 +271,6 @@ class RedisConnection {
           // clean up any waiting command
           clearQueue(pending, auth.cause());
           netSocket.close();
-          state.set(State.DISCONNECTED);
         } else {
           // auth success, proceed with select
           doSelect();
@@ -306,7 +299,6 @@ class RedisConnection {
           clearQueue(pending, select.cause());
 
           netSocket.close();
-          state.set(State.DISCONNECTED);
         } else {
           // select success, proceed with resend
           resendPending();
