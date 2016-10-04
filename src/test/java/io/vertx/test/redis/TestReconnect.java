@@ -13,7 +13,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 /**
  * @author <a href="mailto:julien@julienviet.com">Julien Viet</a>
  */
-public class SomeTest extends VertxTestBase {
+public class TestReconnect extends VertxTestBase {
 
   static final int PORT = 2000;
 
@@ -21,9 +21,8 @@ public class SomeTest extends VertxTestBase {
   private static final Buffer PONG = Buffer.buffer("*1\r\n$4\r\nPONG\r\n");
 
   @Test
-  public void doTheTest() throws Exception {
-
-/*
+  public void test() throws Exception {
+    long numCommands = 100_000;
     NetServer server = vertx.createNetServer();
     server.connectHandler(so -> {
       AtomicInteger received = new AtomicInteger();
@@ -42,27 +41,26 @@ public class SomeTest extends VertxTestBase {
       });
     });
     CountDownLatch latch = new CountDownLatch(1);
-    server.listen(PORT, "localhost", onSuccess(v -> {
-      latch.countDown();
-    }));
+    server.listen(PORT, "localhost", onSuccess(v -> latch.countDown()));
     awaitLatch(latch);
-
     RedisClient client = RedisClient.create(vertx, new RedisOptions().setAddress("localhost").setPort(PORT));
-
-    vertx.runOnContext(v -> {
-
-    });
     AtomicInteger inflight = new AtomicInteger();
-    while (true) {
-      if (inflight.get() < 10000) {
+    AtomicInteger done = new AtomicInteger();
+    AtomicInteger sent = new AtomicInteger();
+    while (sent.get() < numCommands) {
+      if (inflight.get() < 5000) {
         inflight.incrementAndGet();
+        sent.incrementAndGet();
         client.ping(ar -> {
           inflight.decrementAndGet();
+          if (done.incrementAndGet() == numCommands) {
+            testComplete();
+          }
         });
       } else {
         Thread.yield();
       }
     }
-*/
+    await();
   }
 }
