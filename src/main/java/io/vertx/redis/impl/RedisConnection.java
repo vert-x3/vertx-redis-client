@@ -246,12 +246,7 @@ class RedisConnection {
         case CONNECTING:
         case ERROR:
         case DISCONNECTED:
-          if (state.get() != State.CONNECTED) {
-            pending.add(command);
-          } else {
-            // state changed so start over...
-            send(command);
-          }
+          pending.add(command);
           break;
       }
     });
