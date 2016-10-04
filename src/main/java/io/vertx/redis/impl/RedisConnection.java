@@ -241,13 +241,7 @@ class RedisConnection {
     runOnContext(v -> {
       switch (state.get()) {
         case CONNECTED:
-          // The order read must match the order written, vertx guarantees
-          // that this is only called from a single thread.
-          for (int i = 0; i < command.getExpectedReplies(); ++i) {
-            waiting.add(command);
-          }
-
-          command.writeTo(netSocket);
+          write(command);
           break;
         case CONNECTING:
         case ERROR:
@@ -261,6 +255,17 @@ class RedisConnection {
           break;
       }
     });
+  }
+
+  /**
+   * Write the command to the socket. The order read must match the order written, vertx
+   * guarantees that this is only called from a single thread.
+   */
+  private void write(Command<?> command) {
+    for (int i = 0; i < command.getExpectedReplies(); ++i) {
+      waiting.add(command);
+    }
+    command.writeTo(netSocket);
   }
 
   /**
@@ -286,8 +291,7 @@ class RedisConnection {
 
       // write to the socket in the netSocket context
       // queue it
-      waiting.add(authCmd);
-      authCmd.writeTo(netSocket);
+      write(authCmd);
     } else {
       // no auth, proceed with select
       doSelect();
@@ -316,8 +320,7 @@ class RedisConnection {
 
       // write to the socket in the netSocket context
       // queue it
-      waiting.add(selectCmd);
-      selectCmd.writeTo(netSocket);
+      write(selectCmd);
     } else {
       // no select, proceed with resend
       resendPending();
@@ -329,14 +332,7 @@ class RedisConnection {
     if (state.compareAndSet(State.CONNECTING, State.CONNECTED)) {
       // we are connected so clean up the pending queue
       while ((command = pending.poll()) != null) {
-        // The order read must match the order written, vertx guarantees
-        // that this is only called from a single thread.
-        for (int i = 0; i < command.getExpectedReplies(); ++i) {
-          waiting.add(command);
-        }
-
-        // write to the socket in the netSocket context
-        command.writeTo(netSocket);
+        write(command);
       }
     }
   }
