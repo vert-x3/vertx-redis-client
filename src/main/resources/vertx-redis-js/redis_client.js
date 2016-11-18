@@ -1572,7 +1572,7 @@ var RedisClient = function(j_val) {
     if (__args.length === 2 && typeof __args[0] === 'string' && typeof __args[1] === 'function') {
       j_redisClient["getBinary(java.lang.String,io.vertx.core.Handler)"](key, function(ar) {
       if (ar.succeeded()) {
-        handler(utils.convReturnVertxGen(ar.result(), Buffer), null);
+        handler(utils.convReturnVertxGen(Buffer, ar.result()), null);
       } else {
         handler(null, ar.cause());
       }
@@ -4193,7 +4193,7 @@ var RedisClient = function(j_val) {
   this.transaction = function() {
     var __args = arguments;
     if (__args.length === 0) {
-      return utils.convReturnVertxGen(j_redisClient["transaction()"](), RedisTransaction);
+      return utils.convReturnVertxGen(RedisTransaction, j_redisClient["transaction()"]());
     } else throw new TypeError('function invoked with invalid arguments');
   };
 
@@ -5288,6 +5288,25 @@ var RedisClient = function(j_val) {
   this._jdel = j_redisClient;
 };
 
+RedisClient._jclass = utils.getJavaClass("io.vertx.redis.RedisClient");
+RedisClient._jtype = {
+  accept: function(obj) {
+    return RedisClient._jclass.isInstance(obj._jdel);
+  },
+  wrap: function(jdel) {
+    var obj = Object.create(RedisClient.prototype, {});
+    RedisClient.apply(obj, arguments);
+    return obj;
+  },
+  unwrap: function(obj) {
+    return obj._jdel;
+  }
+};
+RedisClient._create = function(jdel) {
+  var obj = Object.create(RedisClient.prototype, {});
+  RedisClient.apply(obj, arguments);
+  return obj;
+}
 /**
 
  @memberof module:vertx-redis-js/redis_client
@@ -5298,11 +5317,10 @@ var RedisClient = function(j_val) {
 RedisClient.create = function() {
   var __args = arguments;
   if (__args.length === 1 && typeof __args[0] === 'object' && __args[0]._jdel) {
-    return utils.convReturnVertxGen(JRedisClient["create(io.vertx.core.Vertx)"](__args[0]._jdel), RedisClient);
+    return utils.convReturnVertxGen(RedisClient, JRedisClient["create(io.vertx.core.Vertx)"](__args[0]._jdel));
   }else if (__args.length === 2 && typeof __args[0] === 'object' && __args[0]._jdel && (typeof __args[1] === 'object' && __args[1] != null)) {
-    return utils.convReturnVertxGen(JRedisClient["create(io.vertx.core.Vertx,io.vertx.redis.RedisOptions)"](__args[0]._jdel, __args[1] != null ? new RedisOptions(new JsonObject(JSON.stringify(__args[1]))) : null), RedisClient);
+    return utils.convReturnVertxGen(RedisClient, JRedisClient["create(io.vertx.core.Vertx,io.vertx.redis.RedisOptions)"](__args[0]._jdel, __args[1] != null ? new RedisOptions(new JsonObject(JSON.stringify(__args[1]))) : null));
   } else throw new TypeError('function invoked with invalid arguments');
 };
 
-// We export the Constructor function
 module.exports = RedisClient;
