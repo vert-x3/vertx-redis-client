@@ -1979,7 +1979,7 @@ public interface RedisTransaction {
    * group: set
    */
   @Fluent
-  RedisTransaction smembers(String key, Handler<AsyncResult<String>> handler);
+  RedisTransaction smembers(String key, Handler<AsyncResult<JsonArray>> handler);
 
   /**
    * Move a member from one set to another
