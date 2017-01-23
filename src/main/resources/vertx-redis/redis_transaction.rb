@@ -2002,7 +2002,7 @@ module VertxRedis
     # @return [self]
     def smembers(key=nil)
       if key.class == String && block_given?
-        @j_del.java_method(:smembers, [Java::java.lang.String.java_class,Java::IoVertxCore::Handler.java_class]).call(key,(Proc.new { |ar| yield(ar.failed ? ar.cause : nil, ar.succeeded ? ar.result : nil) }))
+        @j_del.java_method(:smembers, [Java::java.lang.String.java_class,Java::IoVertxCore::Handler.java_class]).call(key,(Proc.new { |ar| yield(ar.failed ? ar.cause : nil, ar.succeeded ? ar.result != nil ? JSON.parse(ar.result.encode) : nil : nil) }))
         return self
       end
       raise ArgumentError, "Invalid arguments when calling smembers(#{key})"
