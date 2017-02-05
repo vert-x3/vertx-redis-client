@@ -1,4 +1,4 @@
-moduleName = vertx-redis-module
+moduleName = io.vertx.redis.RedisTransaction-module
 moduleVersion = 1.0
-extensionClasses = io.vertx.groovy.redis.GroovyExtension
-staticExtensionClasses = io.vertx.groovy.redis.GroovyStaticExtension
+extensionClasses = io.vertx.groovy.redis.RedisClient_GroovyExtension, io.vertx.groovy.redis.RedisTransaction_GroovyExtension
+staticExtensionClasses = io.vertx.groovy.redis.RedisClient_GroovyStaticExtension
