@@ -48,7 +48,7 @@ compile 'io.vertx:vertx-redis-client:3.4.0-SNAPSHOT'
 
 == Connecting to Redis
 
-In order to connect to Redis there is a config required. This config is provided in the form of `link:../dataobjects.html#RedisOptions[RedisOptions]`
+In order to connect to Redis there is a config required. This config is provided in the form of `link:../../apidocs/io/vertx/redis/RedisOptions.html[RedisOptions]`
 containing the following values:
 
 * `host`: default is `localhost`
@@ -59,14 +59,12 @@ containing the following values:
 
 An connection example can then be:
 
-[source,js]
+[source,kotlin]
 ----
-var RedisClient = require("vertx-redis-js/redis_client");
-var config = {
-  "host" : "127.0.0.1"
-};
+var config = RedisOptions(
+  host = "127.0.0.1")
 
-var redis = RedisClient.create(vertx, config);
+var redis = RedisClient.create(vertx, config)
 
 ----
 
@@ -77,8 +75,8 @@ password and/or database id to the config object, the properties names are:
 * `auth`
 * `select`
 
-If you do not do this and manually call the `link:../../jsdoc/module-vertx-redis-js_redis_client-RedisClient.html#auth[auth]`
-or `link:../../jsdoc/module-vertx-redis-js_redis_client-RedisClient.html#select[select]` then the client will not know how to recover
+If you do not do this and manually call the `link:../../apidocs/io/vertx/redis/RedisClient.html#auth-java.lang.String-io.vertx.core.Handler-[auth]`
+or `link:../../apidocs/io/vertx/redis/RedisClient.html#select-int-io.vertx.core.Handler-[select]` then the client will not know how to recover
 the connection in case of socket error.
 
 == Running commands
@@ -87,17 +85,15 @@ Given that the redis client is connected to the server, all commands are now pos
 The module offers a clean API for executing commands without the need to hand write the command itself, for example
 if one wants to get a value of a key it can be done as:
 
-[source,js]
+[source,kotlin]
 ----
-var RedisClient = require("vertx-redis-js/redis_client");
-var redis = RedisClient.create(vertx, {
-});
+var redis = RedisClient.create(vertx, RedisOptions())
 
-redis.get("mykey", function (res, res_err) {
-  if (res_err == null) {
+redis.get("mykey", { res ->
+  if (res.succeeded()) {
     // so something...
   }
-});
+})
 
 ----
 
@@ -110,45 +106,41 @@ it cannot be used for running other commands than the command to leave that mode
 
 To start a subscriber one would do:
 
-[source,js]
+[source,kotlin]
 ----
-var RedisClient = require("vertx-redis-js/redis_client");
 
 // register a handler for the incoming message the naming the Redis module will use is base address + '.' + redis channel
-vertx.eventBus().consumer("io.vertx.redis.channel1", function (received) {
+vertx.eventBus().consumer<JsonObject>("io.vertx.redis.channel1", { received ->
   // do whatever you need to do with your message
-  var value = received.body().value;
+  var value = received.body().getJsonObject("value")
   // the value is a JSON doc with the following properties
   // channel - The channel to which this message was sent
   // pattern - Pattern is present if you use psubscribe command and is the pattern that matched this message channel
   // message - The message payload
-});
+})
 
-var redis = RedisClient.create(vertx, {
-});
+var redis = RedisClient.create(vertx, RedisOptions())
 
-redis.subscribe("channel1", function (res, res_err) {
-  if (res_err == null) {
+redis.subscribe("channel1", { res ->
+  if (res.succeeded()) {
     // so something...
   }
-});
+})
 
 ----
 
 And from another place in the code publish messages to the queue:
 
-[source,js]
+[source,kotlin]
 ----
-var RedisClient = require("vertx-redis-js/redis_client");
 
-var redis = RedisClient.create(vertx, {
-});
+var redis = RedisClient.create(vertx, RedisOptions())
 
-redis.publish("channel1", "Hello World!", function (res, res_err) {
-  if (res_err == null) {
+redis.publish("channel1", "Hello World!", { res ->
+  if (res.succeeded()) {
     // so something...
   }
-});
+})
 
 ----
 
