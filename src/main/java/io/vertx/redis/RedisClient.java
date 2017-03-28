@@ -761,7 +761,7 @@ public interface RedisClient {
    * group: generic
    */
   @Fluent
-  RedisClient expire(String key, int seconds, Handler<AsyncResult<Long>> handler);
+  RedisClient expire(String key, long seconds, Handler<AsyncResult<Long>> handler);
 
   /**
    * Set the expiration for a key as a UNIX timestamp

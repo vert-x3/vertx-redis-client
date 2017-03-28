@@ -1849,7 +1849,7 @@ public final class RedisClientImpl extends AbstractRedisClient {
   }
 
   @Override
-  public RedisClient expire(String key, int seconds, Handler<AsyncResult<Long>> handler) {
+  public RedisClient expire(String key, long seconds, Handler<AsyncResult<Long>> handler) {
     sendLong(EXPIRE, toPayload(key, seconds), handler);
     return this;
   }
