@@ -21,6 +21,7 @@ import io.vertx.core.logging.Logger;
 import io.vertx.core.logging.LoggerFactory;
 
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
 public class RedisSubscriptions {
@@ -100,5 +101,13 @@ public class RedisSubscriptions {
 
   public int patternSize() {
     return patternSubscribers.size();
+  }
+
+  public Set<String> channelNames() {
+    return channelSubscribers.keySet();
+  }
+
+  public Set<String> patternNames() {
+    return patternSubscribers.keySet();
   }
 }
