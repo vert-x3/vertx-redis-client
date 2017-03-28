@@ -34,7 +34,7 @@ import static io.vertx.redis.impl.RedisCommand.*;
 
 public final class RedisClientImpl extends AbstractRedisClient {
 
-  RedisTransaction transaction;
+  private RedisTransaction transaction;
 
   public class RedisTransactionImpl implements RedisTransaction{
 
@@ -2852,6 +2852,48 @@ public final class RedisClientImpl extends AbstractRedisClient {
   @Override
   public RedisClient georadiusbymemberWithOptions(String key, String member, double radius, GeoUnit unit, GeoRadiusOptions options, Handler<AsyncResult<JsonArray>> handler) {
     sendJsonArray(GEORADIUSBYMEMBER, toPayload(key, member, radius, unit, options != null ? options.toJsonArray() : null), handler);
+    return this;
+  }
+
+  @Override
+  public RedisClient clientReply(ClientReplyOptions options, Handler<AsyncResult<String>> handler) {
+    sendString(CLIENT_REPLY, toPayload(options), handler);
+    return this;
+  }
+
+  @Override
+  public RedisClient hstrlen(String key, String field, Handler<AsyncResult<Long>> handler) {
+    sendLong(HSTRLEN, toPayload(key, field), handler);
+    return this;
+  }
+
+  @Override
+  public RedisClient touch(String key, Handler<AsyncResult<Long>> handler) {
+    sendLong(TOUCH, toPayload(key), handler);
+    return this;
+  }
+
+  @Override
+  public RedisClient touchMany(List<String> keys, Handler<AsyncResult<Long>> handler) {
+    sendLong(TOUCH, keys, handler);
+    return this;
+  }
+
+  @Override
+  public RedisClient scriptDebug(ScriptDebugOptions scriptDebugOptions, Handler<AsyncResult<String>> handler) {
+    sendString(SCRIPT_DEBUG, toPayload(scriptDebugOptions), handler);
+    return this;
+  }
+
+  @Override
+  public RedisClient bitfield(String key, BitFieldOptions bitFieldOptions, Handler<AsyncResult<JsonArray>> handler) {
+    sendJsonArray(BITFIELD, toPayload(key, bitFieldOptions != null ? bitFieldOptions.toJsonArray(): null), handler);
+    return this;
+  }
+
+  @Override
+  public RedisClient bitfieldWithOverflow(String key, BitFieldOptions bitFieldOptions, BitFieldOverflowOptions overflow, Handler<AsyncResult<JsonArray>> handler) {
+    sendJsonArray(BITFIELD, toPayload(key, bitFieldOptions != null ? bitFieldOptions.toJsonArray(): null, overflow), handler);
     return this;
   }
 

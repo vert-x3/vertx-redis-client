@@ -2735,4 +2735,74 @@ public interface RedisClient {
    */
   @Fluent
   RedisClient georadiusbymemberWithOptions(String key, String member, double radius, GeoUnit unit, GeoRadiusOptions options, Handler<AsyncResult<JsonArray>> handler);
+
+  /**
+   * Instruct the server whether to reply to commands.
+   *
+   * @since Redis 3.2.0
+   * group: server
+   */
+  @Fluent
+  RedisClient clientReply(ClientReplyOptions options, Handler<AsyncResult<String>> handler);
+
+  /**
+   * Get the length of the value of a hash field.
+   *
+   * @param key Key String
+   * @param field field
+   * @since Redis 3.2.0
+   * group: hash
+   */
+  @Fluent
+  RedisClient hstrlen(String key, String field, Handler<AsyncResult<Long>> handler);
+
+  /**
+   * Alters the last access time of a key(s). Returns the number of existing keys specified.
+   *
+   * @param key Key String
+   * @since Redis 3.2.1
+   * group: generic
+   */
+  @Fluent
+  RedisClient touch(String key, Handler<AsyncResult<Long>> handler);
+
+  /**
+   * Alters the last access time of a key(s). Returns the number of existing keys specified.
+   *
+   * @param keys list of keys
+   * @since Redis 3.2.1
+   * group: generic
+   */
+  @Fluent
+  RedisClient touchMany(List<String> keys, Handler<AsyncResult<Long>> handler);
+
+  /**
+   * Set the debug mode for executed scripts.
+   *
+   * @param scriptDebugOptions the option
+   * @since Redis 3.2.0
+   * group: generic
+   */
+  @Fluent
+  RedisClient scriptDebug(ScriptDebugOptions scriptDebugOptions, Handler<AsyncResult<String>> handler);
+
+  /**
+   * Perform arbitrary bitfield integer operations on strings.
+   *
+   * @param key     Key string
+   * @since Redis 3.2.0
+   * group: string
+   */
+  @Fluent
+  RedisClient bitfield(String key, BitFieldOptions bitFieldOptions, Handler<AsyncResult<JsonArray>> handler);
+
+  /**
+   * Perform arbitrary bitfield integer operations on strings.
+   *
+   * @param key     Key string
+   * @since Redis 3.2.0
+   * group: string
+   */
+  @Fluent
+  RedisClient bitfieldWithOverflow(String key, BitFieldOptions commands, BitFieldOverflowOptions overflow, Handler<AsyncResult<JsonArray>> handler);
 }
