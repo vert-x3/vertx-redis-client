@@ -25,6 +25,7 @@ import io.vertx.core.json.JsonObject;
 import io.vertx.redis.RedisClient;
 import io.vertx.redis.RedisOptions;
 import io.vertx.redis.RedisTransaction;
+import io.vertx.redis.Script;
 import io.vertx.redis.op.*;
 
 import java.util.*;
@@ -461,6 +462,18 @@ public final class RedisClientImpl extends AbstractRedisClient {
     keys = (keys != null) ? keys : Collections.emptyList();
     args = (args != null) ? args : Collections.emptyList();
     sendJsonArray(EVALSHA, toPayload(sha1, keys.size(), keys, args), handler);
+    return this;
+  }
+
+  @Override
+  public RedisClient evalScript(Script script, List<String> keys, List<String> args, Handler<AsyncResult<JsonArray>> handler) {
+    this.evalsha(script.getSha1(), keys, args, res -> {
+      if (res.failed() && res.cause().getMessage().startsWith("NOSCRIPT")) {
+        this.eval(script.getScript(), keys, args, handler);
+      } else {
+        handler.handle(res);
+      }
+    });
     return this;
   }
 
