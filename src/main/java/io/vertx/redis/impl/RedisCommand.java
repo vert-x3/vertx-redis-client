@@ -18,7 +18,7 @@ package io.vertx.redis.impl;
 import io.vertx.codegen.annotations.VertxGen;
 
 @VertxGen
-public enum RedisCommand {
+public enum RedisCommand implements AbstractCommand {
 
   APPEND("APPEND"),
   AUTH("AUTH"),

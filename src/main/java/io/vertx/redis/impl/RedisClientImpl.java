@@ -1252,7 +1252,7 @@ public final class RedisClientImpl extends AbstractRedisClient {
     @Override
     public RedisTransaction zinterstoreWeighed(String destkey, Map<String, Double> sets, AggregateOptions options, Handler<AsyncResult<String>> handler) {
       sendString(ZINTERSTORE, toPayload(destkey, sets.size(), sets.keySet(), "WEIGHTS", sets.values(),
-              options != null ? options.toJsonArray() : null), handler);
+        options != null ? options.toJsonArray() : null), handler);
       return this;
     }
 
@@ -1361,7 +1361,7 @@ public final class RedisClientImpl extends AbstractRedisClient {
     @Override
     public RedisTransaction zunionstoreWeighed(String destkey, Map<String, Double> sets, AggregateOptions options, Handler<AsyncResult<String>> handler) {
       sendString(ZUNIONSTORE, toPayload(destkey, sets.size(), sets.keySet(), "WEIGHTS", sets.values(),
-              options != null ? options.toJsonArray() : null), handler);
+        options != null ? options.toJsonArray() : null), handler);
       return this;
     }
 

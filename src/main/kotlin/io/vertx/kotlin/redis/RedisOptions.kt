@@ -7,19 +7,19 @@ import io.vertx.redis.RedisOptions
  *
  * This object controls the connection setting to the Redis Server. There is no need to specify most of the settings
  * since it has built the following sensible defaults:
- *
+ * <p>
  * * `encoding`: `UTF-8`
  * * `host`: `localhost`
  * * `port`: 6379
  * * `tcpKeepAlive`: true
  * * `tcpNoDelay`: true
  * * `binary`: false
- *
+ * <p>
  * However there are two extra properties that have no defaults since they are optional:
- *
+ * <p>
  * * `auth`
  * * `select`
- *
+ * <p>
  * The usage of this two extra properties is to setup required authentication and optionally the selection of the active
  * database at connection time. If you define this extra properties on every connection to Redis server this client
  * will perform the authentication handshake and database selection, however if you don't do this and call [io.vertx.redis.RedisClient]
@@ -30,8 +30,10 @@ import io.vertx.redis.RedisOptions
  * @param binary  Set the user defined character encoding, e.g.: `iso-8859-1`.
  * @param encoding  Set the user defined character encoding, e.g.: `iso-8859-1`.
  * @param host  Set the host name where the Redis server is listening.
+ * @param masterName  Set name of Redis master (used with Sentinel).
  * @param port  Set the tcp port where the Redis server is listening.
  * @param select  Set the database to select at connection time.
+ * @param sentinels  Add Sentinel node.
  * @param tcpKeepAlive  Set the TCP KeepAlive option
  * @param tcpNoDelay  Set the TCP NoDelay at the socket level.
  *
@@ -44,8 +46,10 @@ fun RedisOptions(
   binary: Boolean? = null,
   encoding: String? = null,
   host: String? = null,
+  masterName: String? = null,
   port: Int? = null,
   select: Int? = null,
+  sentinels: Iterable<String>? = null,
   tcpKeepAlive: Boolean? = null,
   tcpNoDelay: Boolean? = null): RedisOptions = io.vertx.redis.RedisOptions().apply {
 
@@ -64,11 +68,19 @@ fun RedisOptions(
   if (host != null) {
     this.setHost(host)
   }
+  if (masterName != null) {
+    this.setMasterName(masterName)
+  }
   if (port != null) {
     this.setPort(port)
   }
   if (select != null) {
     this.setSelect(select)
+  }
+  if (sentinels != null) {
+    for (item in sentinels) {
+      this.addSentinel(item)
+    }
   }
   if (tcpKeepAlive != null) {
     this.setTcpKeepAlive(tcpKeepAlive)
