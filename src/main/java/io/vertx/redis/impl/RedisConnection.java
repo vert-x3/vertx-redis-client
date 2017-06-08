@@ -86,8 +86,7 @@ class RedisConnection {
 
   private final AtomicReference<State> state = new AtomicReference<>(State.DISCONNECTED);
   // attempt to reconnect on error, by default true
-  private final AtomicBoolean reconnect = new AtomicBoolean(true);
-
+  private volatile boolean reconnect = true;
   private volatile NetSocket netSocket;
 
   /**
@@ -144,7 +143,7 @@ class RedisConnection {
 
   private void connect() {
     // in case the user has disconnected before, update the state
-    reconnect.compareAndSet(false, true);
+    reconnect = true;
 
     if (state.compareAndSet(State.DISCONNECTED, State.CONNECTING)) {
 
@@ -164,7 +163,7 @@ class RedisConnection {
 
               state.set(State.DISCONNECTED);
               // Should we retry?
-              if (reconnect.get()) {
+              if (reconnect) {
                 vertx.setTimer(config.getReconnectInterval(), v0 -> connect());
               }
             }
@@ -181,7 +180,7 @@ class RedisConnection {
                   state.set(State.DISCONNECTED);
                   client.close();
                   // was this close intentional?
-                  if (reconnect.get()) {
+                  if (reconnect) {
                     vertx.setTimer(config.getReconnectInterval(), v0 -> connect());
                   }
                 })
@@ -200,7 +199,7 @@ class RedisConnection {
 
   void disconnect(Handler<AsyncResult<Void>> closeHandler) {
     // update state to notify that the user wants to disconnect
-    reconnect.set(false);
+    reconnect = false;
 
     switch (state.get()) {
       case CONNECTING:
