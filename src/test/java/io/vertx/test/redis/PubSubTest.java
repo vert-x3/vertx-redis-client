@@ -143,4 +143,61 @@ public class PubSubTest extends AbstractRedisClientBase {
 
     await();
   }
+
+  @Test
+  public void testReconnect() {
+    final String message = makeKey();
+    final AtomicInteger cnt = new AtomicInteger(0);
+
+    // register a handler for the incoming message
+    vertx.eventBus().consumer("io.vertx.redis.ch3", (Message<JsonObject> msg) -> {
+      JsonObject value = msg.body().getJsonObject("value");
+      assertEquals("ch3", value.getString("channel"));
+      assertEquals(message, value.getString("message"));
+      if (cnt.incrementAndGet() == 2) {
+        testComplete();
+      }
+    });
+
+    // on sub address subscribe to channel ch2
+    redis.subscribe("ch3", subscribe -> {
+      assertTrue(subscribe.succeeded());
+
+      assertEquals("subscribe", subscribe.result().getValue(0));
+      assertEquals("ch3", subscribe.result().getValue(1));
+      assertEquals(1l, subscribe.result().getValue(2));
+
+      redis.publish("ch3", message, r0 -> {
+        assertTrue(r0.succeeded());
+
+        try {
+          stopRedis();
+          // we need some time to let the process really terminate
+          vertx.setTimer(500, v -> {
+            try {
+              startRedis();
+              // we need some time to let the process really start
+              vertx.setTimer(500, v1 -> {
+                redis.ping(v2 -> {
+                  assertTrue(v2.succeeded());
+                  // we need some time to let the client reconnect and complete the handshake
+                  vertx.setTimer(500, v3 -> {
+                    redis.publish("ch3", message, r1 -> {
+                      assertTrue(r1.succeeded());
+                    });
+                  });
+                });
+              });
+            } catch (Exception e) {
+              fail(e);
+            }
+          });
+        } catch (Exception e) {
+          fail(e);
+        }
+      });
+    });
+
+    await();
+  }
 }

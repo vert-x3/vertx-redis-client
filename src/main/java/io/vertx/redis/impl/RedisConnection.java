@@ -22,7 +22,6 @@ import io.vertx.core.json.JsonObject;
 import io.vertx.core.logging.Logger;
 import io.vertx.core.logging.LoggerFactory;
 import io.vertx.core.net.NetClient;
-import io.vertx.core.net.NetClientOptions;
 import io.vertx.core.net.NetSocket;
 import io.vertx.redis.RedisOptions;
 
@@ -31,6 +30,7 @@ import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Queue;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicReference;
 
 /**
@@ -39,6 +39,7 @@ import java.util.concurrent.atomic.AtomicReference;
  */
 class RedisConnection {
 
+  private final Vertx vertx;
   private final Context context;
 
   private static final Logger log = LoggerFactory.getLogger(RedisConnection.class);
@@ -60,8 +61,8 @@ class RedisConnection {
   private final Queue<Command<?>> waiting = new LinkedList<>();
 
   private final ReplyParser replyParser;
+  private final RedisSubscriptions subscriptions;
 
-  private final NetClient client;
   private final RedisOptions config;
 
   private enum State {
@@ -84,14 +85,14 @@ class RedisConnection {
   }
 
   private final AtomicReference<State> state = new AtomicReference<>(State.DISCONNECTED);
-
+  // attempt to reconnect on error, by default true
+  private volatile boolean reconnect = true;
   private volatile NetSocket netSocket;
 
   /**
    * Create a RedisConnection.
    */
   public RedisConnection(Vertx vertx, RedisOptions config, RedisSubscriptions subscriptions) {
-
     // Make sure we have an event loop context for serializability of the commands
     Context ctx = Vertx.currentContext();
     if (ctx == null) {
@@ -101,13 +102,10 @@ class RedisConnection {
       ctx = vi.createEventLoopContext(null, null, new JsonObject(), Thread.currentThread().getContextClassLoader());
     }
 
+    this.vertx = vertx;
     this.context = ctx;
     this.config = config;
-
-    // create a netClient for the connection
-    client = vertx.createNetClient(new NetClientOptions()
-        .setTcpKeepAlive(config.isTcpKeepAlive())
-        .setTcpNoDelay(config.isTcpNoDelay()));
+    this.subscriptions = subscriptions;
 
     if (subscriptions != null) {
       this.replyParser = new ReplyParser(reply -> {
@@ -144,10 +142,17 @@ class RedisConnection {
   }
 
   private void connect() {
+    // in case the user has disconnected before, update the state
+    reconnect = true;
+
     if (state.compareAndSet(State.DISCONNECTED, State.CONNECTING)) {
 
       runOnContext(v -> {
         replyParser.reset();
+
+        // create a netClient for the connection
+        final NetClient client = vertx.createNetClient(config);
+
         client.connect(config.getPort(), config.getHost(), asyncResult -> {
           if (asyncResult.failed()) {
             if (state.compareAndSet(State.CONNECTING, State.ERROR)) {
@@ -157,6 +162,10 @@ class RedisConnection {
               clearQueue(pending, asyncResult.cause());
 
               state.set(State.DISCONNECTED);
+              // Should we retry?
+              if (reconnect) {
+                vertx.setTimer(config.getReconnectInterval(), v0 -> connect());
+              }
             }
           } else {
             netSocket = asyncResult.result()
@@ -169,10 +178,13 @@ class RedisConnection {
                   clearQueue(pending, "Connection closed");
 
                   state.set(State.DISCONNECTED);
+                  client.close();
+                  // was this close intentional?
+                  if (reconnect) {
+                    vertx.setTimer(config.getReconnectInterval(), v0 -> connect());
+                  }
                 })
-                .exceptionHandler(e -> {
-                  netSocket.close();
-                });
+                .exceptionHandler(e -> netSocket.close());
 
             // clean up any waiting command
             clearQueue(waiting, "Connection lost");
@@ -186,6 +198,9 @@ class RedisConnection {
   }
 
   void disconnect(Handler<AsyncResult<Void>> closeHandler) {
+    // update state to notify that the user wants to disconnect
+    reconnect = false;
+
     switch (state.get()) {
       case CONNECTING:
         // eventually will become connected
@@ -300,8 +315,8 @@ class RedisConnection {
 
           netSocket.close();
         } else {
-          // select success, proceed with resend
-          resendPending();
+          // select success, proceed with resend of pending messages/resubscribe pub/sub
+          restoreState();
         }
       });
 
@@ -309,17 +324,32 @@ class RedisConnection {
       // queue it
       write(selectCmd);
     } else {
-      // no select, proceed with resend
-      resendPending();
+      // no select, proceed with resend of pending messages/resubscribe pub/sub
+      restoreState();
     }
   }
 
-  private void resendPending() {
+  private void restoreState() {
     Command<?> command;
     if (state.compareAndSet(State.CONNECTING, State.CONNECTED)) {
       // we are connected so clean up the pending queue
       while ((command = pending.poll()) != null) {
         write(command);
+      }
+      // restore the pub/sub subscriptions
+      if (subscriptions != null) {
+        for (String channel : subscriptions.channelNames()) {
+          final List<Object> args = new ArrayList<>();
+          args.add(channel);
+
+          write(new Command<>(context, RedisCommand.SUBSCRIBE, args, Charset.forName(config.getEncoding()), ResponseTransform.NONE, JsonArray.class));
+        }
+        for (String pattern : subscriptions.patternNames()) {
+          final List<Object> args = new ArrayList<>();
+          args.add(pattern);
+
+          write(new Command<>(context, RedisCommand.PSUBSCRIBE, args, Charset.forName(config.getEncoding()), ResponseTransform.NONE, JsonArray.class));
+        }
       }
     }
   }
