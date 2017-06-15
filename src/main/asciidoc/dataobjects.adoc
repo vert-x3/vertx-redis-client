@@ -1,5 +1,56 @@
 = Cheatsheets
 
+[[BitFieldGetCommand]]
+== BitFieldGetCommand
+
+
+[cols=">25%,^25%,50%"]
+[frame="topbot"]
+|===
+^|Name | Type ^| Description
+|[[offset]]`offset`|`Number (long)`|-
+|[[type]]`type`|`String`|-
+|===
+
+[[BitFieldIncrbyCommand]]
+== BitFieldIncrbyCommand
+
+
+[cols=">25%,^25%,50%"]
+[frame="topbot"]
+|===
+^|Name | Type ^| Description
+|[[increment]]`increment`|`Number (long)`|-
+|[[offset]]`offset`|`Number (long)`|-
+|[[type]]`type`|`String`|-
+|===
+
+[[BitFieldOptions]]
+== BitFieldOptions
+
+
+[cols=">25%,^25%,50%"]
+[frame="topbot"]
+|===
+^|Name | Type ^| Description
+|[[get]]`get`|`link:dataobjects.html#BitFieldGetCommand[BitFieldGetCommand]`|-
+|[[incrby]]`incrby`|`link:dataobjects.html#BitFieldIncrbyCommand[BitFieldIncrbyCommand]`|-
+|[[set]]`set`|`link:dataobjects.html#BitFieldSetCommand[BitFieldSetCommand]`|-
+|===
+
+[[BitFieldSetCommand]]
+== BitFieldSetCommand
+
+
+[cols=">25%,^25%,50%"]
+[frame="topbot"]
+|===
+^|Name | Type ^| Description
+|[[offset]]`offset`|`Number (long)`|-
+|[[type]]`type`|`String`|-
+|[[value]]`value`|`Number (long)`|-
+|===
+
 [[GeoMember]]
 == GeoMember
 

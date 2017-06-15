@@ -17,6 +17,22 @@
 |[[MAX]]`MAX`|-
 |===
 
+[[BitFieldOverflowOptions]]
+== BitFieldOverflowOptions
+
+++++
+++++
+'''
+
+[cols=">25%,75%"]
+[frame="topbot"]
+|===
+^|Name | Description
+|[[WRAP]]`WRAP`|-
+|[[SAT]]`SAT`|-
+|[[FAIL]]`FAIL`|-
+|===
+
 [[BitOperation]]
 == BitOperation
 
@@ -32,6 +48,22 @@
 |[[OR]]`OR`|-
 |[[XOR]]`XOR`|-
 |[[NOT]]`NOT`|-
+|===
+
+[[ClientReplyOptions]]
+== ClientReplyOptions
+
+++++
+++++
+'''
+
+[cols=">25%,75%"]
+[frame="topbot"]
+|===
+^|Name | Description
+|[[ON]]`ON`|-
+|[[OFF]]`OFF`|-
+|[[SKIP]]`SKIP`|-
 |===
 
 [[FailoverOptions]]
@@ -138,6 +170,22 @@ Feet
 ^|Name | Description
 |[[HARD]]`HARD`|-
 |[[SOFT]]`SOFT`|-
+|===
+
+[[ScriptDebugOptions]]
+== ScriptDebugOptions
+
+++++
+++++
+'''
+
+[cols=">25%,75%"]
+[frame="topbot"]
+|===
+^|Name | Description
+|[[YES]]`YES`|-
+|[[SYNC]]`SYNC`|-
+|[[NO]]`NO`|-
 |===
 
 [[ShutdownOptions]]
