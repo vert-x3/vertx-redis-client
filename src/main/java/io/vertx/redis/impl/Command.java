@@ -83,7 +83,7 @@ public class Command<T> {
   private int expectedReplies = 1;
   private Handler<AsyncResult<T>> handler;
 
-  public Command(Context context, RedisCommand command, final List<?> args, Charset encoding, ResponseTransform transform, Class<T> returnType) {
+  public Command(Context context, AbstractCommand command, final List<?> args, Charset encoding, ResponseTransform transform, Class<T> returnType) {
     this.context = context;
     this.encoding = encoding.name();
 
