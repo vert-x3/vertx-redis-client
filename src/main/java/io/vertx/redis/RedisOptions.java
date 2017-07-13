@@ -20,6 +20,9 @@ import io.vertx.core.Handler;
 import io.vertx.core.json.JsonObject;
 import io.vertx.core.net.NetClientOptions;
 
+import java.util.ArrayList;
+import java.util.List;
+
 /**
  * This object controls the connection setting to the Redis Server. There is no need to specify most of the settings
  * since it has built the following sensible defaults:
@@ -58,6 +61,9 @@ public class RedisOptions extends NetClientOptions {
 
   private String auth;
   private Integer select;
+
+  private String masterName;
+  private List<String> sentinels;
 
   public RedisOptions() {
     super();
@@ -112,8 +118,7 @@ public class RedisOptions extends NetClientOptions {
 
   /**
    * Return the character encoding for Strings, default `UTF-8`.
-   *
-   * @return character encoding
+   * * @return character encoding
    */
   public String getEncoding() {
     return encoding;
@@ -121,21 +126,20 @@ public class RedisOptions extends NetClientOptions {
 
   /**
    * Set the user defined character encoding, e.g.: `iso-8859-1`.
+   * * @param encoding the user character encoding
    *
-   * @param encoding the user character encoding
    * @return self
    */
   public RedisOptions setEncoding(String encoding) {
     this.encoding = encoding;
-    // special case here the binary and encoding are corelated so they need to be verified after set
+    // special case here the binary andencodingare corelated so they need to be verified after set
     postInit();
     return this;
   }
 
   /**
    * Return if the messages to/from redis are binary, default `false`.
-   *
-   * @return are messages binary
+   * * @return are messages binary
    */
   public boolean isBinary() {
     return binary;
@@ -143,21 +147,20 @@ public class RedisOptions extends NetClientOptions {
 
   /**
    * Set the user defined character encoding, e.g.: `iso-8859-1`.
+   * * @param binary use binary messages
    *
-   * @param binary use binary messages
    * @return self
    */
   public RedisOptions setBinary(boolean binary) {
     this.binary = binary;
-    // special case here the binary and encoding are corelated so they need to be verified after set
+    // special case here the binary andencodingare corelated so they need to be verified after set
     postInit();
     return this;
   }
 
   /**
    * Get the default `PUB/SUB` eventbus address prefix, default `io.vertx.redis`.
-   *
-   * @return eventbus address prefix
+   * * @return eventbus address prefix
    */
   public String getAddress() {
     return address;
@@ -165,8 +168,8 @@ public class RedisOptions extends NetClientOptions {
 
   /**
    * Set the eventbus address prefix for `PUB/SUB`.
+   * * @param address address prefix.
    *
-   * @param address address prefix.
    * @return self
    */
   public RedisOptions setAddress(String address) {
@@ -176,8 +179,7 @@ public class RedisOptions extends NetClientOptions {
 
   /**
    * Get the host name for the Redis server, default `localhost`.
-   *
-   * @return host name.
+   * * @return host name.
    */
   public String getHost() {
     return host;
@@ -185,8 +187,8 @@ public class RedisOptions extends NetClientOptions {
 
   /**
    * Set the host name where the Redis server is listening.
+   * * @param host host name
    *
-   * @param host host name
    * @return self
    */
   public RedisOptions setHost(String host) {
@@ -196,8 +198,7 @@ public class RedisOptions extends NetClientOptions {
 
   /**
    * Get the tcp port where the Redis server is listening, default 6379.
-   *
-   * @return tcp port
+   * * @return tcp port
    */
   public int getPort() {
     return port;
@@ -216,8 +217,7 @@ public class RedisOptions extends NetClientOptions {
 
   /**
    * Get the password for authentication at connection time.
-   *
-   * @return password
+   * * @return password
    */
   public String getAuth() {
     return auth;
@@ -236,8 +236,7 @@ public class RedisOptions extends NetClientOptions {
 
   /**
    * Get the database to select at connection time.
-   *
-   * @return database id
+   * * @return database id
    */
   public Integer getSelect() {
     return select;
@@ -245,8 +244,8 @@ public class RedisOptions extends NetClientOptions {
 
   /**
    * Set the database to select at connection time.
+   * * @param select database id
    *
-   * @param select database id
    * @return self
    */
   public RedisOptions setSelect(Integer select) {
@@ -254,9 +253,58 @@ public class RedisOptions extends NetClientOptions {
     return this;
   }
 
-  public JsonObject toJSON() {
-    final JsonObject json = new JsonObject();
-    RedisOptionsConverter.toJson(this, json);
-    return json;
+  /**
+   * Get name of Redis master.
+   *
+   * @return Redis master name
+   */
+  public String getMasterName() {
+    return masterName;
+  }
+
+  /**
+   * Set name of Redis master (used with Sentinel).
+   *
+   * @param masterName name of Redis master
+   * @return self
+   */
+  public RedisOptions setMasterName(String masterName) {
+    this.masterName = masterName;
+    return this;
+  }
+
+  /**
+   * Add Sentinel node.
+   *
+   * @param sentinelHostAndPort Sentinel node on the form 'hostname:port'
+   * @return self
+   */
+  public RedisOptions addSentinel(String sentinelHostAndPort) {
+    if (sentinels == null) {
+      sentinels = new ArrayList<>();
+    }
+
+    sentinels.add(sentinelHostAndPort);
+    return this;
+  }
+
+  /**
+   * Get list of Sentinels.
+   *
+   * @return List of Sentinels on the form 'hostname:port'
+   */
+  public List<String> getSentinels() {
+    return sentinels;
+  }
+
+  /**
+   * Set the list of Sentinels.
+   *
+   * @param sentinels a list of sentinels host and port string
+   * @return self
+   */
+  public RedisOptions setSentinels(List<String> sentinels) {
+    this.sentinels = sentinels;
+    return this;
   }
 }

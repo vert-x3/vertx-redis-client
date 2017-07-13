@@ -1,17 +1,17 @@
 /**
  * Copyright 2015 Red Hat, Inc.
- *
- *  All rights reserved. This program and the accompanying materials
- *  are made available under the terms of the Eclipse Public License v1.0
- *  and Apache License v2.0 which accompanies this distribution.
- *
- *  The Eclipse Public License is available at
- *  http://www.eclipse.org/legal/epl-v10.html
- *
- *  The Apache License v2.0 is available at
- *  http://www.opensource.org/licenses/apache2.0.php
- *
- *  You may elect to redistribute this code under either of these licenses.
+ * <p>
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * and Apache License v2.0 which accompanies this distribution.
+ * <p>
+ * The Eclipse Public License is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ * <p>
+ * The Apache License v2.0 is available at
+ * http://www.opensource.org/licenses/apache2.0.php
+ * <p>
+ * You may elect to redistribute this code under either of these licenses.
  */
 package io.vertx.redis.impl;
 
@@ -27,28 +27,9 @@ import java.util.concurrent.ConcurrentHashMap;
 public class RedisSubscriptions {
 
   private static final Logger log = LoggerFactory.getLogger(RedisSubscriptions.class);
-
-  private class Subscription {
-    final Context context;
-    final MessageHandler handler;
-
-    Subscription(MessageHandler handler) {
-      context = vertx.getOrCreateContext();
-      this.handler = handler;
-    }
-
-    void handle(String channelOrPattern, Reply[] replyData) {
-      context.runOnContext(v -> {
-        handler.handle(channelOrPattern, replyData);
-      });
-    }
-  }
-
   private final Vertx vertx;
-
   private final Map<String, Subscription> channelSubscribers = new ConcurrentHashMap<>();
   private final Map<String, Subscription> patternSubscribers = new ConcurrentHashMap<>();
-
   public RedisSubscriptions(Vertx vertx) {
     this.vertx = vertx;
   }
@@ -109,5 +90,21 @@ public class RedisSubscriptions {
 
   public Set<String> patternNames() {
     return patternSubscribers.keySet();
+  }
+
+  private class Subscription {
+    final Context context;
+    final MessageHandler handler;
+
+    Subscription(MessageHandler handler) {
+      context = vertx.getOrCreateContext();
+      this.handler = handler;
+    }
+
+    void handle(String channelOrPattern, Reply[] replyData) {
+      context.runOnContext(v -> {
+        handler.handle(channelOrPattern, replyData);
+      });
+    }
   }
 }

@@ -1,17 +1,17 @@
 /**
  * Copyright 2015 Red Hat, Inc.
- *
- *  All rights reserved. This program and the accompanying materials
- *  are made available under the terms of the Eclipse Public License v1.0
- *  and Apache License v2.0 which accompanies this distribution.
- *
- *  The Eclipse Public License is available at
- *  http://www.eclipse.org/legal/epl-v10.html
- *
- *  The Apache License v2.0 is available at
- *  http://www.opensource.org/licenses/apache2.0.php
- *
- *  You may elect to redistribute this code under either of these licenses.
+ * <p>
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * and Apache License v2.0 which accompanies this distribution.
+ * <p>
+ * The Eclipse Public License is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ * <p>
+ * The Apache License v2.0 is available at
+ * http://www.opensource.org/licenses/apache2.0.php
+ * <p>
+ * You may elect to redistribute this code under either of these licenses.
  */
 package io.vertx.redis.impl;
 
@@ -26,11 +26,7 @@ import io.vertx.core.net.NetSocket;
 import io.vertx.redis.RedisOptions;
 
 import java.nio.charset.Charset;
-import java.util.ArrayList;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Queue;
-import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.*;
 import java.util.concurrent.atomic.AtomicReference;
 
 /**
@@ -39,20 +35,18 @@ import java.util.concurrent.atomic.AtomicReference;
  */
 class RedisConnection {
 
+  private static final Logger log = LoggerFactory.getLogger(RedisConnection.class);
   private final Vertx vertx;
   private final Context context;
-
-  private static final Logger log = LoggerFactory.getLogger(RedisConnection.class);
-
   /**
    * there are 2 queues, one for commands not yet sent over the wire to redis and another for commands already sent to
    * redis. At start up it expected that until the connection handshake is complete the pending queue will grow and once
    * the handshake completes it will be empty while the second one will be in constant movement.
-   *
+   * <p>
    * Since the client works **ALWAYS** in pipeline mode the order of adding and removing elements to the queues is
    * crucial. A command is sent only when its reply handler or handlers are added to any of the queues and the command
    * is send to the wire.
-   *
+   * <p>
    * For this reason we must **ALWAYS** synchronize the access to the queues and writes to the socket.
    */
   // pending: commands that have not yet been sent to the server
@@ -63,36 +57,17 @@ class RedisConnection {
   private final ReplyParser replyParser;
   private final RedisSubscriptions subscriptions;
 
+
   private final RedisOptions config;
-
-  private enum State {
-    /**
-     * The connection is not active. The is a stop state.
-     */
-    DISCONNECTED,
-    /**
-     * The connection is in transit, from here it can become connected or and error can occur.
-     */
-    CONNECTING,
-    /**
-     * Connection is active from here it can become an error or disconnected.
-     */
-    CONNECTED,
-    /**
-     * Connection problem
-     */
-    ERROR
-  }
-
   private final AtomicReference<State> state = new AtomicReference<>(State.DISCONNECTED);
   // attempt to reconnect on error, by default true
   private volatile boolean reconnect = true;
   private volatile NetSocket netSocket;
-
   /**
    * Create a RedisConnection.
    */
   public RedisConnection(Vertx vertx, RedisOptions config, RedisSubscriptions subscriptions) {
+
     // Make sure we have an event loop context for serializability of the commands
     Context ctx = Vertx.currentContext();
     if (ctx == null) {
@@ -105,6 +80,7 @@ class RedisConnection {
     this.vertx = vertx;
     this.context = ctx;
     this.config = config;
+
     this.subscriptions = subscriptions;
 
     if (subscriptions != null) {
@@ -141,58 +117,89 @@ class RedisConnection {
     }
   }
 
-  private void connect() {
+  private boolean useSentinel() {
     // in case the user has disconnected before, update the state
     reconnect = true;
+    if (config.getSentinels() != null && config.getSentinels().size() > 0 && config.getMasterName() != null) {
+      return true;
+    } else {
+      return false;
+    }
+  }
+
+  private void connect(String host, int port, boolean checkMaster) {
+    replyParser.reset();
+// create a netClient for the connection
+    final NetClient client = vertx.createNetClient(config);
+    client.connect(port, host, asyncResult -> {
+      if (asyncResult.failed()) {
+        if (state.compareAndSet(State.CONNECTING, State.ERROR)) {
+          // clean up any waiting command
+          clearQueue(waiting, asyncResult.cause());
+          // clean up any pending command
+          clearQueue(pending, asyncResult.cause());
+
+          state.set(State.DISCONNECTED);
+          // Should we retry?
+          if (reconnect) {
+            vertx.setTimer(config.getReconnectInterval(), v0 -> connect());
+          }
+        }
+      } else {
+        netSocket = asyncResult.result()
+          .handler(replyParser)
+          .closeHandler(v2 -> {
+            state.set(State.ERROR);
+            // clean up any waiting command
+            clearQueue(waiting, "Connection closed");
+            // clean up any pending command
+            clearQueue(pending, "Connection closed");
+
+            state.set(State.DISCONNECTED);
+            client.close();
+            // was this close intentional?
+            if (reconnect) {
+              vertx.setTimer(config.getReconnectInterval(), v0 -> connect());
+            }
+          })
+          .exceptionHandler(e ->
+            netSocket.close());
+
+        // clean up any waiting command
+        clearQueue(waiting, "Connection lost");
+
+        // handle the connection handshake
+        doAuth();
+        // check if the Redis instance is master
+        if (checkMaster) {
+          doCheckMaster();
+        }
+      }
+    });
+  }
+
+  private void connect() {
 
     if (state.compareAndSet(State.DISCONNECTED, State.CONNECTING)) {
-
       runOnContext(v -> {
-        replyParser.reset();
-
-        // create a netClient for the connection
-        final NetClient client = vertx.createNetClient(config);
-
-        client.connect(config.getPort(), config.getHost(), asyncResult -> {
-          if (asyncResult.failed()) {
-            if (state.compareAndSet(State.CONNECTING, State.ERROR)) {
+        if (useSentinel()) {
+          RedisMasterResolver resolver = new RedisMasterResolver(context.owner(), config);
+          resolver.getMasterAddressByName(jsonObjectAsyncResult -> {
+            if (jsonObjectAsyncResult.succeeded()) {
+              JsonObject masterAddress = jsonObjectAsyncResult.result();
+              connect(masterAddress.getString("host"), masterAddress.getInteger("port"), true);
+            } else {
               // clean up any waiting command
-              clearQueue(waiting, asyncResult.cause());
+              clearQueue(waiting, jsonObjectAsyncResult.cause());
               // clean up any pending command
-              clearQueue(pending, asyncResult.cause());
+              clearQueue(pending, jsonObjectAsyncResult.cause());
 
               state.set(State.DISCONNECTED);
-              // Should we retry?
-              if (reconnect) {
-                vertx.setTimer(config.getReconnectInterval(), v0 -> connect());
-              }
             }
-          } else {
-            netSocket = asyncResult.result()
-                .handler(replyParser)
-                .closeHandler(v2 -> {
-                  state.set(State.ERROR);
-                  // clean up any waiting command
-                  clearQueue(waiting, "Connection closed");
-                  // clean up any pending command
-                  clearQueue(pending, "Connection closed");
-
-                  state.set(State.DISCONNECTED);
-                  client.close();
-                  // was this close intentional?
-                  if (reconnect) {
-                    vertx.setTimer(config.getReconnectInterval(), v0 -> connect());
-                  }
-                })
-                .exceptionHandler(e -> netSocket.close());
-
-            // clean up any waiting command
-            clearQueue(waiting, "Connection lost");
-
-            // handle the connection handshake
-            doAuth();
-          }
-        });
+          });
+        } else {
+          connect(config.getHost(), config.getPort(), false);
+        }
       });
     }
   }
@@ -200,7 +207,6 @@ class RedisConnection {
   void disconnect(Handler<AsyncResult<Void>> closeHandler) {
     // update state to notify that the user wants to disconnect
     reconnect = false;
-
     switch (state.get()) {
       case CONNECTING:
         // eventually will become connected
@@ -241,6 +247,7 @@ class RedisConnection {
    * @param command the redis command to send
    */
   void send(final Command<?> command) {
+
     // start the handshake if not connected
     if (state.get() == State.DISCONNECTED) {
       connect();
@@ -301,6 +308,28 @@ class RedisConnection {
     }
   }
 
+  private void doCheckMaster() {
+    Command<JsonObject> infoCommand = new Command<>(context, RedisCommand.INFO, Collections.emptyList(), Charset.forName(config.getEncoding()), ResponseTransform.INFO, JsonObject.class).handler(info -> {
+      if (info.failed()) {
+        // clean up any waiting command
+        clearQueue(pending, info.cause());
+        netSocket.close();
+      } else {
+        if (!"master".equals(info.result().getJsonObject("replication").getString("role"))) {
+          clearQueue(pending, info.cause());
+          netSocket.close();
+          log.error("Forced disconnect of non-master");
+        } else {
+          log.info("Verification of master role succeeded");
+        }
+      }
+    });
+
+    // write to the socket in the netSocket context
+    // queue it
+    write(infoCommand);
+  }
+
   private void doSelect() {
     // optionally there could be a select command
     if (config.getSelect() != null) {
@@ -315,7 +344,7 @@ class RedisConnection {
 
           netSocket.close();
         } else {
-          // select success, proceed with resend of pending messages/resubscribe pub/sub
+          // select success, proceed with resendof pending messages/resubscribe pub/sub
           restoreState();
         }
       });
@@ -324,7 +353,7 @@ class RedisConnection {
       // queue it
       write(selectCmd);
     } else {
-      // no select, proceed with resend of pending messages/resubscribe pub/sub
+      // no select, proceed with resendof pending messages/resubscribe pub/sub
       restoreState();
     }
   }
@@ -471,5 +500,24 @@ class RedisConnection {
     while ((cmd = q.poll()) != null) {
       cmd.handle(Future.failedFuture(cause));
     }
+  }
+
+  private enum State {
+    /**
+     * The connection is not active. The is a stop state.
+     */
+    DISCONNECTED,
+    /**
+     * The connection is in transit, from here it can become connected or and error can occur.
+     */
+    CONNECTING,
+    /**
+     * Connection is active from here it can become an error or disconnected.
+     */
+    CONNECTED,
+    /**
+     * Connection problem
+     */
+    ERROR
   }
 }

@@ -1,17 +1,17 @@
 /**
  * Copyright 2015 Red Hat, Inc.
- *
- *  All rights reserved. This program and the accompanying materials
- *  are made available under the terms of the Eclipse Public License v1.0
- *  and Apache License v2.0 which accompanies this distribution.
- *
- *  The Eclipse Public License is available at
- *  http://www.eclipse.org/legal/epl-v10.html
- *
- *  The Apache License v2.0 is available at
- *  http://www.opensource.org/licenses/apache2.0.php
- *
- *  You may elect to redistribute this code under either of these licenses.
+ * <p>
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * and Apache License v2.0 which accompanies this distribution.
+ * <p>
+ * The Eclipse Public License is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ * <p>
+ * The Apache License v2.0 is available at
+ * http://www.opensource.org/licenses/apache2.0.php
+ * <p>
+ * You may elect to redistribute this code under either of these licenses.
  */
 package io.vertx.test.redis;
 
@@ -45,6 +45,7 @@ public abstract class RedisClientTestBase extends VertxTestBase {
   private static final Integer DEFAULT_PORT = 6379;
 
   private static final Map<Integer, RedisServer> instances = new ConcurrentHashMap<>();
+  protected RedisClient redis;
 
   private static String getHost() {
     return getProperty("host");
@@ -58,8 +59,6 @@ public abstract class RedisClientTestBase extends VertxTestBase {
     String s = System.getProperty(name);
     return (s != null && s.trim().length() > 0) ? s : null;
   }
-
-  protected RedisClient redis;
 
   @BeforeClass
   static public void startRedis() throws Exception {
@@ -96,23 +95,6 @@ public abstract class RedisClientTestBase extends VertxTestBase {
       instances.put(port, new RedisServer(port));
       System.out.println("Created embedded redis server on port " + port);
     }
-  }
-
-  protected RedisOptions getConfig() {
-    String host = getHost();
-    String port = getPort();
-
-    RedisOptions config = new RedisOptions();
-
-    if (host != null) {
-      config.setHost(host);
-    }
-
-    if (port != null) {
-      config.setPort(Integer.parseInt(port));
-    }
-
-    return config;
   }
 
   private static JsonArray toJsonArray(final Object... params) {
@@ -152,6 +134,23 @@ public abstract class RedisClientTestBase extends VertxTestBase {
     return Arrays.asList(params);
   }
 
+  protected RedisOptions getConfig() {
+    String host = getHost();
+    String port = getPort();
+
+    RedisOptions config = new RedisOptions();
+
+    if (host != null) {
+      config.setHost(host);
+    }
+
+    if (port != null) {
+      config.setPort(Integer.parseInt(port));
+    }
+
+    return config;
+  }
+
   @Test
   public void testAppend() {
     final String key = makeKey();
@@ -188,8 +187,8 @@ public abstract class RedisClientTestBase extends VertxTestBase {
     RedisServer server = RedisServer.builder().port(6381).setting("requirepass foobar").build();
     server.start();
     RedisOptions job = new RedisOptions()
-        .setHost("localhost")
-        .setPort(6381);
+      .setHost("localhost")
+      .setPort(6381);
     RedisClient rdx = RedisClient.create(vertx, job);
 
     rdx.auth("barfoo", reply -> {
@@ -482,8 +481,8 @@ public abstract class RedisClientTestBase extends VertxTestBase {
     RedisServer server = RedisServer.builder().port(6381).build();
     server.start();
     RedisOptions job = new RedisOptions()
-        .setHost("localhost")
-        .setPort(6381);
+      .setHost("localhost")
+      .setPort(6381);
     RedisClient rdx = RedisClient.create(vertx, job);
 
     rdx.debugSegfault(reply -> {
@@ -622,12 +621,12 @@ public abstract class RedisClientTestBase extends VertxTestBase {
     final String key1 = makeKey();
     final String key2 = makeKey();
     redis.eval("return {KEYS[1],KEYS[2],ARGV[1],ARGV[2]}", toList(key1, key2), toList("first", "second"),
-        reply -> {
-          assertTrue(reply.succeeded());
-          Object r = reply.result();
-          assertNotNull(r);
-          testComplete();
-        });
+      reply -> {
+        assertTrue(reply.succeeded());
+        Object r = reply.result();
+        assertNotNull(r);
+        testComplete();
+      });
     await();
   }
 
@@ -1593,8 +1592,8 @@ public abstract class RedisClientTestBase extends VertxTestBase {
     RedisServer server = RedisServer.builder().port(6382).build();
     server.start();
     RedisOptions job = new RedisOptions()
-        .setHost("localhost")
-        .setPort(6382);
+      .setHost("localhost")
+      .setPort(6382);
     RedisClient rdx = RedisClient.create(vertx, job);
 
     String key = makeKey();
@@ -2007,29 +2006,29 @@ public abstract class RedisClientTestBase extends VertxTestBase {
     final String mykey = makeKey();
     final String myotherkey = makeKey();
     redis.rpush(mykey, "one", reply0 -> {
-          assertTrue(reply0.succeeded());
-          assertEquals(1, reply0.result().longValue());
-          redis.rpush(mykey, "two", reply1 -> {
-            assertTrue(reply1.succeeded());
-            assertEquals(2, reply1.result().longValue());
-            redis.rpush(mykey, "three", reply2 -> {
-              assertTrue(reply2.succeeded());
-              assertEquals(3, reply2.result().longValue());
-              redis.rpoplpush(mykey, myotherkey, reply3 -> {
-                assertTrue(reply3.succeeded());
-                assertEquals("three", reply3.result());
-                redis.lrange(mykey, 0, -1, reply5 -> {
-                  assertTrue(reply5.succeeded());
-                  assertArrayEquals(toArray("one", "two"), reply5.result().getList().toArray());
-                  redis.lrange(myotherkey, 0, -1, reply6 -> {
-                    assertArrayEquals(toArray("three"), reply6.result().getList().toArray());
-                    testComplete();
-                  });
+        assertTrue(reply0.succeeded());
+        assertEquals(1, reply0.result().longValue());
+        redis.rpush(mykey, "two", reply1 -> {
+          assertTrue(reply1.succeeded());
+          assertEquals(2, reply1.result().longValue());
+          redis.rpush(mykey, "three", reply2 -> {
+            assertTrue(reply2.succeeded());
+            assertEquals(3, reply2.result().longValue());
+            redis.rpoplpush(mykey, myotherkey, reply3 -> {
+              assertTrue(reply3.succeeded());
+              assertEquals("three", reply3.result());
+              redis.lrange(mykey, 0, -1, reply5 -> {
+                assertTrue(reply5.succeeded());
+                assertArrayEquals(toArray("one", "two"), reply5.result().getList().toArray());
+                redis.lrange(myotherkey, 0, -1, reply6 -> {
+                  assertArrayEquals(toArray("three"), reply6.result().getList().toArray());
+                  testComplete();
                 });
               });
             });
           });
-        }
+        });
+      }
 
     );
 
@@ -2179,8 +2178,8 @@ public abstract class RedisClientTestBase extends VertxTestBase {
     });
 
     RedisOptions job = new RedisOptions()
-        .setHost("localhost")
-        .setPort(6379);
+      .setHost("localhost")
+      .setPort(6379);
     RedisClient rdx = RedisClient.create(vertx, job);
 
     rdx.scriptKill(reply -> {

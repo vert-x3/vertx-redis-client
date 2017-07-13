@@ -234,6 +234,10 @@ Set the host name where the Redis server is listening.
 |[[keyStoreOptions]]`keyStoreOptions`|`link:dataobjects.html#JksOptions[JksOptions]`|-
 |[[localAddress]]`localAddress`|`String`|-
 |[[logActivity]]`logActivity`|`Boolean`|-
+|[[masterName]]`masterName`|`String`|
++++
+Set name of Redis master (used with Sentinel).
++++
 |[[metricsName]]`metricsName`|`String`|-
 |[[openSslEngineOptions]]`openSslEngineOptions`|`link:dataobjects.html#OpenSSLEngineOptions[OpenSSLEngineOptions]`|-
 |[[pemKeyCertOptions]]`pemKeyCertOptions`|`link:dataobjects.html#PemKeyCertOptions[PemKeyCertOptions]`|-
@@ -254,6 +258,10 @@ Set the tcp port where the Redis server is listening.
 Set the database to select at connection time.
 +++
 |[[sendBufferSize]]`sendBufferSize`|`Number (int)`|-
+|[[sentinels]]`sentinels`|`Array of String`|
++++
+Set the list of Sentinels.
++++
 |[[soLinger]]`soLinger`|`Number (int)`|-
 |[[ssl]]`ssl`|`Boolean`|-
 |[[tcpKeepAlive]]`tcpKeepAlive`|`Boolean`|-

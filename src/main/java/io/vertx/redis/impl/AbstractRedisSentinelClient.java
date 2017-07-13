@@ -1,56 +1,39 @@
-/**
- * Copyright 2015 Red Hat, Inc.
- * <p>
- * All rights reserved. This program and the accompanying materials
- * are made available under the terms of the Eclipse Public License v1.0
- * and Apache License v2.0 which accompanies this distribution.
- * <p>
- * The Eclipse Public License is available at
- * http://www.eclipse.org/legal/epl-v10.html
- * <p>
- * The Apache License v2.0 is available at
- * http://www.opensource.org/licenses/apache2.0.php
- * <p>
- * You may elect to redistribute this code under either of these licenses.
- */
 package io.vertx.redis.impl;
 
 import io.vertx.core.AsyncResult;
 import io.vertx.core.Handler;
 import io.vertx.core.Vertx;
 import io.vertx.core.json.JsonObject;
-import io.vertx.redis.RedisClient;
 import io.vertx.redis.RedisOptions;
+import io.vertx.redis.sentinel.RedisSentinel;
+import io.vertx.redis.sentinel.RedisSentinelCommand;
 
 import java.util.List;
 
-public abstract class AbstractRedisClient extends BaseRedisClient<RedisCommand> implements RedisClient {
+/**
+ * Abstract Redis Sentinel Client.
+ */
+public abstract class AbstractRedisSentinelClient extends BaseRedisClient<RedisSentinelCommand> implements RedisSentinel {
 
-  AbstractRedisClient(Vertx vertx, RedisOptions config) {
+  AbstractRedisSentinelClient(Vertx vertx, RedisOptions config) {
     super(vertx, config);
   }
 
-  private ResponseTransform getResponseTransformFor(RedisCommand command) {
-    if (command == RedisCommand.HGETALL) {
-      return ResponseTransform.HASH;
-    }
-    if (command == RedisCommand.INFO) {
+  private ResponseTransform getResponseTransformFor(RedisSentinelCommand command) {
+    if (command == RedisSentinelCommand.INFO) {
       return ResponseTransform.INFO;
-    }
-
-    if (command == RedisCommand.EVAL || command == RedisCommand.EVALSHA) {
-      return ResponseTransform.ARRAY;
     }
 
     return ResponseTransform.NONE;
   }
 
   @Override
-  final <T> void send(final RedisCommand command, final List<?> redisArgs, final Class<T> returnType,
+  final <T> void send(final RedisSentinelCommand command, final List<?> redisArgs, final Class<T> returnType,
                       final boolean binary,
                       final Handler<AsyncResult<T>> resultHandler) {
 
-    final Command<T> cmd = new Command<>(Vertx.currentContext(), command, redisArgs, binary ? binaryCharset : charset, getResponseTransformFor(command), returnType).handler(resultHandler);
+    final Command<T> cmd = new Command<>(Vertx.currentContext(), command, redisArgs,
+      binary ? binaryCharset : charset, getResponseTransformFor(command), returnType).handler(resultHandler);
 
     switch (command) {
       case PSUBSCRIBE:
@@ -138,4 +121,5 @@ public abstract class AbstractRedisClient extends BaseRedisClient<RedisCommand> 
         break;
     }
   }
+
 }

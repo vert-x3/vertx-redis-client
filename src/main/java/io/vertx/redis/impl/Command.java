@@ -1,17 +1,17 @@
 /**
  * Copyright 2015 Red Hat, Inc.
- *
- *  All rights reserved. This program and the accompanying materials
- *  are made available under the terms of the Eclipse Public License v1.0
- *  and Apache License v2.0 which accompanies this distribution.
- *
- *  The Eclipse Public License is available at
- *  http://www.eclipse.org/legal/epl-v10.html
- *
- *  The Apache License v2.0 is available at
- *  http://www.opensource.org/licenses/apache2.0.php
- *
- *  You may elect to redistribute this code under either of these licenses.
+ * <p>
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * and Apache License v2.0 which accompanies this distribution.
+ * <p>
+ * The Eclipse Public License is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ * <p>
+ * The Apache License v2.0 is available at
+ * http://www.opensource.org/licenses/apache2.0.php
+ * <p>
+ * You may elect to redistribute this code under either of these licenses.
  */
 package io.vertx.redis.impl;
 
@@ -41,6 +41,47 @@ public class Command<T> {
   static {
     for (int i = 0; i < NUM_MAP_LENGTH; i++) {
       numMap[i] = convert(i);
+    }
+  }
+
+  private final Context context;
+  private final Buffer buffer;
+  private final ResponseTransform transform;
+  private final String encoding;
+  private final Class<T> returnType;
+  private int expectedReplies = 1;
+  private Handler<AsyncResult<T>> handler;
+
+  public Command(Context context, AbstractCommand command, final List<?> args, Charset encoding, ResponseTransform transform, Class<T> returnType) {
+    this.context = context;
+    this.encoding = encoding.name();
+
+    this.transform = transform;
+    this.returnType = returnType;
+
+    int totalArgs;
+    if (args == null) {
+      totalArgs = 0;
+    } else {
+      totalArgs = args.size();
+    }
+
+    String[] commandTokens = command.getTokens();
+
+    // serialize the request
+    buffer = Buffer.buffer();
+    buffer.appendByte(ARGS_PREFIX);
+    buffer.appendBytes(numToBytes(totalArgs + commandTokens.length));
+    buffer.appendBytes(CRLF);
+
+    // serialize the command
+    for (String token : commandTokens) {
+      appendToBuffer(token.getBytes(encoding), encoding, buffer);
+    }
+
+    // serialize arguments
+    for (int i = 0; i < totalArgs; i++) {
+      appendToBuffer(args.get(i), encoding, buffer);
     }
   }
 
@@ -74,64 +115,22 @@ public class Command<T> {
     return bytes;
   }
 
-  private final Context context;
-  private final Buffer buffer;
-  private final ResponseTransform transform;
-  private final String encoding;
-  private final Class<T> returnType;
-
-  private int expectedReplies = 1;
-  private Handler<AsyncResult<T>> handler;
-
-  public Command(Context context, RedisCommand command, final List<?> args, Charset encoding, ResponseTransform transform, Class<T> returnType) {
-    this.context = context;
-    this.encoding = encoding.name();
-
-    this.transform = transform;
-    this.returnType = returnType;
-
-    int totalArgs;
-    if (args == null) {
-      totalArgs = 0;
-    } else {
-      totalArgs = args.size();
-    }
-
-    String[] commandTokens = command.getTokens();
-
-    // serialize the request
-    buffer = Buffer.buffer();
-    buffer.appendByte(ARGS_PREFIX);
-    buffer.appendBytes(numToBytes(totalArgs + commandTokens.length));
-    buffer.appendBytes(CRLF);
-
-    // serialize the command
-    for (String token : commandTokens) {
-      appendToBuffer(token.getBytes(encoding), encoding, buffer);
-    }
-
-    // serialize arguments
-    for (int i = 0; i < totalArgs; i++) {
-      appendToBuffer(args.get(i), encoding, buffer);
-    }
-  }
-
   // setters
-
-  public Command<T> setExpectedReplies(int expectedReplies) {
-    this.expectedReplies = expectedReplies;
-    return this;
-  }
 
   public Command<T> handler(Handler<AsyncResult<T>> handler) {
     this.handler = handler;
     return this;
   }
 
-  // getters
-
   public int getExpectedReplies() {
     return expectedReplies;
+  }
+
+  // getters
+
+  public Command<T> setExpectedReplies(int expectedReplies) {
+    this.expectedReplies = expectedReplies;
+    return this;
   }
 
   public ResponseTransform responseTransform() {

@@ -1,17 +1,17 @@
 /**
  * Copyright 2015 Red Hat, Inc.
- *
- *  All rights reserved. This program and the accompanying materials
- *  are made available under the terms of the Eclipse Public License v1.0
- *  and Apache License v2.0 which accompanies this distribution.
- *
- *  The Eclipse Public License is available at
- *  http://www.eclipse.org/legal/epl-v10.html
- *
- *  The Apache License v2.0 is available at
- *  http://www.opensource.org/licenses/apache2.0.php
- *
- *  You may elect to redistribute this code under either of these licenses.
+ * <p>
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * and Apache License v2.0 which accompanies this distribution.
+ * <p>
+ * The Eclipse Public License is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ * <p>
+ * The Apache License v2.0 is available at
+ * http://www.opensource.org/licenses/apache2.0.php
+ * <p>
+ * You may elect to redistribute this code under either of these licenses.
  */
 package io.vertx.redis.impl;
 
@@ -19,23 +19,11 @@ import io.vertx.core.Handler;
 import io.vertx.core.buffer.Buffer;
 
 public class ReplyParser implements Handler<Buffer> {
-  
-  private static class IndexOutOfBoundsException extends Exception {
-    IndexOutOfBoundsException(String message) {
-      super(message);
-    }
-    
-    @Override
-    public synchronized Throwable fillInStackTrace() {
-      return this;
-    }
-  }
 
+  private final String _encoding = "utf-8";
+  private final Handler<Reply> handler;
   private Buffer _buffer;
   private int _offset;
-  private final String _encoding = "utf-8";
-
-  private final Handler<Reply> handler;
 
   public ReplyParser(Handler<Reply> handler) {
     this.handler = handler;
@@ -47,7 +35,6 @@ public class ReplyParser implements Handler<Buffer> {
 
     return this;
   }
-
 
   private Reply parseResult(byte type) throws IndexOutOfBoundsException {
     int start, end, offset;
@@ -259,5 +246,16 @@ public class ReplyParser implements Handler<Buffer> {
 
   private int bytesRemaining() {
     return (_buffer.length() - _offset) < 0 ? 0 : (_buffer.length() - _offset);
+  }
+
+  private static class IndexOutOfBoundsException extends Exception {
+    IndexOutOfBoundsException(String message) {
+      super(message);
+    }
+
+    @Override
+    public synchronized Throwable fillInStackTrace() {
+      return this;
+    }
   }
 }

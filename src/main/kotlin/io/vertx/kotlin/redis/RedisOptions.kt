@@ -1,13 +1,6 @@
 package io.vertx.kotlin.redis
 
 import io.vertx.redis.RedisOptions
-import io.vertx.core.net.JdkSSLEngineOptions
-import io.vertx.core.net.JksOptions
-import io.vertx.core.net.OpenSSLEngineOptions
-import io.vertx.core.net.PemKeyCertOptions
-import io.vertx.core.net.PemTrustOptions
-import io.vertx.core.net.PfxOptions
-import io.vertx.core.net.ProxyOptions
 
 /**
  * A function providing a DSL for building [io.vertx.redis.RedisOptions] objects.
@@ -35,42 +28,44 @@ import io.vertx.core.net.ProxyOptions
  * @param address  Set the eventbus address prefix for `PUB/SUB`.
  * @param auth  Set the password for authentication at connection time.
  * @param binary  Set the user defined character encoding, e.g.: `iso-8859-1`.
- * @param connectTimeout 
- * @param crlPaths 
- * @param crlValues 
- * @param enabledCipherSuites 
- * @param enabledSecureTransportProtocols 
+ * @param connectTimeout
+ * @param crlPaths
+ * @param crlValues
+ * @param enabledCipherSuites
+ * @param enabledSecureTransportProtocols
  * @param encoding  Set the user defined character encoding, e.g.: `iso-8859-1`.
  * @param host  Set the host name where the Redis server is listening.
- * @param hostnameVerificationAlgorithm 
- * @param idleTimeout 
- * @param jdkSslEngineOptions 
- * @param keyStoreOptions 
- * @param localAddress 
- * @param logActivity 
- * @param metricsName 
- * @param openSslEngineOptions 
- * @param pemKeyCertOptions 
- * @param pemTrustOptions 
- * @param pfxKeyCertOptions 
- * @param pfxTrustOptions 
+ * @param hostnameVerificationAlgorithm
+ * @param idleTimeout
+ * @param jdkSslEngineOptions
+ * @param keyStoreOptions
+ * @param localAddress
+ * @param logActivity
+ * @param masterName  Set name of Redis master (used with Sentinel).
+ * @param metricsName
+ * @param openSslEngineOptions
+ * @param pemKeyCertOptions
+ * @param pemTrustOptions
+ * @param pfxKeyCertOptions
+ * @param pfxTrustOptions
  * @param port  Set the tcp port where the Redis server is listening.
- * @param proxyOptions 
- * @param receiveBufferSize 
- * @param reconnectAttempts 
- * @param reconnectInterval 
- * @param reuseAddress 
+ * @param proxyOptions
+ * @param receiveBufferSize
+ * @param reconnectAttempts
+ * @param reconnectInterval
+ * @param reuseAddress
  * @param select  Set the database to select at connection time.
- * @param sendBufferSize 
- * @param soLinger 
- * @param ssl 
- * @param tcpKeepAlive 
- * @param tcpNoDelay 
- * @param trafficClass 
- * @param trustAll 
- * @param trustStoreOptions 
- * @param useAlpn 
- * @param usePooledBuffers 
+ * @param sendBufferSize
+ * @param sentinels  Set the list of Sentinels.
+ * @param soLinger
+ * @param ssl
+ * @param tcpKeepAlive
+ * @param tcpNoDelay
+ * @param trafficClass
+ * @param trustAll
+ * @param trustStoreOptions
+ * @param useAlpn
+ * @param usePooledBuffers
  *
  * <p/>
  * NOTE: This function has been automatically generated from the [io.vertx.redis.RedisOptions original] using Vert.x codegen.
@@ -92,6 +87,7 @@ fun RedisOptions(
   keyStoreOptions: io.vertx.core.net.JksOptions? = null,
   localAddress: String? = null,
   logActivity: Boolean? = null,
+  masterName: String? = null,
   metricsName: String? = null,
   openSslEngineOptions: io.vertx.core.net.OpenSSLEngineOptions? = null,
   pemKeyCertOptions: io.vertx.core.net.PemKeyCertOptions? = null,
@@ -106,6 +102,7 @@ fun RedisOptions(
   reuseAddress: Boolean? = null,
   select: Int? = null,
   sendBufferSize: Int? = null,
+  sentinels: Iterable<String>? = null,
   soLinger: Int? = null,
   ssl: Boolean? = null,
   tcpKeepAlive: Boolean? = null,
@@ -172,6 +169,9 @@ fun RedisOptions(
   if (logActivity != null) {
     this.setLogActivity(logActivity)
   }
+  if (masterName != null) {
+    this.setMasterName(masterName)
+  }
   if (metricsName != null) {
     this.setMetricsName(metricsName)
   }
@@ -213,6 +213,9 @@ fun RedisOptions(
   }
   if (sendBufferSize != null) {
     this.setSendBufferSize(sendBufferSize)
+  }
+  if (sentinels != null) {
+    this.setSentinels(sentinels.toList())
   }
   if (soLinger != null) {
     this.setSoLinger(soLinger)

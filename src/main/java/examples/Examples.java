@@ -15,7 +15,7 @@ public class Examples {
 
   public void example1(Vertx vertx) {
     RedisOptions config = new RedisOptions()
-        .setHost("127.0.0.1");
+      .setHost("127.0.0.1");
 
     RedisClient redis = RedisClient.create(vertx, config);
   }
@@ -45,9 +45,9 @@ public class Examples {
     RedisClient redis = RedisClient.create(vertx, new RedisOptions());
 
     redis.subscribe("channel1", res -> {
-        if (res.succeeded()) {
-            // so something...
-        }
+      if (res.succeeded()) {
+        // so something...
+      }
     });
   }
 
@@ -56,9 +56,9 @@ public class Examples {
     RedisClient redis = RedisClient.create(vertx, new RedisOptions());
 
     redis.publish("channel1", "Hello World!", res -> {
-        if (res.succeeded()) {
-            // so something...
-        }
+      if (res.succeeded()) {
+        // so something...
+      }
     });
   }
 

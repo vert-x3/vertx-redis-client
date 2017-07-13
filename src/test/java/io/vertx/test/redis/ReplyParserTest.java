@@ -1,17 +1,17 @@
 /**
  * Copyright 2015 Red Hat, Inc.
- *
- *  All rights reserved. This program and the accompanying materials
- *  are made available under the terms of the Eclipse Public License v1.0
- *  and Apache License v2.0 which accompanies this distribution.
- *
- *  The Eclipse Public License is available at
- *  http://www.eclipse.org/legal/epl-v10.html
- *
- *  The Apache License v2.0 is available at
- *  http://www.opensource.org/licenses/apache2.0.php
- *
- *  You may elect to redistribute this code under either of these licenses.
+ * <p>
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * and Apache License v2.0 which accompanies this distribution.
+ * <p>
+ * The Eclipse Public License is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ * <p>
+ * The Apache License v2.0 is available at
+ * http://www.opensource.org/licenses/apache2.0.php
+ * <p>
+ * You may elect to redistribute this code under either of these licenses.
  */
 package io.vertx.test.redis;
 
@@ -31,14 +31,14 @@ public class ReplyParserTest extends VertxTestBase {
   public void testArrayArrayParser() {
     Buffer b = Buffer.buffer();
     b.appendString(
+      "*2\r\n" +
+        "*3\r\n" +
+        ":1\r\n" +
+        ":2\r\n" +
+        ":3\r\n" +
         "*2\r\n" +
-            "*3\r\n" +
-            ":1\r\n" +
-            ":2\r\n" +
-            ":3\r\n" +
-            "*2\r\n" +
-            "+Foo\r\n" +
-            "-Bar\r\n");
+        "+Foo\r\n" +
+        "-Bar\r\n");
 
     ReplyParser parser = new ReplyParser(reply -> testComplete());
 
@@ -73,11 +73,11 @@ public class ReplyParserTest extends VertxTestBase {
     });
 
     List<String> parts = Arrays.asList(
-        ":1",
-        // second message
-        "\r\n:1",
-        // third
-        "\r\n:1\r\n"
+      ":1",
+      // second message
+      "\r\n:1",
+      // third
+      "\r\n:1\r\n"
     );
 
     for (String part : parts) {

@@ -31,7 +31,7 @@ public class TestReconnect extends VertxTestBase {
         int val = index.addAndGet(buff.length());
         int pongs = val / PING.length();
         index.set(val % PING.length());
-        for (int i = 0;i < pongs;i++) {
+        for (int i = 0; i < pongs; i++) {
           if (received.incrementAndGet() == 10000) {
             so.close();
             return;
