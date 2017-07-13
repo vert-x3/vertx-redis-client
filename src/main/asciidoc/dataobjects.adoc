@@ -206,6 +206,7 @@ Set TYPE filter
 |[[address]]`address`|`String`|
 +++
 Set the eventbus address prefix for `PUB/SUB`.
+ * @param address address prefix.
 +++
 |[[auth]]`auth`|`String`|
 +++
@@ -214,6 +215,7 @@ Set the password for authentication at connection time.
 |[[binary]]`binary`|`Boolean`|
 +++
 Set the user defined character encoding, e.g.: `iso-8859-1`.
+ * @param binary use binary messages
 +++
 |[[connectTimeout]]`connectTimeout`|`Number (int)`|-
 |[[crlPaths]]`crlPaths`|`Array of String`|-
@@ -223,10 +225,12 @@ Set the user defined character encoding, e.g.: `iso-8859-1`.
 |[[encoding]]`encoding`|`String`|
 +++
 Set the user defined character encoding, e.g.: `iso-8859-1`.
+ * @param encoding the user character encoding
 +++
 |[[host]]`host`|`String`|
 +++
 Set the host name where the Redis server is listening.
+ * @param host host name
 +++
 |[[hostnameVerificationAlgorithm]]`hostnameVerificationAlgorithm`|`String`|-
 |[[idleTimeout]]`idleTimeout`|`Number (int)`|-
@@ -256,6 +260,7 @@ Set the tcp port where the Redis server is listening.
 |[[select]]`select`|`Number (Integer)`|
 +++
 Set the database to select at connection time.
+ * @param select database id
 +++
 |[[sendBufferSize]]`sendBufferSize`|`Number (int)`|-
 |[[sentinels]]`sentinels`|`Array of String`|

@@ -16,45 +16,45 @@
 
 package io.vertx.redis;
 
-import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;
+import io.vertx.core.json.JsonArray;
 
 /**
  * Converter for {@link io.vertx.redis.RedisOptions}.
- * <p>
+ *
  * NOTE: This class has been automatically generated from the {@link io.vertx.redis.RedisOptions} original class using Vert.x codegen.
  */
 public class RedisOptionsConverter {
 
   public static void fromJson(JsonObject json, RedisOptions obj) {
     if (json.getValue("address") instanceof String) {
-      obj.setAddress((String) json.getValue("address"));
+      obj.setAddress((String)json.getValue("address"));
     }
     if (json.getValue("auth") instanceof String) {
-      obj.setAuth((String) json.getValue("auth"));
+      obj.setAuth((String)json.getValue("auth"));
     }
     if (json.getValue("binary") instanceof Boolean) {
-      obj.setBinary((Boolean) json.getValue("binary"));
+      obj.setBinary((Boolean)json.getValue("binary"));
     }
     if (json.getValue("encoding") instanceof String) {
-      obj.setEncoding((String) json.getValue("encoding"));
+      obj.setEncoding((String)json.getValue("encoding"));
     }
     if (json.getValue("host") instanceof String) {
-      obj.setHost((String) json.getValue("host"));
+      obj.setHost((String)json.getValue("host"));
     }
     if (json.getValue("masterName") instanceof String) {
-      obj.setMasterName((String) json.getValue("masterName"));
+      obj.setMasterName((String)json.getValue("masterName"));
     }
     if (json.getValue("port") instanceof Number) {
-      obj.setPort(((Number) json.getValue("port")).intValue());
+      obj.setPort(((Number)json.getValue("port")).intValue());
     }
     if (json.getValue("select") instanceof Number) {
-      obj.setSelect(((Number) json.getValue("select")).intValue());
+      obj.setSelect(((Number)json.getValue("select")).intValue());
     }
     if (json.getValue("sentinels") instanceof JsonArray) {
       json.getJsonArray("sentinels").forEach(item -> {
         if (item instanceof String)
-          obj.addSentinel((String) item);
+          obj.addSentinel((String)item);
       });
     }
   }

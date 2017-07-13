@@ -196,6 +196,7 @@ class RedisConnection {
 
               state.set(State.DISCONNECTED);
             }
+            resolver.close();
           });
         } else {
           connect(config.getHost(), config.getPort(), false);

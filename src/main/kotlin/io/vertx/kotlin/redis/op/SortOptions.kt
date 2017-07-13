@@ -6,9 +6,9 @@ import io.vertx.redis.op.SortOptions
  * A function providing a DSL for building [io.vertx.redis.op.SortOptions] objects.
  *
  *
- * @param by
- * @param gets
- * @param store
+ * @param by 
+ * @param gets 
+ * @param store 
  *
  * <p/>
  * NOTE: This function has been automatically generated from the [io.vertx.redis.op.SortOptions original] using Vert.x codegen.

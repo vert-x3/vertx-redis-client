@@ -19,7 +19,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 /**
  * Use this class to resolve the address of the Redis master using Sentinel servers.
  */
-public class RedisMasterResolver {
+class RedisMasterResolver {
 
   private static final Logger log = LoggerFactory.getLogger(RedisMasterResolver.class);
 
@@ -30,11 +30,11 @@ public class RedisMasterResolver {
 
   private Vertx vertx;
 
-  public RedisMasterResolver(Vertx vertx, RedisOptions redisOptions) {
+  RedisMasterResolver(Vertx vertx, RedisOptions redisOptions) {
 
     this.vertx = vertx;
     this.masterName = redisOptions.getMasterName();
-    redisOptions.getSentinels().stream().forEach(s -> {
+    redisOptions.getSentinels().forEach(s -> {
       String[] hostAndPort = s.split(":");
       if (hostAndPort.length == 2) {
         sentinels.add(RedisSentinel.create(vertx, getSentinelOptions(redisOptions, hostAndPort[0], Integer.valueOf(hostAndPort[1]))));
@@ -44,7 +44,7 @@ public class RedisMasterResolver {
     });
   }
 
-  public void getMasterAddressByName(Handler<AsyncResult<JsonObject>> handler) {
+  void getMasterAddressByName(Handler<AsyncResult<JsonObject>> handler) {
 
     log.debug("Attempting to resolving master address");
 
@@ -63,7 +63,7 @@ public class RedisMasterResolver {
             JsonArray masterArray = jsonObjectAsyncResult.result();
             if (masterArray != null && masterArray.size() == 2) {
               JsonObject redisMaster = new JsonObject().put("host", masterArray.getString(0)).put("port", Integer.valueOf(masterArray.getString(1)));
-              if (foundMaster.get() == false) {
+              if (!foundMaster.get()) {
                 log.info(String.format("Sentinel resolved address for master '%s' to %s:%d", masterName, masterArray.getString(0), Integer.valueOf(masterArray.getString(1))));
                 foundMaster.set(true);
                 handler.handle(Future.factory.succeededFuture(redisMaster));
@@ -75,8 +75,8 @@ public class RedisMasterResolver {
             handler.handle(Future.failedFuture(String.format("Sentinel unreachable. %s", jsonObjectAsyncResult.cause().getMessage())));
           }
 
-          if (count.get() == 0 && foundMaster.get() == false) {
-            handler.handle(Future.failedFuture(String.format("Failed to resolve master address")));
+          if (count.get() == 0 && !foundMaster.get()) {
+            handler.handle(Future.failedFuture("Failed to resolve master address"));
           }
         };
 
@@ -104,5 +104,11 @@ public class RedisMasterResolver {
     options.setPort(port);
 
     return options;
+  }
+
+  void close() {
+    for (RedisSentinel sentinel : sentinels) {
+      sentinel.close(h -> {});
+    }
   }
 }

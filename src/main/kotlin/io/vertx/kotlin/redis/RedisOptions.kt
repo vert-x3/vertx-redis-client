@@ -1,6 +1,13 @@
 package io.vertx.kotlin.redis
 
 import io.vertx.redis.RedisOptions
+import io.vertx.core.net.JdkSSLEngineOptions
+import io.vertx.core.net.JksOptions
+import io.vertx.core.net.OpenSSLEngineOptions
+import io.vertx.core.net.PemKeyCertOptions
+import io.vertx.core.net.PemTrustOptions
+import io.vertx.core.net.PfxOptions
+import io.vertx.core.net.ProxyOptions
 
 /**
  * A function providing a DSL for building [io.vertx.redis.RedisOptions] objects.
@@ -25,47 +32,47 @@ import io.vertx.redis.RedisOptions
  * will perform the authentication handshake and database selection, however if you don't do this and call [io.vertx.redis.RedisClient]
  * yourself in case of connection failure the client will not be able to perform the correct authentication handshake.
  *
- * @param address  Set the eventbus address prefix for `PUB/SUB`.
+ * @param address  Set the eventbus address prefix for `PUB/SUB`. * @param address address prefix.
  * @param auth  Set the password for authentication at connection time.
- * @param binary  Set the user defined character encoding, e.g.: `iso-8859-1`.
- * @param connectTimeout
- * @param crlPaths
- * @param crlValues
- * @param enabledCipherSuites
- * @param enabledSecureTransportProtocols
- * @param encoding  Set the user defined character encoding, e.g.: `iso-8859-1`.
- * @param host  Set the host name where the Redis server is listening.
- * @param hostnameVerificationAlgorithm
- * @param idleTimeout
- * @param jdkSslEngineOptions
- * @param keyStoreOptions
- * @param localAddress
- * @param logActivity
+ * @param binary  Set the user defined character encoding, e.g.: `iso-8859-1`. * @param binary use binary messages
+ * @param connectTimeout 
+ * @param crlPaths 
+ * @param crlValues 
+ * @param enabledCipherSuites 
+ * @param enabledSecureTransportProtocols 
+ * @param encoding  Set the user defined character encoding, e.g.: `iso-8859-1`. * @param encoding the user character encoding
+ * @param host  Set the host name where the Redis server is listening. * @param host host name
+ * @param hostnameVerificationAlgorithm 
+ * @param idleTimeout 
+ * @param jdkSslEngineOptions 
+ * @param keyStoreOptions 
+ * @param localAddress 
+ * @param logActivity 
  * @param masterName  Set name of Redis master (used with Sentinel).
- * @param metricsName
- * @param openSslEngineOptions
- * @param pemKeyCertOptions
- * @param pemTrustOptions
- * @param pfxKeyCertOptions
- * @param pfxTrustOptions
+ * @param metricsName 
+ * @param openSslEngineOptions 
+ * @param pemKeyCertOptions 
+ * @param pemTrustOptions 
+ * @param pfxKeyCertOptions 
+ * @param pfxTrustOptions 
  * @param port  Set the tcp port where the Redis server is listening.
- * @param proxyOptions
- * @param receiveBufferSize
- * @param reconnectAttempts
- * @param reconnectInterval
- * @param reuseAddress
- * @param select  Set the database to select at connection time.
- * @param sendBufferSize
+ * @param proxyOptions 
+ * @param receiveBufferSize 
+ * @param reconnectAttempts 
+ * @param reconnectInterval 
+ * @param reuseAddress 
+ * @param select  Set the database to select at connection time. * @param select database id
+ * @param sendBufferSize 
  * @param sentinels  Set the list of Sentinels.
- * @param soLinger
- * @param ssl
- * @param tcpKeepAlive
- * @param tcpNoDelay
- * @param trafficClass
- * @param trustAll
- * @param trustStoreOptions
- * @param useAlpn
- * @param usePooledBuffers
+ * @param soLinger 
+ * @param ssl 
+ * @param tcpKeepAlive 
+ * @param tcpNoDelay 
+ * @param trafficClass 
+ * @param trustAll 
+ * @param trustStoreOptions 
+ * @param useAlpn 
+ * @param usePooledBuffers 
  *
  * <p/>
  * NOTE: This function has been automatically generated from the [io.vertx.redis.RedisOptions original] using Vert.x codegen.
