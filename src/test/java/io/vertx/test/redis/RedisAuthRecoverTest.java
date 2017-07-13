@@ -14,9 +14,9 @@ public class RedisAuthRecoverTest extends AbstractRedisClientBase {
     server.start();
 
     RedisOptions job = new RedisOptions()
-        .setHost("localhost")
-        .setPort(6381)
-        .setAuth("foobar");
+      .setHost("localhost")
+      .setPort(6381)
+      .setAuth("foobar");
 
     RedisClient rdx = RedisClient.create(vertx, job);
 
@@ -30,7 +30,8 @@ public class RedisAuthRecoverTest extends AbstractRedisClientBase {
 
         try {
           server.stop();
-        } catch (Exception ignore) {}
+        } catch (Exception ignore) {
+        }
 
         testComplete();
       });
@@ -46,9 +47,9 @@ public class RedisAuthRecoverTest extends AbstractRedisClientBase {
     server.start();
 
     RedisOptions job = new RedisOptions()
-        .setHost("localhost")
-        .setPort(6381)
-        .setAuth("foobar");
+      .setHost("localhost")
+      .setPort(6381)
+      .setAuth("foobar");
 
     RedisClient rdx = RedisClient.create(vertx, job);
 

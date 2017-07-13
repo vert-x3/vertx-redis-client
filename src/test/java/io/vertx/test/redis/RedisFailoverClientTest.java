@@ -12,41 +12,41 @@ import java.util.concurrent.CountDownLatch;
  */
 public class RedisFailoverClientTest extends RedisFailoverClientTestBase {
 
-    @Override
-    public void setUp() throws Exception {
-        super.setUp();
+  @Override
+  public void setUp() throws Exception {
+    super.setUp();
 
-        host = InetAddress.getLocalHost().getHostAddress();
-        RedisOptions ro = new RedisOptions();
-        for (int i = 0; i < 3; i++) {
-            ro.addSentinel(String.format("%s:%d", host, DEFAULT_SENTINEL_PORT + i));
-        }
-        ro.setMasterName("mymaster");
-        redis = RedisClient.create(vertx, ro);
-
-        // sleeping for 1 second for client to refresh once.
-        Thread.sleep(1000L);
+    host = InetAddress.getLocalHost().getHostAddress();
+    RedisOptions ro = new RedisOptions();
+    for (int i = 0; i < 3; i++) {
+      ro.addSentinel(String.format("%s:%d", host, DEFAULT_SENTINEL_PORT + i));
     }
+    ro.setMasterName("mymaster");
+    redis = RedisClient.create(vertx, ro);
 
-    @Test
-    public void testInfo() {
-        redis.info(reply0 -> {
-            assertTrue(reply0.succeeded());
-            assertNotNull(reply0.result());
-            testComplete();
-        });
-        await();
-    }
+    // sleeping for 1 second for client to refresh once.
+    Thread.sleep(1000L);
+  }
 
-    @Override
-    public void tearDown() throws Exception {
-        // close the failover client
-        CountDownLatch latch = new CountDownLatch(1);
-        redis.close(asyncResult -> {
-            latch.countDown();
-        });
+  @Test
+  public void testInfo() {
+    redis.info(reply0 -> {
+      assertTrue(reply0.succeeded());
+      assertNotNull(reply0.result());
+      testComplete();
+    });
+    await();
+  }
 
-        awaitLatch(latch);
-        super.tearDown();
-    }
+  @Override
+  public void tearDown() throws Exception {
+    // close the failover client
+    CountDownLatch latch = new CountDownLatch(1);
+    redis.close(asyncResult -> {
+      latch.countDown();
+    });
+
+    awaitLatch(latch);
+    super.tearDown();
+  }
 }

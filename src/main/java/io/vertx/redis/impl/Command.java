@@ -1,17 +1,17 @@
 /**
  * Copyright 2015 Red Hat, Inc.
- *
- *  All rights reserved. This program and the accompanying materials
- *  are made available under the terms of the Eclipse Public License v1.0
- *  and Apache License v2.0 which accompanies this distribution.
- *
- *  The Eclipse Public License is available at
- *  http://www.eclipse.org/legal/epl-v10.html
- *
- *  The Apache License v2.0 is available at
- *  http://www.opensource.org/licenses/apache2.0.php
- *
- *  You may elect to redistribute this code under either of these licenses.
+ * <p>
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * and Apache License v2.0 which accompanies this distribution.
+ * <p>
+ * The Eclipse Public License is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ * <p>
+ * The Apache License v2.0 is available at
+ * http://www.opensource.org/licenses/apache2.0.php
+ * <p>
+ * You may elect to redistribute this code under either of these licenses.
  */
 package io.vertx.redis.impl;
 
@@ -44,42 +44,11 @@ public class Command<T> {
     }
   }
 
-  // Optimized for the direct to ASCII bytes case
-  // About 5x faster than using Long.toString.getBytes
-  private static byte[] numToBytes(long value) {
-    if (value >= 0 && value < NUM_MAP_LENGTH) {
-      int index = (int) value;
-      return numMap[index];
-    } else if (value == -1) {
-      return NEG_ONE;
-    }
-    return convert(value);
-  }
-
-  private static byte[] convert(long value) {
-    boolean negative = value < 0;
-    // Checked javadoc: If the argument is equal to 10^n for integer n, then the result is n.
-    // Also, if negative, leave another slot for the sign.
-    long abs = Math.abs(value);
-    int index = (value == 0 ? 0 : (int) Math.log10(abs)) + (negative ? 2 : 1);
-    byte[] bytes = new byte[index];
-    // Put the sign in the slot we saved
-    if (negative) bytes[0] = '-';
-    long next = abs;
-    while ((next /= 10) > 0) {
-      bytes[--index] = (byte) ('0' + (abs % 10));
-      abs = next;
-    }
-    bytes[--index] = (byte) ('0' + abs);
-    return bytes;
-  }
-
   private final Context context;
   private final Buffer buffer;
   private final ResponseTransform transform;
   private final String encoding;
   private final Class<T> returnType;
-
   private int expectedReplies = 1;
   private Handler<AsyncResult<T>> handler;
 
@@ -116,22 +85,52 @@ public class Command<T> {
     }
   }
 
-  // setters
-
-  public Command<T> setExpectedReplies(int expectedReplies) {
-    this.expectedReplies = expectedReplies;
-    return this;
+  // Optimized for the direct to ASCII bytes case
+  // About 5x faster than using Long.toString.getBytes
+  private static byte[] numToBytes(long value) {
+    if (value >= 0 && value < NUM_MAP_LENGTH) {
+      int index = (int) value;
+      return numMap[index];
+    } else if (value == -1) {
+      return NEG_ONE;
+    }
+    return convert(value);
   }
+
+  private static byte[] convert(long value) {
+    boolean negative = value < 0;
+    // Checked javadoc: If the argument is equal to 10^n for integer n, then the result is n.
+    // Also, if negative, leave another slot for the sign.
+    long abs = Math.abs(value);
+    int index = (value == 0 ? 0 : (int) Math.log10(abs)) + (negative ? 2 : 1);
+    byte[] bytes = new byte[index];
+    // Put the sign in the slot we saved
+    if (negative) bytes[0] = '-';
+    long next = abs;
+    while ((next /= 10) > 0) {
+      bytes[--index] = (byte) ('0' + (abs % 10));
+      abs = next;
+    }
+    bytes[--index] = (byte) ('0' + abs);
+    return bytes;
+  }
+
+  // setters
 
   public Command<T> handler(Handler<AsyncResult<T>> handler) {
     this.handler = handler;
     return this;
   }
 
-  // getters
-
   public int getExpectedReplies() {
     return expectedReplies;
+  }
+
+  // getters
+
+  public Command<T> setExpectedReplies(int expectedReplies) {
+    this.expectedReplies = expectedReplies;
+    return this;
   }
 
   public ResponseTransform responseTransform() {

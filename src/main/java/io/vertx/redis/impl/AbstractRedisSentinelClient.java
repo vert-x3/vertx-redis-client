@@ -1,61 +1,22 @@
 package io.vertx.redis.impl;
 
 import io.vertx.core.AsyncResult;
-import io.vertx.core.Future;
 import io.vertx.core.Handler;
 import io.vertx.core.Vertx;
-import io.vertx.core.eventbus.EventBus;
-import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;
 import io.vertx.redis.RedisOptions;
 import io.vertx.redis.sentinel.RedisSentinel;
 import io.vertx.redis.sentinel.RedisSentinelCommand;
 
-import java.nio.charset.Charset;
 import java.util.List;
-import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * Abstract Redis Sentinel Client.
  */
-public abstract class AbstractRedisSentinelClient implements RedisSentinel {
-  private final EventBus eb;
-  private final RedisSubscriptions subscriptions;
-  private final String encoding;
-  private final Charset charset;
-  private final Charset binaryCharset;
-  private final String baseAddress;
+public abstract class AbstractRedisSentinelClient extends BaseRedisClient<RedisSentinelCommand> implements RedisSentinel {
 
-  // we need 2 connections for redis sentinel, one for normal commands and a second in case we do pub/sub
-  private final RedisConnection redis;
-  private final RedisConnection pubsub;
-
-  public AbstractRedisSentinelClient(Vertx vertx, RedisOptions config) {
-    this.eb = vertx.eventBus();
-    this.encoding = config.getEncoding();
-    this.charset = Charset.forName(encoding);
-    this.binaryCharset = Charset.forName("iso-8859-1");
-    this.baseAddress = config.getAddress();
-
-    subscriptions = new RedisSubscriptions(vertx);
-
-    redis = new RedisConnection(vertx, config, null);
-    pubsub = new RedisConnection(vertx, config, subscriptions);
-  }
-
-  @Override
-  public synchronized void close(Handler<AsyncResult<Void>> handler) {
-    // this is a special case it should sent the message QUIT and then close the sockets
-    final AtomicInteger cnt = new AtomicInteger(0);
-
-    final Handler<AsyncResult<Void>> cb = v -> {
-      if (cnt.incrementAndGet() == 2) {
-        handler.handle(Future.succeededFuture());
-      }
-    };
-
-    redis.disconnect(cb);
-    pubsub.disconnect(cb);
+  AbstractRedisSentinelClient(Vertx vertx, RedisOptions config) {
+    super(vertx, config);
   }
 
   private ResponseTransform getResponseTransformFor(RedisSentinelCommand command) {
@@ -66,31 +27,10 @@ public abstract class AbstractRedisSentinelClient implements RedisSentinel {
     return ResponseTransform.NONE;
   }
 
-  final void sendJsonArray(final RedisSentinelCommand command, final List<?> args, final Handler<AsyncResult<JsonArray>> resultHandler) {
-    sendSentinel(command, args, JsonArray.class, resultHandler);
-  }
-
-  final void sendJsonObject(final RedisSentinelCommand command, final List<?> args, final Handler<AsyncResult<JsonObject>> resultHandler) {
-    sendSentinel(command, args, JsonObject.class, resultHandler);
-  }
-
-  final void sendVoid(final RedisSentinelCommand command, final List<?> args, final Handler<AsyncResult<Void>> resultHandler) {
-    sendSentinel(command, args, Void.class, resultHandler);
-  }
-
-  final void sendString(final RedisSentinelCommand command, final List<?> args, final Handler<AsyncResult<String>> resultHandler) {
-    sendSentinel(command, args, String.class, resultHandler);
-  }
-
-  final <T> void sendSentinel(final RedisSentinelCommand command, final List<?> redisArgs,
-                              final Class<T> returnType,
-                              final Handler<AsyncResult<T>> resultHandler) {
-    sendSentinel(command, redisArgs, returnType, false, resultHandler);
-  }
-
-  final <T> void sendSentinel(final RedisSentinelCommand command, final List<?> redisArgs, final Class<T> returnType,
-                              final boolean binary,
-                              final Handler<AsyncResult<T>> resultHandler) {
+  @Override
+  final <T> void send(final RedisSentinelCommand command, final List<?> redisArgs, final Class<T> returnType,
+                      final boolean binary,
+                      final Handler<AsyncResult<T>> resultHandler) {
 
     final Command<T> cmd = new Command<>(Vertx.currentContext(), command, redisArgs,
       binary ? binaryCharset : charset, getResponseTransformFor(command), returnType).handler(resultHandler);

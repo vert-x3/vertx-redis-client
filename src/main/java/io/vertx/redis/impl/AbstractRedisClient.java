@@ -1,70 +1,33 @@
 /**
  * Copyright 2015 Red Hat, Inc.
- *
- *  All rights reserved. This program and the accompanying materials
- *  are made available under the terms of the Eclipse Public License v1.0
- *  and Apache License v2.0 which accompanies this distribution.
- *
- *  The Eclipse Public License is available at
- *  http://www.eclipse.org/legal/epl-v10.html
- *
- *  The Apache License v2.0 is available at
- *  http://www.opensource.org/licenses/apache2.0.php
- *
- *  You may elect to redistribute this code under either of these licenses.
+ * <p>
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * and Apache License v2.0 which accompanies this distribution.
+ * <p>
+ * The Eclipse Public License is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ * <p>
+ * The Apache License v2.0 is available at
+ * http://www.opensource.org/licenses/apache2.0.php
+ * <p>
+ * You may elect to redistribute this code under either of these licenses.
  */
 package io.vertx.redis.impl;
 
-import io.vertx.core.*;
-import io.vertx.core.eventbus.EventBus;
-import io.vertx.core.json.JsonArray;
+import io.vertx.core.AsyncResult;
+import io.vertx.core.Handler;
+import io.vertx.core.Vertx;
 import io.vertx.core.json.JsonObject;
 import io.vertx.redis.RedisClient;
 import io.vertx.redis.RedisOptions;
 
-import java.nio.charset.Charset;
 import java.util.List;
-import java.util.concurrent.atomic.AtomicInteger;
 
-public abstract class AbstractRedisClient implements RedisClient {
-
-  private final EventBus eb;
-  private final RedisSubscriptions subscriptions;
-  private final String encoding;
-  private final Charset charset;
-  private final Charset binaryCharset;
-  private final String baseAddress;
-
-  // we need 2 connections, one for normal commands and a second in case we do pub/sub
-  private final RedisConnection redis;
-  private final RedisConnection pubsub;
+public abstract class AbstractRedisClient extends BaseRedisClient<RedisCommand> implements RedisClient {
 
   AbstractRedisClient(Vertx vertx, RedisOptions config) {
-    this.eb = vertx.eventBus();
-    this.encoding = config.getEncoding();
-    this.charset = Charset.forName(encoding);
-    this.binaryCharset = Charset.forName("iso-8859-1");
-    this.baseAddress = config.getAddress();
-
-    subscriptions = new RedisSubscriptions(vertx);
-
-    redis = new RedisConnection(vertx, config, null);
-    pubsub = new RedisConnection(vertx, config, subscriptions);
-  }
-
-  @Override
-  public synchronized void close(Handler<AsyncResult<Void>> handler) {
-    // this is a special case it should sent the message QUIT and then close the sockets
-    final AtomicInteger cnt = new AtomicInteger(0);
-
-    final Handler<AsyncResult<Void>> cb = v -> {
-      if (cnt.incrementAndGet() == 2) {
-        handler.handle(Future.succeededFuture());
-      }
-    };
-
-    redis.disconnect(cb);
-    pubsub.disconnect(cb);
+    super(vertx, config);
   }
 
   private ResponseTransform getResponseTransformFor(RedisCommand command) {
@@ -82,26 +45,7 @@ public abstract class AbstractRedisClient implements RedisClient {
     return ResponseTransform.NONE;
   }
 
-  final void sendString(final RedisCommand command, final List<?> args, final Handler<AsyncResult<String>> resultHandler) {
-    send(command, args, String.class, false, resultHandler);
-  }
-
-  final void sendLong(final RedisCommand command, final List<?> args, final Handler<AsyncResult<Long>> resultHandler) {
-    send(command, args, Long.class, false, resultHandler);
-  }
-
-  final void sendVoid(final RedisCommand command, final List<?> args, final Handler<AsyncResult<Void>> resultHandler) {
-    send(command, args, Void.class, false, resultHandler);
-  }
-
-  final void sendJsonArray(final RedisCommand command, final List<?> args, final Handler<AsyncResult<JsonArray>> resultHandler) {
-    send(command, args, JsonArray.class, false, resultHandler);
-  }
-
-  final void sendJsonObject(final RedisCommand command, final List<?> args, final Handler<AsyncResult<JsonObject>> resultHandler) {
-    send(command, args, JsonObject.class, false, resultHandler);
-  }
-
+  @Override
   final <T> void send(final RedisCommand command, final List<?> redisArgs, final Class<T> returnType,
                       final boolean binary,
                       final Handler<AsyncResult<T>> resultHandler) {

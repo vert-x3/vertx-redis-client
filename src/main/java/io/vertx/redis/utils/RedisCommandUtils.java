@@ -13,17 +13,17 @@ import java.util.stream.Stream;
 public class RedisCommandUtils {
   /**
    * A helper method to package method parameters into JsonArray payload.
-   *
+   * <p>
    * Null parameters are ignored.
    *
    * @param parameters Call parameters
    * @return JsonArray that can be passed to send()
    */
   @SuppressWarnings("unchecked")
-  public static List<?> toPayload(Object ... parameters) {
+  public static List<?> toPayload(Object... parameters) {
     List<Object> result = new ArrayList<>(parameters.length);
 
-    for (Object param: parameters) {
+    for (Object param : parameters) {
       // unwrap
       if (param instanceof JsonArray) {
         param = ((JsonArray) param).getList();

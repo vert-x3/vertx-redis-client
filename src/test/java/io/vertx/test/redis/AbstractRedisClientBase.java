@@ -1,44 +1,38 @@
 /**
  * Copyright 2015 Red Hat, Inc.
- *
- *  All rights reserved. This program and the accompanying materials
- *  are made available under the terms of the Eclipse Public License v1.0
- *  and Apache License v2.0 which accompanies this distribution.
- *
- *  The Eclipse Public License is available at
- *  http://www.eclipse.org/legal/epl-v10.html
- *
- *  The Apache License v2.0 is available at
- *  http://www.opensource.org/licenses/apache2.0.php
- *
- *  You may elect to redistribute this code under either of these licenses.
+ * <p>
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * and Apache License v2.0 which accompanies this distribution.
+ * <p>
+ * The Eclipse Public License is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ * <p>
+ * The Apache License v2.0 is available at
+ * http://www.opensource.org/licenses/apache2.0.php
+ * <p>
+ * You may elect to redistribute this code under either of these licenses.
  */
 package io.vertx.test.redis;
 
-import io.vertx.core.json.JsonArray;
-import io.vertx.core.json.JsonObject;
 import io.vertx.redis.RedisClient;
 import io.vertx.redis.RedisOptions;
-import io.vertx.redis.op.*;
 import io.vertx.test.core.VertxTestBase;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
-import org.junit.Ignore;
-import org.junit.Test;
-import org.junit.experimental.categories.Category;
 import redis.embedded.RedisServer;
 
-import java.nio.charset.Charset;
-import java.util.*;
+import java.util.Map;
+import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CountDownLatch;
-import java.util.concurrent.TimeUnit;
 
 public abstract class AbstractRedisClientBase extends VertxTestBase {
 
   private static final Integer DEFAULT_PORT = 6379;
 
   private static final Map<Integer, RedisServer> instances = new ConcurrentHashMap<>();
+  protected RedisClient redis;
 
   private static String getHost() {
     return getProperty("host");
@@ -50,10 +44,8 @@ public abstract class AbstractRedisClientBase extends VertxTestBase {
 
   private static String getProperty(String name) {
     String s = System.getProperty(name);
-    return (s != null && s.trim().length() > 0) ?  s : null;
+    return (s != null && s.trim().length() > 0) ? s : null;
   }
-
-  protected RedisClient redis;
 
   @BeforeClass
   static public void startRedis() throws Exception {
@@ -68,11 +60,32 @@ public abstract class AbstractRedisClientBase extends VertxTestBase {
 
   @AfterClass
   static public void stopRedis() throws Exception {
-    for(Map.Entry<Integer, RedisServer> entry: instances.entrySet()) {
-      if(entry != null){
+    for (Map.Entry<Integer, RedisServer> entry : instances.entrySet()) {
+      if (entry != null) {
         entry.getValue().stop();
       }
     }
+  }
+
+  public static void createRedisCount(final int count) throws Exception {
+    Integer[] ports = new Integer[count];
+    Integer basePort = DEFAULT_PORT;
+    for (int i = 0; i < count; i++) {
+      ports[i] = basePort++;
+    }
+    createRedisInstance(ports);
+  }
+
+  public static void createRedisInstance(final Integer... ports) throws Exception {
+    for (Integer port : ports) {
+      System.out.println("Creating redis server on port: " + port);
+      instances.put(port, new RedisServer(port));
+      System.out.println("Created embedded redis server on port " + port);
+    }
+  }
+
+  protected static String makeKey() {
+    return UUID.randomUUID().toString();
   }
 
   @Override
@@ -95,23 +108,6 @@ public abstract class AbstractRedisClientBase extends VertxTestBase {
     super.tearDown();
   }
 
-  public static void createRedisCount(final int count) throws Exception {
-    Integer[] ports = new Integer[count];
-    Integer basePort = DEFAULT_PORT;
-    for(int i = 0; i < count; i++) {
-      ports[i] = basePort++;
-    }
-    createRedisInstance(ports);
-  }
-
-  public static void createRedisInstance(final Integer... ports) throws Exception {
-    for(Integer port: ports) {
-      System.out.println("Creating redis server on port: " + port);
-      instances.put(port, new RedisServer(port));
-      System.out.println("Created embedded redis server on port " + port);
-    }
-  }
-
   protected RedisOptions getConfig() {
     String host = getHost();
     String port = getPort();
@@ -127,10 +123,6 @@ public abstract class AbstractRedisClientBase extends VertxTestBase {
     }
 
     return config;
-  }
-
-  protected static String makeKey() {
-    return UUID.randomUUID().toString();
   }
 
 }

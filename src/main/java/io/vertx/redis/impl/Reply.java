@@ -1,17 +1,17 @@
 /**
  * Copyright 2015 Red Hat, Inc.
- *
- *  All rights reserved. This program and the accompanying materials
- *  are made available under the terms of the Eclipse Public License v1.0
- *  and Apache License v2.0 which accompanies this distribution.
- *
- *  The Eclipse Public License is available at
- *  http://www.eclipse.org/legal/epl-v10.html
- *
- *  The Apache License v2.0 is available at
- *  http://www.opensource.org/licenses/apache2.0.php
- *
- *  You may elect to redistribute this code under either of these licenses.
+ * <p>
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * and Apache License v2.0 which accompanies this distribution.
+ * <p>
+ * The Eclipse Public License is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ * <p>
+ * The Apache License v2.0 is available at
+ * http://www.opensource.org/licenses/apache2.0.php
+ * <p>
+ * You may elect to redistribute this code under either of these licenses.
  */
 package io.vertx.redis.impl;
 
@@ -94,7 +94,7 @@ public final class Reply {
       for (Reply r : (Reply[]) data) {
         Object elem;
         switch (r.type()) {
-          case '+':  
+          case '+':
           case '$':   // Bulk
             elem = r.asType(String.class, encoding);
             break;
@@ -133,13 +133,13 @@ public final class Reply {
 
         switch (brValue.type()) {
           case '$':   // Bulk
-            multi.put((k == null ? "k" + (i/2) : k), brValue.asType(String.class, encoding));
+            multi.put((k == null ? "k" + (i / 2) : k), brValue.asType(String.class, encoding));
             break;
           case ':':   // Integer
-            multi.put((k == null ? "k" + (i/2) : k), brValue.asType(Long.class, encoding));
+            multi.put((k == null ? "k" + (i / 2) : k), brValue.asType(Long.class, encoding));
             break;
           case '*':   // Multi
-            multi.put((k == null ? "k" + (i/2) : k), brValue.asType(JsonArray.class, encoding));
+            multi.put((k == null ? "k" + (i / 2) : k), brValue.asType(JsonArray.class, encoding));
             break;
           default:
             throw new RuntimeException("Unknown sub message type in multi: " + ((Reply[]) data)[i + 1].type());

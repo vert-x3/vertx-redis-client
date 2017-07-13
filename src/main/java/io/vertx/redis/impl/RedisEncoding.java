@@ -1,17 +1,17 @@
 /**
  * Copyright 2015 Red Hat, Inc.
- *
- *  All rights reserved. This program and the accompanying materials
- *  are made available under the terms of the Eclipse Public License v1.0
- *  and Apache License v2.0 which accompanies this distribution.
- *
- *  The Eclipse Public License is available at
- *  http://www.eclipse.org/legal/epl-v10.html
- *
- *  The Apache License v2.0 is available at
- *  http://www.opensource.org/licenses/apache2.0.php
- *
- *  You may elect to redistribute this code under either of these licenses.
+ * <p>
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * and Apache License v2.0 which accompanies this distribution.
+ * <p>
+ * The Eclipse Public License is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ * <p>
+ * The Apache License v2.0 is available at
+ * http://www.opensource.org/licenses/apache2.0.php
+ * <p>
+ * You may elect to redistribute this code under either of these licenses.
  */
 package io.vertx.redis.impl;
 
@@ -46,7 +46,7 @@ public class RedisEncoding {
   public static String encode(String value) {
     StringBuilder sb = new StringBuilder();
     int len = value.length();
-    for (int i=0; i < len; i++) {
+    for (int i = 0; i < len; i++) {
       char c = value.charAt(i);
       int lo = 0xFF & c;
       if (lo >= 32 && lo < 127) {
@@ -92,7 +92,7 @@ public class RedisEncoding {
     int decoding = -1;
     int d = 0;
 
-    for (int i=0; i < len; i++) {
+    for (int i = 0; i < len; i++) {
       char c = value.charAt(i);
 
       if (decoding > -1) {
@@ -129,14 +129,14 @@ public class RedisEncoding {
         }
 
         int val = c >= 48 && c < 58 ? (c - 48)
-            : c >= 65 && c < 71 ? (10 + c - 65)
-            : c >= 97 && c < 103 ? (10 + c - 97)
-            : -1;
+          : c >= 65 && c < 71 ? (10 + c - 65)
+          : c >= 97 && c < 103 ? (10 + c - 97)
+          : -1;
         if (val == -1) {
-          throw new RuntimeException("Invalid escape sequence: " + value.substring(decoding, i+1) + " at pos: " + i);
+          throw new RuntimeException("Invalid escape sequence: " + value.substring(decoding, i + 1) + " at pos: " + i);
         }
 
-        d += df == 2 ? 16*val : val;
+        d += df == 2 ? 16 * val : val;
 
         if (df == 3) {
           sb.append((char) d);
@@ -144,7 +144,7 @@ public class RedisEncoding {
           d = 0;
         }
       } else if (c == '\\') {
-          decoding = i;
+        decoding = i;
       } else {
         sb.append(c);
       }
