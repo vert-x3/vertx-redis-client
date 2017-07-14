@@ -5,6 +5,7 @@ import io.vertx.core.json.JsonObject;
 import io.vertx.redis.RedisClient;
 import io.vertx.redis.RedisOptions;
 import io.vertx.redis.RedisTransaction;
+import io.vertx.redis.Script;
 
 /**
  * These are the examples used in the documentation.
@@ -74,6 +75,17 @@ public class Examples {
           });
         }
       });
+    });
+  }
+
+  public void example6() {
+    RedisClient client = RedisClient.create(Vertx.vertx(), new RedisOptions().setAddress("127.0.0.1").setPort(6379));
+    client.evalScript(Script.create("return 42"), null, null, res -> {
+      if (res.succeeded()) {
+        System.out.println(res.result().getInteger(0));
+      } else {
+        System.err.println(res.cause());
+      }
     });
   }
 }

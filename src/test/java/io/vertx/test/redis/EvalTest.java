@@ -15,6 +15,7 @@
  */
 package io.vertx.test.redis;
 
+import io.vertx.redis.Script;
 import org.junit.Test;
 
 import java.util.Arrays;
@@ -73,6 +74,21 @@ public class EvalTest extends AbstractRedisClientBase {
         redis.evalsha("6b1bf486c81ceb7edf3c093f4c48582e38c0e791", null, null, res2 -> {
           assertTrue(res1.succeeded());
           // expect "bar"
+          testComplete();
+        });
+      });
+    });
+    await();
+  }
+
+  @Test
+  public void test6() {
+    redis.scriptFlush(res -> {
+      assertTrue(res.succeeded());
+      redis.evalScript(Script.create("return 1"), null, null, res1 -> {
+        assertTrue(res1.succeeded());
+        redis.evalScript(Script.create("return 1"), null, null, res2 -> {
+          assertTrue(res2.succeeded());
           testComplete();
         });
       });
