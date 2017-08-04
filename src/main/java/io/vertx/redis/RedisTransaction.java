@@ -813,7 +813,7 @@ public interface RedisTransaction {
    * group: string
    */
   @Fluent
-  RedisTransaction getBinary(String key, Handler<AsyncResult<String>> handler);
+  RedisTransaction getBinary(String key, Handler<AsyncResult<Buffer>> handler);
 
   /**
    * Returns the bit value at offset in the string value stored at key
