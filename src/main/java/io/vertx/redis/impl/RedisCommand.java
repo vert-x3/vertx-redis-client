@@ -215,7 +215,9 @@ public enum RedisCommand implements AbstractCommand {
   CLIENT_REPLY("CLIENT REPLY"),
   HSTRLEN("HSTRLEN"),
   SCRIPT_DEBUG("SCRIPT DEBUG"),
-  TOUCH("TOUCH");
+  TOUCH("TOUCH"),
+  UNLINK("UNLINK"),
+  SWAPDB("SWAPDB");
 
   private final String[] tokens;
 

@@ -2772,4 +2772,37 @@ public interface RedisTransaction {
    */
   @Fluent
   RedisTransaction georadiusbymemberWithOptions(String key, String member, double radius, GeoUnit unit, GeoRadiusOptions options, Handler<AsyncResult<String>> handler);
+
+  /**
+   * Delete a key asynchronously in another thread. Otherwise it is just as DEL, but non blocking.
+   *
+   * @param key Key string
+   * @since Redis 4.0.0
+   * group: generic
+   */
+  @Fluent
+  RedisTransaction unlink(String key, Handler<AsyncResult<String>> handler);
+
+  /**
+   * Delete multiple keys asynchronously in another thread. Otherwise it is just as DEL, but non blocking.
+   *
+   * @param keys    List of keys to delete
+   * @param handler Handler for the result of this call.
+   * @since Redis 4.0.0
+   * group: generic
+   */
+  @Fluent
+  RedisTransaction unlinkMany(List<String> keys, Handler<AsyncResult<String>> handler);
+
+  /**
+   * Swaps two Redis databases
+   *
+   * @param index1  index of first database to swap
+   * @param index2  index of second database to swap
+   * @param handler Handler for the result of this call.
+   * @since Redis 4.0.0
+   * group: connection
+   */
+  @Fluent
+  RedisTransaction swapdb(int index1, int index2, Handler<AsyncResult<String>> handler);
 }

@@ -1532,6 +1532,24 @@ public final class RedisClientImpl extends AbstractRedisClient {
     return this;
   }
 
+  @Override
+  public RedisClient unlink(String key, Handler<AsyncResult<Long>> handler) {
+    sendLong(UNLINK, toPayload(key), handler);
+    return this;
+  }
+
+  @Override
+  public RedisClient unlinkMany(List<String> keys, Handler<AsyncResult<Long>> handler) {
+    sendLong(UNLINK, toPayload(keys), handler);
+    return this;
+  }
+
+  @Override
+  public RedisClient swapdb(int index1, int index2, Handler<AsyncResult<String>> handler) {
+    sendString(SWAPDB, toPayload(index1, index2), handler);
+    return this;
+  }
+
   public class RedisTransactionImpl implements RedisTransaction {
 
     @Override
@@ -2954,6 +2972,24 @@ public final class RedisClientImpl extends AbstractRedisClient {
     @Override
     public RedisTransaction georadiusbymemberWithOptions(String key, String member, double radius, GeoUnit unit, GeoRadiusOptions options, Handler<AsyncResult<String>> handler) {
       sendString(GEORADIUSBYMEMBER, toPayload(key, member, radius, unit, options != null ? options.toJsonArray() : null), handler);
+      return this;
+    }
+
+    @Override
+    public RedisTransaction unlink(String key, Handler<AsyncResult<String>> handler) {
+      sendString(UNLINK, toPayload(key), handler);
+      return this;
+    }
+
+    @Override
+    public RedisTransaction unlinkMany(List<String> keys, Handler<AsyncResult<String>> handler) {
+      sendString(UNLINK, toPayload(keys), handler);
+      return this;
+    }
+
+    @Override
+    public RedisTransaction swapdb(int index1, int index2, Handler<AsyncResult<String>> handler) {
+      sendString(SWAPDB, toPayload(index1, index2), handler);
       return this;
     }
   }
