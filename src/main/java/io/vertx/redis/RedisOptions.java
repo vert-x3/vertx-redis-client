@@ -132,7 +132,7 @@ public class RedisOptions extends NetClientOptions {
    */
   public RedisOptions setEncoding(String encoding) {
     this.encoding = encoding;
-    // special case here the binary andencodingare corelated so they need to be verified after set
+    // special case here: the binary and encoding are correlated so they need to be verified after set
     postInit();
     return this;
   }
@@ -146,14 +146,14 @@ public class RedisOptions extends NetClientOptions {
   }
 
   /**
-   * Set the user defined character encoding, e.g.: `iso-8859-1`.
+   * Set the messages to/from redis as binary, default `false`.
    * * @param binary use binary messages
    *
    * @return self
    */
   public RedisOptions setBinary(boolean binary) {
     this.binary = binary;
-    // special case here the binary andencodingare corelated so they need to be verified after set
+    // special case here the binary and encoding are correlated so they need to be verified after set
     postInit();
     return this;
   }
