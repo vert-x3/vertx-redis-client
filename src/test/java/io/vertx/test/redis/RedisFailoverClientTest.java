@@ -42,9 +42,7 @@ public class RedisFailoverClientTest extends RedisFailoverClientTestBase {
   public void tearDown() throws Exception {
     // close the failover client
     CountDownLatch latch = new CountDownLatch(1);
-    redis.close(asyncResult -> {
-      latch.countDown();
-    });
+    redis.close(asyncResult -> latch.countDown());
 
     awaitLatch(latch);
     super.tearDown();

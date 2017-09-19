@@ -66,16 +66,14 @@ public class Examples {
   public void example5() {
     RedisClient client = RedisClient.create(Vertx.vertx(), new RedisOptions().setAddress("127.0.0.1").setPort(6379));
     RedisTransaction transaction = client.transaction();
-    transaction.multi(event -> {
-      transaction.hgetall("mykey", getAllEvent -> {
-        if (getAllEvent.succeeded() && "QUEUED".equals(getAllEvent.result())) {
-          transaction.exec(execEvent -> System.out.println(execEvent.result()));
-        } else {
-          transaction.discard(discardEvent -> {
-          });
-        }
-      });
-    });
+    transaction.multi(event -> transaction.hgetall("mykey", getAllEvent -> {
+      if (getAllEvent.succeeded() && "QUEUED".equals(getAllEvent.result())) {
+        transaction.exec(execEvent -> System.out.println(execEvent.result()));
+      } else {
+        transaction.discard(discardEvent -> {
+        });
+      }
+    }));
   }
 
   public void example6() {

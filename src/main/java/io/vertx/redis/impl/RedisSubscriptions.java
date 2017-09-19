@@ -102,9 +102,7 @@ public class RedisSubscriptions {
     }
 
     void handle(String channelOrPattern, Reply[] replyData) {
-      context.runOnContext(v -> {
-        handler.handle(channelOrPattern, replyData);
-      });
+      context.runOnContext(v -> handler.handle(channelOrPattern, replyData));
     }
   }
 }

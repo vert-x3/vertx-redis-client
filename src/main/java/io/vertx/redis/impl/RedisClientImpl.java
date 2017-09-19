@@ -65,7 +65,7 @@ public final class RedisClientImpl extends AbstractRedisClient {
       }
 
       if (param instanceof Collection) {
-        ((Collection) param).stream().filter(el -> el != null).forEach(result::add);
+        ((Collection) param).stream().filter(Objects::nonNull).forEach(result::add);
       } else if (param instanceof Map) {
         for (Map.Entry<?, ?> pair : ((Map<?, ?>) param).entrySet()) {
           result.add(pair.getKey());
@@ -74,9 +74,7 @@ public final class RedisClientImpl extends AbstractRedisClient {
       } else if (param instanceof Stream) {
         ((Stream) param).forEach(e -> {
           if (e instanceof Object[]) {
-            for (Object item : (Object[]) e) {
-              result.add(item);
-            }
+            Collections.addAll(result, (Object[]) e);
           } else {
             result.add(e);
           }

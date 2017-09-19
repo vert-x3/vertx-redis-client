@@ -19,7 +19,7 @@ public abstract class AbstractRedisSentinelBase extends VertxTestBase {
   protected static final Map<Integer, redis.embedded.RedisServer> instances = new ConcurrentHashMap<>();
   protected static String host = null;
 
-  protected final static void createRedisSentinelInstance(final Integer sentinelPort, final Integer masterPort)
+  protected static void createRedisSentinelInstance(final Integer sentinelPort, final Integer masterPort)
     throws Exception {
     System.out.println("Creating redis sentinel on port: " + sentinelPort);
 
@@ -34,7 +34,7 @@ public abstract class AbstractRedisSentinelBase extends VertxTestBase {
     System.out.println("Created embedded redis server on port " + sentinelPort);
   }
 
-  protected final static void createRedisInstance(final Integer port, final String... settings) throws Exception {
+  protected static void createRedisInstance(final Integer port, final String... settings) throws Exception {
     System.out.println("Creating redis server on port: " + port);
     RedisServerBuilder builder = RedisServer.builder().port(port);
 
@@ -46,8 +46,8 @@ public abstract class AbstractRedisSentinelBase extends VertxTestBase {
     System.out.println("Created embedded redis server on port " + port);
   }
 
-  protected final static void createSlaveRedisInstance(final Integer port, final Integer masterPort,
-                                                       final String... settings) throws Exception {
+  protected static void createSlaveRedisInstance(final Integer port, final Integer masterPort,
+                                                 final String... settings) throws Exception {
     System.out.println("Creating redis slave server on port: " + port);
     RedisServerBuilder builder = RedisServer.builder().port(port);
 

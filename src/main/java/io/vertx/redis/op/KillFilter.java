@@ -141,7 +141,7 @@ public class KillFilter {
     return result;
   }
 
-  public static enum Type {
+  public enum Type {
     NORMAL,
     SLAVE,
     PUBSUB

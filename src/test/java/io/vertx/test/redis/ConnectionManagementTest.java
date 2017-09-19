@@ -21,21 +21,17 @@ public class ConnectionManagementTest extends AbstractRedisClientBase {
 
   @Test
   public void testQuit() {
-    redis.close(v -> {
-      testComplete();
-    });
+    redis.close(v -> testComplete());
     await();
   }
 
   @Test
   public void testCommandAfterQuit() {
-    redis.close(v -> {
-      redis.info(res -> {
-        assertTrue(res.succeeded());
-        assertNotNull(res.result());
-        testComplete();
-      });
-    });
+    redis.close(v -> redis.info(res -> {
+      assertTrue(res.succeeded());
+      assertNotNull(res.result());
+      testComplete();
+    }));
     await();
   }
 }

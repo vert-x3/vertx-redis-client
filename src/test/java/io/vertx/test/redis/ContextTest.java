@@ -28,12 +28,10 @@ public class ContextTest extends AbstractRedisClientBase {
 
     Context ctx = vertx.getOrCreateContext();
 
-    ctx.runOnContext(v -> {
-      redis.get(key, res -> {
-        assertEquals(ctx, Vertx.currentContext());
-        testComplete();
-      });
-    });
+    ctx.runOnContext(v -> redis.get(key, res -> {
+      assertEquals(ctx, Vertx.currentContext());
+      testComplete();
+    }));
 
     await();
   }

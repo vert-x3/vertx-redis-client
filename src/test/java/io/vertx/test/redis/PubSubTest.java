@@ -44,12 +44,12 @@ public class PubSubTest extends AbstractRedisClientBase {
 
       assertEquals("subscribe", subscribe.result().getValue(0));
       assertEquals("ch1", subscribe.result().getValue(1));
-      assertEquals(1l, subscribe.result().getValue(2));
+      assertEquals(1L, subscribe.result().getValue(2));
 
       // on pub address publish a message
       redis.publish("ch1", message, res -> {
         assertTrue(res.succeeded());
-        assertEquals(Long.valueOf(1l), res.result());
+        assertEquals(Long.valueOf(1L), res.result());
       });
     });
     await();
@@ -81,18 +81,18 @@ public class PubSubTest extends AbstractRedisClientBase {
 
       assertEquals("psubscribe", subscribe.result().getValue(0));
       assertEquals("news.*", subscribe.result().getValue(1));
-      assertEquals(1l, subscribe.result().getValue(2));
+      assertEquals(1L, subscribe.result().getValue(2));
 
       // on pub address publish a message to news.wold
       redis.publish("news.world", worldNews, r0 -> {
         assertTrue(r0.succeeded());
-        assertEquals(1l, r0.result().longValue());
+        assertEquals(1L, r0.result().longValue());
       });
 
       // on pub address publish a message to news.wold
       redis.publish("news.technology", technologyNews, r0 -> {
         assertTrue(r0.succeeded());
-        assertEquals(1l, r0.result().longValue());
+        assertEquals(1L, r0.result().longValue());
       });
     });
 
@@ -120,7 +120,7 @@ public class PubSubTest extends AbstractRedisClientBase {
 
       assertEquals("subscribe", subscribe.result().getValue(0));
       assertEquals("ch2", subscribe.result().getValue(1));
-      assertEquals(1l, subscribe.result().getValue(2));
+      assertEquals(1L, subscribe.result().getValue(2));
 
       // deploy a new sub
       RedisClient redis2 = RedisClient.create(vertx, getConfig());
@@ -131,12 +131,12 @@ public class PubSubTest extends AbstractRedisClientBase {
 
         assertEquals("subscribe", subscribe2.result().getValue(0));
         assertEquals("ch2", subscribe2.result().getValue(1));
-        assertEquals(1l, subscribe2.result().getValue(2));
+        assertEquals(1L, subscribe2.result().getValue(2));
 
         // on pub address publish a message
         redis2.publish("ch2", message, r0 -> {
           assertTrue(r0.succeeded());
-          assertEquals(2l, r0.result().longValue());
+          assertEquals(2L, r0.result().longValue());
         });
       });
     });
@@ -165,7 +165,7 @@ public class PubSubTest extends AbstractRedisClientBase {
 
       assertEquals("subscribe", subscribe.result().getValue(0));
       assertEquals("ch3", subscribe.result().getValue(1));
-      assertEquals(1l, subscribe.result().getValue(2));
+      assertEquals(1L, subscribe.result().getValue(2));
 
       redis.publish("ch3", message, r0 -> {
         assertTrue(r0.succeeded());
@@ -177,17 +177,11 @@ public class PubSubTest extends AbstractRedisClientBase {
             try {
               startRedis();
               // we need some time to let the process really start
-              vertx.setTimer(500, v1 -> {
-                redis.ping(v2 -> {
-                  assertTrue(v2.succeeded());
-                  // we need some time to let the client reconnect and complete the handshake
-                  vertx.setTimer(500, v3 -> {
-                    redis.publish("ch3", message, r1 -> {
-                      assertTrue(r1.succeeded());
-                    });
-                  });
-                });
-              });
+              vertx.setTimer(500, v1 -> redis.ping(v2 -> {
+                assertTrue(v2.succeeded());
+                // we need some time to let the client reconnect and complete the handshake
+                vertx.setTimer(500, v3 -> redis.publish("ch3", message, r1 -> assertTrue(r1.succeeded())));
+              }));
             } catch (Exception e) {
               fail(e);
             }

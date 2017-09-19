@@ -4,10 +4,7 @@ import io.vertx.core.buffer.Buffer;
 import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Stream;
 
 public class RedisCommandUtils {
@@ -34,7 +31,7 @@ public class RedisCommandUtils {
       }
 
       if (param instanceof Collection) {
-        ((Collection) param).stream().filter(el -> el != null).forEach(result::add);
+        ((Collection) param).stream().filter(Objects::nonNull).forEach(result::add);
       } else if (param instanceof Map) {
         for (Map.Entry<?, ?> pair : ((Map<?, ?>) param).entrySet()) {
           result.add(pair.getKey());
@@ -43,9 +40,7 @@ public class RedisCommandUtils {
       } else if (param instanceof Stream) {
         ((Stream) param).forEach(e -> {
           if (e instanceof Object[]) {
-            for (Object item : (Object[]) e) {
-              result.add(item);
-            }
+            Collections.addAll(result, (Object[]) e);
           } else {
             result.add(e);
           }

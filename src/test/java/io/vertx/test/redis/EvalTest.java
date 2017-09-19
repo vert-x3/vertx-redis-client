@@ -19,6 +19,7 @@ import io.vertx.redis.Script;
 import org.junit.Test;
 
 import java.util.Arrays;
+import java.util.Collections;
 
 public class EvalTest extends AbstractRedisClientBase {
 
@@ -34,7 +35,7 @@ public class EvalTest extends AbstractRedisClientBase {
 
   @Test
   public void test2() {
-    redis.eval("return redis.call('set',KEYS[1],'bar')", Arrays.asList("foo"), null, res -> {
+    redis.eval("return redis.call('set',KEYS[1],'bar')", Collections.singletonList("foo"), null, res -> {
       assertTrue(res.succeeded());
       // expect OK
       testComplete();

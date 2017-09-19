@@ -120,11 +120,7 @@ class RedisConnection {
   private boolean useSentinel() {
     // in case the user has disconnected before, update the state
     reconnect = true;
-    if (config.getSentinels() != null && config.getSentinels().size() > 0 && config.getMasterName() != null) {
-      return true;
-    } else {
-      return false;
-    }
+    return config.getSentinels() != null && config.getSentinels().size() > 0 && config.getMasterName() != null;
   }
 
   private void connect(String host, int port, boolean checkMaster) {

@@ -68,19 +68,17 @@ public class RedisAuthRecoverTest extends AbstractRedisClientBase {
         // INFO: there are 2 gets here because we are killing the server process before and do not let the
         // OS deliver the socket error in time, so the 1st attempt will get a connection lost error and the
         // second will the properly reconnect.
-        vertx.runOnContext(v -> {
-          rdx.get(key, get -> {
+        vertx.runOnContext(v -> rdx.get(key, get -> {
 
-            assertTrue(get.succeeded());
+          assertTrue(get.succeeded());
 
-            try {
-              server.stop();
-            } catch (Exception ignore) {
-            }
+          try {
+            server.stop();
+          } catch (Exception ignore) {
+          }
 
-            testComplete();
-          });
-        });
+          testComplete();
+        }));
       });
     });
 

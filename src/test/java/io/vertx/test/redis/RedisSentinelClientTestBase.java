@@ -151,7 +151,7 @@ public abstract class RedisSentinelClientTestBase extends AbstractRedisSentinelB
   public void testFailover() {
     redisSentinel.failover(MASTER_NAME, reply -> {
       assertTrue(reply.succeeded());
-      assertEquals("OK", reply.result().toString());
+      assertEquals("OK", reply.result());
       testComplete();
     });
     await();
@@ -162,7 +162,7 @@ public abstract class RedisSentinelClientTestBase extends AbstractRedisSentinelB
   public void testCkquorum() {
     redisSentinel.failover(MASTER_NAME, reply -> {
       assertTrue(reply.succeeded());
-      assertEquals("OK", reply.result().toString());
+      assertEquals("OK", reply.result());
       testComplete();
     });
     await();
