@@ -2824,4 +2824,38 @@ public interface RedisClient {
    */
   @Fluent
   RedisClient bitfieldWithOverflow(String key, BitFieldOptions commands, BitFieldOverflowOptions overflow, Handler<AsyncResult<JsonArray>> handler);
+
+  /**
+   * Delete a key asynchronously in another thread. Otherwise it is just as DEL, but non blocking.
+   *
+   * @param key     Key to delete
+   * @param handler Handler for the result of this call.
+   * @since Redis 4.0.0
+   * group: generic
+   */
+  @Fluent
+  RedisClient unlink(String key, Handler<AsyncResult<Long>> handler);
+
+  /**
+   * Delete multiple keys asynchronously in another thread. Otherwise it is just as DEL, but non blocking.
+   *
+   * @param keys    List of keys to delete
+   * @param handler Handler for the result of this call.
+   * @since Redis 4.0.0
+   * group: generic
+   */
+  @Fluent
+  RedisClient unlinkMany(List<String> keys, Handler<AsyncResult<Long>> handler);
+
+  /**
+   * Swaps two Redis databases
+   *
+   * @param index1  index of first database to swap
+   * @param index2  index of second database to swap
+   * @param handler Handler for the result of this call.
+   * @since Redis 4.0.0
+   * group: connection
+   */
+  @Fluent
+  RedisClient swapdb(int index1, int index2, Handler<AsyncResult<String>> handler);
 }
