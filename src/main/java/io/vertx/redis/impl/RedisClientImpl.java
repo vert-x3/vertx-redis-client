@@ -1981,8 +1981,8 @@ public final class RedisClientImpl extends AbstractRedisClient {
     }
 
     @Override
-    public RedisTransaction getBinary(String key, Handler<AsyncResult<String>> handler) {
-      send(GET, toPayload(key), String.class, true, handler);
+    public RedisTransaction getBinary(String key, Handler<AsyncResult<Buffer>> handler) {
+      send(GET, toPayload(key), Buffer.class, true, handler);
       return this;
     }
 
