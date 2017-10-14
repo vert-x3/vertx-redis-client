@@ -52,12 +52,15 @@ public class RedisOptions extends NetClientOptions {
   private static final int DEFAULT_PORT = 6379;
   private static final boolean DEFAULT_BINARY = false;
   private static final String DEFAULT_ADDRESS = "io.vertx.redis";
+  private static final boolean DEFAULT_DOMAIN_SOCKET_OPTION = false;
 
   private String encoding;
   private String host;
   private int port;
   private boolean binary;
   private String address;
+  private String domainSocketAddress;
+  private boolean domainSocket;
 
   private String auth;
   private Integer select;
@@ -79,6 +82,8 @@ public class RedisOptions extends NetClientOptions {
     this.port = other.port;
     this.binary = other.binary;
     this.address = other.address;
+    this.domainSocketAddress = other.domainSocketAddress;
+    this.domainSocket = other.domainSocket;
     // custom
     this.auth = other.auth;
     this.select = other.select;
@@ -99,6 +104,7 @@ public class RedisOptions extends NetClientOptions {
     port = DEFAULT_PORT;
     binary = DEFAULT_BINARY;
     address = DEFAULT_ADDRESS;
+    domainSocket = DEFAULT_DOMAIN_SOCKET_OPTION;
     // tcp defaults
     setTcpKeepAlive(true);
     setTcpNoDelay(true);
@@ -306,5 +312,41 @@ public class RedisOptions extends NetClientOptions {
   public RedisOptions setSentinels(List<String> sentinels) {
     this.sentinels = sentinels;
     return this;
+  }
+
+  /**
+   * Set the domain socket address where the Redis server is listening.
+   * @param domainSocketAddress
+   * * @return self
+   */
+  public RedisOptions setDomainSocketAddress(String domainSocketAddress) {
+    this.domainSocketAddress = domainSocketAddress;
+    return this;
+  }
+
+  /**
+   * Get the domain socket address for the Redis server.
+   * @return domain socket address
+   */
+  public String getDomainSocketAddress() {
+    return domainSocketAddress;
+  }
+
+  /**
+   * Set the domain socket enabled option, default `false`.
+   * @param domainSocket
+   * * @return self
+   */
+  public RedisOptions setDomainSocket(boolean domainSocket) {
+    this.domainSocket = domainSocket;
+    return this;
+  }
+
+  /**
+   * Get the domain socket enabled option, default `false`.
+   * * @return domain socket enabled option
+   */
+  public boolean isDomainSocket() {
+    return domainSocket;
   }
 }

@@ -36,6 +36,12 @@ public class RedisOptionsConverter {
     if (json.getValue("binary") instanceof Boolean) {
       obj.setBinary((Boolean)json.getValue("binary"));
     }
+    if (json.getValue("domainSocket") instanceof Boolean) {
+      obj.setDomainSocket((Boolean)json.getValue("domainSocket"));
+    }
+    if (json.getValue("domainSocketAddress") instanceof String) {
+      obj.setDomainSocketAddress((String)json.getValue("domainSocketAddress"));
+    }
     if (json.getValue("encoding") instanceof String) {
       obj.setEncoding((String)json.getValue("encoding"));
     }
@@ -67,6 +73,10 @@ public class RedisOptionsConverter {
       json.put("auth", obj.getAuth());
     }
     json.put("binary", obj.isBinary());
+    json.put("domainSocket", obj.isDomainSocket());
+    if (obj.getDomainSocketAddress() != null) {
+      json.put("domainSocketAddress", obj.getDomainSocketAddress());
+    }
     if (obj.getEncoding() != null) {
       json.put("encoding", obj.getEncoding());
     }

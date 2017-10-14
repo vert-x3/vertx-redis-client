@@ -34,10 +34,12 @@ import io.vertx.core.net.ProxyOptions
  *
  * @param address  Set the eventbus address prefix for `PUB/SUB`. * @param address address prefix.
  * @param auth  Set the password for authentication at connection time.
- * @param binary  Set the user defined character encoding, e.g.: `iso-8859-1`. * @param binary use binary messages
+ * @param binary  Set the messages to/from redis as binary, default `false`. * @param binary use binary messages
  * @param connectTimeout 
  * @param crlPaths 
  * @param crlValues 
+ * @param domainSocket  Set the domain socket enabled option, default `false`.
+ * @param domainSocketAddress  Set the domain socket address where the Redis server is listening.
  * @param enabledCipherSuites 
  * @param enabledSecureTransportProtocols 
  * @param encoding  Set the user defined character encoding, e.g.: `iso-8859-1`. * @param encoding the user character encoding
@@ -61,13 +63,17 @@ import io.vertx.core.net.ProxyOptions
  * @param reconnectAttempts 
  * @param reconnectInterval 
  * @param reuseAddress 
+ * @param reusePort 
  * @param select  Set the database to select at connection time. * @param select database id
  * @param sendBufferSize 
  * @param sentinels  Set the list of Sentinels.
  * @param soLinger 
  * @param ssl 
+ * @param tcpCork 
+ * @param tcpFastOpen 
  * @param tcpKeepAlive 
  * @param tcpNoDelay 
+ * @param tcpQuickAck 
  * @param trafficClass 
  * @param trustAll 
  * @param trustStoreOptions 
@@ -84,6 +90,8 @@ fun RedisOptions(
   connectTimeout: Int? = null,
   crlPaths: Iterable<String>? = null,
   crlValues: Iterable<io.vertx.core.buffer.Buffer>? = null,
+  domainSocket: Boolean? = null,
+  domainSocketAddress: String? = null,
   enabledCipherSuites: Iterable<String>? = null,
   enabledSecureTransportProtocols: Iterable<String>? = null,
   encoding: String? = null,
@@ -107,13 +115,17 @@ fun RedisOptions(
   reconnectAttempts: Int? = null,
   reconnectInterval: Long? = null,
   reuseAddress: Boolean? = null,
+  reusePort: Boolean? = null,
   select: Int? = null,
   sendBufferSize: Int? = null,
   sentinels: Iterable<String>? = null,
   soLinger: Int? = null,
   ssl: Boolean? = null,
+  tcpCork: Boolean? = null,
+  tcpFastOpen: Boolean? = null,
   tcpKeepAlive: Boolean? = null,
   tcpNoDelay: Boolean? = null,
+  tcpQuickAck: Boolean? = null,
   trafficClass: Int? = null,
   trustAll: Boolean? = null,
   trustStoreOptions: io.vertx.core.net.JksOptions? = null,
@@ -141,6 +153,12 @@ fun RedisOptions(
     for (item in crlValues) {
       this.addCrlValue(item)
     }
+  }
+  if (domainSocket != null) {
+    this.setDomainSocket(domainSocket)
+  }
+  if (domainSocketAddress != null) {
+    this.setDomainSocketAddress(domainSocketAddress)
   }
   if (enabledCipherSuites != null) {
     for (item in enabledCipherSuites) {
@@ -215,6 +233,9 @@ fun RedisOptions(
   if (reuseAddress != null) {
     this.setReuseAddress(reuseAddress)
   }
+  if (reusePort != null) {
+    this.setReusePort(reusePort)
+  }
   if (select != null) {
     this.setSelect(select)
   }
@@ -230,11 +251,20 @@ fun RedisOptions(
   if (ssl != null) {
     this.setSsl(ssl)
   }
+  if (tcpCork != null) {
+    this.setTcpCork(tcpCork)
+  }
+  if (tcpFastOpen != null) {
+    this.setTcpFastOpen(tcpFastOpen)
+  }
   if (tcpKeepAlive != null) {
     this.setTcpKeepAlive(tcpKeepAlive)
   }
   if (tcpNoDelay != null) {
     this.setTcpNoDelay(tcpNoDelay)
+  }
+  if (tcpQuickAck != null) {
+    this.setTcpQuickAck(tcpQuickAck)
   }
   if (trafficClass != null) {
     this.setTrafficClass(trafficClass)
