@@ -214,7 +214,7 @@ Set the password for authentication at connection time.
 +++
 |[[binary]]`binary`|`Boolean`|
 +++
-Set the user defined character encoding, e.g.: `iso-8859-1`.
+Set the messages to/from redis as binary, default `false`.
  * @param binary use binary messages
 +++
 |[[connectTimeout]]`connectTimeout`|`Number (int)`|-
@@ -257,6 +257,7 @@ Set the tcp port where the Redis server is listening.
 |[[reconnectAttempts]]`reconnectAttempts`|`Number (int)`|-
 |[[reconnectInterval]]`reconnectInterval`|`Number (long)`|-
 |[[reuseAddress]]`reuseAddress`|`Boolean`|-
+|[[reusePort]]`reusePort`|`Boolean`|-
 |[[select]]`select`|`Number (Integer)`|
 +++
 Set the database to select at connection time.
@@ -269,8 +270,11 @@ Set the list of Sentinels.
 +++
 |[[soLinger]]`soLinger`|`Number (int)`|-
 |[[ssl]]`ssl`|`Boolean`|-
+|[[tcpCork]]`tcpCork`|`Boolean`|-
+|[[tcpFastOpen]]`tcpFastOpen`|`Boolean`|-
 |[[tcpKeepAlive]]`tcpKeepAlive`|`Boolean`|-
 |[[tcpNoDelay]]`tcpNoDelay`|`Boolean`|-
+|[[tcpQuickAck]]`tcpQuickAck`|`Boolean`|-
 |[[trafficClass]]`trafficClass`|`Number (int)`|-
 |[[trustAll]]`trustAll`|`Boolean`|-
 |[[trustStoreOptions]]`trustStoreOptions`|`link:dataobjects.html#JksOptions[JksOptions]`|-
