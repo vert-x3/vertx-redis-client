@@ -20,16 +20,16 @@
   <parent>
     <groupId>io.vertx</groupId>
     <artifactId>vertx-ext-parent</artifactId>
-    <version>26</version>
+    <version>27</version>
   </parent>
 
   <artifactId>vertx-redis-client</artifactId>
-  <version>3.5.0-SNAPSHOT</version>
+  <version>3.5.1-SNAPSHOT</version>
 
   <name>Vert.x Redis Client</name>
 
   <properties>
-    <stack.version>3.5.0-SNAPSHOT</stack.version>
+    <stack.version>3.5.1-SNAPSHOT</stack.version>
     <codegen.rxjava.deprecated>true</codegen.rxjava.deprecated>
   </properties>
 
@@ -143,7 +143,9 @@
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-jar-plugin</artifactId>
         <configuration>
-          <useDefaultManifestFile>true</useDefaultManifestFile>
+          <archive>
+            <manifestFile>${project.build.outputDirectory}/META-INF/MANIFEST.MF</manifestFile>
+          </archive>
         </configuration>
       </plugin>
 
