@@ -1,7 +1,5 @@
 package io.vertx.redis.impl;
 
-import io.vertx.redis.impl.AbstractCommand;
-
 /**
  * Redis Sentinel Commands
  */
