@@ -20,12 +20,16 @@ import io.vertx.core.Context;
 import io.vertx.core.Handler;
 import io.vertx.core.Vertx;
 import io.vertx.core.buffer.Buffer;
+import io.vertx.core.logging.Logger;
+import io.vertx.core.logging.LoggerFactory;
 import io.vertx.core.streams.WriteStream;
 
 import java.nio.charset.Charset;
 import java.util.List;
 
 public class Command<T> {
+
+  private static final Logger LOG = LoggerFactory.getLogger(Command.class);
 
   private static final byte ARGS_PREFIX = '*';
   private static final byte[] CRLF = "\r\n".getBytes();
@@ -151,12 +155,26 @@ public class Command<T> {
     if (handler != null) {
       if (context != null) {
         if (Vertx.currentContext() == context) {
-          handler.handle(asyncResult);
+          try {
+            handler.handle(asyncResult);
+          } catch (Throwable e) {
+            LOG.error("Handler error", e);
+          }
         } else {
-          context.runOnContext(v -> handler.handle(asyncResult));
+          context.runOnContext(v -> {
+            try {
+              handler.handle(asyncResult);
+            } catch (Throwable e) {
+              LOG.error("Handler error", e);
+            }
+          });
         }
       } else {
-        handler.handle(asyncResult);
+        try {
+          handler.handle(asyncResult);
+        } catch (Throwable e) {
+          LOG.error("Handler error", e);
+        }
       }
     }
   }
