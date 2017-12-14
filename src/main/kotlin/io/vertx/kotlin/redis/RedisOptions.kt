@@ -38,6 +38,8 @@ import io.vertx.core.net.ProxyOptions
  * @param connectTimeout 
  * @param crlPaths 
  * @param crlValues 
+ * @param domainSocket  Set the domain socket enabled option, default `false`.
+ * @param domainSocketAddress  Set the domain socket address where the Redis server is listening.
  * @param enabledCipherSuites 
  * @param enabledSecureTransportProtocols 
  * @param encoding  Set the user defined character encoding, e.g.: `iso-8859-1`. * @param encoding the user character encoding
@@ -88,6 +90,8 @@ fun RedisOptions(
   connectTimeout: Int? = null,
   crlPaths: Iterable<String>? = null,
   crlValues: Iterable<io.vertx.core.buffer.Buffer>? = null,
+  domainSocket: Boolean? = null,
+  domainSocketAddress: String? = null,
   enabledCipherSuites: Iterable<String>? = null,
   enabledSecureTransportProtocols: Iterable<String>? = null,
   encoding: String? = null,
@@ -149,6 +153,12 @@ fun RedisOptions(
     for (item in crlValues) {
       this.addCrlValue(item)
     }
+  }
+  if (domainSocket != null) {
+    this.setDomainSocket(domainSocket)
+  }
+  if (domainSocketAddress != null) {
+    this.setDomainSocketAddress(domainSocketAddress)
   }
   if (enabledCipherSuites != null) {
     for (item in enabledCipherSuites) {
