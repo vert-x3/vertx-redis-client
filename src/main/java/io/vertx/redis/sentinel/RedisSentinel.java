@@ -1,5 +1,7 @@
 package io.vertx.redis.sentinel;
 
+import io.vertx.codegen.annotations.Fluent;
+import io.vertx.codegen.annotations.VertxGen;
 import io.vertx.core.AsyncResult;
 import io.vertx.core.Handler;
 import io.vertx.core.Vertx;
@@ -10,6 +12,7 @@ import io.vertx.redis.impl.RedisSentinelClientImpl;
 /**
  * Interface for sentinel commands
  */
+@VertxGen
 public interface RedisSentinel {
 
   static RedisSentinel create(Vertx vertx, RedisOptions config) {
@@ -28,6 +31,7 @@ public interface RedisSentinel {
    *
    * @param handler Handler for the result of this call
    */
+  @Fluent
   RedisSentinel masters(Handler<AsyncResult<JsonArray>> handler);
 
   /**
@@ -36,6 +40,7 @@ public interface RedisSentinel {
    * @param name    master name
    * @param handler Handler for the result of this call
    */
+  @Fluent
   RedisSentinel master(String name, Handler<AsyncResult<JsonArray>> handler);
 
   /**
@@ -44,6 +49,7 @@ public interface RedisSentinel {
    * @param name    master name
    * @param handler Handler for the result of this call
    */
+  @Fluent
   RedisSentinel slaves(String name, Handler<AsyncResult<JsonArray>> handler);
 
   /**
@@ -52,6 +58,7 @@ public interface RedisSentinel {
    * @param name    master name
    * @param handler Handler for the result of this call
    */
+  @Fluent
   RedisSentinel sentinels(String name, Handler<AsyncResult<JsonArray>> handler);
 
   /**
@@ -62,6 +69,7 @@ public interface RedisSentinel {
    * @param name    master name
    * @param handler Handler for the result of this call
    */
+  @Fluent
   RedisSentinel getMasterAddrByName(String name, Handler<AsyncResult<JsonArray>> handler);
 
 
@@ -73,6 +81,7 @@ public interface RedisSentinel {
    * @param pattern pattern String
    * @param handler Handler for the result of this call
    */
+  @Fluent
   RedisSentinel reset(String pattern, Handler<AsyncResult<Void>> handler);
 
   /**
@@ -83,6 +92,7 @@ public interface RedisSentinel {
    * @param name    master name
    * @param handler Handler for the result of this call
    */
+  @Fluent
   RedisSentinel failover(String name, Handler<AsyncResult<String>> handler);
 
   /**
@@ -93,6 +103,7 @@ public interface RedisSentinel {
    * @param name    master name
    * @param handler Handler for the result of this call
    */
+  @Fluent
   RedisSentinel ckquorum(String name, Handler<AsyncResult<String>> handler);
 
   /**
@@ -106,5 +117,6 @@ public interface RedisSentinel {
    *
    * @param handler Handler for the result of this call
    */
+  @Fluent
   RedisSentinel flushConfig(Handler<AsyncResult<Void>> handler);
 }

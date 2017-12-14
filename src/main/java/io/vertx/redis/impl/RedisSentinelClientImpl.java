@@ -8,7 +8,7 @@ import io.vertx.redis.RedisOptions;
 import io.vertx.redis.sentinel.RedisSentinel;
 import io.vertx.redis.utils.RedisCommandUtils;
 
-import static io.vertx.redis.sentinel.RedisSentinelCommand.*;
+import static io.vertx.redis.impl.RedisSentinelCommand.*;
 
 
 /**

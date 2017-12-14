@@ -6,7 +6,6 @@ import io.vertx.core.Vertx;
 import io.vertx.core.json.JsonObject;
 import io.vertx.redis.RedisOptions;
 import io.vertx.redis.sentinel.RedisSentinel;
-import io.vertx.redis.sentinel.RedisSentinelCommand;
 
 import java.util.List;
 
