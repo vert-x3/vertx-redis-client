@@ -752,6 +752,16 @@ public interface RedisTransaction {
   RedisTransaction exists(String key, Handler<AsyncResult<String>> handler);
 
   /**
+   * Determine if one or many keys exist
+   * @param keys    List of key strings
+   * @param handler Handler for the result of this call.
+   * @since Redis 3.0.3
+   * group: generic
+   */
+  @Fluent
+  RedisTransaction existsMany(List<String> keys, Handler<AsyncResult<String>> handler);
+
+  /**
    * Set a key's time to live in seconds
    *
    * @param key     Key string

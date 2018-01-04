@@ -771,6 +771,16 @@ public interface RedisClient {
   RedisClient exists(String key, Handler<AsyncResult<Long>> handler);
 
   /**
+   * Determine if one or many keys exist
+   * @param keys    List of key strings
+   * @param handler Handler for the result of this call.
+   * @since Redis 3.0.3
+   * group: generic
+   */
+  @Fluent
+  RedisClient existsMany(List<String> keys, Handler<AsyncResult<Long>> handler);
+
+  /**
    * Set a key's time to live in seconds
    *
    * @param key     Key string
