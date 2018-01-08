@@ -712,6 +712,37 @@ public abstract class RedisClientTestBase extends VertxTestBase {
   }
 
   @Test
+  public void testExistsMany() {
+    final String key1 = makeKey();
+    final String key2 = makeKey();
+
+    redis.set(key1, "Hello", reply0 -> {
+      assertTrue(reply0.succeeded());
+
+      redis.existsMany(toList(key1, key2), reply1 -> {
+        assertTrue(reply1.succeeded());
+        assertEquals(1, reply1.result().longValue());
+
+        redis.set(key2, "Hello", reply2 -> {
+          assertTrue(reply2.succeeded());
+
+          redis.existsMany(toList(key1, key2), reply3 -> {
+            assertTrue(reply3.succeeded());
+            assertEquals(2, reply3.result().longValue());
+
+            redis.existsMany(toList(key1), reply4 -> {
+              assertTrue(reply4.succeeded());
+              assertEquals(1, reply4.result().longValue());
+              testComplete();
+            });
+          });
+        });
+      });
+    });
+    await();
+  }
+
+  @Test
   public void testExpire() {
     final String mykey = makeKey();
 

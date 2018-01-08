@@ -482,6 +482,12 @@ public final class RedisClientImpl extends AbstractRedisClient {
   }
 
   @Override
+  public RedisClient existsMany(List<String> keys, Handler<AsyncResult<Long>> handler) {
+    sendLong(EXISTS, toPayload(keys), handler);
+    return this;
+  }
+
+  @Override
   public RedisClient expire(String key, long seconds, Handler<AsyncResult<Long>> handler) {
     sendLong(EXPIRE, toPayload(key, seconds), handler);
     return this;
@@ -1945,6 +1951,12 @@ public final class RedisClientImpl extends AbstractRedisClient {
     @Override
     public RedisTransaction exists(String key, Handler<AsyncResult<String>> handler) {
       sendString(EXISTS, toPayload(key), handler);
+      return this;
+    }
+
+    @Override
+    public RedisTransaction existsMany(List<String> keys, Handler<AsyncResult<String>> handler) {
+      sendString(EXISTS, toPayload(keys), handler);
       return this;
     }
 
