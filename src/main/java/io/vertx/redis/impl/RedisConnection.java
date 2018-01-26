@@ -138,6 +138,7 @@ class RedisConnection {
     final NetClient client = vertx.createNetClient(config);
     client.connect(socketAddress, asyncResult -> {
       if (asyncResult.failed()) {
+        client.close();
         if (state.compareAndSet(State.CONNECTING, State.ERROR)) {
           // clean up any waiting command
           clearQueue(waiting, asyncResult.cause());
