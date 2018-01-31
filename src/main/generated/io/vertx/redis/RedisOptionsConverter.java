@@ -1,5 +1,5 @@
 /*
- * Copyright 2014 Red Hat, Inc.
+ * Copyright (c) 2014 Red Hat, Inc. and others
  *
  * Red Hat licenses this file to you under the Apache License, version 2.0
  * (the "License"); you may not use this file except in compliance with the
@@ -58,10 +58,12 @@ public class RedisOptionsConverter {
       obj.setSelect(((Number)json.getValue("select")).intValue());
     }
     if (json.getValue("sentinels") instanceof JsonArray) {
-      json.getJsonArray("sentinels").forEach(item -> {
+      java.util.ArrayList<java.lang.String> list = new java.util.ArrayList<>();
+      json.getJsonArray("sentinels").forEach( item -> {
         if (item instanceof String)
-          obj.addSentinel((String)item);
+          list.add((String)item);
       });
+      obj.setSentinels(list);
     }
   }
 
