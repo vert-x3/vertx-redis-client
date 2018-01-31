@@ -711,6 +711,8 @@ public abstract class RedisClientTestBase extends VertxTestBase {
     await();
   }
 
+  // Require a more recent version of Redis
+  @Ignore
   @Test
   public void testExistsMany() {
     String key1 = makeKey();
