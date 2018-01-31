@@ -227,7 +227,7 @@ class RedisConnection {
       case CONNECTED:
         final Command<Void> cmd = new Command<>(context, RedisCommand.QUIT, null, Charset.defaultCharset(), ResponseTransform.NONE, Void.class);
 
-        cmd.handler(v -> {
+        cmd.handler(ar -> {
           // at this we force the state to error so any incoming command will not start a connection
           if (state.compareAndSet(State.CONNECTED, State.ERROR)) {
             // clean up any waiting command
@@ -237,8 +237,8 @@ class RedisConnection {
 
             netSocket.close();
 
-            closeHandler.handle(Future.succeededFuture());
           }
+          closeHandler.handle(Future.succeededFuture());
         });
 
         send(cmd);
