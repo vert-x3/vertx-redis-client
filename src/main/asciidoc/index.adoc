@@ -33,9 +33,9 @@ To use the Vert.x Redis client, add the following dependency to the _dependencie
 [source,xml,subs="+attributes"]
 ----
 <dependency>
-<groupId>io.vertx</groupId>
-<artifactId>vertx-redis-client</artifactId>
-<version>3.5.1</version>
+<groupId>${maven.groupId}</groupId>
+<artifactId>${maven.artifactId}</artifactId>
+<version>${maven.version}</version>
 </dependency>
 ----
 
@@ -43,12 +43,12 @@ To use the Vert.x Redis client, add the following dependency to the _dependencie
 
 [source,groovy,subs="+attributes"]
 ----
-compile 'io.vertx:vertx-redis-client:3.5.1'
+compile '${maven.groupId}:${maven.artifactId}:${maven.version}'
 ----
 
 == Connecting to Redis
 
-In order to connect to Redis there is a config required. This config is provided in the form of `link:../dataobjects.html#RedisOptions[RedisOptions]`
+In order to connect to Redis there is a config required. This config is provided in the form of {@link io.vertx.redis.RedisOptions}
 containing the following values:
 
 * `host`: default is `localhost`
@@ -59,15 +59,9 @@ containing the following values:
 
 An connection example can then be:
 
-[source,ruby]
+[source,$lang]
 ----
-require 'vertx-redis/redis_client'
-config = {
-  'host' => "127.0.0.1"
-}
-
-redis = VertxRedis::RedisClient.create(vertx, config)
-
+{@link examples.Examples#example1}
 ----
 
 The client attempts to reconnect to the server on connection errors, for this reason if you are connecting to a server
@@ -77,8 +71,8 @@ password and/or database id to the config object, the properties names are:
 * `auth`
 * `select`
 
-If you do not do this and manually call the `link:../../yardoc/VertxRedis/RedisClient.html#auth-instance_method[auth]`
-or `link:../../yardoc/VertxRedis/RedisClient.html#select-instance_method[select]` then the client will not know how to recover
+If you do not do this and manually call the {@link io.vertx.redis.RedisClient#auth(java.lang.String, io.vertx.core.Handler)}
+or {@link io.vertx.redis.RedisClient#select(int, io.vertx.core.Handler)} then the client will not know how to recover
 the connection in case of socket error.
 
 == Running commands
@@ -87,18 +81,9 @@ Given that the redis client is connected to the server, all commands are now pos
 The module offers a clean API for executing commands without the need to hand write the command itself, for example
 if one wants to get a value of a key it can be done as:
 
-[source,ruby]
+[source,$lang]
 ----
-require 'vertx-redis/redis_client'
-redis = VertxRedis::RedisClient.create(vertx, {
-})
-
-redis.get("mykey") { |res_err,res|
-  if (res_err == nil)
-    # so something...
-  end
-}
-
+{@link examples.Examples#example2}
 ----
 
 In order to know more about the commands available you should look at: <a href="http://redis.io/commands">redis documentation</a>.
@@ -110,46 +95,16 @@ it cannot be used for running other commands than the command to leave that mode
 
 To start a subscriber one would do:
 
-[source,ruby]
+[source,$lang]
 ----
-require 'vertx-redis/redis_client'
-
-# register a handler for the incoming message the naming the Redis module will use is base address + '.' + redis channel
-vertx.event_bus().consumer("io.vertx.redis.channel1") { |received|
-  # do whatever you need to do with your message
-  value = received.body()['value']
-  # the value is a JSON doc with the following properties
-  # channel - The channel to which this message was sent
-  # pattern - Pattern is present if you use psubscribe command and is the pattern that matched this message channel
-  # message - The message payload
-}
-
-redis = VertxRedis::RedisClient.create(vertx, {
-})
-
-redis.subscribe("channel1") { |res_err,res|
-  if (res_err == nil)
-    # so something...
-  end
-}
-
+{@link examples.Examples#example3}
 ----
 
 And from another place in the code publish messages to the queue:
 
-[source,ruby]
+[source,$lang]
 ----
-require 'vertx-redis/redis_client'
-
-redis = VertxRedis::RedisClient.create(vertx, {
-})
-
-redis.publish("channel1", "Hello World!") { |res_err,res|
-  if (res_err == nil)
-    # so something...
-  end
-}
-
+{@link examples.Examples#example4}
 ----
 
 == Friendlier hash commands
@@ -252,7 +207,7 @@ In this case the return value will be a json array with the value 10 on index 0.
 == Redis Sentinel
 
 This client support the Redis Sentinel API with the API interface:
-`link:../../yardoc/VertxRedis/RedisSentinel.html[RedisSentinel]`.
+{@link io.vertx.redis.sentinel.RedisSentinel}.
 
 The API exposes the sentinel commands:
 
