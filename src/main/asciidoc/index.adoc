@@ -61,7 +61,7 @@ An connection example can then be:
 
 [source,$lang]
 ----
-{@link examples.Examples#example1}
+{@link examples.RedisExamples#example1}
 ----
 
 The client attempts to reconnect to the server on connection errors, for this reason if you are connecting to a server
@@ -83,7 +83,7 @@ if one wants to get a value of a key it can be done as:
 
 [source,$lang]
 ----
-{@link examples.Examples#example2}
+{@link examples.RedisExamples#example2}
 ----
 
 In order to know more about the commands available you should look at: <a href="http://redis.io/commands">redis documentation</a>.
@@ -97,14 +97,14 @@ To start a subscriber one would do:
 
 [source,$lang]
 ----
-{@link examples.Examples#example3}
+{@link examples.RedisExamples#example3}
 ----
 
 And from another place in the code publish messages to the queue:
 
 [source,$lang]
 ----
-{@link examples.Examples#example4}
+{@link examples.RedisExamples#example4}
 ----
 
 == Friendlier hash commands

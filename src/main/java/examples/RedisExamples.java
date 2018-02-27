@@ -12,7 +12,7 @@ import io.vertx.redis.Script;
  *
  * @author <a href="mailto:pmlopes@gmail.com">Paulo Lopes</a>
  */
-public class Examples {
+public class RedisExamples {
 
   public void example1(Vertx vertx) {
     RedisOptions config = new RedisOptions()
