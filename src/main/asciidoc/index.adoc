@@ -33,8 +33,8 @@ To use the Vert.x Redis client, add the following dependency to the _dependencie
 [source,xml,subs="+attributes"]
 ----
 <dependency>
-<groupId>${maven.groupId}</groupId>
-<artifactId>${maven.artifactId}</artifactId>
+<groupId>io.vertx</groupId>
+<artifactId>vertx-redis-client</artifactId>
 <version>${maven.version}</version>
 </dependency>
 ----
@@ -43,7 +43,7 @@ To use the Vert.x Redis client, add the following dependency to the _dependencie
 
 [source,groovy,subs="+attributes"]
 ----
-compile '${maven.groupId}:${maven.artifactId}:${maven.version}'
+compile 'io.vertx:vertx-redis-client:${maven.version}'
 ----
 
 == Connecting to Redis
