@@ -20,7 +20,7 @@
   <parent>
     <groupId>io.vertx</groupId>
     <artifactId>vertx-ext-parent</artifactId>
-    <version>30</version>
+    <version>34</version>
   </parent>
 
   <artifactId>vertx-redis-client</artifactId>
@@ -92,16 +92,6 @@
   <build>
 
     <plugins>
-      <!-- Copy resources after compilation phase as we generate JS in src/main/resources -->
-      <plugin>
-        <artifactId>maven-resources-plugin</artifactId>
-        <executions>
-          <execution>
-            <id>default-resources</id>
-            <phase>process-classes</phase>
-          </execution>
-        </executions>
-      </plugin>
 
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
@@ -167,14 +157,16 @@
         </property>
       </activation>
       <build>
-        <plugins>
-          <plugin>
-            <artifactId>maven-surefire-plugin</artifactId>
-            <configuration>
-              <excludedGroups>io.vertx.test.redis.RedisPost28Tests</excludedGroups>
-            </configuration>
-          </plugin>
-        </plugins>
+        <pluginManagement>
+          <plugins>
+            <plugin>
+              <artifactId>maven-surefire-plugin</artifactId>
+              <configuration>
+                <excludedGroups>io.vertx.test.redis.RedisPost28Tests</excludedGroups>
+              </configuration>
+            </plugin>
+          </plugins>
+        </pluginManagement>
       </build>
     </profile>
   </profiles>
