@@ -96,7 +96,7 @@ class RedisConnection {
       this.replyParser = new ReplyParser(reply -> {
         // Pub/sub messages are always multi-bulk
         if (reply.is('*')) {
-          Reply[] data = (Reply[]) reply.data();
+          Reply[] data = reply.multi();
           if (data != null) {
             // message
             if (data.length == 3) {

@@ -1,4 +1,4 @@
-/**
+/*
  * Copyright 2015 Red Hat, Inc.
  * <p>
  * All rights reserved. This program and the accompanying materials
@@ -20,7 +20,6 @@ import io.vertx.core.buffer.Buffer;
 
 public class ReplyParser implements Handler<Buffer> {
 
-  private final String _encoding = "utf-8";
   private final Handler<Reply> handler;
   private Buffer _buffer;
   private int _offset;
@@ -53,11 +52,7 @@ public class ReplyParser implements Handler<Buffer> {
         throw new IndexOutOfBoundsException("Wait for more data.");
       }
 
-      if (type == '+') {
-        return new Reply(type, _buffer.getString(start, end, _encoding));
-      } else {
-        return new Reply(type, _buffer.getString(start, end, _encoding));
-      }
+        return new Reply(type, _buffer.getBuffer(start, end));
     } else if (type == ':') {
       // up to the delimiter
       end = packetEndOffset() - 1;
@@ -72,7 +67,7 @@ public class ReplyParser implements Handler<Buffer> {
       }
 
       // return the coerced numeric value
-      return new Reply(type, Long.parseLong(_buffer.getString(start, end)));
+      return new Reply(type, _buffer.getBuffer(start, end));
     } else if (type == '$') {
       // set a rewind point, as the packet could be larger than the
       // buffer in memory
@@ -209,7 +204,7 @@ public class ReplyParser implements Handler<Buffer> {
 
   private int parsePacketSize() throws IndexOutOfBoundsException {
     int end = packetEndOffset();
-    String value = _buffer.getString(_offset, end - 1, _encoding);
+    String value = _buffer.getString(_offset, end - 1);
 
     _offset = end + 1;
 

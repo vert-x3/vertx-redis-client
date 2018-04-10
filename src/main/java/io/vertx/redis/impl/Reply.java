@@ -19,23 +19,30 @@ import io.vertx.core.buffer.Buffer;
 import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;
 
-public final class Reply {
+public final class Reply implements io.vertx.redis.Reply {
 
   private final byte type;
-  private final Object data;
+  private final Buffer buffer;
+  private final Reply[] multi;
 
-  public Reply(byte type, Object data) {
+  public Reply(byte type, Buffer buffer) {
     this.type = type;
-    this.data = data;
+    this.buffer = buffer;
+    this.multi = null;
   }
 
   public Reply(byte type, int size) {
     this.type = type;
-    this.data = new Reply[size];
+    this.buffer = null;
+    this.multi = new Reply[size];
   }
 
   void set(int pos, Reply reply) {
-    ((Reply[]) data)[pos] = reply;
+    if (multi != null) {
+      multi[pos] = reply;
+    } else {
+      throw new IndexOutOfBoundsException("Position: " + pos);
+    }
   }
 
   public boolean is(byte b) {
@@ -55,43 +62,52 @@ public final class Reply {
     return type;
   }
 
-  public Object data() {
-    return data;
+  public Reply[] multi() {
+    return multi;
   }
 
   @SuppressWarnings("unchecked")
   public <T> T asType(final Class<T> type, final String encoding) throws ClassCastException {
 
-    if (data == null) {
-      return null;
-    }
-
     if (type == String.class) {
-      if (data instanceof String) {
-        return (T) data;
+      if (buffer == null) {
+        return null;
       }
-      if (data instanceof Buffer) {
-        return (T) ((Buffer) data).toString(encoding);
+      if (encoding != null) {
+        return (T) buffer.toString(encoding);
+      } else {
+        return (T) buffer.toString();
       }
-      return (T) data.toString();
     }
 
     if (type == Long.class) {
-      return (T) data;
+      if (buffer == null) {
+        return null;
+      }
+      return (T) Long.valueOf(buffer.toString());
     }
 
     if (type == Void.class) {
+      if (buffer == null) {
+        return null;
+      }
       return null;
     }
 
     if (type == Buffer.class) {
-      return (T) data;
+      if (buffer == null) {
+        return null;
+      }
+      return (T) buffer;
     }
 
     if (type == JsonArray.class) {
-      final JsonArray multi = new JsonArray();
+      if (multi == null) {
+        return null;
+      }
+      final JsonArray json = new JsonArray();
 
-      for (Reply r : (Reply[]) data) {
+      for (Reply r : multi) {
         Object elem;
         switch (r.type()) {
           case '+':
@@ -108,45 +124,47 @@ public final class Reply {
             throw new RuntimeException("Unknown sub message type in multi: " + r.type());
         }
         if (elem == null) {
-          multi.addNull();
+          json.addNull();
         } else {
-          multi.add(elem);
+          json.add(elem);
         }
       }
 
-      return (T) multi;
-
+      return (T) json;
     }
 
     if (type == JsonObject.class) {
-      final JsonObject multi = new JsonObject();
+      if (multi == null) {
+        return null;
+      }
+      final JsonObject json = new JsonObject();
 
-      for (int i = 0; i < ((Reply[]) data).length; i += 2) {
-        if (((Reply[]) data)[i].type() != '$') {
-          throw new RuntimeException("Expected String as key type in multi: " + ((Reply[]) data)[i].type());
+      for (int i = 0; i < multi.length; i += 2) {
+        if (multi[i].type() != '$') {
+          throw new RuntimeException("Expected String as key type in multi: " + multi[i].type());
         }
 
-        Reply brKey = ((Reply[]) data)[i];
-        Reply brValue = ((Reply[]) data)[i + 1];
+        Reply brKey = multi[i];
+        Reply brValue = multi[i + 1];
 
         String k = brKey.asType(String.class, encoding);
 
         switch (brValue.type()) {
           case '$':   // Bulk
-            multi.put((k == null ? "k" + (i / 2) : k), brValue.asType(String.class, encoding));
+            json.put((k == null ? "k" + (i / 2) : k), brValue.asType(String.class, encoding));
             break;
           case ':':   // Integer
-            multi.put((k == null ? "k" + (i / 2) : k), brValue.asType(Long.class, encoding));
+            json.put((k == null ? "k" + (i / 2) : k), brValue.asType(Long.class, encoding));
             break;
           case '*':   // Multi
-            multi.put((k == null ? "k" + (i / 2) : k), brValue.asType(JsonArray.class, encoding));
+            json.put((k == null ? "k" + (i / 2) : k), brValue.asType(JsonArray.class, encoding));
             break;
           default:
-            throw new RuntimeException("Unknown sub message type in multi: " + ((Reply[]) data)[i + 1].type());
+            throw new RuntimeException("Unknown sub message type in multi: " + multi[i + 1].type());
         }
 
       }
-      return (T) multi;
+      return (T) json;
     }
 
     return null;
@@ -154,5 +172,150 @@ public final class Reply {
 
   public <T> T asType(Class<T> type) throws ClassCastException {
     return asType(type, "UTF-8");
+  }
+
+  @Override
+  public String status() {
+    if ((type == '+' || type == '-') && buffer != null) {
+      return buffer.toString();
+    }
+    return null;
+  }
+
+  @Override
+  public JsonArray asJsonArray() {
+    if (type == '*' && multi != null) {
+      final JsonArray array = new JsonArray();
+
+      for (Reply r : multi) {
+        Object elem;
+        switch (r.type()) {
+          case '+':
+          case '-':
+            elem = r.status();
+            break;
+          case '$':   // Bulk
+            elem = r.asString();
+            break;
+          case ':':   // Integer
+            elem = r.asLong();
+            break;
+          case '*':   // Multi
+            elem = r.asJsonArray();
+            break;
+          default:
+            throw new RuntimeException("Unknown sub message type in multi: " + r.type());
+        }
+        if (elem == null) {
+          array.addNull();
+        } else {
+          array.add(elem);
+        }
+      }
+
+      return array;
+    }
+
+    return null;
+  }
+
+  @Override
+  public JsonObject asJsonObject() {
+    if (type == '*' && multi != null) {
+      final JsonObject json = new JsonObject();
+
+      for (int i = 0; i < multi.length; i += 2) {
+        if (multi[i].type() != '$') {
+          throw new RuntimeException("Expected String as key type in multi: " + multi[i].type());
+        }
+
+        Reply brKey = multi[i];
+        Reply brValue = multi[i + 1];
+
+        String k = brKey.asString();
+
+        switch (brValue.type()) {
+          case '+':   // Status
+          case '-':   // Status
+            json.put((k == null ? "k" + (i / 2) : k), brValue.status());
+            break;
+          case '$':   // Bulk
+            json.put((k == null ? "k" + (i / 2) : k), brValue.asString());
+            break;
+          case ':':   // Integer
+            json.put((k == null ? "k" + (i / 2) : k), brValue.asLong());
+            break;
+          case '*':   // Multi
+            json.put((k == null ? "k" + (i / 2) : k), brValue.asJsonArray());
+            break;
+          default:
+            throw new RuntimeException("Unknown sub message type in multi: " + multi[i + 1].type());
+        }
+      }
+
+      return json;
+    }
+
+    return null;
+  }
+
+  @Override
+  public Long asLong() {
+    if ((type == '$' || type == ':') && buffer != null) {
+      return Long.parseLong(buffer.toString());
+    }
+    return null;
+  }
+
+  @Override
+  public Integer asInteger() {
+    if ((type == '$' || type == ':') && buffer != null) {
+      return Integer.parseInt(buffer.toString());
+    }
+    return null;
+  }
+
+  @Override
+  public String asString() {
+    if ((type == '$' || type == '+' || type == '-' || type == ':') && buffer != null) {
+      return buffer.toString();
+    }
+    return null;
+  }
+
+  @Override
+  public String asString(String encoding) {
+    if ((type == '$' || type == '+' || type == '-' || type == ':') && buffer != null) {
+      return buffer.toString(encoding);
+    }
+    return null;
+  }
+
+  @Override
+  public Buffer asBuffer() {
+    return buffer;
+  }
+
+  @Override
+  public boolean isMulti() {
+    return multi != null;
+  }
+
+  @Override
+  public int size() {
+    if (multi != null) {
+      return multi.length;
+    }
+
+    return 0;
+  }
+
+  @Override
+  public Reply get(int pos) {
+    if (multi != null) {
+      return multi[pos];
+    }
+
+    throw new IndexOutOfBoundsException("Position: " + pos);
   }
 }
