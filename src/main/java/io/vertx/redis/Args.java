@@ -108,6 +108,9 @@ public interface Args {
   @GenIgnore
   @Fluent
   default Args add(Integer arg) {
+    if (arg == null) {
+      return addNull();
+    }
     return add(arg.longValue());
   }
 

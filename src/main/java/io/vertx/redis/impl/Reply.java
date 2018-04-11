@@ -318,4 +318,9 @@ public final class Reply implements io.vertx.redis.Reply {
 
     throw new IndexOutOfBoundsException("Position: " + pos);
   }
+
+  @Override
+  public String toString() {
+    return asString();
+  }
 }

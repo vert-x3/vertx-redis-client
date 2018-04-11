@@ -86,7 +86,7 @@ public interface Reply {
   Buffer asBuffer();
 
   /**
-   * Is this reply a multu bulk?
+   * Is this reply a multibulk?
    * @return boolean
    */
   boolean isMulti();

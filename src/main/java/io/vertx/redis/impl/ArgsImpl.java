@@ -67,6 +67,10 @@ public class ArgsImpl implements Args {
 
   @Override
   public Args add(Buffer arg) {
+    // short circuit the encoding if null
+    if (arg == null) {
+      return addNull();
+    }
     buffer.appendByte(BYTES_PREFIX);
     buffer.appendBytes(numToBytes(arg.length()));
     buffer.appendBytes(CRLF);
@@ -78,6 +82,10 @@ public class ArgsImpl implements Args {
 
   @Override
   public Args add(Long arg) {
+    // short circuit the encoding if null
+    if (arg == null) {
+      return addNull();
+    }
     buffer.appendByte(BYTES_PREFIX);
     final byte[] bytes = numToBytes(arg);
     buffer.appendBytes(numToBytes(bytes.length));
