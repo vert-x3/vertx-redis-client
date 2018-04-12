@@ -64,6 +64,16 @@ An connection example can then be:
 {@link examples.RedisExamples#example1}
 ----
 
+You can also enable connection via Unix domain socket like this:
+
+[source,$lang]
+----
+{@link examples.RedisExamples#example7}
+----
+
+Make sure your `vertx` instance has enabled native transports, more information can be found in https://vertx.io/docs/vertx-core/java/#_native_transports[Vert.x documentation].
+The client will prefer to use domain socket if you configure domain socket and tcp connection at the same time.
+
 The client attempts to reconnect to the server on connection errors, for this reason if you are connecting to a server
 that requires authentication and/or you are not using the default database you must provide the authentication
 password and/or database id to the config object, the properties names are:
