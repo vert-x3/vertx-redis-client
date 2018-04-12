@@ -86,4 +86,12 @@ public class RedisExamples {
       }
     });
   }
+
+  public void example7(Vertx vertx) {
+    RedisOptions config = new RedisOptions()
+      .setDomainSocket(true)
+      .setDomainSocketAddress("/tmp/redis.sock");
+      
+    RedisClient redis = RedisClient.create(vertx, config);
+  }
 }
