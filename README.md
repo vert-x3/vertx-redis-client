@@ -6,8 +6,8 @@ The Vert.x Redis client provides an asynchronous API to interact with a [Redis](
 
 Documentation:
 
-* http://vertx.io/docs/vertx-redis-client/java/[Java documentation]
-* http://vertx.io/docs/vertx-redis-client/js/[JavaScript documentation]
-* http://vertx.io/docs/vertx-redis-client/kotlin/[Kotlin documentation]
-* http://vertx.io/docs/vertx-redis-client/groovy/[Groovy documentation]
-* http://vertx.io/docs/vertx-redis-client/ruby/[Ruby documentation]
+* [Java documentation](http://vertx.io/docs/vertx-redis-client/java/)
+* [JavaScript documentation](http://vertx.io/docs/vertx-redis-client/js/)
+* [Kotlin documentation](http://vertx.io/docs/vertx-redis-client/kotlin/)
+* [Groovy documentation](http://vertx.io/docs/vertx-redis-client/groovy/)
+* [Ruby documentation](http://vertx.io/docs/vertx-redis-client/ruby/)
