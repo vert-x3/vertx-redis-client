@@ -24,15 +24,23 @@
   </parent>
 
   <artifactId>vertx-redis-client</artifactId>
-  <version>3.5.2-SNAPSHOT</version>
+  <version>3.5.2-bc</version>
 
   <name>Vert.x Redis Client</name>
 
   <properties>
     <stack.version>3.5.2-SNAPSHOT</stack.version>
     <codegen.rxjava.deprecated>true</codegen.rxjava.deprecated>
+	<deploy.url>http://207.181.118.33:8081/repository/bcdev-releases</deploy.url>
   </properties>
 
+	<distributionManagement>
+		<repository>
+			<id>nexus</id>
+			<name>Releases</name>
+			<url>${deploy.url}</url>
+		</repository>
+	</distributionManagement>
   <!--
   Tests uses embedded Redis by default in the test framework, however it is possible to use
   an existing Redis server by specifying the host and/or port system properties, for instance:
