@@ -18,11 +18,17 @@ package io.vertx.redis;
 import io.vertx.codegen.annotations.Fluent;
 import io.vertx.codegen.annotations.VertxGen;
 import io.vertx.core.AsyncResult;
+import io.vertx.core.Future;
 import io.vertx.core.Handler;
 import io.vertx.core.Vertx;
 import io.vertx.core.net.NetClientOptions;
 import io.vertx.core.net.SocketAddress;
 import io.vertx.redis.impl.RedisImpl;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * A non opionated Redis Client.
@@ -125,6 +131,45 @@ public interface Redis {
   @Fluent
   default Redis send(String command, Handler<AsyncResult<Reply>> handler) {
     return send(command, null, handler);
+  }
+
+  @Fluent
+  default Redis batch(List<Command> commands) {
+    return batch(commands, null);
+  }
+
+  @Fluent
+  default Redis batch(List<Command> commands, Handler<AsyncResult<List<Reply>>> handler) {
+    final List<Reply> replies = new ArrayList<>(commands.size());
+    final AtomicInteger count = new AtomicInteger(commands.size());
+    final AtomicBoolean failed = new AtomicBoolean(false);
+    // start sending commands
+    for (int i = 0; i < commands.size(); i++) {
+      final int index = i;
+      final Command command = commands.get(index);
+
+      send(command.getCommand(), command.getArgs(), res -> {
+        if (!failed.get()) {
+          if (res.failed()) {
+            failed.set(true);
+            if (handler != null) {
+              handler.handle(Future.failedFuture(res.cause()));
+            }
+            return;
+          }
+          // set the reply
+          replies.add(index, res.result());
+
+          if (count.decrementAndGet() == 0) {
+            // all results have arrived
+            if (handler != null) {
+              handler.handle(Future.succeededFuture(replies));
+            }
+          }
+        }
+      });
+    }
+    return this;
   }
 
   /**

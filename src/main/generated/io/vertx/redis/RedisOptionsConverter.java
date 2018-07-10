@@ -1,19 +1,3 @@
-/*
- * Copyright (c) 2014 Red Hat, Inc. and others
- *
- * Red Hat licenses this file to you under the Apache License, version 2.0
- * (the "License"); you may not use this file except in compliance with the
- * License.  You may obtain a copy of the License at:
- *
- * http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
- * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.  See the
- * License for the specific language governing permissions and limitations
- * under the License.
- */
-
 package io.vertx.redis;
 
 import io.vertx.core.json.JsonObject;
@@ -21,53 +5,82 @@ import io.vertx.core.json.JsonArray;
 
 /**
  * Converter for {@link io.vertx.redis.RedisOptions}.
- *
- * NOTE: This class has been automatically generated from the {@link io.vertx.redis.RedisOptions} original class using Vert.x codegen.
+ * NOTE: This class has been automatically generated from the {@link "io.vertx.redis.RedisOptions} original class using Vert.x codegen.
  */
 public class RedisOptionsConverter {
 
-  public static void fromJson(JsonObject json, RedisOptions obj) {
-    if (json.getValue("address") instanceof String) {
-      obj.setAddress((String)json.getValue("address"));
-    }
-    if (json.getValue("auth") instanceof String) {
-      obj.setAuth((String)json.getValue("auth"));
-    }
-    if (json.getValue("binary") instanceof Boolean) {
-      obj.setBinary((Boolean)json.getValue("binary"));
-    }
-    if (json.getValue("domainSocket") instanceof Boolean) {
-      obj.setDomainSocket((Boolean)json.getValue("domainSocket"));
-    }
-    if (json.getValue("domainSocketAddress") instanceof String) {
-      obj.setDomainSocketAddress((String)json.getValue("domainSocketAddress"));
-    }
-    if (json.getValue("encoding") instanceof String) {
-      obj.setEncoding((String)json.getValue("encoding"));
-    }
-    if (json.getValue("host") instanceof String) {
-      obj.setHost((String)json.getValue("host"));
-    }
-    if (json.getValue("masterName") instanceof String) {
-      obj.setMasterName((String)json.getValue("masterName"));
-    }
-    if (json.getValue("port") instanceof Number) {
-      obj.setPort(((Number)json.getValue("port")).intValue());
-    }
-    if (json.getValue("select") instanceof Number) {
-      obj.setSelect(((Number)json.getValue("select")).intValue());
-    }
-    if (json.getValue("sentinels") instanceof JsonArray) {
-      java.util.ArrayList<java.lang.String> list = new java.util.ArrayList<>();
-      json.getJsonArray("sentinels").forEach( item -> {
-        if (item instanceof String)
-          list.add((String)item);
-      });
-      obj.setSentinels(list);
+  public static void fromJson(Iterable<java.util.Map.Entry<String, Object>> json, RedisOptions obj) {
+    for (java.util.Map.Entry<String, Object> member : json) {
+      switch (member.getKey()) {
+        case "address":
+          if (member.getValue() instanceof String) {
+            obj.setAddress((String)member.getValue());
+          }
+          break;
+        case "auth":
+          if (member.getValue() instanceof String) {
+            obj.setAuth((String)member.getValue());
+          }
+          break;
+        case "binary":
+          if (member.getValue() instanceof Boolean) {
+            obj.setBinary((Boolean)member.getValue());
+          }
+          break;
+        case "domainSocket":
+          if (member.getValue() instanceof Boolean) {
+            obj.setDomainSocket((Boolean)member.getValue());
+          }
+          break;
+        case "domainSocketAddress":
+          if (member.getValue() instanceof String) {
+            obj.setDomainSocketAddress((String)member.getValue());
+          }
+          break;
+        case "encoding":
+          if (member.getValue() instanceof String) {
+            obj.setEncoding((String)member.getValue());
+          }
+          break;
+        case "host":
+          if (member.getValue() instanceof String) {
+            obj.setHost((String)member.getValue());
+          }
+          break;
+        case "masterName":
+          if (member.getValue() instanceof String) {
+            obj.setMasterName((String)member.getValue());
+          }
+          break;
+        case "port":
+          if (member.getValue() instanceof Number) {
+            obj.setPort(((Number)member.getValue()).intValue());
+          }
+          break;
+        case "select":
+          if (member.getValue() instanceof Number) {
+            obj.setSelect(((Number)member.getValue()).intValue());
+          }
+          break;
+        case "sentinels":
+          if (member.getValue() instanceof JsonArray) {
+            java.util.ArrayList<java.lang.String> list =  new java.util.ArrayList<>();
+            ((Iterable<Object>)member.getValue()).forEach( item -> {
+              if (item instanceof String)
+                list.add((String)item);
+            });
+            obj.setSentinels(list);
+          }
+          break;
+      }
     }
   }
 
   public static void toJson(RedisOptions obj, JsonObject json) {
+    toJson(obj, json.getMap());
+  }
+
+  public static void toJson(RedisOptions obj, java.util.Map<String, Object> json) {
     if (obj.getAddress() != null) {
       json.put("address", obj.getAddress());
     }

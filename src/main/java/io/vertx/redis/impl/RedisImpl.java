@@ -186,6 +186,8 @@ public class RedisImpl implements Redis, Handler<Reply> {
       }
     }
 
+    final boolean multiWordCommand = totalArgs > 1;
+
     if (args != null) {
       totalArgs += args.size();
     }
@@ -197,14 +199,18 @@ public class RedisImpl implements Redis, Handler<Reply> {
     buffer.appendBytes(CRLF);
     // serialize the command
     int last = 0;
-    for (int i = 0; i < command.length(); i++) {
-      if (command.charAt(i) == ' ') {
-        buffer.appendByte(BYTES_PREFIX);
-        buffer.appendBytes(ArgsImpl.numToBytes(i - last));
-        buffer.appendBytes(CRLF);
-        buffer.appendString(command.substring(last, i));
-        buffer.appendBytes(CRLF);
-        last = ++i;
+    // will avoid running the loop again as we already know this
+    // command is composed of a single word
+    if (multiWordCommand) {
+      for (int i = 0; i < command.length(); i++) {
+        if (command.charAt(i) == ' ') {
+          buffer.appendByte(BYTES_PREFIX);
+          buffer.appendBytes(ArgsImpl.numToBytes(i - last));
+          buffer.appendBytes(CRLF);
+          buffer.appendString(command.substring(last, i));
+          buffer.appendBytes(CRLF);
+          last = ++i;
+        }
       }
     }
 

@@ -321,6 +321,9 @@ public final class Reply implements io.vertx.redis.Reply {
 
   @Override
   public String toString() {
+    if (multi != null) {
+      return "["+ multi.length + "]";
+    }
     return asString();
   }
 }
