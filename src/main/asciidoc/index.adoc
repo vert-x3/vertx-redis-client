@@ -35,7 +35,7 @@ To use the Vert.x Redis client, add the following dependency to the _dependencie
 <dependency>
 <groupId>io.vertx</groupId>
 <artifactId>vertx-redis-client</artifactId>
-<version>${maven.version}</version>
+<version>3.5.2.CR3</version>
 </dependency>
 ----
 
@@ -43,12 +43,12 @@ To use the Vert.x Redis client, add the following dependency to the _dependencie
 
 [source,groovy,subs="+attributes"]
 ----
-compile 'io.vertx:vertx-redis-client:${maven.version}'
+compile 'io.vertx:vertx-redis-client:3.5.2.CR3'
 ----
 
 == Connecting to Redis
 
-In order to connect to Redis there is a config required. This config is provided in the form of {@link io.vertx.redis.RedisOptions}
+In order to connect to Redis there is a config required. This config is provided in the form of `link:../../apidocs/io/vertx/redis/RedisOptions.html[RedisOptions]`
 containing the following values:
 
 * `host`: default is `localhost`
@@ -59,20 +59,15 @@ containing the following values:
 
 An connection example can then be:
 
-[source,$lang]
+[source,groovy]
 ----
-{@link examples.RedisExamples#example1}
-----
+def config = [
+  host:"127.0.0.1"
+]
 
-You can also enable connection via Unix domain socket like this:
+def redis = RedisClient.create(vertx, config)
 
-[source,$lang]
 ----
-{@link examples.RedisExamples#example7}
-----
-
-Make sure your `vertx` instance has enabled native transports, more information can be found in https://vertx.io/docs/vertx-core/java/#_native_transports[Vert.x documentation].
-The client will prefer to use domain socket if you configure domain socket and tcp connection at the same time.
 
 The client attempts to reconnect to the server on connection errors, for this reason if you are connecting to a server
 that requires authentication and/or you are not using the default database you must provide the authentication
@@ -81,8 +76,8 @@ password and/or database id to the config object, the properties names are:
 * `auth`
 * `select`
 
-If you do not do this and manually call the {@link io.vertx.redis.RedisClient#auth(java.lang.String, io.vertx.core.Handler)}
-or {@link io.vertx.redis.RedisClient#select(int, io.vertx.core.Handler)} then the client will not know how to recover
+If you do not do this and manually call the `link:../../apidocs/io/vertx/redis/RedisClient.html#auth-java.lang.String-io.vertx.core.Handler-[auth]`
+or `link:../../apidocs/io/vertx/redis/RedisClient.html#select-int-io.vertx.core.Handler-[select]` then the client will not know how to recover
 the connection in case of socket error.
 
 == Running commands
@@ -91,9 +86,16 @@ Given that the redis client is connected to the server, all commands are now pos
 The module offers a clean API for executing commands without the need to hand write the command itself, for example
 if one wants to get a value of a key it can be done as:
 
-[source,$lang]
+[source,groovy]
 ----
-{@link examples.RedisExamples#example2}
+def redis = RedisClient.create(vertx, [:])
+
+redis.get("mykey", { res ->
+  if (res.succeeded()) {
+    // so something...
+  }
+})
+
 ----
 
 In order to know more about the commands available you should look at: <a href="http://redis.io/commands">redis documentation</a>.
@@ -105,16 +107,42 @@ it cannot be used for running other commands than the command to leave that mode
 
 To start a subscriber one would do:
 
-[source,$lang]
+[source,groovy]
 ----
-{@link examples.RedisExamples#example3}
+
+// register a handler for the incoming message the naming the Redis module will use is base address + '.' + redis channel
+vertx.eventBus().consumer("io.vertx.redis.channel1", { received ->
+  // do whatever you need to do with your message
+  def value = received.body().value
+  // the value is a JSON doc with the following properties
+  // channel - The channel to which this message was sent
+  // pattern - Pattern is present if you use psubscribe command and is the pattern that matched this message channel
+  // message - The message payload
+})
+
+def redis = RedisClient.create(vertx, [:])
+
+redis.subscribe("channel1", { res ->
+  if (res.succeeded()) {
+    // so something...
+  }
+})
+
 ----
 
 And from another place in the code publish messages to the queue:
 
-[source,$lang]
+[source,groovy]
 ----
-{@link examples.RedisExamples#example4}
+
+def redis = RedisClient.create(vertx, [:])
+
+redis.publish("channel1", "Hello World!", { res ->
+  if (res.succeeded()) {
+    // so something...
+  }
+})
+
 ----
 
 == Friendlier hash commands
@@ -217,7 +245,7 @@ In this case the return value will be a json array with the value 10 on index 0.
 == Redis Sentinel
 
 This client support the Redis Sentinel API with the API interface:
-{@link io.vertx.redis.sentinel.RedisSentinel}.
+`link:../../apidocs/io/vertx/redis/sentinel/RedisSentinel.html[RedisSentinel]`.
 
 The API exposes the sentinel commands:
 
