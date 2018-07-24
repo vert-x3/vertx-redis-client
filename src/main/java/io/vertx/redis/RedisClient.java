@@ -17,6 +17,7 @@ package io.vertx.redis;
 
 import io.vertx.codegen.annotations.Fluent;
 import io.vertx.codegen.annotations.GenIgnore;
+import io.vertx.codegen.annotations.Nullable;
 import io.vertx.codegen.annotations.VertxGen;
 import io.vertx.core.AsyncResult;
 import io.vertx.core.Handler;
@@ -831,7 +832,7 @@ public interface RedisClient {
    * group: string
    */
   @Fluent
-  RedisClient get(String key, Handler<AsyncResult<String>> handler);
+  RedisClient get(String key, Handler<AsyncResult<@Nullable String>> handler);
 
   /**
    * Get the value of a key - without decoding as utf-8
@@ -842,7 +843,7 @@ public interface RedisClient {
    * group: string
    */
   @Fluent
-  RedisClient getBinary(String key, Handler<AsyncResult<Buffer>> handler);
+  RedisClient getBinary(String key, Handler<AsyncResult<@Nullable Buffer>> handler);
 
   /**
    * Returns the bit value at offset in the string value stored at key
