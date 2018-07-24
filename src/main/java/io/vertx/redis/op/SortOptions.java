@@ -105,11 +105,29 @@ public class SortOptions {
     return this;
   }
 
+  public SortOptions setDescending(Boolean descending) {
+    this.descending = descending;
+    return this;
+  }
+
+  /**
+   * @deprecated use {@link #setDescending(Boolean)} instead
+   */
+  @Deprecated
   public SortOptions useDescending() {
     this.descending = true;
     return this;
   }
 
+  public SortOptions setAlpha(Boolean alpha) {
+    this.alpha = alpha;
+    return this;
+  }
+
+  /**
+   * @deprecated use {@link #setAlpha(Boolean)} instead
+   */
+  @Deprecated
   public SortOptions useAlpha() {
     this.alpha = true;
     return this;
