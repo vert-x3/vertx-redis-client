@@ -16,10 +16,12 @@ public class NullableTest extends AbstractRedisClientBase {
             fail(asyncResult.cause());
           } else {
             assertNull(asyncResult.result());
+            testComplete();
           }
         });
       }
     });
+    await();
   }
   @Test
   public void testGetBinaryNullable() {
@@ -32,9 +34,11 @@ public class NullableTest extends AbstractRedisClientBase {
             fail(asyncResult.cause());
           } else {
             assertNull(asyncResult.result());
+            testComplete();
           }
         });
       }
     });
+    await();
   }
 }
