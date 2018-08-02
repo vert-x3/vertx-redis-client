@@ -65,6 +65,20 @@ public interface Reply {
   Integer asInteger();
 
   /**
+   * If the reply is a redis integer or bulk or bulk it will encode it as a float.
+   * @return float
+   */
+  @Nullable
+  Float asFloat();
+
+  /**
+   * If the reply is a redis integer or bulk or bulk it will encode it as a double.
+   * @return double
+   */
+  @Nullable
+  Double asDouble();
+
+  /**
    * If the reply is a not a multibulk it will encode it as a String.
    * @return string
    */

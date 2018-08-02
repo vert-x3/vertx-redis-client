@@ -276,6 +276,22 @@ public final class Reply implements io.vertx.redis.Reply {
   }
 
   @Override
+  public Float asFloat() {
+    if ((type == '$' || type == ':') && buffer != null) {
+      return Float.parseFloat(buffer.toString());
+    }
+    return null;
+  }
+
+  @Override
+  public Double asDouble() {
+    if ((type == '$' || type == ':') && buffer != null) {
+      return Double.parseDouble(buffer.toString());
+    }
+    return null;
+  }
+
+  @Override
   public String asString() {
     if ((type == '$' || type == '+' || type == '-' || type == ':') && buffer != null) {
       return buffer.toString();
