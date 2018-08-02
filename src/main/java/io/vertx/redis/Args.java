@@ -38,6 +38,7 @@ public interface Args {
     return new ArgsImpl();
   }
 
+  @GenIgnore
   static Args args(Object... args) {
     return new ArgsImpl(args);
   }
