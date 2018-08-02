@@ -143,6 +143,14 @@ public class ArgsImpl implements Args {
       return add((Integer) arg);
     }
 
+    if (arg instanceof Float) {
+      return add((Float) arg);
+    }
+
+    if (arg instanceof Double) {
+      return add((Double) arg);
+    }
+
     if (arg instanceof Buffer) {
       return add((Buffer) arg);
     }

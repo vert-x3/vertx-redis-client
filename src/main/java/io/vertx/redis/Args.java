@@ -149,6 +149,30 @@ public interface Args {
   }
 
   /**
+   * Adds a Float argument
+   * @return self
+   */
+  @Fluent
+  default Args add(Float arg) {
+    if (arg == null) {
+      return addNull();
+    }
+    return add(Float.toString(arg));
+  }
+
+  /**
+   * Adds a Double argument
+   * @return self
+   */
+  @Fluent
+  default Args add(Double arg) {
+    if (arg == null) {
+      return addNull();
+    }
+    return add(Double.toString(arg));
+  }
+
+  /**
    * Retuns the current number of arguments
    * @return size
    */
