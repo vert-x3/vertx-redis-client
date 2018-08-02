@@ -1,7 +1,11 @@
 package io.vertx.redis.impl;
 
 import io.vertx.core.buffer.Buffer;
+import io.vertx.core.json.JsonArray;
+import io.vertx.core.json.JsonObject;
 import io.vertx.redis.Args;
+
+import java.util.List;
 
 
 public class ArgsImpl implements Args {
@@ -55,6 +59,16 @@ public class ArgsImpl implements Args {
     return bytes;
   }
 
+  public ArgsImpl() {
+
+  }
+
+  public ArgsImpl(Object[] args) {
+    for (Object el : args) {
+      addObject(el);
+    }
+  }
+
   @Override
   public Args addNull() {
     buffer.appendByte(BYTES_PREFIX);
@@ -94,6 +108,58 @@ public class ArgsImpl implements Args {
     buffer.appendBytes(CRLF);
     size++;
     return this;
+  }
+
+  @Override
+  public Args add(List arg) {
+    // short circuit the encoding if null
+    if (arg == null) {
+      return addNull();
+    }
+    // add the size
+    add(arg.size());
+    // add the values
+    for (Object el : arg) {
+      addObject(el);
+    }
+
+    return this;
+  }
+
+  private Args addObject(Object arg) throws IllegalArgumentException {
+    if (arg == null) {
+      return addNull();
+    }
+
+    if (arg instanceof String) {
+      return add((String) arg);
+    }
+
+    if (arg instanceof Long) {
+      return add((Long) arg);
+    }
+
+    if (arg instanceof Integer) {
+      return add((Integer) arg);
+    }
+
+    if (arg instanceof Buffer) {
+      return add((Buffer) arg);
+    }
+
+    if (arg instanceof byte[]) {
+      return add((byte[]) arg);
+    }
+
+    if (arg instanceof JsonArray) {
+      return add((JsonArray) arg);
+    }
+
+    if (arg instanceof List) {
+      return add((List) arg);
+    }
+
+    throw new IllegalArgumentException(arg.getClass().getName() + " is not allowed!");
   }
 
   @Override

@@ -19,10 +19,12 @@ import io.vertx.codegen.annotations.Fluent;
 import io.vertx.codegen.annotations.GenIgnore;
 import io.vertx.codegen.annotations.VertxGen;
 import io.vertx.core.buffer.Buffer;
+import io.vertx.core.json.JsonArray;
 import io.vertx.redis.impl.ArgsImpl;
 
 import java.io.UnsupportedEncodingException;
 import java.nio.charset.Charset;
+import java.util.List;
 
 /**
  * Encodes arguments in a REDIS way
@@ -36,6 +38,10 @@ public interface Args {
     return new ArgsImpl();
   }
 
+  static Args args(Object... args) {
+    return new ArgsImpl(args);
+  }
+
   /**
    * Adds a null argument
    * @return self
@@ -47,8 +53,8 @@ public interface Args {
    * Adds a byte array
    * @return self
    */
-  @GenIgnore
   @Fluent
+  @GenIgnore
   default Args add(byte[] arg) {
     if (arg == null) {
       return addNull();
@@ -84,8 +90,8 @@ public interface Args {
    * Adds a String using a specific charset argument
    * @return self
    */
-  @GenIgnore
   @Fluent
+  @GenIgnore
   default Args add(String arg, Charset charset) {
     if (arg == null) {
       return addNull();
@@ -105,8 +111,8 @@ public interface Args {
    * Adds a Integer argument
    * @return self
    */
-  @GenIgnore
   @Fluent
+  @GenIgnore
   default Args add(Integer arg) {
     if (arg == null) {
       return addNull();
@@ -120,6 +126,26 @@ public interface Args {
    */
   @Fluent
   Args add(Long arg);
+
+  /**
+   * Adds a List argument
+   * @return self
+   */
+  @Fluent
+  @GenIgnore
+  Args add(List arg);
+
+  /**
+   * Adds a JSON array argument
+   * @return self
+   */
+  @Fluent
+  default Args add(JsonArray arg) {
+    if (arg == null) {
+      return addNull();
+    }
+    return add(arg.getList());
+  }
 
   /**
    * Retuns the current number of arguments
