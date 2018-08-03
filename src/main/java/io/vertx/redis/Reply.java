@@ -106,6 +106,12 @@ public interface Reply {
   boolean isMulti();
 
   /**
+   * Is this reply a null?
+   * @return boolean
+   */
+  boolean isNull();
+
+  /**
    * Returns the size of the multibulk
    * @return json
    */

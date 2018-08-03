@@ -32,13 +32,13 @@ import io.vertx.redis.impl.RedisAPIImpl;
 public interface RedisAPI extends Redis {
 
   /**
-   * Creates an instance of the Client.
+   * Creates an instance of the Client wrapping an existing client.
    *
-   * @param vertx vertx instance
+   * @param client existing redis client
    * @return a instance of the connector.
    */
-  static RedisAPI create(Vertx vertx) {
-    return new RedisAPIImpl(vertx);
+  static RedisAPI create(Redis client) {
+    return new RedisAPIImpl(client);
   }
 
   /**

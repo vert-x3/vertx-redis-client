@@ -31,16 +31,16 @@ public class UnoppionatedPubSubTest {
     server = new RedisServer(6379);
     server.start();
 
-    pub = Redis.create(vertx);
+    pub = Redis.create(vertx, SocketAddress.inetSocketAddress(6379, "localhost"));
     pub.exceptionHandler(should::fail);
 
-    pub.open(SocketAddress.inetSocketAddress(6379, "localhost"), pubOpen -> {
+    pub.open(pubOpen -> {
       should.assertTrue(pubOpen.succeeded());
 
-      sub = Redis.create(vertx);
+      sub = Redis.create(vertx, SocketAddress.inetSocketAddress(6379, "localhost"));
       sub.exceptionHandler(should::fail);
 
-      sub.open(SocketAddress.inetSocketAddress(6379, "localhost"), subOpen -> {
+      sub.open(subOpen -> {
         should.assertTrue(subOpen.succeeded());
         test.complete();
       });

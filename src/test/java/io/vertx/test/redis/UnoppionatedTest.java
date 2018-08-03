@@ -32,10 +32,10 @@ public class UnoppionatedTest {
     server = new RedisServer(6379);
     server.start();
 
-    redis = Redis.create(vertx);
+    redis = Redis.create(vertx, SocketAddress.inetSocketAddress(6379, "localhost"));
     redis.exceptionHandler(should::fail);
 
-    redis.open(SocketAddress.inetSocketAddress(6379, "localhost"), open -> {
+    redis.open(open -> {
       should.assertTrue(open.succeeded());
       test.complete();
     });

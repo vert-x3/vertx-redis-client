@@ -79,6 +79,9 @@ public class RedisImpl implements Redis, Handler<Reply> {
   private static final byte[] CRLF = "\r\n".getBytes();
   private static final byte BYTES_PREFIX = '$';
 
+  private final SocketAddress socketAddress;
+  private final NetClientOptions netClientOptions;
+
   // waiting: commands that have been sent but not answered
   private final Queue<Req> waiting = new LinkedList<>();
   // parser utility
@@ -93,7 +96,7 @@ public class RedisImpl implements Redis, Handler<Reply> {
   private Handler<Void> onClose;
   private Handler<io.vertx.redis.Reply> onMessage;
 
-  public RedisImpl(Vertx vertx) {
+  public RedisImpl(Vertx vertx, SocketAddress socketAddress, NetClientOptions netClientOptions) {
     // Make sure we have an event loop context for serializability of the commands
     Context ctx = Vertx.currentContext();
     if (ctx == null) {
@@ -105,13 +108,15 @@ public class RedisImpl implements Redis, Handler<Reply> {
 
     this.vertx = vertx;
     this.context = ctx;
+    this.socketAddress = socketAddress;
+    this.netClientOptions = netClientOptions;
   }
 
   @Override
-  public Redis open(SocketAddress socketAddress, NetClientOptions options, Handler<AsyncResult<Void>> onOpen) {
+  public Redis open(Handler<AsyncResult<Void>> onOpen) {
     parser.reset();
     // create a netClient for the connection
-    final NetClient client = vertx.createNetClient(options);
+    final NetClient client = vertx.createNetClient(netClientOptions);
     client.connect(socketAddress, asyncResult -> {
       if (asyncResult.failed()) {
         client.close();
@@ -125,14 +130,7 @@ public class RedisImpl implements Redis, Handler<Reply> {
         .closeHandler(close -> {
           client.close();
           // clean up the pending queue
-          Req req;
-          while ((req = waiting.poll()) != null) {
-            try {
-              req.handle(Future.failedFuture("Connection closed"));
-            } catch (RuntimeException e) {
-              LOG.warn("Exception during cleanup", e);
-            }
-          }
+          cleanupQueue("Connection closed");
           // call the close handler if any
           if (onClose != null) {
             onClose.handle(close);
@@ -142,14 +140,7 @@ public class RedisImpl implements Redis, Handler<Reply> {
           netSocket.close();
           client.close();
           // clean up the pending queue
-          Req req;
-          while ((req = waiting.poll()) != null) {
-            try {
-              req.handle(Future.failedFuture(exception));
-            } catch (RuntimeException e) {
-              LOG.warn("Exception during cleanup", e);
-            }
-          }
+          cleanupQueue(exception);
           // call the exception handler if any
           if (onException != null) {
             onException.handle(exception);
@@ -185,6 +176,32 @@ public class RedisImpl implements Redis, Handler<Reply> {
   @Override
   public Redis handler(Handler<io.vertx.redis.Reply> handler) {
     this.onMessage = handler;
+    return this;
+  }
+
+  protected Redis cleanupQueue(String errorMessage) {
+    Req req;
+    while ((req = waiting.poll()) != null) {
+      try {
+        req.handle(Future.failedFuture(errorMessage));
+      } catch (RuntimeException e) {
+        LOG.warn("Exception during cleanup", e);
+      }
+    }
+
+    return this;
+  }
+
+  protected Redis cleanupQueue(Throwable t) {
+    Req req;
+    while ((req = waiting.poll()) != null) {
+      try {
+        req.handle(Future.failedFuture(t));
+      } catch (RuntimeException e) {
+        LOG.warn("Exception during cleanup", e);
+      }
+    }
+
     return this;
   }
 

@@ -44,33 +44,33 @@ public interface Redis {
    * Creates an instance of the Client.
    *
    * @param vertx vertx instance
+   * @param socketAddress the socket address
    * @return a instance of the connector.
    */
-  static Redis create(Vertx vertx) {
-    return new RedisImpl(vertx);
+  static Redis create(Vertx vertx, SocketAddress socketAddress) {
+    return new RedisImpl(vertx, socketAddress, new NetClientOptions());
   }
 
   /**
-   * Opens a connection to the redis server.
+   * Creates an instance of the Client.
    *
-   * @param socketAddress the socket address
-   * @param handler a handler to be called once the connection is open or on error.
-   * @return self
-   */
-  default Redis open(SocketAddress socketAddress, Handler<AsyncResult<Void>> handler) {
-    return open(socketAddress, new NetClientOptions(), handler);
-  }
-
-  /**
-   * Opens a connection to the redis server.
-   *
+   * @param vertx vertx instance
    * @param socketAddress the socket address
    * @param options the net client options to be used
+   * @return a instance of the connector.
+   */
+  static Redis create(Vertx vertx, SocketAddress socketAddress, NetClientOptions options) {
+    return new RedisImpl(vertx, socketAddress, options);
+  }
+
+  /**
+   * Opens a connection to the redis server.
+   *
    * @param handler a handler to be called once the connection is open or on error.
    * @return self
    */
   @Fluent
-  Redis open(SocketAddress socketAddress, NetClientOptions options, Handler<AsyncResult<Void>> handler);
+  Redis open(Handler<AsyncResult<Void>> handler);
 
   /**
    * Closes the underlying net client.
@@ -94,7 +94,7 @@ public interface Redis {
   Redis closeHandler(Handler<Void> handler);
 
   /**
-   * Set the exception handler to be called on message.
+   * Set the handler to be called on message.
    * @param handler the handler
    * @return self
    */

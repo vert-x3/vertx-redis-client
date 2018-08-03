@@ -313,6 +313,11 @@ public final class Reply implements io.vertx.redis.Reply {
   }
 
   @Override
+  public boolean isNull() {
+    return !isMulti() && buffer == null;
+  }
+
+  @Override
   public boolean isMulti() {
     return multi != null;
   }

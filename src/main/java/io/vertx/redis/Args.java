@@ -153,6 +153,7 @@ public interface Args {
    * @return self
    */
   @Fluent
+  @GenIgnore
   default Args add(Float arg) {
     if (arg == null) {
       return addNull();
@@ -165,6 +166,7 @@ public interface Args {
    * @return self
    */
   @Fluent
+  @GenIgnore
   default Args add(Double arg) {
     if (arg == null) {
       return addNull();
