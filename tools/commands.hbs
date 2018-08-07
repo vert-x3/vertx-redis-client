@@ -20,7 +20,6 @@ import io.vertx.codegen.annotations.VertxGen;
 
 import io.vertx.core.AsyncResult;
 import io.vertx.core.Handler;
-import io.vertx.core.Vertx;
 
 import io.vertx.redis.impl.RedisAPIImpl;
 
@@ -30,17 +29,24 @@ import io.vertx.redis.impl.RedisAPIImpl;
  * @author <a href="mailto:plopes@redhat.com">Paulo Lopes</a>
  */
 @VertxGen
-public interface RedisAPI extends Redis {
+public interface RedisAPI {
 
   /**
-   * Creates an instance of the Client wrapping an existing client.
+   * Wraps an instance of the Client.
    *
    * @param client existing redis client
    * @return a instance of the connector.
    */
-  static RedisAPI create(Redis client) {
+  static RedisAPI wrap(Redis client) {
     return new RedisAPIImpl(client);
   }
+
+  /**
+   * Unwraps the underlying client.
+   *
+   * @return the underlying client.
+   */
+  Redis unwrap();
 
 {{#each .}}
   /**
@@ -57,7 +63,7 @@ public interface RedisAPI extends Redis {
    */
   @Fluent
   default RedisAPI {{camelcase (lowercase @key)}}({{#if arguments}}Args arguments, {{/if}}Handler<AsyncResult<Reply>> handler) {
-    send("{{@key}}", {{#if arguments}}arguments, {{/if}}handler);
+    unwrap().send("{{@key}}", {{#if arguments}}arguments, {{/if}}handler);
     return this;
   }
 

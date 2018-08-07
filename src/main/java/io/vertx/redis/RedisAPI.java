@@ -20,7 +20,6 @@ import io.vertx.codegen.annotations.VertxGen;
 
 import io.vertx.core.AsyncResult;
 import io.vertx.core.Handler;
-import io.vertx.core.Vertx;
 import io.vertx.redis.impl.RedisAPIImpl;
 
 /**
@@ -29,7 +28,7 @@ import io.vertx.redis.impl.RedisAPIImpl;
  * @author <a href="mailto:plopes@redhat.com">Paulo Lopes</a>
  */
 @VertxGen
-public interface RedisAPI extends Redis {
+public interface RedisAPI {
 
   /**
    * Creates an instance of the Client wrapping an existing client.
@@ -37,9 +36,16 @@ public interface RedisAPI extends Redis {
    * @param client existing redis client
    * @return a instance of the connector.
    */
-  static RedisAPI create(Redis client) {
+  static RedisAPI wrap(Redis client) {
     return new RedisAPIImpl(client);
   }
+
+  /**
+   * Unwraps the underlying client.
+   *
+   * @return the underlying client.
+   */
+  Redis unwrap();
 
   /**
    * Append a value to a key
@@ -55,7 +61,7 @@ public interface RedisAPI extends Redis {
    */
   @Fluent
   default RedisAPI append(Args arguments, Handler<AsyncResult<Reply>> handler) {
-    send("APPEND", arguments, handler);
+    unwrap().send("APPEND", arguments, handler);
     return this;
   }
 
@@ -70,7 +76,7 @@ public interface RedisAPI extends Redis {
    */
   @Fluent
   default RedisAPI auth(Args arguments, Handler<AsyncResult<Reply>> handler) {
-    send("AUTH", arguments, handler);
+    unwrap().send("AUTH", arguments, handler);
     return this;
   }
 
@@ -84,7 +90,7 @@ public interface RedisAPI extends Redis {
    */
   @Fluent
   default RedisAPI bgrewriteaof(Handler<AsyncResult<Reply>> handler) {
-    send("BGREWRITEAOF", handler);
+    unwrap().send("BGREWRITEAOF", handler);
     return this;
   }
 
@@ -98,7 +104,7 @@ public interface RedisAPI extends Redis {
    */
   @Fluent
   default RedisAPI bgsave(Handler<AsyncResult<Reply>> handler) {
-    send("BGSAVE", handler);
+    unwrap().send("BGSAVE", handler);
     return this;
   }
 
@@ -116,7 +122,7 @@ public interface RedisAPI extends Redis {
    */
   @Fluent
   default RedisAPI bitcount(Args arguments, Handler<AsyncResult<Reply>> handler) {
-    send("BITCOUNT", arguments, handler);
+    unwrap().send("BITCOUNT", arguments, handler);
     return this;
   }
 
@@ -137,7 +143,7 @@ public interface RedisAPI extends Redis {
    */
   @Fluent
   default RedisAPI bitfield(Args arguments, Handler<AsyncResult<Reply>> handler) {
-    send("BITFIELD", arguments, handler);
+    unwrap().send("BITFIELD", arguments, handler);
     return this;
   }
 
@@ -156,7 +162,7 @@ public interface RedisAPI extends Redis {
    */
   @Fluent
   default RedisAPI bitop(Args arguments, Handler<AsyncResult<Reply>> handler) {
-    send("BITOP", arguments, handler);
+    unwrap().send("BITOP", arguments, handler);
     return this;
   }
 
@@ -176,7 +182,7 @@ public interface RedisAPI extends Redis {
    */
   @Fluent
   default RedisAPI bitpos(Args arguments, Handler<AsyncResult<Reply>> handler) {
-    send("BITPOS", arguments, handler);
+    unwrap().send("BITPOS", arguments, handler);
     return this;
   }
 
@@ -194,7 +200,7 @@ public interface RedisAPI extends Redis {
    */
   @Fluent
   default RedisAPI blpop(Args arguments, Handler<AsyncResult<Reply>> handler) {
-    send("BLPOP", arguments, handler);
+    unwrap().send("BLPOP", arguments, handler);
     return this;
   }
 
@@ -212,7 +218,7 @@ public interface RedisAPI extends Redis {
    */
   @Fluent
   default RedisAPI brpop(Args arguments, Handler<AsyncResult<Reply>> handler) {
-    send("BRPOP", arguments, handler);
+    unwrap().send("BRPOP", arguments, handler);
     return this;
   }
 
@@ -231,7 +237,7 @@ public interface RedisAPI extends Redis {
    */
   @Fluent
   default RedisAPI brpoplpush(Args arguments, Handler<AsyncResult<Reply>> handler) {
-    send("BRPOPLPUSH", arguments, handler);
+    unwrap().send("BRPOPLPUSH", arguments, handler);
     return this;
   }
 
@@ -249,7 +255,7 @@ public interface RedisAPI extends Redis {
    */
   @Fluent
   default RedisAPI bzpopmin(Args arguments, Handler<AsyncResult<Reply>> handler) {
-    send("BZPOPMIN", arguments, handler);
+    unwrap().send("BZPOPMIN", arguments, handler);
     return this;
   }
 
@@ -267,7 +273,7 @@ public interface RedisAPI extends Redis {
    */
   @Fluent
   default RedisAPI bzpopmax(Args arguments, Handler<AsyncResult<Reply>> handler) {
-    send("BZPOPMAX", arguments, handler);
+    unwrap().send("BZPOPMAX", arguments, handler);
     return this;
   }
 
@@ -288,7 +294,7 @@ public interface RedisAPI extends Redis {
    */
   @Fluent
   default RedisAPI clientKill(Args arguments, Handler<AsyncResult<Reply>> handler) {
-    send("CLIENT KILL", arguments, handler);
+    unwrap().send("CLIENT KILL", arguments, handler);
     return this;
   }
 
@@ -304,7 +310,7 @@ public interface RedisAPI extends Redis {
    */
   @Fluent
   default RedisAPI clientList(Handler<AsyncResult<Reply>> handler) {
-    send("CLIENT LIST", handler);
+    unwrap().send("CLIENT LIST", handler);
     return this;
   }
 
@@ -320,7 +326,7 @@ public interface RedisAPI extends Redis {
    */
   @Fluent
   default RedisAPI clientGetname(Handler<AsyncResult<Reply>> handler) {
-    send("CLIENT GETNAME", handler);
+    unwrap().send("CLIENT GETNAME", handler);
     return this;
   }
 
@@ -337,7 +343,7 @@ public interface RedisAPI extends Redis {
    */
   @Fluent
   default RedisAPI clientPause(Args arguments, Handler<AsyncResult<Reply>> handler) {
-    send("CLIENT PAUSE", arguments, handler);
+    unwrap().send("CLIENT PAUSE", arguments, handler);
     return this;
   }
 
@@ -354,7 +360,7 @@ public interface RedisAPI extends Redis {
    */
   @Fluent
   default RedisAPI clientReply(Args arguments, Handler<AsyncResult<Reply>> handler) {
-    send("CLIENT REPLY", arguments, handler);
+    unwrap().send("CLIENT REPLY", arguments, handler);
     return this;
   }
 
@@ -371,7 +377,7 @@ public interface RedisAPI extends Redis {
    */
   @Fluent
   default RedisAPI clientSetname(Args arguments, Handler<AsyncResult<Reply>> handler) {
-    send("CLIENT SETNAME", arguments, handler);
+    unwrap().send("CLIENT SETNAME", arguments, handler);
     return this;
   }
 
@@ -388,7 +394,7 @@ public interface RedisAPI extends Redis {
    */
   @Fluent
   default RedisAPI clusterAddslots(Args arguments, Handler<AsyncResult<Reply>> handler) {
-    send("CLUSTER ADDSLOTS", arguments, handler);
+    unwrap().send("CLUSTER ADDSLOTS", arguments, handler);
     return this;
   }
 
@@ -405,7 +411,7 @@ public interface RedisAPI extends Redis {
    */
   @Fluent
   default RedisAPI clusterCountFailureReports(Args arguments, Handler<AsyncResult<Reply>> handler) {
-    send("CLUSTER COUNT-FAILURE-REPORTS", arguments, handler);
+    unwrap().send("CLUSTER COUNT-FAILURE-REPORTS", arguments, handler);
     return this;
   }
 
@@ -422,7 +428,7 @@ public interface RedisAPI extends Redis {
    */
   @Fluent
   default RedisAPI clusterCountkeysinslot(Args arguments, Handler<AsyncResult<Reply>> handler) {
-    send("CLUSTER COUNTKEYSINSLOT", arguments, handler);
+    unwrap().send("CLUSTER COUNTKEYSINSLOT", arguments, handler);
     return this;
   }
 
@@ -439,7 +445,7 @@ public interface RedisAPI extends Redis {
    */
   @Fluent
   default RedisAPI clusterDelslots(Args arguments, Handler<AsyncResult<Reply>> handler) {
-    send("CLUSTER DELSLOTS", arguments, handler);
+    unwrap().send("CLUSTER DELSLOTS", arguments, handler);
     return this;
   }
 
@@ -456,7 +462,7 @@ public interface RedisAPI extends Redis {
    */
   @Fluent
   default RedisAPI clusterFailover(Args arguments, Handler<AsyncResult<Reply>> handler) {
-    send("CLUSTER FAILOVER", arguments, handler);
+    unwrap().send("CLUSTER FAILOVER", arguments, handler);
     return this;
   }
 
@@ -473,7 +479,7 @@ public interface RedisAPI extends Redis {
    */
   @Fluent
   default RedisAPI clusterForget(Args arguments, Handler<AsyncResult<Reply>> handler) {
-    send("CLUSTER FORGET", arguments, handler);
+    unwrap().send("CLUSTER FORGET", arguments, handler);
     return this;
   }
 
@@ -491,7 +497,7 @@ public interface RedisAPI extends Redis {
    */
   @Fluent
   default RedisAPI clusterGetkeysinslot(Args arguments, Handler<AsyncResult<Reply>> handler) {
-    send("CLUSTER GETKEYSINSLOT", arguments, handler);
+    unwrap().send("CLUSTER GETKEYSINSLOT", arguments, handler);
     return this;
   }
 
@@ -507,7 +513,7 @@ public interface RedisAPI extends Redis {
    */
   @Fluent
   default RedisAPI clusterInfo(Handler<AsyncResult<Reply>> handler) {
-    send("CLUSTER INFO", handler);
+    unwrap().send("CLUSTER INFO", handler);
     return this;
   }
 
@@ -524,7 +530,7 @@ public interface RedisAPI extends Redis {
    */
   @Fluent
   default RedisAPI clusterKeyslot(Args arguments, Handler<AsyncResult<Reply>> handler) {
-    send("CLUSTER KEYSLOT", arguments, handler);
+    unwrap().send("CLUSTER KEYSLOT", arguments, handler);
     return this;
   }
 
@@ -542,7 +548,7 @@ public interface RedisAPI extends Redis {
    */
   @Fluent
   default RedisAPI clusterMeet(Args arguments, Handler<AsyncResult<Reply>> handler) {
-    send("CLUSTER MEET", arguments, handler);
+    unwrap().send("CLUSTER MEET", arguments, handler);
     return this;
   }
 
@@ -558,7 +564,7 @@ public interface RedisAPI extends Redis {
    */
   @Fluent
   default RedisAPI clusterNodes(Handler<AsyncResult<Reply>> handler) {
-    send("CLUSTER NODES", handler);
+    unwrap().send("CLUSTER NODES", handler);
     return this;
   }
 
@@ -575,7 +581,7 @@ public interface RedisAPI extends Redis {
    */
   @Fluent
   default RedisAPI clusterReplicate(Args arguments, Handler<AsyncResult<Reply>> handler) {
-    send("CLUSTER REPLICATE", arguments, handler);
+    unwrap().send("CLUSTER REPLICATE", arguments, handler);
     return this;
   }
 
@@ -592,7 +598,7 @@ public interface RedisAPI extends Redis {
    */
   @Fluent
   default RedisAPI clusterReset(Args arguments, Handler<AsyncResult<Reply>> handler) {
-    send("CLUSTER RESET", arguments, handler);
+    unwrap().send("CLUSTER RESET", arguments, handler);
     return this;
   }
 
@@ -608,7 +614,7 @@ public interface RedisAPI extends Redis {
    */
   @Fluent
   default RedisAPI clusterSaveconfig(Handler<AsyncResult<Reply>> handler) {
-    send("CLUSTER SAVECONFIG", handler);
+    unwrap().send("CLUSTER SAVECONFIG", handler);
     return this;
   }
 
@@ -625,7 +631,7 @@ public interface RedisAPI extends Redis {
    */
   @Fluent
   default RedisAPI clusterSetConfigEpoch(Args arguments, Handler<AsyncResult<Reply>> handler) {
-    send("CLUSTER SET-CONFIG-EPOCH", arguments, handler);
+    unwrap().send("CLUSTER SET-CONFIG-EPOCH", arguments, handler);
     return this;
   }
 
@@ -644,7 +650,7 @@ public interface RedisAPI extends Redis {
    */
   @Fluent
   default RedisAPI clusterSetslot(Args arguments, Handler<AsyncResult<Reply>> handler) {
-    send("CLUSTER SETSLOT", arguments, handler);
+    unwrap().send("CLUSTER SETSLOT", arguments, handler);
     return this;
   }
 
@@ -661,7 +667,7 @@ public interface RedisAPI extends Redis {
    */
   @Fluent
   default RedisAPI clusterSlaves(Args arguments, Handler<AsyncResult<Reply>> handler) {
-    send("CLUSTER SLAVES", arguments, handler);
+    unwrap().send("CLUSTER SLAVES", arguments, handler);
     return this;
   }
 
@@ -677,7 +683,7 @@ public interface RedisAPI extends Redis {
    */
   @Fluent
   default RedisAPI clusterSlots(Handler<AsyncResult<Reply>> handler) {
-    send("CLUSTER SLOTS", handler);
+    unwrap().send("CLUSTER SLOTS", handler);
     return this;
   }
 
@@ -693,7 +699,7 @@ public interface RedisAPI extends Redis {
    */
   @Fluent
   default RedisAPI command(Handler<AsyncResult<Reply>> handler) {
-    send("COMMAND", handler);
+    unwrap().send("COMMAND", handler);
     return this;
   }
 
@@ -709,7 +715,7 @@ public interface RedisAPI extends Redis {
    */
   @Fluent
   default RedisAPI commandCount(Handler<AsyncResult<Reply>> handler) {
-    send("COMMAND COUNT", handler);
+    unwrap().send("COMMAND COUNT", handler);
     return this;
   }
 
@@ -725,7 +731,7 @@ public interface RedisAPI extends Redis {
    */
   @Fluent
   default RedisAPI commandGetkeys(Handler<AsyncResult<Reply>> handler) {
-    send("COMMAND GETKEYS", handler);
+    unwrap().send("COMMAND GETKEYS", handler);
     return this;
   }
 
@@ -742,7 +748,7 @@ public interface RedisAPI extends Redis {
    */
   @Fluent
   default RedisAPI commandInfo(Args arguments, Handler<AsyncResult<Reply>> handler) {
-    send("COMMAND INFO", arguments, handler);
+    unwrap().send("COMMAND INFO", arguments, handler);
     return this;
   }
 
@@ -757,7 +763,7 @@ public interface RedisAPI extends Redis {
    */
   @Fluent
   default RedisAPI configGet(Args arguments, Handler<AsyncResult<Reply>> handler) {
-    send("CONFIG GET", arguments, handler);
+    unwrap().send("CONFIG GET", arguments, handler);
     return this;
   }
 
@@ -771,7 +777,7 @@ public interface RedisAPI extends Redis {
    */
   @Fluent
   default RedisAPI configRewrite(Handler<AsyncResult<Reply>> handler) {
-    send("CONFIG REWRITE", handler);
+    unwrap().send("CONFIG REWRITE", handler);
     return this;
   }
 
@@ -787,7 +793,7 @@ public interface RedisAPI extends Redis {
    */
   @Fluent
   default RedisAPI configSet(Args arguments, Handler<AsyncResult<Reply>> handler) {
-    send("CONFIG SET", arguments, handler);
+    unwrap().send("CONFIG SET", arguments, handler);
     return this;
   }
 
@@ -803,7 +809,7 @@ public interface RedisAPI extends Redis {
    */
   @Fluent
   default RedisAPI configResetstat(Handler<AsyncResult<Reply>> handler) {
-    send("CONFIG RESETSTAT", handler);
+    unwrap().send("CONFIG RESETSTAT", handler);
     return this;
   }
 
@@ -817,7 +823,7 @@ public interface RedisAPI extends Redis {
    */
   @Fluent
   default RedisAPI dbsize(Handler<AsyncResult<Reply>> handler) {
-    send("DBSIZE", handler);
+    unwrap().send("DBSIZE", handler);
     return this;
   }
 
@@ -832,7 +838,7 @@ public interface RedisAPI extends Redis {
    */
   @Fluent
   default RedisAPI debugObject(Args arguments, Handler<AsyncResult<Reply>> handler) {
-    send("DEBUG OBJECT", arguments, handler);
+    unwrap().send("DEBUG OBJECT", arguments, handler);
     return this;
   }
 
@@ -846,7 +852,7 @@ public interface RedisAPI extends Redis {
    */
   @Fluent
   default RedisAPI debugSegfault(Handler<AsyncResult<Reply>> handler) {
-    send("DEBUG SEGFAULT", handler);
+    unwrap().send("DEBUG SEGFAULT", handler);
     return this;
   }
 
@@ -863,7 +869,7 @@ public interface RedisAPI extends Redis {
    */
   @Fluent
   default RedisAPI decr(Args arguments, Handler<AsyncResult<Reply>> handler) {
-    send("DECR", arguments, handler);
+    unwrap().send("DECR", arguments, handler);
     return this;
   }
 
@@ -881,7 +887,7 @@ public interface RedisAPI extends Redis {
    */
   @Fluent
   default RedisAPI decrby(Args arguments, Handler<AsyncResult<Reply>> handler) {
-    send("DECRBY", arguments, handler);
+    unwrap().send("DECRBY", arguments, handler);
     return this;
   }
 
@@ -898,7 +904,7 @@ public interface RedisAPI extends Redis {
    */
   @Fluent
   default RedisAPI del(Args arguments, Handler<AsyncResult<Reply>> handler) {
-    send("DEL", arguments, handler);
+    unwrap().send("DEL", arguments, handler);
     return this;
   }
 
@@ -912,7 +918,7 @@ public interface RedisAPI extends Redis {
    */
   @Fluent
   default RedisAPI discard(Handler<AsyncResult<Reply>> handler) {
-    send("DISCARD", handler);
+    unwrap().send("DISCARD", handler);
     return this;
   }
 
@@ -929,7 +935,7 @@ public interface RedisAPI extends Redis {
    */
   @Fluent
   default RedisAPI dump(Args arguments, Handler<AsyncResult<Reply>> handler) {
-    send("DUMP", arguments, handler);
+    unwrap().send("DUMP", arguments, handler);
     return this;
   }
 
@@ -944,7 +950,7 @@ public interface RedisAPI extends Redis {
    */
   @Fluent
   default RedisAPI echo(Args arguments, Handler<AsyncResult<Reply>> handler) {
-    send("ECHO", arguments, handler);
+    unwrap().send("ECHO", arguments, handler);
     return this;
   }
 
@@ -964,7 +970,7 @@ public interface RedisAPI extends Redis {
    */
   @Fluent
   default RedisAPI eval(Args arguments, Handler<AsyncResult<Reply>> handler) {
-    send("EVAL", arguments, handler);
+    unwrap().send("EVAL", arguments, handler);
     return this;
   }
 
@@ -984,7 +990,7 @@ public interface RedisAPI extends Redis {
    */
   @Fluent
   default RedisAPI evalsha(Args arguments, Handler<AsyncResult<Reply>> handler) {
-    send("EVALSHA", arguments, handler);
+    unwrap().send("EVALSHA", arguments, handler);
     return this;
   }
 
@@ -998,7 +1004,7 @@ public interface RedisAPI extends Redis {
    */
   @Fluent
   default RedisAPI exec(Handler<AsyncResult<Reply>> handler) {
-    send("EXEC", handler);
+    unwrap().send("EXEC", handler);
     return this;
   }
 
@@ -1015,7 +1021,7 @@ public interface RedisAPI extends Redis {
    */
   @Fluent
   default RedisAPI exists(Args arguments, Handler<AsyncResult<Reply>> handler) {
-    send("EXISTS", arguments, handler);
+    unwrap().send("EXISTS", arguments, handler);
     return this;
   }
 
@@ -1033,7 +1039,7 @@ public interface RedisAPI extends Redis {
    */
   @Fluent
   default RedisAPI expire(Args arguments, Handler<AsyncResult<Reply>> handler) {
-    send("EXPIRE", arguments, handler);
+    unwrap().send("EXPIRE", arguments, handler);
     return this;
   }
 
@@ -1051,7 +1057,7 @@ public interface RedisAPI extends Redis {
    */
   @Fluent
   default RedisAPI expireat(Args arguments, Handler<AsyncResult<Reply>> handler) {
-    send("EXPIREAT", arguments, handler);
+    unwrap().send("EXPIREAT", arguments, handler);
     return this;
   }
 
@@ -1066,7 +1072,7 @@ public interface RedisAPI extends Redis {
    */
   @Fluent
   default RedisAPI flushall(Args arguments, Handler<AsyncResult<Reply>> handler) {
-    send("FLUSHALL", arguments, handler);
+    unwrap().send("FLUSHALL", arguments, handler);
     return this;
   }
 
@@ -1081,7 +1087,7 @@ public interface RedisAPI extends Redis {
    */
   @Fluent
   default RedisAPI flushdb(Args arguments, Handler<AsyncResult<Reply>> handler) {
-    send("FLUSHDB", arguments, handler);
+    unwrap().send("FLUSHDB", arguments, handler);
     return this;
   }
 
@@ -1099,7 +1105,7 @@ public interface RedisAPI extends Redis {
    */
   @Fluent
   default RedisAPI geoadd(Args arguments, Handler<AsyncResult<Reply>> handler) {
-    send("GEOADD", arguments, handler);
+    unwrap().send("GEOADD", arguments, handler);
     return this;
   }
 
@@ -1117,7 +1123,7 @@ public interface RedisAPI extends Redis {
    */
   @Fluent
   default RedisAPI geohash(Args arguments, Handler<AsyncResult<Reply>> handler) {
-    send("GEOHASH", arguments, handler);
+    unwrap().send("GEOHASH", arguments, handler);
     return this;
   }
 
@@ -1135,7 +1141,7 @@ public interface RedisAPI extends Redis {
    */
   @Fluent
   default RedisAPI geopos(Args arguments, Handler<AsyncResult<Reply>> handler) {
-    send("GEOPOS", arguments, handler);
+    unwrap().send("GEOPOS", arguments, handler);
     return this;
   }
 
@@ -1155,7 +1161,7 @@ public interface RedisAPI extends Redis {
    */
   @Fluent
   default RedisAPI geodist(Args arguments, Handler<AsyncResult<Reply>> handler) {
-    send("GEODIST", arguments, handler);
+    unwrap().send("GEODIST", arguments, handler);
     return this;
   }
 
@@ -1183,7 +1189,7 @@ public interface RedisAPI extends Redis {
    */
   @Fluent
   default RedisAPI georadius(Args arguments, Handler<AsyncResult<Reply>> handler) {
-    send("GEORADIUS", arguments, handler);
+    unwrap().send("GEORADIUS", arguments, handler);
     return this;
   }
 
@@ -1210,7 +1216,7 @@ public interface RedisAPI extends Redis {
    */
   @Fluent
   default RedisAPI georadiusbymember(Args arguments, Handler<AsyncResult<Reply>> handler) {
-    send("GEORADIUSBYMEMBER", arguments, handler);
+    unwrap().send("GEORADIUSBYMEMBER", arguments, handler);
     return this;
   }
 
@@ -1227,7 +1233,7 @@ public interface RedisAPI extends Redis {
    */
   @Fluent
   default RedisAPI get(Args arguments, Handler<AsyncResult<Reply>> handler) {
-    send("GET", arguments, handler);
+    unwrap().send("GET", arguments, handler);
     return this;
   }
 
@@ -1245,7 +1251,7 @@ public interface RedisAPI extends Redis {
    */
   @Fluent
   default RedisAPI getbit(Args arguments, Handler<AsyncResult<Reply>> handler) {
-    send("GETBIT", arguments, handler);
+    unwrap().send("GETBIT", arguments, handler);
     return this;
   }
 
@@ -1264,7 +1270,7 @@ public interface RedisAPI extends Redis {
    */
   @Fluent
   default RedisAPI getrange(Args arguments, Handler<AsyncResult<Reply>> handler) {
-    send("GETRANGE", arguments, handler);
+    unwrap().send("GETRANGE", arguments, handler);
     return this;
   }
 
@@ -1282,7 +1288,7 @@ public interface RedisAPI extends Redis {
    */
   @Fluent
   default RedisAPI getset(Args arguments, Handler<AsyncResult<Reply>> handler) {
-    send("GETSET", arguments, handler);
+    unwrap().send("GETSET", arguments, handler);
     return this;
   }
 
@@ -1300,7 +1306,7 @@ public interface RedisAPI extends Redis {
    */
   @Fluent
   default RedisAPI hdel(Args arguments, Handler<AsyncResult<Reply>> handler) {
-    send("HDEL", arguments, handler);
+    unwrap().send("HDEL", arguments, handler);
     return this;
   }
 
@@ -1318,7 +1324,7 @@ public interface RedisAPI extends Redis {
    */
   @Fluent
   default RedisAPI hexists(Args arguments, Handler<AsyncResult<Reply>> handler) {
-    send("HEXISTS", arguments, handler);
+    unwrap().send("HEXISTS", arguments, handler);
     return this;
   }
 
@@ -1336,7 +1342,7 @@ public interface RedisAPI extends Redis {
    */
   @Fluent
   default RedisAPI hget(Args arguments, Handler<AsyncResult<Reply>> handler) {
-    send("HGET", arguments, handler);
+    unwrap().send("HGET", arguments, handler);
     return this;
   }
 
@@ -1353,7 +1359,7 @@ public interface RedisAPI extends Redis {
    */
   @Fluent
   default RedisAPI hgetall(Args arguments, Handler<AsyncResult<Reply>> handler) {
-    send("HGETALL", arguments, handler);
+    unwrap().send("HGETALL", arguments, handler);
     return this;
   }
 
@@ -1372,7 +1378,7 @@ public interface RedisAPI extends Redis {
    */
   @Fluent
   default RedisAPI hincrby(Args arguments, Handler<AsyncResult<Reply>> handler) {
-    send("HINCRBY", arguments, handler);
+    unwrap().send("HINCRBY", arguments, handler);
     return this;
   }
 
@@ -1391,7 +1397,7 @@ public interface RedisAPI extends Redis {
    */
   @Fluent
   default RedisAPI hincrbyfloat(Args arguments, Handler<AsyncResult<Reply>> handler) {
-    send("HINCRBYFLOAT", arguments, handler);
+    unwrap().send("HINCRBYFLOAT", arguments, handler);
     return this;
   }
 
@@ -1408,7 +1414,7 @@ public interface RedisAPI extends Redis {
    */
   @Fluent
   default RedisAPI hkeys(Args arguments, Handler<AsyncResult<Reply>> handler) {
-    send("HKEYS", arguments, handler);
+    unwrap().send("HKEYS", arguments, handler);
     return this;
   }
 
@@ -1425,7 +1431,7 @@ public interface RedisAPI extends Redis {
    */
   @Fluent
   default RedisAPI hlen(Args arguments, Handler<AsyncResult<Reply>> handler) {
-    send("HLEN", arguments, handler);
+    unwrap().send("HLEN", arguments, handler);
     return this;
   }
 
@@ -1443,7 +1449,7 @@ public interface RedisAPI extends Redis {
    */
   @Fluent
   default RedisAPI hmget(Args arguments, Handler<AsyncResult<Reply>> handler) {
-    send("HMGET", arguments, handler);
+    unwrap().send("HMGET", arguments, handler);
     return this;
   }
 
@@ -1461,7 +1467,7 @@ public interface RedisAPI extends Redis {
    */
   @Fluent
   default RedisAPI hmset(Args arguments, Handler<AsyncResult<Reply>> handler) {
-    send("HMSET", arguments, handler);
+    unwrap().send("HMSET", arguments, handler);
     return this;
   }
 
@@ -1480,7 +1486,7 @@ public interface RedisAPI extends Redis {
    */
   @Fluent
   default RedisAPI hset(Args arguments, Handler<AsyncResult<Reply>> handler) {
-    send("HSET", arguments, handler);
+    unwrap().send("HSET", arguments, handler);
     return this;
   }
 
@@ -1499,7 +1505,7 @@ public interface RedisAPI extends Redis {
    */
   @Fluent
   default RedisAPI hsetnx(Args arguments, Handler<AsyncResult<Reply>> handler) {
-    send("HSETNX", arguments, handler);
+    unwrap().send("HSETNX", arguments, handler);
     return this;
   }
 
@@ -1517,7 +1523,7 @@ public interface RedisAPI extends Redis {
    */
   @Fluent
   default RedisAPI hstrlen(Args arguments, Handler<AsyncResult<Reply>> handler) {
-    send("HSTRLEN", arguments, handler);
+    unwrap().send("HSTRLEN", arguments, handler);
     return this;
   }
 
@@ -1534,7 +1540,7 @@ public interface RedisAPI extends Redis {
    */
   @Fluent
   default RedisAPI hvals(Args arguments, Handler<AsyncResult<Reply>> handler) {
-    send("HVALS", arguments, handler);
+    unwrap().send("HVALS", arguments, handler);
     return this;
   }
 
@@ -1551,7 +1557,7 @@ public interface RedisAPI extends Redis {
    */
   @Fluent
   default RedisAPI incr(Args arguments, Handler<AsyncResult<Reply>> handler) {
-    send("INCR", arguments, handler);
+    unwrap().send("INCR", arguments, handler);
     return this;
   }
 
@@ -1569,7 +1575,7 @@ public interface RedisAPI extends Redis {
    */
   @Fluent
   default RedisAPI incrby(Args arguments, Handler<AsyncResult<Reply>> handler) {
-    send("INCRBY", arguments, handler);
+    unwrap().send("INCRBY", arguments, handler);
     return this;
   }
 
@@ -1587,7 +1593,7 @@ public interface RedisAPI extends Redis {
    */
   @Fluent
   default RedisAPI incrbyfloat(Args arguments, Handler<AsyncResult<Reply>> handler) {
-    send("INCRBYFLOAT", arguments, handler);
+    unwrap().send("INCRBYFLOAT", arguments, handler);
     return this;
   }
 
@@ -1602,7 +1608,7 @@ public interface RedisAPI extends Redis {
    */
   @Fluent
   default RedisAPI info(Args arguments, Handler<AsyncResult<Reply>> handler) {
-    send("INFO", arguments, handler);
+    unwrap().send("INFO", arguments, handler);
     return this;
   }
 
@@ -1619,7 +1625,7 @@ public interface RedisAPI extends Redis {
    */
   @Fluent
   default RedisAPI keys(Args arguments, Handler<AsyncResult<Reply>> handler) {
-    send("KEYS", arguments, handler);
+    unwrap().send("KEYS", arguments, handler);
     return this;
   }
 
@@ -1633,7 +1639,7 @@ public interface RedisAPI extends Redis {
    */
   @Fluent
   default RedisAPI lastsave(Handler<AsyncResult<Reply>> handler) {
-    send("LASTSAVE", handler);
+    unwrap().send("LASTSAVE", handler);
     return this;
   }
 
@@ -1651,7 +1657,7 @@ public interface RedisAPI extends Redis {
    */
   @Fluent
   default RedisAPI lindex(Args arguments, Handler<AsyncResult<Reply>> handler) {
-    send("LINDEX", arguments, handler);
+    unwrap().send("LINDEX", arguments, handler);
     return this;
   }
 
@@ -1671,7 +1677,7 @@ public interface RedisAPI extends Redis {
    */
   @Fluent
   default RedisAPI linsert(Args arguments, Handler<AsyncResult<Reply>> handler) {
-    send("LINSERT", arguments, handler);
+    unwrap().send("LINSERT", arguments, handler);
     return this;
   }
 
@@ -1688,7 +1694,7 @@ public interface RedisAPI extends Redis {
    */
   @Fluent
   default RedisAPI llen(Args arguments, Handler<AsyncResult<Reply>> handler) {
-    send("LLEN", arguments, handler);
+    unwrap().send("LLEN", arguments, handler);
     return this;
   }
 
@@ -1705,7 +1711,7 @@ public interface RedisAPI extends Redis {
    */
   @Fluent
   default RedisAPI lpop(Args arguments, Handler<AsyncResult<Reply>> handler) {
-    send("LPOP", arguments, handler);
+    unwrap().send("LPOP", arguments, handler);
     return this;
   }
 
@@ -1723,7 +1729,7 @@ public interface RedisAPI extends Redis {
    */
   @Fluent
   default RedisAPI lpush(Args arguments, Handler<AsyncResult<Reply>> handler) {
-    send("LPUSH", arguments, handler);
+    unwrap().send("LPUSH", arguments, handler);
     return this;
   }
 
@@ -1741,7 +1747,7 @@ public interface RedisAPI extends Redis {
    */
   @Fluent
   default RedisAPI lpushx(Args arguments, Handler<AsyncResult<Reply>> handler) {
-    send("LPUSHX", arguments, handler);
+    unwrap().send("LPUSHX", arguments, handler);
     return this;
   }
 
@@ -1760,7 +1766,7 @@ public interface RedisAPI extends Redis {
    */
   @Fluent
   default RedisAPI lrange(Args arguments, Handler<AsyncResult<Reply>> handler) {
-    send("LRANGE", arguments, handler);
+    unwrap().send("LRANGE", arguments, handler);
     return this;
   }
 
@@ -1779,7 +1785,7 @@ public interface RedisAPI extends Redis {
    */
   @Fluent
   default RedisAPI lrem(Args arguments, Handler<AsyncResult<Reply>> handler) {
-    send("LREM", arguments, handler);
+    unwrap().send("LREM", arguments, handler);
     return this;
   }
 
@@ -1798,7 +1804,7 @@ public interface RedisAPI extends Redis {
    */
   @Fluent
   default RedisAPI lset(Args arguments, Handler<AsyncResult<Reply>> handler) {
-    send("LSET", arguments, handler);
+    unwrap().send("LSET", arguments, handler);
     return this;
   }
 
@@ -1817,7 +1823,7 @@ public interface RedisAPI extends Redis {
    */
   @Fluent
   default RedisAPI ltrim(Args arguments, Handler<AsyncResult<Reply>> handler) {
-    send("LTRIM", arguments, handler);
+    unwrap().send("LTRIM", arguments, handler);
     return this;
   }
 
@@ -1831,7 +1837,7 @@ public interface RedisAPI extends Redis {
    */
   @Fluent
   default RedisAPI memoryDoctor(Handler<AsyncResult<Reply>> handler) {
-    send("MEMORY DOCTOR", handler);
+    unwrap().send("MEMORY DOCTOR", handler);
     return this;
   }
 
@@ -1845,7 +1851,7 @@ public interface RedisAPI extends Redis {
    */
   @Fluent
   default RedisAPI memoryHelp(Handler<AsyncResult<Reply>> handler) {
-    send("MEMORY HELP", handler);
+    unwrap().send("MEMORY HELP", handler);
     return this;
   }
 
@@ -1859,7 +1865,7 @@ public interface RedisAPI extends Redis {
    */
   @Fluent
   default RedisAPI memoryMallocStats(Handler<AsyncResult<Reply>> handler) {
-    send("MEMORY MALLOC-STATS", handler);
+    unwrap().send("MEMORY MALLOC-STATS", handler);
     return this;
   }
 
@@ -1873,7 +1879,7 @@ public interface RedisAPI extends Redis {
    */
   @Fluent
   default RedisAPI memoryPurge(Handler<AsyncResult<Reply>> handler) {
-    send("MEMORY PURGE", handler);
+    unwrap().send("MEMORY PURGE", handler);
     return this;
   }
 
@@ -1887,7 +1893,7 @@ public interface RedisAPI extends Redis {
    */
   @Fluent
   default RedisAPI memoryStats(Handler<AsyncResult<Reply>> handler) {
-    send("MEMORY STATS", handler);
+    unwrap().send("MEMORY STATS", handler);
     return this;
   }
 
@@ -1905,7 +1911,7 @@ public interface RedisAPI extends Redis {
    */
   @Fluent
   default RedisAPI memoryUsage(Args arguments, Handler<AsyncResult<Reply>> handler) {
-    send("MEMORY USAGE", arguments, handler);
+    unwrap().send("MEMORY USAGE", arguments, handler);
     return this;
   }
 
@@ -1922,7 +1928,7 @@ public interface RedisAPI extends Redis {
    */
   @Fluent
   default RedisAPI mget(Args arguments, Handler<AsyncResult<Reply>> handler) {
-    send("MGET", arguments, handler);
+    unwrap().send("MGET", arguments, handler);
     return this;
   }
 
@@ -1946,7 +1952,7 @@ public interface RedisAPI extends Redis {
    */
   @Fluent
   default RedisAPI migrate(Args arguments, Handler<AsyncResult<Reply>> handler) {
-    send("MIGRATE", arguments, handler);
+    unwrap().send("MIGRATE", arguments, handler);
     return this;
   }
 
@@ -1960,7 +1966,7 @@ public interface RedisAPI extends Redis {
    */
   @Fluent
   default RedisAPI monitor(Handler<AsyncResult<Reply>> handler) {
-    send("MONITOR", handler);
+    unwrap().send("MONITOR", handler);
     return this;
   }
 
@@ -1978,7 +1984,7 @@ public interface RedisAPI extends Redis {
    */
   @Fluent
   default RedisAPI move(Args arguments, Handler<AsyncResult<Reply>> handler) {
-    send("MOVE", arguments, handler);
+    unwrap().send("MOVE", arguments, handler);
     return this;
   }
 
@@ -1995,7 +2001,7 @@ public interface RedisAPI extends Redis {
    */
   @Fluent
   default RedisAPI mset(Args arguments, Handler<AsyncResult<Reply>> handler) {
-    send("MSET", arguments, handler);
+    unwrap().send("MSET", arguments, handler);
     return this;
   }
 
@@ -2012,7 +2018,7 @@ public interface RedisAPI extends Redis {
    */
   @Fluent
   default RedisAPI msetnx(Args arguments, Handler<AsyncResult<Reply>> handler) {
-    send("MSETNX", arguments, handler);
+    unwrap().send("MSETNX", arguments, handler);
     return this;
   }
 
@@ -2026,7 +2032,7 @@ public interface RedisAPI extends Redis {
    */
   @Fluent
   default RedisAPI multi(Handler<AsyncResult<Reply>> handler) {
-    send("MULTI", handler);
+    unwrap().send("MULTI", handler);
     return this;
   }
 
@@ -2044,7 +2050,7 @@ public interface RedisAPI extends Redis {
    */
   @Fluent
   default RedisAPI object(Args arguments, Handler<AsyncResult<Reply>> handler) {
-    send("OBJECT", arguments, handler);
+    unwrap().send("OBJECT", arguments, handler);
     return this;
   }
 
@@ -2061,7 +2067,7 @@ public interface RedisAPI extends Redis {
    */
   @Fluent
   default RedisAPI persist(Args arguments, Handler<AsyncResult<Reply>> handler) {
-    send("PERSIST", arguments, handler);
+    unwrap().send("PERSIST", arguments, handler);
     return this;
   }
 
@@ -2079,7 +2085,7 @@ public interface RedisAPI extends Redis {
    */
   @Fluent
   default RedisAPI pexpire(Args arguments, Handler<AsyncResult<Reply>> handler) {
-    send("PEXPIRE", arguments, handler);
+    unwrap().send("PEXPIRE", arguments, handler);
     return this;
   }
 
@@ -2097,7 +2103,7 @@ public interface RedisAPI extends Redis {
    */
   @Fluent
   default RedisAPI pexpireat(Args arguments, Handler<AsyncResult<Reply>> handler) {
-    send("PEXPIREAT", arguments, handler);
+    unwrap().send("PEXPIREAT", arguments, handler);
     return this;
   }
 
@@ -2115,7 +2121,7 @@ public interface RedisAPI extends Redis {
    */
   @Fluent
   default RedisAPI pfadd(Args arguments, Handler<AsyncResult<Reply>> handler) {
-    send("PFADD", arguments, handler);
+    unwrap().send("PFADD", arguments, handler);
     return this;
   }
 
@@ -2132,7 +2138,7 @@ public interface RedisAPI extends Redis {
    */
   @Fluent
   default RedisAPI pfcount(Args arguments, Handler<AsyncResult<Reply>> handler) {
-    send("PFCOUNT", arguments, handler);
+    unwrap().send("PFCOUNT", arguments, handler);
     return this;
   }
 
@@ -2150,7 +2156,7 @@ public interface RedisAPI extends Redis {
    */
   @Fluent
   default RedisAPI pfmerge(Args arguments, Handler<AsyncResult<Reply>> handler) {
-    send("PFMERGE", arguments, handler);
+    unwrap().send("PFMERGE", arguments, handler);
     return this;
   }
 
@@ -2165,7 +2171,7 @@ public interface RedisAPI extends Redis {
    */
   @Fluent
   default RedisAPI ping(Args arguments, Handler<AsyncResult<Reply>> handler) {
-    send("PING", arguments, handler);
+    unwrap().send("PING", arguments, handler);
     return this;
   }
 
@@ -2184,7 +2190,7 @@ public interface RedisAPI extends Redis {
    */
   @Fluent
   default RedisAPI psetex(Args arguments, Handler<AsyncResult<Reply>> handler) {
-    send("PSETEX", arguments, handler);
+    unwrap().send("PSETEX", arguments, handler);
     return this;
   }
 
@@ -2201,7 +2207,7 @@ public interface RedisAPI extends Redis {
    */
   @Fluent
   default RedisAPI psubscribe(Args arguments, Handler<AsyncResult<Reply>> handler) {
-    send("PSUBSCRIBE", arguments, handler);
+    unwrap().send("PSUBSCRIBE", arguments, handler);
     return this;
   }
 
@@ -2219,7 +2225,7 @@ public interface RedisAPI extends Redis {
    */
   @Fluent
   default RedisAPI pubsub(Args arguments, Handler<AsyncResult<Reply>> handler) {
-    send("PUBSUB", arguments, handler);
+    unwrap().send("PUBSUB", arguments, handler);
     return this;
   }
 
@@ -2236,7 +2242,7 @@ public interface RedisAPI extends Redis {
    */
   @Fluent
   default RedisAPI pttl(Args arguments, Handler<AsyncResult<Reply>> handler) {
-    send("PTTL", arguments, handler);
+    unwrap().send("PTTL", arguments, handler);
     return this;
   }
 
@@ -2254,7 +2260,7 @@ public interface RedisAPI extends Redis {
    */
   @Fluent
   default RedisAPI publish(Args arguments, Handler<AsyncResult<Reply>> handler) {
-    send("PUBLISH", arguments, handler);
+    unwrap().send("PUBLISH", arguments, handler);
     return this;
   }
 
@@ -2271,7 +2277,7 @@ public interface RedisAPI extends Redis {
    */
   @Fluent
   default RedisAPI punsubscribe(Args arguments, Handler<AsyncResult<Reply>> handler) {
-    send("PUNSUBSCRIBE", arguments, handler);
+    unwrap().send("PUNSUBSCRIBE", arguments, handler);
     return this;
   }
 
@@ -2285,7 +2291,7 @@ public interface RedisAPI extends Redis {
    */
   @Fluent
   default RedisAPI quit(Handler<AsyncResult<Reply>> handler) {
-    send("QUIT", handler);
+    unwrap().send("QUIT", handler);
     return this;
   }
 
@@ -2301,7 +2307,7 @@ public interface RedisAPI extends Redis {
    */
   @Fluent
   default RedisAPI randomkey(Handler<AsyncResult<Reply>> handler) {
-    send("RANDOMKEY", handler);
+    unwrap().send("RANDOMKEY", handler);
     return this;
   }
 
@@ -2317,7 +2323,7 @@ public interface RedisAPI extends Redis {
    */
   @Fluent
   default RedisAPI readonly(Handler<AsyncResult<Reply>> handler) {
-    send("READONLY", handler);
+    unwrap().send("READONLY", handler);
     return this;
   }
 
@@ -2333,7 +2339,7 @@ public interface RedisAPI extends Redis {
    */
   @Fluent
   default RedisAPI readwrite(Handler<AsyncResult<Reply>> handler) {
-    send("READWRITE", handler);
+    unwrap().send("READWRITE", handler);
     return this;
   }
 
@@ -2351,7 +2357,7 @@ public interface RedisAPI extends Redis {
    */
   @Fluent
   default RedisAPI rename(Args arguments, Handler<AsyncResult<Reply>> handler) {
-    send("RENAME", arguments, handler);
+    unwrap().send("RENAME", arguments, handler);
     return this;
   }
 
@@ -2369,14 +2375,14 @@ public interface RedisAPI extends Redis {
    */
   @Fluent
   default RedisAPI renamenx(Args arguments, Handler<AsyncResult<Reply>> handler) {
-    send("RENAMENX", arguments, handler);
+    unwrap().send("RENAMENX", arguments, handler);
     return this;
   }
 
   /**
    * Create a key using the provided serialized value, previously obtained using DUMP.
    * 
-    * <b>Time complexity</b>: <i>O(1) to create the new key and additional O(N*M) to reconstruct the serialized value, where N is the number of Redis objects composing the value and M their average size. For small string values the time complexity is thus O(1)+O(1*M) where M is small, so simply O(1). However for sorted set values the complexity is O(N*M*log(N)) because inserting values into sorted sets is O(log(N)).</i>
+    * <b>Time complexity</b>: <i>O(1) to wrap the new key and additional O(N*M) to reconstruct the serialized value, where N is the number of Redis objects composing the value and M their average size. For small string values the time complexity is thus O(1)+O(1*M) where M is small, so simply O(1). However for sorted set values the complexity is O(N*M*log(N)) because inserting values into sorted sets is O(log(N)).</i>
    * 
    * <ul>
    *   <li>key - key</li>
@@ -2389,7 +2395,7 @@ public interface RedisAPI extends Redis {
    */
   @Fluent
   default RedisAPI restore(Args arguments, Handler<AsyncResult<Reply>> handler) {
-    send("RESTORE", arguments, handler);
+    unwrap().send("RESTORE", arguments, handler);
     return this;
   }
 
@@ -2403,7 +2409,7 @@ public interface RedisAPI extends Redis {
    */
   @Fluent
   default RedisAPI role(Handler<AsyncResult<Reply>> handler) {
-    send("ROLE", handler);
+    unwrap().send("ROLE", handler);
     return this;
   }
 
@@ -2420,7 +2426,7 @@ public interface RedisAPI extends Redis {
    */
   @Fluent
   default RedisAPI rpop(Args arguments, Handler<AsyncResult<Reply>> handler) {
-    send("RPOP", arguments, handler);
+    unwrap().send("RPOP", arguments, handler);
     return this;
   }
 
@@ -2438,7 +2444,7 @@ public interface RedisAPI extends Redis {
    */
   @Fluent
   default RedisAPI rpoplpush(Args arguments, Handler<AsyncResult<Reply>> handler) {
-    send("RPOPLPUSH", arguments, handler);
+    unwrap().send("RPOPLPUSH", arguments, handler);
     return this;
   }
 
@@ -2456,7 +2462,7 @@ public interface RedisAPI extends Redis {
    */
   @Fluent
   default RedisAPI rpush(Args arguments, Handler<AsyncResult<Reply>> handler) {
-    send("RPUSH", arguments, handler);
+    unwrap().send("RPUSH", arguments, handler);
     return this;
   }
 
@@ -2474,7 +2480,7 @@ public interface RedisAPI extends Redis {
    */
   @Fluent
   default RedisAPI rpushx(Args arguments, Handler<AsyncResult<Reply>> handler) {
-    send("RPUSHX", arguments, handler);
+    unwrap().send("RPUSHX", arguments, handler);
     return this;
   }
 
@@ -2492,7 +2498,7 @@ public interface RedisAPI extends Redis {
    */
   @Fluent
   default RedisAPI sadd(Args arguments, Handler<AsyncResult<Reply>> handler) {
-    send("SADD", arguments, handler);
+    unwrap().send("SADD", arguments, handler);
     return this;
   }
 
@@ -2506,7 +2512,7 @@ public interface RedisAPI extends Redis {
    */
   @Fluent
   default RedisAPI save(Handler<AsyncResult<Reply>> handler) {
-    send("SAVE", handler);
+    unwrap().send("SAVE", handler);
     return this;
   }
 
@@ -2523,7 +2529,7 @@ public interface RedisAPI extends Redis {
    */
   @Fluent
   default RedisAPI scard(Args arguments, Handler<AsyncResult<Reply>> handler) {
-    send("SCARD", arguments, handler);
+    unwrap().send("SCARD", arguments, handler);
     return this;
   }
 
@@ -2540,7 +2546,7 @@ public interface RedisAPI extends Redis {
    */
   @Fluent
   default RedisAPI scriptDebug(Args arguments, Handler<AsyncResult<Reply>> handler) {
-    send("SCRIPT DEBUG", arguments, handler);
+    unwrap().send("SCRIPT DEBUG", arguments, handler);
     return this;
   }
 
@@ -2557,7 +2563,7 @@ public interface RedisAPI extends Redis {
    */
   @Fluent
   default RedisAPI scriptExists(Args arguments, Handler<AsyncResult<Reply>> handler) {
-    send("SCRIPT EXISTS", arguments, handler);
+    unwrap().send("SCRIPT EXISTS", arguments, handler);
     return this;
   }
 
@@ -2573,7 +2579,7 @@ public interface RedisAPI extends Redis {
    */
   @Fluent
   default RedisAPI scriptFlush(Handler<AsyncResult<Reply>> handler) {
-    send("SCRIPT FLUSH", handler);
+    unwrap().send("SCRIPT FLUSH", handler);
     return this;
   }
 
@@ -2589,7 +2595,7 @@ public interface RedisAPI extends Redis {
    */
   @Fluent
   default RedisAPI scriptKill(Handler<AsyncResult<Reply>> handler) {
-    send("SCRIPT KILL", handler);
+    unwrap().send("SCRIPT KILL", handler);
     return this;
   }
 
@@ -2606,7 +2612,7 @@ public interface RedisAPI extends Redis {
    */
   @Fluent
   default RedisAPI scriptLoad(Args arguments, Handler<AsyncResult<Reply>> handler) {
-    send("SCRIPT LOAD", arguments, handler);
+    unwrap().send("SCRIPT LOAD", arguments, handler);
     return this;
   }
 
@@ -2623,7 +2629,7 @@ public interface RedisAPI extends Redis {
    */
   @Fluent
   default RedisAPI sdiff(Args arguments, Handler<AsyncResult<Reply>> handler) {
-    send("SDIFF", arguments, handler);
+    unwrap().send("SDIFF", arguments, handler);
     return this;
   }
 
@@ -2641,7 +2647,7 @@ public interface RedisAPI extends Redis {
    */
   @Fluent
   default RedisAPI sdiffstore(Args arguments, Handler<AsyncResult<Reply>> handler) {
-    send("SDIFFSTORE", arguments, handler);
+    unwrap().send("SDIFFSTORE", arguments, handler);
     return this;
   }
 
@@ -2656,7 +2662,7 @@ public interface RedisAPI extends Redis {
    */
   @Fluent
   default RedisAPI select(Args arguments, Handler<AsyncResult<Reply>> handler) {
-    send("SELECT", arguments, handler);
+    unwrap().send("SELECT", arguments, handler);
     return this;
   }
 
@@ -2676,7 +2682,7 @@ public interface RedisAPI extends Redis {
    */
   @Fluent
   default RedisAPI set(Args arguments, Handler<AsyncResult<Reply>> handler) {
-    send("SET", arguments, handler);
+    unwrap().send("SET", arguments, handler);
     return this;
   }
 
@@ -2695,7 +2701,7 @@ public interface RedisAPI extends Redis {
    */
   @Fluent
   default RedisAPI setbit(Args arguments, Handler<AsyncResult<Reply>> handler) {
-    send("SETBIT", arguments, handler);
+    unwrap().send("SETBIT", arguments, handler);
     return this;
   }
 
@@ -2714,7 +2720,7 @@ public interface RedisAPI extends Redis {
    */
   @Fluent
   default RedisAPI setex(Args arguments, Handler<AsyncResult<Reply>> handler) {
-    send("SETEX", arguments, handler);
+    unwrap().send("SETEX", arguments, handler);
     return this;
   }
 
@@ -2732,7 +2738,7 @@ public interface RedisAPI extends Redis {
    */
   @Fluent
   default RedisAPI setnx(Args arguments, Handler<AsyncResult<Reply>> handler) {
-    send("SETNX", arguments, handler);
+    unwrap().send("SETNX", arguments, handler);
     return this;
   }
 
@@ -2751,7 +2757,7 @@ public interface RedisAPI extends Redis {
    */
   @Fluent
   default RedisAPI setrange(Args arguments, Handler<AsyncResult<Reply>> handler) {
-    send("SETRANGE", arguments, handler);
+    unwrap().send("SETRANGE", arguments, handler);
     return this;
   }
 
@@ -2766,7 +2772,7 @@ public interface RedisAPI extends Redis {
    */
   @Fluent
   default RedisAPI shutdown(Args arguments, Handler<AsyncResult<Reply>> handler) {
-    send("SHUTDOWN", arguments, handler);
+    unwrap().send("SHUTDOWN", arguments, handler);
     return this;
   }
 
@@ -2783,7 +2789,7 @@ public interface RedisAPI extends Redis {
    */
   @Fluent
   default RedisAPI sinter(Args arguments, Handler<AsyncResult<Reply>> handler) {
-    send("SINTER", arguments, handler);
+    unwrap().send("SINTER", arguments, handler);
     return this;
   }
 
@@ -2801,7 +2807,7 @@ public interface RedisAPI extends Redis {
    */
   @Fluent
   default RedisAPI sinterstore(Args arguments, Handler<AsyncResult<Reply>> handler) {
-    send("SINTERSTORE", arguments, handler);
+    unwrap().send("SINTERSTORE", arguments, handler);
     return this;
   }
 
@@ -2819,7 +2825,7 @@ public interface RedisAPI extends Redis {
    */
   @Fluent
   default RedisAPI sismember(Args arguments, Handler<AsyncResult<Reply>> handler) {
-    send("SISMEMBER", arguments, handler);
+    unwrap().send("SISMEMBER", arguments, handler);
     return this;
   }
 
@@ -2835,7 +2841,7 @@ public interface RedisAPI extends Redis {
    */
   @Fluent
   default RedisAPI slaveof(Args arguments, Handler<AsyncResult<Reply>> handler) {
-    send("SLAVEOF", arguments, handler);
+    unwrap().send("SLAVEOF", arguments, handler);
     return this;
   }
 
@@ -2851,7 +2857,7 @@ public interface RedisAPI extends Redis {
    */
   @Fluent
   default RedisAPI slowlog(Args arguments, Handler<AsyncResult<Reply>> handler) {
-    send("SLOWLOG", arguments, handler);
+    unwrap().send("SLOWLOG", arguments, handler);
     return this;
   }
 
@@ -2868,7 +2874,7 @@ public interface RedisAPI extends Redis {
    */
   @Fluent
   default RedisAPI smembers(Args arguments, Handler<AsyncResult<Reply>> handler) {
-    send("SMEMBERS", arguments, handler);
+    unwrap().send("SMEMBERS", arguments, handler);
     return this;
   }
 
@@ -2887,7 +2893,7 @@ public interface RedisAPI extends Redis {
    */
   @Fluent
   default RedisAPI smove(Args arguments, Handler<AsyncResult<Reply>> handler) {
-    send("SMOVE", arguments, handler);
+    unwrap().send("SMOVE", arguments, handler);
     return this;
   }
 
@@ -2910,7 +2916,7 @@ public interface RedisAPI extends Redis {
    */
   @Fluent
   default RedisAPI sort(Args arguments, Handler<AsyncResult<Reply>> handler) {
-    send("SORT", arguments, handler);
+    unwrap().send("SORT", arguments, handler);
     return this;
   }
 
@@ -2928,7 +2934,7 @@ public interface RedisAPI extends Redis {
    */
   @Fluent
   default RedisAPI spop(Args arguments, Handler<AsyncResult<Reply>> handler) {
-    send("SPOP", arguments, handler);
+    unwrap().send("SPOP", arguments, handler);
     return this;
   }
 
@@ -2946,7 +2952,7 @@ public interface RedisAPI extends Redis {
    */
   @Fluent
   default RedisAPI srandmember(Args arguments, Handler<AsyncResult<Reply>> handler) {
-    send("SRANDMEMBER", arguments, handler);
+    unwrap().send("SRANDMEMBER", arguments, handler);
     return this;
   }
 
@@ -2964,7 +2970,7 @@ public interface RedisAPI extends Redis {
    */
   @Fluent
   default RedisAPI srem(Args arguments, Handler<AsyncResult<Reply>> handler) {
-    send("SREM", arguments, handler);
+    unwrap().send("SREM", arguments, handler);
     return this;
   }
 
@@ -2981,7 +2987,7 @@ public interface RedisAPI extends Redis {
    */
   @Fluent
   default RedisAPI strlen(Args arguments, Handler<AsyncResult<Reply>> handler) {
-    send("STRLEN", arguments, handler);
+    unwrap().send("STRLEN", arguments, handler);
     return this;
   }
 
@@ -2998,7 +3004,7 @@ public interface RedisAPI extends Redis {
    */
   @Fluent
   default RedisAPI subscribe(Args arguments, Handler<AsyncResult<Reply>> handler) {
-    send("SUBSCRIBE", arguments, handler);
+    unwrap().send("SUBSCRIBE", arguments, handler);
     return this;
   }
 
@@ -3015,7 +3021,7 @@ public interface RedisAPI extends Redis {
    */
   @Fluent
   default RedisAPI sunion(Args arguments, Handler<AsyncResult<Reply>> handler) {
-    send("SUNION", arguments, handler);
+    unwrap().send("SUNION", arguments, handler);
     return this;
   }
 
@@ -3033,7 +3039,7 @@ public interface RedisAPI extends Redis {
    */
   @Fluent
   default RedisAPI sunionstore(Args arguments, Handler<AsyncResult<Reply>> handler) {
-    send("SUNIONSTORE", arguments, handler);
+    unwrap().send("SUNIONSTORE", arguments, handler);
     return this;
   }
 
@@ -3049,7 +3055,7 @@ public interface RedisAPI extends Redis {
    */
   @Fluent
   default RedisAPI swapdb(Args arguments, Handler<AsyncResult<Reply>> handler) {
-    send("SWAPDB", arguments, handler);
+    unwrap().send("SWAPDB", arguments, handler);
     return this;
   }
 
@@ -3063,7 +3069,7 @@ public interface RedisAPI extends Redis {
    */
   @Fluent
   default RedisAPI sync(Handler<AsyncResult<Reply>> handler) {
-    send("SYNC", handler);
+    unwrap().send("SYNC", handler);
     return this;
   }
 
@@ -3079,7 +3085,7 @@ public interface RedisAPI extends Redis {
    */
   @Fluent
   default RedisAPI time(Handler<AsyncResult<Reply>> handler) {
-    send("TIME", handler);
+    unwrap().send("TIME", handler);
     return this;
   }
 
@@ -3096,7 +3102,7 @@ public interface RedisAPI extends Redis {
    */
   @Fluent
   default RedisAPI touch(Args arguments, Handler<AsyncResult<Reply>> handler) {
-    send("TOUCH", arguments, handler);
+    unwrap().send("TOUCH", arguments, handler);
     return this;
   }
 
@@ -3113,7 +3119,7 @@ public interface RedisAPI extends Redis {
    */
   @Fluent
   default RedisAPI ttl(Args arguments, Handler<AsyncResult<Reply>> handler) {
-    send("TTL", arguments, handler);
+    unwrap().send("TTL", arguments, handler);
     return this;
   }
 
@@ -3130,7 +3136,7 @@ public interface RedisAPI extends Redis {
    */
   @Fluent
   default RedisAPI type(Args arguments, Handler<AsyncResult<Reply>> handler) {
-    send("TYPE", arguments, handler);
+    unwrap().send("TYPE", arguments, handler);
     return this;
   }
 
@@ -3147,7 +3153,7 @@ public interface RedisAPI extends Redis {
    */
   @Fluent
   default RedisAPI unsubscribe(Args arguments, Handler<AsyncResult<Reply>> handler) {
-    send("UNSUBSCRIBE", arguments, handler);
+    unwrap().send("UNSUBSCRIBE", arguments, handler);
     return this;
   }
 
@@ -3164,7 +3170,7 @@ public interface RedisAPI extends Redis {
    */
   @Fluent
   default RedisAPI unlink(Args arguments, Handler<AsyncResult<Reply>> handler) {
-    send("UNLINK", arguments, handler);
+    unwrap().send("UNLINK", arguments, handler);
     return this;
   }
 
@@ -3180,7 +3186,7 @@ public interface RedisAPI extends Redis {
    */
   @Fluent
   default RedisAPI unwatch(Handler<AsyncResult<Reply>> handler) {
-    send("UNWATCH", handler);
+    unwrap().send("UNWATCH", handler);
     return this;
   }
 
@@ -3198,7 +3204,7 @@ public interface RedisAPI extends Redis {
    */
   @Fluent
   default RedisAPI wait(Args arguments, Handler<AsyncResult<Reply>> handler) {
-    send("WAIT", arguments, handler);
+    unwrap().send("WAIT", arguments, handler);
     return this;
   }
 
@@ -3215,7 +3221,7 @@ public interface RedisAPI extends Redis {
    */
   @Fluent
   default RedisAPI watch(Args arguments, Handler<AsyncResult<Reply>> handler) {
-    send("WATCH", arguments, handler);
+    unwrap().send("WATCH", arguments, handler);
     return this;
   }
 
@@ -3236,7 +3242,7 @@ public interface RedisAPI extends Redis {
    */
   @Fluent
   default RedisAPI zadd(Args arguments, Handler<AsyncResult<Reply>> handler) {
-    send("ZADD", arguments, handler);
+    unwrap().send("ZADD", arguments, handler);
     return this;
   }
 
@@ -3253,7 +3259,7 @@ public interface RedisAPI extends Redis {
    */
   @Fluent
   default RedisAPI zcard(Args arguments, Handler<AsyncResult<Reply>> handler) {
-    send("ZCARD", arguments, handler);
+    unwrap().send("ZCARD", arguments, handler);
     return this;
   }
 
@@ -3272,7 +3278,7 @@ public interface RedisAPI extends Redis {
    */
   @Fluent
   default RedisAPI zcount(Args arguments, Handler<AsyncResult<Reply>> handler) {
-    send("ZCOUNT", arguments, handler);
+    unwrap().send("ZCOUNT", arguments, handler);
     return this;
   }
 
@@ -3291,7 +3297,7 @@ public interface RedisAPI extends Redis {
    */
   @Fluent
   default RedisAPI zincrby(Args arguments, Handler<AsyncResult<Reply>> handler) {
-    send("ZINCRBY", arguments, handler);
+    unwrap().send("ZINCRBY", arguments, handler);
     return this;
   }
 
@@ -3312,7 +3318,7 @@ public interface RedisAPI extends Redis {
    */
   @Fluent
   default RedisAPI zinterstore(Args arguments, Handler<AsyncResult<Reply>> handler) {
-    send("ZINTERSTORE", arguments, handler);
+    unwrap().send("ZINTERSTORE", arguments, handler);
     return this;
   }
 
@@ -3331,7 +3337,7 @@ public interface RedisAPI extends Redis {
    */
   @Fluent
   default RedisAPI zlexcount(Args arguments, Handler<AsyncResult<Reply>> handler) {
-    send("ZLEXCOUNT", arguments, handler);
+    unwrap().send("ZLEXCOUNT", arguments, handler);
     return this;
   }
 
@@ -3349,7 +3355,7 @@ public interface RedisAPI extends Redis {
    */
   @Fluent
   default RedisAPI zpopmax(Args arguments, Handler<AsyncResult<Reply>> handler) {
-    send("ZPOPMAX", arguments, handler);
+    unwrap().send("ZPOPMAX", arguments, handler);
     return this;
   }
 
@@ -3367,7 +3373,7 @@ public interface RedisAPI extends Redis {
    */
   @Fluent
   default RedisAPI zpopmin(Args arguments, Handler<AsyncResult<Reply>> handler) {
-    send("ZPOPMIN", arguments, handler);
+    unwrap().send("ZPOPMIN", arguments, handler);
     return this;
   }
 
@@ -3387,7 +3393,7 @@ public interface RedisAPI extends Redis {
    */
   @Fluent
   default RedisAPI zrange(Args arguments, Handler<AsyncResult<Reply>> handler) {
-    send("ZRANGE", arguments, handler);
+    unwrap().send("ZRANGE", arguments, handler);
     return this;
   }
 
@@ -3407,7 +3413,7 @@ public interface RedisAPI extends Redis {
    */
   @Fluent
   default RedisAPI zrangebylex(Args arguments, Handler<AsyncResult<Reply>> handler) {
-    send("ZRANGEBYLEX", arguments, handler);
+    unwrap().send("ZRANGEBYLEX", arguments, handler);
     return this;
   }
 
@@ -3427,7 +3433,7 @@ public interface RedisAPI extends Redis {
    */
   @Fluent
   default RedisAPI zrevrangebylex(Args arguments, Handler<AsyncResult<Reply>> handler) {
-    send("ZREVRANGEBYLEX", arguments, handler);
+    unwrap().send("ZREVRANGEBYLEX", arguments, handler);
     return this;
   }
 
@@ -3448,7 +3454,7 @@ public interface RedisAPI extends Redis {
    */
   @Fluent
   default RedisAPI zrangebyscore(Args arguments, Handler<AsyncResult<Reply>> handler) {
-    send("ZRANGEBYSCORE", arguments, handler);
+    unwrap().send("ZRANGEBYSCORE", arguments, handler);
     return this;
   }
 
@@ -3466,7 +3472,7 @@ public interface RedisAPI extends Redis {
    */
   @Fluent
   default RedisAPI zrank(Args arguments, Handler<AsyncResult<Reply>> handler) {
-    send("ZRANK", arguments, handler);
+    unwrap().send("ZRANK", arguments, handler);
     return this;
   }
 
@@ -3484,7 +3490,7 @@ public interface RedisAPI extends Redis {
    */
   @Fluent
   default RedisAPI zrem(Args arguments, Handler<AsyncResult<Reply>> handler) {
-    send("ZREM", arguments, handler);
+    unwrap().send("ZREM", arguments, handler);
     return this;
   }
 
@@ -3503,7 +3509,7 @@ public interface RedisAPI extends Redis {
    */
   @Fluent
   default RedisAPI zremrangebylex(Args arguments, Handler<AsyncResult<Reply>> handler) {
-    send("ZREMRANGEBYLEX", arguments, handler);
+    unwrap().send("ZREMRANGEBYLEX", arguments, handler);
     return this;
   }
 
@@ -3522,7 +3528,7 @@ public interface RedisAPI extends Redis {
    */
   @Fluent
   default RedisAPI zremrangebyrank(Args arguments, Handler<AsyncResult<Reply>> handler) {
-    send("ZREMRANGEBYRANK", arguments, handler);
+    unwrap().send("ZREMRANGEBYRANK", arguments, handler);
     return this;
   }
 
@@ -3541,7 +3547,7 @@ public interface RedisAPI extends Redis {
    */
   @Fluent
   default RedisAPI zremrangebyscore(Args arguments, Handler<AsyncResult<Reply>> handler) {
-    send("ZREMRANGEBYSCORE", arguments, handler);
+    unwrap().send("ZREMRANGEBYSCORE", arguments, handler);
     return this;
   }
 
@@ -3561,7 +3567,7 @@ public interface RedisAPI extends Redis {
    */
   @Fluent
   default RedisAPI zrevrange(Args arguments, Handler<AsyncResult<Reply>> handler) {
-    send("ZREVRANGE", arguments, handler);
+    unwrap().send("ZREVRANGE", arguments, handler);
     return this;
   }
 
@@ -3582,7 +3588,7 @@ public interface RedisAPI extends Redis {
    */
   @Fluent
   default RedisAPI zrevrangebyscore(Args arguments, Handler<AsyncResult<Reply>> handler) {
-    send("ZREVRANGEBYSCORE", arguments, handler);
+    unwrap().send("ZREVRANGEBYSCORE", arguments, handler);
     return this;
   }
 
@@ -3600,7 +3606,7 @@ public interface RedisAPI extends Redis {
    */
   @Fluent
   default RedisAPI zrevrank(Args arguments, Handler<AsyncResult<Reply>> handler) {
-    send("ZREVRANK", arguments, handler);
+    unwrap().send("ZREVRANK", arguments, handler);
     return this;
   }
 
@@ -3618,7 +3624,7 @@ public interface RedisAPI extends Redis {
    */
   @Fluent
   default RedisAPI zscore(Args arguments, Handler<AsyncResult<Reply>> handler) {
-    send("ZSCORE", arguments, handler);
+    unwrap().send("ZSCORE", arguments, handler);
     return this;
   }
 
@@ -3639,7 +3645,7 @@ public interface RedisAPI extends Redis {
    */
   @Fluent
   default RedisAPI zunionstore(Args arguments, Handler<AsyncResult<Reply>> handler) {
-    send("ZUNIONSTORE", arguments, handler);
+    unwrap().send("ZUNIONSTORE", arguments, handler);
     return this;
   }
 
@@ -3658,7 +3664,7 @@ public interface RedisAPI extends Redis {
    */
   @Fluent
   default RedisAPI scan(Args arguments, Handler<AsyncResult<Reply>> handler) {
-    send("SCAN", arguments, handler);
+    unwrap().send("SCAN", arguments, handler);
     return this;
   }
 
@@ -3678,7 +3684,7 @@ public interface RedisAPI extends Redis {
    */
   @Fluent
   default RedisAPI sscan(Args arguments, Handler<AsyncResult<Reply>> handler) {
-    send("SSCAN", arguments, handler);
+    unwrap().send("SSCAN", arguments, handler);
     return this;
   }
 
@@ -3698,7 +3704,7 @@ public interface RedisAPI extends Redis {
    */
   @Fluent
   default RedisAPI hscan(Args arguments, Handler<AsyncResult<Reply>> handler) {
-    send("HSCAN", arguments, handler);
+    unwrap().send("HSCAN", arguments, handler);
     return this;
   }
 
@@ -3718,7 +3724,7 @@ public interface RedisAPI extends Redis {
    */
   @Fluent
   default RedisAPI zscan(Args arguments, Handler<AsyncResult<Reply>> handler) {
-    send("ZSCAN", arguments, handler);
+    unwrap().send("ZSCAN", arguments, handler);
     return this;
   }
 
@@ -3737,7 +3743,7 @@ public interface RedisAPI extends Redis {
    */
   @Fluent
   default RedisAPI xadd(Args arguments, Handler<AsyncResult<Reply>> handler) {
-    send("XADD", arguments, handler);
+    unwrap().send("XADD", arguments, handler);
     return this;
   }
 
@@ -3757,7 +3763,7 @@ public interface RedisAPI extends Redis {
    */
   @Fluent
   default RedisAPI xrange(Args arguments, Handler<AsyncResult<Reply>> handler) {
-    send("XRANGE", arguments, handler);
+    unwrap().send("XRANGE", arguments, handler);
     return this;
   }
 
@@ -3777,7 +3783,7 @@ public interface RedisAPI extends Redis {
    */
   @Fluent
   default RedisAPI xrevrange(Args arguments, Handler<AsyncResult<Reply>> handler) {
-    send("XREVRANGE", arguments, handler);
+    unwrap().send("XREVRANGE", arguments, handler);
     return this;
   }
 
@@ -3794,7 +3800,7 @@ public interface RedisAPI extends Redis {
    */
   @Fluent
   default RedisAPI xlen(Args arguments, Handler<AsyncResult<Reply>> handler) {
-    send("XLEN", arguments, handler);
+    unwrap().send("XLEN", arguments, handler);
     return this;
   }
 
@@ -3815,7 +3821,7 @@ public interface RedisAPI extends Redis {
    */
   @Fluent
   default RedisAPI xread(Args arguments, Handler<AsyncResult<Reply>> handler) {
-    send("XREAD", arguments, handler);
+    unwrap().send("XREAD", arguments, handler);
     return this;
   }
 
@@ -3837,7 +3843,7 @@ public interface RedisAPI extends Redis {
    */
   @Fluent
   default RedisAPI xreadgroup(Args arguments, Handler<AsyncResult<Reply>> handler) {
-    send("XREADGROUP", arguments, handler);
+    unwrap().send("XREADGROUP", arguments, handler);
     return this;
   }
 
@@ -3857,7 +3863,7 @@ public interface RedisAPI extends Redis {
    */
   @Fluent
   default RedisAPI xpending(Args arguments, Handler<AsyncResult<Reply>> handler) {
-    send("XPENDING", arguments, handler);
+    unwrap().send("XPENDING", arguments, handler);
     return this;
   }
 

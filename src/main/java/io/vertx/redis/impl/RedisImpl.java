@@ -93,7 +93,7 @@ public class RedisImpl implements Redis, Handler<Reply> {
   // state
   private NetSocket netSocket;
   private Handler<Throwable> onException;
-  private Handler<Void> onClose;
+  private Handler<Void> onEnd;
   private Handler<io.vertx.redis.Reply> onMessage;
 
   public RedisImpl(Vertx vertx, SocketAddress socketAddress, NetClientOptions netClientOptions) {
@@ -115,7 +115,7 @@ public class RedisImpl implements Redis, Handler<Reply> {
   @Override
   public Redis open(Handler<AsyncResult<Void>> onOpen) {
     parser.reset();
-    // create a netClient for the connection
+    // wrap a netClient for the connection
     final NetClient client = vertx.createNetClient(netClientOptions);
     client.connect(socketAddress, asyncResult -> {
       if (asyncResult.failed()) {
@@ -132,8 +132,8 @@ public class RedisImpl implements Redis, Handler<Reply> {
           // clean up the pending queue
           cleanupQueue("Connection closed");
           // call the close handler if any
-          if (onClose != null) {
-            onClose.handle(close);
+          if (onEnd != null) {
+            onEnd.handle(close);
           }
         })
         .exceptionHandler(exception -> {
@@ -168,14 +168,26 @@ public class RedisImpl implements Redis, Handler<Reply> {
   }
 
   @Override
-  public Redis closeHandler(Handler<Void> handler) {
-    this.onClose = handler;
+  public Redis endHandler(Handler<Void> handler) {
+    this.onEnd = handler;
     return this;
   }
 
   @Override
   public Redis handler(Handler<io.vertx.redis.Reply> handler) {
     this.onMessage = handler;
+    return this;
+  }
+
+  @Override
+  public Redis pause() {
+    netSocket.pause();
+    return this;
+  }
+
+  @Override
+  public Redis resume() {
+    netSocket.resume();
     return this;
   }
 

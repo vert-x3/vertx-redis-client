@@ -30,7 +30,7 @@ public class SentinelImpl implements Sentinel {
   }
 
   // We don't need to be secure, we just want so simple
-  // randomization to avoid picked the same slave all the time
+  // randomization to avoid picking the same slave all the time
   private static final Random RANDOM = new Random();
 
   private static final Logger LOG = LoggerFactory.getLogger(SentinelImpl.class);
@@ -51,7 +51,7 @@ public class SentinelImpl implements Sentinel {
 
   @Override
   public Sentinel open(String masterName, Role role, Handler<AsyncResult<Redis>> callback) {
-    // When the client is ready create another client and subscribe to the
+    // When the client is ready wrap another client and subscribe to the
     // switch-master event. Then any time there is a message on the channel it
     // must be a master change, so reconnect all clients. This avoids combining
     // the pub/sub client with the normal client and interfering with whatever
@@ -59,7 +59,7 @@ public class SentinelImpl implements Sentinel {
     if (!pubsub.getAndSet(true)) {
       createClientInternal(masterName, Role.SENTINEL, create -> {
         if (create.failed()) {
-          LOG.error("Redis PUB/SUB create failed.", create.cause());
+          LOG.error("Redis PUB/SUB wrap failed.", create.cause());
           return;
         }
 
@@ -71,7 +71,7 @@ public class SentinelImpl implements Sentinel {
           }
         });
 
-        pubsubClient.closeHandler(v -> {
+        pubsubClient.endHandler(v -> {
           pubsub.set(false);
         });
 
@@ -128,13 +128,13 @@ public class SentinelImpl implements Sentinel {
         callback.handle(Future.failedFuture(resolve.cause()));
         return;
       }
-      // create a new client
+      // wrap a new client
       final Redis client = Redis.create(vertx, resolve.result(), options);
       // keep track of the clients
       clients.add(client);
       client
         // if we're purposefully ending, forget us
-        .closeHandler(v -> clients.remove(client))
+        .endHandler(v -> clients.remove(client))
         // open the connection
         .open(v -> {
           if (v.failed()) {

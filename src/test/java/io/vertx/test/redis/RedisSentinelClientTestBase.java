@@ -34,15 +34,15 @@ public abstract class RedisSentinelClientTestBase extends AbstractRedisSentinelB
     // hence getting ip address.
     host = InetAddress.getLocalHost().getHostAddress();
 
-    // create Redis Master
+    // wrap Redis Master
     createRedisInstance(DEFAULT_PORT, "loglevel debug");
     instances.get(DEFAULT_PORT).start();
 
-    // create Redis Slave
+    // wrap Redis Slave
     createSlaveRedisInstance(DEFAULT_PORT + 1, DEFAULT_PORT, "loglevel debug");
     instances.get(DEFAULT_PORT + 1).start();
 
-    // create sentinels
+    // wrap sentinels
     for (int i = 0; i < 3; i++) {
       createRedisSentinelInstance(DEFAULT_SENTINEL_PORT + i, DEFAULT_PORT);
       sentinels.get(DEFAULT_SENTINEL_PORT + i).start();

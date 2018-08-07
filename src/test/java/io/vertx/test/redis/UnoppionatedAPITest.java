@@ -38,11 +38,12 @@ public class UnoppionatedAPITest {
     server = new RedisServer(6379);
     server.start();
 
-    redis = RedisAPI.create(Redis.create(rule.vertx(), SocketAddress.inetSocketAddress(6379, "localhost")));
-    redis.exceptionHandler(should::fail);
+    Redis client = Redis.create(rule.vertx(), SocketAddress.inetSocketAddress(6379, "localhost"));
 
-    redis.open(open -> {
+    client.exceptionHandler(should::fail);
+    client.open(open -> {
       should.assertTrue(open.succeeded());
+      redis = RedisAPI.wrap(client);
       test.complete();
     });
   }
@@ -89,15 +90,17 @@ public class UnoppionatedAPITest {
     RedisServer server = RedisServer.builder().port(6381).setting("requirepass foobar").build();
     server.start();
 
-    final RedisAPI rdx = RedisAPI.create(Redis.create(rule.vertx(), SocketAddress.inetSocketAddress(6381, "localhost")));
+    Redis client = Redis.create(rule.vertx(), SocketAddress.inetSocketAddress(6381, "localhost"));
 
-    rdx.open(open -> {
+    client.open(open -> {
       should.assertTrue(open.succeeded());
+      final RedisAPI rdx = RedisAPI.wrap(client);
+
       rdx.auth(args("barfoo"), reply -> {
         should.assertFalse(reply.succeeded());
         rdx.auth(args("foobar"), reply2 -> {
           should.assertTrue(reply2.succeeded());
-          rdx.close();
+          client.close();
           try {
             server.stop();
           } catch (Exception ignore) {
@@ -106,7 +109,6 @@ public class UnoppionatedAPITest {
         });
       });
     });
-
   }
 
   @Test

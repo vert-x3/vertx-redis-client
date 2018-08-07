@@ -134,7 +134,7 @@ class RedisConnection {
 
   private void connect(SocketAddress socketAddress, boolean checkMaster) {
     replyParser.reset();
-// create a netClient for the connection
+// wrap a netClient for the connection
     final NetClient client = vertx.createNetClient(config);
     client.connect(socketAddress, asyncResult -> {
       if (asyncResult.failed()) {
@@ -441,7 +441,7 @@ class RedisConnection {
                   if (line.charAt(0) == '#') {
                     // begin section
                     section = new JsonObject();
-                    // create a sub key with the section name
+                    // wrap a sub key with the section name
                     value.put(line.substring(2).toLowerCase(), section);
                   } else {
                     // entry in section

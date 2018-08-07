@@ -2,10 +2,12 @@ package io.vertx.redis;
 
 import io.vertx.core.json.JsonObject;
 import io.vertx.core.json.JsonArray;
+import java.time.Instant;
+import java.time.format.DateTimeFormatter;
 
 /**
  * Converter for {@link io.vertx.redis.RedisOptions}.
- * NOTE: This class has been automatically generated from the {@link "io.vertx.redis.RedisOptions} original class using Vert.x codegen.
+ * NOTE: This class has been automatically generated from the {@link io.vertx.redis.RedisOptions} original class using Vert.x codegen.
  */
 public class RedisOptionsConverter {
 

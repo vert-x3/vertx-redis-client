@@ -1,19 +1,15 @@
 package io.vertx.test.redis;
 
-import io.vertx.core.Vertx;
-import io.vertx.core.json.JsonObject;
 import io.vertx.core.net.SocketAddress;
 import io.vertx.ext.unit.Async;
 import io.vertx.ext.unit.TestContext;
 import io.vertx.ext.unit.junit.RunTestOnContext;
 import io.vertx.ext.unit.junit.VertxUnitRunner;
 import io.vertx.redis.*;
-import io.vertx.redis.utils.JsonUtils;
 import org.junit.*;
 import org.junit.runner.RunWith;
 import redis.embedded.RedisSentinel;
 import redis.embedded.RedisServer;
-import redis.embedded.RedisServerBuilder;
 
 import java.net.InetAddress;
 import java.util.Arrays;
@@ -46,7 +42,7 @@ public class UnoppionatedSentinelTest {
     // hence getting ip address.
     host = InetAddress.getLocalHost().getHostAddress();
 
-    // create Redis Master
+    // wrap Redis Master
     master = RedisServer.builder()
       .port(6379)
       .setting("loglevel debug")
@@ -54,7 +50,7 @@ public class UnoppionatedSentinelTest {
 
     master.start();
 
-    // create Redis Slave
+    // wrap Redis Slave
     slave = RedisServer.builder()
       .port(6379 + 1)
       .setting("loglevel debug")
@@ -63,7 +59,7 @@ public class UnoppionatedSentinelTest {
 
     slave.start();
 
-    // create sentinels
+    // wrap sentinels
     for (int i = 0; i < sentinels.length; i++) {
       sentinels[i] = RedisSentinel.builder()
         .port(26739 + i)

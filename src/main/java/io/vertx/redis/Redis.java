@@ -23,6 +23,7 @@ import io.vertx.core.Handler;
 import io.vertx.core.Vertx;
 import io.vertx.core.net.NetClientOptions;
 import io.vertx.core.net.SocketAddress;
+import io.vertx.core.streams.ReadStream;
 import io.vertx.redis.impl.RedisImpl;
 
 import java.util.ArrayList;
@@ -38,7 +39,7 @@ import java.util.concurrent.atomic.AtomicInteger;
  * @author Paulo Lopes
  */
 @VertxGen
-public interface Redis {
+public interface Redis extends ReadStream<Reply> {
 
   /**
    * Creates an instance of the Client.
@@ -86,12 +87,12 @@ public interface Redis {
   Redis exceptionHandler(Handler<Throwable> handler);
 
   /**
-   * Set the exception handler to be called on close.
+   * Set the handler to be called on end.
    * @param handler the handler
    * @return self
    */
   @Fluent
-  Redis closeHandler(Handler<Void> handler);
+  Redis endHandler(Handler<Void> handler);
 
   /**
    * Set the handler to be called on message.
@@ -100,6 +101,12 @@ public interface Redis {
    */
   @Fluent
   Redis handler(Handler<Reply> handler);
+
+  @Fluent
+  Redis pause();
+
+  @Fluent
+  Redis resume();
 
   /**
    * Send a message to redis.
