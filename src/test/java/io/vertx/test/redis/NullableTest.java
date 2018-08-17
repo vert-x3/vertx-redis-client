@@ -9,7 +9,7 @@ public class NullableTest extends AbstractRedisClientBase {
 
   @Test
   public void testGetNullable() {
-    makeSureKeyNotExistes(() -> {
+    makeSureKeyNotExists(() -> {
       redis.get(notExistsKey, this::handle);
     });
     await();
@@ -17,7 +17,7 @@ public class NullableTest extends AbstractRedisClientBase {
 
   @Test
   public void testGetBinaryNullable() {
-    makeSureKeyNotExistes(() -> {
+    makeSureKeyNotExists(() -> {
       redis.getBinary(notExistsKey, asyncResult -> {
         if (asyncResult.failed()) {
           fail(asyncResult.cause());
@@ -32,7 +32,7 @@ public class NullableTest extends AbstractRedisClientBase {
 
   @Test
   public void testGetSetNullable() {
-    makeSureKeyNotExistes(() -> {
+    makeSureKeyNotExists(() -> {
       redis.getset(notExistsKey, "value", this::handle);
     });
     await();
@@ -40,7 +40,7 @@ public class NullableTest extends AbstractRedisClientBase {
 
   @Test
   public void testHGetNullable() {
-    makeSureKeyNotExistes(() -> {
+    makeSureKeyNotExists(() -> {
       String notExistsField = "notExistsField";
       redis.hget(notExistsKey, notExistsField, this::handle);
     });
@@ -49,7 +49,7 @@ public class NullableTest extends AbstractRedisClientBase {
 
   @Test
   public void testLPopNullable() {
-    makeSureKeyNotExistes(() -> {
+    makeSureKeyNotExists(() -> {
       redis.lpop(notExistsKey, this::handle);
     });
     await();
@@ -57,13 +57,13 @@ public class NullableTest extends AbstractRedisClientBase {
 
   @Test
   public void testSPopNullable() {
-    makeSureKeyNotExistes(() -> {
+    makeSureKeyNotExists(() -> {
       redis.spop(notExistsKey, this::handle);
     });
     await();
   }
 
-  private void makeSureKeyNotExistes(Runnable task) {
+  private void makeSureKeyNotExists(Runnable task) {
     redis.del(notExistsKey, r -> {
       if (r.failed()) {
         fail(r.cause());
