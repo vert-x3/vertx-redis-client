@@ -880,7 +880,7 @@ public interface RedisClient {
    * group: string
    */
   @Fluent
-  RedisClient getset(String key, String value, Handler<AsyncResult<String>> handler);
+  RedisClient getset(String key, String value, Handler<AsyncResult<@Nullable String>> handler);
 
   /**
    * Delete one or more hash fields
@@ -928,7 +928,7 @@ public interface RedisClient {
    * group: hash
    */
   @Fluent
-  RedisClient hget(String key, String field, Handler<AsyncResult<String>> handler);
+  RedisClient hget(String key, String field, Handler<AsyncResult<@Nullable String>> handler);
 
   /**
    * Get all the fields and values in a hash
@@ -1172,7 +1172,7 @@ public interface RedisClient {
    * group: list
    */
   @Fluent
-  RedisClient lpop(String key, Handler<AsyncResult<String>> handler);
+  RedisClient lpop(String key, Handler<AsyncResult<@Nullable String>> handler);
 
   /**
    * Prepend one or multiple values to a list
@@ -2036,7 +2036,7 @@ public interface RedisClient {
    * group: set
    */
   @Fluent
-  RedisClient spop(String key, Handler<AsyncResult<String>> handler);
+  RedisClient spop(String key, Handler<AsyncResult<@Nullable String>> handler);
 
   /**
    * Remove and return random members from a set
