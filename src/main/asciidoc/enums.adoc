@@ -93,20 +93,16 @@
 [frame="topbot"]
 |===
 ^|Name | Description
-|[[m]]`m`|
-+++
+|[[m]]`m`|+++
 Meter
 +++
-|[[km]]`km`|
-+++
+|[[km]]`km`|+++
 Kilometer
 +++
-|[[mi]]`mi`|
-+++
+|[[mi]]`mi`|+++
 Mile
 +++
-|[[ft]]`ft`|
-+++
+|[[ft]]`ft`|+++
 Feet
 +++
 |===
