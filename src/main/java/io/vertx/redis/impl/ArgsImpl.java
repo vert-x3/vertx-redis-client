@@ -2,7 +2,6 @@ package io.vertx.redis.impl;
 
 import io.vertx.core.buffer.Buffer;
 import io.vertx.core.json.JsonArray;
-import io.vertx.core.json.JsonObject;
 import io.vertx.redis.Args;
 
 import java.util.List;
@@ -28,6 +27,8 @@ public class ArgsImpl implements Args {
 
   private final Buffer buffer = Buffer.buffer();
   private int size;
+  // key reference
+  private String key;
 
   // Optimized for the direct to ASCII bytes case
   // About 5x faster than using Long.toString.getBytes
@@ -76,6 +77,13 @@ public class ArgsImpl implements Args {
     buffer.appendBytes(CRLF);
     buffer.appendBytes(CRLF);
     size++;
+    return this;
+  }
+
+  @Override
+  public Args key(String key) {
+    this.key = key;
+    add(key.getBytes());
     return this;
   }
 
@@ -178,5 +186,10 @@ public class ArgsImpl implements Args {
   @Override
   public Buffer toBuffer() {
     return buffer;
+  }
+
+  @Override
+  public String getKey() {
+    return key;
   }
 }

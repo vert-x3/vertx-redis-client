@@ -29,7 +29,7 @@
   <name>Vert.x Redis Client</name>
 
   <properties>
-    <stack.version>3.6.0-SNAPSHOT</stack.version>
+    <stack.version>3.6.0.CR1</stack.version>
   </properties>
 
   <!--

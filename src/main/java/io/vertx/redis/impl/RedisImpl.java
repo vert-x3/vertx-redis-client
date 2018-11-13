@@ -30,6 +30,7 @@ import io.vertx.redis.Redis;
 
 import java.util.LinkedList;
 import java.util.Queue;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
  * @author <a href="mailto:plopes@redhat.com">Paulo Lopes</a>
@@ -96,6 +97,8 @@ public class RedisImpl implements Redis, Handler<Reply> {
   private Handler<Void> onEnd;
   private Handler<io.vertx.redis.Reply> onMessage;
 
+  private final AtomicBoolean closed = new AtomicBoolean(true);
+
   public RedisImpl(Vertx vertx, SocketAddress socketAddress, NetClientOptions netClientOptions) {
     // Make sure we have an event loop context for serializability of the commands
     Context ctx = Vertx.currentContext();
@@ -133,6 +136,7 @@ public class RedisImpl implements Redis, Handler<Reply> {
           cleanupQueue("Connection closed");
           // call the close handler if any
           if (onEnd != null) {
+            closed.compareAndSet(false, true);
             onEnd.handle(close);
           }
         })
@@ -143,11 +147,13 @@ public class RedisImpl implements Redis, Handler<Reply> {
           cleanupQueue(exception);
           // call the exception handler if any
           if (onException != null) {
+            closed.compareAndSet(false, true);
             onException.handle(exception);
           }
         });
 
       // ready
+      closed.compareAndSet(true, false);
       onOpen.handle(Future.succeededFuture());
     });
 
@@ -188,6 +194,12 @@ public class RedisImpl implements Redis, Handler<Reply> {
   @Override
   public Redis resume() {
     netSocket.resume();
+    return this;
+  }
+
+  @Override
+  public Redis fetch(long size) {
+    // no-op
     return this;
   }
 
@@ -311,5 +323,15 @@ public class RedisImpl implements Redis, Handler<Reply> {
     } else {
       context.runOnContext(handler);
     }
+  }
+
+  @Override
+  public boolean closed() {
+    return closed.get();
+  }
+
+  @Override
+  public SocketAddress address() {
+    return socketAddress;
   }
 }

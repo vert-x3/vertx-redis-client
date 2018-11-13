@@ -76,6 +76,13 @@ public interface Args {
   }
 
   /**
+   * Adds a String key argument
+   * @return self
+   */
+  @Fluent
+  Args key(String key);
+
+  /**
    * Adds a String using a specific character encoding argument
    * @return self
    */
@@ -185,4 +192,10 @@ public interface Args {
    * @return self
    */
   Buffer toBuffer();
+
+  /**
+   * Returns the the argument marked as key if any or null
+   * @return self
+   */
+  String getKey();
 }

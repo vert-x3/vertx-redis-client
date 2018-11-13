@@ -188,4 +188,16 @@ public interface Redis extends ReadStream<Reply> {
    */
   @Fluent
   Redis send(String command, Args args, Handler<AsyncResult<Reply>> handler);
+
+  /**
+   * Returns true if the underlying connection is closed.
+   * @return true is closed.
+   */
+  boolean closed();
+
+  /**
+   * Returns the address associated with this client.
+   * @return the address.
+   */
+  SocketAddress address();
 }

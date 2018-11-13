@@ -1,0 +1,15 @@
+version: '2'
+services:
+  redis-cluster:
+    environment:
+     IP: '127.0.0.1'
+     SENTINEL: ${REDIS_USE_SENTINEL}
+     STANDALONE: ${REDIS_USE_STANDALONE}
+    build:
+      context: .
+      args:
+        redis_version: '5.0.0'
+    hostname: server
+    ports:
+      - '7000-7007:7000-7007'
+      - '5000-5002:5000-5002'
