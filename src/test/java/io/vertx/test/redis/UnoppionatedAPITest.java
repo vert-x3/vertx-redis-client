@@ -231,7 +231,7 @@ public class UnoppionatedAPITest {
   public void testClientList(TestContext should) {
     final Async test = should.async();
 
-    redis.clientList(result -> {
+    redis.clientList(Args.args(), result -> {
       should.assertTrue(result.succeeded());
       should.assertNotNull(result.result());
       test.complete();
