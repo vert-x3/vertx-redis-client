@@ -1,4 +1,10 @@
 language: java
+services:
+  - docker
+install:
+  - docker pull grokzen/redis-cluster:latest
+  - docker run -d -e 'IP=127.0.0.1' -p '7000-7007:7000-7007' -p '5000-5002:5000-5002' grokzen/redis-cluster:latest
+  - docker ps -a
 branches:
   only:
   - master

@@ -20,6 +20,7 @@ import io.vertx.codegen.annotations.VertxGen;
 
 import io.vertx.core.AsyncResult;
 import io.vertx.core.Handler;
+
 import io.vertx.redis.impl.RedisAPIImpl;
 
 /**
@@ -31,7 +32,7 @@ import io.vertx.redis.impl.RedisAPIImpl;
 public interface RedisAPI {
 
   /**
-   * Creates an instance of the Client wrapping an existing client.
+   * Wraps an instance of the Client.
    *
    * @param client existing redis client
    * @return a instance of the connector.
@@ -278,6 +279,22 @@ public interface RedisAPI {
   }
 
   /**
+   * Returns the client ID for the current connection
+   * 
+    * <b>Time complexity</b>: <i>O(1)</i>
+   * 
+
+   * 
+   * @since Redis 5.0.0
+   * group: server
+   */
+  @Fluent
+  default RedisAPI clientId(Handler<AsyncResult<Reply>> handler) {
+    unwrap().send("CLIENT ID", handler);
+    return this;
+  }
+
+  /**
    * Kill the connection of a client
    * 
     * <b>Time complexity</b>: <i>O(N) where N is the number of client connections</i>
@@ -303,14 +320,15 @@ public interface RedisAPI {
    * 
     * <b>Time complexity</b>: <i>O(N) where N is the number of client connections</i>
    * 
-
-   * 
+   * <ul>
+   *   <li><b>TYPE</b>  <i>(optional)</i> - enum</li>
+   * </ul>
    * @since Redis 2.4.0
    * group: server
    */
   @Fluent
-  default RedisAPI clientList(Handler<AsyncResult<Reply>> handler) {
-    unwrap().send("CLIENT LIST", handler);
+  default RedisAPI clientList(Args arguments, Handler<AsyncResult<Reply>> handler) {
+    unwrap().send("CLIENT LIST", arguments, handler);
     return this;
   }
 
@@ -378,6 +396,24 @@ public interface RedisAPI {
   @Fluent
   default RedisAPI clientSetname(Args arguments, Handler<AsyncResult<Reply>> handler) {
     unwrap().send("CLIENT SETNAME", arguments, handler);
+    return this;
+  }
+
+  /**
+   * Unblock a client blocked in a blocking command from a different connection
+   * 
+    * <b>Time complexity</b>: <i>O(log N) where N is the number of client connections</i>
+   * 
+   * <ul>
+   *   <li>client-id - string</li>
+   *   <li>unblock-type <i>(optional)</i> - enum</li>
+   * </ul>
+   * @since Redis 5.0.0
+   * group: server
+   */
+  @Fluent
+  default RedisAPI clientUnblock(Args arguments, Handler<AsyncResult<Reply>> handler) {
+    unwrap().send("CLIENT UNBLOCK", arguments, handler);
     return this;
   }
 
@@ -450,7 +486,7 @@ public interface RedisAPI {
   }
 
   /**
-   * Forces a slave to perform a manual failover of its master.
+   * Forces a replica to perform a manual failover of its master.
    * 
     * <b>Time complexity</b>: <i>O(1)</i>
    * 
@@ -569,7 +605,7 @@ public interface RedisAPI {
   }
 
   /**
-   * Reconfigure a node as a slave of the specified master node
+   * Reconfigure a node as a replica of the specified master node
    * 
     * <b>Time complexity</b>: <i>O(1)</i>
    * 
@@ -655,7 +691,7 @@ public interface RedisAPI {
   }
 
   /**
-   * List slave nodes of the specified master node
+   * List replica nodes of the specified master node
    * 
     * <b>Time complexity</b>: <i>O(1)</i>
    * 
@@ -668,6 +704,23 @@ public interface RedisAPI {
   @Fluent
   default RedisAPI clusterSlaves(Args arguments, Handler<AsyncResult<Reply>> handler) {
     unwrap().send("CLUSTER SLAVES", arguments, handler);
+    return this;
+  }
+
+  /**
+   * List replica nodes of the specified master node
+   * 
+    * <b>Time complexity</b>: <i>O(1)</i>
+   * 
+   * <ul>
+   *   <li>node-id - string</li>
+   * </ul>
+   * @since Redis 5.0.0
+   * group: cluster
+   */
+  @Fluent
+  default RedisAPI clusterReplicas(Args arguments, Handler<AsyncResult<Reply>> handler) {
+    unwrap().send("CLUSTER REPLICAS", arguments, handler);
     return this;
   }
 
@@ -2312,7 +2365,7 @@ public interface RedisAPI {
   }
 
   /**
-   * Enables read queries for a connection to a cluster slave node
+   * Enables read queries for a connection to a cluster replica node
    * 
     * <b>Time complexity</b>: <i>O(1)</i>
    * 
@@ -2328,7 +2381,7 @@ public interface RedisAPI {
   }
 
   /**
-   * Disables read queries for a connection to a cluster slave node
+   * Disables read queries for a connection to a cluster replica node
    * 
     * <b>Time complexity</b>: <i>O(1)</i>
    * 
@@ -2382,7 +2435,7 @@ public interface RedisAPI {
   /**
    * Create a key using the provided serialized value, previously obtained using DUMP.
    * 
-    * <b>Time complexity</b>: <i>O(1) to wrap the new key and additional O(N*M) to reconstruct the serialized value, where N is the number of Redis objects composing the value and M their average size. For small string values the time complexity is thus O(1)+O(1*M) where M is small, so simply O(1). However for sorted set values the complexity is O(N*M*log(N)) because inserting values into sorted sets is O(log(N)).</i>
+    * <b>Time complexity</b>: <i>O(1) to create the new key and additional O(N*M) to reconstruct the serialized value, where N is the number of Redis objects composing the value and M their average size. For small string values the time complexity is thus O(1)+O(1*M) where M is small, so simply O(1). However for sorted set values the complexity is O(N*M*log(N)) because inserting values into sorted sets is O(log(N)).</i>
    * 
    * <ul>
    *   <li>key - key</li>
@@ -2830,7 +2883,7 @@ public interface RedisAPI {
   }
 
   /**
-   * Make the server a slave of another instance, or promote it as master
+   * Make the server a replica of another instance, or promote it as master. Deprecated starting with Redis 5. Use REPLICAOF instead.
    * 
    * <ul>
    *   <li>host - string</li>
@@ -2842,6 +2895,22 @@ public interface RedisAPI {
   @Fluent
   default RedisAPI slaveof(Args arguments, Handler<AsyncResult<Reply>> handler) {
     unwrap().send("SLAVEOF", arguments, handler);
+    return this;
+  }
+
+  /**
+   * Make the server a replica of another instance, or promote it as master.
+   * 
+   * <ul>
+   *   <li>host - string</li>
+   *   <li>port - string</li>
+   * </ul>
+   * @since Redis 5.0.0
+   * group: server
+   */
+  @Fluent
+  default RedisAPI replicaof(Args arguments, Handler<AsyncResult<Reply>> handler) {
+    unwrap().send("REPLICAOF", arguments, handler);
     return this;
   }
 
@@ -3196,7 +3265,7 @@ public interface RedisAPI {
     * <b>Time complexity</b>: <i>O(1)</i>
    * 
    * <ul>
-   *   <li>numslaves - integer</li>
+   *   <li>numreplicas - integer</li>
    *   <li>timeout - integer</li>
    * </ul>
    * @since Redis 3.0.0
@@ -3729,9 +3798,29 @@ public interface RedisAPI {
   }
 
   /**
+   * Get information on streams and consumer groups
+   * 
+    * <b>Time complexity</b>: <i>O(N) with N being the number of returned items for the subcommands CONSUMERS and GROUPS. The STREAM subcommand is O(log N) with N being the number of items in the stream.</i>
+   * 
+   * <ul>
+   *   <li><b>CONSUMERS</b> key,groupname <i>(optional)</i> - key,string</li>
+   *   <li><b>GROUPS</b> key <i>(optional)</i> - key</li>
+   *   <li><b>STREAM</b> key <i>(optional)</i> - key</li>
+   *   <li>help <i>(optional)</i> - enum</li>
+   * </ul>
+   * @since Redis 5.0.0
+   * group: stream
+   */
+  @Fluent
+  default RedisAPI xinfo(Args arguments, Handler<AsyncResult<Reply>> handler) {
+    unwrap().send("XINFO", arguments, handler);
+    return this;
+  }
+
+  /**
    * Appends a new entry to a stream
    * 
-    * <b>Time complexity</b>: <i>O(log(N)) with N being the number of items already into the stream.</i>
+    * <b>Time complexity</b>: <i>O(1)</i>
    * 
    * <ul>
    *   <li>key - key</li>
@@ -3748,9 +3837,47 @@ public interface RedisAPI {
   }
 
   /**
+   * Trims the stream to (approximately if &#x27;~&#x27; is passed) a certain size
+   * 
+    * <b>Time complexity</b>: <i>O(N), with N being the number of evicted entries. Constant times are very small however, since entries are organized in macro nodes containing multiple entries that can be released with a single deallocation.</i>
+   * 
+   * <ul>
+   *   <li>key - key</li>
+   *   <li>strategy - enum</li>
+   *   <li>approx <i>(optional)</i> - enum</li>
+   *   <li>count - integer</li>
+   * </ul>
+   * @since Redis 5.0.0
+   * group: stream
+   */
+  @Fluent
+  default RedisAPI xtrim(Args arguments, Handler<AsyncResult<Reply>> handler) {
+    unwrap().send("XTRIM", arguments, handler);
+    return this;
+  }
+
+  /**
+   * Removes the specified entries from the stream. Returns the number of items actually deleted, that may be different from the number of IDs passed in case certain IDs do not exist.
+   * 
+    * <b>Time complexity</b>: <i>O(1) for each single item to delete in the stream, regardless of the stream size.</i>
+   * 
+   * <ul>
+   *   <li>key - key</li>
+   *   <li>ID - string</li>
+   * </ul>
+   * @since Redis 5.0.0
+   * group: stream
+   */
+  @Fluent
+  default RedisAPI xdel(Args arguments, Handler<AsyncResult<Reply>> handler) {
+    unwrap().send("XDEL", arguments, handler);
+    return this;
+  }
+
+  /**
    * Return a range of elements in a stream, with IDs matching the specified IDs interval
    * 
-    * <b>Time complexity</b>: <i>O(log(N)+M) with N being the number of elements in the stream and M the number of elements being returned. If M is constant (e.g. always asking for the first 10 elements with COUNT), you can consider it O(log(N)).</i>
+    * <b>Time complexity</b>: <i>O(N) with N being the number of elements being returned. If N is constant (e.g. always asking for the first 10 elements with COUNT), you can consider it O(1).</i>
    * 
    * <ul>
    *   <li>key - key</li>
@@ -3770,7 +3897,7 @@ public interface RedisAPI {
   /**
    * Return a range of elements in a stream, with IDs matching the specified IDs interval, in reverse order (from greater to smaller IDs) compared to XRANGE
    * 
-    * <b>Time complexity</b>: <i>O(log(N)+M) with N being the number of elements in the stream and M the number of elements being returned. If M is constant (e.g. always asking for the first 10 elements with COUNT), you can consider it O(log(N)).</i>
+    * <b>Time complexity</b>: <i>O(N) with N being the number of elements returned. If N is constant (e.g. always asking for the first 10 elements with COUNT), you can consider it O(1).</i>
    * 
    * <ul>
    *   <li>key - key</li>
@@ -3807,7 +3934,7 @@ public interface RedisAPI {
   /**
    * Return never seen elements in multiple streams, with IDs greater than the ones reported by the caller for each stream. Can block.
    * 
-    * <b>Time complexity</b>: <i>For each stream mentioned: O(log(N)+M) with N being the number of elements in the stream and M the number of elements being returned. If M is constant (e.g. always asking for the first 10 elements with COUNT), you can consider it O(log(N)). On the other side, XADD will pay the O(N) time in order to serve the N clients blocked on the stream getting new data.</i>
+    * <b>Time complexity</b>: <i>For each stream mentioned: O(N) with N being the number of elements being returned, it menas that XREAD-ing with a fixed COUNT is O(1). Note that when the BLOCK option is used, XADD will pay O(M) time in order to serve the M clients blocked on the stream getting new data.</i>
    * 
    * <ul>
    *   <li><b>COUNT</b> count <i>(optional)</i> - integer</li>
@@ -3826,14 +3953,35 @@ public interface RedisAPI {
   }
 
   /**
+   * Create, destroy, and manage consumer groups.
+   * 
+    * <b>Time complexity</b>: <i>O(1) for all the subcommands, with the exception of the DESTROY subcommand which takes an additional O(M) time in order to delete the M entries inside the consumer group pending entries list (PEL).</i>
+   * 
+   * <ul>
+   *   <li><b>CREATE</b> key,groupname,id-or-$ <i>(optional)</i> - key,string,string</li>
+   *   <li><b>SETID</b> key,groupname,id-or-$ <i>(optional)</i> - key,string,string</li>
+   *   <li><b>DESTROY</b> key,groupname <i>(optional)</i> - key,string</li>
+   *   <li><b>DELCONSUMER</b> key,groupname,consumername <i>(optional)</i> - key,string,string</li>
+   * </ul>
+   * @since Redis 5.0.0
+   * group: stream
+   */
+  @Fluent
+  default RedisAPI xgroup(Args arguments, Handler<AsyncResult<Reply>> handler) {
+    unwrap().send("XGROUP", arguments, handler);
+    return this;
+  }
+
+  /**
    * Return new entries from a stream using a consumer group, or access the history of the pending entries for a given consumer. Can block.
    * 
-    * <b>Time complexity</b>: <i>For each stream mentioned: O(log(N)+M) with N being the number of elements in the stream and M the number of elements being returned. If M is constant (e.g. always asking for the first 10 elements with COUNT), you can consider it O(log(N)). On the other side, XADD will pay the O(N) time in order to serve the N clients blocked on the stream getting new data.</i>
+    * <b>Time complexity</b>: <i>For each stream mentioned: O(M) with M being the number of elements returned. If M is constant (e.g. always asking for the first 10 elements with COUNT), you can consider it O(1). On the other side when XREADGROUP blocks, XADD will pay the O(N) time in order to serve the N clients blocked on the stream getting new data.</i>
    * 
    * <ul>
    *   <li><b>GROUP</b> group,consumer - string,string</li>
    *   <li><b>COUNT</b> count <i>(optional)</i> - integer</li>
    *   <li><b>BLOCK</b> milliseconds <i>(optional)</i> - integer</li>
+   *   <li>noack <i>(optional)</i> - enum</li>
    *   <li>streams - enum</li>
    *   <li>key - key</li>
    *   <li>ID - string</li>
@@ -3848,9 +3996,54 @@ public interface RedisAPI {
   }
 
   /**
+   * Marks a pending message as correctly processed, effectively removing it from the pending entries list of the consumer group. Return value of the command is the number of messages successfully acknowledged, that is, the IDs we were actually able to resolve in the PEL.
+   * 
+    * <b>Time complexity</b>: <i>O(1) for each message ID processed.</i>
+   * 
+   * <ul>
+   *   <li>key - key</li>
+   *   <li>group - string</li>
+   *   <li>ID - string</li>
+   * </ul>
+   * @since Redis 5.0.0
+   * group: stream
+   */
+  @Fluent
+  default RedisAPI xack(Args arguments, Handler<AsyncResult<Reply>> handler) {
+    unwrap().send("XACK", arguments, handler);
+    return this;
+  }
+
+  /**
+   * Changes (or acquires) ownership of a message in a consumer group, as if the message was delivered to the specified consumer.
+   * 
+    * <b>Time complexity</b>: <i>O(log N) with N being the number of messages in the PEL of the consumer group.</i>
+   * 
+   * <ul>
+   *   <li>key - key</li>
+   *   <li>group - string</li>
+   *   <li>consumer - string</li>
+   *   <li>min-idle-time - string</li>
+   *   <li>ID - string</li>
+   *   <li><b>IDLE</b> ms <i>(optional)</i> - integer</li>
+   *   <li><b>TIME</b> ms-unix-time <i>(optional)</i> - integer</li>
+   *   <li><b>RETRYCOUNT</b> count <i>(optional)</i> - integer</li>
+   *   <li>force <i>(optional)</i> - </li>
+   *   <li>justid <i>(optional)</i> - </li>
+   * </ul>
+   * @since Redis 5.0.0
+   * group: stream
+   */
+  @Fluent
+  default RedisAPI xclaim(Args arguments, Handler<AsyncResult<Reply>> handler) {
+    unwrap().send("XCLAIM", arguments, handler);
+    return this;
+  }
+
+  /**
    * Return information and entries from a stream consumer group pending entries list, that are messages fetched but never acknowledged.
    * 
-    * <b>Time complexity</b>: <i>O(log(N)+M) with N being the number of elements in the consumer group pending entries list, and M the number of elements being returned. When the command returns just the summary it runs in O(1) time assuming the list of consumers is small, otherwise there is additional O(N) time needed to iterate every consumer.</i>
+    * <b>Time complexity</b>: <i>O(N) with N being the number of elements returned, so asking for a small fixed number of entries per call is O(1). When the command returns just the summary it runs in O(1) time assuming the list of consumers is small, otherwise there is additional O(N) time needed to iterate every consumer.</i>
    * 
    * <ul>
    *   <li>key - key</li>
