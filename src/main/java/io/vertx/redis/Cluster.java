@@ -14,11 +14,11 @@ import static io.vertx.redis.ClusterSlaves.NEVER;
 public interface Cluster extends Redis {
 
   static Cluster create(Vertx vertx, List<SocketAddress> endpoints) {
-    return new ClusterImpl(vertx, endpoints, new NetClientOptions(), NEVER);
+    return new ClusterImpl(vertx, endpoints, new NetClientOptions().setTcpNoDelay(true), NEVER);
   }
 
   static Cluster create(Vertx vertx, List<SocketAddress> endpoints, ClusterSlaves slaves) {
-    return new ClusterImpl(vertx, endpoints, new NetClientOptions(), slaves);
+    return new ClusterImpl(vertx, endpoints, new NetClientOptions().setTcpNoDelay(true), slaves);
   }
 
   static Cluster create(Vertx vertx, List<SocketAddress> endpoints, NetClientOptions options) {

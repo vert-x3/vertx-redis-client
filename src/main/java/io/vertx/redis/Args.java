@@ -24,6 +24,7 @@ import io.vertx.redis.impl.ArgsImpl;
 
 import java.io.UnsupportedEncodingException;
 import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.util.List;
 
 /**
@@ -41,6 +42,19 @@ public interface Args {
   @GenIgnore
   static Args args(Object... args) {
     return new ArgsImpl(args);
+  }
+
+  static Args key(String key) {
+    return new ArgsImpl().addKey(key);
+  }
+
+  static Args key(Buffer key) {
+    return new ArgsImpl().addKey(key);
+  }
+
+  @GenIgnore
+  static Args key(byte[] key) {
+    return new ArgsImpl().addKey(key);
   }
 
   /**
@@ -80,7 +94,24 @@ public interface Args {
    * @return self
    */
   @Fluent
-  Args key(String key);
+  default Args addKey(String key) {
+    return addKey(key.getBytes(StandardCharsets.UTF_8));
+  }
+
+  /**
+   * Adds a String key argument
+   * @return self
+   */
+  @Fluent
+  @GenIgnore
+  Args addKey(byte[] key);
+
+  /**
+   * Adds a String key argument
+   * @return self
+   */
+  @Fluent
+  Args addKey(Buffer key);
 
   /**
    * Adds a String using a specific character encoding argument
@@ -188,14 +219,14 @@ public interface Args {
   int size();
 
   /**
-   * Returns the the arguments encoded as a buffer using REDIS format
+   * Returns the arguments encoded as a buffer using REDIS format
    * @return self
    */
   Buffer toBuffer();
 
   /**
-   * Returns the the argument marked as key if any or null
-   * @return self
+   * Returns the key hash as a slot id, or -1 if not key is present.
+   * @return slot
    */
-  String getKey();
+  int getKeySlot();
 }

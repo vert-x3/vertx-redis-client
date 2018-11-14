@@ -15,7 +15,11 @@ import java.util.List;
 public interface Sentinel {
 
   static Sentinel create(Vertx vertx, List<SocketAddress> endpoints) {
-    return new SentinelImpl(vertx, endpoints, new NetClientOptions());
+    return new SentinelImpl(
+      vertx,
+      endpoints,
+      // by default redis works with TCP_NO_DELAY
+      new NetClientOptions().setTcpNoDelay(true));
   }
 
   static Sentinel create(Vertx vertx, List<SocketAddress> endpoints, NetClientOptions options) {

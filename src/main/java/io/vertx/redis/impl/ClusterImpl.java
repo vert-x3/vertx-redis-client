@@ -20,20 +20,19 @@ public class ClusterImpl implements Cluster {
 
   private static class Slot {
 
-    Slot(int start, int end, List<Redis> clients) {
+    Slot(int start, int end, Redis[] clients) {
       this.start = start;
       this.end = end;
       this.clients = clients;
     }
 
-    int start;
-    int end;
-    List<Redis> clients;
+    final int start;
+    final int end;
+    final Redis[] clients;
   }
 
   // number of attempts/redirects when we get connection errors
   // or when we get MOVED/ASK responses
-  // https://github.com/antirez/redis-rb-cluster/blob/fd931ed34dfc53159e2f52c9ea2d4a5073faabeb/cluster.rb#L29
   private static final int RETRIES = 16;
 
   // we need some randomness, it doesn't need
@@ -67,7 +66,7 @@ public class ClusterImpl implements Cluster {
     final AtomicBoolean failed = new AtomicBoolean();
 
     for (SocketAddress endpoint : endpoints) {
-      getClient(endpoint, false, ar -> {
+      getClient(endpoint, ar -> {
         if (ar.failed()) {
           if (failed.compareAndSet(false, true)) {
             handler.handle(Future.failedFuture(ar.cause()));
@@ -119,59 +118,81 @@ public class ClusterImpl implements Cluster {
 
   @Override
   public Redis pause() {
+    for (Redis cli : connections.values()) {
+      cli.pause();
+    }
     return this;
   }
 
   @Override
   public Redis resume() {
+    for (Redis cli : connections.values()) {
+      cli.resume();
+    }
     return this;
   }
 
   @Override
   public ReadStream<Reply> fetch(long amount) {
+    for (Redis cli : connections.values()) {
+      cli.fetch(amount);
+    }
     return this;
   }
 
   @Override
-  public Redis send(String command, Args args, Handler<AsyncResult<Reply>> handler) {
-
-    send(selectClient(args.getKey()), RETRIES, command, args, handler);
+  public Redis send(String command, Args args, boolean readOnly, Handler<AsyncResult<Reply>> handler) {
+    send(selectClient(args.getKeySlot(), readOnly), RETRIES, command, args, handler);
     return this;
   }
 
   private void send(final Redis client, final int retries, String command, Args args, Handler<AsyncResult<Reply>> handler) {
+
+    if (client == null) {
+      handler.handle(Future.failedFuture("No connection available."));
+      return;
+    }
+
     client.send(command, args, send -> {
-      if (send.failed() && retries >= 0) {
-        String message = send.cause().getMessage();
-        boolean ask = message != null && message.startsWith("ASK ");
-        boolean moved = !ask && message != null && message.startsWith("MOVED ");
+      if (send.failed() && send.cause() instanceof RedisException && retries >= 0) {
+        final RedisException cause = (RedisException) send.cause();
+
+        boolean ask = cause.is("ASK");
+        boolean moved = !ask && cause.is("MOVED");
 
         if (moved || ask) {
           final Runnable andThen = () -> {
             // REQUERY THE NEW ONE (we've got the correct details)
-            String addr = message.split(" ")[2];
-            String[] saddr = addr.split(":");
-            getClient(SocketAddress.inetSocketAddress(Integer.parseInt(saddr[1]), saddr[0]), true, getClient -> {
+            String addr = cause.slice(' ', 2);
+
+            if (addr == null) {
+              // bad message
+              handler.handle(Future.failedFuture(cause));
+              return;
+            }
+
+            int sep = addr.lastIndexOf(':');
+            SocketAddress socketAddress;
+
+            if (sep != -1) {
+              // InetAddress
+              socketAddress = SocketAddress.inetSocketAddress(
+                Integer.parseInt(addr.substring(sep + 1)),
+                addr.substring(0, sep)
+              );
+            } else {
+              // assume unix domain
+              socketAddress = SocketAddress.domainSocketAddress(addr);
+            }
+
+            getClient(socketAddress, getClient -> {
               if (getClient.failed()) {
                 handler.handle(Future.failedFuture(getClient.cause()));
                 return;
               }
 
-              final Redis c = getClient.result();
-
-              if (ask) {
-                c.send("asking", asking -> {
-                  if (asking.failed()) {
-                    handler.handle(Future.failedFuture(asking.cause()));
-                    return;
-                  }
-                  // re-run on the new client
-                  send(c, retries - 1, command, args, handler);
-                });
-              } else {
-                // re-run on the new client
-                send(c, retries - 1, command, args, handler);
-              }
+              // re-run on the new client
+              send(getClient.result(), retries - 1, command, args, handler);
             });
           };
 
@@ -185,7 +206,7 @@ public class ClusterImpl implements Cluster {
           return;
         }
 
-        if (message != null && (message.startsWith("TRYAGAIN") || message.startsWith("CLUSTERDOWN"))) {
+        if (cause.is("TRYAGAIN") || cause.is("CLUSTERDOWN")) {
           // TRYAGAIN response or cluster down, retry with backoff up to 1280ms
           long backoff = (long) (Math.pow(2, 16 - Math.max(retries, 9)) * 10);
           vertx.setTimer(backoff, t -> send(client, retries - 1, command, args, handler));
@@ -198,11 +219,6 @@ public class ClusterImpl implements Cluster {
   }
 
   @Override
-  public boolean closed() {
-    return false;
-  }
-
-  @Override
   public SocketAddress address() {
     throw new UnsupportedOperationException("Cluster address depends on the command");
   }
@@ -211,7 +227,7 @@ public class ClusterImpl implements Cluster {
   /**
    * Get a Redis client via the connection cache (one per host)
    */
-  private void getClient(SocketAddress address, boolean master, Handler<AsyncResult<Redis>> handler) {
+  private void getClient(SocketAddress address, Handler<AsyncResult<Redis>> handler) {
 
     Redis cli = connections.get(address);
 
@@ -225,13 +241,15 @@ public class ClusterImpl implements Cluster {
 
     client.exceptionHandler(t -> {
       // broken connection so force a new client to be created
-      connections.put(address, null);
+      connections.remove(address);
+      // propagate the exception
       if (onException != null) {
         onException.handle(t);
       }
-      // slots are unbalanced need to refresh
+      // now since the clients are unbalenced, we need to reload the slots
       getSlots(ar -> {
         if (ar.failed()) {
+          // getting slots failed, so raise the exception
           if (onException != null) {
             onException.handle(ar.cause());
           }
@@ -241,14 +259,22 @@ public class ClusterImpl implements Cluster {
 
 
     client.endHandler(v -> {
-      for (Redis conn : connections.values()) {
-        if (conn != null && !conn.closed()) {
-          return;
+      // closed connections should be removed
+      connections.remove(address);
+      // how many connections are still open?
+      // when there's more than 0 then we can still operate
+      if (connections.size() == 0) {
+        // all connections are closed so we must assume this
+        // cluster is ended (or we can't recover)
+        if (onEnd != null) {
+          onEnd.handle(null);
         }
       }
-      // all connections are closed
-      if (onEnd != null) {
-        onEnd.handle(null);
+    });
+
+    client.handler(r -> {
+      if (onMessage != null) {
+        onMessage.handle(r);
       }
     });
 
@@ -301,15 +327,17 @@ public class ClusterImpl implements Cluster {
             int start = s.get(0).asInteger();
             int end = s.get(1).asInteger();
 
-            List<Redis> clients = new ArrayList<>();
+            final Redis[] clients = new Redis[s.size() - 2];
+
             // array of all clients, clients[2] = master, others are slaves
             for (int index = 2; index < s.size(); index++) {
+              final int idx = index - 2;
               Reply c = s.get(index);
               SocketAddress address = SocketAddress.inetSocketAddress(c.get(1).asInteger(), c.get(0).asString());
               seenClients.add(address);
-              getClient(address, index == 2, getClient -> {
+              getClient(address, getClient -> {
                 if (getClient.succeeded()) {
-                  clients.add(getClient.result());
+                  clients[idx] = getClient.result();
                 }
               });
             }
@@ -347,44 +375,50 @@ public class ClusterImpl implements Cluster {
       .map(Map.Entry::getValue)
       .collect(Collectors.toList());
 
+    if (available.size() == 0) {
+      // signal no client
+      return null;
+    }
+
     return available.get(random.nextInt(available.size()));
   }
 
   /**
    * Select a Redis client for the given key
    */
-  private Redis selectClient(String key) {
+  private Redis selectClient(int keySlot, boolean readOnly) {
     // this command doesn't have keys, return any connection
     // NOTE: this means slaves may be used for no key commands regardless of slave config
-    if (key == null) {
+    if (keySlot == -1) {
       return getRandomConnection(Collections.emptySet());
     }
 
-    int slot = ZModem.generate(key);
-
-    List<Redis> clients = null;
+    Redis[] clients = null;
     for (Slot s : slots) {
-      if (s.start <= slot && slot >= s.end) {
+      if (s.start <= keySlot && keySlot >= s.end) {
         clients = s.clients;
       }
     }
     // if we haven't got config for this slot, try any connection
-    if (clients == null || clients.size() == 0) {
+    if (clients == null || clients.length == 0) {
       return getRandomConnection(Collections.emptySet());
     }
 
     int index = 0;
 
-    // always use a slave for read commands
-    if (slaves == ClusterSlaves.ALWAYS) {
-      index = 1 + random.nextInt(clients.size() - 1);
-    }
-    // share read commands across master + slaves
-    if (slaves == ClusterSlaves.SHARE) {
-      index = random.nextInt(clients.size());
+    // always, never, share
+    if (readOnly && slaves != ClusterSlaves.NEVER && clients.length > 1) {
+      // always use a slave for read commands
+      if (slaves == ClusterSlaves.ALWAYS) {
+        index = random.nextInt(clients.length - 1) + 1;
+      }
+      // share read commands across master + slaves
+      if (slaves == ClusterSlaves.SHARE) {
+        index = random.nextInt(clients.length);
+      }
     }
 
-    return clients.get(index);
+    return clients[index];
   }
 }
 

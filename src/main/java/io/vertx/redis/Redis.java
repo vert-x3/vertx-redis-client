@@ -49,7 +49,11 @@ public interface Redis extends ReadStream<Reply> {
    * @return a instance of the connector.
    */
   static Redis create(Vertx vertx, SocketAddress socketAddress) {
-    return new RedisImpl(vertx, socketAddress, new NetClientOptions());
+    return new RedisImpl(
+      vertx,
+      socketAddress,
+      // by default redis works with TCP_NO_DELAY
+      new NetClientOptions().setTcpNoDelay(true));
   }
 
   /**
@@ -187,13 +191,19 @@ public interface Redis extends ReadStream<Reply> {
    * @return self
    */
   @Fluent
-  Redis send(String command, Args args, Handler<AsyncResult<Reply>> handler);
+  default Redis send(String command, Args args, Handler<AsyncResult<Reply>> handler) {
+    return send(command, args, false, handler);
+  }
 
   /**
-   * Returns true if the underlying connection is closed.
-   * @return true is closed.
+   * Send a message to redis.
+   * @param command the command to execute
+   * @param args the args to the command
+   * @param handler the handler
+   * @return self
    */
-  boolean closed();
+  @Fluent
+  Redis send(String command, Args args, boolean readOnly, Handler<AsyncResult<Reply>> handler);
 
   /**
    * Returns the address associated with this client.

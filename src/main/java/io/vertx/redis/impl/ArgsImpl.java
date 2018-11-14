@@ -28,7 +28,7 @@ public class ArgsImpl implements Args {
   private final Buffer buffer = Buffer.buffer();
   private int size;
   // key reference
-  private String key;
+  private int slot = -1;
 
   // Optimized for the direct to ASCII bytes case
   // About 5x faster than using Long.toString.getBytes
@@ -81,9 +81,16 @@ public class ArgsImpl implements Args {
   }
 
   @Override
-  public Args key(String key) {
-    this.key = key;
-    add(key.getBytes());
+  public Args addKey(byte[] key) {
+    add(key);
+    this.slot = ZModem.generate(key);
+    return this;
+  }
+
+  @Override
+  public Args addKey(Buffer key) {
+    add(key);
+    this.slot = ZModem.generate(key.getBytes());
     return this;
   }
 
@@ -189,7 +196,7 @@ public class ArgsImpl implements Args {
   }
 
   @Override
-  public String getKey() {
-    return key;
+  public int getKeySlot() {
+    return slot;
   }
 }

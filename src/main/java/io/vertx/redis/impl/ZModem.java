@@ -58,15 +58,23 @@ public class ZModem {
   /**
    * Convert a string into a redis slot hash.
    * @param str string
-   * @returns hash
+   * @return hash
    */
   public static int generate(String str) {
+    return generate(str.getBytes(StandardCharsets.UTF_8));
+  }
+
+  /**
+   * Convert a string into a redis slot hash.
+   * @param utf8 bytes
+   * @return hash
+   */
+  public static int generate(byte[] utf8) {
     int ch;
     int i = 0;
     int start = -1;
     int result = 0;
     int resultHash = 0;
-    byte[] utf8 = str.getBytes(StandardCharsets.UTF_8);
     int len = utf8.length;
 
     while (i < len) {
@@ -100,6 +108,26 @@ public class ZModem {
 
     while (i < len) {
       if (generate(keys.get(i++)) != base) {
+        return -1;
+      }
+    }
+
+    return base;
+  }
+
+  /**
+   * Convert an array of multiple strings into a redis slot hash.
+   * Returns -1 if one of the keys is not for the same slot as the others
+   * @param keys array of keys
+   * @returns the overall hash
+   */
+  public static int generateMulti(byte[]... keys) {
+    int i = 1;
+    int len = keys.length;
+    int base = generate(keys[0]);
+
+    while (i < len) {
+      if (generate(keys[i++]) != base) {
         return -1;
       }
     }

@@ -27,10 +27,10 @@ import io.vertx.core.net.NetSocket;
 import io.vertx.core.net.SocketAddress;
 import io.vertx.redis.Args;
 import io.vertx.redis.Redis;
+import io.vertx.redis.RedisException;
 
 import java.util.LinkedList;
 import java.util.Queue;
-import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
  * @author <a href="mailto:plopes@redhat.com">Paulo Lopes</a>
@@ -97,8 +97,6 @@ public class RedisImpl implements Redis, Handler<Reply> {
   private Handler<Void> onEnd;
   private Handler<io.vertx.redis.Reply> onMessage;
 
-  private final AtomicBoolean closed = new AtomicBoolean(true);
-
   public RedisImpl(Vertx vertx, SocketAddress socketAddress, NetClientOptions netClientOptions) {
     // Make sure we have an event loop context for serializability of the commands
     Context ctx = Vertx.currentContext();
@@ -136,7 +134,6 @@ public class RedisImpl implements Redis, Handler<Reply> {
           cleanupQueue("Connection closed");
           // call the close handler if any
           if (onEnd != null) {
-            closed.compareAndSet(false, true);
             onEnd.handle(close);
           }
         })
@@ -147,13 +144,11 @@ public class RedisImpl implements Redis, Handler<Reply> {
           cleanupQueue(exception);
           // call the exception handler if any
           if (onException != null) {
-            closed.compareAndSet(false, true);
             onException.handle(exception);
           }
         });
 
       // ready
-      closed.compareAndSet(true, false);
       onOpen.handle(Future.succeededFuture());
     });
 
@@ -230,7 +225,7 @@ public class RedisImpl implements Redis, Handler<Reply> {
   }
 
   @Override
-  public Redis send(String command, Args args, Handler<AsyncResult<io.vertx.redis.Reply>> handler) {
+  public Redis send(String command, Args args, boolean readOnly, Handler<AsyncResult<io.vertx.redis.Reply>> handler) {
     if (command == null) {
       handler.handle(Future.failedFuture("Command cannot be null"));
       return this;
@@ -306,7 +301,7 @@ public class RedisImpl implements Redis, Handler<Reply> {
 
     if (req != null) {
       if (reply.is('-')) {
-        req.handle(Future.failedFuture(reply.status()));
+        req.handle(Future.failedFuture(new RedisException(reply.status())));
         return;
       }
 
@@ -323,11 +318,6 @@ public class RedisImpl implements Redis, Handler<Reply> {
     } else {
       context.runOnContext(handler);
     }
-  }
-
-  @Override
-  public boolean closed() {
-    return closed.get();
   }
 
   @Override
