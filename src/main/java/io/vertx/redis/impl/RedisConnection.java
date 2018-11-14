@@ -177,7 +177,8 @@ class RedisConnection {
         // handle the connection handshake
         doAuth();
         // check if the Redis instance is master
-        if (checkMaster) {
+		// Only valid to check for non pubsub connections as INFO is rejected while subscribing
+        if (checkMaster && subscriptions == null) {
           doCheckMaster();
         }
       }

@@ -17,6 +17,7 @@ package io.vertx.redis;
 
 import io.vertx.codegen.annotations.Fluent;
 import io.vertx.codegen.annotations.GenIgnore;
+import io.vertx.codegen.annotations.Nullable;
 import io.vertx.codegen.annotations.VertxGen;
 import io.vertx.core.AsyncResult;
 import io.vertx.core.Handler;
@@ -831,7 +832,7 @@ public interface RedisClient {
    * group: string
    */
   @Fluent
-  RedisClient get(String key, Handler<AsyncResult<String>> handler);
+  RedisClient get(String key, Handler<AsyncResult<@Nullable String>> handler);
 
   /**
    * Get the value of a key - without decoding as utf-8
@@ -842,7 +843,7 @@ public interface RedisClient {
    * group: string
    */
   @Fluent
-  RedisClient getBinary(String key, Handler<AsyncResult<Buffer>> handler);
+  RedisClient getBinary(String key, Handler<AsyncResult<@Nullable Buffer>> handler);
 
   /**
    * Returns the bit value at offset in the string value stored at key
@@ -879,7 +880,7 @@ public interface RedisClient {
    * group: string
    */
   @Fluent
-  RedisClient getset(String key, String value, Handler<AsyncResult<String>> handler);
+  RedisClient getset(String key, String value, Handler<AsyncResult<@Nullable String>> handler);
 
   /**
    * Delete one or more hash fields
@@ -927,7 +928,7 @@ public interface RedisClient {
    * group: hash
    */
   @Fluent
-  RedisClient hget(String key, String field, Handler<AsyncResult<String>> handler);
+  RedisClient hget(String key, String field, Handler<AsyncResult<@Nullable String>> handler);
 
   /**
    * Get all the fields and values in a hash
@@ -1171,7 +1172,7 @@ public interface RedisClient {
    * group: list
    */
   @Fluent
-  RedisClient lpop(String key, Handler<AsyncResult<String>> handler);
+  RedisClient lpop(String key, Handler<AsyncResult<@Nullable String>> handler);
 
   /**
    * Prepend one or multiple values to a list
@@ -2035,7 +2036,7 @@ public interface RedisClient {
    * group: set
    */
   @Fluent
-  RedisClient spop(String key, Handler<AsyncResult<String>> handler);
+  RedisClient spop(String key, Handler<AsyncResult<@Nullable String>> handler);
 
   /**
    * Remove and return random members from a set

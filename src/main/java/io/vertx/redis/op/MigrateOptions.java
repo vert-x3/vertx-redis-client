@@ -43,11 +43,28 @@ public class MigrateOptions {
     replace = json.getBoolean("replace");
   }
 
+  public MigrateOptions setCopy(Boolean copy) {
+    this.copy = copy;
+    return this;
+  }
+
+  public MigrateOptions setReplace(Boolean replace) {
+    this.replace = replace;
+    return this;
+  }
+
+  /**
+   * @deprecated use {@link #setCopy(Boolean)} instead
+   */
+  @Deprecated
   public MigrateOptions useCopy() {
     copy = true;
     return this;
   }
-
+  /**
+   * @deprecated use {@link #setReplace(Boolean)} instead
+   */
+  @Deprecated
   public MigrateOptions useReplace() {
     replace = true;
     return this;

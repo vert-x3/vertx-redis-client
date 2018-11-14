@@ -51,17 +51,6 @@
 |[[value]]`@value`|`Number (long)`|-
 |===
 
-[[Command]]
-== Command
-
-
-[cols=">25%,25%,50%"]
-[frame="topbot"]
-|===
-^|Name | Type ^| Description
-|[[command]]`@command`|`String`|-
-|===
-
 [[GeoMember]]
 == GeoMember
 
@@ -145,6 +134,8 @@ Set TYPE filter
 [frame="topbot"]
 |===
 ^|Name | Type ^| Description
+|[[count]]`@count`|`Number (Long)`|-
+|[[offset]]`@offset`|`Number (Long)`|-
 |===
 
 [[MigrateOptions]]
@@ -158,6 +149,8 @@ Set TYPE filter
 [frame="topbot"]
 |===
 ^|Name | Type ^| Description
+|[[copy]]`@copy`|`Boolean`|-
+|[[replace]]`@replace`|`Boolean`|-
 |===
 
 [[RangeLimitOptions]]
@@ -171,6 +164,9 @@ Set TYPE filter
 [frame="topbot"]
 |===
 ^|Name | Type ^| Description
+|[[count]]`@count`|`Number (Long)`|-
+|[[offset]]`@offset`|`Number (Long)`|-
+|[[withscores]]`@withscores`|`Boolean`|-
 |===
 
 [[RedisOptions]]
@@ -323,7 +319,9 @@ Set the list of Sentinels.
 [frame="topbot"]
 |===
 ^|Name | Type ^| Description
+|[[alpha]]`@alpha`|`Boolean`|-
 |[[by]]`@by`|`String`|-
+|[[descending]]`@descending`|`Boolean`|-
 |[[gets]]`@gets`|`Array of String`|-
 |[[store]]`@store`|`String`|-
 |===

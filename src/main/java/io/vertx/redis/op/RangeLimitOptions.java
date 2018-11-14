@@ -42,8 +42,17 @@ public class RangeLimitOptions extends LimitOptions {
     withscores = obj.getBoolean("withscores");
   }
 
+  /**
+   * @deprecated use {@link #setWithscores(Boolean)} instead
+   */
+  @Deprecated
   public RangeLimitOptions useWithScores() {
     withscores = true;
+    return this;
+  }
+
+  public RangeLimitOptions setWithscores(Boolean withscores) {
+    this.withscores = withscores;
     return this;
   }
 
