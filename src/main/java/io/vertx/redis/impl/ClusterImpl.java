@@ -18,19 +18,6 @@ import java.util.stream.Collectors;
 
 public class ClusterImpl implements Cluster {
 
-  private static class Slot {
-
-    Slot(int start, int end, Redis[] clients) {
-      this.start = start;
-      this.end = end;
-      this.clients = clients;
-    }
-
-    final int start;
-    final int end;
-    final Redis[] clients;
-  }
-
   // number of attempts/redirects when we get connection errors
   // or when we get MOVED/ASK responses
   private static final int RETRIES = 16;
@@ -46,7 +33,7 @@ public class ClusterImpl implements Cluster {
 
   // mutable state
   private final Map<SocketAddress, Redis> connections = new HashMap<>();
-  private final List<Slot> slots = new ArrayList<>();
+  private final Redis[][] slots = new Redis[16384][];
 
   private Handler<Throwable> onException;
   private Handler<Void> onEnd;
@@ -246,7 +233,7 @@ public class ClusterImpl implements Cluster {
       if (onException != null) {
         onException.handle(t);
       }
-      // now since the clients are unbalenced, we need to reload the slots
+      // now since the clients are unbalanced, we need to reload the slots
       getSlots(ar -> {
         if (ar.failed()) {
           // getting slots failed, so raise the exception
@@ -289,6 +276,12 @@ public class ClusterImpl implements Cluster {
     });
   }
 
+  private void clearSlots() {
+    for (int i = 0; i < slots.length; i++) {
+      slots[i] = null;
+    }
+  }
+
   private void getSlots(Handler<AsyncResult<Void>> handler) {
 
     final Set<SocketAddress> exclude = new HashSet<>();
@@ -315,14 +308,14 @@ public class ClusterImpl implements Cluster {
           }
 
 
-          final Reply slots = send.result();
+          final Reply reply = send.result();
 
           Set<SocketAddress> seenClients = new HashSet<>();
-          ClusterImpl.this.slots.clear();
+          clearSlots();
 
-          for (int i = 0; i < slots.size(); i++) {
+          for (int i = 0; i < reply.size(); i++) {
             // multibulk
-            Reply s = slots.get(i);
+            Reply s = reply.get(i);
             // single bulk
             int start = s.get(0).asInteger();
             int end = s.get(1).asInteger();
@@ -342,7 +335,10 @@ public class ClusterImpl implements Cluster {
               });
             }
 
-            ClusterImpl.this.slots.add(new Slot(start, end, clients));
+            // expensive precomputed table of slots
+            for (int j = start; j <= end; j++) {
+              slots[j] = clients;
+            }
           }
 
           // quit now-unused clients
@@ -393,12 +389,8 @@ public class ClusterImpl implements Cluster {
       return getRandomConnection(Collections.emptySet());
     }
 
-    Redis[] clients = null;
-    for (Slot s : slots) {
-      if (s.start <= keySlot && keySlot >= s.end) {
-        clients = s.clients;
-      }
-    }
+    Redis[] clients = slots[keySlot];
+
     // if we haven't got config for this slot, try any connection
     if (clients == null || clients.length == 0) {
       return getRandomConnection(Collections.emptySet());

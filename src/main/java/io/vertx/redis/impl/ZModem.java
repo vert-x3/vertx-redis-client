@@ -1,5 +1,7 @@
 package io.vertx.redis.impl;
 
+import io.vertx.core.buffer.Buffer;
+
 import java.nio.charset.StandardCharsets;
 import java.util.List;
 
@@ -79,6 +81,45 @@ public class ZModem {
 
     while (i < len) {
       ch = utf8[i++];
+      if (start == -1) {
+        if (ch == 0x7B) {
+          start = i;
+        }
+      } else if (ch != 0x7D) {
+        resultHash = lookup[(ch ^ (resultHash >> 8)) & 0xFF] ^ (resultHash << 8);
+      } else if (i - 1 != start) {
+        return resultHash & 0x3FFF;
+      }
+
+      result = lookup[(ch ^ (result >> 8)) & 0xFF] ^ (result << 8);
+    }
+
+    return result & 0x3FFF;
+  }
+
+  /**
+   * Convert a buffer into a redis slot hash.
+   * @param buffer buffer
+   * @return hash
+   */
+  public static int generate(Buffer buffer) {
+    return generate(buffer, 0, buffer.length());
+  }
+
+  /**
+   * Convert a buffer into a redis slot hash.
+   * @param buffer buffer
+   * @return hash
+   */
+  public static int generate(Buffer buffer, int _start, int length) {
+    int ch;
+    int i = _start;
+    int start = -1;
+    int result = 0;
+    int resultHash = 0;
+
+    while (i < length) {
+      ch = buffer.getByte(i++);
       if (start == -1) {
         if (ch == 0x7B) {
           start = i;

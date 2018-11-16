@@ -3,6 +3,8 @@ package io.vertx.redis.impl;
 import org.junit.Test;
 
 import java.util.Arrays;
+import java.util.HashSet;
+import java.util.Set;
 
 import static org.junit.Assert.*;
 
@@ -40,5 +42,15 @@ public class ZModemTest {
       "abcdefghijklmnopqrstuvwxyz",
       "abcdefghijklmnopqrstuvwxyz"
     )));
+  }
+
+  @Test
+  public void testAll() {
+    final Set<Integer> slots = new HashSet<>();
+    for (int i = 0; i < Math.pow(2, 17); i++) {
+      slots.add(ZModem.generate("" + i));
+    }
+
+    assertEquals(16384, slots.size());
   }
 }
