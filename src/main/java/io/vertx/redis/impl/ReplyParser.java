@@ -243,14 +243,9 @@ public class ReplyParser implements Handler<Buffer> {
     return (_buffer.length() - _offset) < 0 ? 0 : (_buffer.length() - _offset);
   }
 
-  private static class IndexOutOfBoundsException extends Exception {
+  private static class IndexOutOfBoundsException extends Throwable {
     IndexOutOfBoundsException(String message) {
-      super(message);
-    }
-
-    @Override
-    public synchronized Throwable fillInStackTrace() {
-      return this;
+      super(message, null, false, false);
     }
   }
 }
