@@ -90,7 +90,7 @@ public class ArgsImpl implements Args {
   @Override
   public Args addKey(Buffer key) {
     add(key);
-    this.slot = ZModem.generate(key.getBytes());
+    this.slot = ZModem.generate(key);
     return this;
   }
 
