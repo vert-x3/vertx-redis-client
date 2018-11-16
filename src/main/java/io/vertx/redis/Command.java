@@ -8,6 +8,7 @@ public class Command {
 
   private String command;
   private Args args;
+  private boolean readOnly;
 
   public Command() {}
 
@@ -34,6 +35,15 @@ public class Command {
 
   public Command setArgs(Args args) {
     this.args = args;
+    return this;
+  }
+
+  public boolean isReadOnly() {
+    return readOnly;
+  }
+
+  public Command setReadOnly(boolean readOnly) {
+    this.readOnly = readOnly;
     return this;
   }
 }

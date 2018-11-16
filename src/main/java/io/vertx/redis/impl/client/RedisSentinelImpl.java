@@ -1,4 +1,4 @@
-package io.vertx.redis.impl;
+package io.vertx.redis.impl.client;
 
 import io.vertx.core.AsyncResult;
 import io.vertx.core.Future;
@@ -7,17 +7,16 @@ import io.vertx.core.Vertx;
 import io.vertx.core.json.JsonObject;
 import io.vertx.core.logging.Logger;
 import io.vertx.core.logging.LoggerFactory;
+import io.vertx.core.net.NetClient;
 import io.vertx.core.net.NetClientOptions;
 import io.vertx.core.net.SocketAddress;
 import io.vertx.redis.*;
-import io.vertx.redis.Reply;
 
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Random;
 import java.util.concurrent.atomic.AtomicBoolean;
 
-public class SentinelImpl implements Sentinel {
+public class RedisSentinelImpl extends AbstractRedisClient implements RedisSentinel {
 
   private static class Pair<L, R> {
     final L left;
@@ -33,63 +32,62 @@ public class SentinelImpl implements Sentinel {
   // randomization to avoid picking the same slave all the time
   private static final Random RANDOM = new Random();
 
-  private static final Logger LOG = LoggerFactory.getLogger(SentinelImpl.class);
-
-  private final Vertx vertx;
-  private final List<SocketAddress> endpoints;
-  private final NetClientOptions options;
-
-  private final List<Redis> clients = new LinkedList<>();
+  private static final Logger LOG = LoggerFactory.getLogger(RedisSentinelImpl.class);
+  // ensure that just 1 connection is created to listen to sentinel push messages
   private final AtomicBoolean pubsub = new AtomicBoolean();
+  // mutable state
+  private Handler<Void> masterSwitchHandler;
+  private RedisConnection sentinelPubSub;
 
-  public SentinelImpl(Vertx vertx, List<SocketAddress> endpoints, NetClientOptions options) {
-    this.vertx = vertx;
-    this.endpoints = endpoints;
-    this.options = options;
-
+  public RedisSentinelImpl(Vertx vertx, List<SocketAddress> endpoints, NetClientOptions options) {
+    super(vertx, endpoints, options);
   }
 
   @Override
-  public Sentinel open(String masterName, Role role, Handler<AsyncResult<Redis>> callback) {
-    // When the client is ready wrap another client and subscribe to the
+  public RedisSentinel open(String masterName, RedisRole role, Handler<AsyncResult<RedisConnection>> callback) {
+    // When the client is created wrap another client and subscribe to the
     // switch-master event. Then any time there is a message on the channel it
     // must be a master change, so reconnect all clients. This avoids combining
     // the pub/sub client with the normal client and interfering with whatever
     // the user is trying to do.
     if (!pubsub.getAndSet(true)) {
-      createClientInternal(masterName, Role.SENTINEL, create -> {
+      createClientInternal(masterName, RedisRole.SENTINEL, create -> {
         if (create.failed()) {
           LOG.error("Redis PUB/SUB wrap failed.", create.cause());
+          pubsub.set(false);
           return;
         }
 
-        final Redis pubsubClient = create.result();
+        sentinelPubSub = create.result();
 
-        pubsubClient.send("SUBSCRIBE", Args.args("+switch-master"), send -> {
+        sentinelPubSub.send("SUBSCRIBE", Args.args("+switch-master"), send -> {
           if (send.failed()) {
             LOG.error("Unable to subscribe to Sentinel PUBSUB", send.cause());
+            sentinelPubSub.close();
+            pubsub.set(false);
           }
         });
 
-        pubsubClient.endHandler(v -> {
+        sentinelPubSub.endHandler(v -> pubsub.set(false));
+
+        sentinelPubSub.exceptionHandler(t -> {
+          LOG.error("Unhandled exception in Sentinel PUBSUB", t);
+          sentinelPubSub.close();
           pubsub.set(false);
         });
 
-        pubsubClient.exceptionHandler(t -> {
-          LOG.error("Unhandled exception in Sentinel PUBSUB", t);
-          pubsubClient.close();
-        });
-
-        pubsubClient.handler(msg -> {
+        sentinelPubSub.handler(msg -> {
           if (msg.isMulti()) {
             if ("MESSAGE".equalsIgnoreCase(msg.get(0).asString())) {
               // we don't care about the payload
-              LOG.warn("Received +switch-master message from Redis Sentinel. Reconnecting clients.");
-              disconnectAllClients();
+              if (masterSwitchHandler != null) {
+                masterSwitchHandler.handle(null);
+              } else {
+                LOG.warn("Received +switch-master message from Redis Sentinel. Reconnecting clients.");
+              }
             }
           }
         });
-
       });
     }
 
@@ -98,53 +96,38 @@ public class SentinelImpl implements Sentinel {
   }
 
   @Override
+  public RedisSentinel masterSwitchHandler(Handler<Void> handler) {
+    this.masterSwitchHandler = handler;
+    return this;
+  }
+
+  @Override
   public void close() {
-    for (Redis client : clients) {
-      client.close();
-      // forget about this client
-      clients.remove(client);
+    if (pubsub.compareAndSet(true, false)) {
+      sentinelPubSub.close();
+      pubsub.set(false);
     }
   }
 
-  /*
-   * Ensure that all clients are disconnected as we switched master.
-   */
-  private void disconnectAllClients() {
-    for (Redis client : clients) {
-      if (client instanceof RedisImpl) {
-        ((RedisImpl) client)
-          .cleanupQueue("sentinel switch-master")
-          .close();
-      }
-      // forget about this client
-      clients.remove(client);
-    }
-  }
-
-  private void createClientInternal(String masterName, Role role, Handler<AsyncResult<Redis>> callback) {
+  private void createClientInternal(String masterName, RedisRole role, Handler<AsyncResult<RedisConnection>> onCreate) {
 
     final Handler<AsyncResult<SocketAddress>> createAndConnect = resolve -> {
       if (resolve.failed()) {
-        callback.handle(Future.failedFuture(resolve.cause()));
+        onCreate.handle(Future.failedFuture(resolve.cause()));
         return;
       }
       // wrap a new client
-      final Redis client = Redis.create(vertx, resolve.result(), options);
-      // keep track of the clients
-      clients.add(client);
-      client
-        // if we're purposefully ending, forget us
-        .endHandler(v -> clients.remove(client))
-        // open the connection
-        .open(v -> {
-          if (v.failed()) {
-            // forget about this client
-            clients.remove(client);
-            callback.handle(Future.failedFuture(v.cause()));
-          } else {
-            callback.handle(Future.succeededFuture(client));
-          }
-        });
+      final NetClient client = createNetClient();
+      client.connect(resolve.result(), connect -> {
+        if (connect.failed()) {
+          client.close();
+          onCreate.handle(Future.failedFuture(connect.cause()));
+          return;
+        }
+        // TCP connected
+        onCreate.handle(Future.succeededFuture(
+          new RedisConnectionImpl(context, client, connect.result(), resolve.result())));
+      });
     };
 
     switch (role) {
@@ -185,103 +168,97 @@ public class SentinelImpl implements Sentinel {
   }
 
 
-  private void isSentinelOk(SocketAddress endpoint, String argument, Handler<AsyncResult<SocketAddress>> callback) {
-    final Redis client = Redis.create(vertx, endpoint, options);
-
-    client.exceptionHandler(t -> {
-      callback.handle(Future.failedFuture(t));
-    });
-
-    client.open(open -> {
-      if (open.failed()) {
-        callback.handle(Future.failedFuture(open.cause()));
+  private void isSentinelOk(SocketAddress endpoint, String argument, Handler<AsyncResult<SocketAddress>> handler) {
+    final NetClient client = createNetClient();
+    client.connect(endpoint, connect -> {
+      if (connect.failed()) {
+        client.close();
+        handler.handle(Future.failedFuture(connect.cause()));
         return;
       }
+      // TCP connected
+      final RedisConnectionImpl conn = new RedisConnectionImpl(context, client, connect.result(), endpoint);
 
-      // Send a command just to check we can...
-      client.send("INFO", info -> {
+      // Send a command just to check we have a working node
+      conn.send("INFO", info -> {
         if (info.failed()) {
-          callback.handle(Future.failedFuture(info.cause()));
+          handler.handle(Future.failedFuture(info.cause()));
           return;
         }
 
-        callback.handle(Future.succeededFuture(endpoint));
-        client.close();
+        handler.handle(Future.succeededFuture(endpoint));
+        conn.close();
       });
     });
   }
 
-  private void getMasterFromEndpoint(SocketAddress endpoint, String masterName, Handler<AsyncResult<SocketAddress>> callback) {
-    final Redis client = Redis.create(vertx, endpoint, options);
-
-    client.exceptionHandler(t -> {
-      callback.handle(Future.failedFuture(t));
-    });
-
-    client.open(open -> {
-      if (open.failed()) {
-        callback.handle(Future.failedFuture(open.cause()));
+  private void getMasterFromEndpoint(SocketAddress endpoint, String masterName, Handler<AsyncResult<SocketAddress>> handler) {
+    final NetClient client = createNetClient();
+    client.connect(endpoint, connect -> {
+      if (connect.failed()) {
+        client.close();
+        handler.handle(Future.failedFuture(connect.cause()));
         return;
       }
+      // TCP connected
+      final RedisConnectionImpl conn = new RedisConnectionImpl(context, client, connect.result(), endpoint);
 
-      // Send a command just to check we can...
-      client.send("SENTINEL", Args.args("get-master-addr-by-name", masterName), sentinel -> {
+      // Send a command just to check we have a working node
+      conn.send("SENTINEL", Args.args("get-master-addr-by-name", masterName), sentinel -> {
         if (sentinel.failed()) {
-          callback.handle(Future.failedFuture(sentinel.cause()));
+          handler.handle(Future.failedFuture(sentinel.cause()));
           return;
         }
 
         // Test the response
         if (!sentinel.result().isMulti()) {
-          callback.handle(Future.failedFuture("Unknown master name: " + masterName));
+          handler.handle(Future.failedFuture("Unknown master name: " + masterName));
         } else {
           Reply result = sentinel.result();
-          callback.handle(Future.succeededFuture(SocketAddress.inetSocketAddress(result.get(1).asInteger(), result.get(0).asString())));
+          handler.handle(Future.succeededFuture(SocketAddress.inetSocketAddress(result.get(1).asInteger(), result.get(0).asString())));
         }
-        client.close();
+        conn.close();
       });
     });
   }
 
-  private void getSlaveFromEndpoint(SocketAddress endpoint, String masterName, Handler<AsyncResult<SocketAddress>> callback) {
-    final Redis client = Redis.create(vertx, endpoint, options);
-
-    client.exceptionHandler(t -> {
-      callback.handle(Future.failedFuture(t));
-    });
-
-    client.open(open -> {
-      if (open.failed()) {
-        callback.handle(Future.failedFuture(open.cause()));
+  private void getSlaveFromEndpoint(SocketAddress endpoint, String masterName, Handler<AsyncResult<SocketAddress>> handler) {
+    final NetClient client = createNetClient();
+    client.connect(endpoint, connect -> {
+      if (connect.failed()) {
+        client.close();
+        handler.handle(Future.failedFuture(connect.cause()));
         return;
       }
+      // TCP connected
+      final RedisConnectionImpl conn = new RedisConnectionImpl(context, client, connect.result(), endpoint);
 
-      // Send a command just to check we can...
-      client.send("SENTINEL", Args.args("slaves", masterName), sentinel -> {
+      // Send a command just to check we have a working node
+      conn.send("SENTINEL", Args.args("slaves", masterName), sentinel -> {
         if (sentinel.failed()) {
-          callback.handle(Future.failedFuture(sentinel.cause()));
+          handler.handle(Future.failedFuture(sentinel.cause()));
           return;
         }
 
         // Test the response
         if (!sentinel.result().isMulti()) {
-          callback.handle(Future.failedFuture("Unknown master name: " + masterName));
+          handler.handle(Future.failedFuture("Unknown master name: " + masterName));
         } else if (sentinel.result().size() == 0) {
-          callback.handle(Future.failedFuture("No slaves linked to the master: " + masterName));
+          handler.handle(Future.failedFuture("No slaves linked to the master: " + masterName));
         } else {
           Reply result = sentinel.result();
 
           Reply slaveInfoArr = result.get(RANDOM.nextInt(result.size()));
           if ((slaveInfoArr.size() % 2) > 0) {
-            callback.handle(Future.failedFuture("Corrupted response from the sentinel"));
+            handler.handle(Future.failedFuture("Corrupted response from the sentinel"));
           } else {
             JsonObject json = slaveInfoArr.asJsonObject();
             // Redis JSONs are usually Strings, so we need to perform some parsing
-            callback.handle(Future.succeededFuture(
+            handler.handle(Future.succeededFuture(
               SocketAddress.inetSocketAddress(Integer.parseInt(json.getString("port")), json.getString("ip"))));
           }
         }
-        client.close();
+        conn.close();
       });
     });
   }

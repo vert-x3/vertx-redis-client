@@ -32,7 +32,7 @@ public class ArgsImpl implements Args {
 
   // Optimized for the direct to ASCII bytes case
   // About 5x faster than using Long.toString.getBytes
-  static byte[] numToBytes(long value) {
+  public static byte[] numToBytes(long value) {
     if (value >= 0 && value < NUM_MAP_LENGTH) {
       int index = (int) value;
       return numMap[index];

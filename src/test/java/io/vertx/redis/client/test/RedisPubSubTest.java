@@ -1,57 +1,49 @@
-package io.vertx.test.redis;
+package io.vertx.redis.client.test;
 
-import io.vertx.core.Vertx;
 import io.vertx.core.net.SocketAddress;
 import io.vertx.ext.unit.Async;
 import io.vertx.ext.unit.TestContext;
+import io.vertx.ext.unit.junit.RunTestOnContext;
 import io.vertx.ext.unit.junit.VertxUnitRunner;
 import io.vertx.redis.Redis;
-import org.junit.After;
+import io.vertx.redis.RedisConnection;
 import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import redis.embedded.RedisServer;
 
 import static io.vertx.redis.Args.args;
 
 @RunWith(VertxUnitRunner.class)
-public class UnoppionatedPubSubTest {
+public class RedisPubSubTest {
 
-  private final Vertx vertx = Vertx.vertx();
+  @Rule
+  public RunTestOnContext rule = new RunTestOnContext();
 
-  private RedisServer server;
-  private Redis pub;
-  private Redis sub;
+  private RedisConnection pub;
+  private RedisConnection sub;
 
   @Before
   public void setUp(TestContext should) throws Exception {
-    final Async test = should.async();
+    final Async setUp = should.async();
 
-    // start a server
-    server = new RedisServer(6379);
-    server.start();
+    Redis
+      .create(rule.vertx(), SocketAddress.inetSocketAddress(7006, "localhost"))
+      .open(open -> {
+        should.assertTrue(open.succeeded());
+        pub = open.result();
+        pub.exceptionHandler(should::fail);
 
-    pub = Redis.create(vertx, SocketAddress.inetSocketAddress(6379, "localhost"));
-    pub.exceptionHandler(should::fail);
+        Redis
+          .create(rule.vertx(), SocketAddress.inetSocketAddress(7006, "localhost"))
+          .open(open2 -> {
+            should.assertTrue(open2.succeeded());
+            sub = open2.result();
+            sub.exceptionHandler(should::fail);
 
-    pub.open(pubOpen -> {
-      should.assertTrue(pubOpen.succeeded());
-
-      sub = Redis.create(vertx, SocketAddress.inetSocketAddress(6379, "localhost"));
-      sub.exceptionHandler(should::fail);
-
-      sub.open(subOpen -> {
-        should.assertTrue(subOpen.succeeded());
-        test.complete();
+            setUp.complete();
+          });
       });
-    });
-
-    test.await();
-  }
-
-  @After
-  public void tearDown() {
-    server.stop();
   }
 
   @Test
@@ -75,7 +67,5 @@ public class UnoppionatedPubSubTest {
         should.assertNotNull(publish.result());
       });
     });
-
-    test.await();
   }
 }

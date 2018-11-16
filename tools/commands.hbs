@@ -21,6 +21,8 @@ import io.vertx.codegen.annotations.VertxGen;
 import io.vertx.core.AsyncResult;
 import io.vertx.core.Handler;
 
+import io.vertx.redis.RedisConnection;
+
 import io.vertx.redis.impl.RedisAPIImpl;
 
 /**
@@ -37,7 +39,7 @@ public interface RedisAPI {
    * @param client existing redis client
    * @return a instance of the connector.
    */
-  static RedisAPI wrap(Redis client) {
+  static RedisAPI wrap(RedisConnection client) {
     return new RedisAPIImpl(client);
   }
 
@@ -46,7 +48,7 @@ public interface RedisAPI {
    *
    * @return the underlying client.
    */
-  Redis unwrap();
+  RedisConnection unwrap();
 
 {{#each .}}
   /**

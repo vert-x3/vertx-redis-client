@@ -13,21 +13,21 @@
  * <p>
  * You may elect to redistribute this code under either of these licenses.
  */
-package io.vertx.redis.impl;
+package io.vertx.redis.impl.client;
 
 import io.vertx.core.*;
 import io.vertx.core.buffer.Buffer;
-import io.vertx.core.impl.VertxInternal;
-import io.vertx.core.json.JsonObject;
 import io.vertx.core.logging.Logger;
 import io.vertx.core.logging.LoggerFactory;
 import io.vertx.core.net.NetClient;
-import io.vertx.core.net.NetClientOptions;
 import io.vertx.core.net.NetSocket;
 import io.vertx.core.net.SocketAddress;
 import io.vertx.redis.Args;
-import io.vertx.redis.Redis;
+import io.vertx.redis.RedisConnection;
 import io.vertx.redis.RedisException;
+import io.vertx.redis.impl.Reply;
+import io.vertx.redis.impl.ArgsImpl;
+import io.vertx.redis.impl.ReplyParser;
 
 import java.util.LinkedList;
 import java.util.Queue;
@@ -35,7 +35,7 @@ import java.util.Queue;
 /**
  * @author <a href="mailto:plopes@redhat.com">Paulo Lopes</a>
  */
-public class RedisImpl implements Redis, Handler<Reply> {
+public class RedisConnectionImpl implements RedisConnection, Handler<Reply> {
 
   private static class Req {
     final Context ctx;
@@ -75,130 +75,94 @@ public class RedisImpl implements Redis, Handler<Reply> {
     }
   }
 
-  private static final Logger LOG = LoggerFactory.getLogger(RedisConnection.class);
+  private static final Logger LOG = LoggerFactory.getLogger(RedisConnectionImpl.class);
   private static final byte ARGS_PREFIX = '*';
   private static final byte[] CRLF = "\r\n".getBytes();
   private static final byte BYTES_PREFIX = '$';
 
-  private final SocketAddress socketAddress;
-  private final NetClientOptions netClientOptions;
-
   // waiting: commands that have been sent but not answered
   private final Queue<Req> waiting = new LinkedList<>();
-  // parser utility
-  private final ReplyParser parser = new ReplyParser(this);
 
-  private final Vertx vertx;
   private final Context context;
+  private final NetSocket netSocket;
+  private final SocketAddress socketAddress;
 
   // state
-  private NetSocket netSocket;
   private Handler<Throwable> onException;
   private Handler<Void> onEnd;
   private Handler<io.vertx.redis.Reply> onMessage;
 
-  public RedisImpl(Vertx vertx, SocketAddress socketAddress, NetClientOptions netClientOptions) {
-    // Make sure we have an event loop context for serializability of the commands
-    Context ctx = Vertx.currentContext();
-    if (ctx == null) {
-      ctx = vertx.getOrCreateContext();
-    } else if (!ctx.isEventLoopContext()) {
-      VertxInternal vi = (VertxInternal) vertx;
-      ctx = vi.createEventLoopContext(null, null, new JsonObject(), Thread.currentThread().getContextClassLoader());
-    }
+  public RedisConnectionImpl(Context context, NetClient netClient, NetSocket netSocket, SocketAddress endpoint) {
+    this.context = context;
+    this.netSocket = netSocket;
+    this.socketAddress = endpoint;
 
-    this.vertx = vertx;
-    this.context = ctx;
-    this.socketAddress = socketAddress;
-    this.netClientOptions = netClientOptions;
-  }
-
-  @Override
-  public Redis open(Handler<AsyncResult<Void>> onOpen) {
-    parser.reset();
-    // wrap a netClient for the connection
-    final NetClient client = vertx.createNetClient(netClientOptions);
-    client.connect(socketAddress, asyncResult -> {
-      if (asyncResult.failed()) {
-        client.close();
-        onOpen.handle(Future.failedFuture(asyncResult.cause()));
-        return;
-      }
-      netSocket = asyncResult.result();
-
-      netSocket
-        .handler(parser)
-        .closeHandler(close -> {
-          client.close();
-          // clean up the pending queue
-          cleanupQueue("Connection closed");
-          // call the close handler if any
-          if (onEnd != null) {
-            onEnd.handle(close);
-          }
-        })
-        .exceptionHandler(exception -> {
-          netSocket.close();
-          client.close();
-          // clean up the pending queue
-          cleanupQueue(exception);
-          // call the exception handler if any
-          if (onException != null) {
-            onException.handle(exception);
-          }
-        });
-
-      // ready
-      onOpen.handle(Future.succeededFuture());
-    });
-
-    return this;
+    // parser utility
+    netSocket
+      .handler(new ReplyParser(this))
+      .closeHandler(close -> {
+        netClient.close();
+        // clean up the pending queue
+        cleanupQueue(new RedisException("CONNECTION_CLOSED"));
+        // call the close handler if any
+        if (onEnd != null) {
+          onEnd.handle(close);
+        }
+      })
+      .exceptionHandler(exception -> {
+        netSocket.close();
+        netClient.close();
+        // clean up the pending queue
+        cleanupQueue(exception);
+        // call the exception handler if any
+        if (onException != null) {
+          onException.handle(exception);
+        }
+      });
   }
 
   @Override
   public void close() {
-    if (netSocket != null) {
-      netSocket.close();
-    }
+    netSocket.close();
   }
 
   @Override
-  public Redis exceptionHandler(Handler<Throwable> handler) {
+  public RedisConnection exceptionHandler(Handler<Throwable> handler) {
     this.onException = handler;
     return this;
   }
 
   @Override
-  public Redis endHandler(Handler<Void> handler) {
+  public RedisConnection endHandler(Handler<Void> handler) {
     this.onEnd = handler;
     return this;
   }
 
   @Override
-  public Redis handler(Handler<io.vertx.redis.Reply> handler) {
+  public RedisConnection handler(Handler<io.vertx.redis.Reply> handler) {
     this.onMessage = handler;
     return this;
   }
 
   @Override
-  public Redis pause() {
+  public RedisConnection pause() {
     netSocket.pause();
     return this;
   }
 
   @Override
-  public Redis resume() {
+  public RedisConnection resume() {
     netSocket.resume();
     return this;
   }
 
   @Override
-  public Redis fetch(long size) {
+  public RedisConnection fetch(long size) {
     // no-op
     return this;
   }
 
-  protected Redis cleanupQueue(String errorMessage) {
+  void cleanupQueue(String errorMessage) {
     Req req;
     while ((req = waiting.poll()) != null) {
       try {
@@ -207,11 +171,9 @@ public class RedisImpl implements Redis, Handler<Reply> {
         LOG.warn("Exception during cleanup", e);
       }
     }
-
-    return this;
   }
 
-  protected Redis cleanupQueue(Throwable t) {
+  void cleanupQueue(Throwable t) {
     Req req;
     while ((req = waiting.poll()) != null) {
       try {
@@ -220,12 +182,10 @@ public class RedisImpl implements Redis, Handler<Reply> {
         LOG.warn("Exception during cleanup", e);
       }
     }
-
-    return this;
   }
 
   @Override
-  public Redis send(String command, Args args, boolean readOnly, Handler<AsyncResult<io.vertx.redis.Reply>> handler) {
+  public RedisConnection send(String command, Args args, boolean readOnly, Handler<AsyncResult<io.vertx.redis.Reply>> handler) {
     if (command == null) {
       handler.handle(Future.failedFuture("Command cannot be null"));
       return this;

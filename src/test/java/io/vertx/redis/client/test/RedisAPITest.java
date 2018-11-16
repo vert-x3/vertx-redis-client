@@ -1,4 +1,4 @@
-package io.vertx.test.redis;
+package io.vertx.redis.client.test;
 
 import io.vertx.core.buffer.Buffer;
 import io.vertx.core.json.JsonArray;
@@ -11,14 +11,13 @@ import io.vertx.ext.unit.junit.VertxUnitRunner;
 import io.vertx.redis.*;
 import org.junit.*;
 import org.junit.runner.RunWith;
-import redis.embedded.RedisServer;
 
 import java.util.*;
 
 import static io.vertx.redis.Args.*;
 
 @RunWith(VertxUnitRunner.class)
-public class UnoppionatedAPITest {
+public class RedisAPITest {
 
   private static String makeKey() {
     return UUID.randomUUID().toString();
@@ -27,30 +26,24 @@ public class UnoppionatedAPITest {
   @Rule
   public RunTestOnContext rule = new RunTestOnContext();
 
-  private RedisServer server;
   private RedisAPI redis;
 
   @Before
-  public void setUp(TestContext should) throws Exception {
-    final Async test = should.async();
+  public void setUp(TestContext should) {
+    final Async setUp = should.async();
 
-    // start a server
-    server = new RedisServer(6379);
-    server.start();
+    Redis
+      .create(rule.vertx(), SocketAddress.inetSocketAddress(7006, "127.0.0.1"))
+      .open(open -> {
+        should.assertTrue(open.succeeded());
 
-    Redis client = Redis.create(rule.vertx(), SocketAddress.inetSocketAddress(6379, "localhost"));
+        final RedisConnection conn = open.result();
 
-    client.exceptionHandler(should::fail);
-    client.open(open -> {
-      should.assertTrue(open.succeeded());
-      redis = RedisAPI.wrap(client);
-      test.complete();
-    });
-  }
+        conn.exceptionHandler(should::fail);
 
-  @After
-  public void tearDown() {
-    server.stop();
+        redis = RedisAPI.wrap(conn);
+        setUp.complete();
+      });
   }
 
   @Test
@@ -76,36 +69,6 @@ public class UnoppionatedAPITest {
             should.assertEquals("Hello World", reply3.result().asString());
             test.complete();
           });
-        });
-      });
-    });
-  }
-
-  @Test
-  //Note the try/finally is to ensure that the server is shutdown so other tests do not have to
-  //provide auth information
-  public void testAuth(TestContext should) {
-    final Async test = should.async();
-
-    RedisServer server = RedisServer.builder().port(6381).setting("requirepass foobar").build();
-    server.start();
-
-    Redis client = Redis.create(rule.vertx(), SocketAddress.inetSocketAddress(6381, "localhost"));
-
-    client.open(open -> {
-      should.assertTrue(open.succeeded());
-      final RedisAPI rdx = RedisAPI.wrap(client);
-
-      rdx.auth(args("barfoo"), reply -> {
-        should.assertFalse(reply.succeeded());
-        rdx.auth(args("foobar"), reply2 -> {
-          should.assertTrue(reply2.succeeded());
-          client.close();
-          try {
-            server.stop();
-          } catch (Exception ignore) {
-          }
-          test.complete();
         });
       });
     });

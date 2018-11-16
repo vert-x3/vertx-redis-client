@@ -1,4 +1,4 @@
-package io.vertx.redis.impl;
+package io.vertx.redis.impl.client;
 
 import io.vertx.core.AsyncResult;
 import io.vertx.core.Handler;

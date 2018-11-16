@@ -15,7 +15,7 @@
  */
 package io.vertx.redis.impl;
 
-import io.vertx.redis.Redis;
+import io.vertx.redis.RedisConnection;
 import io.vertx.redis.RedisAPI;
 
 /**
@@ -23,15 +23,15 @@ import io.vertx.redis.RedisAPI;
  */
 public class RedisAPIImpl implements RedisAPI {
 
-  private final Redis delegate;
+  private final RedisConnection delegate;
 
 
-  public RedisAPIImpl(Redis client) {
+  public RedisAPIImpl(RedisConnection client) {
     delegate = client;
   }
 
   @Override
-  public Redis unwrap() {
+  public RedisConnection unwrap() {
     return delegate;
   }
 }
