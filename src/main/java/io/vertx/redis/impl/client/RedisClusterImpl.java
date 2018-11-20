@@ -4,6 +4,8 @@ import io.vertx.core.AsyncResult;
 import io.vertx.core.Future;
 import io.vertx.core.Handler;
 import io.vertx.core.Vertx;
+import io.vertx.core.logging.Logger;
+import io.vertx.core.logging.LoggerFactory;
 import io.vertx.core.net.NetClient;
 import io.vertx.core.net.NetClientOptions;
 import io.vertx.core.net.SocketAddress;
@@ -18,199 +20,16 @@ import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.stream.Collectors;
 
+import static io.vertx.redis.RedisCommand.cmd;
+import static io.vertx.redis.RedisCommandEnum.*;
+
 public class RedisClusterImpl extends AbstractRedisClient implements RedisCluster {
 
-  class RedisClusterConnectionImpl implements RedisConnection {
+  // number of attempts/redirects when we get connection errors
+  // or when we get MOVED/ASK responses
+  private static final int RETRIES = 16;
 
-    // number of attempts/redirects when we get connection errors
-    // or when we get MOVED/ASK responses
-    private static final int RETRIES = 16;
-
-    private final RedisClusterImpl self;
-    private final RedisSlaves slaves;
-
-    RedisClusterConnectionImpl(RedisSlaves slaves) {
-      this.slaves = slaves;
-      self = RedisClusterImpl.this;
-    }
-
-    @Override
-    public void close() {
-      self.close();
-    }
-
-    @Override
-    public RedisConnection exceptionHandler(Handler<Throwable> handler) {
-      self.onException = handler;
-      return this;
-    }
-
-    @Override
-    public RedisConnection endHandler(Handler<Void> handler) {
-      self.onEnd = handler;
-      return this;
-    }
-
-    @Override
-    public RedisConnection handler(Handler<Reply> handler) {
-      self.onMessage = handler;
-      return this;
-    }
-
-    @Override
-    public RedisConnection pause() {
-      self.connections.values().forEach(conn -> {
-        if (conn != null) {
-          try {
-            conn.pause();
-          } catch (RuntimeException e) {
-            if (self.onException != null) {
-              self.onException.handle(e);
-            }
-          }
-        }
-      });
-      return this;
-    }
-
-    @Override
-    public RedisConnection resume() {
-      self.connections.values().forEach(conn -> {
-        if (conn != null) {
-          try {
-            conn.resume();
-          } catch (RuntimeException e) {
-            if (self.onException != null) {
-              self.onException.handle(e);
-            }
-          }
-        }
-      });
-      return null;
-    }
-
-    @Override
-    public RedisConnection send(String command, Args args, boolean readonly, Handler<AsyncResult<Reply>> handler) {
-      send(selectClient(args.getKeySlot(), readonly), RETRIES, command, args, handler);
-      return this;
-    }
-
-    @Override
-    public SocketAddress address() {
-      throw new UnsupportedOperationException("Cluster Connection is not bound to a socket");
-    }
-
-    @Override
-    public ReadStream<Reply> fetch(long amount) {
-      return this;
-    }
-
-    private void send(final RedisConnection client, final int retries, String command, Args args, Handler<AsyncResult<Reply>> handler) {
-
-      if (client == null) {
-        handler.handle(Future.failedFuture("No connection available."));
-        return;
-      }
-
-      client.send(command, args, send -> {
-        if (send.failed() && send.cause() instanceof RedisException && retries >= 0) {
-          final RedisException cause = (RedisException) send.cause();
-
-          boolean ask = cause.is("ASK");
-          boolean moved = !ask && cause.is("MOVED");
-
-          if (moved || ask) {
-            final Runnable andThen = () -> {
-              // REQUERY THE NEW ONE (we've got the correct details)
-              String addr = cause.slice(' ', 2);
-
-              if (addr == null) {
-                // bad message
-                handler.handle(Future.failedFuture(cause));
-                return;
-              }
-
-              int sep = addr.lastIndexOf(':');
-              SocketAddress socketAddress;
-
-              if (sep != -1) {
-                // InetAddress
-                socketAddress = SocketAddress.inetSocketAddress(
-                  Integer.parseInt(addr.substring(sep + 1)),
-                  addr.substring(0, sep)
-                );
-              } else {
-                // assume unix domain
-                socketAddress = SocketAddress.domainSocketAddress(addr);
-              }
-
-              getClient(socketAddress, getClient -> {
-                if (getClient.failed()) {
-                  handler.handle(Future.failedFuture(getClient.cause()));
-                  return;
-                }
-
-                // re-run on the new client
-                send(getClient.result(), retries - 1, command, args, handler);
-              });
-            };
-
-            // key has been moved!
-            // lets re fetch slots from redis to get an up to date allocation
-            if (moved) {
-              getSlots(getSlots -> andThen.run());
-            } else {
-              andThen.run();
-            }
-            return;
-          }
-
-          if (cause.is("TRYAGAIN") || cause.is("CLUSTERDOWN")) {
-            // TRYAGAIN response or cluster down, retry with backoff up to 1280ms
-            long backoff = (long) (Math.pow(2, 16 - Math.max(retries, 9)) * 10);
-            vertx.setTimer(backoff, t -> send(client, retries - 1, command, args, handler));
-            return;
-          }
-        }
-
-        handler.handle(send);
-      });
-    }
-
-    /**
-     * Select a Redis client for the given key
-     */
-    private RedisConnection selectClient(int keySlot, boolean readOnly) {
-      // this command doesn't have keys, return any connection
-      // NOTE: this means slaves may be used for no key commands regardless of slave config
-      if (keySlot == -1) {
-        return getRandomConnection(Collections.emptySet());
-      }
-
-      RedisConnection[] clients = slots[keySlot];
-
-      // if we haven't got config for this slot, try any connection
-      if (clients == null || clients.length == 0) {
-        return getRandomConnection(Collections.emptySet());
-      }
-
-      int index = 0;
-
-      // always, never, share
-      if (readOnly && slaves != RedisSlaves.NEVER && clients.length > 1) {
-        // always use a slave for read commands
-        if (slaves == RedisSlaves.ALWAYS) {
-          index = random.nextInt(clients.length - 1) + 1;
-        }
-        // share read commands across master + slaves
-        if (slaves == RedisSlaves.SHARE) {
-          index = random.nextInt(clients.length);
-        }
-      }
-
-      return clients[index];
-    }
-  }
+  private static final Logger LOG = LoggerFactory.getLogger(RedisClusterImpl.class);
 
   // we need some randomness, it doesn't need
   // to be secure or unpredictable
@@ -219,6 +38,8 @@ public class RedisClusterImpl extends AbstractRedisClient implements RedisCluste
   // mutable state
   private final Map<SocketAddress, RedisConnection> connections = new HashMap<>();
   private final RedisConnection[][] slots = new RedisConnection[16384][];
+  // set at connect
+  private RedisSlaves slaves;
 
   private Handler<Throwable> onException;
   private Handler<Void> onEnd;
@@ -229,12 +50,13 @@ public class RedisClusterImpl extends AbstractRedisClient implements RedisCluste
   }
 
   @Override
-  public RedisCluster open(RedisSlaves slaves, Handler<AsyncResult<RedisConnection>> handler) {
+  public RedisCluster connect(RedisSlaves slaves, Handler<AsyncResult<Void>> handler) {
     // for each endpoint open a client
-    final AtomicInteger counter = new AtomicInteger(endpoints.size());
+    final AtomicInteger counter = new AtomicInteger(endpoints().size());
+    // ensure that in case of error, only call the callback once
     final AtomicBoolean failed = new AtomicBoolean();
 
-    for (SocketAddress endpoint : endpoints) {
+    for (SocketAddress endpoint : endpoints()) {
       getClient(endpoint, ar -> {
         if (ar.failed()) {
           if (failed.compareAndSet(false, true)) {
@@ -248,7 +70,8 @@ public class RedisClusterImpl extends AbstractRedisClient implements RedisCluste
             if (getSlots.failed()) {
               handler.handle(Future.failedFuture(getSlots.cause()));
             } else {
-              handler.handle(Future.succeededFuture(new RedisClusterConnectionImpl(slaves)));
+              this.slaves = slaves;
+              handler.handle(Future.succeededFuture());
             }
           });
         }
@@ -266,6 +89,172 @@ public class RedisClusterImpl extends AbstractRedisClient implements RedisCluste
       }
       return true;
     });
+  }
+
+  @Override
+  public RedisConnection exceptionHandler(Handler<Throwable> handler) {
+    this.onException = handler;
+    return this;
+  }
+
+  @Override
+  public RedisConnection endHandler(Handler<Void> handler) {
+    this.onEnd = handler;
+    return this;
+  }
+
+  @Override
+  public RedisConnection handler(Handler<Reply> handler) {
+    this.onMessage = handler;
+    return this;
+  }
+
+  @Override
+  public RedisConnection pause() {
+    this.connections.values().forEach(conn -> {
+      if (conn != null) {
+        conn.pause();
+      }
+    });
+    return this;
+  }
+
+  @Override
+  public RedisConnection resume() {
+    this.connections.values().forEach(conn -> {
+      if (conn != null) {
+        conn.resume();
+      }
+    });
+    return null;
+  }
+
+  @Override
+  public RedisConnection send(RedisCommand command, Handler<AsyncResult<Reply>> handler) {
+    send(selectClient(command.getKeySlot(), command.isReadOnly()), RETRIES, command, handler);
+    return this;
+  }
+
+  @Override
+  public SocketAddress address() {
+    throw new UnsupportedOperationException("Cluster Connection is not bound to a socket");
+  }
+
+  @Override
+  public ReadStream<Reply> fetch(long amount) {
+    this.connections.values().forEach(conn -> {
+      if (conn != null) {
+        conn.fetch(amount);
+      }
+    });
+
+    return this;
+  }
+
+  private void send(final RedisConnection client, final int retries, RedisCommand command, Handler<AsyncResult<Reply>> handler) {
+
+    if (client == null) {
+      handler.handle(Future.failedFuture("No connection available."));
+      return;
+    }
+
+    client.send(command, send -> {
+      if (send.failed() && send.cause() instanceof RedisException && retries >= 0) {
+        final RedisException cause = (RedisException) send.cause();
+
+        boolean ask = cause.is("ASK");
+        boolean moved = !ask && cause.is("MOVED");
+
+        if (moved || ask) {
+          final Runnable andThen = () -> {
+            // REQUERY THE NEW ONE (we've got the correct details)
+            String addr = cause.slice(' ', 2);
+
+            if (addr == null) {
+              // bad message
+              handler.handle(Future.failedFuture(cause));
+              return;
+            }
+
+            int sep = addr.lastIndexOf(':');
+            SocketAddress socketAddress;
+
+            if (sep != -1) {
+              // InetAddress
+              socketAddress = SocketAddress.inetSocketAddress(
+                Integer.parseInt(addr.substring(sep + 1)),
+                addr.substring(0, sep)
+              );
+            } else {
+              // assume unix domain
+              socketAddress = SocketAddress.domainSocketAddress(addr);
+            }
+
+            getClient(socketAddress, getClient -> {
+              if (getClient.failed()) {
+                handler.handle(Future.failedFuture(getClient.cause()));
+                return;
+              }
+
+              // re-run on the new client
+              send(getClient.result(), retries - 1, command, handler);
+            });
+          };
+
+          // key has been moved!
+          // lets re fetch slots from redis to get an up to date allocation
+          if (moved) {
+            getSlots(getSlots -> andThen.run());
+          } else {
+            andThen.run();
+          }
+          return;
+        }
+
+        if (cause.is("TRYAGAIN") || cause.is("CLUSTERDOWN")) {
+          // TRYAGAIN response or cluster down, retry with backoff up to 1280ms
+          long backoff = (long) (Math.pow(2, 16 - Math.max(retries, 9)) * 10);
+          vertx.setTimer(backoff, t -> send(client, retries - 1, command, handler));
+          return;
+        }
+      }
+
+      handler.handle(send);
+    });
+  }
+
+  /**
+   * Select a Redis client for the given key
+   */
+  private RedisConnection selectClient(int keySlot, boolean readOnly) {
+    // this command doesn't have keys, return any connection
+    // NOTE: this means slaves may be used for no key commands regardless of slave config
+    if (keySlot == -1) {
+      return getRandomConnection(Collections.emptySet());
+    }
+
+    RedisConnection[] clients = slots[keySlot];
+
+    // if we haven't got config for this slot, try any connection
+    if (clients == null || clients.length == 0) {
+      return getRandomConnection(Collections.emptySet());
+    }
+
+    int index = 0;
+
+    // always, never, share
+    if (readOnly && slaves != RedisSlaves.NEVER && clients.length > 1) {
+      // always use a slave for read commands
+      if (slaves == RedisSlaves.ALWAYS) {
+        index = random.nextInt(clients.length - 1) + 1;
+      }
+      // share read commands across master + slaves
+      if (slaves == RedisSlaves.SHARE) {
+        index = random.nextInt(clients.length);
+      }
+    }
+
+    return clients[index];
   }
 
   /**
@@ -335,20 +324,10 @@ public class RedisClusterImpl extends AbstractRedisClient implements RedisCluste
     });
   }
 
-  private void clearSlots() {
-    for (int i = 0; i < slots.length; i++) {
-      slots[i] = null;
-    }
-  }
-
   private void getSlots(Handler<AsyncResult<Void>> handler) {
 
     final Set<SocketAddress> exclude = new HashSet<>();
     final AtomicReference<Throwable> cause = new AtomicReference<>();
-
-    final Handler<Throwable> cleanUp = err -> {
-
-    };
 
     final Runnable tryClient = new Runnable() {
       @Override
@@ -360,7 +339,7 @@ public class RedisClusterImpl extends AbstractRedisClient implements RedisCluste
           return;
         }
 
-        conn.send("CLUSTER", Args.args("slots"), send -> {
+        conn.send(cmd(CLUSTER_SLOTS), send -> {
           if (send.failed()) {
             // exclude this client from then next attempt
             exclude.add(conn.address());
@@ -370,11 +349,22 @@ public class RedisClusterImpl extends AbstractRedisClient implements RedisCluste
             return;
           }
 
-
           final Reply reply = send.result();
 
-          Set<SocketAddress> seenClients = new HashSet<>();
-          clearSlots();
+          if (reply.size() == 0) {
+            // no slots available we can't really proceed
+            // exclude this client from then next attempt
+            exclude.add(conn.address());
+            cause.set(new RuntimeException("No slots available in the cluster."));
+            // try again
+            run();
+            return;
+          }
+
+          // keep a set of seen clients so in the end unseen clients can be removed
+          // from the connections list
+          final Set<SocketAddress> seenClients = new HashSet<>();
+          final AtomicInteger slotCounter = new AtomicInteger(reply.size());
 
           for (int i = 0; i < reply.size(); i++) {
             // multibulk
@@ -383,43 +373,37 @@ public class RedisClusterImpl extends AbstractRedisClient implements RedisCluste
             int start = s.get(0).asInteger();
             int end = s.get(1).asInteger();
 
-            final RedisConnection[] connections = new RedisConnection[s.size() - 2];
-
-            // expensive precomputed table of slots
-            for (int j = start; j <= end; j++) {
-              slots[j] = connections;
-            }
-
             // array of all clients, clients[2] = master, others are slaves
+            List<SocketAddress> addresses = new ArrayList<>();
             for (int index = 2; index < s.size(); index++) {
-              final int idx = index - 2;
               Reply c = s.get(index);
               SocketAddress address = SocketAddress.inetSocketAddress(c.get(1).asInteger(), c.get(0).asString());
+              addresses.add(address);
               seenClients.add(address);
-              getClient(address, getClient -> {
-                if (getClient.succeeded()) {
-                  connections[idx] = getClient.result();
-                }
-              });
             }
+            // load this slot
+            loadSlot(start, end, addresses, onLoad -> {
+              // all slots have been loaded
+              if (slotCounter.decrementAndGet() == 0) {
+                // quit now-unused clients
+                connections.entrySet().removeIf(kv -> {
+                  if (kv.getValue() == null) {
+                    return true;
+                  }
+
+                  if (!seenClients.contains(kv.getKey())) {
+                    kv.getValue().close();
+                    kv.setValue(null);
+                    return true;
+                  }
+
+                  return false;
+                });
+
+                handler.handle(Future.succeededFuture());
+              }
+            });
           }
-
-          // quit now-unused clients
-          connections.entrySet().removeIf(kv -> {
-            if (kv.getValue() == null) {
-              return true;
-            }
-
-            if (!seenClients.contains(kv.getKey())) {
-              kv.getValue().close();
-              kv.setValue(null);
-              return true;
-            }
-
-            return false;
-          });
-
-          handler.handle(Future.succeededFuture());
         });
       }
     };
@@ -443,6 +427,34 @@ public class RedisClusterImpl extends AbstractRedisClient implements RedisCluste
     }
 
     return available.get(random.nextInt(available.size()));
+  }
+
+  private void loadSlot(int start, int end, List<SocketAddress> addresses, Handler<Void> onLoad) {
+    // temporal holder for the loaded connections
+    final RedisConnection[] connections = new RedisConnection[addresses.size()];
+    final AtomicInteger counter = new AtomicInteger(addresses.size());
+    for (int i = 0; i < addresses.size(); i++) {
+      final int idx = i;
+      final SocketAddress address = addresses.get(idx);
+
+      getClient(address, getClient -> {
+        // we don't care if we can't get a client, in this case the client is ignored
+        if (getClient.failed()) {
+          LOG.warn("Could not get a connection to node [" + address + "]");
+        } else {
+          connections[idx] = getClient.result();
+        }
+        // end condition
+        if (counter.decrementAndGet() == 0) {
+          // update the slot table
+          for (int j = start; j <= end; j++) {
+            slots[j] = connections;
+          }
+          // notify
+          onLoad.handle(null);
+        }
+      });
+    }
   }
 }
 

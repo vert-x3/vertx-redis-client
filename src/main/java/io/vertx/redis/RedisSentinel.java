@@ -12,7 +12,7 @@ import io.vertx.redis.impl.client.RedisSentinelImpl;
 import java.util.List;
 
 @VertxGen
-public interface RedisSentinel {
+public interface RedisSentinel extends RedisConnection {
 
   static RedisSentinel create(Vertx vertx, List<SocketAddress> endpoints) {
     return create(
@@ -31,8 +31,8 @@ public interface RedisSentinel {
    * @return            the Redis client for the desired endpoint
    */
   @Fluent
-  default RedisSentinel open(Handler<AsyncResult<RedisConnection>> handler) {
-    return open("mymaster", RedisRole.MASTER, handler);
+  default RedisSentinel connect(Handler<AsyncResult<Void>> handler) {
+    return connect("mymaster", RedisRole.MASTER, handler);
   }
 
   /**
@@ -41,8 +41,8 @@ public interface RedisSentinel {
    * @return            the Redis client for the desired endpoint
    */
   @Fluent
-  default RedisSentinel open(RedisRole role, Handler<AsyncResult<RedisConnection>> handler) {
-    return open("mymaster", role, handler);
+  default RedisSentinel connect(RedisRole role, Handler<AsyncResult<Void>> handler) {
+    return connect("mymaster", role, handler);
   }
 
   /**
@@ -52,7 +52,7 @@ public interface RedisSentinel {
    * @return            the Redis client for the desired endpoint
    */
   @Fluent
-  RedisSentinel open(String masterName, RedisRole role, Handler<AsyncResult<RedisConnection>> handler);
+  RedisSentinel connect(String masterName, RedisRole role, Handler<AsyncResult<Void>> handler);
 
   /**
    * Notify the user that the master node to this sentinel setup is switched.
@@ -65,7 +65,9 @@ public interface RedisSentinel {
   RedisSentinel masterSwitchHandler(Handler<Void> handler);
 
   /**
-   * Closes the client.
+   * Close the redis connection and if the argument is true it also closes the watching sentinel.
+   *
+   * @param sentinelWatch also close the sentinal watch
    */
-  void close();
+  void close(boolean sentinelWatch);
 }

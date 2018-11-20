@@ -13,7 +13,7 @@ import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 
-@VertxGen
+@VertxGen(concrete = false)
 public interface RedisConnection extends ReadStream<Reply> {
 
   /**
@@ -58,18 +58,17 @@ public interface RedisConnection extends ReadStream<Reply> {
    */
   @Fluent
   default RedisConnection send(String command) {
-    return send(command, null, null);
+    return send(RedisCommand.create(command), null);
   }
 
   /**
    * Send a message to redis.
    * @param command the command to execute
-   * @param args the args to the command
    * @return self
    */
   @Fluent
-  default RedisConnection send(String command, Args args) {
-    return send(command, args, null);
+  default RedisConnection send(RedisCommand command) {
+    return send(command, null);
   }
 
   /**
@@ -80,25 +79,25 @@ public interface RedisConnection extends ReadStream<Reply> {
    */
   @Fluent
   default RedisConnection send(String command, Handler<AsyncResult<Reply>> handler) {
-    return send(command, null, handler);
+    return send(RedisCommand.create(command), handler);
   }
 
   @Fluent
-  default RedisConnection batch(List<Command> commands) {
+  default RedisConnection batch(List<RedisCommand> commands) {
     return batch(commands, null);
   }
 
   @Fluent
-  default RedisConnection batch(List<Command> commands, Handler<AsyncResult<List<Reply>>> handler) {
+  default RedisConnection batch(List<RedisCommand> commands, Handler<AsyncResult<List<Reply>>> handler) {
     final List<Reply> replies = new ArrayList<>(commands.size());
     final AtomicInteger count = new AtomicInteger(commands.size());
     final AtomicBoolean failed = new AtomicBoolean(false);
     // start sending commands
     for (int i = 0; i < commands.size(); i++) {
       final int index = i;
-      final Command command = commands.get(index);
+      final RedisCommand command = commands.get(index);
 
-      send(command.getCommand(), command.getArgs(), command.isReadOnly(), res -> {
+      send(command, res -> {
         if (!failed.get()) {
           if (res.failed()) {
             failed.set(true);
@@ -125,25 +124,11 @@ public interface RedisConnection extends ReadStream<Reply> {
   /**
    * Send a message to redis.
    * @param command the command to execute
-   * @param args the args to the command
    * @param handler the handler
    * @return self
    */
   @Fluent
-  default RedisConnection send(String command, Args args, Handler<AsyncResult<Reply>> handler) {
-    return send(command, args, false, handler);
-  }
-
-  /**
-   * Send a message to redis.
-   * @param command the command to execute
-   * @param args the args to the command
-   * @param readOnly hint the connection that the command is readonly
-   * @param handler the handler
-   * @return self
-   */
-  @Fluent
-  RedisConnection send(String command, Args args, boolean readOnly, Handler<AsyncResult<Reply>> handler);
+  RedisConnection send(RedisCommand command, Handler<AsyncResult<Reply>> handler);
 
   /**
    * Returns the address associated with this client.

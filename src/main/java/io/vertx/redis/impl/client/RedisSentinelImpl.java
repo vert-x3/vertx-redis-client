@@ -10,11 +10,15 @@ import io.vertx.core.logging.LoggerFactory;
 import io.vertx.core.net.NetClient;
 import io.vertx.core.net.NetClientOptions;
 import io.vertx.core.net.SocketAddress;
+import io.vertx.core.streams.ReadStream;
 import io.vertx.redis.*;
 
 import java.util.List;
 import java.util.Random;
 import java.util.concurrent.atomic.AtomicBoolean;
+
+import static io.vertx.redis.RedisCommand.cmd;
+import static io.vertx.redis.RedisCommandEnum.*;
 
 public class RedisSentinelImpl extends AbstractRedisClient implements RedisSentinel {
 
@@ -35,16 +39,22 @@ public class RedisSentinelImpl extends AbstractRedisClient implements RedisSenti
   private static final Logger LOG = LoggerFactory.getLogger(RedisSentinelImpl.class);
   // ensure that just 1 connection is created to listen to sentinel push messages
   private final AtomicBoolean pubsub = new AtomicBoolean();
-  // mutable state
+  // mutable state (global watch)
   private Handler<Void> masterSwitchHandler;
   private RedisConnection sentinelPubSub;
+  // connection
+  private RedisConnection connection;
+  // temp holders while conn isn't available
+  private Handler<Throwable> onException;
+  private Handler<Void> onEnd;
+  private Handler<Reply> onMessage;
 
   public RedisSentinelImpl(Vertx vertx, List<SocketAddress> endpoints, NetClientOptions options) {
     super(vertx, endpoints, options);
   }
 
   @Override
-  public RedisSentinel open(String masterName, RedisRole role, Handler<AsyncResult<RedisConnection>> callback) {
+  public RedisSentinel connect(String masterName, RedisRole role, Handler<AsyncResult<Void>> onConnect) {
     // When the client is created wrap another client and subscribe to the
     // switch-master event. Then any time there is a message on the channel it
     // must be a master change, so reconnect all clients. This avoids combining
@@ -60,7 +70,7 @@ public class RedisSentinelImpl extends AbstractRedisClient implements RedisSenti
 
         sentinelPubSub = create.result();
 
-        sentinelPubSub.send("SUBSCRIBE", Args.args("+switch-master"), send -> {
+        sentinelPubSub.send(cmd(SUBSCRIBE).arg("+switch-master"), send -> {
           if (send.failed()) {
             LOG.error("Unable to subscribe to Sentinel PUBSUB", send.cause());
             sentinelPubSub.close();
@@ -83,7 +93,7 @@ public class RedisSentinelImpl extends AbstractRedisClient implements RedisSenti
               if (masterSwitchHandler != null) {
                 masterSwitchHandler.handle(null);
               } else {
-                LOG.warn("Received +switch-master message from Redis Sentinel. Reconnecting clients.");
+                LOG.warn("Received +switch-master message from Redis Sentinel.");
               }
             }
           }
@@ -91,7 +101,23 @@ public class RedisSentinelImpl extends AbstractRedisClient implements RedisSenti
       });
     }
 
-    createClientInternal(masterName, role, callback);
+    createClientInternal(masterName, role, createClientInternal -> {
+      if (createClientInternal.failed()) {
+        // reset state
+        connection = null;
+        onConnect.handle(Future.failedFuture(createClientInternal.cause()));
+        return;
+      }
+      // socket connection succeeded
+      connection = createClientInternal.result();
+      connection
+        .handler(onMessage)
+        .endHandler(onEnd)
+        .exceptionHandler(onException);
+
+      onConnect.handle(Future.succeededFuture());
+    });
+
     return this;
   }
 
@@ -102,11 +128,15 @@ public class RedisSentinelImpl extends AbstractRedisClient implements RedisSenti
   }
 
   @Override
-  public void close() {
-    if (pubsub.compareAndSet(true, false)) {
-      sentinelPubSub.close();
-      pubsub.set(false);
+  public void close(boolean sentinel) {
+    if (sentinel) {
+      if (pubsub.compareAndSet(true, false)) {
+        sentinelPubSub.close();
+        pubsub.set(false);
+      }
     }
+    // always closes the underlying connection
+    connection.close();
   }
 
   private void createClientInternal(String masterName, RedisRole role, Handler<AsyncResult<RedisConnection>> onCreate) {
@@ -158,9 +188,9 @@ public class RedisSentinelImpl extends AbstractRedisClient implements RedisSenti
         final Pair<Integer, SocketAddress> found = iterate.result();
         // This is the endpoint that has responded so stick it on the top of
         // the list
-        SocketAddress endpoint = endpoints.get(found.left);
-        endpoints.set(found.left, endpoints.get(0));
-        endpoints.set(0, endpoint);
+        SocketAddress endpoint = endpoint(found.left);
+        endpoint(found.left, endpoint());
+        endpoint(0, endpoint);
         // now return the right address
         callback.handle(Future.succeededFuture(found.right));
       }
@@ -180,7 +210,7 @@ public class RedisSentinelImpl extends AbstractRedisClient implements RedisSenti
       final RedisConnectionImpl conn = new RedisConnectionImpl(context, client, connect.result(), endpoint);
 
       // Send a command just to check we have a working node
-      conn.send("INFO", info -> {
+      conn.send(cmd(INFO), info -> {
         if (info.failed()) {
           handler.handle(Future.failedFuture(info.cause()));
           return;
@@ -204,7 +234,7 @@ public class RedisSentinelImpl extends AbstractRedisClient implements RedisSenti
       final RedisConnectionImpl conn = new RedisConnectionImpl(context, client, connect.result(), endpoint);
 
       // Send a command just to check we have a working node
-      conn.send("SENTINEL", Args.args("get-master-addr-by-name", masterName), sentinel -> {
+      conn.send(cmd(SENTINEL_GET_MASTER_ADDR_BY_NAME).arg(masterName), sentinel -> {
         if (sentinel.failed()) {
           handler.handle(Future.failedFuture(sentinel.cause()));
           return;
@@ -234,7 +264,7 @@ public class RedisSentinelImpl extends AbstractRedisClient implements RedisSenti
       final RedisConnectionImpl conn = new RedisConnectionImpl(context, client, connect.result(), endpoint);
 
       // Send a command just to check we have a working node
-      conn.send("SENTINEL", Args.args("slaves", masterName), sentinel -> {
+      conn.send(cmd(SENTINEL_SLAVES).arg(masterName), sentinel -> {
         if (sentinel.failed()) {
           handler.handle(Future.failedFuture(sentinel.cause()));
           return;
@@ -265,13 +295,13 @@ public class RedisSentinelImpl extends AbstractRedisClient implements RedisSenti
 
   private void iterate(final int idx, final Resolver checkEndpointFn, final String argument, final Handler<AsyncResult<Pair<Integer, SocketAddress>>> resultHandler) {
     // stop condition
-    if (idx >= endpoints.size()) {
+    if (idx >= endpoints().size()) {
       resultHandler.handle(Future.failedFuture("No more endpoints in chain."));
       return;
     }
 
     // attempt to perform operation
-    checkEndpointFn.resolve(endpoints.get(idx), argument, res -> {
+    checkEndpointFn.resolve(endpoint(idx), argument, res -> {
       if (res.succeeded()) {
         resultHandler.handle(Future.succeededFuture(new Pair<>(idx, res.result())));
       } else {
@@ -279,5 +309,77 @@ public class RedisSentinelImpl extends AbstractRedisClient implements RedisSenti
         iterate(idx + 1, checkEndpointFn, argument, resultHandler);
       }
     });
+  }
+
+  @Override
+  public void close() {
+    connection.close();
+    // reset connection state
+    connection = null;
+  }
+
+  @Override
+  public RedisConnection exceptionHandler(Handler<Throwable> handler) {
+    if (connection == null) {
+      onException = handler;
+    } else {
+      connection.exceptionHandler(handler);
+    }
+    return this;
+  }
+
+  @Override
+  public RedisConnection endHandler(Handler<Void> handler) {
+    if (connection == null) {
+      onEnd = handler;
+    } else {
+      connection.endHandler(handler);
+    }
+    return this;
+  }
+
+  @Override
+  public RedisConnection handler(Handler<Reply> handler) {
+    if (connection == null) {
+      onMessage = handler;
+    } else {
+      connection.handler(handler);
+    }
+    return this;
+  }
+  @Override
+  public RedisConnection pause() {
+    connection.pause();
+    return this;
+  }
+
+  @Override
+  public RedisConnection resume() {
+    connection.resume();
+    return this;
+  }
+
+  @Override
+  public ReadStream<Reply> fetch(long amount) {
+    connection.fetch(amount);
+    return this;
+  }
+
+  @Override
+  public RedisConnection send(RedisCommand command, Handler<AsyncResult<Reply>> handler) {
+    // connection can be null if the connection cycle isn't finished
+    if (connection == null) {
+      // avoid keeping state which could lead to undefined behavior or OOM
+      handler.handle(Future.failedFuture("Redis Connection isn't ready."));
+    } else {
+      connection.send(command, handler);
+    }
+
+    return this;
+  }
+
+  @Override
+  public SocketAddress address() {
+    return connection.address();
   }
 }

@@ -5,9 +5,7 @@ import io.vertx.ext.unit.Async;
 import io.vertx.ext.unit.TestContext;
 import io.vertx.ext.unit.junit.RunTestOnContext;
 import io.vertx.ext.unit.junit.VertxUnitRunner;
-import io.vertx.redis.Args;
 import io.vertx.redis.RedisCluster;
-import io.vertx.redis.RedisConnection;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -17,6 +15,10 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Random;
 import java.util.concurrent.atomic.AtomicInteger;
+
+import static io.vertx.redis.RedisCommand.cmd;
+import static io.vertx.redis.RedisCommandEnum.*;
+
 
 @RunWith(VertxUnitRunner.class)
 public class RedisClusterTest {
@@ -40,36 +42,34 @@ public class RedisClusterTest {
   public void runTheSlotScope(TestContext should) {
     final Async test = should.async();
 
-    RedisCluster
-      .create(rule.vertx(), clusterHosts)
-      .open(open -> {
-        should.assertTrue(open.succeeded());
+    final RedisCluster cluster = RedisCluster.create(rule.vertx(), clusterHosts);
 
-        final RedisConnection conn = open.result();
+    cluster.connect(open -> {
+      should.assertTrue(open.succeeded());
 
-        final int len = (int) Math.pow(2, 17);
-        final AtomicInteger counter = new AtomicInteger();
+      final int len = (int) Math.pow(2, 17);
+      final AtomicInteger counter = new AtomicInteger();
 
-        for (int i = 0; i < len; i++) {
-          final String id = Integer.toString(i);
-          conn.send("SET", Args.key(id).add(id), set -> {
-            should.assertTrue(set.succeeded());
-            conn.send("GET", Args.key(id), get -> {
-              should.assertTrue(get.succeeded());
-              should.assertEquals(id, get.result().asString());
+      for (int i = 0; i < len; i++) {
+        final String id = Integer.toString(i);
+        cluster.send(cmd(SET).key(id).arg(id), set -> {
+          should.assertTrue(set.succeeded());
+          cluster.send(cmd(GET).key(id), get -> {
+            should.assertTrue(get.succeeded());
+            should.assertEquals(id, get.result().asString());
 
-              final int cnt = counter.incrementAndGet();
-              if (cnt % 1024 == 0) {
-                System.out.print('.');
-              }
+            final int cnt = counter.incrementAndGet();
+            if (cnt % 1024 == 0) {
+              System.out.print('.');
+            }
 
-              if (cnt == len) {
-                test.complete();
-              }
-            });
+            if (cnt == len) {
+              test.complete();
+            }
           });
-        }
-      });
+        });
+      }
+    });
   }
 
   @Test(timeout = 30_000)
@@ -80,36 +80,34 @@ public class RedisClusterTest {
     // drop a node
     clusterHosts2.remove(random.nextInt(clusterHosts2.size()));
 
-    RedisCluster
-      .create(rule.vertx(), clusterHosts2)
-      .open(open -> {
-        should.assertTrue(open.succeeded());
+    final RedisCluster cluster = RedisCluster.create(rule.vertx(), clusterHosts2);
 
-        final RedisConnection conn = open.result();
+    cluster.connect(open -> {
+      should.assertTrue(open.succeeded());
 
-        final int len = (int) Math.pow(2, 17);
-        final AtomicInteger counter = new AtomicInteger();
+      final int len = (int) Math.pow(2, 17);
+      final AtomicInteger counter = new AtomicInteger();
 
-        for (int i = 0; i < len; i++) {
-          final String id = Integer.toString(i);
-          conn.send("SET", Args.key(id).add(id), set -> {
-            should.assertTrue(set.succeeded());
-            conn.send("GET", Args.key(id), get -> {
-              should.assertTrue(get.succeeded());
-              should.assertEquals(id, get.result().asString());
+      for (int i = 0; i < len; i++) {
+        final String id = Integer.toString(i);
+        cluster.send(cmd(SET).key(id).arg(id), set -> {
+          should.assertTrue(set.succeeded());
+          cluster.send(cmd(GET).key(id), get -> {
+            should.assertTrue(get.succeeded());
+            should.assertEquals(id, get.result().asString());
 
-              final int cnt = counter.incrementAndGet();
-              if (cnt % 1024 == 0) {
-                System.out.print('.');
-              }
+            final int cnt = counter.incrementAndGet();
+            if (cnt % 1024 == 0) {
+              System.out.print('.');
+            }
 
-              if (cnt == len) {
-                test.complete();
-              }
-            });
+            if (cnt == len) {
+              test.complete();
+            }
           });
-        }
-      });
+        });
+      }
+    });
   }
 
   @Test(timeout = 30_000)
@@ -117,38 +115,36 @@ public class RedisClusterTest {
     final Async test = should.async();
 
     final List<SocketAddress> clusterHosts3 = new ArrayList<>();
-    // drop a node
+    // just one node
     clusterHosts3.add(SocketAddress.inetSocketAddress(7000, "127.0.0.1"));
 
-    RedisCluster
-      .create(rule.vertx(), clusterHosts3)
-      .open(open -> {
-        should.assertTrue(open.succeeded());
+    final RedisCluster cluster = RedisCluster.create(rule.vertx(), clusterHosts3);
 
-        final RedisConnection conn = open.result();
+    cluster.connect(open -> {
+      should.assertTrue(open.succeeded());
 
-        final int len = (int) Math.pow(2, 17);
-        final AtomicInteger counter = new AtomicInteger();
+      final int len = (int) Math.pow(2, 17);
+      final AtomicInteger counter = new AtomicInteger();
 
-        for (int i = 0; i < len; i++) {
-          final String id = Integer.toString(i);
-          conn.send("SET", Args.key(id).add(id), set -> {
-            should.assertTrue(set.succeeded());
-            conn.send("GET", Args.key(id), get -> {
-              should.assertTrue(get.succeeded());
-              should.assertEquals(id, get.result().asString());
+      for (int i = 0; i < len; i++) {
+        final String id = Integer.toString(i);
+        cluster.send(cmd(SET).key(id).arg(id), set -> {
+          should.assertTrue(set.succeeded());
+          cluster.send(cmd(GET).key(id), get -> {
+            should.assertTrue(get.succeeded());
+            should.assertEquals(id, get.result().asString());
 
-              final int cnt = counter.incrementAndGet();
-              if (cnt % 1024 == 0) {
-                System.out.print('.');
-              }
+            final int cnt = counter.incrementAndGet();
+            if (cnt % 1024 == 0) {
+              System.out.print('.');
+            }
 
-              if (cnt == len) {
-                test.complete();
-              }
-            });
+            if (cnt == len) {
+              test.complete();
+            }
           });
-        }
-      });
+        });
+      }
+    });
   }
 }

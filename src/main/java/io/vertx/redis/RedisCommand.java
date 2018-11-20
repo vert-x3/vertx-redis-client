@@ -15,12 +15,14 @@
  */
 package io.vertx.redis;
 
+import io.netty.buffer.ByteBuf;
+import io.netty.buffer.Unpooled;
 import io.vertx.codegen.annotations.Fluent;
 import io.vertx.codegen.annotations.GenIgnore;
 import io.vertx.codegen.annotations.VertxGen;
 import io.vertx.core.buffer.Buffer;
 import io.vertx.core.json.JsonArray;
-import io.vertx.redis.impl.ArgsImpl;
+import io.vertx.redis.impl.client.RedisCommandImpl;
 
 import java.io.UnsupportedEncodingException;
 import java.nio.charset.Charset;
@@ -33,28 +35,14 @@ import java.util.List;
  * @author Paulo Lopes
  */
 @VertxGen
-public interface Args {
+public interface RedisCommand {
 
-  static Args args() {
-    return new ArgsImpl();
+  static RedisCommand create(String command) {
+    return new RedisCommandImpl(command);
   }
 
-  @GenIgnore
-  static Args args(Object... args) {
-    return new ArgsImpl(args);
-  }
-
-  static Args key(String key) {
-    return new ArgsImpl().addKey(key);
-  }
-
-  static Args key(Buffer key) {
-    return new ArgsImpl().addKey(key);
-  }
-
-  @GenIgnore
-  static Args key(byte[] key) {
-    return new ArgsImpl().addKey(key);
+  static RedisCommand cmd(RedisCommandEnum commandEnum) {
+    return new RedisCommandImpl(commandEnum);
   }
 
   /**
@@ -62,7 +50,7 @@ public interface Args {
    * @return self
    */
   @Fluent
-  Args addNull();
+  RedisCommand nullArg();
 
   /**
    * Adds a byte array
@@ -70,32 +58,32 @@ public interface Args {
    */
   @Fluent
   @GenIgnore
-  default Args add(byte[] arg) {
+  default RedisCommand arg(byte[] arg) {
     if (arg == null) {
-      return addNull();
+      return nullArg();
     }
-    return add(Buffer.buffer(arg));
+    return arg(Unpooled.wrappedBuffer(arg));
   }
 
   /**
-   * Adds a String argument
+   * Adds a String argument using UTF8 character encoding
    * @return self
    */
   @Fluent
-  default Args add(String arg) {
+  default RedisCommand arg(String arg) {
     if (arg == null) {
-      return addNull();
+      return nullArg();
     }
-    return add(arg.getBytes());
+    return arg(arg.getBytes(StandardCharsets.UTF_8));
   }
 
   /**
-   * Adds a String key argument
+   * Adds a String key argument using UTF8 character encoding
    * @return self
    */
   @Fluent
-  default Args addKey(String key) {
-    return addKey(key.getBytes(StandardCharsets.UTF_8));
+  default RedisCommand key(String key) {
+    return key(key.getBytes(StandardCharsets.UTF_8));
   }
 
   /**
@@ -104,25 +92,37 @@ public interface Args {
    */
   @Fluent
   @GenIgnore
-  Args addKey(byte[] key);
+  default RedisCommand key(byte[] key) {
+    return key(Unpooled.wrappedBuffer(key));
+  }
 
   /**
    * Adds a String key argument
    * @return self
    */
   @Fluent
-  Args addKey(Buffer key);
+  default RedisCommand key(Buffer key) {
+    return key(key.getByteBuf());
+  }
+
+  /**
+   * Adds a String key argument
+   * @return self
+   */
+  @Fluent
+  @GenIgnore
+  RedisCommand key(ByteBuf key);
 
   /**
    * Adds a String using a specific character encoding argument
    * @return self
    */
   @Fluent
-  default Args add(String arg, String enc) throws UnsupportedEncodingException {
+  default RedisCommand arg(String arg, String enc) throws UnsupportedEncodingException {
     if (arg == null) {
-      return addNull();
+      return nullArg();
     }
-    return add(arg.getBytes(enc));
+    return arg(arg.getBytes(enc));
   }
 
   /**
@@ -131,11 +131,11 @@ public interface Args {
    */
   @Fluent
   @GenIgnore
-  default Args add(String arg, Charset charset) {
+  default RedisCommand arg(String arg, Charset charset) {
     if (arg == null) {
-      return addNull();
+      return nullArg();
     }
-    return add(arg.getBytes(charset));
+    return arg(arg.getBytes(charset));
   }
 
   /**
@@ -143,7 +143,17 @@ public interface Args {
    * @return self
    */
   @Fluent
-  Args add(Buffer arg);
+  default RedisCommand arg(Buffer arg) {
+    return arg(arg.getByteBuf());
+  }
+
+  /**
+   * Adds a Buffer argument
+   * @return self
+   */
+  @Fluent
+  @GenIgnore
+  RedisCommand arg(ByteBuf arg);
 
 
   /**
@@ -152,11 +162,11 @@ public interface Args {
    */
   @Fluent
   @GenIgnore
-  default Args add(Integer arg) {
+  default RedisCommand arg(Integer arg) {
     if (arg == null) {
-      return addNull();
+      return nullArg();
     }
-    return add(arg.longValue());
+    return arg(arg.longValue());
   }
 
   /**
@@ -164,7 +174,7 @@ public interface Args {
    * @return self
    */
   @Fluent
-  Args add(Long arg);
+  RedisCommand arg(Long arg);
 
   /**
    * Adds a List argument
@@ -172,18 +182,18 @@ public interface Args {
    */
   @Fluent
   @GenIgnore
-  Args add(List arg);
+  RedisCommand arg(List arg);
 
   /**
    * Adds a JSON array argument
    * @return self
    */
   @Fluent
-  default Args add(JsonArray arg) {
+  default RedisCommand arg(JsonArray arg) {
     if (arg == null) {
-      return addNull();
+      return nullArg();
     }
-    return add(arg.getList());
+    return arg(arg.getList());
   }
 
   /**
@@ -192,11 +202,11 @@ public interface Args {
    */
   @Fluent
   @GenIgnore
-  default Args add(Float arg) {
+  default RedisCommand arg(Float arg) {
     if (arg == null) {
-      return addNull();
+      return nullArg();
     }
-    return add(Float.toString(arg));
+    return arg(Float.toString(arg));
   }
 
   /**
@@ -205,11 +215,11 @@ public interface Args {
    */
   @Fluent
   @GenIgnore
-  default Args add(Double arg) {
+  default RedisCommand arg(Double arg) {
     if (arg == null) {
-      return addNull();
+      return nullArg();
     }
-    return add(Double.toString(arg));
+    return arg(Double.toString(arg));
   }
 
   /**
@@ -222,11 +232,17 @@ public interface Args {
    * Returns the arguments encoded as a buffer using REDIS format
    * @return self
    */
-  Buffer toBuffer();
+  @GenIgnore
+  ByteBuf toByteBuf();
 
   /**
    * Returns the key hash as a slot id, or -1 if not key is present.
    * @return slot
    */
   int getKeySlot();
+
+  @Fluent
+  RedisCommand setReadOnly(boolean readOnly);
+
+  boolean isReadOnly();
 }

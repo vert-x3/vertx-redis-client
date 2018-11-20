@@ -12,10 +12,10 @@ import io.vertx.redis.impl.client.RedisClusterImpl;
 import java.util.List;
 
 @VertxGen
-public interface RedisCluster {
+public interface RedisCluster extends RedisConnection {
 
   static RedisCluster create(Vertx vertx, List<SocketAddress> endpoints) {
-    return create(vertx, endpoints, new NetClientOptions().setTcpNoDelay(true));
+    return create(vertx, endpoints, new NetClientOptions().setTcpKeepAlive(true).setTcpNoDelay(true));
   }
 
   static RedisCluster create(Vertx vertx, List<SocketAddress> endpoints, NetClientOptions options) {
@@ -28,8 +28,8 @@ public interface RedisCluster {
    * @return self
    */
   @Fluent
-  default RedisCluster open(Handler<AsyncResult<RedisConnection>> handler) {
-    return open(RedisSlaves.NEVER, handler);
+  default RedisCluster connect(Handler<AsyncResult<Void>> handler) {
+    return connect(RedisSlaves.NEVER, handler);
   }
 
   /**
@@ -38,10 +38,5 @@ public interface RedisCluster {
    * @return self
    */
   @Fluent
-  RedisCluster open(RedisSlaves slaves, Handler<AsyncResult<RedisConnection>> handler);
-
-  /**
-   * Closes the client.
-   */
-  void close();
+  RedisCluster connect(RedisSlaves slaves, Handler<AsyncResult<Void>> handler);
 }

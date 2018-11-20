@@ -1,6 +1,6 @@
 package io.vertx.redis.impl;
 
-import io.vertx.core.buffer.Buffer;
+import io.netty.buffer.ByteBuf;
 
 import java.nio.charset.StandardCharsets;
 import java.util.List;
@@ -102,8 +102,8 @@ public class ZModem {
    * @param buffer buffer
    * @return hash
    */
-  public static int generate(Buffer buffer) {
-    return generate(buffer, 0, buffer.length());
+  public static int generate(ByteBuf buffer) {
+    return generate(buffer, 0, buffer.writerIndex());
   }
 
   /**
@@ -111,7 +111,7 @@ public class ZModem {
    * @param buffer buffer
    * @return hash
    */
-  public static int generate(Buffer buffer, int _start, int length) {
+  public static int generate(ByteBuf buffer, int _start, int length) {
     int ch;
     int i = _start;
     int start = -1;

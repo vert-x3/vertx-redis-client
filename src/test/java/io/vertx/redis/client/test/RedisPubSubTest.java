@@ -6,13 +6,13 @@ import io.vertx.ext.unit.TestContext;
 import io.vertx.ext.unit.junit.RunTestOnContext;
 import io.vertx.ext.unit.junit.VertxUnitRunner;
 import io.vertx.redis.Redis;
-import io.vertx.redis.RedisConnection;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
-import static io.vertx.redis.Args.args;
+import static io.vertx.redis.RedisCommand.cmd;
+import static io.vertx.redis.RedisCommandEnum.*;
 
 @RunWith(VertxUnitRunner.class)
 public class RedisPubSubTest {
@@ -20,30 +20,30 @@ public class RedisPubSubTest {
   @Rule
   public RunTestOnContext rule = new RunTestOnContext();
 
-  private RedisConnection pub;
-  private RedisConnection sub;
+  private Redis pub;
+  private Redis sub;
 
   @Before
   public void setUp(TestContext should) throws Exception {
     final Async setUp = should.async();
 
-    Redis
-      .create(rule.vertx(), SocketAddress.inetSocketAddress(7006, "localhost"))
-      .open(open -> {
-        should.assertTrue(open.succeeded());
-        pub = open.result();
-        pub.exceptionHandler(should::fail);
+    pub = Redis
+      .create(rule.vertx(), SocketAddress.inetSocketAddress(7006, "127.0.0.1"));
 
-        Redis
-          .create(rule.vertx(), SocketAddress.inetSocketAddress(7006, "localhost"))
-          .open(open2 -> {
-            should.assertTrue(open2.succeeded());
-            sub = open2.result();
-            sub.exceptionHandler(should::fail);
+    pub.connect(open -> {
+      should.assertTrue(open.succeeded());
+      pub.exceptionHandler(should::fail);
 
-            setUp.complete();
-          });
+      sub = Redis
+        .create(rule.vertx(), SocketAddress.inetSocketAddress(7006, "127.0.0.1"));
+
+      sub.connect(open2 -> {
+        should.assertTrue(open2.succeeded());
+        sub.exceptionHandler(should::fail);
+
+        setUp.complete();
       });
+    });
   }
 
   @Test
@@ -59,10 +59,10 @@ public class RedisPubSubTest {
       test.complete();
     });
 
-    sub.send("subscribe", args().add("mychannel"), subscribe -> {
+    sub.send(cmd(SUBSCRIBE).arg("mychannel"), subscribe -> {
       should.assertTrue(subscribe.succeeded());
 
-      pub.send("publish", args().add("mychannel").add(123456), publish -> {
+      pub.send(cmd(PUBLISH).arg("mychannel").arg(123456), publish -> {
         should.assertTrue(publish.succeeded());
         should.assertNotNull(publish.result());
       });

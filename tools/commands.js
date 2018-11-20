@@ -3,7 +3,7 @@ var https = require("https");
 var fs = require('fs');
 
 var Handlebars = require('handlebars');
-var helpers = require('handlebars-helpers')();
+require('handlebars-helpers')();
 
 /**
  * getJSON:  REST get request returning JSON object(s)
@@ -33,7 +33,7 @@ function getJSON (options, callback)
   req.end();
 }
 
-var template = Handlebars.compile(fs.readFileSync('commands.hbs', 'utf8'));
+var cmd_template = Handlebars.compile(fs.readFileSync('redis-command.hbs', 'utf8'));
 
 var options = {
   host: 'redis.io',
@@ -46,5 +46,5 @@ var options = {
 };
 
 getJSON(options, function(statusCode, result) {
-  fs.writeFileSync('../src/main/java/io/vertx/redis/RedisAPI.java', template(result));
+  fs.writeFileSync('../src/main/java/io/vertx/redis/RedisCommandEnum.java', cmd_template(result));
 });

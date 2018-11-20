@@ -32,7 +32,7 @@ import io.vertx.redis.impl.client.RedisImpl;
  * @author Paulo Lopes
  */
 @VertxGen
-public interface Redis {
+public interface Redis extends RedisConnection {
 
   /**
    * Creates an instance of the Client.
@@ -68,10 +68,5 @@ public interface Redis {
    * @return self
    */
   @Fluent
-  Redis open(Handler<AsyncResult<RedisConnection>> handler);
-
-  /**
-   * Closes the underlying net client.
-   */
-  void close();
+  Redis connect(Handler<AsyncResult<Void>> handler);
 }

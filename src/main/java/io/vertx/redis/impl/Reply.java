@@ -1,4 +1,4 @@
-/**
+/*
  * Copyright 2015 Red Hat, Inc.
  * <p>
  * All rights reserved. This program and the accompanying materials

@@ -51,17 +51,6 @@
 |[[value]]`@value`|`Number (long)`|-
 |===
 
-[[Command]]
-== Command
-
-
-[cols=">25%,25%,50%"]
-[frame="topbot"]
-|===
-^|Name | Type ^| Description
-|[[command]]`@command`|`String`|-
-|===
-
 [[GeoMember]]
 == GeoMember
 
