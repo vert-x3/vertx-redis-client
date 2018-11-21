@@ -15,9 +15,9 @@
 */
 package io.vertx.redis;
 
+import java.nio.charset.StandardCharsets;
+
 import io.vertx.codegen.annotations.VertxGen;
-import io.vertx.core.buffer.Buffer;
-import io.vertx.redis.impl.client.RedisCommandImpl;
 
 /**
 * <b>Auto generated</b> API Commands to interact with REDIS.
@@ -27,46 +27,40 @@ import io.vertx.redis.impl.client.RedisCommandImpl;
 @VertxGen
 public enum RedisCommandEnum {
 {{#each .}}
-  {{ upcase (snakecase @key) }}("{{ upcase @key }}"),
+  {{ upcase (snakecase @key) }}("{{ upcase @key }}", {{ length arguments }}),
 {{/each}}
   // extra commands (sentinel)
-  SENTINEL_CKQUORUM("SENTINEL CKQUORUM"),
-  SENTINEL_FAILOVER("SENTINEL FAILOVER"),
-  SENTINEL_FLUSHCONFIG("SENTINEL FLUSHCONFIG"),
-  SENTINEL_GET_MASTER_ADDR_BY_NAME("SENTINEL GET-MASTER-ADDR-BY-NAME"),
-  SENTINEL_INFO("SENTINEL INFO"),
-  SENTINEL_MASTER("SENTINEL MASTER"),
-  SENTINEL_MASTERS("SENTINEL MASTERS"),
-  SENTINEL_RESET("SENTINEL RESET"),
-  SENTINEL_SLAVES("SENTINEL SLAVES"),
-  SENTINEL_SENTINELS("SENTINEL SENTINELS"),
+  SENTINEL_CKQUORUM("SENTINEL CKQUORUM", 0),
+  SENTINEL_FAILOVER("SENTINEL FAILOVER", 0),
+  SENTINEL_FLUSHCONFIG("SENTINEL FLUSHCONFIG", 0),
+  SENTINEL_GET_MASTER_ADDR_BY_NAME("SENTINEL GET-MASTER-ADDR-BY-NAME", 1),
+  SENTINEL_INFO("SENTINEL INFO", 0),
+  SENTINEL_MASTER("SENTINEL MASTER", 0),
+  SENTINEL_MASTERS("SENTINEL MASTERS", 0),
+  SENTINEL_RESET("SENTINEL RESET", 0),
+  SENTINEL_SLAVES("SENTINEL SLAVES", 0),
+  SENTINEL_SENTINELS("SENTINEL SENTINELS", 0),
 
-  ASKING("ASKING");
+  ASKING("ASKING", 0);
 
-  private final int tokenCount;
-  private final Buffer buffer;
+  private final byte[][] tokens;
+  private final int lengthHint;
 
-  RedisCommandEnum(String command) {
+  RedisCommandEnum(String command, int argumentsHint) {
     final String[] parts = command.split(" ");
-    this.tokenCount = parts.length;
-    this.buffer = Buffer.buffer();
-    for (int i = 0; i < tokenCount; i++) {
-      // serialize the command
-      buffer.appendByte((byte) '$');
-      buffer.appendBytes(RedisCommandImpl.numToBytes(parts[i].length()));
-      buffer.appendByte((byte) '\r');
-      buffer.appendByte((byte) '\n');
-      buffer.appendString(parts[i]);
-      buffer.appendByte((byte) '\r');
-      buffer.appendByte((byte) '\n');
+    tokens = new byte[parts.length][];
+    for (int i = 0; i < parts.length; i++) {
+      tokens[i] = parts[i].getBytes(StandardCharsets.UTF_8);
     }
+    // precompute the hint
+    lengthHint = parts.length + argumentsHint;
   }
 
-  public Buffer toBuffer() {
-    return buffer;
+  public byte[][] tokens() {
+    return tokens;
   }
 
-  public int getTokenCount() {
-    return tokenCount;
+  public int lengthHint() {
+    return lengthHint;
   }
 }

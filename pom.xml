@@ -30,6 +30,7 @@
 
   <properties>
     <stack.version>3.6.0.CR1</stack.version>
+    <netty.version>4.1.27.Final</netty.version>
   </properties>
 
   <!--
@@ -56,6 +57,11 @@
       <groupId>io.vertx</groupId>
       <artifactId>vertx-core</artifactId>
     </dependency>
+    <dependency>
+      <groupId>io.netty</groupId>
+      <artifactId>netty-codec-redis</artifactId>
+      <version>${netty.version}</version>
+    </dependency>
 
     <dependency>
       <groupId>io.vertx</groupId>
@@ -67,6 +73,7 @@
       <artifactId>vertx-docgen</artifactId>
       <optional>true</optional>
     </dependency>
+
     <dependency>
       <groupId>io.vertx</groupId>
       <artifactId>vertx-core</artifactId>
