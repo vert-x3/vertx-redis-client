@@ -1,17 +1,20 @@
 package io.vertx.redis.client.impl.types;
 
 import io.vertx.redis.client.Response;
+import io.vertx.redis.client.ResponseType;
+
+import java.nio.charset.StandardCharsets;
 
 public final class ErrorType extends Throwable implements Response {
 
-  public static Response create(String message) {
+  public static ErrorType create(String message) {
     return new ErrorType(message);
   }
 
   private final String kind;
 
   private ErrorType(String message) {
-    super(message);
+    super(message, null, false, false);
 
     if (message != null) {
       for (int i = 0; i < message.length(); i++) {
@@ -24,6 +27,11 @@ public final class ErrorType extends Throwable implements Response {
     kind = message;
   }
 
+  @Override
+  public ResponseType type() {
+    return ResponseType.ERROR;
+  }
+
   public boolean is(String kind) {
     if (this.kind == null) {
       return kind == null;
@@ -34,5 +42,15 @@ public final class ErrorType extends Throwable implements Response {
 
   public String getKind() {
     return kind;
+  }
+
+  @Override
+  public String string() {
+    return getMessage();
+  }
+
+  @Override
+  public String toString() {
+    return getMessage();
   }
 }

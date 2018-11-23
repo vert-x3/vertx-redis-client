@@ -1,6 +1,7 @@
 package io.vertx.redis.client.impl.types;
 
 import io.vertx.redis.client.Response;
+import io.vertx.redis.client.ResponseType;
 
 public final class IntegerType implements Response {
 
@@ -15,27 +16,37 @@ public final class IntegerType implements Response {
   }
 
   @Override
-  public long getLong() {
+  public ResponseType type() {
+    return ResponseType.INTEGER;
+  }
+
+  @Override
+  public long int64() {
     return value;
   }
 
   @Override
-  public int getInteger() {
+  public int int32() {
     return value.intValue();
   }
 
   @Override
-  public short getShort() {
+  public short int16() {
     return value.shortValue();
   }
 
   @Override
-  public byte getByte() {
+  public byte int8() {
     return value.byteValue();
   }
 
   @Override
-  public boolean getBoolean() {
+  public boolean bool() {
     return value == 1L;
+  }
+
+  @Override
+  public String toString() {
+    return value.toString();
   }
 }

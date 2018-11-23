@@ -1,137 +1,181 @@
 package io.vertx.redis.client.impl;
 
-import io.netty.channel.ChannelPipeline;
-import io.netty.handler.codec.CodecException;
-import io.netty.handler.codec.redis.*;
-import io.netty.util.ReferenceCountUtil;
-import io.vertx.core.AsyncResult;
-import io.vertx.core.Future;
-import io.vertx.core.Handler;
-import io.vertx.core.Vertx;
-import io.vertx.core.impl.NetSocketInternal;
+import io.vertx.core.*;
+import io.vertx.core.buffer.Buffer;
+import io.vertx.core.logging.Logger;
+import io.vertx.core.logging.LoggerFactory;
 import io.vertx.core.net.NetClient;
 import io.vertx.core.net.NetClientOptions;
+import io.vertx.core.net.NetSocket;
 import io.vertx.core.net.SocketAddress;
 import io.vertx.redis.client.RedisClient;
 import io.vertx.redis.client.Request;
 import io.vertx.redis.client.Response;
-import io.vertx.redis.client.impl.types.*;
+import io.vertx.redis.client.ResponseType;
+import io.vertx.redis.client.impl.types.ErrorType;
+import io.vertx.redis.impl.client.RedisConnectionImpl;
 
-import java.util.Deque;
-import java.util.concurrent.ConcurrentLinkedDeque;
+public class RedisClientImpl implements RedisClient, Handler<Response> {
 
-public class RedisClientImpl implements RedisClient {
+  private static final Logger LOG = LoggerFactory.getLogger(RedisConnectionImpl.class);
+
+  private static final ErrorType CONNECTION_BROKEN = ErrorType.create("CONNECTION_BROKEN");
 
   public static void connect(Vertx vertx, SocketAddress address, NetClientOptions options, Handler<AsyncResult<RedisClient>> onConnect) {
-    NetClient client = vertx.createNetClient(options);
+    final NetClient netClient = vertx.createNetClient(options);
 
-    // Connect to the redis instance
-    client.connect(address, ar -> {
-      if (ar.succeeded()) {
-        // Get the socket
-        NetSocketInternal so = (NetSocketInternal) ar.result();
-
-        // Create the client
-        RedisClientImpl redis = new RedisClientImpl(so);
-
-        // Return the memcached instance to the client
-        onConnect.handle(Future.succeededFuture(redis));
-      } else {
-        onConnect.handle(Future.failedFuture(ar.cause()));
+    netClient.connect(address, clientConnect -> {
+      if (clientConnect.failed()) {
+        // connection failed
+        netClient.close();
+        onConnect.handle(Future.failedFuture(clientConnect.cause()));
+        return;
       }
+
+      // socket connection succeeded
+      onConnect.handle(
+        Future.succeededFuture(
+          new RedisClientImpl(200, netClient, clientConnect.result(), address)));
     });
   }
 
-  // client state
-  private final NetSocketInternal so;
-  // TODO: lookup the real type
-  private final Deque<Handler<AsyncResult<Response>>> inflight = new ConcurrentLinkedDeque<>();
+  // waiting: commands that have been sent but not answered
+  // the queue is only accessed from the event loop
+  private final ArrayQueue waiting;
 
+  private final NetSocket netSocket;
+  private final SocketAddress socketAddress;
 
-  public RedisClientImpl(final NetSocketInternal so) {
-    this.so = so;
-    // initialize the client, this will configure Netty's pipeline
-    // an set an handler to process the decoded messages.
-    final ChannelPipeline pipeline = so.channelHandlerContext().pipeline();
+  // state
+  private Handler<Throwable> onException;
+  private Handler<Void> onEnd;
+  private Handler<Response> onMessage;
 
-    // encode messages to redis
-    pipeline.addFirst(new RedisEncoder());
-    // decode arrays (arrays can be mixed typed)
-    pipeline.addFirst(new RedisArrayAggregator());
-    // decode bulks (think of UTF strings or BLOBs)
-    pipeline.addFirst(new RedisBulkStringAggregator());
-    // basic decoder
-    pipeline.addFirst(new RedisDecoder());
+  RedisClientImpl(int maxQueue, NetClient netClient, NetSocket netSocket, SocketAddress endpoint) {
+    this.waiting = new ArrayQueue(maxQueue);
+    this.netSocket = netSocket;
+    this.socketAddress = endpoint;
 
-    // Set the message handler to process redis message
-    so.messageHandler(this::processResponse);
+    // parser utility
+    netSocket
+      .handler(new RESPParser(this))
+      .closeHandler(close -> {
+        netClient.close();
+        // clean up the pending queue
+        cleanupQueue(CONNECTION_BROKEN);
+        // call the close handler if any
+        if (onEnd != null) {
+          onEnd.handle(close);
+        }
+      })
+      .exceptionHandler(exception -> {
+        netSocket.close();
+        netClient.close();
+        // clean up the pending queue
+        cleanupQueue(exception);
+        // call the exception handler if any
+        if (onException != null) {
+          onException.handle(exception);
+        }
+      });
   }
 
-  private Response toReply(Object msg) {
-    if (msg instanceof SimpleStringRedisMessage) {
-      return SimpleStringType.create(((SimpleStringRedisMessage) msg).content());
-    } else if (msg instanceof ErrorRedisMessage) {
-      return ErrorType.create(((ErrorRedisMessage) msg).content());
-    } else if (msg instanceof IntegerRedisMessage) {
-      return IntegerType.create(((IntegerRedisMessage) msg).value());
-    } else if (msg instanceof FullBulkStringRedisMessage) {
-      if (((FullBulkStringRedisMessage) msg).isNull()) {
-        return NullType.create();
-      }
-      return BulkType.create(((FullBulkStringRedisMessage) msg).content());
-    } else if (msg instanceof ArrayRedisMessage) {
-      if (((ArrayRedisMessage) msg).isNull()) {
-        return NullType.create();
-      }
-      final int len = ((ArrayRedisMessage) msg).children().size();
-      final Response[] replies = new Response[len];
-
-      for (int i = 0; i < len; i++) {
-        replies[i] = toReply(((ArrayRedisMessage) msg).children().get(i));
-      }
-      return ArrayType.create(replies);
-    } else {
-      throw new CodecException("unknown message type: " + msg);
-    }
+  @Override
+  public void close() {
+    netSocket.close();
   }
 
-  private void processResponse(Object msg) {
+  @Override
+  public RedisClient exceptionHandler(Handler<Throwable> handler) {
+    this.onException = handler;
+    return this;
+  }
 
-    final Response reply = toReply(msg);
+  @Override
+  public RedisClient endHandler(Handler<Void> handler) {
+    this.onEnd = handler;
+    return this;
+  }
 
-    // message must be a redis message
-    try {
-      // Get the handler that will process the response
-      Handler<AsyncResult<Response>> handler = inflight.poll();
+  @Override
+  public RedisClient handler(Handler<Response> handler) {
+    this.onMessage = handler;
+    return this;
+  }
 
-      if (reply instanceof ErrorType) {
-        // Handle the message
-        handler.handle(Future.failedFuture((ErrorType) reply));
-      } else {
-        // Handle the message
-        handler.handle(Future.succeededFuture(reply));
+  @Override
+  public RedisClient pause() {
+    netSocket.pause();
+    return this;
+  }
+
+  @Override
+  public RedisClient resume() {
+    netSocket.resume();
+    return this;
+  }
+
+  @Override
+  public RedisClient fetch(long size) {
+    // no-op
+    return this;
+  }
+
+  private void cleanupQueue(Throwable t) {
+    Handler<AsyncResult<Response>> callback;
+
+    while ((callback = waiting.poll()) != null) {
+      try {
+        callback.handle(Future.failedFuture(t));
+      } catch (RuntimeException e) {
+        LOG.warn("Exception during cleanup", e);
       }
-    } finally {
-      // Release the referenced counted message
-      ReferenceCountUtil.release(msg);
     }
   }
 
   @Override
-  public void send(Request command, Handler<AsyncResult<Response>> onSend) {
-    final RequestImpl cmd = (RequestImpl) command;
-    // Write the message, the redis codec will encode the request
-    // to a buffer and it will be sent
-    so.writeMessage(cmd.message(), ar -> {
-      if (ar.succeeded()) {
-        // The message has been encoded succesfully and sent
-        // we add the handler to the inflight queue
-        inflight.add(onSend);
+  public RedisClient send(final Request request, Handler<AsyncResult<Response>> handler) {
+    if (waiting.isFull()) {
+      handler.handle(Future.failedFuture("Redis waiting Queue is full"));
+      return this;
+    }
+    // encode the message to a buffer
+    final Buffer message = ((RequestImpl) request).encode();
+    // write to the socket
+    netSocket.write(message, write -> {
+      if (write.succeeded()) {
+        waiting.offer(handler);
       } else {
-        // The message could not be encoded or sent
-        // we signal an error
-        onSend.handle(Future.failedFuture(ar.cause()));
+        handler.handle(Future.failedFuture(write.cause()));
       }
     });
+    return this;
+  }
+
+  @Override
+  public void handle(Response reply) {
+    // pub/sub mode
+    if (waiting.isEmpty() && onMessage != null) {
+      onMessage.handle(reply);
+      return;
+    }
+
+    final Handler<AsyncResult<Response>> req = waiting.poll();
+
+    if (req != null) {
+      if (reply.type() == ResponseType.ERROR) {
+        req.handle(Future.failedFuture((ErrorType) reply));
+        return;
+      }
+
+      req.handle(Future.succeededFuture(reply));
+    } else {
+      LOG.error("No handler waiting for message: " + reply);
+    }
+  }
+
+  @Override
+  public SocketAddress socketAddress() {
+    return socketAddress;
   }
 }

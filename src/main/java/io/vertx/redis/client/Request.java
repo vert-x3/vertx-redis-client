@@ -15,16 +15,11 @@
  */
 package io.vertx.redis.client;
 
-import io.netty.buffer.ByteBuf;
 import io.vertx.codegen.annotations.Fluent;
 import io.vertx.codegen.annotations.GenIgnore;
 import io.vertx.codegen.annotations.VertxGen;
 import io.vertx.core.buffer.Buffer;
 import io.vertx.redis.client.impl.RequestImpl;
-
-import java.io.UnsupportedEncodingException;
-import java.nio.charset.Charset;
-import java.nio.charset.StandardCharsets;
 
 /**
  * Builder for REDIS requests that will be encoded according to the RESP protocol was introduced in Redis 1.2.
@@ -70,50 +65,28 @@ public interface Request {
    * @return self
    */
   @Fluent
-  default Request arg(String arg) {
-    if (arg == null) {
-      return nullArg();
-    }
-    if (arg.length() == 0) {
-      return arg();
-    }
+  Request arg(String arg);
 
-    return arg(arg.getBytes(StandardCharsets.UTF_8));
-  }
+  /**
+   * Adds a String using a specific character encoding argument
+   * @return self
+   */
+  @Fluent
+  Request arg(String arg, String enc);
 
   /**
    * Adds a String key argument
    * @return self
    */
   @Fluent
-  default Request arg(Buffer arg) {
-    if (arg == null) {
-      return nullArg();
-    }
-    if (arg.length() == 0) {
-      return arg();
-    }
-
-    return arg(arg.getByteBuf());
-  }
-
-  /**
-   * Adds a String key argument
-   * @return self
-   */
-  @Fluent
-  @GenIgnore
-  Request arg(ByteBuf arg);
-
+  Request arg(Buffer arg);
 
   /**
    * Adds a String key argument using UTF8 character encoding
    * @return self
    */
   @Fluent
-  default Request key(String key) {
-    return key(key.getBytes(StandardCharsets.UTF_8));
-  }
+  Request key(String key);
 
   /**
    * Adds a String key argument
@@ -128,48 +101,7 @@ public interface Request {
    * @return self
    */
   @Fluent
-  default Request key(Buffer key) {
-    return key(key.getByteBuf());
-  }
-
-  /**
-   * Adds a String key argument
-   * @return self
-   */
-  @Fluent
-  @GenIgnore
-  Request key(ByteBuf key);
-
-  /**
-   * Adds a String using a specific character encoding argument
-   * @return self
-   */
-  @Fluent
-  default Request arg(String arg, String enc) throws UnsupportedEncodingException {
-    if (arg == null) {
-      return nullArg();
-    }
-    if (arg.length() == 0) {
-      return arg();
-    }
-    return arg(arg.getBytes(enc));
-  }
-
-  /**
-   * Adds a String using a specific charset argument
-   * @return self
-   */
-  @Fluent
-  @GenIgnore
-  default Request arg(String arg, Charset charset) {
-    if (arg == null) {
-      return nullArg();
-    }
-    if (arg.length() == 0) {
-      return arg();
-    }
-    return arg(arg.getBytes(charset));
-  }
+  Request key(Buffer key);
 
   /**
    * Adds a long encoded to string
@@ -227,13 +159,6 @@ public interface Request {
    */
   @Fluent
   Request nullArg();
-
-  /**
-   * Adds a EMPTY encoded string
-   * @return self
-   */
-  @Fluent
-  Request arg();
 
   /**
    * Returns the key hash as a slot id, or -1 if not key is present.

@@ -1,6 +1,7 @@
 package io.vertx.redis.client.impl.types;
 
 import io.vertx.redis.client.Response;
+import io.vertx.redis.client.ResponseType;
 
 public final class SimpleStringType implements Response {
 
@@ -14,7 +15,18 @@ public final class SimpleStringType implements Response {
     this.message = message;
   }
 
-  public String getString() {
+  @Override
+  public ResponseType type() {
+    return ResponseType.SIMPLE;
+  }
+
+  @Override
+  public String string() {
+    return message;
+  }
+
+  @Override
+  public String toString() {
     return message;
   }
 }

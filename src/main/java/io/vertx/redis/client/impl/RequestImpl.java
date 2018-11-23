@@ -1,18 +1,13 @@
 package io.vertx.redis.client.impl;
 
-import io.netty.buffer.ByteBuf;
-import io.netty.handler.codec.redis.ArrayRedisMessage;
-import io.netty.handler.codec.redis.FullBulkStringRedisMessage;
-import io.netty.handler.codec.redis.RedisMessage;
+import io.vertx.core.buffer.Buffer;
 import io.vertx.redis.client.Request;
 import io.vertx.redis.client.Command;
 import io.vertx.redis.impl.ZModem;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.util.Objects;
-
-import static io.netty.buffer.Unpooled.*;
 
 public final class RequestImpl implements Request {
 
@@ -23,6 +18,10 @@ public final class RequestImpl implements Request {
   // percentage of numbers passed over the wire.
   private static final int NUM_MAP_LENGTH = 256;
   private static final byte[][] NUM_MAP = new byte[NUM_MAP_LENGTH][];
+
+  private static final byte[] EMPTY_BULK = "$0\r\n\r\n".getBytes(StandardCharsets.US_ASCII);
+  private static final byte[] NULL_BULK = "$-1\r\n".getBytes(StandardCharsets.US_ASCII);
+  private static final byte[] EOL = "\r\n".getBytes(StandardCharsets.US_ASCII);
 
   static {
     for (int i = 0; i < NUM_MAP_LENGTH; i++) {
@@ -52,7 +51,7 @@ public final class RequestImpl implements Request {
   }
 
   // Optimized for the direct to ASCII bytes case
-  // About 5x faster than using Long.toString.getBytes
+  // About 5x faster than using Long.toString.bytes
   private static byte[] numToBytes(long value) {
     if (value >= 0 && value < NUM_MAP_LENGTH) {
       int index = (int) value;
@@ -63,14 +62,13 @@ public final class RequestImpl implements Request {
     return convert(value);
   }
 
-  private final List<RedisMessage> parts;
+  private final Buffer nakedBuffer = Buffer.buffer();
+  private int elements = 0;
   private int slot = -1;
   private boolean readOnly;
 
   public RequestImpl(String command) {
     Objects.requireNonNull(command, "command");
-
-    parts = new ArrayList<>();
 
     final String[] parts = command.split(" ");
 
@@ -81,16 +79,19 @@ public final class RequestImpl implements Request {
 
   public RequestImpl(Command commandEnum) {
     // we have a hint how many parts this message will contain
-    parts = new ArrayList<>(commandEnum.lengthHint());
-    for (byte[] part : commandEnum.tokens()) {
-      arg(wrappedBuffer(part));
+    final byte[][] tokens = commandEnum.tokens();
+    // initial elements
+    elements = tokens.length;
+
+    for (int i = 0; i < elements; i++) {
+      nakedBuffer.appendBytes(tokens[i]);
     }
   }
 
   // key management - keys are redis strings
 
   @Override
-  public Request key(ByteBuf key) {
+  public Request key(String key) {
     arg(key);
     this.slot = ZModem.generate(key);
     return this;
@@ -98,6 +99,13 @@ public final class RequestImpl implements Request {
 
   @Override
   public Request key(byte[] key) {
+    arg(key);
+    this.slot = ZModem.generate(key);
+    return this;
+  }
+
+  @Override
+  public Request key(Buffer key) {
     arg(key);
     this.slot = ZModem.generate(key);
     return this;
@@ -134,28 +142,8 @@ public final class RequestImpl implements Request {
 
   @Override
   public Request nullArg() {
-    parts.add(FullBulkStringRedisMessage.NULL_INSTANCE);
-    return this;
-  }
-
-  // empty
-
-  @Override
-  public Request arg() {
-    parts.add(FullBulkStringRedisMessage.EMPTY_INSTANCE);
-    return this;
-  }
-
-  // bulk string
-
-  @Override
-  public Request arg(ByteBuf arg) {
-    if (arg == null) {
-      parts.add(FullBulkStringRedisMessage.NULL_INSTANCE);
-      return this;
-    }
-
-    parts.add(new FullBulkStringRedisMessage(arg));
+    nakedBuffer.appendBytes(NULL_BULK);
+    elements++;
     return this;
   }
 
@@ -164,15 +152,108 @@ public final class RequestImpl implements Request {
   @Override
   public Request arg(byte[] arg) {
     if (arg == null) {
-      parts.add(FullBulkStringRedisMessage.NULL_INSTANCE);
+      nakedBuffer.appendBytes(NULL_BULK);
+      elements++;
       return this;
     }
 
-    parts.add(new FullBulkStringRedisMessage(wrappedBuffer(arg)));
+    if (arg.length == 0) {
+      nakedBuffer.appendBytes(EMPTY_BULK);
+      elements++;
+      return this;
+    }
+
+    nakedBuffer.appendByte((byte) '$');
+    nakedBuffer.appendBytes(numToBytes(arg.length));
+    nakedBuffer.appendBytes(EOL);
+    nakedBuffer.appendBytes(arg);
+    nakedBuffer.appendBytes(EOL);
+    elements++;
     return this;
   }
 
-  RedisMessage message() {
-    return new ArrayRedisMessage(parts);
+  @Override
+  public Request arg(String arg) {
+    if (arg == null) {
+      nakedBuffer.appendBytes(NULL_BULK);
+      elements++;
+      return this;
+    }
+
+    if (arg.length() == 0) {
+      nakedBuffer.appendBytes(EMPTY_BULK);
+      elements++;
+      return this;
+    }
+
+    nakedBuffer.appendByte((byte) '$');
+    final byte[] bytes = arg.getBytes(StandardCharsets.UTF_8);
+    nakedBuffer.appendBytes(numToBytes(bytes.length));
+    nakedBuffer.appendBytes(EOL);
+    nakedBuffer.appendBytes(bytes);
+    nakedBuffer.appendBytes(EOL);
+    elements++;
+    return this;
+  }
+
+  @Override
+  public Request arg(String arg, String charset) {
+    if (arg == null) {
+      nakedBuffer.appendBytes(NULL_BULK);
+      elements++;
+      return this;
+    }
+
+    if (arg.length() == 0) {
+      nakedBuffer.appendBytes(EMPTY_BULK);
+      elements++;
+      return this;
+    }
+
+    nakedBuffer.appendByte((byte) '$');
+    final byte[] bytes = arg.getBytes(Charset.forName(charset));
+    nakedBuffer.appendBytes(numToBytes(bytes.length));
+    nakedBuffer.appendBytes(EOL);
+    nakedBuffer.appendBytes(bytes);
+    nakedBuffer.appendBytes(EOL);
+    elements++;
+    return this;
+  }
+
+  @Override
+  public Request arg(Buffer arg) {
+    if (arg == null) {
+      nakedBuffer.appendBytes(NULL_BULK);
+      elements++;
+      return this;
+    }
+
+    if (arg.length() == 0) {
+      nakedBuffer.appendBytes(EMPTY_BULK);
+      elements++;
+      return this;
+    }
+
+    nakedBuffer.appendByte((byte) '$');
+    nakedBuffer.appendBytes(numToBytes(arg.length()));
+    nakedBuffer.appendBytes(EOL);
+    nakedBuffer.appendBuffer(arg);
+    nakedBuffer.appendBytes(EOL);
+
+    elements++;
+    return this;
+  }
+
+  Buffer encode() {
+    final byte[] len = numToBytes(elements);
+    // we know for sure the final size
+    final Buffer encoded = Buffer.buffer(1 + len.length + 2 + nakedBuffer.length());
+    encoded
+      .appendByte((byte) '*')
+      .appendBytes(len)
+      .appendBytes(EOL)
+      .appendBuffer(nakedBuffer);
+
+    return encoded;
   }
 }

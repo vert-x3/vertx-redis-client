@@ -274,7 +274,9 @@ public enum Command {
     final String[] parts = command.split(" ");
     tokens = new byte[parts.length][];
     for (int i = 0; i < parts.length; i++) {
-      tokens[i] = parts[i].getBytes(StandardCharsets.UTF_8);
+      final String part = parts[i];
+      final String encodedToken = "$" + part.length() + "\r\n" + part + "\r\n";
+      tokens[i] = encodedToken.getBytes(StandardCharsets.US_ASCII);
     }
     // precompute the hint
     lengthHint = parts.length + argumentsHint;
