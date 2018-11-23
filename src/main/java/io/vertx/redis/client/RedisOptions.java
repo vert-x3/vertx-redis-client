@@ -1,6 +1,7 @@
 package io.vertx.redis.client;
 
 import io.vertx.codegen.annotations.DataObject;
+import io.vertx.core.json.JsonObject;
 import io.vertx.core.net.NetClientOptions;
 import io.vertx.core.net.SocketAddress;
 import io.vertx.redis.RedisRole;
@@ -19,14 +20,13 @@ public class RedisOptions {
   private RedisRole role;
   private RedisSlaves slaves;
 
-
   private void init() {
     netClientOptions =
       new NetClientOptions()
         .setTcpKeepAlive(true)
         .setTcpNoDelay(true);
 
-    maxWaitingHandlers = 500;
+    maxWaitingHandlers = 1024;
     masterName = "mymaster";
     role = RedisRole.MASTER;
     slaves = RedisSlaves.NEVER;
@@ -34,6 +34,20 @@ public class RedisOptions {
 
   public RedisOptions() {
     init();
+  }
+
+  public RedisOptions(RedisOptions other) {
+    this.netClientOptions = other.netClientOptions;
+    this.endpoints = other.endpoints;
+    this.maxWaitingHandlers = other.maxWaitingHandlers;
+    this.masterName = other.masterName;
+    this.role = other.role;
+    this.slaves = other.slaves;
+  }
+
+  public RedisOptions(JsonObject json) {
+    init();
+    RedisOptionsConverter.fromJson(json, this);
   }
 
   public NetClientOptions getNetClientOptions() {
@@ -115,5 +129,11 @@ public class RedisOptions {
   public RedisOptions setUseSlave(RedisSlaves slaves) {
     this.slaves = slaves;
     return this;
+  }
+
+  public JsonObject toJson() {
+    final JsonObject json = new JsonObject();
+    RedisOptionsConverter.toJson(this, json);
+    return json;
   }
 }
