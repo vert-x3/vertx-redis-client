@@ -90,7 +90,7 @@ public class Command<T> {
   }
 
   // Optimized for the direct to ASCII bytes case
-  // About 5x faster than using Long.toString.getBytes
+  // About 5x faster than using Long.toString.bytes
   private static byte[] numToBytes(long value) {
     if (value >= 0 && value < NUM_MAP_LENGTH) {
       int index = (int) value;

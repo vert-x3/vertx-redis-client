@@ -582,7 +582,7 @@ public abstract class RedisClientTestBase extends VertxTestBase {
   //            redis.dump(j(mykey), reply1 -> {
   //                assertTrue(reply1.succeeded());
   //                try {
-  //                    byte[] data = reply1.result().getBytes("ISO-8859-1");
+  //                    byte[] data = reply1.result().bytes("ISO-8859-1");
   //
   //                    assertEquals(data[0], (byte) 0);
   //                    assertEquals(data[1], (byte) 0xc0);

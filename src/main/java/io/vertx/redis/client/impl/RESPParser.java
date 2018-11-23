@@ -27,6 +27,9 @@ import java.nio.charset.StandardCharsets;
 
 public final class RESPParser implements Handler<Buffer> {
 
+  private static final Response OK = SimpleStringType.create("OK");
+
+  // limit of integer parsing before overflowing
   private static final long MAX_INTEGER_DIV_10 = Long.MAX_VALUE / 10;
   // 512Mb
   private static final long MAX_STRING_LENGTH = 536870912;
@@ -70,7 +73,6 @@ public final class RESPParser implements Handler<Buffer> {
         final byte type = buffer.readByte();
 
         int start, end, index;
-        String content;
         long integer;
 
         switch (type) {
@@ -90,22 +92,27 @@ public final class RESPParser implements Handler<Buffer> {
               break loop;
             }
             // create a message from the available content (simple strings are not binary safe)
-            content = buffer.toString(start, index - start, StandardCharsets.US_ASCII);
-            // clean up the buffer
-            buffer.readerIndex(start + index - start + 2);
-            // TODO: validate the skipped bytes to be \r\n
-
             switch (type) {
               case '+':
-                handleResponse(SimpleStringType.create(content));
+                // special case OK
+                if (end == 2 && buffer.getByte(start) == 'O' && buffer.getByte(start + 1) == 'K') {
+                  handleResponse(OK);
+                } else {
+                  handleResponse(SimpleStringType.create(buffer.toString(start, index - start, StandardCharsets.ISO_8859_1)));
+                }
                 break;
               case '-':
-                handleResponse(ErrorType.create(content));
+                handleResponse(ErrorType.create(buffer.toString(start, index - start, StandardCharsets.ISO_8859_1)));
                 break;
               default:
                 throw new IllegalStateException();
             }
+
+            // clean up the buffer
+            buffer.readerIndex(start + index - start + 2);
+            // TODO: validate the skipped bytes to be \r\n
             break;
+
           case ':':
           case '$':
           case '*':
@@ -248,6 +255,10 @@ public final class RESPParser implements Handler<Buffer> {
           }
           // peek into the next entry
           m = stack.peek();
+
+          if (m == null) {
+            throw new IllegalStateException();
+          }
         }
       }
     } else {

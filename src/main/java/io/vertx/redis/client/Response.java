@@ -16,23 +16,23 @@ public interface Response {
   }
 
   default long int64() {
-    throw new UnsupportedOperationException("This types doesn't hold an Integer type");
+    return Long.parseLong(string());
   }
 
   default int int32() {
-    throw new UnsupportedOperationException("This types doesn't hold an Integer type");
+    return Integer.parseInt(string());
   }
 
   default short int16() {
-    throw new UnsupportedOperationException("This types doesn't hold an Integer type");
+    return Short.parseShort(string());
   }
 
   default byte int8() {
-    throw new UnsupportedOperationException("This types doesn't hold an Integer type");
+    return Byte.parseByte(string());
   }
 
   default boolean bool() {
-    throw new UnsupportedOperationException("This types doesn't hold an Integer type");
+    return 1L == int64();
   }
 
   @GenIgnore

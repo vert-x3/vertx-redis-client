@@ -42,7 +42,7 @@ public class RedisCommandImpl implements RedisCommand {
   private boolean readOnly = false;
 
   // Optimized for the direct to ASCII bytes case
-  // About 5x faster than using Long.toString.getBytes
+  // About 5x faster than using Long.toString.bytes
   public static byte[] numToBytes(long value) {
     if (value >= 0 && value < NUM_MAP_LENGTH) {
       int index = (int) value;
@@ -118,7 +118,7 @@ public class RedisCommandImpl implements RedisCommand {
   @Override
   public RedisCommand key(ByteBuf key) {
     arg(key);
-    this.slot = ZModem.generate(key);
+    this.slot = ZModem.generate(Buffer.buffer(key));
     return this;
   }
 

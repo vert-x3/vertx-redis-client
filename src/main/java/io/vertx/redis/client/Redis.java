@@ -6,29 +6,44 @@ import io.vertx.codegen.annotations.VertxGen;
 import io.vertx.core.AsyncResult;
 import io.vertx.core.Handler;
 import io.vertx.core.Vertx;
-import io.vertx.core.net.NetClientOptions;
 import io.vertx.core.net.SocketAddress;
 import io.vertx.core.streams.ReadStream;
-import io.vertx.redis.client.impl.RedisClientImpl;
+import io.vertx.redis.client.impl.RedisFactory;
+
+import java.util.List;
 
 /**
  * A simple Redis client.
  */
 @VertxGen
-public interface RedisClient extends ReadStream<Response> {
+public interface Redis extends ReadStream<Response> {
 
   /**
-   * Connect to redis, the {@code onConnect} will get the {@link RedisClient} instance.
+   * Connect to redis, the {@code onConnect} will get the {@link Redis} instance.
    */
-  static void connect(Vertx vertx, SocketAddress address, Handler<AsyncResult<RedisClient>> onConnect) {
-    connect(vertx, address, new NetClientOptions().setTcpKeepAlive(true).setTcpNoDelay(true), onConnect);
+  static void createClient(Vertx vertx, SocketAddress address, Handler<AsyncResult<Redis>> onCreate) {
+    createClient(vertx, new RedisOptions().setEndpoint(address), onCreate);
   }
 
   /**
-   * Connect to redis, the {@code onConnect} will get the {@link RedisClient} instance.
+   * Connect to redis, the {@code onConnect} will get the {@link Redis} instance.
    */
-  static void connect(Vertx vertx, SocketAddress address, NetClientOptions options, Handler<AsyncResult<RedisClient>> onConnect) {
-    RedisClientImpl.connect(vertx, address, options, onConnect);
+  static void createClient(Vertx vertx, RedisOptions options, Handler<AsyncResult<Redis>> onCreate) {
+    RedisFactory.createClient(vertx, options.getEndpoint(), options, onCreate);
+  }
+
+  /**
+   * Connect to redis, the {@code onConnect} will get the {@link Redis} instance.
+   */
+  static void createSentinelClient(Vertx vertx, RedisOptions options, Handler<AsyncResult<Redis>> onCreate) {
+    RedisFactory.createSentinelClient(vertx, options, onCreate);
+  }
+
+  /**
+   * Connect to redis, the {@code onConnect} will get the {@link Redis} instance.
+   */
+  static void createClusterClient(Vertx vertx, RedisOptions options, Handler<AsyncResult<Redis>> onCreate) {
+    RedisFactory.createClusterClient(vertx, options, onCreate);
   }
 
   /**
@@ -37,7 +52,7 @@ public interface RedisClient extends ReadStream<Response> {
    * @param handler  the exception handler
    * @return a reference to this, so the API can be used fluently
    */
-  RedisClient exceptionHandler(Handler<Throwable> handler);
+  Redis exceptionHandler(Handler<Throwable> handler);
 
   /**
    * Set a data handler. As data is read, the handler will be called with the data.
@@ -45,7 +60,7 @@ public interface RedisClient extends ReadStream<Response> {
    * @return a reference to this, so the API can be used fluently
    */
   @Fluent
-  RedisClient handler(Handler<Response> handler);
+  Redis handler(Handler<Response> handler);
 
   /**
    * Pause the {@code ReadStream}, it sets the buffer in {@code fetch} mode and clears the actual demand.
@@ -55,7 +70,7 @@ public interface RedisClient extends ReadStream<Response> {
    * @return a reference to this, so the API can be used fluently
    */
   @Fluent
-  RedisClient pause();
+  Redis pause();
 
   /**
    * Resume reading, and sets the buffer in {@code flowing} mode.
@@ -65,7 +80,7 @@ public interface RedisClient extends ReadStream<Response> {
    * @return a reference to this, so the API can be used fluently
    */
   @Fluent
-  RedisClient resume();
+  Redis resume();
 
   /**
    * Fetch the specified {@code amount} of elements. If the {@code ReadStream} has been paused, reading will
@@ -75,7 +90,7 @@ public interface RedisClient extends ReadStream<Response> {
    * @return a reference to this, so the API can be used fluently
    */
   @Fluent
-  RedisClient fetch(long amount);
+  Redis fetch(long amount);
 
   /**
    * Set an end handler. Once the stream has ended, and there is no more data to be read, this handler will be called.
@@ -83,11 +98,14 @@ public interface RedisClient extends ReadStream<Response> {
    * @return a reference to this, so the API can be used fluently
    */
   @Fluent
-  RedisClient endHandler(@Nullable Handler<Void> endHandler);
+  Redis endHandler(@Nullable Handler<Void> endHandler);
 
 
   @Fluent
-  RedisClient send(Request command, Handler<AsyncResult<Response>> onSend);
+  Redis send(Request command, Handler<AsyncResult<Response>> onSend);
+
+  @Fluent
+  Redis batch(List<Request> commands, Handler<AsyncResult<List<Response>>> handler);
 
 
   /**

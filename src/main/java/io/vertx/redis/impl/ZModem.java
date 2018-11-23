@@ -1,6 +1,6 @@
 package io.vertx.redis.impl;
 
-import io.netty.buffer.ByteBuf;
+import io.vertx.core.buffer.Buffer;
 
 import java.nio.charset.StandardCharsets;
 import java.util.List;
@@ -102,21 +102,13 @@ public class ZModem {
    * @param buffer buffer
    * @return hash
    */
-  public static int generate(ByteBuf buffer) {
-    return generate(buffer, 0, buffer.writerIndex());
-  }
-
-  /**
-   * Convert a buffer into a redis slot hash.
-   * @param buffer buffer
-   * @return hash
-   */
-  public static int generate(ByteBuf buffer, int _start, int length) {
+  public static int generate(Buffer buffer) {
     int ch;
-    int i = _start;
+    int i = 0;
     int start = -1;
     int result = 0;
     int resultHash = 0;
+    int length = buffer.length();
 
     while (i < length) {
       ch = buffer.getByte(i++);

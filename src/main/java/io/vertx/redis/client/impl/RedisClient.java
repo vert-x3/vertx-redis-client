@@ -5,24 +5,25 @@ import io.vertx.core.buffer.Buffer;
 import io.vertx.core.logging.Logger;
 import io.vertx.core.logging.LoggerFactory;
 import io.vertx.core.net.NetClient;
-import io.vertx.core.net.NetClientOptions;
 import io.vertx.core.net.NetSocket;
 import io.vertx.core.net.SocketAddress;
-import io.vertx.redis.client.RedisClient;
-import io.vertx.redis.client.Request;
-import io.vertx.redis.client.Response;
-import io.vertx.redis.client.ResponseType;
+import io.vertx.redis.client.*;
 import io.vertx.redis.client.impl.types.ErrorType;
-import io.vertx.redis.impl.client.RedisConnectionImpl;
 
-public class RedisClientImpl implements RedisClient, Handler<Response> {
+import java.util.ArrayList;
+import java.util.List;
+import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicInteger;
 
-  private static final Logger LOG = LoggerFactory.getLogger(RedisConnectionImpl.class);
+public class RedisClient implements Redis, Handler<Response> {
+
+  private static final Logger LOG = LoggerFactory.getLogger(RedisClient.class);
 
   private static final ErrorType CONNECTION_BROKEN = ErrorType.create("CONNECTION_BROKEN");
 
-  public static void connect(Vertx vertx, SocketAddress address, NetClientOptions options, Handler<AsyncResult<RedisClient>> onConnect) {
-    final NetClient netClient = vertx.createNetClient(options);
+  public static void create(Vertx vertx, SocketAddress address, RedisOptions options, Handler<AsyncResult<Redis>> onConnect) {
+    final NetClient netClient = vertx.createNetClient(options.getNetClientOptions());
+    final int maxWaitingQueue = options.getMaxWaitingHandlers();
 
     netClient.connect(address, clientConnect -> {
       if (clientConnect.failed()) {
@@ -35,7 +36,7 @@ public class RedisClientImpl implements RedisClient, Handler<Response> {
       // socket connection succeeded
       onConnect.handle(
         Future.succeededFuture(
-          new RedisClientImpl(200, netClient, clientConnect.result(), address)));
+          new RedisClient(maxWaitingQueue, netClient, clientConnect.result(), address)));
     });
   }
 
@@ -51,7 +52,7 @@ public class RedisClientImpl implements RedisClient, Handler<Response> {
   private Handler<Void> onEnd;
   private Handler<Response> onMessage;
 
-  RedisClientImpl(int maxQueue, NetClient netClient, NetSocket netSocket, SocketAddress endpoint) {
+  private RedisClient(int maxQueue, NetClient netClient, NetSocket netSocket, SocketAddress endpoint) {
     this.waiting = new ArrayQueue(maxQueue);
     this.netSocket = netSocket;
     this.socketAddress = endpoint;
@@ -86,37 +87,37 @@ public class RedisClientImpl implements RedisClient, Handler<Response> {
   }
 
   @Override
-  public RedisClient exceptionHandler(Handler<Throwable> handler) {
+  public Redis exceptionHandler(Handler<Throwable> handler) {
     this.onException = handler;
     return this;
   }
 
   @Override
-  public RedisClient endHandler(Handler<Void> handler) {
+  public Redis endHandler(Handler<Void> handler) {
     this.onEnd = handler;
     return this;
   }
 
   @Override
-  public RedisClient handler(Handler<Response> handler) {
+  public Redis handler(Handler<Response> handler) {
     this.onMessage = handler;
     return this;
   }
 
   @Override
-  public RedisClient pause() {
+  public Redis pause() {
     netSocket.pause();
     return this;
   }
 
   @Override
-  public RedisClient resume() {
+  public Redis resume() {
     netSocket.resume();
     return this;
   }
 
   @Override
-  public RedisClient fetch(long size) {
+  public Redis fetch(long size) {
     // no-op
     return this;
   }
@@ -134,7 +135,7 @@ public class RedisClientImpl implements RedisClient, Handler<Response> {
   }
 
   @Override
-  public RedisClient send(final Request request, Handler<AsyncResult<Response>> handler) {
+  public Redis send(final Request request, Handler<AsyncResult<Response>> handler) {
     if (waiting.isFull()) {
       handler.handle(Future.failedFuture("Redis waiting Queue is full"));
       return this;
@@ -153,10 +154,73 @@ public class RedisClientImpl implements RedisClient, Handler<Response> {
   }
 
   @Override
+  public Redis batch(List<Request> commands, Handler<AsyncResult<List<Response>>> handler) {
+    if (waiting.freeSlots() < commands.size()) {
+      handler.handle(Future.failedFuture("Redis waiting Queue is full"));
+      return this;
+    }
+
+    // will re-encode the handler into a list of handlers
+    final List<Handler<AsyncResult<Response>>> callbacks = new ArrayList<>(commands.size());
+    final List<Response> replies = new ArrayList<>(commands.size());
+    final AtomicInteger count = new AtomicInteger(commands.size());
+    final AtomicBoolean failed = new AtomicBoolean(false);
+
+    // encode the message to a single buffer
+    final Buffer messages = Buffer.buffer();
+
+    for (int i = 0; i < commands.size(); i++) {
+      final int index = i;
+      final RequestImpl req = (RequestImpl) commands.get(i);
+      // encode to the single buffer
+      req.encode(messages);
+      // unwrap the handler into a single handler
+      callbacks.add(i, command -> {
+        if (!failed.get()) {
+          if (command.failed()) {
+            failed.set(true);
+            if (handler != null) {
+              handler.handle(Future.failedFuture(command.cause()));
+            }
+            return;
+          }
+          // set the reply
+          replies.add(index, command.result());
+
+          if (count.decrementAndGet() == 0) {
+            // all results have arrived
+            if (handler != null) {
+              handler.handle(Future.succeededFuture(replies));
+            }
+          }
+        }
+      });
+    }
+
+    // write to the socket
+    netSocket.write(messages, write -> {
+      if (write.succeeded()) {
+        for (Handler<AsyncResult<Response>> callback : callbacks) {
+          waiting.offer(callback);
+        }
+      } else {
+        handler.handle(Future.failedFuture(write.cause()));
+      }
+    });
+
+    return this;
+  }
+
+
+  @Override
   public void handle(Response reply) {
     // pub/sub mode
-    if (waiting.isEmpty() && onMessage != null) {
-      onMessage.handle(reply);
+    if (waiting.isEmpty()) {
+      if (onMessage != null) {
+        onMessage.handle(reply);
+      } else {
+        LOG.warn("No handler waiting for message: " + reply);
+      }
       return;
     }
 
@@ -177,5 +241,13 @@ public class RedisClientImpl implements RedisClient, Handler<Response> {
   @Override
   public SocketAddress socketAddress() {
     return socketAddress;
+  }
+
+  void fail(Throwable t) {
+    if (onException != null) {
+      onException.handle(t);
+    } else {
+      LOG.error("External failure", t);
+    }
   }
 }

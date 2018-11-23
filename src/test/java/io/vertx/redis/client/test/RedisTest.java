@@ -5,15 +5,17 @@ import io.vertx.ext.unit.Async;
 import io.vertx.ext.unit.TestContext;
 import io.vertx.ext.unit.junit.RunTestOnContext;
 import io.vertx.ext.unit.junit.VertxUnitRunner;
-import io.vertx.redis.Redis;
+import io.vertx.redis.client.Command;
+import io.vertx.redis.client.Redis;
+import io.vertx.redis.client.Request;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
-import static io.vertx.redis.RedisCommand.cmd;
-import static io.vertx.redis.RedisCommandEnum.*;
-
 import java.util.Arrays;
+
+import static io.vertx.redis.client.Command.*;
+import static io.vertx.redis.client.Request.*;
 
 @RunWith(VertxUnitRunner.class)
 public class RedisTest {
@@ -25,43 +27,39 @@ public class RedisTest {
   public void simpleTest(TestContext should) {
     final Async test = should.async();
 
-    final Redis redis = Redis
-      .create(rule.vertx(), SocketAddress.inetSocketAddress(7006, "127.0.0.1"));
+    Redis.createClient(rule.vertx(), SocketAddress.inetSocketAddress(7006, "127.0.0.1"), create -> {
+      should.assertTrue(create.succeeded());
 
-    redis
-      .connect(open -> {
-        should.assertTrue(open.succeeded());
+      final Redis redis = create.result();
 
-        redis.send("ping", send -> {
-          should.assertTrue(send.succeeded());
-          should.assertNotNull(send.result());
+      redis.send(Request.cmd(Command.PING), send -> {
+        should.assertTrue(send.succeeded());
+        should.assertNotNull(send.result());
 
-          should.assertEquals("PONG", send.result().asString());
-          test.complete();
-        });
+        should.assertEquals("PONG", send.result().string());
+        test.complete();
       });
+    });
   }
 
   @Test
   public void batchTest(TestContext should) {
     final Async test = should.async();
 
-    final Redis redis = Redis
-      .create(rule.vertx(), SocketAddress.inetSocketAddress(7006, "127.0.0.1"));
+    Redis.createClient(rule.vertx(), SocketAddress.inetSocketAddress(7006, "127.0.0.1"), create -> {
+      should.assertTrue(create.succeeded());
 
-    redis
-      .connect(open -> {
-        should.assertTrue(open.succeeded());
+      final Redis redis = create.result();
 
-        redis.batch(Arrays.asList(
-          cmd(MULTI),
-          cmd(SET).arg("a").arg(3),
-          cmd(LPOP).arg("a"),
-          cmd(EXEC)
-        ), batch -> {
-          should.assertTrue(batch.succeeded());
-          test.complete();
-        });
+      redis.batch(Arrays.asList(
+        cmd(MULTI),
+        cmd(SET).arg("a").arg(3),
+        cmd(LPOP).arg("a"),
+        cmd(EXEC)
+      ), batch -> {
+        should.assertTrue(batch.succeeded());
+        test.complete();
       });
+    });
   }
 }

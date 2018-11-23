@@ -698,6 +698,21 @@ Feet
 |[[SOFT]]`SOFT`|-
 |===
 
+[[ResponseType]]
+== ResponseType
+
+
+[cols=">25%,75%"]
+[frame="topbot"]
+|===
+^|Name | Description
+|[[SIMPLE]]`SIMPLE`|-
+|[[ERROR]]`ERROR`|-
+|[[INTEGER]]`INTEGER`|-
+|[[BULK]]`BULK`|-
+|[[MULTI]]`MULTI`|-
+|===
+
 [[ScriptDebugOptions]]
 == ScriptDebugOptions
 

@@ -48,12 +48,11 @@ final class ArrayQueue {
   /**
    * Returns the first element in the queue.
    *
-   * @return element at front of the queue
-   * @throws NoSuchElementException if the queue is empty.
+   * @return element at front of the queue, null if empty.
    */
   <T> T peek() {
     if (isEmpty()) {
-      throw new NoSuchElementException();
+      return null;
     } else {
       return (T) queue[front % queue.length];
     }
@@ -73,17 +72,8 @@ final class ArrayQueue {
     return e;
   }
 
-  /**
-   * Makes the queue physically empty.
-   */
-  void clear() {
-    for (int i = 0; i < queue.length; i++) {
-      queue[i] = null;
-    }
-
-    cur = 0;
-    back = -1;
-    front = 0;
+  int freeSlots() {
+    return queue.length - cur;
   }
 
   /**

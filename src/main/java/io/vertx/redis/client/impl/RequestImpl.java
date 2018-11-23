@@ -256,4 +256,12 @@ public final class RequestImpl implements Request {
 
     return encoded;
   }
+
+  void encode(Buffer encoded) {
+    encoded
+      .appendByte((byte) '*')
+      .appendBytes(numToBytes(elements))
+      .appendBytes(EOL)
+      .appendBuffer(nakedBuffer);
+  }
 }
