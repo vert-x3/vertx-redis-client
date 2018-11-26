@@ -51,7 +51,7 @@ public class RedisSentinelClient implements Redis {
       sentinel
         .handler(msg -> {
           if (msg.type() == ResponseType.MULTI) {
-            if ("MESSAGE".equalsIgnoreCase(msg.get(0).string())) {
+            if ("MESSAGE".equalsIgnoreCase(msg.get(0).toString())) {
               // we don't care about the payload
               if (redis != null) {
                 redis.fail(ErrorType.create("SWITCH-MASTER Received +switch-master message from Redis Sentinel."));
@@ -265,7 +265,7 @@ public class RedisSentinelClient implements Redis {
         final Response response = getMasterAddrByName.result();
 
         handler.handle(
-          Future.succeededFuture(SocketAddress.inetSocketAddress(response.get(1).int32(), response.get(0).string())));
+          Future.succeededFuture(SocketAddress.inetSocketAddress(response.get(1).toInteger(), response.get(0).toString())));
 
         // we don't need this connection anymore
         conn.close();
@@ -304,11 +304,11 @@ public class RedisSentinelClient implements Redis {
             String ip = null;
 
             for (int i = 0; i < slaveInfoArr.size(); i += 2) {
-              if ("port".equals(slaveInfoArr.get(i).string())) {
-                port = Integer.parseInt(slaveInfoArr.get(i + 1).string());
+              if ("port".equals(slaveInfoArr.get(i).toString())) {
+                port = slaveInfoArr.get(i + 1).toInteger();
               }
-              if ("ip".equals(slaveInfoArr.get(i).string())) {
-                ip = slaveInfoArr.get(i + 1).string();
+              if ("ip".equals(slaveInfoArr.get(i).toString())) {
+                ip = slaveInfoArr.get(i + 1).toString();
               }
             }
 

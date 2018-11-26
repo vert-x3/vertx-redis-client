@@ -52,7 +52,7 @@ public class RedisClusterTest {
           should.assertTrue(set.succeeded());
           cluster.send(cmd(GET).key(id), get -> {
             should.assertTrue(get.succeeded());
-            should.assertEquals(id, get.result().string());
+            should.assertEquals(id, get.result().toString());
 
             final int cnt = counter.incrementAndGet();
             if (cnt % 1024 == 0) {
@@ -95,7 +95,7 @@ public class RedisClusterTest {
           should.assertTrue(set.succeeded());
           cluster.send(cmd(GET).key(id), get -> {
             should.assertTrue(get.succeeded());
-            should.assertEquals(id, get.result().string());
+            should.assertEquals(id, get.result().toString());
 
             final int cnt = counter.incrementAndGet();
             if (cnt % 1024 == 0) {
@@ -136,7 +136,7 @@ public class RedisClusterTest {
           should.assertTrue(set.succeeded());
           cluster.send(cmd(GET).key(id), get -> {
             should.assertTrue(get.succeeded());
-            should.assertEquals(id, get.result().string());
+            should.assertEquals(id, get.result().toString());
 
             final int cnt = counter.incrementAndGet();
             if (cnt % 1024 == 0) {

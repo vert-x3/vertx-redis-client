@@ -19,6 +19,11 @@ public class RedisOptionsConverter {
             obj.setMasterName((String)member.getValue());
           }
           break;
+        case "maxNestedArrays":
+          if (member.getValue() instanceof Number) {
+            obj.setMaxNestedArrays(((Number)member.getValue()).intValue());
+          }
+          break;
         case "maxWaitingHandlers":
           if (member.getValue() instanceof Number) {
             obj.setMaxWaitingHandlers(((Number)member.getValue()).intValue());
@@ -51,6 +56,7 @@ public class RedisOptionsConverter {
     if (obj.getMasterName() != null) {
       json.put("masterName", obj.getMasterName());
     }
+    json.put("maxNestedArrays", obj.getMaxNestedArrays());
     json.put("maxWaitingHandlers", obj.getMaxWaitingHandlers());
     if (obj.getNetClientOptions() != null) {
       json.put("netClientOptions", obj.getNetClientOptions().toJson());

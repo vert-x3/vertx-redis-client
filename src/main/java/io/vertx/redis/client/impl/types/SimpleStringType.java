@@ -21,11 +21,6 @@ public final class SimpleStringType implements Response {
   }
 
   @Override
-  public String string() {
-    return message;
-  }
-
-  @Override
   public String toString() {
     return message;
   }

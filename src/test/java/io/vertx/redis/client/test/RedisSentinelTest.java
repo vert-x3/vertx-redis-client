@@ -38,7 +38,7 @@ public class RedisSentinelTest {
         onCreate.result()
           .send(Request.cmd(Command.INFO), info -> {
             should.assertTrue(info.succeeded());
-            should.assertTrue(info.result().string().contains("tcp_port:7000"));
+            should.assertTrue(info.result().toString().contains("tcp_port:7000"));
             test.complete();
           });
       });
@@ -63,7 +63,7 @@ public class RedisSentinelTest {
         onCreate.result()
           .send(Request.cmd(Command.INFO), info -> {
             should.assertTrue(info.succeeded());
-            should.assertTrue(info.result().string().contains("tcp_port:700"));
+            should.assertTrue(info.result().toString().contains("tcp_port:700"));
             test.complete();
           });
       });
@@ -88,7 +88,7 @@ public class RedisSentinelTest {
         onCreate.result()
           .send(Request.cmd(Command.INFO), info -> {
             should.assertTrue(info.succeeded());
-            String res = info.result().string();
+            String res = info.result().toString();
             System.out.println(res);
             should.assertTrue(res.contains("tcp_port:5000") || res.contains("tcp_port:5001") || res.contains("tcp_port:5002"));
             test.complete();

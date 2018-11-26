@@ -21,28 +21,8 @@ public final class IntegerType implements Response {
   }
 
   @Override
-  public long int64() {
+  public Long toLong() {
     return value;
-  }
-
-  @Override
-  public int int32() {
-    return value.intValue();
-  }
-
-  @Override
-  public short int16() {
-    return value.shortValue();
-  }
-
-  @Override
-  public byte int8() {
-    return value.byteValue();
-  }
-
-  @Override
-  public boolean bool() {
-    return value == 1L;
   }
 
   @Override

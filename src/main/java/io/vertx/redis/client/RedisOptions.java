@@ -16,6 +16,7 @@ public class RedisOptions {
   private NetClientOptions netClientOptions;
   private List<SocketAddress> endpoints;
   private int maxWaitingHandlers;
+  private int maxNestedArrays;
   private String masterName;
   private RedisRole role;
   private RedisSlaves slaves;
@@ -27,6 +28,7 @@ public class RedisOptions {
         .setTcpNoDelay(true);
 
     maxWaitingHandlers = 1024;
+    maxNestedArrays = 32;
     masterName = "mymaster";
     role = RedisRole.MASTER;
     slaves = RedisSlaves.NEVER;
@@ -40,6 +42,7 @@ public class RedisOptions {
     this.netClientOptions = other.netClientOptions;
     this.endpoints = other.endpoints;
     this.maxWaitingHandlers = other.maxWaitingHandlers;
+    this.maxNestedArrays = other.maxNestedArrays;
     this.masterName = other.masterName;
     this.role = other.role;
     this.slaves = other.slaves;
@@ -128,6 +131,16 @@ public class RedisOptions {
 
   public RedisOptions setUseSlave(RedisSlaves slaves) {
     this.slaves = slaves;
+    return this;
+  }
+
+
+  public int getMaxNestedArrays() {
+    return maxNestedArrays;
+  }
+
+  public RedisOptions setMaxNestedArrays(int maxNestedArrays) {
+    this.maxNestedArrays = maxNestedArrays;
     return this;
   }
 

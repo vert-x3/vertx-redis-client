@@ -24,6 +24,7 @@ public class RedisClient implements Redis, Handler<Response> {
   public static void create(Vertx vertx, SocketAddress address, RedisOptions options, Handler<AsyncResult<Redis>> onConnect) {
     final NetClient netClient = vertx.createNetClient(options.getNetClientOptions());
     final int maxWaitingQueue = options.getMaxWaitingHandlers();
+    final int maxNesting = options.getMaxNestedArrays();
 
     netClient.connect(address, clientConnect -> {
       if (clientConnect.failed()) {
@@ -36,7 +37,7 @@ public class RedisClient implements Redis, Handler<Response> {
       // socket connection succeeded
       onConnect.handle(
         Future.succeededFuture(
-          new RedisClient(maxWaitingQueue, netClient, clientConnect.result(), address)));
+          new RedisClient(maxWaitingQueue, maxNesting, netClient, clientConnect.result(), address)));
     });
   }
 
@@ -52,14 +53,14 @@ public class RedisClient implements Redis, Handler<Response> {
   private Handler<Void> onEnd;
   private Handler<Response> onMessage;
 
-  private RedisClient(int maxQueue, NetClient netClient, NetSocket netSocket, SocketAddress endpoint) {
+  private RedisClient(int maxQueue, int maxNesting, NetClient netClient, NetSocket netSocket, SocketAddress endpoint) {
     this.waiting = new ArrayQueue(maxQueue);
     this.netSocket = netSocket;
     this.socketAddress = endpoint;
 
     // parser utility
     netSocket
-      .handler(new RESPParser(this))
+      .handler(new RESPParser(this, maxNesting))
       .closeHandler(close -> {
         netClient.close();
         // clean up the pending queue
@@ -171,11 +172,11 @@ public class RedisClient implements Redis, Handler<Response> {
 
     for (int i = 0; i < commands.size(); i++) {
       final int index = i;
-      final RequestImpl req = (RequestImpl) commands.get(i);
+      final RequestImpl req = (RequestImpl) commands.get(index);
       // encode to the single buffer
       req.encode(messages);
       // unwrap the handler into a single handler
-      callbacks.add(i, command -> {
+      callbacks.add(index, command -> {
         if (!failed.get()) {
           if (command.failed()) {
             failed.set(true);

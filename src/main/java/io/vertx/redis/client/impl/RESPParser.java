@@ -27,11 +27,14 @@ import java.nio.charset.StandardCharsets;
 
 public final class RESPParser implements Handler<Buffer> {
 
+  // precache OK response as it is used widely and immutable
+  // we reduce the GC pressure specially for write operations
+  // as REDIS on the happy flow always returns this message
   private static final Response OK = SimpleStringType.create("OK");
 
   // limit of integer parsing before overflowing
   private static final long MAX_INTEGER_DIV_10 = Long.MAX_VALUE / 10;
-  // 512Mb
+  // 512Mb the max length of a redis string
   private static final long MAX_STRING_LENGTH = 536870912;
 
   // the callback when a full response message has been decoded
@@ -95,7 +98,7 @@ public final class RESPParser implements Handler<Buffer> {
             switch (type) {
               case '+':
                 // special case OK
-                if (end == 2 && buffer.getByte(start) == 'O' && buffer.getByte(start + 1) == 'K') {
+                if (index - start == 2 && buffer.getByte(start) == 'O' && buffer.getByte(start + 1) == 'K') {
                   handleResponse(OK);
                 } else {
                   handleResponse(SimpleStringType.create(buffer.toString(start, index - start, StandardCharsets.ISO_8859_1)));
@@ -160,7 +163,7 @@ public final class RESPParser implements Handler<Buffer> {
                 if (integer < 0) {
                   if (integer == -1L) {
                     // this is a NULL string
-                    handleResponse(BulkType.NULL);
+                    handleResponse(null);
                     break;
                   }
                   // other negative values are not valid
@@ -180,7 +183,7 @@ public final class RESPParser implements Handler<Buffer> {
                 if (integer < 0) {
                   if (integer == -1L) {
                     // this is a NULL array
-                    handleResponse(MultiType.NULL);
+                    handleResponse(null);
                     break;
                   }
                   // other negative values are not valid

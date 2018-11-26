@@ -25,7 +25,7 @@ public class ReplyParserTest {
     final AtomicInteger counter = new AtomicInteger();
 
     final RESPParser parser = new RESPParser(response -> {
-      System.out.println(response.string());
+      System.out.println(response.toString());
       if (counter.incrementAndGet() == 4) {
         test.complete();
       }
@@ -39,7 +39,7 @@ public class ReplyParserTest {
     final Async test = should.async();
 
     final RESPParser parser = new RESPParser(response -> {
-      System.out.println(response.string());
+      System.out.println(response.toString());
       test.complete();
     });
 
@@ -57,7 +57,7 @@ public class ReplyParserTest {
     final Async test = should.async();
 
     final RESPParser parser = new RESPParser(response -> {
-      should.assertEquals(1000L, response.int64());
+      should.assertEquals(1000L, response.toLong());
       test.complete();
     });
 
@@ -69,7 +69,7 @@ public class ReplyParserTest {
     final Async test = should.async();
 
     final RESPParser parser = new RESPParser(response -> {
-      should.assertEquals(-1L, response.int64());
+      should.assertEquals(-1L, response.toLong());
       test.complete();
     });
 
@@ -81,7 +81,7 @@ public class ReplyParserTest {
     final Async test = should.async();
 
     final RESPParser parser = new RESPParser(response -> {
-      should.assertEquals("foobar", response.string());
+      should.assertEquals("foobar", response.toString());
       test.complete();
     });
 
@@ -93,7 +93,7 @@ public class ReplyParserTest {
     final Async test = should.async();
 
     final RESPParser parser = new RESPParser(response -> {
-      should.assertEquals("", response.string());
+      should.assertEquals("", response.toString());
       should.assertTrue(response == BulkType.EMPTY);
       test.complete();
     });
@@ -106,8 +106,7 @@ public class ReplyParserTest {
     final Async test = should.async();
 
     final RESPParser parser = new RESPParser(response -> {
-      should.assertTrue(response.isNull());
-      should.assertTrue(response == BulkType.NULL);
+      should.assertTrue(response == null);
       test.complete();
     });
 
@@ -132,8 +131,7 @@ public class ReplyParserTest {
     final Async test = should.async();
 
     final RESPParser parser = new RESPParser(response -> {
-      should.assertTrue(response.isNull());
-      should.assertTrue(response == MultiType.NULL);
+      should.assertTrue(response == null);
       test.complete();
     });
 
@@ -146,8 +144,8 @@ public class ReplyParserTest {
 
     final RESPParser parser = new RESPParser(response -> {
       should.assertEquals(2, response.size());
-      should.assertEquals("foo", response.get(0).string());
-      should.assertEquals("bar", response.get(1).string());
+      should.assertEquals("foo", response.get(0).toString());
+      should.assertEquals("bar", response.get(1).toString());
       test.complete();
     });
 
@@ -160,9 +158,9 @@ public class ReplyParserTest {
 
     final RESPParser parser = new RESPParser(response -> {
       should.assertEquals(3, response.size());
-      should.assertEquals(1, response.get(0).int32());
-      should.assertEquals(2, response.get(1).int32());
-      should.assertEquals(3, response.get(2).int32());
+      should.assertEquals(1, response.get(0).toInteger());
+      should.assertEquals(2, response.get(1).toInteger());
+      should.assertEquals(3, response.get(2).toInteger());
       test.complete();
     });
 
@@ -175,11 +173,11 @@ public class ReplyParserTest {
 
     final RESPParser parser = new RESPParser(response -> {
       should.assertEquals(5, response.size());
-      should.assertEquals(1, response.get(0).int32());
-      should.assertEquals(2, response.get(1).int32());
-      should.assertEquals(3, response.get(2).int32());
-      should.assertEquals(4, response.get(3).int32());
-      should.assertEquals("foobar", response.get(4).string());
+      should.assertEquals(1, response.get(0).toInteger());
+      should.assertEquals(2, response.get(1).toInteger());
+      should.assertEquals(3, response.get(2).toInteger());
+      should.assertEquals(4, response.get(3).toInteger());
+      should.assertEquals("foobar", response.get(4).toString());
       test.complete();
     });
 
@@ -192,11 +190,11 @@ public class ReplyParserTest {
 
     final RESPParser parser = new RESPParser(response -> {
       should.assertEquals(2, response.size());
-      should.assertEquals(1, response.get(0).get(0).int32());
-      should.assertEquals(2, response.get(0).get(1).int32());
-      should.assertEquals(3, response.get(0).get(2).int32());
-      should.assertEquals("Foo", response.get(1).get(0).string());
-      should.assertEquals("Bar", response.get(1).get(1).string());
+      should.assertEquals(1, response.get(0).get(0).toInteger());
+      should.assertEquals(2, response.get(0).get(1).toInteger());
+      should.assertEquals(3, response.get(0).get(2).toInteger());
+      should.assertEquals("Foo", response.get(1).get(0).toString());
+      should.assertEquals("Bar", response.get(1).get(1).toString());
       test.complete();
     });
 
@@ -209,9 +207,9 @@ public class ReplyParserTest {
 
     final RESPParser parser = new RESPParser(response -> {
       should.assertEquals(3, response.size());
-      should.assertEquals("foo", response.get(0).string());
-      should.assertTrue(response.get(1).isNull());
-      should.assertEquals("bar", response.get(2).string());
+      should.assertEquals("foo", response.get(0).toString());
+      should.assertTrue(response.get(1) == null);
+      should.assertEquals("bar", response.get(2).toString());
       test.complete();
     });
 

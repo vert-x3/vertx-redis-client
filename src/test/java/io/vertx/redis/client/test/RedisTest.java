@@ -36,7 +36,7 @@ public class RedisTest {
         should.assertTrue(send.succeeded());
         should.assertNotNull(send.result());
 
-        should.assertEquals("PONG", send.result().string());
+        should.assertEquals("PONG", send.result().toString());
         test.complete();
       });
     });

@@ -5,59 +5,81 @@ import io.vertx.codegen.annotations.VertxGen;
 import io.vertx.core.buffer.Buffer;
 
 import java.nio.charset.Charset;
+import java.util.Iterator;
 
 @VertxGen
-public interface Response {
+public interface Response extends Iterable<Response> {
 
   ResponseType type();
 
-  default String string() {
-    throw new UnsupportedOperationException("This types doesn't hold a String/Bulk type");
+  @Override
+  String toString();
+
+  default Long toLong() {
+    final String msg = toString();
+    if (msg != null) {
+      return Long.parseLong(msg);
+    }
+    return null;
   }
 
-  default long int64() {
-    return Long.parseLong(string());
+  default Integer toInteger() {
+    final String msg = toString();
+    if (msg != null) {
+      return Integer.parseInt(msg);
+    }
+    return null;
   }
 
-  default int int32() {
-    return Integer.parseInt(string());
+  default Short toShort() {
+    final String msg = toString();
+    if (msg != null) {
+      return Short.parseShort(msg);
+    }
+    return null;
   }
 
-  default short int16() {
-    return Short.parseShort(string());
+  default Byte toByte() {
+    final String msg = toString();
+    if (msg != null) {
+      return Byte.parseByte(msg);
+    }
+    return null;
   }
 
-  default byte int8() {
-    return Byte.parseByte(string());
-  }
-
-  default boolean bool() {
-    return 1L == int64();
+  default Boolean toBoolean() {
+    final String msg = toString();
+    if (msg != null) {
+      return 1L == Long.parseLong(msg);
+    }
+    return null;
   }
 
   @GenIgnore
-  default String string(Charset encoding) {
-    throw new UnsupportedOperationException("This types doesn't hold a Bulk type");
+  default String toString(Charset encoding) {
+    throw new UnsupportedOperationException("This type doesn't hold a Bulk type");
   }
 
-  default Buffer buffer() {
-    throw new UnsupportedOperationException("This types doesn't hold a Bulk type");
+  default Buffer toBuffer() {
+    throw new UnsupportedOperationException("This type doesn't hold a Bulk type");
   }
 
   @GenIgnore
-  default byte[] bytes() {
-    throw new UnsupportedOperationException("This types doesn't hold a Bulk type");
+  default byte[] toBytes() {
+    throw new UnsupportedOperationException("This type doesn't hold a Bulk type");
   }
 
   default Response get(int index) {
-    throw new UnsupportedOperationException("This types doesn't hold an Array type");
+    throw new UnsupportedOperationException("This type doesn't hold an Array type");
   }
 
   default int size() {
-    throw new UnsupportedOperationException("This types doesn't hold an Array type");
+    throw new UnsupportedOperationException("This type doesn't hold an Array type");
   }
 
-  default boolean isNull() {
-    return false;
+  @Override
+  @GenIgnore
+  default Iterator<Response> iterator() {
+    throw new UnsupportedOperationException("This type doesn't hold a Array type");
   }
 }

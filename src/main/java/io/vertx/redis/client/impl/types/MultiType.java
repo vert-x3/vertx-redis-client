@@ -3,10 +3,11 @@ package io.vertx.redis.client.impl.types;
 import io.vertx.redis.client.Response;
 import io.vertx.redis.client.ResponseType;
 
+import java.util.Iterator;
+
 public final class MultiType implements Response {
 
-  public static final MultiType NULL = new MultiType(-1);
-  public static final MultiType EMPTY = new MultiType(0);
+  public static final MultiType EMPTY = new MultiType(new Response[0]);
 
   public static Response create(int length) {
     return new MultiType(length);
@@ -19,13 +20,8 @@ public final class MultiType implements Response {
   private int count;
 
   private MultiType(int length) {
-    if (length == -1) {
-      this.replies = null;
-      this.count = -1;
-    } else {
-      this.replies = new Response[length];
-      this.count = 0;
-    }
+    this.replies = new Response[length];
+    this.count = 0;
   }
 
   private MultiType(Response[] replies) {
@@ -53,20 +49,45 @@ public final class MultiType implements Response {
 
   @Override
   public int size() {
-    if (replies == null) {
-      return -1;
-    }
     return replies.length;
   }
 
   @Override
-  public boolean isNull() {
-    return replies == null;
+  public String toString() {
+    final StringBuilder sb = new StringBuilder();
+
+    sb.append('[');
+    boolean first = true;
+    for (Response r : replies) {
+      if (first) {
+        sb.append(", ");
+        first = false;
+      }
+
+      if (r == null) {
+        sb.append("null");
+      } else {
+        sb.append(r.toString());
+      }
+    }
+    sb.append(']');
+
+    return sb.toString();
   }
 
   @Override
-  public String toString() {
-    return "[" + replies + "]";
-  }
+  public Iterator<Response> iterator() {
+    return new Iterator<Response>() {
+      private int idx = 0;
+      @Override
+      public boolean hasNext() {
+        return idx < replies.length;
+      }
 
+      @Override
+      public Response next() {
+        return replies[idx++];
+      }
+    };
+  }
 }

@@ -172,6 +172,22 @@ Set TYPE filter
 [[RedisOptions]]
 == RedisOptions
 
+
+[cols=">25%,25%,50%"]
+[frame="topbot"]
+|===
+^|Name | Type ^| Description
+|[[masterName]]`@masterName`|`String`|-
+|[[maxNestedArrays]]`@maxNestedArrays`|`Number (int)`|-
+|[[maxWaitingHandlers]]`@maxWaitingHandlers`|`Number (int)`|-
+|[[netClientOptions]]`@netClientOptions`|`link:dataobjects.html#NetClientOptions[NetClientOptions]`|-
+|[[role]]`@role`|`link:enums.html#RedisRole[RedisRole]`|-
+|[[useSlave]]`@useSlave`|`link:enums.html#RedisSlaves[RedisSlaves]`|-
+|===
+
+[[RedisOptions]]
+== RedisOptions
+
 ++++
  This object controls the connection setting to the Redis Server. There is no need to specify most of the settings
  since it has built the following sensible defaults:

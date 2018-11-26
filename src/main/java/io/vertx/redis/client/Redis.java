@@ -8,7 +8,11 @@ import io.vertx.core.Handler;
 import io.vertx.core.Vertx;
 import io.vertx.core.net.SocketAddress;
 import io.vertx.core.streams.ReadStream;
-import io.vertx.redis.client.impl.RedisFactory;
+import io.vertx.redis.RedisRole;
+import io.vertx.redis.RedisSlaves;
+import io.vertx.redis.client.impl.RedisClient;
+import io.vertx.redis.client.impl.RedisClusterClient;
+import io.vertx.redis.client.impl.RedisSentinelClient;
 
 import java.util.List;
 
@@ -29,21 +33,35 @@ public interface Redis extends ReadStream<Response> {
    * Connect to redis, the {@code onConnect} will get the {@link Redis} instance.
    */
   static void createClient(Vertx vertx, RedisOptions options, Handler<AsyncResult<Redis>> onCreate) {
-    RedisFactory.createClient(vertx, options.getEndpoint(), options, onCreate);
+    RedisClient.create(vertx, options.getEndpoint(), options, onCreate);
+  }
+
+  /**
+   * Connect to redis, the {@code onConnect} will get the {@link Redis} instance.
+   */
+  static void createSentinelClient(Vertx vertx, SocketAddress address, Handler<AsyncResult<Redis>> onCreate) {
+    createSentinelClient(vertx, new RedisOptions().setEndpoint(address).setRole(RedisRole.MASTER).setMasterName("mymaster"), onCreate);
   }
 
   /**
    * Connect to redis, the {@code onConnect} will get the {@link Redis} instance.
    */
   static void createSentinelClient(Vertx vertx, RedisOptions options, Handler<AsyncResult<Redis>> onCreate) {
-    RedisFactory.createSentinelClient(vertx, options, onCreate);
+    RedisSentinelClient.create(vertx, options, onCreate);
+  }
+
+  /**
+   * Connect to redis, the {@code onConnect} will get the {@link Redis} instance.
+   */
+  static void createClusterClient(Vertx vertx, SocketAddress address, Handler<AsyncResult<Redis>> onCreate) {
+    createClusterClient(vertx, new RedisOptions().setEndpoint(address).setUseSlave(RedisSlaves.NEVER), onCreate);
   }
 
   /**
    * Connect to redis, the {@code onConnect} will get the {@link Redis} instance.
    */
   static void createClusterClient(Vertx vertx, RedisOptions options, Handler<AsyncResult<Redis>> onCreate) {
-    RedisFactory.createClusterClient(vertx, options, onCreate);
+    RedisClusterClient.create(vertx, options, onCreate);
   }
 
   /**

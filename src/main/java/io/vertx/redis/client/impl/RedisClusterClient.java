@@ -14,7 +14,6 @@ import io.vertx.redis.client.Request;
 import io.vertx.redis.client.Response;
 
 import java.util.*;
-import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.stream.Collectors;
@@ -60,7 +59,6 @@ public class RedisClusterClient implements Redis {
 
     final AtomicInteger counter = new AtomicInteger(endpoints.size());
     // ensure that in case of error, only call the callback once
-    final AtomicBoolean failed = new AtomicBoolean();
 
     for (SocketAddress endpoint : endpoints) {
       getClient(endpoint, options, ar -> {
@@ -282,14 +280,14 @@ public class RedisClusterClient implements Redis {
             // multibulk
             Response s = reply.get(i);
             // single bulk
-            int start = s.get(0).int32();
-            int end = s.get(1).int32();
+            int start = s.get(0).toInteger();
+            int end = s.get(1).toInteger();
 
             // array of all clients, clients[2] = master, others are slaves
             List<SocketAddress> addresses = new ArrayList<>();
             for (int index = 2; index < s.size(); index++) {
               Response c = s.get(index);
-              SocketAddress address = SocketAddress.inetSocketAddress(c.get(1).int32(), c.get(0).string());
+              SocketAddress address = SocketAddress.inetSocketAddress(c.get(1).toInteger(), c.get(0).toString());
               addresses.add(address);
               seenClients.add(address);
             }

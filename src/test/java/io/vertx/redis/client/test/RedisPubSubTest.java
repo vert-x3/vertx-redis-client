@@ -50,9 +50,9 @@ public class RedisPubSubTest {
     sub.handler(message -> {
       should.assertTrue(message.type() == ResponseType.MULTI);
       should.assertEquals(3, message.size());
-      should.assertEquals("message", message.get(0).string());
-      should.assertEquals("mychannel", message.get(1).string());
-      should.assertEquals("123456", message.get(2).string());
+      should.assertEquals("message", message.get(0).toString());
+      should.assertEquals("mychannel", message.get(1).toString());
+      should.assertEquals("123456", message.get(2).toString());
       test.complete();
     });
 

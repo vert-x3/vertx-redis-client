@@ -11,7 +11,6 @@ import java.nio.charset.StandardCharsets;
 
 public final class BulkType implements Response {
 
-  public static final BulkType NULL = new BulkType(null);
   public static final BulkType EMPTY = new BulkType(Unpooled.EMPTY_BUFFER);
 
   public static Response create(ByteBuf message) {
@@ -30,38 +29,25 @@ public final class BulkType implements Response {
   }
 
   @Override
-  public String string() {
-    return string(StandardCharsets.UTF_8);
+  public String toString() {
+    return toString(StandardCharsets.UTF_8);
   }
 
   @Override
-  public String string(Charset encoding) {
-    if (message == null) {
-      return null;
-    }
+  public String toString(Charset encoding) {
     return message.toString(encoding);
   }
 
   @Override
-  public Buffer buffer() {
+  public Buffer toBuffer() {
     return Buffer.buffer(message);
   }
 
   @Override
-  public byte[] bytes() {
+  public byte[] toBytes() {
     if (message == null) {
       return null;
     }
     return message.array();
-  }
-
-  @Override
-  public boolean isNull() {
-    return message == null;
-  }
-
-  @Override
-  public String toString() {
-    return message.toString(StandardCharsets.UTF_8);
   }
 }

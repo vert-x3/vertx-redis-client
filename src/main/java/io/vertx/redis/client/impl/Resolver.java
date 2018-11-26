@@ -7,7 +7,7 @@ import io.vertx.core.net.SocketAddress;
 import io.vertx.redis.client.RedisOptions;
 
 @FunctionalInterface
-public interface Resolver {
+interface Resolver {
 
   void resolve(Vertx vertx, SocketAddress endpoint, RedisOptions parameter, Handler<AsyncResult<SocketAddress>> callback);
 }

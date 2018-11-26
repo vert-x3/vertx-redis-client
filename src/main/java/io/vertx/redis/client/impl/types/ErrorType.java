@@ -3,8 +3,6 @@ package io.vertx.redis.client.impl.types;
 import io.vertx.redis.client.Response;
 import io.vertx.redis.client.ResponseType;
 
-import java.nio.charset.StandardCharsets;
-
 public final class ErrorType extends Throwable implements Response {
 
   public static ErrorType create(String message) {
@@ -42,11 +40,6 @@ public final class ErrorType extends Throwable implements Response {
 
   public String getKind() {
     return kind;
-  }
-
-  @Override
-  public String string() {
-    return getMessage();
   }
 
   @Override
