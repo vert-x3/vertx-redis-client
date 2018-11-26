@@ -245,10 +245,21 @@ public class RedisClient implements Redis, Handler<Response> {
   }
 
   void fail(Throwable t) {
+    fail(t, false);
+  }
+
+  void fail(Throwable t, boolean fatal) {
     if (onException != null) {
       onException.handle(t);
     } else {
       LOG.error("External failure", t);
+    }
+    if (fatal) {
+      close();
+      // if there are still on going requests
+      // the are all cancelled with the given
+      // throwable
+      cleanupQueue(t);
     }
   }
 }

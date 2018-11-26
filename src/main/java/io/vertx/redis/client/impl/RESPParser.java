@@ -38,7 +38,7 @@ public final class RESPParser implements Handler<Buffer> {
   private static final long MAX_STRING_LENGTH = 536870912;
 
   // the callback when a full response message has been decoded
-  private final Handler<Response> handler;
+  private final RedisClient client;
 
   // a composite buffer to allow buffer concatenation as if it was
   // a long stream
@@ -47,12 +47,12 @@ public final class RESPParser implements Handler<Buffer> {
   // nesting while parsing
   private final ArrayStack stack;
 
-  RESPParser(Handler<Response> handler) {
-    this(handler, 16);
+  RESPParser(RedisClient client) {
+    this(client, 16);
   }
 
-  RESPParser(Handler<Response> handler, int maxStack) {
-    this.handler = handler;
+  RESPParser(RedisClient client, int maxStack) {
+    this.client = client;
     this.stack = new ArrayStack(maxStack);
   }
 
@@ -108,7 +108,8 @@ public final class RESPParser implements Handler<Buffer> {
                 handleResponse(ErrorType.create(buffer.toString(start, index - start, StandardCharsets.ISO_8859_1)));
                 break;
               default:
-                throw new IllegalStateException();
+                client.fail(ErrorType.create("ILLEGAL_STATE Unknown RESP type " + type), true);
+                return;
             }
 
             // clean up the buffer
@@ -139,7 +140,8 @@ public final class RESPParser implements Handler<Buffer> {
             for (int i = (minus ? start + 1 : start); i < index; i++) {
               // be safe, and don't swallow errors
               if (integer > MAX_INTEGER_DIV_10) {
-                throw new ArithmeticException("Redis Integer Overflow");
+                client.fail(ErrorType.create("ILLEGAL_STATE Redis Integer Overflow"), true);
+                return;
               }
               integer = 10 * integer + (buffer.getByte(i) - '0');
             }
@@ -157,7 +159,8 @@ public final class RESPParser implements Handler<Buffer> {
               case '$':
                 // redis strings cannot be longer than 512Mb
                 if (integer > MAX_STRING_LENGTH) {
-                  throw new IllegalArgumentException("Redis Bulk cannot be larger than 512MB");
+                  client.fail(ErrorType.create("ILLEGAL_STATE Redis Bulk cannot be larger than 512MB"), true);
+                  return;
                 }
                 // special cases
                 if (integer < 0) {
@@ -167,7 +170,8 @@ public final class RESPParser implements Handler<Buffer> {
                     break;
                   }
                   // other negative values are not valid
-                  throw new IllegalArgumentException("Redis Bulk cannot have negative length");
+                  client.fail(ErrorType.create("ILLEGAL_STATE Redis Bulk cannot have negative length"), true);
+                  return;
                 }
                 // safe cast
                 bytesNeeded = (int) integer;
@@ -178,7 +182,8 @@ public final class RESPParser implements Handler<Buffer> {
                 // special cases
                 // redis strings cannot be longer than 512Mb
                 if (integer > Integer.MAX_VALUE) {
-                  throw new IllegalArgumentException("Redis Multi cannot be larger 2GB");
+                  client.fail(ErrorType.create("ILLEGAL_STATE Redis Multi cannot be larger 2GB"), true);
+                  return;
                 }
                 if (integer < 0) {
                   if (integer == -1L) {
@@ -187,7 +192,8 @@ public final class RESPParser implements Handler<Buffer> {
                     break;
                   }
                   // other negative values are not valid
-                  throw new IllegalArgumentException("Redis Multi cannot have negative length");
+                  client.fail(ErrorType.create("ILLEGAL_STATE Redis Multi cannot have negative length"), true);
+                  return;
                 }
                 // empty arrays can be cached and require no further processing
                 if (integer == 0L) {
@@ -198,7 +204,8 @@ public final class RESPParser implements Handler<Buffer> {
                 }
                 break;
               default:
-                throw new IllegalStateException();
+                client.fail(ErrorType.create("ILLEGAL_STATE Unknown RESP type " + type), true);
+                return;
             }
             break;
         }
@@ -253,14 +260,15 @@ public final class RESPParser implements Handler<Buffer> {
           // if the stack is empty or not
           if (stack.empty()) {
             // handle the multi to the listener
-            handler.handle(m);
+            client.handle(m);
             return;
           }
           // peek into the next entry
           m = stack.peek();
 
           if (m == null) {
-            throw new IllegalStateException();
+            client.fail(ErrorType.create("ILLEGAL_STATE Stack is empty or array is null"), true);
+            return;
           }
         }
       }
@@ -271,7 +279,7 @@ public final class RESPParser implements Handler<Buffer> {
         // there's nothing on the stack
         // so we can handle the response directly
         // to the listener
-        handler.handle(response);
+        client.handle(response);
       }
     }
   }
