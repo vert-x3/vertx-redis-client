@@ -267,26 +267,25 @@ public enum Command {
 
   ASKING("ASKING", 0);
 
-  private final byte[][] tokens;
-  private final int lengthHint;
+  private final byte[] bytes;
+  private final int length;
 
   Command(String command, int argumentsHint) {
     final String[] parts = command.split(" ");
-    tokens = new byte[parts.length][];
-    for (int i = 0; i < parts.length; i++) {
-      final String part = parts[i];
-      final String encodedToken = "$" + part.length() + "\r\n" + part + "\r\n";
-      tokens[i] = encodedToken.getBytes(StandardCharsets.US_ASCII);
+    String encoded = "";
+    for (final String part : parts) {
+      encoded += "$" + part.length() + "\r\n" + part + "\r\n";
     }
-    // precompute the hint
-    lengthHint = parts.length + argumentsHint;
+    // precompute the bytes and length
+    bytes = encoded.getBytes(StandardCharsets.ISO_8859_1);
+    length = parts.length;
   }
 
-  public byte[][] tokens() {
-    return tokens;
+  public byte[] bytes() {
+    return bytes;
   }
 
-  public int lengthHint() {
-    return lengthHint;
+  public int length() {
+    return length;
   }
 }

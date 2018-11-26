@@ -19,9 +19,9 @@ public final class RequestImpl implements Request {
   private static final int NUM_MAP_LENGTH = 256;
   private static final byte[][] NUM_MAP = new byte[NUM_MAP_LENGTH][];
 
-  private static final byte[] EMPTY_BULK = "$0\r\n\r\n".getBytes(StandardCharsets.US_ASCII);
-  private static final byte[] NULL_BULK = "$-1\r\n".getBytes(StandardCharsets.US_ASCII);
-  private static final byte[] EOL = "\r\n".getBytes(StandardCharsets.US_ASCII);
+  private static final byte[] EMPTY_BULK = "$0\r\n\r\n".getBytes(StandardCharsets.ISO_8859_1);
+  private static final byte[] NULL_BULK = "$-1\r\n".getBytes(StandardCharsets.ISO_8859_1);
+  private static final byte[] EOL = "\r\n".getBytes(StandardCharsets.ISO_8859_1);
 
   static {
     for (int i = 0; i < NUM_MAP_LENGTH; i++) {
@@ -79,13 +79,9 @@ public final class RequestImpl implements Request {
 
   public RequestImpl(Command commandEnum) {
     // we have a hint how many parts this message will contain
-    final byte[][] tokens = commandEnum.tokens();
     // initial elements
-    elements = tokens.length;
-
-    for (int i = 0; i < elements; i++) {
-      nakedBuffer.appendBytes(tokens[i]);
-    }
+    elements = commandEnum.length();
+    nakedBuffer.appendBytes(commandEnum.bytes());
   }
 
   // key management - keys are redis strings

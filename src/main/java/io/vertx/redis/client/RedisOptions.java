@@ -27,7 +27,7 @@ public class RedisOptions {
         .setTcpKeepAlive(true)
         .setTcpNoDelay(true);
 
-    maxWaitingHandlers = 1024;
+    maxWaitingHandlers = 2048;
     maxNestedArrays = 32;
     masterName = "mymaster";
     role = RedisRole.MASTER;

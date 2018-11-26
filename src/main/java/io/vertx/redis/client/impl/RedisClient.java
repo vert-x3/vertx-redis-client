@@ -15,7 +15,7 @@ import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 
-public class RedisClient implements Redis, Handler<Response> {
+public class RedisClient implements Redis, ParserHandler {
 
   private static final Logger LOG = LoggerFactory.getLogger(RedisClient.class);
 
@@ -244,7 +244,8 @@ public class RedisClient implements Redis, Handler<Response> {
     return socketAddress;
   }
 
-  void fail(Throwable t) {
+  @Override
+  public void fail(Throwable t) {
     if (onException != null) {
       onException.handle(t);
     } else {
@@ -252,7 +253,8 @@ public class RedisClient implements Redis, Handler<Response> {
     }
   }
 
-  void fatal(Throwable t) {
+  @Override
+  public void fatal(Throwable t) {
     if (onException != null) {
       onException.handle(t);
     } else {
