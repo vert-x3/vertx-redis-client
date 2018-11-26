@@ -29,7 +29,7 @@ public class ReplyParserTest {
       if (counter.incrementAndGet() == 4) {
         test.complete();
       }
-    });
+    }, should::fail, 16);
 
     parser.handle(Buffer.buffer("+PONG\r\n+PONG\r\n+PONG\r\n+PONG\r\n"));
   }
@@ -41,7 +41,7 @@ public class ReplyParserTest {
     final RESPParser parser = new RESPParser(response -> {
       System.out.println(response.toString());
       test.complete();
-    });
+    }, should::fail, 16);
 
     parser.handle(Buffer.buffer("+"));
     parser.handle(Buffer.buffer("P"));
@@ -59,7 +59,7 @@ public class ReplyParserTest {
     final RESPParser parser = new RESPParser(response -> {
       should.assertEquals(1000L, response.toLong());
       test.complete();
-    });
+    }, should::fail, 16);
 
     parser.handle(Buffer.buffer(":1000\r\n"));
   }
@@ -71,7 +71,7 @@ public class ReplyParserTest {
     final RESPParser parser = new RESPParser(response -> {
       should.assertEquals(-1L, response.toLong());
       test.complete();
-    });
+    }, should::fail, 16);
 
     parser.handle(Buffer.buffer(":-1\r\n"));
   }
@@ -83,7 +83,7 @@ public class ReplyParserTest {
     final RESPParser parser = new RESPParser(response -> {
       should.assertEquals("foobar", response.toString());
       test.complete();
-    });
+    }, should::fail, 16);
 
     parser.handle(Buffer.buffer("$6\r\nfoobar\r\n"));
   }
@@ -96,7 +96,7 @@ public class ReplyParserTest {
       should.assertEquals("", response.toString());
       should.assertTrue(response == BulkType.EMPTY);
       test.complete();
-    });
+    }, should::fail, 16);
 
     parser.handle(Buffer.buffer("$0\r\n\r\n"));
   }
@@ -108,7 +108,7 @@ public class ReplyParserTest {
     final RESPParser parser = new RESPParser(response -> {
       should.assertTrue(response == null);
       test.complete();
-    });
+    }, should::fail, 16);
 
     parser.handle(Buffer.buffer("$-1\r\n"));
   }
@@ -121,7 +121,7 @@ public class ReplyParserTest {
       should.assertEquals(0, response.size());
       should.assertTrue(response == MultiType.EMPTY);
       test.complete();
-    });
+    }, should::fail, 16);
 
     parser.handle(Buffer.buffer("*0\r\n"));
   }
@@ -133,7 +133,7 @@ public class ReplyParserTest {
     final RESPParser parser = new RESPParser(response -> {
       should.assertTrue(response == null);
       test.complete();
-    });
+    }, should::fail, 16);
 
     parser.handle(Buffer.buffer("*-1\r\n"));
   }
@@ -147,7 +147,7 @@ public class ReplyParserTest {
       should.assertEquals("foo", response.get(0).toString());
       should.assertEquals("bar", response.get(1).toString());
       test.complete();
-    });
+    }, should::fail, 16);
 
     parser.handle(Buffer.buffer("*2\r\n$3\r\nfoo\r\n$3\r\nbar\r\n"));
   }
@@ -162,7 +162,7 @@ public class ReplyParserTest {
       should.assertEquals(2, response.get(1).toInteger());
       should.assertEquals(3, response.get(2).toInteger());
       test.complete();
-    });
+    }, should::fail, 16);
 
     parser.handle(Buffer.buffer("*3\r\n:1\r\n:2\r\n:3\r\n"));
   }
@@ -179,7 +179,7 @@ public class ReplyParserTest {
       should.assertEquals(4, response.get(3).toInteger());
       should.assertEquals("foobar", response.get(4).toString());
       test.complete();
-    });
+    }, should::fail, 16);
 
     parser.handle(Buffer.buffer("*5\r\n:1\r\n:2\r\n:3\r\n:4\r\n$6\r\nfoobar\r\n"));
   }
@@ -196,7 +196,7 @@ public class ReplyParserTest {
       should.assertEquals("Foo", response.get(1).get(0).toString());
       should.assertEquals("Bar", response.get(1).get(1).toString());
       test.complete();
-    });
+    }, should::fail, 16);
 
     parser.handle(Buffer.buffer("*2\r\n*3\r\n:1\r\n:2\r\n:3\r\n*2\r\n+Foo\r\n-Bar\r\n"));
   }
@@ -211,7 +211,7 @@ public class ReplyParserTest {
       should.assertTrue(response.get(1) == null);
       should.assertEquals("bar", response.get(2).toString());
       test.complete();
-    });
+    }, should::fail, 16);
 
     parser.handle(Buffer.buffer("*3\r\n$3\r\nfoo\r\n$-1\r\n$3\r\nbar\r\n"));
   }
@@ -227,7 +227,7 @@ public class ReplyParserTest {
       if (counter.incrementAndGet() == 17) {
         test.complete();
       }
-    });
+    }, should::fail, 16);
 
     parser.handle(Buffer.buffer(
       "+OK\r\n" +
