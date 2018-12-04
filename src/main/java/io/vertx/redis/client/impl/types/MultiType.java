@@ -3,7 +3,10 @@ package io.vertx.redis.client.impl.types;
 import io.vertx.redis.client.Response;
 import io.vertx.redis.client.ResponseType;
 
+import java.util.Collections;
+import java.util.HashMap;
 import java.util.Iterator;
+import java.util.Map;
 
 public final class MultiType implements Response {
 
@@ -89,5 +92,19 @@ public final class MultiType implements Response {
         return replies[idx++];
       }
     };
+  }
+
+  @Override
+  public Map<String, Response> toMap() {
+    if (replies.length == 0) {
+      return Collections.emptyMap();
+    }
+
+    final Map<String, Response> kv = new HashMap<>();
+    for (int i = 0; i < replies.length; i+=2) {
+      kv.put(replies[i].toString(), replies[i+1]);
+    }
+
+    return kv;
   }
 }

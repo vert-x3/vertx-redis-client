@@ -3,9 +3,11 @@ package io.vertx.redis.client;
 import io.vertx.codegen.annotations.GenIgnore;
 import io.vertx.codegen.annotations.VertxGen;
 import io.vertx.core.buffer.Buffer;
+import io.vertx.core.json.JsonObject;
 
 import java.nio.charset.Charset;
 import java.util.Iterator;
+import java.util.Map;
 
 @VertxGen
 public interface Response extends Iterable<Response> {
@@ -74,6 +76,10 @@ public interface Response extends Iterable<Response> {
   }
 
   default int size() {
+    throw new UnsupportedOperationException("This type doesn't hold an Array type");
+  }
+
+  default Map<String, Response> toMap() {
     throw new UnsupportedOperationException("This type doesn't hold an Array type");
   }
 

@@ -1,5 +1,6 @@
 package io.vertx.redis.client.test;
 
+import io.vertx.core.json.JsonObject;
 import io.vertx.core.net.SocketAddress;
 import io.vertx.ext.unit.Async;
 import io.vertx.ext.unit.TestContext;
@@ -7,10 +8,12 @@ import io.vertx.ext.unit.junit.RunTestOnContext;
 import io.vertx.ext.unit.junit.VertxUnitRunner;
 import io.vertx.redis.client.Redis;
 import io.vertx.redis.client.RedisOptions;
+import io.vertx.redis.client.Response;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
+import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import static io.vertx.redis.client.Request.cmd;
@@ -149,6 +152,35 @@ public class RedisClusterTest {
           });
         });
       }
+    });
+  }
+
+  @Test(timeout = 30_000)
+  public void testHgetall(TestContext should) {
+    final Async test = should.async();
+
+    Redis.createClusterClient(rule.vertx(), options, onCreate -> {
+      should.assertTrue(onCreate.succeeded());
+
+      final Redis cluster = onCreate.result();
+      cluster.send(cmd(HSET).key("testKey").arg("field1").arg("Hello"), hset1 -> {
+        should.assertTrue(hset1.succeeded());
+        cluster.send(cmd(HSET).key("testKey").arg("field2").arg("World"), hset2 -> {
+          should.assertTrue(hset2.succeeded());
+          cluster.send(cmd(HGETALL).key("testKey"), hGetAll -> {
+            should.assertTrue(hGetAll.succeeded());
+            try {
+              Map<String, Response> obj = hGetAll.result().toMap();
+              should.assertEquals("Hello", obj.get("field1").toString());
+              should.assertEquals("World", obj.get("field2").toString());
+              test.complete();
+            } catch (Exception ex) {
+              should.fail(ex);
+            }
+          });
+        });
+      });
+
     });
   }
 }
