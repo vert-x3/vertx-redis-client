@@ -79,6 +79,7 @@ public interface Response extends Iterable<Response> {
     throw new UnsupportedOperationException("This type doesn't hold an Array type");
   }
 
+  @GenIgnore
   default Map<String, Response> toMap() {
     throw new UnsupportedOperationException("This type doesn't hold an Array type");
   }
