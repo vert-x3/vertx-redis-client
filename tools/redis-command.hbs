@@ -1,0 +1,91 @@
+/*
+ * Copyright 2018 Red Hat, Inc.
+ *
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * and Apache License v2.0 which accompanies this distribution.
+ *
+ * The Eclipse Public License is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ *
+ * The Apache License v2.0 is available at
+ * http://www.opensource.org/licenses/apache2.0.php
+ *
+ * You may elect to redistribute this code under either of these licenses.
+ */
+package io.vertx.redis.client;
+
+import java.nio.charset.StandardCharsets;
+
+import io.vertx.codegen.annotations.VertxGen;
+
+/**
+ * <b>Auto generated</b> API Commands to interact with REDIS.
+ *
+ * @author <a href="mailto:plopes@redhat.com">Paulo Lopes</a>
+ */
+@VertxGen
+public enum Command {
+{{#each .}}
+  {{ enum }}("{{ name }}", {{ arity }}, {{ firstKey }}, {{ lastKey }}, {{ interval }}, {{ readOnly }}, {{ movable }}),
+{{/each}}  SENTINEL("sentinel", -1, 0, 0, 0, false, false);
+
+  private final byte[] bytes;
+  private final int arity;
+
+  private final boolean multiKey;
+  private final int firstKey;
+  private final int lastKey;
+  private final int interval;
+  private final boolean keyless;
+  private final boolean readOnly;
+  private final boolean movable;
+
+  Command(String command, int arity, int firstKey, int lastKey, int interval, boolean readOnly, boolean movable) {
+    bytes = ("$" + command.length() + "\r\n" + command + "\r\n").getBytes(StandardCharsets.ISO_8859_1);
+    this.arity = arity;
+    this.firstKey = firstKey;
+    this.lastKey = lastKey;
+    this.interval = interval;
+    this.multiKey = lastKey < 0;
+    this.keyless = interval == 0 && !movable;
+    this.readOnly = readOnly;
+    this.movable = movable;
+  }
+
+  public byte[] getBytes() {
+    return bytes;
+  }
+
+  public int getArity() {
+    return arity;
+  }
+
+  public boolean isMultiKey() {
+    return multiKey;
+  }
+
+  public int getFirstKey() {
+    return firstKey;
+  }
+
+  public int getLastKey() {
+    return lastKey;
+  }
+
+  public int getInterval() {
+    return interval;
+  }
+
+  public boolean isKeyless() {
+    return keyless;
+  }
+
+  public boolean isReadOnly() {
+    return readOnly;
+  }
+
+  public boolean isMovable() {
+    return movable;
+  }
+}

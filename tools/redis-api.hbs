@@ -1,0 +1,53 @@
+/*
+ * Copyright 2018 Red Hat, Inc.
+ *
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * and Apache License v2.0 which accompanies this distribution.
+ *
+ * The Eclipse Public License is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ *
+ * The Apache License v2.0 is available at
+ * http://www.opensource.org/licenses/apache2.0.php
+ *
+ * You may elect to redistribute this code under either of these licenses.
+ */
+package io.vertx.redis.client;
+
+import io.vertx.codegen.annotations.Fluent;
+import io.vertx.codegen.annotations.GenIgnore;
+import io.vertx.codegen.annotations.VertxGen;
+import io.vertx.core.AsyncResult;
+import io.vertx.core.Future;
+import io.vertx.core.Handler;
+import io.vertx.redis.impl.RedisAPIImpl;
+
+import java.util.List;
+
+/**
+ * <b>Auto generated</b> Redis API client wrapper.
+ */
+@VertxGen
+public interface RedisAPI {
+
+  static RedisAPI api(Redis client) {
+    return new RedisAPIImpl(client);
+  }
+
+{{#each .}}
+  @GenIgnore
+  default Future<Response> {{ camelcase safename }}({{#if arity}}Object... args{{/if}}) {
+    return send(Command.{{ enum }}{{#if arity}}, args{{/if}});
+  }
+
+  @Fluent
+  default RedisAPI {{ camelcase safename }}({{{ types }}}{{#if arity}}, {{/if}}Handler<AsyncResult<Response>> handler) {
+    {{ camelcase safename }}({{{ args }}}{{#if variable}}.toArray(){{/if}}).setHandler(handler);
+    return this;
+  }
+{{/each}}
+
+  @GenIgnore
+  Future<Response> send(Command cmd, Object... args);
+}
