@@ -47,10 +47,8 @@ public class RedisClusterClient implements Redis {
   static {
     // provided reducers
 
-    addReducer(MSET, list -> {
-      // Simple string reply: always OK since MSET can't fail.
-      return SimpleStringType.OK;
-    });
+    // Simple string reply: always OK since MSET can't fail.
+    addReducer(MSET, list -> SimpleStringType.OK);
 
     addReducer(DEL, list -> {
       long total = 0;
@@ -76,6 +74,25 @@ public class RedisClusterClient implements Redis {
 
       return multi;
     });
+
+    addReducer(KEYS, list -> {
+      int total = 0;
+      for (Response resp : list) {
+        total += resp.size();
+      }
+
+      MultiType multi = MultiType.create(total);
+      for (Response resp : list) {
+        for (Response child : resp) {
+          multi.add(child);
+        }
+      }
+
+      return multi;
+    });
+
+    // Simple string reply: always OK since FLUSHDB can't fail.
+    addReducer(FLUSHDB, list -> SimpleStringType.OK);
   }
 
 
@@ -91,6 +108,7 @@ public class RedisClusterClient implements Redis {
 
   private Handler<Void> onEnd;
   private Handler<Response> onMessage;
+  private int slotNumber;
 
   private RedisClusterClient(Vertx vertx, RedisOptions options, Handler<AsyncResult<Redis>> onCreate) {
     this.vertx = vertx;
@@ -187,6 +205,38 @@ public class RedisClusterClient implements Redis {
       } catch (RuntimeException e) {
         onException.handle(e);
       }
+      return this;
+    }
+
+    if (cmd.isClusterWide()) {
+
+      final List<Future> responses = new ArrayList<>(slotNumber);
+
+      for (int i = 1; i <= slotNumber; i++) {
+
+        Redis[] clients = slots[(slots.length / slotNumber - 1) * i];
+
+        final Future<Response> f = Future.future();
+        send(selectMasterOrSlave(req.command().isReadOnly(), clients), options, RETRIES, req, f);
+        responses.add(f);
+      }
+      CompositeFuture.all(responses).setHandler(composite -> {
+        if (composite.failed()) {
+          // means if one of the operations failed, then we can fail the handler
+          try {
+            handler.handle(Future.failedFuture(composite.cause()));
+          } catch (RuntimeException e) {
+            onException.handle(e);
+          }
+        } else {
+          try {
+            handler.handle(Future.succeededFuture(REDUCERS.get(cmd).apply(composite.result().list())));
+          } catch (RuntimeException e) {
+            onException.handle(e);
+          }
+        }
+      });
+
       return this;
     }
 
@@ -498,6 +548,7 @@ public class RedisClusterClient implements Redis {
           // from the connections list
           final Set<SocketAddress> seenClients = new HashSet<>();
           final AtomicInteger slotCounter = new AtomicInteger(reply.size());
+          slotNumber = reply.size();
 
           for (int i = 0; i < reply.size(); i++) {
             // multibulk
@@ -782,8 +833,11 @@ public class RedisClusterClient implements Redis {
       return getRandomConnection(Collections.emptySet());
     }
 
-    int index = 0;
+    return selectMasterOrSlave(readOnly, clients);
+  }
 
+  private Redis selectMasterOrSlave(boolean readOnly, Redis[] clients) {
+    int index = 0;
     // always, never, share
     if (readOnly && slaves != RedisSlaves.NEVER && clients.length > 1) {
       // always use a slave for read commands
@@ -795,7 +849,6 @@ public class RedisClusterClient implements Redis {
         index = RANDOM.nextInt(clients.length);
       }
     }
-
     return clients[index];
   }
 }
