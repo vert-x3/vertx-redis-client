@@ -11,6 +11,7 @@ import io.vertx.ext.unit.junit.VertxUnitRunner;
 import io.vertx.redis.client.Redis;
 import io.vertx.redis.client.RedisOptions;
 import io.vertx.redis.client.Response;
+import org.junit.After;
 import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
@@ -685,4 +686,61 @@ public class RedisClusterTest {
       });
     });
   }
+
+  @Test(timeout = 10_000)
+  public void testKeys(TestContext should) {
+    final Async test = should.async();
+    final String key1 = "pattern1";
+    final String key2 = "pattern3";
+    final String key3 = "pattern4";
+
+
+    Redis.createClusterClient(rule.vertx(), options, onCreate -> {
+      should.assertTrue(onCreate.succeeded());
+
+      final Redis cluster = onCreate.result();
+
+      cluster.exceptionHandler(should::fail);
+
+      cluster.send(cmd(SET).arg(key1).arg("pattern1"), set1 -> {
+        should.assertTrue(set1.succeeded());
+
+        cluster.send(cmd(SET).arg(key2).arg("pattern2"), set2 -> {
+          should.assertTrue(set2.succeeded());
+
+          cluster.send(cmd(SET).arg(key3).arg("pattern3"), set3 -> {
+            should.assertTrue(set3.succeeded());
+
+            cluster.send(cmd(KEYS).arg("pattern?"), res -> {
+              should.assertTrue(res.result().toString().split(",").length == 3);
+              should.assertTrue(res.result().toString().contains("pattern1"));
+              should.assertTrue(res.result().toString().contains("pattern3"));
+              should.assertTrue(res.result().toString().contains("pattern4"));
+              test.complete();
+            });
+          });
+        });
+      });
+    });
+  }
+
+  @After
+  public void flushAllNodes(TestContext should) {
+    final Async test = should.async();
+    Redis.createClusterClient(rule.vertx(), options, onCreate -> {
+      should.assertTrue(onCreate.succeeded());
+
+      final Redis cluster = onCreate.result();
+
+      cluster.exceptionHandler(should::fail);
+
+      final Future<Response> f = Future.future();
+
+      cluster.send(cmd(FLUSHDB), f);
+
+      f.completer();
+      test.complete();
+    });
+  }
+
 }
