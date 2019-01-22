@@ -35,7 +35,7 @@ To use the Vert.x Redis client, add the following dependency to the _dependencie
 <dependency>
 <groupId>io.vertx</groupId>
 <artifactId>vertx-redis-client</artifactId>
-<version>3.5.2.CR3</version>
+<version>${maven.version}</version>
 </dependency>
 ----
 
@@ -43,42 +43,41 @@ To use the Vert.x Redis client, add the following dependency to the _dependencie
 
 [source,groovy,subs="+attributes"]
 ----
-compile 'io.vertx:vertx-redis-client:3.5.2.CR3'
+compile 'io.vertx:vertx-redis-client:${maven.version}'
 ----
 
 == Connecting to Redis
 
-In order to connect to Redis there is a config required. This config is provided in the form of `link:../../apidocs/io/vertx/redis/RedisOptions.html[RedisOptions]`
-containing the following values:
+The Redis client can operate in 3 distinct modes:
 
-* `host`: default is `localhost`
-* `port`: default is `6379`
-* `encoding`: default is `UTF-8`
-* `tcpKeepAlive`: default `true`
-* `tcpNoDelay`: default `true`
+* Simple client (probably what most users need).
+* Sentinel (when working with Redis in High Availability mode).
+* Cluster (when working with Redis in Clustered mode).
 
-An connection example can then be:
+The connection mode is selected by the factory method on the Redis interface. Regardless of the mode the client can be
+configured using a {@link io.vertx.redis.client.RedisOptions} data object. By default some configuration values are
+initialized with the following values:
 
-[source,groovy]
+* `netClientOptions`: default is `TcpKeepAlive: true`, `TcpNoDelay: true`
+* `endpoint`: default is `localhost:6379`
+* `masterName`: default is `mymaster`
+* `role` default is `MASTER`
+* `slaves` default is `NEVER`
+
+In order to obtain a connection use the following code:
+
+[source,$lang]
 ----
-def config = [
-  host:"127.0.0.1"
-]
-
-def redis = RedisClient.create(vertx, config)
-
+{@link examples.RedisExamples#example1}
 ----
 
-The client attempts to reconnect to the server on connection errors, for this reason if you are connecting to a server
-that requires authentication and/or you are not using the default database you must provide the authentication
-password and/or database id to the config object, the properties names are:
+In the configuration contains a `password` and/or a `select` database, these 2 commands will be executed automatically
+once a successful connection is established to the server.
 
-* `auth`
-* `select`
-
-If you do not do this and manually call the `link:../../apidocs/io/vertx/redis/RedisClient.html#auth-java.lang.String-io.vertx.core.Handler-[auth]`
-or `link:../../apidocs/io/vertx/redis/RedisClient.html#select-int-io.vertx.core.Handler-[select]` then the client will not know how to recover
-the connection in case of socket error.
+[source,$lang]
+----
+{@link examples.RedisExamples#example2}
+----
 
 == Running commands
 
@@ -86,19 +85,52 @@ Given that the redis client is connected to the server, all commands are now pos
 The module offers a clean API for executing commands without the need to hand write the command itself, for example
 if one wants to get a value of a key it can be done as:
 
-[source,groovy]
+[source,$lang]
 ----
-def redis = RedisClient.create(vertx, [:])
-
-redis.get("mykey", { res ->
-  if (res.succeeded()) {
-    // so something...
-  }
-})
-
+{@link examples.RedisExamples#example3}
 ----
 
-In order to know more about the commands available you should look at: <a href="http://redis.io/commands">redis documentation</a>.
+The response object is a generic type that allow converting from the basic redis types to your language types. For
+example, if your response is of type `INTEGER` then you can get the value as any numeric primitive type `int`, `long`,
+etc...
+
+Or you can perform more complex tasks such as handling responses as iterators:
+
+[source,$lang]
+----
+{@link examples.RedisExamples#example4}
+----
+
+== High Availability mode
+
+To work with high availability mode the connection creation is quite similar:
+
+[source,$lang]
+----
+{@link examples.RedisExamples#example5}
+----
+
+What is important to notice is that in this mode, an extra connection is established to the server(s) and behind the
+scenes the client will listen for events from the sentinel. When the sentinel notifies that we switched masters, then
+an exception is send to the client and you can decide what to do next.
+
+== Cluster mode
+
+To work with cluster the connection creation is quite similar:
+
+[source,$lang]
+----
+{@link examples.RedisExamples#example6}
+----
+
+In this case the configuration requires one of more members of the cluster to be known. This list will be used to ask
+the cluster for the current configuration, which means if any of the listed members is not available it will be skipped.
+
+In cluster mode a connection is established to each node and special care is needed when executing commands. It is
+recommended to read redis manual in order to understand how clustering works. The client operating in this mode will do
+a best effort to identify which slot is used by the executed command in order to execute it on the right node. There
+could be cases where this isn't possible to identify and in that case as a best effort the command will be run on a
+random node.
 
 == Pub/Sub mode
 
@@ -107,156 +139,27 @@ it cannot be used for running other commands than the command to leave that mode
 
 To start a subscriber one would do:
 
-[source,groovy]
+[source,$lang]
 ----
-
-// register a handler for the incoming message the naming the Redis module will use is base address + '.' + redis channel
-vertx.eventBus().consumer("io.vertx.redis.channel1", { received ->
-  // do whatever you need to do with your message
-  def value = received.body().value
-  // the value is a JSON doc with the following properties
-  // channel - The channel to which this message was sent
-  // pattern - Pattern is present if you use psubscribe command and is the pattern that matched this message channel
-  // message - The message payload
-})
-
-def redis = RedisClient.create(vertx, [:])
-
-redis.subscribe("channel1", { res ->
-  if (res.succeeded()) {
-    // so something...
-  }
-})
-
+{@link examples.RedisExamples#example7}
 ----
 
 And from another place in the code publish messages to the queue:
 
-[source,groovy]
+[source,$lang]
+----
+{@link examples.RedisExamples#example8}
 ----
 
-def redis = RedisClient.create(vertx, [:])
+== Domain Sockets
 
-redis.publish("channel1", "Hello World!", { res ->
-  if (res.succeeded()) {
-    // so something...
-  }
-})
+Most of the examples shown connecting to a TCP sockets, however it is also possible to use Redis connecting to a UNIX
+domain docket:
 
+[source,$lang]
+----
+{@link examples.RedisExamples#example9}
 ----
 
-== Friendlier hash commands
-
-Most Redis commands take a single String or an Array of Strings as arguments, and replies are sent back as a single
-String or an Array of Strings. When dealing with hash values, there are a couple of useful exceptions to this.
-
-=== Command hgetall
-
-The reply from an hgetall command will be converted into a JSON Object. That way you can interact with the responses
-using JSON syntax which is handy for the EventBus communication.
-
-=== command mset
-
-Multiple values in a hash can be set by supplying an object. Note however that key and value will be coerced to
-strings.
-
-----
-{
-keyName: "value",
-otherKeyName: "other value"
-}
-----
-
-=== command msetnx
-
-Multiple values in a hash can be set by supplying an object. Note however that key and value will be coerced to
-strings.
-
-----
-{
-keyName: "value",
-otherKeyName: "other value"
-}
-----
-
-=== command hmset
-
-Multiple values in a hash can be set by supplying an object. Note however that key and value will be coerced to
-strings.
-
-----
-{
-keyName: "value",
-otherKeyName: "other value"
-}
-----
-
-=== command zadd
-Multiple values in a hash can be set by supplying an object. Note however that key and value will be coerced to
-strings.
-
-----
-{
-score: "member",
-otherScore: "other member"
-}
-----
-
-== Server Info
-
-In order to make it easier to work with the info response you don't need to parse the data yourself and the module
-will return it in a easy to understand JSON format. The format is as follows: A JSON object for each section filled
-with properties that belong to that section. If for some reason there is no section the properties will be visible
-at the top level object.
-
-----
-{
-server: {
-redis_version: "2.5.13",
-redis_git_sha1: "2812b945",
-redis_git_dirty: "0",
-os: "Linux 2.6.32.16-linode28 i686",
-arch_bits: "32",
-multiplexing_api: "epoll",
-gcc_version: "4.4.1",
-process_id: "8107",
-...
-},
-memory: {...},
-client: {...},
-...
-}
-----
-
-== Eval and Evalsha
-
-Eval and Evalsha commands are special due to its return value can be any type. Vert.x is built on top of Java and the
-language adheres to strong typing so returning any type turns to be problematic since we want to avoid having `Object`
-type being used. The reason to avoid the type `Object` is that we also are polyglot and the conversion between
-languages would become rather complicated and hard to implement. For all these reasons the commands eval and evalsha
-will always return a JsonArray, even for example for scripts such as:
-
-```
-return 10
-```
-
-In this case the return value will be a json array with the value 10 on index 0.
-
-== Redis Sentinel
-
-This client support the Redis Sentinel API with the API interface:
-`link:../../apidocs/io/vertx/redis/sentinel/RedisSentinel.html[RedisSentinel]`.
-
-The API exposes the sentinel commands:
-
-* masters
-* master
-* slaves
-* sentinels
-* get-master-addr-by-name
-* reset
-* failover
-* ckquorum
-* flushconfig
-
-For more information please read the redis official documentation: https://redis.io/topics/sentinel
+Be aware that HA and cluster modes report server addresses always on TCP addresses not domain sockets. So the
+combination is not possible. Not because of this client but how Redis works.

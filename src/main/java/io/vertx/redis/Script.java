@@ -7,6 +7,7 @@ import io.vertx.redis.impl.ScriptImpl;
  * Container for a script and its sha1 hash.
  */
 @VertxGen
+@Deprecated
 public interface Script {
   static Script create(String script) {
     return new ScriptImpl(script);

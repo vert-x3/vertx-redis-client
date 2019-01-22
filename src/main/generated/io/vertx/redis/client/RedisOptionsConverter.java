@@ -44,6 +44,11 @@ public class RedisOptionsConverter {
             obj.setRole(io.vertx.redis.client.RedisRole.valueOf((String)member.getValue()));
           }
           break;
+        case "select":
+          if (member.getValue() instanceof Number) {
+            obj.setSelect(((Number)member.getValue()).intValue());
+          }
+          break;
         case "useSlave":
           if (member.getValue() instanceof String) {
             obj.setUseSlave(io.vertx.redis.client.RedisSlaves.valueOf((String)member.getValue()));
@@ -71,6 +76,9 @@ public class RedisOptionsConverter {
     }
     if (obj.getRole() != null) {
       json.put("role", obj.getRole().name());
+    }
+    if (obj.getSelect() != null) {
+      json.put("select", obj.getSelect());
     }
     if (obj.getUseSlave() != null) {
       json.put("useSlave", obj.getUseSlave().name());

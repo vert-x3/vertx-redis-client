@@ -85,13 +85,6 @@
       <version>4.12</version>
     </dependency>
 
-    <dependency>
-      <groupId>com.github.kstyrc</groupId>
-      <artifactId>embedded-redis</artifactId>
-      <version>0.6</version>
-      <scope>test</scope>
-    </dependency>
-
   </dependencies>
 
   <build>
@@ -143,37 +136,4 @@
       </plugin>
     </plugins>
   </build>
-
-  <profiles>
-    <profile>
-      <!-- Use this profile with latest redis already running on localhost:6379 -->
-      <id>server</id>
-      <activation>
-        <property>
-          <name>server</name>
-        </property>
-      </activation>
-    </profile>
-    <profile>
-      <id>redis-embedded</id>
-      <activation>
-        <property>
-          <name>!server</name>
-        </property>
-      </activation>
-      <build>
-        <pluginManagement>
-          <plugins>
-            <plugin>
-              <artifactId>maven-surefire-plugin</artifactId>
-              <configuration>
-                <excludedGroups>io.vertx.test.redis.RedisPost28Tests</excludedGroups>
-              </configuration>
-            </plugin>
-          </plugins>
-        </pluginManagement>
-      </build>
-    </profile>
-  </profiles>
-
 </project>

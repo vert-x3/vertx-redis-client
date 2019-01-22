@@ -21,6 +21,7 @@ import io.vertx.codegen.annotations.VertxGen;
  * @author <a href="mailto:pmlopes@gmail.com">Paulo Lopes</a>
  */
 @VertxGen
+@Deprecated
 public enum FailoverOptions {
   FORCE,
   TAKEOVER

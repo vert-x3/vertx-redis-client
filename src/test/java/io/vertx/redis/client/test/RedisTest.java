@@ -73,14 +73,13 @@ public class RedisTest {
 
       RedisAPI redis = RedisAPI.api(create.result());
 
-      redis.set("key1", "value1")
-        .setHandler(set -> {
-          should.assertTrue(set.succeeded());
-          should.assertNotNull(set.result());
+      redis.set(Arrays.asList("key1", "value1"), set -> {
+        should.assertTrue(set.succeeded());
+        should.assertNotNull(set.result());
 
-          should.assertEquals("OK", set.result().toString());
-          test.complete();
-        });
+        should.assertEquals("OK", set.result().toString());
+        test.complete();
+      });
     });
   }
 }

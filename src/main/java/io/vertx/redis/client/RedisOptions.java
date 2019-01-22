@@ -1,3 +1,18 @@
+/*
+ * Copyright 2019 Red Hat, Inc.
+ * <p>
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * and Apache License v2.0 which accompanies this distribution.
+ * <p>
+ * The Eclipse Public License is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ * <p>
+ * The Apache License v2.0 is available at
+ * http://www.opensource.org/licenses/apache2.0.php
+ * <p>
+ * You may elect to redistribute this code under either of these licenses.
+ */
 package io.vertx.redis.client;
 
 import io.vertx.codegen.annotations.DataObject;
@@ -19,6 +34,7 @@ public class RedisOptions {
   private RedisRole role;
   private RedisSlaves slaves;
   private String password;
+  private Integer select;
 
   private void init() {
     netClientOptions =
@@ -46,6 +62,7 @@ public class RedisOptions {
     this.role = other.role;
     this.slaves = other.slaves;
     this.password = other.password;
+    this.select = other.select;
   }
 
   public RedisOptions(JsonObject json) {
@@ -148,8 +165,18 @@ public class RedisOptions {
     return password;
   }
 
-  public void setPassword(String password) {
+  public RedisOptions setPassword(String password) {
     this.password = password;
+    return this;
+  }
+
+  public Integer getSelect() {
+    return select;
+  }
+
+  public RedisOptions setSelect(Integer select) {
+    this.select = select;
+    return this;
   }
 
   public JsonObject toJson() {

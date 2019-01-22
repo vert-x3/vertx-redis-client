@@ -1,3 +1,18 @@
+/*
+ * Copyright 2019 Red Hat, Inc.
+ * <p>
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * and Apache License v2.0 which accompanies this distribution.
+ * <p>
+ * The Eclipse Public License is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ * <p>
+ * The Apache License v2.0 is available at
+ * http://www.opensource.org/licenses/apache2.0.php
+ * <p>
+ * You may elect to redistribute this code under either of these licenses.
+ */
 package io.vertx.redis.client.impl;
 
 import io.vertx.core.*;
@@ -35,20 +50,55 @@ public class RedisClient implements Redis, ParserHandler {
       }
 
       // socket connection succeeded
-      if (options.getPassword() != null) {
-        // perform authentication
-        final RedisClient client = new RedisClient(maxWaitingQueue, maxNesting, netClient, clientConnect.result(), address);
-        client.send(Request.cmd(Command.AUTH).arg(options.getPassword()), auth -> {
-          if (auth.failed()) {
-            onConnect.handle(Future.failedFuture(auth.cause()));
-          } else {
-            onConnect.handle(Future.succeededFuture(client));
+      final RedisClient client = new RedisClient(maxWaitingQueue, maxNesting, netClient, clientConnect.result(), address);
+
+      // perform authentication
+      authenticate(client, options, authenticate -> {
+        if (authenticate.failed()) {
+          onConnect.handle(Future.failedFuture(authenticate.cause()));
+          return;
+        }
+
+        // perform select
+        select(client, options, select -> {
+          if (select.failed()) {
+            onConnect.handle(Future.failedFuture(select.cause()));
+            return;
           }
+
+          // initialization complete
+          onConnect.handle(Future.succeededFuture(client));
         });
+      });
+    });
+  }
+
+  private static void authenticate(Redis client, RedisOptions options, Handler<AsyncResult<Void>> handler) {
+    if (options.getPassword() == null) {
+      handler.handle(Future.succeededFuture());
+      return;
+    }
+    // perform authentication
+    client.send(Request.cmd(Command.AUTH).arg(options.getPassword()), auth -> {
+      if (auth.failed()) {
+        handler.handle(Future.failedFuture(auth.cause()));
       } else {
-        onConnect.handle(
-          Future.succeededFuture(
-            new RedisClient(maxWaitingQueue, maxNesting, netClient, clientConnect.result(), address)));
+        handler.handle(Future.succeededFuture());
+      }
+    });
+  }
+
+  private static void select(Redis client, RedisOptions options, Handler<AsyncResult<Void>> handler) {
+    if (options.getSelect() == null) {
+      handler.handle(Future.succeededFuture());
+      return;
+    }
+    // perform select
+    client.send(Request.cmd(Command.SELECT).arg(options.getSelect()), auth -> {
+      if (auth.failed()) {
+        handler.handle(Future.failedFuture(auth.cause()));
+      } else {
+        handler.handle(Future.succeededFuture());
       }
     });
   }

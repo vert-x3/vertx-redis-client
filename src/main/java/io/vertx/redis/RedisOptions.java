@@ -45,6 +45,7 @@ import java.util.List;
  * yourself in case of connection failure the client will not be able to perform the correct authentication handshake.
  */
 @DataObject(generateConverter = true)
+@Deprecated
 public class RedisOptions extends NetClientOptions {
 
   private static final String DEFAULT_ENCODING = "UTF-8";

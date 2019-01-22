@@ -22,7 +22,7 @@ redis.command(function (err, res) {
     var args = "";
 
     if (cmd[1] > 0) {
-      for (let i = 0; i < cmd[1]; i++) {
+      for (let i = 0; i < cmd[1] - 1; i++) {
         if (i !== 0) {
           args += ', ';
           types += ', ';
@@ -43,6 +43,7 @@ redis.command(function (err, res) {
       safename: cmd[0].replace('-', ' ').replace(':', '').toUpperCase(),
       arity: cmd[1],
       variable: cmd[1] < 0,
+      argLen: cmd[1] - 1,
       args: args,
       types: types,
       firstKey: cmd[3],
@@ -55,11 +56,11 @@ redis.command(function (err, res) {
     });
   });
 
-  var cmd_template = Handlebars.compile(fs.readFileSync('redis-command.hbs', 'utf8'));
-
-  fs.writeFileSync(
-    '../src/main/java/io/vertx/redis/client/Command.java',
-    cmd_template(commands));
+  // var cmd_template = Handlebars.compile(fs.readFileSync('redis-command.hbs', 'utf8'));
+  //
+  // fs.writeFileSync(
+  //   '../src/main/java/io/vertx/redis/client/Command.java',
+  //   cmd_template(commands));
 
   var api_template = Handlebars.compile(fs.readFileSync('redis-api.hbs', 'utf8'));
 

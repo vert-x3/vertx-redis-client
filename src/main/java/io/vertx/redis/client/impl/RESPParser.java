@@ -1,5 +1,5 @@
 /*
- * Copyright 2015 Red Hat, Inc.
+ * Copyright 2019 Red Hat, Inc.
  * <p>
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
@@ -17,8 +17,6 @@ package io.vertx.redis.client.impl;
 
 import io.vertx.core.Handler;
 import io.vertx.core.buffer.Buffer;
-import io.vertx.core.logging.Logger;
-import io.vertx.core.logging.LoggerFactory;
 import io.vertx.redis.client.Response;
 import io.vertx.redis.client.impl.types.*;
 
@@ -26,7 +24,6 @@ import java.nio.charset.StandardCharsets;
 
 public final class RESPParser implements Handler<Buffer> {
 
-  private static final Logger LOG = LoggerFactory.getLogger(RESPParser.class);
   // 512Mb
   private static final long MAX_STRING_LENGTH = 536870912;
 
@@ -70,6 +67,16 @@ public final class RESPParser implements Handler<Buffer> {
         if (eol == -1) {
           buffer.reset();
           break;
+        }
+
+        // special case for sync messages or messages that report the wrong length
+        if (type == '\r' && (start == eol)) {
+          if (!buffer.skip(1)) {
+            buffer.reset();
+            break;
+          }
+          // skipped CRLF
+          continue;
         }
 
         switch (type) {
@@ -118,12 +125,6 @@ public final class RESPParser implements Handler<Buffer> {
                   handler.fatal(ErrorType.create("ILLEGAL_STATE Redis Bulk cannot have negative length"));
                   return;
                 }
-                // empty string
-                if (integer == 0) {
-                  // special case as we don't need to allocate objects for this
-                  handleResponse(BulkType.EMPTY);
-                  return;
-                }
                 // safe cast
                 bytesNeeded = (int) integer;
                 // in this case we switch from eol parsing to fixed len parsing
@@ -161,13 +162,17 @@ public final class RESPParser implements Handler<Buffer> {
             return;
         }
       } else {
-        // fixed length parsing && read the required bytes
-        handleResponse(BulkType.create(buffer.readBytes(bytesNeeded)));
-
+        // empty string
+        if (bytesNeeded == 0) {
+          // special case as we don't need to allocate objects for this
+          handleResponse(BulkType.EMPTY);
+        } else {
+          // fixed length parsing && read the required bytes
+          handleResponse(BulkType.create(buffer.readBytes(bytesNeeded)));
+        }
         // clean up the buffer, skip the last \r\n
         if (buffer.skip(2)) {
           // switch back to eol parsing
-          bytesNeeded = 0;
           eol = true;
         } else {
           // operation failed

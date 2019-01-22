@@ -21,7 +21,7 @@ import io.vertx.codegen.annotations.VertxGen;
 import io.vertx.core.AsyncResult;
 import io.vertx.core.Future;
 import io.vertx.core.Handler;
-import io.vertx.redis.impl.RedisAPIImpl;
+import io.vertx.redis.client.impl.RedisAPIImpl;
 
 import java.util.List;
 
@@ -36,14 +36,9 @@ public interface RedisAPI {
   }
 
 {{#each .}}
-  @GenIgnore
-  default Future<Response> {{ camelcase safename }}({{#if arity}}Object... args{{/if}}) {
-    return send(Command.{{ enum }}{{#if arity}}, args{{/if}});
-  }
-
   @Fluent
-  default RedisAPI {{ camelcase safename }}({{{ types }}}{{#if arity}}, {{/if}}Handler<AsyncResult<Response>> handler) {
-    {{ camelcase safename }}({{{ args }}}{{#if variable}}.toArray(){{/if}}).setHandler(handler);
+  default RedisAPI {{ camelcase safename }}({{{ types }}}{{#if argLen}}, {{/if}}Handler<AsyncResult<Response>> handler) {
+    send(Command.{{ enum }}{{#if argLen}}, {{{ args }}}{{#if variable}}.toArray(){{/if}}{{/if}}).setHandler(handler);
     return this;
   }
 {{/each}}

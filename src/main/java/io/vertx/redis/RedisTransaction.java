@@ -31,6 +31,7 @@ import java.util.Map;
  * This Interface represents a TX
  */
 @VertxGen
+@Deprecated
 public interface RedisTransaction {
   /**
    * Close the client - when it is fully closed the handler will be called.

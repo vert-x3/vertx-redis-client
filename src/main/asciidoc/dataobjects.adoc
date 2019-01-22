@@ -183,6 +183,7 @@ Set TYPE filter
 |[[netClientOptions]]`@netClientOptions`|`link:dataobjects.html#NetClientOptions[NetClientOptions]`|-
 |[[password]]`@password`|`String`|-
 |[[role]]`@role`|`link:enums.html#RedisRole[RedisRole]`|-
+|[[select]]`@select`|`Number (Integer)`|-
 |[[useSlave]]`@useSlave`|`link:enums.html#RedisSlaves[RedisSlaves]`|-
 |===
 

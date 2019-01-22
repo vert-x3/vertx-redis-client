@@ -6,17 +6,21 @@ import io.vertx.core.AsyncResult;
 import io.vertx.core.Handler;
 import io.vertx.core.Vertx;
 import io.vertx.core.json.JsonArray;
-import io.vertx.redis.RedisOptions;
 import io.vertx.redis.impl.RedisSentinelClientImpl;
 
 /**
  * Interface for sentinel commands
  */
 @VertxGen
+@Deprecated
 public interface RedisSentinel {
 
-  static RedisSentinel create(Vertx vertx, RedisOptions config) {
-    return new RedisSentinelClientImpl(vertx, config);
+  static void create(Vertx vertx, Handler<AsyncResult<RedisSentinel>> handler) {
+    RedisSentinelClientImpl.create(vertx, new io.vertx.redis.client.RedisOptions(), handler);
+  }
+
+  static void create(Vertx vertx, io.vertx.redis.client.RedisOptions options, Handler<AsyncResult<RedisSentinel>> handler) {
+    RedisSentinelClientImpl.create(vertx, options, handler);
   }
 
   /**

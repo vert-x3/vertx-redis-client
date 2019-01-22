@@ -23,6 +23,7 @@ import io.vertx.core.json.JsonObject;
  * @author <a href="mailto:marko.strukelj@gmail.com">Marko Strukelj</a>
  */
 @DataObject
+@Deprecated
 public class RangeLimitOptions extends LimitOptions {
 
   public static final RangeLimitOptions NONE = new RangeLimitOptions();
