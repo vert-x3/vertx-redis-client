@@ -83,7 +83,7 @@ class RedisConnection {
       ctx = vertx.getOrCreateContext();
     } else if (!ctx.isEventLoopContext()) {
       VertxInternal vi = (VertxInternal) vertx;
-      ctx = vi.createEventLoopContext(null, null, Thread.currentThread().getContextClassLoader());
+      ctx = vi.createEventLoopContext(null, null, new JsonObject(), Thread.currentThread().getContextClassLoader());
     }
 
     this.vertx = vertx;
