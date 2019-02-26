@@ -49,7 +49,7 @@ public class RedisClusterClient implements Redis {
   private static final Random RANDOM = new Random();
 
   // reduce from list fo responses to a single response
-  private static final Map<Command, Function<List<Response>, Response>> REDUCERS = new EnumMap<>(Command.class);
+  private static final Map<Command, Function<List<Response>, Response>> REDUCERS = new HashMap<>();
 
   public static void addReducer(Command command, Function<List<Response>, Response> fn) {
     REDUCERS.put(command, fn);

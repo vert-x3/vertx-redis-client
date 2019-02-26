@@ -71,7 +71,7 @@ public interface Response extends Iterable<Response> {
     return null;
   }
 
-  @GenIgnore
+  @GenIgnore(GenIgnore.PERMITTED_TYPE)
   default String toString(Charset encoding) {
     throw new UnsupportedOperationException("This type doesn't hold a Bulk type");
   }
@@ -80,7 +80,7 @@ public interface Response extends Iterable<Response> {
     throw new UnsupportedOperationException("This type doesn't hold a Bulk type");
   }
 
-  @GenIgnore
+  @GenIgnore(GenIgnore.PERMITTED_TYPE)
   default byte[] toBytes() {
     throw new UnsupportedOperationException("This type doesn't hold a Bulk type");
   }
@@ -102,7 +102,7 @@ public interface Response extends Iterable<Response> {
   }
 
   @Override
-  @GenIgnore
+  @GenIgnore(GenIgnore.PERMITTED_TYPE)
   default Iterator<Response> iterator() {
     throw new UnsupportedOperationException("This type doesn't hold a Array type");
   }

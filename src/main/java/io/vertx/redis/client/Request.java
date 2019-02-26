@@ -50,7 +50,7 @@ public interface Request {
    * @return self
    */
   @Fluent
-  @GenIgnore
+  @GenIgnore(GenIgnore.PERMITTED_TYPE)
   Request arg(byte[] arg);
 
   /**
@@ -96,7 +96,7 @@ public interface Request {
    * @return self
    */
   @Fluent
-  @GenIgnore
+  @GenIgnore(GenIgnore.PERMITTED_TYPE)
   default Request arg(int arg) {
     arg((long) arg);
     return this;
@@ -107,7 +107,7 @@ public interface Request {
    * @return self
    */
   @Fluent
-  @GenIgnore
+  @GenIgnore(GenIgnore.PERMITTED_TYPE)
   default Request arg(short arg) {
     arg((long) arg);
     return this;
@@ -118,7 +118,7 @@ public interface Request {
    * @return self
    */
   @Fluent
-  @GenIgnore
+  @GenIgnore(GenIgnore.PERMITTED_TYPE)
   default Request arg(byte arg) {
     arg((long) arg);
     return this;

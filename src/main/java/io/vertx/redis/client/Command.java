@@ -15,9 +15,9 @@
  */
 package io.vertx.redis.client;
 
-import java.nio.charset.StandardCharsets;
-
+import io.vertx.codegen.annotations.GenIgnore;
 import io.vertx.codegen.annotations.VertxGen;
+import io.vertx.redis.client.impl.CommandImpl;
 
 /**
  * <b>Auto generated</b> API Commands to interact with REDIS.
@@ -25,265 +25,252 @@ import io.vertx.codegen.annotations.VertxGen;
  * @author <a href="mailto:plopes@redhat.com">Paulo Lopes</a>
  */
 @VertxGen
-public enum Command {
-  APPEND("append", 3, 1, 1, 1, false, false),
-  ASKING("asking", 1, 0, 0, 0, false, false),
-  AUTH("auth", 2, 0, 0, 0, false, false),
-  BGREWRITEAOF("bgrewriteaof", 1, 0, 0, 0, false, false),
-  BGSAVE("bgsave", -1, 0, 0, 0, false, false),
-  BITCOUNT("bitcount", -2, 1, 1, 1, true, false),
-  BITFIELD("bitfield", -2, 1, 1, 1, false, false),
-  BITOP("bitop", -4, 2, -1, 1, false, false),
-  BITPOS("bitpos", -3, 1, 1, 1, true, false),
-  BLPOP("blpop", -3, 1, -2, 1, false, false),
-  BRPOP("brpop", -3, 1, -2, 1, false, false),
-  BRPOPLPUSH("brpoplpush", 4, 1, 2, 1, false, false),
-  BZPOPMAX("bzpopmax", -2, 1, -2, 1, false, false),
-  BZPOPMIN("bzpopmin", -2, 1, -2, 1, false, false),
-  CLIENT("client", -2, 0, 0, 0, false, false),
-  CLUSTER("cluster", -2, 0, 0, 0, false, false),
-  COMMAND("command", 0, 0, 0, 0, false, false),
-  CONFIG("config", -2, 0, 0, 0, false, false),
-  DBSIZE("dbsize", 1, 0, 0, 0, true, false),
-  DEBUG("debug", -2, 0, 0, 0, false, false),
-  DECR("decr", 2, 1, 1, 1, false, false),
-  DECRBY("decrby", 3, 1, 1, 1, false, false),
-  DEL("del", -2, 1, -1, 1, false, false),
-  DISCARD("discard", 1, 0, 0, 0, false, false),
-  DUMP("dump", 2, 1, 1, 1, true, false),
-  ECHO("echo", 2, 0, 0, 0, false, false),
-  EVAL("eval", -3, 0, 0, 0, false, true),
-  EVALSHA("evalsha", -3, 0, 0, 0, false, true),
-  EXEC("exec", 1, 0, 0, 0, false, false),
-  EXISTS("exists", -2, 1, -1, 1, true, false),
-  EXPIRE("expire", 3, 1, 1, 1, false, false),
-  EXPIREAT("expireat", 3, 1, 1, 1, false, false),
-  FLUSHALL("flushall", -1, 0, 0, 0, false, false),
-  FLUSHDB("flushdb", -1, 0, 0, 0, false, false),
-  GEOADD("geoadd", -5, 1, 1, 1, false, false),
-  GEODIST("geodist", -4, 1, 1, 1, true, false),
-  GEOHASH("geohash", -2, 1, 1, 1, true, false),
-  GEOPOS("geopos", -2, 1, 1, 1, true, false),
-  GEORADIUS("georadius", -6, 1, 1, 1, false, true),
-  GEORADIUS_RO("georadius_ro", -6, 1, 1, 1, true, true),
-  GEORADIUSBYMEMBER("georadiusbymember", -5, 1, 1, 1, false, true),
-  GEORADIUSBYMEMBER_RO("georadiusbymember_ro", -5, 1, 1, 1, true, true),
-  GET("get", 2, 1, 1, 1, true, false),
-  GETBIT("getbit", 3, 1, 1, 1, true, false),
-  GETRANGE("getrange", 4, 1, 1, 1, true, false),
-  GETSET("getset", 3, 1, 1, 1, false, false),
-  HDEL("hdel", -3, 1, 1, 1, false, false),
-  HEXISTS("hexists", 3, 1, 1, 1, true, false),
-  HGET("hget", 3, 1, 1, 1, true, false),
-  HGETALL("hgetall", 2, 1, 1, 1, true, false),
-  HINCRBY("hincrby", 4, 1, 1, 1, false, false),
-  HINCRBYFLOAT("hincrbyfloat", 4, 1, 1, 1, false, false),
-  HKEYS("hkeys", 2, 1, 1, 1, true, false),
-  HLEN("hlen", 2, 1, 1, 1, true, false),
-  HMGET("hmget", -3, 1, 1, 1, true, false),
-  HMSET("hmset", -4, 1, 1, 1, false, false),
-  HOST("host:", -1, 0, 0, 0, false, false),
-  HSCAN("hscan", -3, 1, 1, 1, true, false),
-  HSET("hset", -4, 1, 1, 1, false, false),
-  HSETNX("hsetnx", 4, 1, 1, 1, false, false),
-  HSTRLEN("hstrlen", 3, 1, 1, 1, true, false),
-  HVALS("hvals", 2, 1, 1, 1, true, false),
-  INCR("incr", 2, 1, 1, 1, false, false),
-  INCRBY("incrby", 3, 1, 1, 1, false, false),
-  INCRBYFLOAT("incrbyfloat", 3, 1, 1, 1, false, false),
-  INFO("info", -1, 0, 0, 0, false, false),
-  KEYS("keys", 2, 0, 0, 0, true, false),
-  LASTSAVE("lastsave", 1, 0, 0, 0, false, false),
-  LATENCY("latency", -2, 0, 0, 0, false, false),
-  LINDEX("lindex", 3, 1, 1, 1, true, false),
-  LINSERT("linsert", 5, 1, 1, 1, false, false),
-  LLEN("llen", 2, 1, 1, 1, true, false),
-  LOLWUT("lolwut", -1, 0, 0, 0, true, false),
-  LPOP("lpop", 2, 1, 1, 1, false, false),
-  LPUSH("lpush", -3, 1, 1, 1, false, false),
-  LPUSHX("lpushx", -3, 1, 1, 1, false, false),
-  LRANGE("lrange", 4, 1, 1, 1, true, false),
-  LREM("lrem", 4, 1, 1, 1, false, false),
-  LSET("lset", 4, 1, 1, 1, false, false),
-  LTRIM("ltrim", 4, 1, 1, 1, false, false),
-  MEMORY("memory", -2, 0, 0, 0, true, false),
-  MGET("mget", -2, 1, -1, 1, true, false),
-  MIGRATE("migrate", -6, 0, 0, 0, false, true),
-  MODULE("module", -2, 0, 0, 0, false, false),
-  MONITOR("monitor", 1, 0, 0, 0, false, false),
-  MOVE("move", 3, 1, 1, 1, false, false),
-  MSET("mset", -3, 1, -1, 2, false, false),
-  MSETNX("msetnx", -3, 1, -1, 2, false, false),
-  MULTI("multi", 1, 0, 0, 0, false, false),
-  OBJECT("object", -2, 2, 2, 1, true, false),
-  PERSIST("persist", 2, 1, 1, 1, false, false),
-  PEXPIRE("pexpire", 3, 1, 1, 1, false, false),
-  PEXPIREAT("pexpireat", 3, 1, 1, 1, false, false),
-  PFADD("pfadd", -2, 1, 1, 1, false, false),
-  PFCOUNT("pfcount", -2, 1, -1, 1, true, false),
-  PFDEBUG("pfdebug", -3, 0, 0, 0, false, false),
-  PFMERGE("pfmerge", -2, 1, -1, 1, false, false),
-  PFSELFTEST("pfselftest", 1, 0, 0, 0, false, false),
-  PING("ping", -1, 0, 0, 0, false, false),
-  POST("post", -1, 0, 0, 0, false, false),
-  PSETEX("psetex", 4, 1, 1, 1, false, false),
-  PSUBSCRIBE("psubscribe", -2, 0, 0, 0, false, false),
-  PSYNC("psync", 3, 0, 0, 0, true, false),
-  PTTL("pttl", 2, 1, 1, 1, true, false),
-  PUBLISH("publish", 3, 0, 0, 0, false, false),
-  PUBSUB("pubsub", -2, 0, 0, 0, false, false),
-  PUNSUBSCRIBE("punsubscribe", -1, 0, 0, 0, false, false),
-  RANDOMKEY("randomkey", 1, 0, 0, 0, true, false),
-  READONLY("readonly", 1, 0, 0, 0, false, false),
-  READWRITE("readwrite", 1, 0, 0, 0, false, false),
-  RENAME("rename", 3, 1, 2, 1, false, false),
-  RENAMENX("renamenx", 3, 1, 2, 1, false, false),
-  REPLCONF("replconf", -1, 0, 0, 0, false, false),
-  REPLICAOF("replicaof", 3, 0, 0, 0, false, false),
-  RESTORE("restore", -4, 1, 1, 1, false, false),
-  RESTORE_ASKING("restore-asking", -4, 1, 1, 1, false, false),
-  ROLE("role", 1, 0, 0, 0, false, false),
-  RPOP("rpop", 2, 1, 1, 1, false, false),
-  RPOPLPUSH("rpoplpush", 3, 1, 2, 1, false, false),
-  RPUSH("rpush", -3, 1, 1, 1, false, false),
-  RPUSHX("rpushx", -3, 1, 1, 1, false, false),
-  SADD("sadd", -3, 1, 1, 1, false, false),
-  SAVE("save", 1, 0, 0, 0, false, false),
-  SCAN("scan", -2, 0, 0, 0, true, false),
-  SCARD("scard", 2, 1, 1, 1, true, false),
-  SCRIPT("script", -2, 0, 0, 0, false, false),
-  SDIFF("sdiff", -2, 1, -1, 1, true, false),
-  SDIFFSTORE("sdiffstore", -3, 1, -1, 1, false, false),
-  SELECT("select", 2, 0, 0, 0, false, false),
-  SET("set", -3, 1, 1, 1, false, false),
-  SETBIT("setbit", 4, 1, 1, 1, false, false),
-  SETEX("setex", 4, 1, 1, 1, false, false),
-  SETNX("setnx", 3, 1, 1, 1, false, false),
-  SETRANGE("setrange", 4, 1, 1, 1, false, false),
-  SHUTDOWN("shutdown", -1, 0, 0, 0, false, false),
-  SINTER("sinter", -2, 1, -1, 1, true, false),
-  SINTERSTORE("sinterstore", -3, 1, -1, 1, false, false),
-  SISMEMBER("sismember", 3, 1, 1, 1, true, false),
-  SLAVEOF("slaveof", 3, 0, 0, 0, false, false),
-  SLOWLOG("slowlog", -2, 0, 0, 0, false, false),
-  SMEMBERS("smembers", 2, 1, 1, 1, true, false),
-  SMOVE("smove", 4, 1, 2, 1, false, false),
-  SORT("sort", -2, 1, 1, 1, false, true),
-  SPOP("spop", -2, 1, 1, 1, false, false),
-  SRANDMEMBER("srandmember", -2, 1, 1, 1, true, false),
-  SREM("srem", -3, 1, 1, 1, false, false),
-  SSCAN("sscan", -3, 1, 1, 1, true, false),
-  STRLEN("strlen", 2, 1, 1, 1, true, false),
-  SUBSCRIBE("subscribe", -2, 0, 0, 0, false, false),
-  SUBSTR("substr", 4, 1, 1, 1, true, false),
-  SUNION("sunion", -2, 1, -1, 1, true, false),
-  SUNIONSTORE("sunionstore", -3, 1, -1, 1, false, false),
-  SWAPDB("swapdb", 3, 0, 0, 0, false, false),
-  SYNC("sync", 1, 0, 0, 0, true, false),
-  TIME("time", 1, 0, 0, 0, false, false),
-  TOUCH("touch", -2, 1, 1, 1, true, false),
-  TTL("ttl", 2, 1, 1, 1, true, false),
-  TYPE("type", 2, 1, 1, 1, true, false),
-  UNLINK("unlink", -2, 1, -1, 1, false, false),
-  UNSUBSCRIBE("unsubscribe", -1, 0, 0, 0, false, false),
-  UNWATCH("unwatch", 1, 0, 0, 0, false, false),
-  WAIT("wait", 3, 0, 0, 0, false, false),
-  WATCH("watch", -2, 1, -1, 1, false, false),
-  XACK("xack", -4, 1, 1, 1, false, false),
-  XADD("xadd", -5, 1, 1, 1, false, false),
-  XCLAIM("xclaim", -6, 1, 1, 1, false, false),
-  XDEL("xdel", -3, 1, 1, 1, false, false),
-  XGROUP("xgroup", -2, 2, 2, 1, false, false),
-  XINFO("xinfo", -2, 2, 2, 1, true, false),
-  XLEN("xlen", 2, 1, 1, 1, true, false),
-  XPENDING("xpending", -3, 1, 1, 1, true, false),
-  XRANGE("xrange", -4, 1, 1, 1, true, false),
-  XREAD("xread", -4, 1, 1, 1, true, true),
-  XREADGROUP("xreadgroup", -7, 1, 1, 1, false, true),
-  XREVRANGE("xrevrange", -4, 1, 1, 1, true, false),
-  XSETID("xsetid", 3, 1, 1, 1, false, false),
-  XTRIM("xtrim", -2, 1, 1, 1, false, false),
-  ZADD("zadd", -4, 1, 1, 1, false, false),
-  ZCARD("zcard", 2, 1, 1, 1, true, false),
-  ZCOUNT("zcount", 4, 1, 1, 1, true, false),
-  ZINCRBY("zincrby", 4, 1, 1, 1, false, false),
-  ZINTERSTORE("zinterstore", -4, 0, 0, 0, false, true),
-  ZLEXCOUNT("zlexcount", 4, 1, 1, 1, true, false),
-  ZPOPMAX("zpopmax", -2, 1, 1, 1, false, false),
-  ZPOPMIN("zpopmin", -2, 1, 1, 1, false, false),
-  ZRANGE("zrange", -4, 1, 1, 1, true, false),
-  ZRANGEBYLEX("zrangebylex", -4, 1, 1, 1, true, false),
-  ZRANGEBYSCORE("zrangebyscore", -4, 1, 1, 1, true, false),
-  ZRANK("zrank", 3, 1, 1, 1, true, false),
-  ZREM("zrem", -3, 1, 1, 1, false, false),
-  ZREMRANGEBYLEX("zremrangebylex", 4, 1, 1, 1, false, false),
-  ZREMRANGEBYRANK("zremrangebyrank", 4, 1, 1, 1, false, false),
-  ZREMRANGEBYSCORE("zremrangebyscore", 4, 1, 1, 1, false, false),
-  ZREVRANGE("zrevrange", -4, 1, 1, 1, true, false),
-  ZREVRANGEBYLEX("zrevrangebylex", -4, 1, 1, 1, true, false),
-  ZREVRANGEBYSCORE("zrevrangebyscore", -4, 1, 1, 1, true, false),
-  ZREVRANK("zrevrank", 3, 1, 1, 1, true, false),
-  ZSCAN("zscan", -3, 1, 1, 1, true, false),
-  ZSCORE("zscore", 3, 1, 1, 1, true, false),
-  ZUNIONSTORE("zunionstore", -4, 0, 0, 0, false, true),
-  SENTINEL("sentinel", -1, 0, 0, 0, false, false);
+public interface Command {
 
-  private final byte[] bytes;
-  private final int arity;
+  Command APPEND = Command.create("append", 3, 1, 1, 1, false, false);
+  Command ASKING = Command.create("asking", 1, 0, 0, 0, false, false);
+  Command AUTH = Command.create("auth", 2, 0, 0, 0, false, false);
+  Command BGREWRITEAOF = Command.create("bgrewriteaof", 1, 0, 0, 0, false, false);
+  Command BGSAVE = Command.create("bgsave", -1, 0, 0, 0, false, false);
+  Command BITCOUNT = Command.create("bitcount", -2, 1, 1, 1, true, false);
+  Command BITFIELD = Command.create("bitfield", -2, 1, 1, 1, false, false);
+  Command BITOP = Command.create("bitop", -4, 2, -1, 1, false, false);
+  Command BITPOS = Command.create("bitpos", -3, 1, 1, 1, true, false);
+  Command BLPOP = Command.create("blpop", -3, 1, -2, 1, false, false);
+  Command BRPOP = Command.create("brpop", -3, 1, -2, 1, false, false);
+  Command BRPOPLPUSH = Command.create("brpoplpush", 4, 1, 2, 1, false, false);
+  Command BZPOPMAX = Command.create("bzpopmax", -2, 1, -2, 1, false, false);
+  Command BZPOPMIN = Command.create("bzpopmin", -2, 1, -2, 1, false, false);
+  Command CLIENT = Command.create("client", -2, 0, 0, 0, false, false);
+  Command CLUSTER = Command.create("cluster", -2, 0, 0, 0, false, false);
+  Command COMMAND = Command.create("command", 0, 0, 0, 0, false, false);
+  Command CONFIG = Command.create("config", -2, 0, 0, 0, false, false);
+  Command DBSIZE = Command.create("dbsize", 1, 0, 0, 0, true, false);
+  Command DEBUG = Command.create("debug", -2, 0, 0, 0, false, false);
+  Command DECR = Command.create("decr", 2, 1, 1, 1, false, false);
+  Command DECRBY = Command.create("decrby", 3, 1, 1, 1, false, false);
+  Command DEL = Command.create("del", -2, 1, -1, 1, false, false);
+  Command DISCARD = Command.create("discard", 1, 0, 0, 0, false, false);
+  Command DUMP = Command.create("dump", 2, 1, 1, 1, true, false);
+  Command ECHO = Command.create("echo", 2, 0, 0, 0, false, false);
+  Command EVAL = Command.create("eval", -3, 0, 0, 0, false, true);
+  Command EVALSHA = Command.create("evalsha", -3, 0, 0, 0, false, true);
+  Command EXEC = Command.create("exec", 1, 0, 0, 0, false, false);
+  Command EXISTS = Command.create("exists", -2, 1, -1, 1, true, false);
+  Command EXPIRE = Command.create("expire", 3, 1, 1, 1, false, false);
+  Command EXPIREAT = Command.create("expireat", 3, 1, 1, 1, false, false);
+  Command FLUSHALL = Command.create("flushall", -1, 0, 0, 0, false, false);
+  Command FLUSHDB = Command.create("flushdb", -1, 0, 0, 0, false, false);
+  Command GEOADD = Command.create("geoadd", -5, 1, 1, 1, false, false);
+  Command GEODIST = Command.create("geodist", -4, 1, 1, 1, true, false);
+  Command GEOHASH = Command.create("geohash", -2, 1, 1, 1, true, false);
+  Command GEOPOS = Command.create("geopos", -2, 1, 1, 1, true, false);
+  Command GEORADIUS = Command.create("georadius", -6, 1, 1, 1, false, true);
+  Command GEORADIUS_RO = Command.create("georadius_ro", -6, 1, 1, 1, true, true);
+  Command GEORADIUSBYMEMBER = Command.create("georadiusbymember", -5, 1, 1, 1, false, true);
+  Command GEORADIUSBYMEMBER_RO = Command.create("georadiusbymember_ro", -5, 1, 1, 1, true, true);
+  Command GET = Command.create("get", 2, 1, 1, 1, true, false);
+  Command GETBIT = Command.create("getbit", 3, 1, 1, 1, true, false);
+  Command GETRANGE = Command.create("getrange", 4, 1, 1, 1, true, false);
+  Command GETSET = Command.create("getset", 3, 1, 1, 1, false, false);
+  Command HDEL = Command.create("hdel", -3, 1, 1, 1, false, false);
+  Command HEXISTS = Command.create("hexists", 3, 1, 1, 1, true, false);
+  Command HGET = Command.create("hget", 3, 1, 1, 1, true, false);
+  Command HGETALL = Command.create("hgetall", 2, 1, 1, 1, true, false);
+  Command HINCRBY = Command.create("hincrby", 4, 1, 1, 1, false, false);
+  Command HINCRBYFLOAT = Command.create("hincrbyfloat", 4, 1, 1, 1, false, false);
+  Command HKEYS = Command.create("hkeys", 2, 1, 1, 1, true, false);
+  Command HLEN = Command.create("hlen", 2, 1, 1, 1, true, false);
+  Command HMGET = Command.create("hmget", -3, 1, 1, 1, true, false);
+  Command HMSET = Command.create("hmset", -4, 1, 1, 1, false, false);
+  Command HOST = Command.create("host:", -1, 0, 0, 0, false, false);
+  Command HSCAN = Command.create("hscan", -3, 1, 1, 1, true, false);
+  Command HSET = Command.create("hset", -4, 1, 1, 1, false, false);
+  Command HSETNX = Command.create("hsetnx", 4, 1, 1, 1, false, false);
+  Command HSTRLEN = Command.create("hstrlen", 3, 1, 1, 1, true, false);
+  Command HVALS = Command.create("hvals", 2, 1, 1, 1, true, false);
+  Command INCR = Command.create("incr", 2, 1, 1, 1, false, false);
+  Command INCRBY = Command.create("incrby", 3, 1, 1, 1, false, false);
+  Command INCRBYFLOAT = Command.create("incrbyfloat", 3, 1, 1, 1, false, false);
+  Command INFO = Command.create("info", -1, 0, 0, 0, false, false);
+  Command KEYS = Command.create("keys", 2, 0, 0, 0, true, false);
+  Command LASTSAVE = Command.create("lastsave", 1, 0, 0, 0, false, false);
+  Command LATENCY = Command.create("latency", -2, 0, 0, 0, false, false);
+  Command LINDEX = Command.create("lindex", 3, 1, 1, 1, true, false);
+  Command LINSERT = Command.create("linsert", 5, 1, 1, 1, false, false);
+  Command LLEN = Command.create("llen", 2, 1, 1, 1, true, false);
+  Command LOLWUT = Command.create("lolwut", -1, 0, 0, 0, true, false);
+  Command LPOP = Command.create("lpop", 2, 1, 1, 1, false, false);
+  Command LPUSH = Command.create("lpush", -3, 1, 1, 1, false, false);
+  Command LPUSHX = Command.create("lpushx", -3, 1, 1, 1, false, false);
+  Command LRANGE = Command.create("lrange", 4, 1, 1, 1, true, false);
+  Command LREM = Command.create("lrem", 4, 1, 1, 1, false, false);
+  Command LSET = Command.create("lset", 4, 1, 1, 1, false, false);
+  Command LTRIM = Command.create("ltrim", 4, 1, 1, 1, false, false);
+  Command MEMORY = Command.create("memory", -2, 0, 0, 0, true, false);
+  Command MGET = Command.create("mget", -2, 1, -1, 1, true, false);
+  Command MIGRATE = Command.create("migrate", -6, 0, 0, 0, false, true);
+  Command MODULE = Command.create("module", -2, 0, 0, 0, false, false);
+  Command MONITOR = Command.create("monitor", 1, 0, 0, 0, false, false);
+  Command MOVE = Command.create("move", 3, 1, 1, 1, false, false);
+  Command MSET = Command.create("mset", -3, 1, -1, 2, false, false);
+  Command MSETNX = Command.create("msetnx", -3, 1, -1, 2, false, false);
+  Command MULTI = Command.create("multi", 1, 0, 0, 0, false, false);
+  Command OBJECT = Command.create("object", -2, 2, 2, 1, true, false);
+  Command PERSIST = Command.create("persist", 2, 1, 1, 1, false, false);
+  Command PEXPIRE = Command.create("pexpire", 3, 1, 1, 1, false, false);
+  Command PEXPIREAT = Command.create("pexpireat", 3, 1, 1, 1, false, false);
+  Command PFADD = Command.create("pfadd", -2, 1, 1, 1, false, false);
+  Command PFCOUNT = Command.create("pfcount", -2, 1, -1, 1, true, false);
+  Command PFDEBUG = Command.create("pfdebug", -3, 0, 0, 0, false, false);
+  Command PFMERGE = Command.create("pfmerge", -2, 1, -1, 1, false, false);
+  Command PFSELFTEST = Command.create("pfselftest", 1, 0, 0, 0, false, false);
+  Command PING = Command.create("ping", -1, 0, 0, 0, false, false);
+  Command POST = Command.create("post", -1, 0, 0, 0, false, false);
+  Command PSETEX = Command.create("psetex", 4, 1, 1, 1, false, false);
+  Command PSUBSCRIBE = Command.create("psubscribe", -2, 0, 0, 0, false, false);
+  Command PSYNC = Command.create("psync", 3, 0, 0, 0, true, false);
+  Command PTTL = Command.create("pttl", 2, 1, 1, 1, true, false);
+  Command PUBLISH = Command.create("publish", 3, 0, 0, 0, false, false);
+  Command PUBSUB = Command.create("pubsub", -2, 0, 0, 0, false, false);
+  Command PUNSUBSCRIBE = Command.create("punsubscribe", -1, 0, 0, 0, false, false);
+  Command RANDOMKEY = Command.create("randomkey", 1, 0, 0, 0, true, false);
+  Command READONLY = Command.create("readonly", 1, 0, 0, 0, false, false);
+  Command READWRITE = Command.create("readwrite", 1, 0, 0, 0, false, false);
+  Command RENAME = Command.create("rename", 3, 1, 2, 1, false, false);
+  Command RENAMENX = Command.create("renamenx", 3, 1, 2, 1, false, false);
+  Command REPLCONF = Command.create("replconf", -1, 0, 0, 0, false, false);
+  Command REPLICAOF = Command.create("replicaof", 3, 0, 0, 0, false, false);
+  Command RESTORE = Command.create("restore", -4, 1, 1, 1, false, false);
+  Command RESTORE_ASKING = Command.create("restore-asking", -4, 1, 1, 1, false, false);
+  Command ROLE = Command.create("role", 1, 0, 0, 0, false, false);
+  Command RPOP = Command.create("rpop", 2, 1, 1, 1, false, false);
+  Command RPOPLPUSH = Command.create("rpoplpush", 3, 1, 2, 1, false, false);
+  Command RPUSH = Command.create("rpush", -3, 1, 1, 1, false, false);
+  Command RPUSHX = Command.create("rpushx", -3, 1, 1, 1, false, false);
+  Command SADD = Command.create("sadd", -3, 1, 1, 1, false, false);
+  Command SAVE = Command.create("save", 1, 0, 0, 0, false, false);
+  Command SCAN = Command.create("scan", -2, 0, 0, 0, true, false);
+  Command SCARD = Command.create("scard", 2, 1, 1, 1, true, false);
+  Command SCRIPT = Command.create("script", -2, 0, 0, 0, false, false);
+  Command SDIFF = Command.create("sdiff", -2, 1, -1, 1, true, false);
+  Command SDIFFSTORE = Command.create("sdiffstore", -3, 1, -1, 1, false, false);
+  Command SELECT = Command.create("select", 2, 0, 0, 0, false, false);
+  Command SET = Command.create("set", -3, 1, 1, 1, false, false);
+  Command SETBIT = Command.create("setbit", 4, 1, 1, 1, false, false);
+  Command SETEX = Command.create("setex", 4, 1, 1, 1, false, false);
+  Command SETNX = Command.create("setnx", 3, 1, 1, 1, false, false);
+  Command SETRANGE = Command.create("setrange", 4, 1, 1, 1, false, false);
+  Command SHUTDOWN = Command.create("shutdown", -1, 0, 0, 0, false, false);
+  Command SINTER = Command.create("sinter", -2, 1, -1, 1, true, false);
+  Command SINTERSTORE = Command.create("sinterstore", -3, 1, -1, 1, false, false);
+  Command SISMEMBER = Command.create("sismember", 3, 1, 1, 1, true, false);
+  Command SLAVEOF = Command.create("slaveof", 3, 0, 0, 0, false, false);
+  Command SLOWLOG = Command.create("slowlog", -2, 0, 0, 0, false, false);
+  Command SMEMBERS = Command.create("smembers", 2, 1, 1, 1, true, false);
+  Command SMOVE = Command.create("smove", 4, 1, 2, 1, false, false);
+  Command SORT = Command.create("sort", -2, 1, 1, 1, false, true);
+  Command SPOP = Command.create("spop", -2, 1, 1, 1, false, false);
+  Command SRANDMEMBER = Command.create("srandmember", -2, 1, 1, 1, true, false);
+  Command SREM = Command.create("srem", -3, 1, 1, 1, false, false);
+  Command SSCAN = Command.create("sscan", -3, 1, 1, 1, true, false);
+  Command STRLEN = Command.create("strlen", 2, 1, 1, 1, true, false);
+  Command SUBSCRIBE = Command.create("subscribe", -2, 0, 0, 0, false, false);
+  Command SUBSTR = Command.create("substr", 4, 1, 1, 1, true, false);
+  Command SUNION = Command.create("sunion", -2, 1, -1, 1, true, false);
+  Command SUNIONSTORE = Command.create("sunionstore", -3, 1, -1, 1, false, false);
+  Command SWAPDB = Command.create("swapdb", 3, 0, 0, 0, false, false);
+  Command SYNC = Command.create("sync", 1, 0, 0, 0, true, false);
+  Command TIME = Command.create("time", 1, 0, 0, 0, false, false);
+  Command TOUCH = Command.create("touch", -2, 1, 1, 1, true, false);
+  Command TTL = Command.create("ttl", 2, 1, 1, 1, true, false);
+  Command TYPE = Command.create("type", 2, 1, 1, 1, true, false);
+  Command UNLINK = Command.create("unlink", -2, 1, -1, 1, false, false);
+  Command UNSUBSCRIBE = Command.create("unsubscribe", -1, 0, 0, 0, false, false);
+  Command UNWATCH = Command.create("unwatch", 1, 0, 0, 0, false, false);
+  Command WAIT = Command.create("wait", 3, 0, 0, 0, false, false);
+  Command WATCH = Command.create("watch", -2, 1, -1, 1, false, false);
+  Command XACK = Command.create("xack", -4, 1, 1, 1, false, false);
+  Command XADD = Command.create("xadd", -5, 1, 1, 1, false, false);
+  Command XCLAIM = Command.create("xclaim", -6, 1, 1, 1, false, false);
+  Command XDEL = Command.create("xdel", -3, 1, 1, 1, false, false);
+  Command XGROUP = Command.create("xgroup", -2, 2, 2, 1, false, false);
+  Command XINFO = Command.create("xinfo", -2, 2, 2, 1, true, false);
+  Command XLEN = Command.create("xlen", 2, 1, 1, 1, true, false);
+  Command XPENDING = Command.create("xpending", -3, 1, 1, 1, true, false);
+  Command XRANGE = Command.create("xrange", -4, 1, 1, 1, true, false);
+  Command XREAD = Command.create("xread", -4, 1, 1, 1, true, true);
+  Command XREADGROUP = Command.create("xreadgroup", -7, 1, 1, 1, false, true);
+  Command XREVRANGE = Command.create("xrevrange", -4, 1, 1, 1, true, false);
+  Command XSETID = Command.create("xsetid", 3, 1, 1, 1, false, false);
+  Command XTRIM = Command.create("xtrim", -2, 1, 1, 1, false, false);
+  Command ZADD = Command.create("zadd", -4, 1, 1, 1, false, false);
+  Command ZCARD = Command.create("zcard", 2, 1, 1, 1, true, false);
+  Command ZCOUNT = Command.create("zcount", 4, 1, 1, 1, true, false);
+  Command ZINCRBY = Command.create("zincrby", 4, 1, 1, 1, false, false);
+  Command ZINTERSTORE = Command.create("zinterstore", -4, 0, 0, 0, false, true);
+  Command ZLEXCOUNT = Command.create("zlexcount", 4, 1, 1, 1, true, false);
+  Command ZPOPMAX = Command.create("zpopmax", -2, 1, 1, 1, false, false);
+  Command ZPOPMIN = Command.create("zpopmin", -2, 1, 1, 1, false, false);
+  Command ZRANGE = Command.create("zrange", -4, 1, 1, 1, true, false);
+  Command ZRANGEBYLEX = Command.create("zrangebylex", -4, 1, 1, 1, true, false);
+  Command ZRANGEBYSCORE = Command.create("zrangebyscore", -4, 1, 1, 1, true, false);
+  Command ZRANK = Command.create("zrank", 3, 1, 1, 1, true, false);
+  Command ZREM = Command.create("zrem", -3, 1, 1, 1, false, false);
+  Command ZREMRANGEBYLEX = Command.create("zremrangebylex", 4, 1, 1, 1, false, false);
+  Command ZREMRANGEBYRANK = Command.create("zremrangebyrank", 4, 1, 1, 1, false, false);
+  Command ZREMRANGEBYSCORE = Command.create("zremrangebyscore", 4, 1, 1, 1, false, false);
+  Command ZREVRANGE = Command.create("zrevrange", -4, 1, 1, 1, true, false);
+  Command ZREVRANGEBYLEX = Command.create("zrevrangebylex", -4, 1, 1, 1, true, false);
+  Command ZREVRANGEBYSCORE = Command.create("zrevrangebyscore", -4, 1, 1, 1, true, false);
+  Command ZREVRANK = Command.create("zrevrank", 3, 1, 1, 1, true, false);
+  Command ZSCAN = Command.create("zscan", -3, 1, 1, 1, true, false);
+  Command ZSCORE = Command.create("zscore", 3, 1, 1, 1, true, false);
+  Command ZUNIONSTORE = Command.create("zunionstore", -4, 0, 0, 0, false, true);
+  Command SENTINEL = Command.create("sentinel", -1, 0, 0, 0, false, false);
 
-  private final boolean multiKey;
-  private final int firstKey;
-  private final int lastKey;
-  private final int interval;
-  private final boolean keyless;
-  private final boolean readOnly;
-  private final boolean movable;
-
-  Command(String command, int arity, int firstKey, int lastKey, int interval, boolean readOnly, boolean movable) {
-    bytes = ("$" + command.length() + "\r\n" + command + "\r\n").getBytes(StandardCharsets.ISO_8859_1);
-    this.arity = arity;
-    this.firstKey = firstKey;
-    this.lastKey = lastKey;
-    this.interval = interval;
-    this.multiKey = lastKey < 0;
-    this.keyless = interval == 0 && !movable;
-    this.readOnly = readOnly;
-    this.movable = movable;
+  /**
+   * Creates a Redis Command from METADATA. The metadata comes from the REDIS command "COMMAND"
+   * https://redis.io/commands/command
+   *
+   * Each top-level result contains six nested results. Each nested result is:
+   *
+   *     command name
+   *     command arity specification
+   *     nested Array reply of command flags
+   *     position of first key in argument list
+   *     position of last key in argument list
+   *     step count for locating repeating keys
+   *
+   * @param command command name
+   * @param arity arity
+   * @param firstKey position of the first key
+   * @param lastKey position of the last key
+   * @param interval step count for locating repeating keys
+   * @param readOnly readOnly flag extracted from the nested Array reply of command flags
+   * @param movable movable flag extracted from the nested Array reply of command flags
+   * @return a command instance
+   */
+  static Command create(String command, int arity, int firstKey, int lastKey, int interval, boolean readOnly, boolean movable) {
+    return new CommandImpl(command, arity, firstKey, lastKey, interval, readOnly, movable);
   }
 
-  public byte[] getBytes() {
-    return bytes;
-  }
+  @GenIgnore(GenIgnore.PERMITTED_TYPE)
+  byte[] getBytes();
 
-  public int getArity() {
-    return arity;
-  }
+  int getArity();
 
-  public boolean isMultiKey() {
-    return multiKey;
-  }
+  boolean isMultiKey();
 
-  public int getFirstKey() {
-    return firstKey;
-  }
+  int getFirstKey();
 
-  public int getLastKey() {
-    return lastKey;
-  }
+  int getLastKey();
 
-  public int getInterval() {
-    return interval;
-  }
+  int getInterval();
 
-  public boolean isKeyless() {
-    return keyless;
-  }
+  boolean isKeyless();
 
-  public boolean isReadOnly() {
-    return readOnly;
-  }
+  boolean isReadOnly();
 
-  public boolean isMovable() {
-    return movable;
-  }
+  boolean isMovable();
 }
