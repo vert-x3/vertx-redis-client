@@ -141,8 +141,6 @@ public class RedisExamples {
             client = onCreate.result();
             // make sure the client is reconnected on error
             client.exceptionHandler(e -> {
-              // log the error
-              e.printStackTrace();
               // attempt to reconnect
               attemptReconnect(0);
             });
