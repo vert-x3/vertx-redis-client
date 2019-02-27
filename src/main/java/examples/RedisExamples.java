@@ -1,8 +1,13 @@
 package examples;
 
+import io.vertx.codegen.annotations.VertxGen;
+import io.vertx.core.AsyncResult;
+import io.vertx.core.Handler;
 import io.vertx.core.Vertx;
 import io.vertx.core.net.SocketAddress;
 import io.vertx.redis.client.*;
+
+import java.util.concurrent.atomic.AtomicReference;
 
 /**
  * These are the examples used in the documentation.
@@ -106,6 +111,49 @@ public class RedisExamples {
     Redis.createClient(vertx, SocketAddress.domainSocketAddress("/tmp/redis.sock"), onCreate -> {
       if (onCreate.succeeded()) {
         Redis client = onCreate.result();
+      }
+    });
+  }
+
+  public void example10(Vertx vertx) {
+
+    final RedisOptions options = new RedisOptions();
+
+    Redis.createClient(vertx, options, onCreate -> {
+      if (onCreate.succeeded()) {
+        final AtomicReference<Redis> client = new AtomicReference<>(onCreate.result());
+        // configure the number of retries to reconnect
+        final Handler<Integer> reconnect = new Handler<Integer>() {
+          @Override
+          public void handle(Integer retry) {
+            if (retry < 0) {
+              // stop it has been 16 times without success!
+            } else {
+              // retry with backoff up to 1280ms
+              long backoff = (long) (Math.pow(2, 16 - Math.max(retry, 9)) * 10);
+
+              vertx.setTimer(backoff, timer -> {
+                Redis.createClient(vertx, options, onReconnect -> {
+                  if (onReconnect.succeeded()) {
+                    client.set(onReconnect.result());
+                    // Reconnected!
+                    client.get().exceptionHandler(ex -> {
+                      // attempt to reconnect with in 16 times
+                      this.handle(16);
+                    });
+                  } else {
+                    this.handle(retry - 1);
+                  }
+                });
+              });
+            }
+          }
+        };
+
+        client.get().exceptionHandler(ex -> {
+          // attempt to reconnect with in 16 times
+          reconnect.handle(16);
+        });
       }
     });
   }

@@ -163,3 +163,26 @@ domain docket:
 
 Be aware that HA and cluster modes report server addresses always on TCP addresses not domain sockets. So the
 combination is not possible. Not because of this client but how Redis works.
+
+== Implementing Reconnect on Error
+
+A typical scenario is that a user will want to reconnect to the server whenever an error occurs. The automatic reconnect
+is not part of the redis client has it will force a behaviour that might not match the user expectations, for example:
+
+1. What should happen to current in-flight requests?
+2. Should the exception handler be invoked or not?
+3. What if the retry will also fail?
+4. Should the previous state (db, authentication, subscriptions) be restored?
+5. Etc...
+
+In order to give the user full flexibility, this decision should not be performed by the client. However a simple
+reconnect with backoff timeout could be implemented as follows:
+
+[source,$lang]
+----
+{@link examples.RedisExamples#example10}
+----
+
+In this example the client object will be replaced on reconnect and the application will retry up to 16 times with a
+backoff up to 1280ms. By discarding the client we ensure that all old inflight responses are lost and all new ones
+will be on the new connection.
