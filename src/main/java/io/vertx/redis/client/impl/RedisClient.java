@@ -115,6 +115,9 @@ public class RedisClient implements Redis, ParserHandler {
 
   private Handler<Void> onEnd;
   private Handler<Response> onMessage;
+  // connected flag to signal that the underlying socket
+  // connection is operational.
+  private boolean connected = true;
 
   private RedisClient(int maxQueue, int maxNesting, NetClient netClient, NetSocket netSocket, SocketAddress endpoint) {
     this.waiting = new ArrayQueue(maxQueue);
@@ -138,6 +141,8 @@ public class RedisClient implements Redis, ParserHandler {
         netClient.close();
         // clean up the pending queue
         cleanupQueue(exception);
+        // the underlying socket connection is broken
+        connected  = false;
         // call the exception handler if any
         if (onException != null) {
           onException.handle(exception);
@@ -202,6 +207,13 @@ public class RedisClient implements Redis, ParserHandler {
 
   @Override
   public Redis send(final Request request, Handler<AsyncResult<Response>> handler) {
+    if (!connected) {
+      // this avoids entering the socket exception handler as it is well known
+      // that the transport is broken.
+      handler.handle(Future.failedFuture("Redis connection is broken."));
+      return this;
+    }
+
     if (waiting.isFull()) {
       handler.handle(Future.failedFuture("Redis waiting Queue is full"));
       return this;

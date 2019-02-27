@@ -1,13 +1,11 @@
 package examples;
 
-import io.vertx.codegen.annotations.VertxGen;
+import io.vertx.core.AbstractVerticle;
 import io.vertx.core.AsyncResult;
 import io.vertx.core.Handler;
 import io.vertx.core.Vertx;
 import io.vertx.core.net.SocketAddress;
 import io.vertx.redis.client.*;
-
-import java.util.concurrent.atomic.AtomicReference;
 
 /**
  * These are the examples used in the documentation.
@@ -115,46 +113,62 @@ public class RedisExamples {
     });
   }
 
-  public void example10(Vertx vertx) {
+  public void example10() {
 
-    final RedisOptions options = new RedisOptions();
+    class RedisVerticle extends AbstractVerticle {
 
-    Redis.createClient(vertx, options, onCreate -> {
-      if (onCreate.succeeded()) {
-        final AtomicReference<Redis> client = new AtomicReference<>(onCreate.result());
-        // configure the number of retries to reconnect
-        final Handler<Integer> reconnect = new Handler<Integer>() {
-          @Override
-          public void handle(Integer retry) {
-            if (retry < 0) {
-              // stop it has been 16 times without success!
-            } else {
-              // retry with backoff up to 1280ms
-              long backoff = (long) (Math.pow(2, 16 - Math.max(retry, 9)) * 10);
+      private static final int MAX_RECONNECT_RETRIES = 16;
 
-              vertx.setTimer(backoff, timer -> {
-                Redis.createClient(vertx, options, onReconnect -> {
-                  if (onReconnect.succeeded()) {
-                    client.set(onReconnect.result());
-                    // Reconnected!
-                    client.get().exceptionHandler(ex -> {
-                      // attempt to reconnect with in 16 times
-                      this.handle(16);
-                    });
-                  } else {
-                    this.handle(retry - 1);
-                  }
-                });
-              });
-            }
+      private RedisOptions options = new RedisOptions();
+      private Redis client;
+
+      @Override
+      public void start() {
+        createRedisClient(onCreate -> {
+          if (onCreate.succeeded()) {
+            // connected to redis!
           }
-        };
-
-        client.get().exceptionHandler(ex -> {
-          // attempt to reconnect with in 16 times
-          reconnect.handle(16);
         });
       }
-    });
+
+      /**
+       * Will create a redis client and setup a reconnect handler when there is
+       * an exception in the connection.
+       */
+      private void createRedisClient(Handler<AsyncResult<Redis>> handler) {
+        Redis.createClient(vertx, options, onCreate -> {
+          if (onCreate.succeeded()) {
+            client = onCreate.result();
+            // make sure the client is reconnected on error
+            client.exceptionHandler(e -> {
+              // log the error
+              e.printStackTrace();
+              // attempt to reconnect
+              attemptReconnect(0);
+            });
+          }
+          // allow further processing
+          handler.handle(onCreate);
+        });
+      }
+
+      /**
+       * Attempt to reconnect up to MAX_RECONNECT_RETRIES
+       */
+      private void attemptReconnect(int retry) {
+        if (retry > MAX_RECONNECT_RETRIES) {
+          // we should stop now, as there's nothing we can do.
+        } else {
+          // retry with backoff up to 1280ms
+          long backoff = (long) (Math.pow(2, MAX_RECONNECT_RETRIES - Math.max(MAX_RECONNECT_RETRIES - retry, 9)) * 10);
+
+          vertx.setTimer(backoff, timer -> createRedisClient(onReconnect -> {
+            if (onReconnect.failed()) {
+              attemptReconnect(retry + 1);
+            }
+          }));
+        }
+      }
+    }
   }
 }

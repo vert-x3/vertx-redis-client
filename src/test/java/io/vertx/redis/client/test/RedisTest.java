@@ -33,6 +33,10 @@ public class RedisTest {
 
       final Redis redis = create.result();
 
+      redis.exceptionHandler(ex -> {
+
+      });
+
       redis.send(Request.cmd(Command.PING), send -> {
         should.assertTrue(send.succeeded());
         should.assertNotNull(send.result());
