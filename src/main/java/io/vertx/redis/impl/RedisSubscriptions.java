@@ -17,8 +17,8 @@ package io.vertx.redis.impl;
 
 import io.vertx.core.Context;
 import io.vertx.core.Vertx;
-import io.vertx.core.logging.Logger;
-import io.vertx.core.logging.LoggerFactory;
+import io.vertx.core.impl.logging.Logger;
+import io.vertx.core.impl.logging.LoggerFactory;
 
 import java.util.Map;
 import java.util.Set;
