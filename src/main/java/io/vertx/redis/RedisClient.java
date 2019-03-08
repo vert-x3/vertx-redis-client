@@ -1,4 +1,4 @@
-/**
+/*
  * Copyright 2015 Red Hat, Inc.
  * <p>
  * All rights reserved. This program and the accompanying materials
@@ -16,7 +16,6 @@
 package io.vertx.redis;
 
 import io.vertx.codegen.annotations.Fluent;
-import io.vertx.codegen.annotations.GenIgnore;
 import io.vertx.codegen.annotations.Nullable;
 import io.vertx.codegen.annotations.VertxGen;
 import io.vertx.core.AsyncResult;
@@ -31,24 +30,20 @@ import io.vertx.redis.op.*;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * @deprecated
+ * @see io.vertx.redis.client.Redis for the new API.
+ */
 @VertxGen
+@Deprecated
 public interface RedisClient {
 
-  static RedisClient create(Vertx vertx) {
-    return new RedisClientImpl(vertx, new RedisOptions());
+  static void create(Vertx vertx, Handler<AsyncResult<RedisClient>> handler) {
+    RedisClientImpl.create(vertx, new io.vertx.redis.client.RedisOptions(), handler);
   }
 
-  /**
-   * @deprecated For type safety please use {@link #create(Vertx, RedisOptions)}.
-   */
-  @Deprecated
-  @GenIgnore
-  static RedisClient create(Vertx vertx, JsonObject config) {
-    return new RedisClientImpl(vertx, new RedisOptions(config));
-  }
-
-  static RedisClient create(Vertx vertx, RedisOptions config) {
-    return new RedisClientImpl(vertx, config);
+  static void create(Vertx vertx, io.vertx.redis.client.RedisOptions options, Handler<AsyncResult<RedisClient>> handler) {
+    RedisClientImpl.create(vertx, options, handler);
   }
 
   /**

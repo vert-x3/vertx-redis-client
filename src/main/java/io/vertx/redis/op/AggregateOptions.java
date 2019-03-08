@@ -22,6 +22,7 @@ import io.vertx.core.json.JsonArray;
  * @author <a href="mailto:marko.strukelj@gmail.com">Marko Strukelj</a>
  */
 @VertxGen
+@Deprecated
 public enum AggregateOptions {
   NONE,
   SUM,

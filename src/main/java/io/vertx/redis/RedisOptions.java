@@ -43,8 +43,11 @@ import java.util.List;
  * database at connection time. If you define this extra properties on every connection to Redis server this client
  * will perform the authentication handshake and database selection, however if you don't do this and call {@link io.vertx.redis.RedisClient#auth(String, Handler)}
  * yourself in case of connection failure the client will not be able to perform the correct authentication handshake.
+ * @deprecated
+ * @see io.vertx.redis.client.Redis for the new API.
  */
 @DataObject(generateConverter = true)
+@Deprecated
 public class RedisOptions extends NetClientOptions {
 
   private static final String DEFAULT_ENCODING = "UTF-8";
