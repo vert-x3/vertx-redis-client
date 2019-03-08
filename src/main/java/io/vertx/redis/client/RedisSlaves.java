@@ -17,9 +17,24 @@ package io.vertx.redis.client;
 
 import io.vertx.codegen.annotations.VertxGen;
 
+/**
+ * When should Redis Slave nodes be used for queries.
+ */
 @VertxGen
 public enum RedisSlaves {
+
+  /**
+   * Never use SLAVES, queries are always run on a MASTER node.
+   */
   NEVER,
+
+  /**
+   * Queries can be randomly run on both MASTER and SLAVE nodes.
+   */
   SHARE,
+
+  /**
+   * Queries are always run on SLAVE nodes (never on MASTER node).
+   */
   ALWAYS
 }

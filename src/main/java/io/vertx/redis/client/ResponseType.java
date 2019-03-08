@@ -17,11 +17,33 @@ package io.vertx.redis.client;
 
 import io.vertx.codegen.annotations.VertxGen;
 
+/**
+ * Define the response types that the client can receive from REDIS.
+ */
 @VertxGen
 public enum ResponseType {
+  /**
+   * C String simple String.
+   */
   SIMPLE,
+
+  /**
+   * C String simple String representing an error.
+   */
   ERROR,
+
+  /**
+   * 64 bit integer value.
+   */
   INTEGER,
+
+  /**
+   * byte array value.
+   */
   BULK,
+
+  /**
+   * List of multiple bulk responses.
+   */
   MULTI
 }

@@ -21,7 +21,7 @@ package io.vertx.redis.client;
  *
  * @author Paulo Lopes
  */
-public final class RedisException extends Throwable {
+public final class RedisException extends RuntimeException {
 
   public RedisException(String message) {
     super(message, null, false, false);

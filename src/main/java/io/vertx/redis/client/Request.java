@@ -41,8 +41,8 @@ import java.nio.charset.StandardCharsets;
 @VertxGen
 public interface Request {
 
-  static Request cmd(Command commandEnum) {
-    return new RequestImpl(commandEnum);
+  static Request cmd(Command command) {
+    return new RequestImpl(command);
   }
 
   /**
@@ -141,5 +141,9 @@ public interface Request {
   @Fluent
   Request nullArg();
 
+  /**
+   * Get the Command that is to be used by this request.
+   * @return the command.
+   */
   Command command();
 }

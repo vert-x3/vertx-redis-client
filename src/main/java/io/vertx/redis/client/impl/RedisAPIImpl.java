@@ -41,7 +41,7 @@ public class RedisAPIImpl implements RedisAPI {
       }
     }
 
-    client.send(req, future.completer());
+    client.send(req, future);
     return future;
   }
 }

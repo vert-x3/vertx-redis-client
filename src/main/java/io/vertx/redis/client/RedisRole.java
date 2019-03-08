@@ -17,9 +17,23 @@ package io.vertx.redis.client;
 
 import io.vertx.codegen.annotations.VertxGen;
 
+/**
+ * Define which kind of role to be used in HA mode.
+ */
 @VertxGen
 public enum RedisRole {
+  /**
+   * Use a MASTER node connection.
+   */
   MASTER,
+
+  /**
+   * Use a SLAVE node connection.
+   */
   SLAVE,
+
+  /**
+   * Use a SENTINEL node connection.
+   */
   SENTINEL
 }

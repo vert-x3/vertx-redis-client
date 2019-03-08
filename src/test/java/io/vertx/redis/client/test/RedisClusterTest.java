@@ -182,7 +182,7 @@ public class RedisClusterTest {
 
     for (int i = 0; i < 24; i++) {
       Future f = Future.future();
-      Redis.createClusterClient(rule.vertx(), options, f.completer());
+      Redis.createClusterClient(rule.vertx(), options, f);
       futures.add(f);
     }
 
