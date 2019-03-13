@@ -182,7 +182,7 @@ public interface Response extends Iterable<Response> {
    * @return response iterator.
    */
   @Override
-  @GenIgnore(GenIgnore.PERMITTED_TYPE)
+  @GenIgnore
   default Iterator<Response> iterator() {
     throw new UnsupportedOperationException("This type doesn't hold a Array type");
   }
