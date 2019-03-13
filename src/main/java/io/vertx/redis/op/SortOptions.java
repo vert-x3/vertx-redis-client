@@ -27,6 +27,7 @@ import java.util.List;
  * @author <a href="mailto:marko.strukelj@gmail.com">Marko Strukelj</a>
  */
 @DataObject
+@Deprecated
 public class SortOptions {
 
   public static final SortOptions NONE = new SortOptions();

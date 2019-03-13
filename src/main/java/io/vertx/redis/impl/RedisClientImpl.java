@@ -1,4 +1,4 @@
-/**
+/*
  * Copyright 2015 Red Hat, Inc.
  * <p>
  * All rights reserved. This program and the accompanying materials
@@ -23,22 +23,35 @@ import io.vertx.core.buffer.Buffer;
 import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;
 import io.vertx.redis.RedisClient;
-import io.vertx.redis.RedisOptions;
 import io.vertx.redis.RedisTransaction;
 import io.vertx.redis.Script;
+import io.vertx.redis.client.*;
+import io.vertx.redis.client.Command;
 import io.vertx.redis.op.*;
 
 import java.util.*;
 import java.util.stream.Stream;
 
-import static io.vertx.redis.impl.RedisCommand.*;
+import static io.vertx.redis.client.Command.*;
 
-public final class RedisClientImpl extends AbstractRedisClient {
+@Deprecated
+public final class RedisClientImpl implements RedisClient {
 
-  private RedisTransaction transaction;
+  private final Redis client;
+  private final RedisTransaction transaction;
 
-  public RedisClientImpl(Vertx vertx, RedisOptions config) {
-    super(vertx, config);
+  public static void create(Vertx vertx, RedisOptions options, Handler<AsyncResult<RedisClient>> ready) {
+    Redis.createClient(vertx, options, onReady -> {
+      if (onReady.succeeded()) {
+        ready.handle(Future.succeededFuture(new RedisClientImpl(onReady.result())));
+      } else {
+        ready.handle(Future.failedFuture(onReady.cause()));
+      }
+    });
+  }
+
+  public RedisClientImpl(Redis redis) {
+    this.client = redis;
     this.transaction = new RedisTransactionImpl();
   }
 
@@ -86,6 +99,145 @@ public final class RedisClientImpl extends AbstractRedisClient {
       }
     }
     return result;
+  }
+
+  private void send(Command command, List arguments, Handler<AsyncResult<Response>> handler) {
+    final Request req = Request.cmd(command);
+
+    if (arguments != null) {
+      for (Object o : arguments) {
+        if (o == null) {
+          req.nullArg();
+        } else {
+          req.arg(o.toString());
+        }
+      }
+    }
+
+    client.send(req, handler);
+  }
+
+  private void sendLong(Command command, List arguments, Handler<AsyncResult<Long>> handler) {
+    send(command, arguments, ar -> {
+      if (ar.failed()) {
+        handler.handle(Future.failedFuture(ar.cause()));
+      } else {
+        handler.handle(Future.succeededFuture(ar.result().toLong()));
+      }
+    });
+  }
+
+  private void sendString(Command command, List arguments, Handler<AsyncResult<String>> handler) {
+    send(command, arguments, ar -> {
+      if (ar.failed()) {
+        handler.handle(Future.failedFuture(ar.cause()));
+      } else {
+        handler.handle(Future.succeededFuture(ar.result() != null ? ar.result().toString() : null));
+      }
+    });
+  }
+
+  private static JsonArray toJsonArray(Response response) {
+    final JsonArray json = new JsonArray();
+
+    if (response.type() != ResponseType.MULTI) {
+      switch (response.type()) {
+        case INTEGER:
+          json.add(response.toLong());
+          break;
+        case SIMPLE:
+        case BULK:
+          json.add(response.toString());
+          break;
+      }
+      return json;
+    }
+
+    for (Response r : response) {
+      switch (r.type()) {
+        case INTEGER:
+          json.add(r.toLong());
+          break;
+        case SIMPLE:
+        case BULK:
+          json.add(r.toString());
+          break;
+        case MULTI:
+          json.add(toJsonArray(r));
+          break;
+      }
+    }
+
+    return json;
+  }
+
+  private void sendJsonArray(Command command, List arguments, Handler<AsyncResult<JsonArray>> handler) {
+    send(command, arguments, ar -> {
+      if (ar.failed()) {
+        handler.handle(Future.failedFuture(ar.cause()));
+      } else {
+        handler.handle(Future.succeededFuture(ar.result() != null ? toJsonArray(ar.result()) : null));
+      }
+    });
+  }
+
+  private void sendVoid(Command command, List arguments, Handler<AsyncResult<Void>> handler) {
+    send(command, arguments, ar -> {
+      if (ar.failed()) {
+        handler.handle(Future.failedFuture(ar.cause()));
+      } else {
+        handler.handle(Future.succeededFuture());
+      }
+    });
+  }
+
+  private void sendBuffer(Command command, List arguments, Handler<AsyncResult<Buffer>> handler) {
+    send(command, arguments, ar -> {
+      if (ar.failed()) {
+        handler.handle(Future.failedFuture(ar.cause()));
+      } else {
+        handler.handle(Future.succeededFuture(ar.result().toBuffer()));
+      }
+    });
+  }
+
+  private static JsonObject toJsonObject(Response response) {
+    final JsonObject json = new JsonObject();
+    for (String key : response.getKeys()) {
+      Response value = response.get(key);
+      switch (value.type()) {
+        case INTEGER:
+          json.put(key, value.toLong());
+          break;
+        case SIMPLE:
+        case BULK:
+          json.put(key, value.toString());
+          break;
+        case MULTI:
+          json.put(key, toJsonArray(value));
+          break;
+      }
+    }
+
+    return json;
+  }
+
+  private void sendJsonObject(Command command, List arguments, Handler<AsyncResult<JsonObject>> handler) {
+    send(command, arguments, ar -> {
+      if (ar.failed()) {
+        handler.handle(Future.failedFuture(ar.cause()));
+      } else {
+        handler.handle(Future.succeededFuture(toJsonObject(ar.result())));
+      }
+    });
+  }
+
+  @Override
+  public void close(Handler<AsyncResult<Void>> handler) {
+    client.close();
+    if (handler != null) {
+      handler.handle(Future.succeededFuture());
+    }
   }
 
   @Override
@@ -179,163 +331,163 @@ public final class RedisClientImpl extends AbstractRedisClient {
 
   @Override
   public RedisClient clientKill(KillFilter filter, Handler<AsyncResult<Long>> handler) {
-    sendLong(CLIENT_KILL, filter.toJsonArray().getList(), handler);
+    sendLong(CLIENT, toPayload("kill", filter.toJsonArray().getList()), handler);
     return this;
   }
 
   @Override
   public RedisClient clientList(Handler<AsyncResult<String>> handler) {
-    sendString(CLIENT_LIST, null, handler);
+    sendString(CLIENT, toPayload("list"), handler);
     return this;
   }
 
   @Override
   public RedisClient clientGetname(Handler<AsyncResult<String>> handler) {
-    sendString(CLIENT_GETNAME, null, handler);
+    sendString(CLIENT, toPayload("GETNAME"), handler);
     return this;
   }
 
   @Override
   public RedisClient clientPause(long millis, Handler<AsyncResult<String>> handler) {
-    sendString(CLIENT_PAUSE, toPayload(millis), handler);
+    sendString(CLIENT, toPayload("PAUSE", millis), handler);
     return this;
   }
 
   @Override
   public RedisClient clientSetname(String name, Handler<AsyncResult<String>> handler) {
-    sendString(CLIENT_SETNAME, toPayload(name), handler);
+    sendString(CLIENT, toPayload("SETNAME", name), handler);
     return this;
   }
 
   @Override
   public RedisClient clusterAddslots(List<Long> slots, Handler<AsyncResult<Void>> handler) {
-    sendVoid(CLUSTER_ADDSLOTS, null, handler);
+    sendVoid(CLUSTER, toPayload("ADDSLOTS"), handler);
     return this;
   }
 
   @Override
   public RedisClient clusterCountFailureReports(String nodeId, Handler<AsyncResult<Long>> handler) {
-    sendLong(CLUSTER_COUNT_FAILURE_REPORTS, toPayload(nodeId), handler);
+    sendLong(CLUSTER, toPayload("COUNT-FAILURE-REPORTS", nodeId), handler);
     return this;
   }
 
   @Override
   public RedisClient clusterCountkeysinslot(long slot, Handler<AsyncResult<Long>> handler) {
-    sendLong(CLUSTER_COUNTKEYSINSLOT, toPayload(slot), handler);
+    sendLong(CLUSTER, toPayload("COUNTKEYSINSLOT", slot), handler);
     return this;
   }
 
   @Override
   public RedisClient clusterDelslots(long slot, Handler<AsyncResult<Void>> handler) {
-    sendVoid(CLUSTER_DELSLOTS, toPayload(slot), handler);
+    sendVoid(CLUSTER, toPayload("DELSLOTS", slot), handler);
     return this;
   }
 
   @Override
   public RedisClient clusterDelslotsMany(List<Long> slots, Handler<AsyncResult<Void>> handler) {
-    sendVoid(CLUSTER_DELSLOTS, toPayload(slots), handler);
+    sendVoid(CLUSTER, toPayload("DELSLOTS", slots), handler);
     return this;
   }
 
   @Override
   public RedisClient clusterFailover(Handler<AsyncResult<Void>> handler) {
-    sendVoid(CLUSTER_FAILOVER, null, handler);
+    sendVoid(CLUSTER, toPayload("FAILOVER"), handler);
     return this;
   }
 
   @Override
   public RedisClient clusterFailOverWithOptions(FailoverOptions options, Handler<AsyncResult<Void>> handler) {
-    sendVoid(CLUSTER_FAILOVER, toPayload(options), handler);
+    sendVoid(CLUSTER, toPayload("FAILOVER", options), handler);
     return this;
   }
 
   @Override
   public RedisClient clusterForget(String nodeId, Handler<AsyncResult<Void>> handler) {
-    sendVoid(CLUSTER_FORGET, toPayload(nodeId), handler);
+    sendVoid(CLUSTER, toPayload("FORGET", nodeId), handler);
     return this;
   }
 
   @Override
   public RedisClient clusterGetkeysinslot(long slot, long count, Handler<AsyncResult<JsonArray>> handler) {
-    sendJsonArray(CLUSTER_GETKEYSINSLOT, toPayload(slot, count), handler);
+    sendJsonArray(CLUSTER, toPayload("GETKEYSINSLOT", slot, count), handler);
     return this;
   }
 
   @Override
   public RedisClient clusterInfo(Handler<AsyncResult<JsonArray>> handler) {
-    sendJsonArray(CLUSTER_INFO, null, handler);
+    sendJsonArray(CLUSTER, toPayload("INFO"), handler);
     return this;
   }
 
   @Override
   public RedisClient clusterKeyslot(String key, Handler<AsyncResult<Long>> handler) {
-    sendLong(CLUSTER_KEYSLOT, toPayload(key), handler);
+    sendLong(CLUSTER, toPayload("KEYSLOT", key), handler);
     return this;
   }
 
   @Override
   public RedisClient clusterMeet(String ip, long port, Handler<AsyncResult<Void>> handler) {
-    sendVoid(CLUSTER_MEET, toPayload(ip, port), handler);
+    sendVoid(CLUSTER, toPayload("MEET", ip, port), handler);
     return this;
   }
 
   @Override
   public RedisClient clusterNodes(Handler<AsyncResult<JsonArray>> handler) {
-    sendJsonArray(CLUSTER_NODES, null, handler);
+    sendJsonArray(CLUSTER, toPayload("NODES"), handler);
     return this;
   }
 
   @Override
   public RedisClient clusterReplicate(String nodeId, Handler<AsyncResult<Void>> handler) {
-    sendVoid(CLUSTER_REPLICATE, toPayload(nodeId), handler);
+    sendVoid(CLUSTER, toPayload("REPLICATE", nodeId), handler);
     return this;
   }
 
   @Override
   public RedisClient clusterReset(Handler<AsyncResult<Void>> handler) {
-    sendVoid(CLUSTER_RESET, null, handler);
+    sendVoid(CLUSTER, toPayload("RESET"), handler);
     return this;
   }
 
   @Override
   public RedisClient clusterResetWithOptions(ResetOptions options, Handler<AsyncResult<Void>> handler) {
-    sendVoid(CLUSTER_RESET, toPayload(options), handler);
+    sendVoid(CLUSTER, toPayload("RESET", options), handler);
     return this;
   }
 
   @Override
   public RedisClient clusterSaveconfig(Handler<AsyncResult<Void>> handler) {
-    sendVoid(CLUSTER_SAVECONFIG, null, handler);
+    sendVoid(CLUSTER, toPayload("SAVECONFIG"), handler);
     return this;
   }
 
   @Override
   public RedisClient clusterSetConfigEpoch(long epoch, Handler<AsyncResult<Void>> handler) {
-    sendVoid(CLUSTER_SET_CONFIG_EPOCH, toPayload(epoch), handler);
+    sendVoid(CLUSTER, toPayload("SET-CONFIG-EPOCH", epoch), handler);
     return this;
   }
 
   @Override
   public RedisClient clusterSetslot(long slot, SlotCmd subcommand, Handler<AsyncResult<Void>> handler) {
-    sendVoid(CLUSTER_SETSLOT, toPayload(slot, subcommand), handler);
+    sendVoid(CLUSTER, toPayload("SETSLOT", slot, subcommand), handler);
     return this;
   }
 
   @Override
   public RedisClient clusterSetslotWithNode(long slot, SlotCmd subcommand, String nodeId, Handler<AsyncResult<Void>> handler) {
-    sendVoid(CLUSTER_SETSLOT, toPayload(slot, subcommand, nodeId), handler);
+    sendVoid(CLUSTER, toPayload("SETSLOT", slot, subcommand, nodeId), handler);
     return this;
   }
 
   @Override
   public RedisClient clusterSlaves(String nodeId, Handler<AsyncResult<JsonArray>> handler) {
-    sendJsonArray(CLUSTER_SLAVES, toPayload(nodeId), handler);
+    sendJsonArray(CLUSTER, toPayload("SLAVES", nodeId), handler);
     return this;
   }
 
   @Override
   public RedisClient clusterSlots(Handler<AsyncResult<JsonArray>> handler) {
-    sendJsonArray(CLUSTER_SLOTS, null, handler);
+    sendJsonArray(CLUSTER, toPayload("SLOTS"), handler);
     return this;
   }
 
@@ -347,43 +499,43 @@ public final class RedisClientImpl extends AbstractRedisClient {
 
   @Override
   public RedisClient commandCount(Handler<AsyncResult<Long>> handler) {
-    sendLong(COMMAND_COUNT, null, handler);
+    sendLong(COMMAND, toPayload("COUNT"), handler);
     return this;
   }
 
   @Override
   public RedisClient commandGetkeys(Handler<AsyncResult<JsonArray>> handler) {
-    sendJsonArray(COMMAND_GETKEYS, null, handler);
+    sendJsonArray(COMMAND, toPayload("GETKEYS"), handler);
     return this;
   }
 
   @Override
   public RedisClient commandInfo(List<String> commands, Handler<AsyncResult<JsonArray>> handler) {
-    sendJsonArray(COMMAND_INFO, toPayload(commands), handler);
+    sendJsonArray(COMMAND, toPayload("INFO", commands), handler);
     return this;
   }
 
   @Override
   public RedisClient configGet(String parameter, Handler<AsyncResult<JsonArray>> handler) {
-    sendJsonArray(CONFIG_GET, toPayload(parameter), handler);
+    sendJsonArray(CONFIG, toPayload("GET", parameter), handler);
     return this;
   }
 
   @Override
   public RedisClient configRewrite(Handler<AsyncResult<String>> handler) {
-    sendString(CONFIG_REWRITE, null, handler);
+    sendString(CONFIG, toPayload("REWRITE"), handler);
     return this;
   }
 
   @Override
   public RedisClient configSet(String parameter, String value, Handler<AsyncResult<String>> handler) {
-    sendString(CONFIG_SET, toPayload(parameter, value), handler);
+    sendString(CONFIG, toPayload("SET", parameter, value), handler);
     return this;
   }
 
   @Override
   public RedisClient configResetstat(Handler<AsyncResult<String>> handler) {
-    sendString(CONFIG_RESETSTAT, null, handler);
+    sendString(CONFIG, toPayload("RESETSTAT"), handler);
     return this;
   }
 
@@ -395,13 +547,13 @@ public final class RedisClientImpl extends AbstractRedisClient {
 
   @Override
   public RedisClient debugObject(String key, Handler<AsyncResult<String>> handler) {
-    sendString(DEBUG_OBJECT, toPayload(key), handler);
+    sendString(DEBUG, toPayload("OBJECT", key), handler);
     return this;
   }
 
   @Override
   public RedisClient debugSegfault(Handler<AsyncResult<String>> handler) {
-    sendString(DEBUG_SEGFAULT, null, handler);
+    sendString(DEBUG, toPayload("SEGFAULT"), handler);
     return this;
   }
 
@@ -431,7 +583,7 @@ public final class RedisClientImpl extends AbstractRedisClient {
 
   @Override
   public RedisClient dump(String key, Handler<AsyncResult<String>> handler) {
-    send(DUMP, toPayload(key), String.class, true, dump -> {
+    sendString(DUMP, toPayload(key), dump -> {
       if (dump.failed()) {
         handler.handle(dump);
       } else {
@@ -519,7 +671,7 @@ public final class RedisClientImpl extends AbstractRedisClient {
 
   @Override
   public RedisClient getBinary(String key, Handler<AsyncResult<Buffer>> handler) {
-    send(GET, toPayload(key), Buffer.class, true, handler);
+    sendBuffer(GET, toPayload(key), handler);
     return this;
   }
 
@@ -908,7 +1060,7 @@ public final class RedisClientImpl extends AbstractRedisClient {
 
   @Override
   public RedisClient restore(String key, long millis, String serialized, Handler<AsyncResult<String>> handler) {
-    send(RESTORE, toPayload(key, millis, RedisEncoding.decode(serialized)), String.class, true, handler);
+    sendString(RESTORE, toPayload(key, millis, RedisEncoding.decode(serialized)), handler);
     return this;
   }
 
@@ -974,31 +1126,31 @@ public final class RedisClientImpl extends AbstractRedisClient {
 
   @Override
   public RedisClient scriptExists(String script, Handler<AsyncResult<JsonArray>> handler) {
-    sendJsonArray(SCRIPT_EXISTS, toPayload(script), handler);
+    sendJsonArray(SCRIPT, toPayload("EXISTS", script), handler);
     return this;
   }
 
   @Override
   public RedisClient scriptExistsMany(List<String> scripts, Handler<AsyncResult<JsonArray>> handler) {
-    sendJsonArray(SCRIPT_EXISTS, toPayload(scripts), handler);
+    sendJsonArray(SCRIPT, toPayload("EXISTS", scripts), handler);
     return this;
   }
 
   @Override
   public RedisClient scriptFlush(Handler<AsyncResult<String>> handler) {
-    sendString(SCRIPT_FLUSH, null, handler);
+    sendString(SCRIPT, toPayload("FLUSH"), handler);
     return this;
   }
 
   @Override
   public RedisClient scriptKill(Handler<AsyncResult<String>> handler) {
-    sendString(SCRIPT_KILL, null, handler);
+    sendString(SCRIPT, toPayload("KILL"), handler);
     return this;
   }
 
   @Override
   public RedisClient scriptLoad(String script, Handler<AsyncResult<String>> handler) {
-    sendString(SCRIPT_LOAD, toPayload(script), handler);
+    sendString(SCRIPT, toPayload("LOAD", script), handler);
     return this;
   }
 
@@ -1034,13 +1186,13 @@ public final class RedisClientImpl extends AbstractRedisClient {
 
   @Override
   public RedisClient setBinary(String key, Buffer value, Handler<AsyncResult<Void>> handler) {
-    send(SET, toPayload(key, value), Void.class, true, handler);
+    sendVoid(SET, toPayload(key, value), handler);
     return this;
   }
 
   @Override
   public RedisClient setBinaryWithOptions(String key, Buffer value, SetOptions options, Handler<AsyncResult<Void>> handler) {
-    send(SET, toPayload(key, value, options != null ? options.toJsonArray() : null), Void.class, true, handler);
+    sendVoid(SET, toPayload(key, value, options != null ? options.toJsonArray() : null), handler);
     return this;
   }
 
@@ -1496,7 +1648,7 @@ public final class RedisClientImpl extends AbstractRedisClient {
 
   @Override
   public RedisClient clientReply(ClientReplyOptions options, Handler<AsyncResult<String>> handler) {
-    sendString(CLIENT_REPLY, toPayload(options), handler);
+    sendString(CLIENT, toPayload("REPLY", options), handler);
     return this;
   }
 
@@ -1520,7 +1672,7 @@ public final class RedisClientImpl extends AbstractRedisClient {
 
   @Override
   public RedisClient scriptDebug(ScriptDebugOptions scriptDebugOptions, Handler<AsyncResult<String>> handler) {
-    sendString(SCRIPT_DEBUG, toPayload(scriptDebugOptions), handler);
+    sendString(SCRIPT, toPayload("DEBUG", scriptDebugOptions), handler);
     return this;
   }
 
@@ -1652,163 +1804,163 @@ public final class RedisClientImpl extends AbstractRedisClient {
 
     @Override
     public RedisTransaction clientKill(KillFilter filter, Handler<AsyncResult<String>> handler) {
-      sendString(CLIENT_KILL, filter.toJsonArray().getList(), handler);
+      sendString(CLIENT, toPayload("KILL", filter.toJsonArray().getList()), handler);
       return this;
     }
 
     @Override
     public RedisTransaction clientList(Handler<AsyncResult<String>> handler) {
-      sendString(CLIENT_LIST, null, handler);
+      sendString(CLIENT, toPayload("LIST"), handler);
       return this;
     }
 
     @Override
     public RedisTransaction clientGetname(Handler<AsyncResult<String>> handler) {
-      sendString(CLIENT_GETNAME, null, handler);
+      sendString(CLIENT, toPayload("GETNAME"), handler);
       return this;
     }
 
     @Override
     public RedisTransaction clientPause(long millis, Handler<AsyncResult<String>> handler) {
-      sendString(CLIENT_PAUSE, toPayload(millis), handler);
+      sendString(CLIENT, toPayload("PAUSE", millis), handler);
       return this;
     }
 
     @Override
     public RedisTransaction clientSetname(String name, Handler<AsyncResult<String>> handler) {
-      sendString(CLIENT_SETNAME, toPayload(name), handler);
+      sendString(CLIENT, toPayload("SETNAME", name), handler);
       return this;
     }
 
     @Override
     public RedisTransaction clusterAddslots(List<String> slots, Handler<AsyncResult<String>> handler) {
-      sendString(CLUSTER_ADDSLOTS, null, handler);
+      sendString(CLUSTER, toPayload("ADDSLOTS"), handler);
       return this;
     }
 
     @Override
     public RedisTransaction clusterCountFailureReports(String nodeId, Handler<AsyncResult<String>> handler) {
-      sendString(CLUSTER_COUNT_FAILURE_REPORTS, toPayload(nodeId), handler);
+      sendString(CLUSTER, toPayload("COUNT-FAILURE-REPORTS", nodeId), handler);
       return this;
     }
 
     @Override
     public RedisTransaction clusterCountkeysinslot(long slot, Handler<AsyncResult<String>> handler) {
-      sendString(CLUSTER_COUNTKEYSINSLOT, toPayload(slot), handler);
+      sendString(CLUSTER, toPayload("COUNTKEYSINSLOT", slot), handler);
       return this;
     }
 
     @Override
     public RedisTransaction clusterDelslots(long slot, Handler<AsyncResult<String>> handler) {
-      sendString(CLUSTER_DELSLOTS, toPayload(slot), handler);
+      sendString(CLUSTER, toPayload("DELSLOTS", slot), handler);
       return this;
     }
 
     @Override
     public RedisTransaction clusterDelslotsMany(List<String> slots, Handler<AsyncResult<String>> handler) {
-      sendString(CLUSTER_DELSLOTS, toPayload(slots), handler);
+      sendString(CLUSTER, toPayload("DELSLOTS", slots), handler);
       return this;
     }
 
     @Override
     public RedisTransaction clusterFailover(Handler<AsyncResult<String>> handler) {
-      sendString(CLUSTER_FAILOVER, null, handler);
+      sendString(CLUSTER, toPayload("FAILOVER"), handler);
       return this;
     }
 
     @Override
     public RedisTransaction clusterFailOverWithOptions(FailoverOptions options, Handler<AsyncResult<String>> handler) {
-      sendString(CLUSTER_FAILOVER, toPayload(options), handler);
+      sendString(CLUSTER, toPayload("FAILOVER", options), handler);
       return this;
     }
 
     @Override
     public RedisTransaction clusterForget(String nodeId, Handler<AsyncResult<String>> handler) {
-      sendString(CLUSTER_FORGET, toPayload(nodeId), handler);
+      sendString(CLUSTER, toPayload("FORGET", nodeId), handler);
       return this;
     }
 
     @Override
     public RedisTransaction clusterGetkeysinslot(long slot, long count, Handler<AsyncResult<String>> handler) {
-      sendString(CLUSTER_GETKEYSINSLOT, toPayload(slot, count), handler);
+      sendString(CLUSTER, toPayload("GETKEYSINSLOT", slot, count), handler);
       return this;
     }
 
     @Override
     public RedisTransaction clusterInfo(Handler<AsyncResult<String>> handler) {
-      sendString(CLUSTER_INFO, null, handler);
+      sendString(CLUSTER, toPayload("INFO"), handler);
       return this;
     }
 
     @Override
     public RedisTransaction clusterKeyslot(String key, Handler<AsyncResult<String>> handler) {
-      sendString(CLUSTER_KEYSLOT, toPayload(key), handler);
+      sendString(CLUSTER, toPayload("KEYSLOT", key), handler);
       return this;
     }
 
     @Override
     public RedisTransaction clusterMeet(String ip, long port, Handler<AsyncResult<String>> handler) {
-      sendString(CLUSTER_MEET, toPayload(ip, port), handler);
+      sendString(CLUSTER, toPayload("MEET", ip, port), handler);
       return this;
     }
 
     @Override
     public RedisTransaction clusterNodes(Handler<AsyncResult<String>> handler) {
-      sendString(CLUSTER_NODES, null, handler);
+      sendString(CLUSTER, toPayload("NODES"), handler);
       return this;
     }
 
     @Override
     public RedisTransaction clusterReplicate(String nodeId, Handler<AsyncResult<String>> handler) {
-      sendString(CLUSTER_REPLICATE, toPayload(nodeId), handler);
+      sendString(CLUSTER, toPayload("REPLICATE", nodeId), handler);
       return this;
     }
 
     @Override
     public RedisTransaction clusterReset(Handler<AsyncResult<String>> handler) {
-      sendString(CLUSTER_RESET, null, handler);
+      sendString(CLUSTER, toPayload("RESET"), handler);
       return this;
     }
 
     @Override
     public RedisTransaction clusterResetWithOptions(ResetOptions options, Handler<AsyncResult<String>> handler) {
-      sendString(CLUSTER_RESET, toPayload(options), handler);
+      sendString(CLUSTER, toPayload("RESET", options), handler);
       return this;
     }
 
     @Override
     public RedisTransaction clusterSaveconfig(Handler<AsyncResult<String>> handler) {
-      sendString(CLUSTER_SAVECONFIG, null, handler);
+      sendString(CLUSTER, toPayload("SAVECONFIG"), handler);
       return this;
     }
 
     @Override
     public RedisTransaction clusterSetConfigEpoch(long epoch, Handler<AsyncResult<String>> handler) {
-      sendString(CLUSTER_SET_CONFIG_EPOCH, toPayload(epoch), handler);
+      sendString(CLUSTER, toPayload("SET-CONFIG-EPOCH", epoch), handler);
       return this;
     }
 
     @Override
     public RedisTransaction clusterSetslot(long slot, SlotCmd subcommand, Handler<AsyncResult<String>> handler) {
-      sendString(CLUSTER_SETSLOT, toPayload(slot, subcommand), handler);
+      sendString(CLUSTER, toPayload("SETSLOT", slot, subcommand), handler);
       return this;
     }
 
     @Override
     public RedisTransaction clusterSetslotWithNode(long slot, SlotCmd subcommand, String nodeId, Handler<AsyncResult<String>> handler) {
-      sendString(CLUSTER_SETSLOT, toPayload(slot, subcommand, nodeId), handler);
+      sendString(CLUSTER, toPayload("SETSLOT", slot, subcommand, nodeId), handler);
       return this;
     }
 
     @Override
     public RedisTransaction clusterSlaves(String nodeId, Handler<AsyncResult<String>> handler) {
-      sendString(CLUSTER_SLAVES, toPayload(nodeId), handler);
+      sendString(CLUSTER, toPayload("SLAVES", nodeId), handler);
       return this;
     }
 
     @Override
     public RedisTransaction clusterSlots(Handler<AsyncResult<String>> handler) {
-      sendString(CLUSTER_SLOTS, null, handler);
+      sendString(CLUSTER, toPayload("SLOTS"), handler);
       return this;
     }
 
@@ -1820,43 +1972,43 @@ public final class RedisClientImpl extends AbstractRedisClient {
 
     @Override
     public RedisTransaction commandCount(Handler<AsyncResult<String>> handler) {
-      sendString(COMMAND_COUNT, null, handler);
+      sendString(COMMAND, toPayload("COUNT"), handler);
       return this;
     }
 
     @Override
     public RedisTransaction commandGetkeys(Handler<AsyncResult<String>> handler) {
-      sendString(COMMAND_GETKEYS, null, handler);
+      sendString(COMMAND, toPayload("GETKEYS"), handler);
       return this;
     }
 
     @Override
     public RedisTransaction commandInfo(List<String> commands, Handler<AsyncResult<String>> handler) {
-      sendString(COMMAND_INFO, toPayload(commands), handler);
+      sendString(COMMAND, toPayload("INFO", commands), handler);
       return this;
     }
 
     @Override
     public RedisTransaction configGet(String parameter, Handler<AsyncResult<String>> handler) {
-      sendString(CONFIG_GET, toPayload(parameter), handler);
+      sendString(CONFIG, toPayload("GET", parameter), handler);
       return this;
     }
 
     @Override
     public RedisTransaction configRewrite(Handler<AsyncResult<String>> handler) {
-      sendString(CONFIG_REWRITE, null, handler);
+      sendString(CONFIG, toPayload("REWRITE"), handler);
       return this;
     }
 
     @Override
     public RedisTransaction configSet(String parameter, String value, Handler<AsyncResult<String>> handler) {
-      sendString(CONFIG_SET, toPayload(parameter, value), handler);
+      sendString(CONFIG, toPayload("SET", parameter, value), handler);
       return this;
     }
 
     @Override
     public RedisTransaction configResetstat(Handler<AsyncResult<String>> handler) {
-      sendString(CONFIG_RESETSTAT, null, handler);
+      sendString(CONFIG, toPayload("RESETSTAT"), handler);
       return this;
     }
 
@@ -1868,13 +2020,13 @@ public final class RedisClientImpl extends AbstractRedisClient {
 
     @Override
     public RedisTransaction debugObject(String key, Handler<AsyncResult<String>> handler) {
-      sendString(DEBUG_OBJECT, toPayload(key), handler);
+      sendString(DEBUG, toPayload("OBJECT", key), handler);
       return this;
     }
 
     @Override
     public RedisTransaction debugSegfault(Handler<AsyncResult<String>> handler) {
-      sendString(DEBUG_SEGFAULT, null, handler);
+      sendString(DEBUG, toPayload("SEGFAULT"), handler);
       return this;
     }
 
@@ -1910,7 +2062,7 @@ public final class RedisClientImpl extends AbstractRedisClient {
 
     @Override
     public RedisTransaction dump(String key, Handler<AsyncResult<String>> handler) {
-      send(DUMP, toPayload(key), String.class, true, dump -> {
+      sendString(DUMP, toPayload(key), dump -> {
         if (dump.failed()) {
           handler.handle(dump);
         } else {
@@ -1992,7 +2144,7 @@ public final class RedisClientImpl extends AbstractRedisClient {
 
     @Override
     public RedisTransaction getBinary(String key, Handler<AsyncResult<Buffer>> handler) {
-      send(GET, toPayload(key), Buffer.class, true, handler);
+      sendBuffer(GET, toPayload(key), handler);
       return this;
     }
 
@@ -2387,7 +2539,7 @@ public final class RedisClientImpl extends AbstractRedisClient {
 
     @Override
     public RedisTransaction restore(String key, long millis, String serialized, Handler<AsyncResult<String>> handler) {
-      send(RESTORE, toPayload(key, millis, RedisEncoding.decode(serialized)), String.class, true, handler);
+      sendString(RESTORE, toPayload(key, millis, RedisEncoding.decode(serialized)), handler);
       return this;
     }
 
@@ -2453,31 +2605,31 @@ public final class RedisClientImpl extends AbstractRedisClient {
 
     @Override
     public RedisTransaction scriptExists(String script, Handler<AsyncResult<String>> handler) {
-      sendString(SCRIPT_EXISTS, toPayload(script), handler);
+      sendString(SCRIPT, toPayload("EXISTS", script), handler);
       return this;
     }
 
     @Override
     public RedisTransaction scriptExistsMany(List<String> scripts, Handler<AsyncResult<String>> handler) {
-      sendString(SCRIPT_EXISTS, toPayload(scripts), handler);
+      sendString(SCRIPT, toPayload("EXISTS", scripts), handler);
       return this;
     }
 
     @Override
     public RedisTransaction scriptFlush(Handler<AsyncResult<String>> handler) {
-      sendString(SCRIPT_FLUSH, null, handler);
+      sendString(SCRIPT, toPayload("FLUSH"), handler);
       return this;
     }
 
     @Override
     public RedisTransaction scriptKill(Handler<AsyncResult<String>> handler) {
-      sendString(SCRIPT_KILL, null, handler);
+      sendString(SCRIPT, toPayload("KILL"), handler);
       return this;
     }
 
     @Override
     public RedisTransaction scriptLoad(String script, Handler<AsyncResult<String>> handler) {
-      sendString(SCRIPT_LOAD, toPayload(script), handler);
+      sendString(SCRIPT, toPayload("LOAD", script), handler);
       return this;
     }
 
@@ -2513,13 +2665,13 @@ public final class RedisClientImpl extends AbstractRedisClient {
 
     @Override
     public RedisTransaction setBinary(String key, Buffer value, Handler<AsyncResult<String>> handler) {
-      send(SET, toPayload(key, value), String.class, true, handler);
+      sendString(SET, toPayload(key, value), handler);
       return this;
     }
 
     @Override
     public RedisTransaction setBinaryWithOptions(String key, Buffer value, SetOptions options, Handler<AsyncResult<String>> handler) {
-      send(SET, toPayload(key, value, options != null ? options.toJsonArray() : null), String.class, true, handler);
+      sendString(SET, toPayload(key, value, options != null ? options.toJsonArray() : null), handler);
       return this;
     }
 

@@ -23,6 +23,7 @@ import io.vertx.core.json.JsonObject;
  * @author <a href="mailto:plopes@redhat.com">Paulo Lopes</a>
  */
 @DataObject
+@Deprecated
 public class GeoMember {
 
   private Double longitude;

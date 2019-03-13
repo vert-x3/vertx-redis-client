@@ -1,0 +1,2352 @@
+{
+  "commands": [
+    {
+      "name": "restore-asking",
+      "arity": -4,
+      "flags": [
+        "write",
+        "denyoom",
+        "asking"
+      ],
+      "firstKey": 1,
+      "lastKey": 1,
+      "keyStep": 1,
+      "readOnly": false,
+      "movableKeys": false
+    },
+    {
+      "name": "hkeys",
+      "arity": 2,
+      "flags": [
+        "readonly",
+        "sort_for_script"
+      ],
+      "firstKey": 1,
+      "lastKey": 1,
+      "keyStep": 1,
+      "readOnly": true,
+      "movableKeys": false
+    },
+    {
+      "name": "command",
+      "arity": 0,
+      "flags": [
+        "loading",
+        "stale"
+      ],
+      "firstKey": 0,
+      "lastKey": 0,
+      "keyStep": 0,
+      "readOnly": false,
+      "movableKeys": false
+    },
+    {
+      "name": "pubsub",
+      "arity": -2,
+      "flags": [
+        "pubsub",
+        "random",
+        "loading",
+        "stale"
+      ],
+      "firstKey": 0,
+      "lastKey": 0,
+      "keyStep": 0,
+      "readOnly": false,
+      "movableKeys": false
+    },
+    {
+      "name": "zremrangebylex",
+      "arity": 4,
+      "flags": [
+        "write"
+      ],
+      "firstKey": 1,
+      "lastKey": 1,
+      "keyStep": 1,
+      "readOnly": false,
+      "movableKeys": false
+    },
+    {
+      "name": "georadiusbymember",
+      "arity": -5,
+      "flags": [
+        "write",
+        "movablekeys"
+      ],
+      "firstKey": 1,
+      "lastKey": 1,
+      "keyStep": 1,
+      "readOnly": false,
+      "movableKeys": true
+    },
+    {
+      "name": "setex",
+      "arity": 4,
+      "flags": [
+        "write",
+        "denyoom"
+      ],
+      "firstKey": 1,
+      "lastKey": 1,
+      "keyStep": 1,
+      "readOnly": false,
+      "movableKeys": false
+    },
+    {
+      "name": "persist",
+      "arity": 2,
+      "flags": [
+        "write",
+        "fast"
+      ],
+      "firstKey": 1,
+      "lastKey": 1,
+      "keyStep": 1,
+      "readOnly": false,
+      "movableKeys": false
+    },
+    {
+      "name": "incrby",
+      "arity": 3,
+      "flags": [
+        "write",
+        "denyoom",
+        "fast"
+      ],
+      "firstKey": 1,
+      "lastKey": 1,
+      "keyStep": 1,
+      "readOnly": false,
+      "movableKeys": false
+    },
+    {
+      "name": "renamenx",
+      "arity": 3,
+      "flags": [
+        "write",
+        "fast"
+      ],
+      "firstKey": 1,
+      "lastKey": 2,
+      "keyStep": 1,
+      "readOnly": false,
+      "movableKeys": false
+    },
+    {
+      "name": "watch",
+      "arity": -2,
+      "flags": [
+        "noscript",
+        "fast"
+      ],
+      "firstKey": 1,
+      "lastKey": -1,
+      "keyStep": 1,
+      "readOnly": false,
+      "movableKeys": false
+    },
+    {
+      "name": "flushdb",
+      "arity": -1,
+      "flags": [
+        "write"
+      ],
+      "firstKey": 0,
+      "lastKey": 0,
+      "keyStep": 0,
+      "readOnly": false,
+      "movableKeys": false
+    },
+    {
+      "name": "brpoplpush",
+      "arity": 4,
+      "flags": [
+        "write",
+        "denyoom",
+        "noscript"
+      ],
+      "firstKey": 1,
+      "lastKey": 2,
+      "keyStep": 1,
+      "readOnly": false,
+      "movableKeys": false
+    },
+    {
+      "name": "pfcount",
+      "arity": -2,
+      "flags": [
+        "readonly"
+      ],
+      "firstKey": 1,
+      "lastKey": -1,
+      "keyStep": 1,
+      "readOnly": true,
+      "movableKeys": false
+    },
+    {
+      "name": "bitfield",
+      "arity": -2,
+      "flags": [
+        "write",
+        "denyoom"
+      ],
+      "firstKey": 1,
+      "lastKey": 1,
+      "keyStep": 1,
+      "readOnly": false,
+      "movableKeys": false
+    },
+    {
+      "name": "pfadd",
+      "arity": -2,
+      "flags": [
+        "write",
+        "denyoom",
+        "fast"
+      ],
+      "firstKey": 1,
+      "lastKey": 1,
+      "keyStep": 1,
+      "readOnly": false,
+      "movableKeys": false
+    },
+    {
+      "name": "setbit",
+      "arity": 4,
+      "flags": [
+        "write",
+        "denyoom"
+      ],
+      "firstKey": 1,
+      "lastKey": 1,
+      "keyStep": 1,
+      "readOnly": false,
+      "movableKeys": false
+    },
+    {
+      "name": "select",
+      "arity": 2,
+      "flags": [
+        "loading",
+        "fast"
+      ],
+      "firstKey": 0,
+      "lastKey": 0,
+      "keyStep": 0,
+      "readOnly": false,
+      "movableKeys": false
+    },
+    {
+      "name": "getbit",
+      "arity": 3,
+      "flags": [
+        "readonly",
+        "fast"
+      ],
+      "firstKey": 1,
+      "lastKey": 1,
+      "keyStep": 1,
+      "readOnly": true,
+      "movableKeys": false
+    },
+    {
+      "name": "zremrangebyscore",
+      "arity": 4,
+      "flags": [
+        "write"
+      ],
+      "firstKey": 1,
+      "lastKey": 1,
+      "keyStep": 1,
+      "readOnly": false,
+      "movableKeys": false
+    },
+    {
+      "name": "lindex",
+      "arity": 3,
+      "flags": [
+        "readonly"
+      ],
+      "firstKey": 1,
+      "lastKey": 1,
+      "keyStep": 1,
+      "readOnly": true,
+      "movableKeys": false
+    },
+    {
+      "name": "sort",
+      "arity": -2,
+      "flags": [
+        "write",
+        "denyoom",
+        "movablekeys"
+      ],
+      "firstKey": 1,
+      "lastKey": 1,
+      "keyStep": 1,
+      "readOnly": false,
+      "movableKeys": true
+    },
+    {
+      "name": "mset",
+      "arity": -3,
+      "flags": [
+        "write",
+        "denyoom"
+      ],
+      "firstKey": 1,
+      "lastKey": -1,
+      "keyStep": 2,
+      "readOnly": false,
+      "movableKeys": false
+    },
+    {
+      "name": "hincrby",
+      "arity": 4,
+      "flags": [
+        "write",
+        "denyoom",
+        "fast"
+      ],
+      "firstKey": 1,
+      "lastKey": 1,
+      "keyStep": 1,
+      "readOnly": false,
+      "movableKeys": false
+    },
+    {
+      "name": "hexists",
+      "arity": 3,
+      "flags": [
+        "readonly",
+        "fast"
+      ],
+      "firstKey": 1,
+      "lastKey": 1,
+      "keyStep": 1,
+      "readOnly": true,
+      "movableKeys": false
+    },
+    {
+      "name": "module",
+      "arity": -2,
+      "flags": [
+        "admin",
+        "noscript"
+      ],
+      "firstKey": 0,
+      "lastKey": 0,
+      "keyStep": 0,
+      "readOnly": false,
+      "movableKeys": false
+    },
+    {
+      "name": "subscribe",
+      "arity": -2,
+      "flags": [
+        "pubsub",
+        "noscript",
+        "loading",
+        "stale"
+      ],
+      "firstKey": 0,
+      "lastKey": 0,
+      "keyStep": 0,
+      "readOnly": false,
+      "movableKeys": false
+    },
+    {
+      "name": "ltrim",
+      "arity": 4,
+      "flags": [
+        "write"
+      ],
+      "firstKey": 1,
+      "lastKey": 1,
+      "keyStep": 1,
+      "readOnly": false,
+      "movableKeys": false
+    },
+    {
+      "name": "rename",
+      "arity": 3,
+      "flags": [
+        "write"
+      ],
+      "firstKey": 1,
+      "lastKey": 2,
+      "keyStep": 1,
+      "readOnly": false,
+      "movableKeys": false
+    },
+    {
+      "name": "ttl",
+      "arity": 2,
+      "flags": [
+        "readonly",
+        "fast"
+      ],
+      "firstKey": 1,
+      "lastKey": 1,
+      "keyStep": 1,
+      "readOnly": true,
+      "movableKeys": false
+    },
+    {
+      "name": "strlen",
+      "arity": 2,
+      "flags": [
+        "readonly",
+        "fast"
+      ],
+      "firstKey": 1,
+      "lastKey": 1,
+      "keyStep": 1,
+      "readOnly": true,
+      "movableKeys": false
+    },
+    {
+      "name": "save",
+      "arity": 1,
+      "flags": [
+        "admin",
+        "noscript"
+      ],
+      "firstKey": 0,
+      "lastKey": 0,
+      "keyStep": 0,
+      "readOnly": false,
+      "movableKeys": false
+    },
+    {
+      "name": "dbsize",
+      "arity": 1,
+      "flags": [
+        "readonly",
+        "fast"
+      ],
+      "firstKey": 0,
+      "lastKey": 0,
+      "keyStep": 0,
+      "readOnly": true,
+      "movableKeys": false
+    },
+    {
+      "name": "sadd",
+      "arity": -3,
+      "flags": [
+        "write",
+        "denyoom",
+        "fast"
+      ],
+      "firstKey": 1,
+      "lastKey": 1,
+      "keyStep": 1,
+      "readOnly": false,
+      "movableKeys": false
+    },
+    {
+      "name": "zrevrangebyscore",
+      "arity": -4,
+      "flags": [
+        "readonly"
+      ],
+      "firstKey": 1,
+      "lastKey": 1,
+      "keyStep": 1,
+      "readOnly": true,
+      "movableKeys": false
+    },
+    {
+      "name": "punsubscribe",
+      "arity": -1,
+      "flags": [
+        "pubsub",
+        "noscript",
+        "loading",
+        "stale"
+      ],
+      "firstKey": 0,
+      "lastKey": 0,
+      "keyStep": 0,
+      "readOnly": false,
+      "movableKeys": false
+    },
+    {
+      "name": "debug",
+      "arity": -1,
+      "flags": [
+        "admin",
+        "noscript"
+      ],
+      "firstKey": 0,
+      "lastKey": 0,
+      "keyStep": 0,
+      "readOnly": false,
+      "movableKeys": false
+    },
+    {
+      "name": "lpushx",
+      "arity": -3,
+      "flags": [
+        "write",
+        "denyoom",
+        "fast"
+      ],
+      "firstKey": 1,
+      "lastKey": 1,
+      "keyStep": 1,
+      "readOnly": false,
+      "movableKeys": false
+    },
+    {
+      "name": "shutdown",
+      "arity": -1,
+      "flags": [
+        "admin",
+        "loading",
+        "stale"
+      ],
+      "firstKey": 0,
+      "lastKey": 0,
+      "keyStep": 0,
+      "readOnly": false,
+      "movableKeys": false
+    },
+    {
+      "name": "sunion",
+      "arity": -2,
+      "flags": [
+        "readonly",
+        "sort_for_script"
+      ],
+      "firstKey": 1,
+      "lastKey": -1,
+      "keyStep": 1,
+      "readOnly": true,
+      "movableKeys": false
+    },
+    {
+      "name": "smove",
+      "arity": 4,
+      "flags": [
+        "write",
+        "fast"
+      ],
+      "firstKey": 1,
+      "lastKey": 2,
+      "keyStep": 1,
+      "readOnly": false,
+      "movableKeys": false
+    },
+    {
+      "name": "hget",
+      "arity": 3,
+      "flags": [
+        "readonly",
+        "fast"
+      ],
+      "firstKey": 1,
+      "lastKey": 1,
+      "keyStep": 1,
+      "readOnly": true,
+      "movableKeys": false
+    },
+    {
+      "name": "wait",
+      "arity": 3,
+      "flags": [
+        "noscript"
+      ],
+      "firstKey": 0,
+      "lastKey": 0,
+      "keyStep": 0,
+      "readOnly": false,
+      "movableKeys": false
+    },
+    {
+      "name": "evalsha",
+      "arity": -3,
+      "flags": [
+        "noscript",
+        "movablekeys"
+      ],
+      "firstKey": 0,
+      "lastKey": 0,
+      "keyStep": 0,
+      "readOnly": false,
+      "movableKeys": true
+    },
+    {
+      "name": "post",
+      "arity": -1,
+      "flags": [
+        "loading",
+        "stale"
+      ],
+      "firstKey": 0,
+      "lastKey": 0,
+      "keyStep": 0,
+      "readOnly": false,
+      "movableKeys": false
+    },
+    {
+      "name": "lpop",
+      "arity": 2,
+      "flags": [
+        "write",
+        "fast"
+      ],
+      "firstKey": 1,
+      "lastKey": 1,
+      "keyStep": 1,
+      "readOnly": false,
+      "movableKeys": false
+    },
+    {
+      "name": "monitor",
+      "arity": 1,
+      "flags": [
+        "admin",
+        "noscript"
+      ],
+      "firstKey": 0,
+      "lastKey": 0,
+      "keyStep": 0,
+      "readOnly": false,
+      "movableKeys": false
+    },
+    {
+      "name": "sinter",
+      "arity": -2,
+      "flags": [
+        "readonly",
+        "sort_for_script"
+      ],
+      "firstKey": 1,
+      "lastKey": -1,
+      "keyStep": 1,
+      "readOnly": true,
+      "movableKeys": false
+    },
+    {
+      "name": "brpop",
+      "arity": -3,
+      "flags": [
+        "write",
+        "noscript"
+      ],
+      "firstKey": 1,
+      "lastKey": -2,
+      "keyStep": 1,
+      "readOnly": false,
+      "movableKeys": false
+    },
+    {
+      "name": "randomkey",
+      "arity": 1,
+      "flags": [
+        "readonly",
+        "random"
+      ],
+      "firstKey": 0,
+      "lastKey": 0,
+      "keyStep": 0,
+      "readOnly": true,
+      "movableKeys": false
+    },
+    {
+      "name": "pfdebug",
+      "arity": -3,
+      "flags": [
+        "write"
+      ],
+      "firstKey": 0,
+      "lastKey": 0,
+      "keyStep": 0,
+      "readOnly": false,
+      "movableKeys": false
+    },
+    {
+      "name": "time",
+      "arity": 1,
+      "flags": [
+        "random",
+        "fast"
+      ],
+      "firstKey": 0,
+      "lastKey": 0,
+      "keyStep": 0,
+      "readOnly": false,
+      "movableKeys": false
+    },
+    {
+      "name": "spop",
+      "arity": -2,
+      "flags": [
+        "write",
+        "random",
+        "fast"
+      ],
+      "firstKey": 1,
+      "lastKey": 1,
+      "keyStep": 1,
+      "readOnly": false,
+      "movableKeys": false
+    },
+    {
+      "name": "hsetnx",
+      "arity": 4,
+      "flags": [
+        "write",
+        "denyoom",
+        "fast"
+      ],
+      "firstKey": 1,
+      "lastKey": 1,
+      "keyStep": 1,
+      "readOnly": false,
+      "movableKeys": false
+    },
+    {
+      "name": "zrangebyscore",
+      "arity": -4,
+      "flags": [
+        "readonly"
+      ],
+      "firstKey": 1,
+      "lastKey": 1,
+      "keyStep": 1,
+      "readOnly": true,
+      "movableKeys": false
+    },
+    {
+      "name": "swapdb",
+      "arity": 3,
+      "flags": [
+        "write",
+        "fast"
+      ],
+      "firstKey": 0,
+      "lastKey": 0,
+      "keyStep": 0,
+      "readOnly": false,
+      "movableKeys": false
+    },
+    {
+      "name": "zscore",
+      "arity": 3,
+      "flags": [
+        "readonly",
+        "fast"
+      ],
+      "firstKey": 1,
+      "lastKey": 1,
+      "keyStep": 1,
+      "readOnly": true,
+      "movableKeys": false
+    },
+    {
+      "name": "host:",
+      "arity": -1,
+      "flags": [
+        "loading",
+        "stale"
+      ],
+      "firstKey": 0,
+      "lastKey": 0,
+      "keyStep": 0,
+      "readOnly": false,
+      "movableKeys": false
+    },
+    {
+      "name": "config",
+      "arity": -2,
+      "flags": [
+        "admin",
+        "loading",
+        "stale"
+      ],
+      "firstKey": 0,
+      "lastKey": 0,
+      "keyStep": 0,
+      "readOnly": false,
+      "movableKeys": false
+    },
+    {
+      "name": "pttl",
+      "arity": 2,
+      "flags": [
+        "readonly",
+        "fast"
+      ],
+      "firstKey": 1,
+      "lastKey": 1,
+      "keyStep": 1,
+      "readOnly": true,
+      "movableKeys": false
+    },
+    {
+      "name": "psetex",
+      "arity": 4,
+      "flags": [
+        "write",
+        "denyoom"
+      ],
+      "firstKey": 1,
+      "lastKey": 1,
+      "keyStep": 1,
+      "readOnly": false,
+      "movableKeys": false
+    },
+    {
+      "name": "geopos",
+      "arity": -2,
+      "flags": [
+        "readonly"
+      ],
+      "firstKey": 1,
+      "lastKey": 1,
+      "keyStep": 1,
+      "readOnly": true,
+      "movableKeys": false
+    },
+    {
+      "name": "multi",
+      "arity": 1,
+      "flags": [
+        "noscript",
+        "fast"
+      ],
+      "firstKey": 0,
+      "lastKey": 0,
+      "keyStep": 0,
+      "readOnly": false,
+      "movableKeys": false
+    },
+    {
+      "name": "cluster",
+      "arity": -2,
+      "flags": [
+        "admin"
+      ],
+      "firstKey": 0,
+      "lastKey": 0,
+      "keyStep": 0,
+      "readOnly": false,
+      "movableKeys": false
+    },
+    {
+      "name": "mget",
+      "arity": -2,
+      "flags": [
+        "readonly",
+        "fast"
+      ],
+      "firstKey": 1,
+      "lastKey": -1,
+      "keyStep": 1,
+      "readOnly": true,
+      "movableKeys": false
+    },
+    {
+      "name": "script",
+      "arity": -2,
+      "flags": [
+        "noscript"
+      ],
+      "firstKey": 0,
+      "lastKey": 0,
+      "keyStep": 0,
+      "readOnly": false,
+      "movableKeys": false
+    },
+    {
+      "name": "getrange",
+      "arity": 4,
+      "flags": [
+        "readonly"
+      ],
+      "firstKey": 1,
+      "lastKey": 1,
+      "keyStep": 1,
+      "readOnly": true,
+      "movableKeys": false
+    },
+    {
+      "name": "msetnx",
+      "arity": -3,
+      "flags": [
+        "write",
+        "denyoom"
+      ],
+      "firstKey": 1,
+      "lastKey": -1,
+      "keyStep": 2,
+      "readOnly": false,
+      "movableKeys": false
+    },
+    {
+      "name": "zincrby",
+      "arity": 4,
+      "flags": [
+        "write",
+        "denyoom",
+        "fast"
+      ],
+      "firstKey": 1,
+      "lastKey": 1,
+      "keyStep": 1,
+      "readOnly": false,
+      "movableKeys": false
+    },
+    {
+      "name": "zrank",
+      "arity": 3,
+      "flags": [
+        "readonly",
+        "fast"
+      ],
+      "firstKey": 1,
+      "lastKey": 1,
+      "keyStep": 1,
+      "readOnly": true,
+      "movableKeys": false
+    },
+    {
+      "name": "pfselftest",
+      "arity": 1,
+      "flags": [
+        "admin"
+      ],
+      "firstKey": 0,
+      "lastKey": 0,
+      "keyStep": 0,
+      "readOnly": false,
+      "movableKeys": false
+    },
+    {
+      "name": "set",
+      "arity": -3,
+      "flags": [
+        "write",
+        "denyoom"
+      ],
+      "firstKey": 1,
+      "lastKey": 1,
+      "keyStep": 1,
+      "readOnly": false,
+      "movableKeys": false
+    },
+    {
+      "name": "setrange",
+      "arity": 4,
+      "flags": [
+        "write",
+        "denyoom"
+      ],
+      "firstKey": 1,
+      "lastKey": 1,
+      "keyStep": 1,
+      "readOnly": false,
+      "movableKeys": false
+    },
+    {
+      "name": "exists",
+      "arity": -2,
+      "flags": [
+        "readonly",
+        "fast"
+      ],
+      "firstKey": 1,
+      "lastKey": -1,
+      "keyStep": 1,
+      "readOnly": true,
+      "movableKeys": false
+    },
+    {
+      "name": "object",
+      "arity": -2,
+      "flags": [
+        "readonly"
+      ],
+      "firstKey": 2,
+      "lastKey": 2,
+      "keyStep": 2,
+      "readOnly": true,
+      "movableKeys": false
+    },
+    {
+      "name": "geodist",
+      "arity": -4,
+      "flags": [
+        "readonly"
+      ],
+      "firstKey": 1,
+      "lastKey": 1,
+      "keyStep": 1,
+      "readOnly": true,
+      "movableKeys": false
+    },
+    {
+      "name": "setnx",
+      "arity": 3,
+      "flags": [
+        "write",
+        "denyoom",
+        "fast"
+      ],
+      "firstKey": 1,
+      "lastKey": 1,
+      "keyStep": 1,
+      "readOnly": false,
+      "movableKeys": false
+    },
+    {
+      "name": "linsert",
+      "arity": 5,
+      "flags": [
+        "write",
+        "denyoom"
+      ],
+      "firstKey": 1,
+      "lastKey": 1,
+      "keyStep": 1,
+      "readOnly": false,
+      "movableKeys": false
+    },
+    {
+      "name": "geoadd",
+      "arity": -5,
+      "flags": [
+        "write",
+        "denyoom"
+      ],
+      "firstKey": 1,
+      "lastKey": 1,
+      "keyStep": 1,
+      "readOnly": false,
+      "movableKeys": false
+    },
+    {
+      "name": "zrevrank",
+      "arity": 3,
+      "flags": [
+        "readonly",
+        "fast"
+      ],
+      "firstKey": 1,
+      "lastKey": 1,
+      "keyStep": 1,
+      "readOnly": true,
+      "movableKeys": false
+    },
+    {
+      "name": "lrem",
+      "arity": 4,
+      "flags": [
+        "write"
+      ],
+      "firstKey": 1,
+      "lastKey": 1,
+      "keyStep": 1,
+      "readOnly": false,
+      "movableKeys": false
+    },
+    {
+      "name": "hscan",
+      "arity": -3,
+      "flags": [
+        "readonly",
+        "random"
+      ],
+      "firstKey": 1,
+      "lastKey": 1,
+      "keyStep": 1,
+      "readOnly": true,
+      "movableKeys": false
+    },
+    {
+      "name": "unwatch",
+      "arity": 1,
+      "flags": [
+        "noscript",
+        "fast"
+      ],
+      "firstKey": 0,
+      "lastKey": 0,
+      "keyStep": 0,
+      "readOnly": false,
+      "movableKeys": false
+    },
+    {
+      "name": "publish",
+      "arity": 3,
+      "flags": [
+        "pubsub",
+        "loading",
+        "stale",
+        "fast"
+      ],
+      "firstKey": 0,
+      "lastKey": 0,
+      "keyStep": 0,
+      "readOnly": false,
+      "movableKeys": false
+    },
+    {
+      "name": "unlink",
+      "arity": -2,
+      "flags": [
+        "write",
+        "fast"
+      ],
+      "firstKey": 1,
+      "lastKey": -1,
+      "keyStep": 1,
+      "readOnly": false,
+      "movableKeys": false
+    },
+    {
+      "name": "sscan",
+      "arity": -3,
+      "flags": [
+        "readonly",
+        "random"
+      ],
+      "firstKey": 1,
+      "lastKey": 1,
+      "keyStep": 1,
+      "readOnly": true,
+      "movableKeys": false
+    },
+    {
+      "name": "zrevrange",
+      "arity": -4,
+      "flags": [
+        "readonly"
+      ],
+      "firstKey": 1,
+      "lastKey": 1,
+      "keyStep": 1,
+      "readOnly": true,
+      "movableKeys": false
+    },
+    {
+      "name": "auth",
+      "arity": 2,
+      "flags": [
+        "noscript",
+        "loading",
+        "stale",
+        "fast"
+      ],
+      "firstKey": 0,
+      "lastKey": 0,
+      "keyStep": 0,
+      "readOnly": false,
+      "movableKeys": false
+    },
+    {
+      "name": "echo",
+      "arity": 2,
+      "flags": [
+        "fast"
+      ],
+      "firstKey": 0,
+      "lastKey": 0,
+      "keyStep": 0,
+      "readOnly": false,
+      "movableKeys": false
+    },
+    {
+      "name": "hgetall",
+      "arity": 2,
+      "flags": [
+        "readonly"
+      ],
+      "firstKey": 1,
+      "lastKey": 1,
+      "keyStep": 1,
+      "readOnly": true,
+      "movableKeys": false
+    },
+    {
+      "name": "psubscribe",
+      "arity": -2,
+      "flags": [
+        "pubsub",
+        "noscript",
+        "loading",
+        "stale"
+      ],
+      "firstKey": 0,
+      "lastKey": 0,
+      "keyStep": 0,
+      "readOnly": false,
+      "movableKeys": false
+    },
+    {
+      "name": "georadius",
+      "arity": -6,
+      "flags": [
+        "write",
+        "movablekeys"
+      ],
+      "firstKey": 1,
+      "lastKey": 1,
+      "keyStep": 1,
+      "readOnly": false,
+      "movableKeys": true
+    },
+    {
+      "name": "georadiusbymember_ro",
+      "arity": -5,
+      "flags": [
+        "readonly",
+        "movablekeys"
+      ],
+      "firstKey": 1,
+      "lastKey": 1,
+      "keyStep": 1,
+      "readOnly": true,
+      "movableKeys": true
+    },
+    {
+      "name": "zadd",
+      "arity": -4,
+      "flags": [
+        "write",
+        "denyoom",
+        "fast"
+      ],
+      "firstKey": 1,
+      "lastKey": 1,
+      "keyStep": 1,
+      "readOnly": false,
+      "movableKeys": false
+    },
+    {
+      "name": "del",
+      "arity": -2,
+      "flags": [
+        "write"
+      ],
+      "firstKey": 1,
+      "lastKey": -1,
+      "keyStep": 1,
+      "readOnly": false,
+      "movableKeys": false
+    },
+    {
+      "name": "blpop",
+      "arity": -3,
+      "flags": [
+        "write",
+        "noscript"
+      ],
+      "firstKey": 1,
+      "lastKey": -2,
+      "keyStep": 1,
+      "readOnly": false,
+      "movableKeys": false
+    },
+    {
+      "name": "expireat",
+      "arity": 3,
+      "flags": [
+        "write",
+        "fast"
+      ],
+      "firstKey": 1,
+      "lastKey": 1,
+      "keyStep": 1,
+      "readOnly": false,
+      "movableKeys": false
+    },
+    {
+      "name": "incrbyfloat",
+      "arity": 3,
+      "flags": [
+        "write",
+        "denyoom",
+        "fast"
+      ],
+      "firstKey": 1,
+      "lastKey": 1,
+      "keyStep": 1,
+      "readOnly": false,
+      "movableKeys": false
+    },
+    {
+      "name": "bgrewriteaof",
+      "arity": 1,
+      "flags": [
+        "admin"
+      ],
+      "firstKey": 0,
+      "lastKey": 0,
+      "keyStep": 0,
+      "readOnly": false,
+      "movableKeys": false
+    },
+    {
+      "name": "decr",
+      "arity": 2,
+      "flags": [
+        "write",
+        "denyoom",
+        "fast"
+      ],
+      "firstKey": 1,
+      "lastKey": 1,
+      "keyStep": 1,
+      "readOnly": false,
+      "movableKeys": false
+    },
+    {
+      "name": "hmget",
+      "arity": -3,
+      "flags": [
+        "readonly",
+        "fast"
+      ],
+      "firstKey": 1,
+      "lastKey": 1,
+      "keyStep": 1,
+      "readOnly": true,
+      "movableKeys": false
+    },
+    {
+      "name": "flushall",
+      "arity": -1,
+      "flags": [
+        "write"
+      ],
+      "firstKey": 0,
+      "lastKey": 0,
+      "keyStep": 0,
+      "readOnly": false,
+      "movableKeys": false
+    },
+    {
+      "name": "info",
+      "arity": -1,
+      "flags": [
+        "loading",
+        "stale"
+      ],
+      "firstKey": 0,
+      "lastKey": 0,
+      "keyStep": 0,
+      "readOnly": false,
+      "movableKeys": false
+    },
+    {
+      "name": "lastsave",
+      "arity": 1,
+      "flags": [
+        "random",
+        "fast"
+      ],
+      "firstKey": 0,
+      "lastKey": 0,
+      "keyStep": 0,
+      "readOnly": false,
+      "movableKeys": false
+    },
+    {
+      "name": "migrate",
+      "arity": -6,
+      "flags": [
+        "write",
+        "movablekeys"
+      ],
+      "firstKey": 0,
+      "lastKey": 0,
+      "keyStep": 0,
+      "readOnly": false,
+      "movableKeys": true
+    },
+    {
+      "name": "hstrlen",
+      "arity": 3,
+      "flags": [
+        "readonly",
+        "fast"
+      ],
+      "firstKey": 1,
+      "lastKey": 1,
+      "keyStep": 1,
+      "readOnly": true,
+      "movableKeys": false
+    },
+    {
+      "name": "replconf",
+      "arity": -1,
+      "flags": [
+        "admin",
+        "noscript",
+        "loading",
+        "stale"
+      ],
+      "firstKey": 0,
+      "lastKey": 0,
+      "keyStep": 0,
+      "readOnly": false,
+      "movableKeys": false
+    },
+    {
+      "name": "zinterstore",
+      "arity": -4,
+      "flags": [
+        "write",
+        "denyoom",
+        "movablekeys"
+      ],
+      "firstKey": 0,
+      "lastKey": 0,
+      "keyStep": 0,
+      "readOnly": false,
+      "movableKeys": true
+    },
+    {
+      "name": "srem",
+      "arity": -3,
+      "flags": [
+        "write",
+        "fast"
+      ],
+      "firstKey": 1,
+      "lastKey": 1,
+      "keyStep": 1,
+      "readOnly": false,
+      "movableKeys": false
+    },
+    {
+      "name": "move",
+      "arity": 3,
+      "flags": [
+        "write",
+        "fast"
+      ],
+      "firstKey": 1,
+      "lastKey": 1,
+      "keyStep": 1,
+      "readOnly": false,
+      "movableKeys": false
+    },
+    {
+      "name": "scan",
+      "arity": -2,
+      "flags": [
+        "readonly",
+        "random"
+      ],
+      "firstKey": 0,
+      "lastKey": 0,
+      "keyStep": 0,
+      "readOnly": true,
+      "movableKeys": false
+    },
+    {
+      "name": "georadius_ro",
+      "arity": -6,
+      "flags": [
+        "readonly",
+        "movablekeys"
+      ],
+      "firstKey": 1,
+      "lastKey": 1,
+      "keyStep": 1,
+      "readOnly": true,
+      "movableKeys": true
+    },
+    {
+      "name": "client",
+      "arity": -2,
+      "flags": [
+        "admin",
+        "noscript"
+      ],
+      "firstKey": 0,
+      "lastKey": 0,
+      "keyStep": 0,
+      "readOnly": false,
+      "movableKeys": false
+    },
+    {
+      "name": "zrem",
+      "arity": -3,
+      "flags": [
+        "write",
+        "fast"
+      ],
+      "firstKey": 1,
+      "lastKey": 1,
+      "keyStep": 1,
+      "readOnly": false,
+      "movableKeys": false
+    },
+    {
+      "name": "latency",
+      "arity": -2,
+      "flags": [
+        "admin",
+        "noscript",
+        "loading",
+        "stale"
+      ],
+      "firstKey": 0,
+      "lastKey": 0,
+      "keyStep": 0,
+      "readOnly": false,
+      "movableKeys": false
+    },
+    {
+      "name": "scard",
+      "arity": 2,
+      "flags": [
+        "readonly",
+        "fast"
+      ],
+      "firstKey": 1,
+      "lastKey": 1,
+      "keyStep": 1,
+      "readOnly": true,
+      "movableKeys": false
+    },
+    {
+      "name": "bgsave",
+      "arity": -1,
+      "flags": [
+        "admin"
+      ],
+      "firstKey": 0,
+      "lastKey": 0,
+      "keyStep": 0,
+      "readOnly": false,
+      "movableKeys": false
+    },
+    {
+      "name": "zrange",
+      "arity": -4,
+      "flags": [
+        "readonly"
+      ],
+      "firstKey": 1,
+      "lastKey": 1,
+      "keyStep": 1,
+      "readOnly": true,
+      "movableKeys": false
+    },
+    {
+      "name": "lpush",
+      "arity": -3,
+      "flags": [
+        "write",
+        "denyoom",
+        "fast"
+      ],
+      "firstKey": 1,
+      "lastKey": 1,
+      "keyStep": 1,
+      "readOnly": false,
+      "movableKeys": false
+    },
+    {
+      "name": "pfmerge",
+      "arity": -2,
+      "flags": [
+        "write",
+        "denyoom"
+      ],
+      "firstKey": 1,
+      "lastKey": -1,
+      "keyStep": 1,
+      "readOnly": false,
+      "movableKeys": false
+    },
+    {
+      "name": "hlen",
+      "arity": 2,
+      "flags": [
+        "readonly",
+        "fast"
+      ],
+      "firstKey": 1,
+      "lastKey": 1,
+      "keyStep": 1,
+      "readOnly": true,
+      "movableKeys": false
+    },
+    {
+      "name": "role",
+      "arity": 1,
+      "flags": [
+        "noscript",
+        "loading",
+        "stale"
+      ],
+      "firstKey": 0,
+      "lastKey": 0,
+      "keyStep": 0,
+      "readOnly": false,
+      "movableKeys": false
+    },
+    {
+      "name": "restore",
+      "arity": -4,
+      "flags": [
+        "write",
+        "denyoom"
+      ],
+      "firstKey": 1,
+      "lastKey": 1,
+      "keyStep": 1,
+      "readOnly": false,
+      "movableKeys": false
+    },
+    {
+      "name": "geohash",
+      "arity": -2,
+      "flags": [
+        "readonly"
+      ],
+      "firstKey": 1,
+      "lastKey": 1,
+      "keyStep": 1,
+      "readOnly": true,
+      "movableKeys": false
+    },
+    {
+      "name": "lrange",
+      "arity": 4,
+      "flags": [
+        "readonly"
+      ],
+      "firstKey": 1,
+      "lastKey": 1,
+      "keyStep": 1,
+      "readOnly": true,
+      "movableKeys": false
+    },
+    {
+      "name": "discard",
+      "arity": 1,
+      "flags": [
+        "noscript",
+        "fast"
+      ],
+      "firstKey": 0,
+      "lastKey": 0,
+      "keyStep": 0,
+      "readOnly": false,
+      "movableKeys": false
+    },
+    {
+      "name": "hincrbyfloat",
+      "arity": 4,
+      "flags": [
+        "write",
+        "denyoom",
+        "fast"
+      ],
+      "firstKey": 1,
+      "lastKey": 1,
+      "keyStep": 1,
+      "readOnly": false,
+      "movableKeys": false
+    },
+    {
+      "name": "zcard",
+      "arity": 2,
+      "flags": [
+        "readonly",
+        "fast"
+      ],
+      "firstKey": 1,
+      "lastKey": 1,
+      "keyStep": 1,
+      "readOnly": true,
+      "movableKeys": false
+    },
+    {
+      "name": "lset",
+      "arity": 4,
+      "flags": [
+        "write",
+        "denyoom"
+      ],
+      "firstKey": 1,
+      "lastKey": 1,
+      "keyStep": 1,
+      "readOnly": false,
+      "movableKeys": false
+    },
+    {
+      "name": "bitop",
+      "arity": -4,
+      "flags": [
+        "write",
+        "denyoom"
+      ],
+      "firstKey": 2,
+      "lastKey": -1,
+      "keyStep": 1,
+      "readOnly": false,
+      "movableKeys": false
+    },
+    {
+      "name": "hmset",
+      "arity": -4,
+      "flags": [
+        "write",
+        "denyoom",
+        "fast"
+      ],
+      "firstKey": 1,
+      "lastKey": 1,
+      "keyStep": 1,
+      "readOnly": false,
+      "movableKeys": false
+    },
+    {
+      "name": "sdiffstore",
+      "arity": -3,
+      "flags": [
+        "write",
+        "denyoom"
+      ],
+      "firstKey": 1,
+      "lastKey": -1,
+      "keyStep": 1,
+      "readOnly": false,
+      "movableKeys": false
+    },
+    {
+      "name": "sdiff",
+      "arity": -2,
+      "flags": [
+        "readonly",
+        "sort_for_script"
+      ],
+      "firstKey": 1,
+      "lastKey": -1,
+      "keyStep": 1,
+      "readOnly": true,
+      "movableKeys": false
+    },
+    {
+      "name": "zunionstore",
+      "arity": -4,
+      "flags": [
+        "write",
+        "denyoom",
+        "movablekeys"
+      ],
+      "firstKey": 0,
+      "lastKey": 0,
+      "keyStep": 0,
+      "readOnly": false,
+      "movableKeys": true
+    },
+    {
+      "name": "get",
+      "arity": 2,
+      "flags": [
+        "readonly",
+        "fast"
+      ],
+      "firstKey": 1,
+      "lastKey": 1,
+      "keyStep": 1,
+      "readOnly": true,
+      "movableKeys": false
+    },
+    {
+      "name": "pexpireat",
+      "arity": 3,
+      "flags": [
+        "write",
+        "fast"
+      ],
+      "firstKey": 1,
+      "lastKey": 1,
+      "keyStep": 1,
+      "readOnly": false,
+      "movableKeys": false
+    },
+    {
+      "name": "zlexcount",
+      "arity": 4,
+      "flags": [
+        "readonly",
+        "fast"
+      ],
+      "firstKey": 1,
+      "lastKey": 1,
+      "keyStep": 1,
+      "readOnly": true,
+      "movableKeys": false
+    },
+    {
+      "name": "append",
+      "arity": 3,
+      "flags": [
+        "write",
+        "denyoom"
+      ],
+      "firstKey": 1,
+      "lastKey": 1,
+      "keyStep": 1,
+      "readOnly": false,
+      "movableKeys": false
+    },
+    {
+      "name": "getset",
+      "arity": 3,
+      "flags": [
+        "write",
+        "denyoom"
+      ],
+      "firstKey": 1,
+      "lastKey": 1,
+      "keyStep": 1,
+      "readOnly": false,
+      "movableKeys": false
+    },
+    {
+      "name": "zcount",
+      "arity": 4,
+      "flags": [
+        "readonly",
+        "fast"
+      ],
+      "firstKey": 1,
+      "lastKey": 1,
+      "keyStep": 1,
+      "readOnly": true,
+      "movableKeys": false
+    },
+    {
+      "name": "hset",
+      "arity": -4,
+      "flags": [
+        "write",
+        "denyoom",
+        "fast"
+      ],
+      "firstKey": 1,
+      "lastKey": 1,
+      "keyStep": 1,
+      "readOnly": false,
+      "movableKeys": false
+    },
+    {
+      "name": "sunionstore",
+      "arity": -3,
+      "flags": [
+        "write",
+        "denyoom"
+      ],
+      "firstKey": 1,
+      "lastKey": -1,
+      "keyStep": 1,
+      "readOnly": false,
+      "movableKeys": false
+    },
+    {
+      "name": "llen",
+      "arity": 2,
+      "flags": [
+        "readonly",
+        "fast"
+      ],
+      "firstKey": 1,
+      "lastKey": 1,
+      "keyStep": 1,
+      "readOnly": true,
+      "movableKeys": false
+    },
+    {
+      "name": "hdel",
+      "arity": -3,
+      "flags": [
+        "write",
+        "fast"
+      ],
+      "firstKey": 1,
+      "lastKey": 1,
+      "keyStep": 1,
+      "readOnly": false,
+      "movableKeys": false
+    },
+    {
+      "name": "bitcount",
+      "arity": -2,
+      "flags": [
+        "readonly"
+      ],
+      "firstKey": 1,
+      "lastKey": 1,
+      "keyStep": 1,
+      "readOnly": true,
+      "movableKeys": false
+    },
+    {
+      "name": "rpushx",
+      "arity": -3,
+      "flags": [
+        "write",
+        "denyoom",
+        "fast"
+      ],
+      "firstKey": 1,
+      "lastKey": 1,
+      "keyStep": 1,
+      "readOnly": false,
+      "movableKeys": false
+    },
+    {
+      "name": "type",
+      "arity": 2,
+      "flags": [
+        "readonly",
+        "fast"
+      ],
+      "firstKey": 1,
+      "lastKey": 1,
+      "keyStep": 1,
+      "readOnly": true,
+      "movableKeys": false
+    },
+    {
+      "name": "slaveof",
+      "arity": 3,
+      "flags": [
+        "admin",
+        "noscript",
+        "stale"
+      ],
+      "firstKey": 0,
+      "lastKey": 0,
+      "keyStep": 0,
+      "readOnly": false,
+      "movableKeys": false
+    },
+    {
+      "name": "touch",
+      "arity": -2,
+      "flags": [
+        "readonly",
+        "fast"
+      ],
+      "firstKey": 1,
+      "lastKey": 1,
+      "keyStep": 1,
+      "readOnly": true,
+      "movableKeys": false
+    },
+    {
+      "name": "readonly",
+      "arity": 1,
+      "flags": [
+        "fast"
+      ],
+      "firstKey": 0,
+      "lastKey": 0,
+      "keyStep": 0,
+      "readOnly": false,
+      "movableKeys": false
+    },
+    {
+      "name": "zremrangebyrank",
+      "arity": 4,
+      "flags": [
+        "write"
+      ],
+      "firstKey": 1,
+      "lastKey": 1,
+      "keyStep": 1,
+      "readOnly": false,
+      "movableKeys": false
+    },
+    {
+      "name": "ping",
+      "arity": -1,
+      "flags": [
+        "stale",
+        "fast"
+      ],
+      "firstKey": 0,
+      "lastKey": 0,
+      "keyStep": 0,
+      "readOnly": false,
+      "movableKeys": false
+    },
+    {
+      "name": "zscan",
+      "arity": -3,
+      "flags": [
+        "readonly",
+        "random"
+      ],
+      "firstKey": 1,
+      "lastKey": 1,
+      "keyStep": 1,
+      "readOnly": true,
+      "movableKeys": false
+    },
+    {
+      "name": "hvals",
+      "arity": 2,
+      "flags": [
+        "readonly",
+        "sort_for_script"
+      ],
+      "firstKey": 1,
+      "lastKey": 1,
+      "keyStep": 1,
+      "readOnly": true,
+      "movableKeys": false
+    },
+    {
+      "name": "incr",
+      "arity": 2,
+      "flags": [
+        "write",
+        "denyoom",
+        "fast"
+      ],
+      "firstKey": 1,
+      "lastKey": 1,
+      "keyStep": 1,
+      "readOnly": false,
+      "movableKeys": false
+    },
+    {
+      "name": "asking",
+      "arity": 1,
+      "flags": [
+        "fast"
+      ],
+      "firstKey": 0,
+      "lastKey": 0,
+      "keyStep": 0,
+      "readOnly": false,
+      "movableKeys": false
+    },
+    {
+      "name": "decrby",
+      "arity": 3,
+      "flags": [
+        "write",
+        "denyoom",
+        "fast"
+      ],
+      "firstKey": 1,
+      "lastKey": 1,
+      "keyStep": 1,
+      "readOnly": false,
+      "movableKeys": false
+    },
+    {
+      "name": "unsubscribe",
+      "arity": -1,
+      "flags": [
+        "pubsub",
+        "noscript",
+        "loading",
+        "stale"
+      ],
+      "firstKey": 0,
+      "lastKey": 0,
+      "keyStep": 0,
+      "readOnly": false,
+      "movableKeys": false
+    },
+    {
+      "name": "expire",
+      "arity": 3,
+      "flags": [
+        "write",
+        "fast"
+      ],
+      "firstKey": 1,
+      "lastKey": 1,
+      "keyStep": 1,
+      "readOnly": false,
+      "movableKeys": false
+    },
+    {
+      "name": "slowlog",
+      "arity": -2,
+      "flags": [
+        "admin"
+      ],
+      "firstKey": 0,
+      "lastKey": 0,
+      "keyStep": 0,
+      "readOnly": false,
+      "movableKeys": false
+    },
+    {
+      "name": "rpop",
+      "arity": 2,
+      "flags": [
+        "write",
+        "fast"
+      ],
+      "firstKey": 1,
+      "lastKey": 1,
+      "keyStep": 1,
+      "readOnly": false,
+      "movableKeys": false
+    },
+    {
+      "name": "readwrite",
+      "arity": 1,
+      "flags": [
+        "fast"
+      ],
+      "firstKey": 0,
+      "lastKey": 0,
+      "keyStep": 0,
+      "readOnly": false,
+      "movableKeys": false
+    },
+    {
+      "name": "pexpire",
+      "arity": 3,
+      "flags": [
+        "write",
+        "fast"
+      ],
+      "firstKey": 1,
+      "lastKey": 1,
+      "keyStep": 1,
+      "readOnly": false,
+      "movableKeys": false
+    },
+    {
+      "name": "rpoplpush",
+      "arity": 3,
+      "flags": [
+        "write",
+        "denyoom"
+      ],
+      "firstKey": 1,
+      "lastKey": 2,
+      "keyStep": 1,
+      "readOnly": false,
+      "movableKeys": false
+    },
+    {
+      "name": "bitpos",
+      "arity": -3,
+      "flags": [
+        "readonly"
+      ],
+      "firstKey": 1,
+      "lastKey": 1,
+      "keyStep": 1,
+      "readOnly": true,
+      "movableKeys": false
+    },
+    {
+      "name": "memory",
+      "arity": -2,
+      "flags": [
+        "readonly"
+      ],
+      "firstKey": 0,
+      "lastKey": 0,
+      "keyStep": 0,
+      "readOnly": true,
+      "movableKeys": false
+    },
+    {
+      "name": "zrangebylex",
+      "arity": -4,
+      "flags": [
+        "readonly"
+      ],
+      "firstKey": 1,
+      "lastKey": 1,
+      "keyStep": 1,
+      "readOnly": true,
+      "movableKeys": false
+    },
+    {
+      "name": "substr",
+      "arity": 4,
+      "flags": [
+        "readonly"
+      ],
+      "firstKey": 1,
+      "lastKey": 1,
+      "keyStep": 1,
+      "readOnly": true,
+      "movableKeys": false
+    },
+    {
+      "name": "smembers",
+      "arity": 2,
+      "flags": [
+        "readonly",
+        "sort_for_script"
+      ],
+      "firstKey": 1,
+      "lastKey": 1,
+      "keyStep": 1,
+      "readOnly": true,
+      "movableKeys": false
+    },
+    {
+      "name": "psync",
+      "arity": 3,
+      "flags": [
+        "readonly",
+        "admin",
+        "noscript"
+      ],
+      "firstKey": 0,
+      "lastKey": 0,
+      "keyStep": 0,
+      "readOnly": true,
+      "movableKeys": false
+    },
+    {
+      "name": "eval",
+      "arity": -3,
+      "flags": [
+        "noscript",
+        "movablekeys"
+      ],
+      "firstKey": 0,
+      "lastKey": 0,
+      "keyStep": 0,
+      "readOnly": false,
+      "movableKeys": true
+    },
+    {
+      "name": "sismember",
+      "arity": 3,
+      "flags": [
+        "readonly",
+        "fast"
+      ],
+      "firstKey": 1,
+      "lastKey": 1,
+      "keyStep": 1,
+      "readOnly": true,
+      "movableKeys": false
+    },
+    {
+      "name": "zrevrangebylex",
+      "arity": -4,
+      "flags": [
+        "readonly"
+      ],
+      "firstKey": 1,
+      "lastKey": 1,
+      "keyStep": 1,
+      "readOnly": true,
+      "movableKeys": false
+    },
+    {
+      "name": "srandmember",
+      "arity": -2,
+      "flags": [
+        "readonly",
+        "random"
+      ],
+      "firstKey": 1,
+      "lastKey": 1,
+      "keyStep": 1,
+      "readOnly": true,
+      "movableKeys": false
+    },
+    {
+      "name": "exec",
+      "arity": 1,
+      "flags": [
+        "noscript",
+        "skip_monitor"
+      ],
+      "firstKey": 0,
+      "lastKey": 0,
+      "keyStep": 0,
+      "readOnly": false,
+      "movableKeys": false
+    },
+    {
+      "name": "rpush",
+      "arity": -3,
+      "flags": [
+        "write",
+        "denyoom",
+        "fast"
+      ],
+      "firstKey": 1,
+      "lastKey": 1,
+      "keyStep": 1,
+      "readOnly": false,
+      "movableKeys": false
+    },
+    {
+      "name": "sinterstore",
+      "arity": -3,
+      "flags": [
+        "write",
+        "denyoom"
+      ],
+      "firstKey": 1,
+      "lastKey": -1,
+      "keyStep": 1,
+      "readOnly": false,
+      "movableKeys": false
+    },
+    {
+      "name": "sync",
+      "arity": 1,
+      "flags": [
+        "readonly",
+        "admin",
+        "noscript"
+      ],
+      "firstKey": 0,
+      "lastKey": 0,
+      "keyStep": 0,
+      "readOnly": true,
+      "movableKeys": false
+    },
+    {
+      "name": "keys",
+      "arity": 2,
+      "flags": [
+        "readonly",
+        "sort_for_script"
+      ],
+      "firstKey": 0,
+      "lastKey": 0,
+      "keyStep": 0,
+      "readOnly": true,
+      "movableKeys": false
+    },
+    {
+      "name": "dump",
+      "arity": 2,
+      "flags": [
+        "readonly"
+      ],
+      "firstKey": 1,
+      "lastKey": 1,
+      "keyStep": 1,
+      "readOnly": true,
+      "movableKeys": false
+    }
+  ]
+}

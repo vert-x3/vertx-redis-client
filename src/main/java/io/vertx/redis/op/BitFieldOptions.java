@@ -5,6 +5,7 @@ import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;
 
 @DataObject
+@Deprecated
 public class BitFieldOptions {
 
   private BitFieldGetCommand get;
