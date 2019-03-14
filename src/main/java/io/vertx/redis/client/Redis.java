@@ -37,6 +37,9 @@ public interface Redis extends ReadStream<Response> {
 
   /**
    * Connect to redis, the {@code onConnect} will get the {@link Redis} instance.
+   *
+   * This connection will use the default options which are connect
+   * to a standalone server on the default port on "localhost".
    */
   static void createClient(Vertx vertx, SocketAddress address, Handler<AsyncResult<Redis>> onCreate) {
     createClient(vertx, new RedisOptions().setEndpoint(address), onCreate);
@@ -46,35 +49,48 @@ public interface Redis extends ReadStream<Response> {
    * Connect to redis, the {@code onConnect} will get the {@link Redis} instance.
    */
   static void createClient(Vertx vertx, RedisOptions options, Handler<AsyncResult<Redis>> onCreate) {
-    RedisClient.create(vertx, options.getEndpoint(), options, onCreate);
+    switch (options.getType()) {
+      case STANDALONE:
+        RedisClient.create(vertx, options, onCreate);
+        break;
+      case SENTINEL:
+        RedisSentinelClient.create(vertx, options, onCreate);
+        break;
+      case CLUSTER:
+        RedisClusterClient.create(vertx, options, onCreate);
+        break;
+      default:
+        throw new IllegalStateException("Unknown Redis Client type: " + options.getType());
+    }
   }
 
   /**
-   * Connect to redis, the {@code onConnect} will get the {@link Redis} instance.
+   * Connect to redis in sentinel mode, the {@code onConnect} will get the {@link Redis} instance.
+   *
+   * This is a helper factory which uses a preset of defaults for the connection:
+   *
+   * <ul>
+   *     <li>client type - <b>SENTINEL</b></li>
+   *     <li>role - <b>MASTER</b></li>
+   *     <li>master name - <b>"mymaster"</b></li>
+   * </ul>
    */
   static void createSentinelClient(Vertx vertx, SocketAddress address, Handler<AsyncResult<Redis>> onCreate) {
-    createSentinelClient(vertx, new RedisOptions().setEndpoint(address).setRole(RedisRole.MASTER).setMasterName("mymaster"), onCreate);
+    createClient(vertx, new RedisOptions().setType(RedisClientType.SENTINEL).setEndpoint(address).setRole(RedisRole.MASTER).setMasterName("mymaster"), onCreate);
   }
 
   /**
-   * Connect to redis, the {@code onConnect} will get the {@link Redis} instance.
-   */
-  static void createSentinelClient(Vertx vertx, RedisOptions options, Handler<AsyncResult<Redis>> onCreate) {
-    RedisSentinelClient.create(vertx, options, onCreate);
-  }
-
-  /**
-   * Connect to redis, the {@code onConnect} will get the {@link Redis} instance.
+   * Connect to redis in cluster mode, the {@code onConnect} will get the {@link Redis} instance.
+   *
+   * This is a helper factory which uses a preset of defaults for the connection:
+   *
+   * <ul>
+   *     <li>client type - <b>CLUSTER</b></li>
+   *     <li>slave usage - <b>NEVER</b></li>
+   * </ul>
    */
   static void createClusterClient(Vertx vertx, SocketAddress address, Handler<AsyncResult<Redis>> onCreate) {
-    createClusterClient(vertx, new RedisOptions().setEndpoint(address).setUseSlave(RedisSlaves.NEVER), onCreate);
-  }
-
-  /**
-   * Connect to redis, the {@code onConnect} will get the {@link Redis} instance.
-   */
-  static void createClusterClient(Vertx vertx, RedisOptions options, Handler<AsyncResult<Redis>> onCreate) {
-    RedisClusterClient.create(vertx, options, onCreate);
+    createClient(vertx, new RedisOptions().setType(RedisClientType.CLUSTER).setEndpoint(address).setUseSlave(RedisSlaves.NEVER), onCreate);
   }
 
   /**

@@ -19,9 +19,10 @@ public class RedisSentinelTest {
   public void testGetClientToMaster(TestContext should) {
     final Async test = should.async();
 
-    Redis.createSentinelClient(
+    Redis.createClient(
       rule.vertx(),
       new RedisOptions()
+        .setType(RedisClientType.SENTINEL)
         .addEndpoint(SocketAddress.inetSocketAddress(5000, "127.0.0.1"))
         .addEndpoint(SocketAddress.inetSocketAddress(5001, "127.0.0.1"))
         .addEndpoint(SocketAddress.inetSocketAddress(5002, "127.0.0.1"))
@@ -44,9 +45,10 @@ public class RedisSentinelTest {
   public void testGetClientToSlave(TestContext should) {
     final Async test = should.async();
 
-    Redis.createSentinelClient(
+    Redis.createClient(
       rule.vertx(),
       new RedisOptions()
+        .setType(RedisClientType.SENTINEL)
         .addEndpoint(SocketAddress.inetSocketAddress(5000, "127.0.0.1"))
         .addEndpoint(SocketAddress.inetSocketAddress(5001, "127.0.0.1"))
         .addEndpoint(SocketAddress.inetSocketAddress(5002, "127.0.0.1"))
@@ -69,9 +71,10 @@ public class RedisSentinelTest {
   public void testGetClientToSentinel(TestContext should) {
     final Async test = should.async();
 
-    Redis.createSentinelClient(
+    Redis.createClient(
       rule.vertx(),
       new RedisOptions()
+        .setType(RedisClientType.SENTINEL)
         .addEndpoint(SocketAddress.inetSocketAddress(5000, "127.0.0.1"))
         .addEndpoint(SocketAddress.inetSocketAddress(5001, "127.0.0.1"))
         .addEndpoint(SocketAddress.inetSocketAddress(5002, "127.0.0.1"))
