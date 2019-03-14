@@ -65,35 +65,6 @@ public interface Redis extends ReadStream<Response> {
   }
 
   /**
-   * Connect to redis in sentinel mode, the {@code onConnect} will get the {@link Redis} instance.
-   *
-   * This is a helper factory which uses a preset of defaults for the connection:
-   *
-   * <ul>
-   *     <li>client type - <b>SENTINEL</b></li>
-   *     <li>role - <b>MASTER</b></li>
-   *     <li>master name - <b>"mymaster"</b></li>
-   * </ul>
-   */
-  static void createSentinelClient(Vertx vertx, SocketAddress address, Handler<AsyncResult<Redis>> onCreate) {
-    createClient(vertx, new RedisOptions().setType(RedisClientType.SENTINEL).setEndpoint(address).setRole(RedisRole.MASTER).setMasterName("mymaster"), onCreate);
-  }
-
-  /**
-   * Connect to redis in cluster mode, the {@code onConnect} will get the {@link Redis} instance.
-   *
-   * This is a helper factory which uses a preset of defaults for the connection:
-   *
-   * <ul>
-   *     <li>client type - <b>CLUSTER</b></li>
-   *     <li>slave usage - <b>NEVER</b></li>
-   * </ul>
-   */
-  static void createClusterClient(Vertx vertx, SocketAddress address, Handler<AsyncResult<Redis>> onCreate) {
-    createClient(vertx, new RedisOptions().setType(RedisClientType.CLUSTER).setEndpoint(address).setUseSlave(RedisSlaves.NEVER), onCreate);
-  }
-
-  /**
    * Set an exception handler on the read stream.
    *
    * @param handler  the exception handler
