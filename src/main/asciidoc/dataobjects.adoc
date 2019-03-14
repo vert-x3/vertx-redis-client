@@ -203,6 +203,9 @@ Set the role name (only considered in HA mode).
 |[[select]]`@select`|`Number (Integer)`|+++
 Set the provided database to be selected when establishing a connection to the server.
 +++
+|[[type]]`@type`|`link:enums.html#RedisClientType[RedisClientType]`|+++
+Set the desired client type to be created.
++++
 |[[useSlave]]`@useSlave`|`link:enums.html#RedisSlaves[RedisSlaves]`|+++
 Set whether or not to use slave nodes (only considered in Cluster mode).
 +++

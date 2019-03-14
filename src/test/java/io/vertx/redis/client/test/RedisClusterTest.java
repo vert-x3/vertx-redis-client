@@ -9,6 +9,7 @@ import io.vertx.ext.unit.TestContext;
 import io.vertx.ext.unit.junit.RunTestOnContext;
 import io.vertx.ext.unit.junit.VertxUnitRunner;
 import io.vertx.redis.client.Redis;
+import io.vertx.redis.client.RedisClientType;
 import io.vertx.redis.client.RedisOptions;
 import io.vertx.redis.client.Response;
 import org.junit.Ignore;
@@ -31,6 +32,7 @@ public class RedisClusterTest {
 
   // Server: https://github.com/Grokzen/docker-redis-cluster
   final RedisOptions options = new RedisOptions()
+    .setType(RedisClientType.CLUSTER)
     // we will flood the redis server
     .setMaxWaitingHandlers(128 * 1024)
     .addEndpoint(SocketAddress.inetSocketAddress(7000, "127.0.0.1"))
@@ -52,7 +54,7 @@ public class RedisClusterTest {
   public void runTheSlotScope(TestContext should) {
     final Async test = should.async();
 
-    Redis.createClusterClient(rule.vertx(), options, onCreate -> {
+    Redis.createClient(rule.vertx(), options, onCreate -> {
       should.assertTrue(onCreate.succeeded());
 
       final Redis cluster = onCreate.result();
@@ -88,6 +90,7 @@ public class RedisClusterTest {
     final Async test = should.async();
 
     final RedisOptions options = new RedisOptions()
+      .setType(RedisClientType.CLUSTER)
       // we will flood the redis server
       .setMaxWaitingHandlers(128 * 1024)
       .addEndpoint(SocketAddress.inetSocketAddress(7000, "127.0.0.1"))
@@ -96,7 +99,7 @@ public class RedisClusterTest {
 
     // we miss add the odd port nodes on purpose
 
-    Redis.createClusterClient(rule.vertx(), options, onCreate -> {
+    Redis.createClient(rule.vertx(), options, onCreate -> {
       should.assertTrue(onCreate.succeeded());
 
       final Redis cluster = onCreate.result();
@@ -132,13 +135,14 @@ public class RedisClusterTest {
     final Async test = should.async();
 
     final RedisOptions options = new RedisOptions()
+      .setType(RedisClientType.CLUSTER)
       // we will flood the redis server
       .setMaxWaitingHandlers(128 * 1024)
       .addEndpoint(SocketAddress.inetSocketAddress(7000, "127.0.0.1"));
 
     // we only provide 1 node
 
-    Redis.createClusterClient(rule.vertx(), options, onCreate -> {
+    Redis.createClient(rule.vertx(), options, onCreate -> {
       should.assertTrue(onCreate.succeeded());
 
       final Redis cluster = onCreate.result();
@@ -174,6 +178,7 @@ public class RedisClusterTest {
     final Async test = should.async();
 
     final RedisOptions options = new RedisOptions()
+      .setType(RedisClientType.CLUSTER)
       // we will flood the redis server
       .setMaxWaitingHandlers(128 * 1024)
       .addEndpoint(SocketAddress.inetSocketAddress(7000, "127.0.0.1"));
@@ -182,7 +187,7 @@ public class RedisClusterTest {
 
     for (int i = 0; i < 24; i++) {
       Future f = Future.future();
-      Redis.createClusterClient(rule.vertx(), options, f);
+      Redis.createClient(rule.vertx(), options, f);
       futures.add(f);
     }
 
@@ -229,7 +234,7 @@ public class RedisClusterTest {
   public void testHgetall(TestContext should) {
     final Async test = should.async();
 
-    Redis.createClusterClient(rule.vertx(), options, onCreate -> {
+    Redis.createClient(rule.vertx(), options, onCreate -> {
       should.assertTrue(onCreate.succeeded());
 
       final Redis cluster = onCreate.result();
@@ -260,7 +265,7 @@ public class RedisClusterTest {
     final Async test = should.async();
     final String key = makeKey();
 
-    Redis.createClusterClient(rule.vertx(), options, onCreate -> {
+    Redis.createClient(rule.vertx(), options, onCreate -> {
       should.assertTrue(onCreate.succeeded());
 
       final Redis cluster = onCreate.result();
@@ -293,7 +298,7 @@ public class RedisClusterTest {
     final Async test = should.async();
     final String key = makeKey();
 
-    Redis.createClusterClient(rule.vertx(), options, onCreate -> {
+    Redis.createClient(rule.vertx(), options, onCreate -> {
       should.assertTrue(onCreate.succeeded());
 
       final Redis cluster = onCreate.result();
@@ -329,7 +334,7 @@ public class RedisClusterTest {
     final String key2 = makeKey();
     final String destkey = makeKey();
 
-    Redis.createClusterClient(rule.vertx(), options, onCreate -> {
+    Redis.createClient(rule.vertx(), options, onCreate -> {
       should.assertTrue(onCreate.succeeded());
 
       final Redis cluster = onCreate.result();
@@ -359,7 +364,7 @@ public class RedisClusterTest {
     final String list1 = makeKey();
     final String list2 = makeKey();
 
-    Redis.createClusterClient(rule.vertx(), options, onCreate -> {
+    Redis.createClient(rule.vertx(), options, onCreate -> {
       should.assertTrue(onCreate.succeeded());
 
       final Redis cluster = onCreate.result();
@@ -395,7 +400,7 @@ public class RedisClusterTest {
     final byte[] value1 = new byte[]{(byte) 0xff, (byte) 0xf0, (byte) 0x00};
     final byte[] value2 = new byte[]{0, 0, 0};
 
-    Redis.createClusterClient(rule.vertx(), options, onCreate -> {
+    Redis.createClient(rule.vertx(), options, onCreate -> {
       should.assertTrue(onCreate.succeeded());
 
       final Redis cluster = onCreate.result();
@@ -429,7 +434,7 @@ public class RedisClusterTest {
     final String list1 = makeKey();
     final String list2 = makeKey();
 
-    Redis.createClusterClient(rule.vertx(), options, onCreate -> {
+    Redis.createClient(rule.vertx(), options, onCreate -> {
       should.assertTrue(onCreate.succeeded());
 
       final Redis cluster = onCreate.result();
@@ -460,7 +465,7 @@ public class RedisClusterTest {
     final Async test = should.async();
     final String key = makeKey();
 
-    Redis.createClusterClient(rule.vertx(), options, onCreate -> {
+    Redis.createClient(rule.vertx(), options, onCreate -> {
       should.assertTrue(onCreate.succeeded());
 
       final Redis cluster = onCreate.result();
@@ -483,7 +488,7 @@ public class RedisClusterTest {
     final Async test = should.async();
     final String key = makeKey();
 
-    Redis.createClusterClient(rule.vertx(), options, onCreate -> {
+    Redis.createClient(rule.vertx(), options, onCreate -> {
       should.assertTrue(onCreate.succeeded());
 
       final Redis cluster = onCreate.result();
@@ -507,7 +512,7 @@ public class RedisClusterTest {
     final String key1 = makeKey();
     final String key2 = makeKey();
 
-    Redis.createClusterClient(rule.vertx(), options, onCreate -> {
+    Redis.createClient(rule.vertx(), options, onCreate -> {
       should.assertTrue(onCreate.succeeded());
 
       final Redis cluster = onCreate.result();
@@ -533,7 +538,7 @@ public class RedisClusterTest {
   public void testEcho(TestContext should) {
     final Async test = should.async();
 
-    Redis.createClusterClient(rule.vertx(), options, onCreate -> {
+    Redis.createClient(rule.vertx(), options, onCreate -> {
       should.assertTrue(onCreate.succeeded());
 
       final Redis cluster = onCreate.result();
@@ -555,7 +560,7 @@ public class RedisClusterTest {
 
     final AtomicInteger counter = new AtomicInteger();
 
-    Redis.createClusterClient(rule.vertx(), options, onCreate -> {
+    Redis.createClient(rule.vertx(), options, onCreate -> {
       should.assertTrue(onCreate.succeeded());
 
       final Redis cluster = onCreate.result();
@@ -588,7 +593,7 @@ public class RedisClusterTest {
     final Async test = should.async();
     final String key = makeKey();
 
-    Redis.createClusterClient(rule.vertx(), options, onCreate -> {
+    Redis.createClient(rule.vertx(), options, onCreate -> {
       should.assertTrue(onCreate.succeeded());
 
       final Redis cluster = onCreate.result();
@@ -626,7 +631,7 @@ public class RedisClusterTest {
     final Async test = should.async();
     final String key = makeKey();
 
-    Redis.createClusterClient(rule.vertx(), options, onCreate -> {
+    Redis.createClient(rule.vertx(), options, onCreate -> {
       should.assertTrue(onCreate.succeeded());
 
       final Redis cluster = onCreate.result();
@@ -662,7 +667,7 @@ public class RedisClusterTest {
     final String nonExistentKey = makeKey();
 
 
-    Redis.createClusterClient(rule.vertx(), options, onCreate -> {
+    Redis.createClient(rule.vertx(), options, onCreate -> {
       should.assertTrue(onCreate.succeeded());
 
       final Redis cluster = onCreate.result();

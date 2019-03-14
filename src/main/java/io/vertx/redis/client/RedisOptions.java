@@ -31,6 +31,7 @@ import java.util.List;
 @DataObject(generateConverter = true)
 public class RedisOptions {
 
+  private RedisClientType type;
   private NetClientOptions netClientOptions;
   private List<SocketAddress> endpoints;
   private int maxWaitingHandlers;
@@ -52,6 +53,7 @@ public class RedisOptions {
     masterName = "mymaster";
     role = RedisRole.MASTER;
     slaves = RedisSlaves.NEVER;
+    type = RedisClientType.STANDALONE;
   }
 
   /**
@@ -66,6 +68,7 @@ public class RedisOptions {
    * @param other the object to clone.
    */
   public RedisOptions(RedisOptions other) {
+    this.type = other.type;
     this.netClientOptions = other.netClientOptions;
     this.endpoints = other.endpoints;
     this.maxWaitingHandlers = other.maxWaitingHandlers;
@@ -85,6 +88,25 @@ public class RedisOptions {
     init();
     RedisOptionsConverter.fromJson(json, this);
   }
+
+  /**
+   * Get the type of client to be created.
+   * @return the desired client type.
+   */
+  public RedisClientType getType() {
+    return type;
+  }
+
+  /**
+   * Set the desired client type to be created.
+   * @param type the client type.
+   * @return fluent self.
+   */
+  public RedisOptions setType(RedisClientType type) {
+    this.type = type;
+    return this;
+  }
+
 
   /**
    * Get the net client options used to connect to the server.
