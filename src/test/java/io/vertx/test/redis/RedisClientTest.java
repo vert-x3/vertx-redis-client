@@ -23,6 +23,7 @@ import io.vertx.ext.unit.TestContext;
 import io.vertx.ext.unit.junit.RunTestOnContext;
 import io.vertx.ext.unit.junit.VertxUnitRunner;
 import io.vertx.redis.RedisClient;
+import io.vertx.redis.RedisOptions;
 import io.vertx.redis.RedisTransaction;
 import io.vertx.redis.op.*;
 import org.junit.*;
@@ -47,7 +48,7 @@ public class RedisClientTest {
   public void before(TestContext should) {
     final Async before = should.async();
 
-    RedisClient.create(rule.vertx(), new io.vertx.redis.client.RedisOptions().addEndpoint(SocketAddress.inetSocketAddress(7006, "127.0.0.1")), create -> {
+    RedisClient.create(rule.vertx(), new RedisOptions().setPort(7006), create -> {
       should.assertTrue(create.succeeded());
 
       redis = create.result();

@@ -41,28 +41,34 @@ public interface Redis extends ReadStream<Response> {
    * This connection will use the default options which are connect
    * to a standalone server on the default port on "localhost".
    */
-  static void createClient(Vertx vertx, SocketAddress address, Handler<AsyncResult<Redis>> onCreate) {
-    createClient(vertx, new RedisOptions().setEndpoint(address), onCreate);
+  static Redis createClient(Vertx vertx, SocketAddress address) {
+    return createClient(vertx, new RedisOptions().setEndpoint(address));
   }
 
   /**
    * Connect to redis, the {@code onConnect} will get the {@link Redis} instance.
    */
-  static void createClient(Vertx vertx, RedisOptions options, Handler<AsyncResult<Redis>> onCreate) {
+  static Redis createClient(Vertx vertx, RedisOptions options) {
     switch (options.getType()) {
       case STANDALONE:
-        RedisClient.create(vertx, options, onCreate);
-        break;
+        return RedisClient.create(vertx, options);
       case SENTINEL:
-        RedisSentinelClient.create(vertx, options, onCreate);
-        break;
+        return RedisSentinelClient.create(vertx, options);
       case CLUSTER:
-        RedisClusterClient.create(vertx, options, onCreate);
-        break;
+        return RedisClusterClient.create(vertx, options);
       default:
         throw new IllegalStateException("Unknown Redis Client type: " + options.getType());
     }
   }
+
+  /**
+   * Connects to the redis server.
+   *
+   * @param handler  the async result handler
+   * @return a reference to this, so the API can be used fluently
+   */
+  @Fluent
+  Redis connect(Handler<AsyncResult<Redis>> handler);
 
   /**
    * Set an exception handler on the read stream.
@@ -70,6 +76,7 @@ public interface Redis extends ReadStream<Response> {
    * @param handler  the exception handler
    * @return a reference to this, so the API can be used fluently
    */
+  @Fluent
   Redis exceptionHandler(Handler<Throwable> handler);
 
   /**

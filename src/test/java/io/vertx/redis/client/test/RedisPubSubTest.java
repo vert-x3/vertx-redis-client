@@ -28,19 +28,21 @@ public class RedisPubSubTest {
   public void setUp(TestContext should) {
     final Async setUp = should.async();
 
-    Redis.createClient(rule.vertx(), SocketAddress.inetSocketAddress(7006, "127.0.0.1"), onCreate -> {
-      should.assertTrue(onCreate.succeeded());
-      pub = onCreate.result();
-      pub.exceptionHandler(should::fail);
+    Redis.createClient(rule.vertx(), SocketAddress.inetSocketAddress(7006, "127.0.0.1"))
+      .connect(onCreate -> {
+        should.assertTrue(onCreate.succeeded());
+        pub = onCreate.result();
+        pub.exceptionHandler(should::fail);
 
-      Redis.createClient(rule.vertx(), SocketAddress.inetSocketAddress(7006, "127.0.0.1"), onCreate2 -> {
-        should.assertTrue(onCreate2.succeeded());
-        sub = onCreate2.result();
-        sub.exceptionHandler(should::fail);
+        Redis.createClient(rule.vertx(), SocketAddress.inetSocketAddress(7006, "127.0.0.1"))
+          .connect(onCreate2 -> {
+            should.assertTrue(onCreate2.succeeded());
+            sub = onCreate2.result();
+            sub.exceptionHandler(should::fail);
 
-        setUp.complete();
+            setUp.complete();
+          });
       });
-    });
   }
 
   @Test

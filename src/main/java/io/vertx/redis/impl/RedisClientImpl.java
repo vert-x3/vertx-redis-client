@@ -41,7 +41,7 @@ public final class RedisClientImpl implements RedisClient {
   private final RedisTransaction transaction;
 
   public static void create(Vertx vertx, RedisOptions options, Handler<AsyncResult<RedisClient>> ready) {
-    Redis.createClient(vertx, options, onReady -> {
+    Redis.createClient(vertx, options).connect(onReady -> {
       if (onReady.succeeded()) {
         ready.handle(Future.succeededFuture(new RedisClientImpl(onReady.result())));
       } else {

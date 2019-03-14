@@ -15,11 +15,12 @@ import io.vertx.redis.client.*;
 public class RedisExamples {
 
   public void example1(Vertx vertx) {
-    Redis.createClient(vertx, new RedisOptions(), onCreate -> {
-      if (onCreate.succeeded()) {
-        Redis client = onCreate.result();
-      }
-    });
+    Redis.createClient(vertx, new RedisOptions())
+      .connect(onConnect -> {
+        if (onConnect.succeeded()) {
+          Redis client = onConnect.result();
+        }
+      });
   }
 
   public void example2(Vertx vertx) {
@@ -27,11 +28,12 @@ public class RedisExamples {
       .setPassword("abracadabra")
       .setSelect(1);
 
-    Redis.createClient(vertx, options, onCreate -> {
-      if (onCreate.succeeded()) {
-        Redis client = onCreate.result();
-      }
-    });
+    Redis.createClient(vertx, options)
+      .connect(onConnect -> {
+        if (onConnect.succeeded()) {
+          Redis client = onConnect.result();
+        }
+      });
   }
 
   public void example3(Redis client) {
@@ -62,11 +64,11 @@ public class RedisExamples {
         .addEndpoint(SocketAddress.inetSocketAddress(5001, "127.0.0.1"))
         .addEndpoint(SocketAddress.inetSocketAddress(5002, "127.0.0.1"))
         .setMasterName("sentinel7000")
-        .setRole(RedisRole.MASTER),
-      onCreate -> {
+        .setRole(RedisRole.MASTER))
+      .connect(onConnect -> {
         // assuming we got a connection to the master node
         // query the info for the node
-        onCreate.result()
+        onConnect.result()
           .send(Request.cmd(Command.INFO), info -> {
             // do something...
           });
@@ -85,15 +87,16 @@ public class RedisExamples {
 
   public void example7(Vertx vertx) {
 
-    Redis.createClient(vertx, new RedisOptions(), onCreate -> {
-      if (onCreate.succeeded()) {
-        Redis client = onCreate.result();
+    Redis.createClient(vertx, new RedisOptions())
+      .connect(onConnect -> {
+        if (onConnect.succeeded()) {
+          Redis client = onConnect.result();
 
-        client.handler(message -> {
-          // do whatever you need to do with your message
-        });
-      }
-    });
+          client.handler(message -> {
+            // do whatever you need to do with your message
+          });
+        }
+      });
   }
 
   public void example8(Redis redis) {
@@ -107,11 +110,12 @@ public class RedisExamples {
 
   public void example9(Vertx vertx) {
 
-    Redis.createClient(vertx, SocketAddress.domainSocketAddress("/tmp/redis.sock"), onCreate -> {
-      if (onCreate.succeeded()) {
-        Redis client = onCreate.result();
-      }
-    });
+    Redis.createClient(vertx, SocketAddress.domainSocketAddress("/tmp/redis.sock"))
+      .connect(onConnect -> {
+        if (onConnect.succeeded()) {
+          Redis client = onConnect.result();
+        }
+      });
   }
 
   public void example10() {
@@ -137,18 +141,19 @@ public class RedisExamples {
        * an exception in the connection.
        */
       private void createRedisClient(Handler<AsyncResult<Redis>> handler) {
-        Redis.createClient(vertx, options, onCreate -> {
-          if (onCreate.succeeded()) {
-            client = onCreate.result();
-            // make sure the client is reconnected on error
-            client.exceptionHandler(e -> {
-              // attempt to reconnect
-              attemptReconnect(0);
-            });
-          }
-          // allow further processing
-          handler.handle(onCreate);
-        });
+        Redis.createClient(vertx, options)
+          .connect(onConnect -> {
+            if (onConnect.succeeded()) {
+              client = onConnect.result();
+              // make sure the client is reconnected on error
+              client.exceptionHandler(e -> {
+                // attempt to reconnect
+                attemptReconnect(0);
+              });
+            }
+            // allow further processing
+            handler.handle(onConnect);
+          });
       }
 
       /**

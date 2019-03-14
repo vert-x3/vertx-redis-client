@@ -49,10 +49,19 @@ public class RedisSentinelClient implements Redis {
 
   private static final Logger LOG = LoggerFactory.getLogger(RedisSentinelClient.class);
 
+  private final Vertx vertx;
+  private final RedisOptions options;
+
   private Redis sentinel;
   private RedisClient redis;
 
-  private RedisSentinelClient(Vertx vertx, RedisOptions options, Handler<AsyncResult<Redis>> onCreate) {
+  private RedisSentinelClient(Vertx vertx, RedisOptions options) {
+    this.vertx = vertx;
+    this.options = options;
+  }
+
+  @Override
+  public Redis connect(Handler<AsyncResult<Redis>> onCreate) {
     // sentinel (HA) requires 2 connections, one to watch for sentinel events and the connection itself
     createClientInternal(vertx, options, RedisRole.SENTINEL, create -> {
       if (create.failed()) {
@@ -99,6 +108,8 @@ public class RedisSentinelClient implements Redis {
 
       onCreate.handle(Future.succeededFuture(this));
     });
+
+    return this;
   }
 
   @Override
@@ -160,8 +171,8 @@ public class RedisSentinelClient implements Redis {
     return this;
   }
 
-  public static void create(Vertx vertx, RedisOptions options, Handler<AsyncResult<Redis>> onCreate) {
-    new RedisSentinelClient(vertx, options, onCreate);
+  public static Redis create(Vertx vertx, RedisOptions options) {
+    return new RedisSentinelClient(vertx, options);
   }
 
   private static void createClientInternal(Vertx vertx, RedisOptions options, RedisRole role, Handler<AsyncResult<Redis>> onCreate) {
@@ -172,7 +183,7 @@ public class RedisSentinelClient implements Redis {
         return;
       }
       // wrap a new client
-      RedisClient.create(vertx, resolve.result(), options, onCreate);
+      RedisClient.create(vertx, options, resolve.result()).connect(onCreate);
     };
 
     switch (role) {
@@ -237,7 +248,7 @@ public class RedisSentinelClient implements Redis {
 
   private static void isSentinelOk(Vertx vertx, SocketAddress endpoint, RedisOptions argument, Handler<AsyncResult<SocketAddress>> handler) {
 
-    RedisClient.create(vertx, endpoint, argument, onCreate -> {
+    RedisClient.create(vertx, argument, endpoint).connect(onCreate -> {
       if (onCreate.failed()) {
         handler.handle(Future.failedFuture(onCreate.cause()));
         return;
@@ -259,7 +270,7 @@ public class RedisSentinelClient implements Redis {
   }
 
   private static void getMasterFromEndpoint(Vertx vertx, SocketAddress endpoint, RedisOptions options, Handler<AsyncResult<SocketAddress>> handler) {
-    RedisClient.create(vertx, endpoint, options, onCreate -> {
+    RedisClient.create(vertx, options, endpoint).connect(onCreate -> {
       if (onCreate.failed()) {
         handler.handle(Future.failedFuture(onCreate.cause()));
         return;
@@ -288,7 +299,7 @@ public class RedisSentinelClient implements Redis {
   }
 
   private static void getSlaveFromEndpoint(Vertx vertx, SocketAddress endpoint, RedisOptions options, Handler<AsyncResult<SocketAddress>> handler) {
-    RedisClient.create(vertx, endpoint, options, onCreate -> {
+    RedisClient.create(vertx, options, endpoint).connect(onCreate -> {
       if (onCreate.failed()) {
         handler.handle(Future.failedFuture(onCreate.cause()));
         return;

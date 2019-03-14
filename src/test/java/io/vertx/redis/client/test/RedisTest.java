@@ -28,62 +28,65 @@ public class RedisTest {
   public void simpleTest(TestContext should) {
     final Async test = should.async();
 
-    Redis.createClient(rule.vertx(), SocketAddress.inetSocketAddress(7006, "127.0.0.1"), create -> {
-      should.assertTrue(create.succeeded());
+    Redis.createClient(rule.vertx(), SocketAddress.inetSocketAddress(7006, "127.0.0.1"))
+      .connect(create -> {
+        should.assertTrue(create.succeeded());
 
-      final Redis redis = create.result();
+        final Redis redis = create.result();
 
-      redis.exceptionHandler(ex -> {
+        redis.exceptionHandler(ex -> {
 
+        });
+
+        redis.send(Request.cmd(Command.PING), send -> {
+          should.assertTrue(send.succeeded());
+          should.assertNotNull(send.result());
+
+          should.assertEquals("PONG", send.result().toString());
+          test.complete();
+        });
       });
-
-      redis.send(Request.cmd(Command.PING), send -> {
-        should.assertTrue(send.succeeded());
-        should.assertNotNull(send.result());
-
-        should.assertEquals("PONG", send.result().toString());
-        test.complete();
-      });
-    });
   }
 
   @Test
   public void batchTest(TestContext should) {
     final Async test = should.async();
 
-    Redis.createClient(rule.vertx(), SocketAddress.inetSocketAddress(7006, "127.0.0.1"), create -> {
-      should.assertTrue(create.succeeded());
+    Redis.createClient(rule.vertx(), SocketAddress.inetSocketAddress(7006, "127.0.0.1"))
+      .connect(create -> {
+        should.assertTrue(create.succeeded());
 
-      final Redis redis = create.result();
+        final Redis redis = create.result();
 
-      redis.batch(Arrays.asList(
-        cmd(MULTI),
-        cmd(SET).arg("a").arg(3),
-        cmd(LPOP).arg("a"),
-        cmd(EXEC)
-      ), batch -> {
-        should.assertTrue(batch.succeeded());
-        test.complete();
+        redis.batch(Arrays.asList(
+          cmd(MULTI),
+          cmd(SET).arg("a").arg(3),
+          cmd(LPOP).arg("a"),
+          cmd(EXEC)
+        ), batch -> {
+          should.assertTrue(batch.succeeded());
+          test.complete();
+        });
       });
-    });
   }
 
   @Test
   public void simpleTestAPI(TestContext should) {
     final Async test = should.async();
 
-    Redis.createClient(rule.vertx(), SocketAddress.inetSocketAddress(7006, "127.0.0.1"), create -> {
-      should.assertTrue(create.succeeded());
+    Redis.createClient(rule.vertx(), SocketAddress.inetSocketAddress(7006, "127.0.0.1"))
+      .connect(create -> {
+        should.assertTrue(create.succeeded());
 
-      RedisAPI redis = RedisAPI.api(create.result());
+        RedisAPI redis = RedisAPI.api(create.result());
 
-      redis.set(Arrays.asList("key1", "value1"), set -> {
-        should.assertTrue(set.succeeded());
-        should.assertNotNull(set.result());
+        redis.set(Arrays.asList("key1", "value1"), set -> {
+          should.assertTrue(set.succeeded());
+          should.assertNotNull(set.result());
 
-        should.assertEquals("OK", set.result().toString());
-        test.complete();
+          should.assertEquals("OK", set.result().toString());
+          test.complete();
+        });
       });
-    });
   }
 }

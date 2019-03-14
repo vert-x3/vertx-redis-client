@@ -24,6 +24,7 @@ import io.vertx.core.Vertx;
 import io.vertx.core.buffer.Buffer;
 import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;
+import io.vertx.core.net.SocketAddress;
 import io.vertx.redis.impl.RedisClientImpl;
 import io.vertx.redis.op.*;
 
@@ -42,8 +43,15 @@ public interface RedisClient {
     RedisClientImpl.create(vertx, new io.vertx.redis.client.RedisOptions(), handler);
   }
 
-  static void create(Vertx vertx, io.vertx.redis.client.RedisOptions options, Handler<AsyncResult<RedisClient>> handler) {
-    RedisClientImpl.create(vertx, options, handler);
+  static void create(Vertx vertx, RedisOptions options, Handler<AsyncResult<RedisClient>> handler) {
+    RedisClientImpl.create(vertx,
+      // need to convert from the old options to the new one...
+      new io.vertx.redis.client.RedisOptions()
+        .setNetClientOptions(options)
+        .setEndpoint(options.isDomainSocket() ? SocketAddress.domainSocketAddress(options.getDomainSocketAddress()) : SocketAddress.inetSocketAddress(options.getPort(), options.getHost()))
+        .setPassword(options.getAuth())
+        .setSelect(options.getSelect()),
+      handler);
   }
 
   /**
