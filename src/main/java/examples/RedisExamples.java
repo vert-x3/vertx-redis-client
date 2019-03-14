@@ -54,9 +54,10 @@ public class RedisExamples {
   }
 
   public void example5(Vertx vertx) {
-    Redis.createSentinelClient(
+    Redis.createClient(
       vertx,
       new RedisOptions()
+        .setType(RedisClientType.SENTINEL)
         .addEndpoint(SocketAddress.inetSocketAddress(5000, "127.0.0.1"))
         .addEndpoint(SocketAddress.inetSocketAddress(5001, "127.0.0.1"))
         .addEndpoint(SocketAddress.inetSocketAddress(5002, "127.0.0.1"))

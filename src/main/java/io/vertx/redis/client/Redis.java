@@ -37,6 +37,9 @@ public interface Redis extends ReadStream<Response> {
 
   /**
    * Connect to redis, the {@code onConnect} will get the {@link Redis} instance.
+   *
+   * This connection will use the default options which are connect
+   * to a standalone server on the default port on "localhost".
    */
   static void createClient(Vertx vertx, SocketAddress address, Handler<AsyncResult<Redis>> onCreate) {
     createClient(vertx, new RedisOptions().setEndpoint(address), onCreate);
@@ -46,35 +49,19 @@ public interface Redis extends ReadStream<Response> {
    * Connect to redis, the {@code onConnect} will get the {@link Redis} instance.
    */
   static void createClient(Vertx vertx, RedisOptions options, Handler<AsyncResult<Redis>> onCreate) {
-    RedisClient.create(vertx, options.getEndpoint(), options, onCreate);
-  }
-
-  /**
-   * Connect to redis, the {@code onConnect} will get the {@link Redis} instance.
-   */
-  static void createSentinelClient(Vertx vertx, SocketAddress address, Handler<AsyncResult<Redis>> onCreate) {
-    createSentinelClient(vertx, new RedisOptions().setEndpoint(address).setRole(RedisRole.MASTER).setMasterName("mymaster"), onCreate);
-  }
-
-  /**
-   * Connect to redis, the {@code onConnect} will get the {@link Redis} instance.
-   */
-  static void createSentinelClient(Vertx vertx, RedisOptions options, Handler<AsyncResult<Redis>> onCreate) {
-    RedisSentinelClient.create(vertx, options, onCreate);
-  }
-
-  /**
-   * Connect to redis, the {@code onConnect} will get the {@link Redis} instance.
-   */
-  static void createClusterClient(Vertx vertx, SocketAddress address, Handler<AsyncResult<Redis>> onCreate) {
-    createClusterClient(vertx, new RedisOptions().setEndpoint(address).setUseSlave(RedisSlaves.NEVER), onCreate);
-  }
-
-  /**
-   * Connect to redis, the {@code onConnect} will get the {@link Redis} instance.
-   */
-  static void createClusterClient(Vertx vertx, RedisOptions options, Handler<AsyncResult<Redis>> onCreate) {
-    RedisClusterClient.create(vertx, options, onCreate);
+    switch (options.getType()) {
+      case STANDALONE:
+        RedisClient.create(vertx, options, onCreate);
+        break;
+      case SENTINEL:
+        RedisSentinelClient.create(vertx, options, onCreate);
+        break;
+      case CLUSTER:
+        RedisClusterClient.create(vertx, options, onCreate);
+        break;
+      default:
+        throw new IllegalStateException("Unknown Redis Client type: " + options.getType());
+    }
   }
 
   /**

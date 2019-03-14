@@ -36,7 +36,11 @@ public class RedisClient implements Redis, ParserHandler {
 
   private static final ErrorType CONNECTION_CLOSED = ErrorType.create("CONNECTION_CLOSED");
 
-  public static void create(Vertx vertx, SocketAddress address, RedisOptions options, Handler<AsyncResult<Redis>> onConnect) {
+  public static void create(Vertx vertx, RedisOptions options, Handler<AsyncResult<Redis>> onConnect) {
+    create(vertx, options.getEndpoint(), options, onConnect);
+  }
+
+  static void create(Vertx vertx, SocketAddress address, RedisOptions options, Handler<AsyncResult<Redis>> onConnect) {
     final NetClient netClient = vertx.createNetClient(options.getNetClientOptions());
     final int maxWaitingQueue = options.getMaxWaitingHandlers();
     final int maxNesting = options.getMaxNestedArrays();
