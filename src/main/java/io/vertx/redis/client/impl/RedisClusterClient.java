@@ -55,8 +55,8 @@ public class RedisClusterClient implements Redis {
     REDUCERS.put(command, fn);
   }
 
-  public static void create(Vertx vertx, RedisOptions options, Handler<AsyncResult<Redis>> onCreate) {
-    new RedisClusterClient(vertx, options, onCreate);
+  public static Redis create(Vertx vertx, RedisOptions options) {
+    return new RedisClusterClient(vertx, options);
   }
 
   static {
@@ -107,11 +107,14 @@ public class RedisClusterClient implements Redis {
   private Handler<Void> onEnd;
   private Handler<Response> onMessage;
 
-  private RedisClusterClient(Vertx vertx, RedisOptions options, Handler<AsyncResult<Redis>> onCreate) {
+  private RedisClusterClient(Vertx vertx, RedisOptions options) {
     this.vertx = vertx;
     this.slaves = options.getUseSlave();
     this.options = options;
+  }
 
+  @Override
+  public Redis connect(Handler<AsyncResult<Redis>> onCreate) {
     // for each endpoint open a client
     final List<SocketAddress> endpoints = options.getEndpoints();
 
@@ -139,6 +142,8 @@ public class RedisClusterClient implements Redis {
         }
       });
     }
+
+    return this;
   }
 
   @Override
@@ -420,7 +425,7 @@ public class RedisClusterClient implements Redis {
       return;
     }
 
-    RedisClient.create(vertx, address, options, create -> {
+    RedisClient.create(vertx, options, address).connect(create -> {
       if (create.failed()) {
         onClient.handle(create);
         return;

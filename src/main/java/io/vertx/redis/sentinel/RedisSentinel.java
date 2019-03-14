@@ -6,6 +6,8 @@ import io.vertx.core.AsyncResult;
 import io.vertx.core.Handler;
 import io.vertx.core.Vertx;
 import io.vertx.core.json.JsonArray;
+import io.vertx.core.net.SocketAddress;
+import io.vertx.redis.RedisOptions;
 import io.vertx.redis.impl.RedisSentinelClientImpl;
 
 /**
@@ -21,8 +23,15 @@ public interface RedisSentinel {
     RedisSentinelClientImpl.create(vertx, new io.vertx.redis.client.RedisOptions(), handler);
   }
 
-  static void create(Vertx vertx, io.vertx.redis.client.RedisOptions options, Handler<AsyncResult<RedisSentinel>> handler) {
-    RedisSentinelClientImpl.create(vertx, options, handler);
+  static void create(Vertx vertx, RedisOptions options, Handler<AsyncResult<RedisSentinel>> handler) {
+    RedisSentinelClientImpl.create(vertx,
+      // need to convert from the old options to the new one...
+      new io.vertx.redis.client.RedisOptions()
+        .setNetClientOptions(options)
+        .setEndpoint(options.isDomainSocket() ? SocketAddress.domainSocketAddress(options.getDomainSocketAddress()) : SocketAddress.inetSocketAddress(options.getPort(), options.getHost()))
+        .setPassword(options.getAuth())
+        .setSelect(options.getSelect()),
+      handler);
   }
 
   /**
