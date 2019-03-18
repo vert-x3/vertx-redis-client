@@ -255,6 +255,8 @@ public interface Command {
     return new CommandImpl(command, arity, firstKey, lastKey, interval, readOnly, movable, clusterWide);
   }
 
+  String getCommandName();
+
   @GenIgnore(GenIgnore.PERMITTED_TYPE)
   byte[] getBytes();
 

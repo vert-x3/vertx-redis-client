@@ -29,6 +29,7 @@ public class CommandImpl implements Command {
   private final byte[] bytes;
   private final int arity;
 
+  private final String commandName;
   private final boolean multiKey;
   private final int firstKey;
   private final int lastKey;
@@ -40,6 +41,7 @@ public class CommandImpl implements Command {
 
   public CommandImpl(String command, int arity, int firstKey, int lastKey, int interval, boolean readOnly, boolean movable, boolean clusterWide) {
     bytes = ("$" + command.length() + "\r\n" + command + "\r\n").getBytes(StandardCharsets.ISO_8859_1);
+    this.commandName = command;
     this.arity = arity;
     this.firstKey = firstKey;
     this.lastKey = lastKey;
@@ -49,6 +51,11 @@ public class CommandImpl implements Command {
     this.readOnly = readOnly;
     this.movable = movable;
     this.clusterWide = clusterWide;
+  }
+
+  @Override
+  public String getCommandName() {
+    return commandName;
   }
 
   @Override
