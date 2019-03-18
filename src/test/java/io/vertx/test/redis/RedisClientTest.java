@@ -45,15 +45,8 @@ public class RedisClientTest {
   private RedisClient redis;
 
   @Before
-  public void before(TestContext should) {
-    final Async before = should.async();
-
-    RedisClient.create(rule.vertx(), new RedisOptions().setPort(7006), create -> {
-      should.assertTrue(create.succeeded());
-
-      redis = create.result();
-      before.complete();
-    });
+  public void before() {
+    redis = RedisClient.create(rule.vertx(), new RedisOptions().setPort(7006));
   }
 
   @After
