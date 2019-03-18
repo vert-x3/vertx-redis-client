@@ -243,21 +243,15 @@ public class RedisClient implements Redis, ParserHandler {
       handler.handle(Future.failedFuture("Redis waiting Queue is full"));
       return this;
     }
-    // encode the message to a buffer
-    final Buffer message = ((RequestImpl) request).encode();
-    // write to the socket
-    netSocket.write(message, write -> {
-      if (write.succeeded()) {
-        waiting.offer(handler);
-      } else {
-        try {
-          handler.handle(Future.failedFuture(write.cause()));
-        } catch (RuntimeException e) {
-          onException.handle(e);
-        }
-
-      }
-    });
+    try {
+      // encode the message to a buffer
+      final Buffer message = ((RequestImpl) request).encode();
+      // write to the socket
+      waiting.offer(handler);
+      netSocket.write(message);
+    } catch (RuntimeException e) {
+      onException.handle(e);
+    }
     return this;
   }
 
