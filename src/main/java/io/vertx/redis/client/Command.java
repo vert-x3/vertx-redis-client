@@ -93,7 +93,7 @@ public interface Command {
   Command INCRBY = Command.create("incrby", 3, 1, 1, 1, false, false, false);
   Command INCRBYFLOAT = Command.create("incrbyfloat", 3, 1, 1, 1, false, false, false);
   Command INFO = Command.create("info", -1, 0, 0, 0, false, false, false);
-  Command KEYS = Command.create("keys", 2, 0, 0, 0, true, false, false);
+  Command KEYS = Command.create("keys", 2, 0, 0, 0, true, false, true);
   Command LASTSAVE = Command.create("lastsave", 1, 0, 0, 0, false, false, false);
   Command LATENCY = Command.create("latency", -2, 0, 0, 0, false, false, false);
   Command LINDEX = Command.create("lindex", 3, 1, 1, 1, true, false, false);
@@ -149,7 +149,7 @@ public interface Command {
   Command RPUSH = Command.create("rpush", -3, 1, 1, 1, false, false, false);
   Command RPUSHX = Command.create("rpushx", -3, 1, 1, 1, false, false, false);
   Command SADD = Command.create("sadd", -3, 1, 1, 1, false, false, false);
-  Command SAVE = Command.create("save", 1, 0, 0, 0, false, false, false);
+  Command SAVE = Command.create("save", 1, 0, 0, 0, false, false, true);
   Command SCAN = Command.create("scan", -2, 0, 0, 0, true, false, false);
   Command SCARD = Command.create("scard", 2, 1, 1, 1, true, false, false);
   Command SCRIPT = Command.create("script", -2, 0, 0, 0, false, false, false);
