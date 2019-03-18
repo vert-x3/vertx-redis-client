@@ -93,7 +93,7 @@ public interface Command {
   Command INCRBY = Command.create("incrby", 3, 1, 1, 1, false, false, false);
   Command INCRBYFLOAT = Command.create("incrbyfloat", 3, 1, 1, 1, false, false, false);
   Command INFO = Command.create("info", -1, 0, 0, 0, false, false, false);
-  Command KEYS = Command.create("keys", 2, 0, 0, 0, true, true, false);
+  Command KEYS = Command.create("keys", 2, 0, 0, 0, true, false, false);
   Command LASTSAVE = Command.create("lastsave", 1, 0, 0, 0, false, false, false);
   Command LATENCY = Command.create("latency", -2, 0, 0, 0, false, false, false);
   Command LINDEX = Command.create("lindex", 3, 1, 1, 1, true, false, false);
