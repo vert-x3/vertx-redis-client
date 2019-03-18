@@ -36,8 +36,9 @@ public class CommandImpl implements Command {
   private final boolean keyless;
   private final boolean readOnly;
   private final boolean movable;
+  private final boolean clusterWide;
 
-  public CommandImpl(String command, int arity, int firstKey, int lastKey, int interval, boolean readOnly, boolean movable) {
+  public CommandImpl(String command, int arity, int firstKey, int lastKey, int interval, boolean readOnly, boolean movable, boolean clusterWide) {
     bytes = ("$" + command.length() + "\r\n" + command + "\r\n").getBytes(StandardCharsets.ISO_8859_1);
     this.arity = arity;
     this.firstKey = firstKey;
@@ -47,6 +48,7 @@ public class CommandImpl implements Command {
     this.keyless = interval == 0 && !movable;
     this.readOnly = readOnly;
     this.movable = movable;
+    this.clusterWide = clusterWide;
   }
 
   @Override
@@ -92,5 +94,10 @@ public class CommandImpl implements Command {
   @Override
   public boolean isMovable() {
     return movable;
+  }
+
+  @Override
+  public boolean isClusterWide() {
+    return clusterWide;
   }
 }
