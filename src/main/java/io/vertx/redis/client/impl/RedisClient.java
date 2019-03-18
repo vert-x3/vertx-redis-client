@@ -36,45 +36,12 @@ public class RedisClient implements Redis, ParserHandler {
 
   private static final ErrorType CONNECTION_CLOSED = ErrorType.create("CONNECTION_CLOSED");
 
-  public static void create(Vertx vertx, RedisOptions options, Handler<AsyncResult<Redis>> onConnect) {
-    create(vertx, options.getEndpoint(), options, onConnect);
+  public static Redis create(Vertx vertx, RedisOptions options) {
+    return create(vertx, options, options.getEndpoint());
   }
 
-  static void create(Vertx vertx, SocketAddress address, RedisOptions options, Handler<AsyncResult<Redis>> onConnect) {
-    final NetClient netClient = vertx.createNetClient(options.getNetClientOptions());
-    final int maxWaitingQueue = options.getMaxWaitingHandlers();
-    final int maxNesting = options.getMaxNestedArrays();
-
-    netClient.connect(address, clientConnect -> {
-      if (clientConnect.failed()) {
-        // connection failed
-        netClient.close();
-        onConnect.handle(Future.failedFuture(clientConnect.cause()));
-        return;
-      }
-
-      // socket connection succeeded
-      final RedisClient client = new RedisClient(maxWaitingQueue, maxNesting, netClient, clientConnect.result(), address);
-
-      // perform authentication
-      authenticate(client, options, authenticate -> {
-        if (authenticate.failed()) {
-          onConnect.handle(Future.failedFuture(authenticate.cause()));
-          return;
-        }
-
-        // perform select
-        select(client, options, select -> {
-          if (select.failed()) {
-            onConnect.handle(Future.failedFuture(select.cause()));
-            return;
-          }
-
-          // initialization complete
-          onConnect.handle(Future.succeededFuture(client));
-        });
-      });
-    });
+  static Redis create(Vertx vertx, RedisOptions options, SocketAddress address) {
+    return new RedisClient(vertx, options, address);
   }
 
   private static void authenticate(Redis client, RedisOptions options, Handler<AsyncResult<Void>> handler) {
@@ -111,52 +78,106 @@ public class RedisClient implements Redis, ParserHandler {
   // the queue is only accessed from the event loop
   private final ArrayQueue waiting;
 
-  private final NetSocket netSocket;
+  private final NetClient netClient;
   private final SocketAddress socketAddress;
+
+  private final RedisOptions options;
 
   // state
   private Handler<Throwable> onException = t -> LOG.error("Unhandled Error", t);
 
   private Handler<Void> onEnd;
   private Handler<Response> onMessage;
+
+  private NetSocket netSocket;
   // connected flag to signal that the underlying socket
   // connection is operational.
-  private boolean connected = true;
+  private boolean connected = false;
 
-  private RedisClient(int maxQueue, int maxNesting, NetClient netClient, NetSocket netSocket, SocketAddress endpoint) {
-    this.waiting = new ArrayQueue(maxQueue);
-    this.netSocket = netSocket;
+  private RedisClient(Vertx vertx, RedisOptions options, SocketAddress endpoint) {
+    this.netClient = vertx.createNetClient(options.getNetClientOptions());
+    this.waiting = new ArrayQueue(options.getMaxWaitingHandlers());
     this.socketAddress = endpoint;
+    this.options = options;
+  }
 
-    // parser utility
-    netSocket
-      .handler(new RESPParser(this, maxNesting))
-      .closeHandler(close -> {
+  @Override
+  public Redis connect(Handler<AsyncResult<Redis>> onConnect) {
+
+    if (connected) {
+      onConnect.handle(Future.succeededFuture(this));
+      return this;
+    }
+
+    netClient.connect(socketAddress, clientConnect -> {
+      if (clientConnect.failed()) {
+        // connection failed
         netClient.close();
-        // clean up the pending queue
-        cleanupQueue(CONNECTION_CLOSED);
-        // call the close handler if any
-        if (onEnd != null) {
-          onEnd.handle(close);
+        onConnect.handle(Future.failedFuture(clientConnect.cause()));
+        return;
+      }
+
+      // socket connection succeeded
+      netSocket = clientConnect.result();
+
+      // parser utility
+      netSocket
+        .handler(new RESPParser(this, options.getMaxNestedArrays()))
+        .closeHandler(close -> {
+          netClient.close();
+          // clean up the pending queue
+          cleanupQueue(CONNECTION_CLOSED);
+          // the underlying socket connection is closed
+          connected  = false;
+          // call the close handler if any
+          if (onEnd != null) {
+            onEnd.handle(close);
+          }
+        })
+        .exceptionHandler(exception -> {
+          netSocket.close();
+          netClient.close();
+          // clean up the pending queue
+          cleanupQueue(exception);
+          // the underlying socket connection is broken
+          connected  = false;
+          // call the exception handler if any
+          if (onException != null) {
+            onException.handle(exception);
+          }
+        });
+
+      // perform authentication
+      authenticate(this, options, authenticate -> {
+        if (authenticate.failed()) {
+          onConnect.handle(Future.failedFuture(authenticate.cause()));
+          return;
         }
-      })
-      .exceptionHandler(exception -> {
-        netSocket.close();
-        netClient.close();
-        // clean up the pending queue
-        cleanupQueue(exception);
-        // the underlying socket connection is broken
-        connected  = false;
-        // call the exception handler if any
-        if (onException != null) {
-          onException.handle(exception);
-        }
+
+        // perform select
+        select(this, options, select -> {
+          if (select.failed()) {
+            onConnect.handle(Future.failedFuture(select.cause()));
+            return;
+          }
+
+          // initialization complete
+          this.connected = true;
+          onConnect.handle(Future.succeededFuture(this));
+        });
       });
+    });
+
+    return this;
   }
 
   @Override
   public void close() {
-    netSocket.close();
+    if (netSocket != null) {
+      netSocket.close();
+    }
+    // the underlying socket connection is closed
+    connected  = false;
   }
 
   @Override

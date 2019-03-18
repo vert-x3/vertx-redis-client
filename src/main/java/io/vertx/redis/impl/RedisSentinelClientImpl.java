@@ -24,7 +24,7 @@ public class RedisSentinelClientImpl implements RedisSentinel {
   private final Redis client;
 
   public static void create(Vertx vertx, io.vertx.redis.client.RedisOptions options, Handler<AsyncResult<RedisSentinel>> ready) {
-    Redis.createClient(vertx, options.setType(RedisClientType.SENTINEL), onReady -> {
+    Redis.createClient(vertx, options.setType(RedisClientType.SENTINEL)).connect(onReady -> {
       if (onReady.succeeded()) {
         ready.handle(Future.succeededFuture(new RedisSentinelClientImpl(onReady.result())));
       } else {

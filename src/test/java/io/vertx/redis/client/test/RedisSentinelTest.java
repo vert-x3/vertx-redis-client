@@ -27,8 +27,8 @@ public class RedisSentinelTest {
         .addEndpoint(SocketAddress.inetSocketAddress(5001, "127.0.0.1"))
         .addEndpoint(SocketAddress.inetSocketAddress(5002, "127.0.0.1"))
         .setMasterName("sentinel7000")
-        .setRole(RedisRole.MASTER),
-      onCreate -> {
+        .setRole(RedisRole.MASTER))
+      .connect(onCreate -> {
         // get a connection to the master node
         should.assertTrue(onCreate.succeeded());
         // query the info
@@ -53,8 +53,8 @@ public class RedisSentinelTest {
         .addEndpoint(SocketAddress.inetSocketAddress(5001, "127.0.0.1"))
         .addEndpoint(SocketAddress.inetSocketAddress(5002, "127.0.0.1"))
         .setMasterName("sentinel7000")
-        .setRole(RedisRole.SLAVE),
-      onCreate -> {
+        .setRole(RedisRole.SLAVE))
+      .connect(onCreate -> {
         // get a connection to the master node
         should.assertTrue(onCreate.succeeded());
         // query the info
@@ -79,8 +79,8 @@ public class RedisSentinelTest {
         .addEndpoint(SocketAddress.inetSocketAddress(5001, "127.0.0.1"))
         .addEndpoint(SocketAddress.inetSocketAddress(5002, "127.0.0.1"))
         .setMasterName("sentinel7000")
-        .setRole(RedisRole.SENTINEL),
-      onCreate -> {
+        .setRole(RedisRole.SENTINEL))
+      .connect(onCreate -> {
         // get a connection to the master node
         should.assertTrue(onCreate.succeeded());
         // query the info
