@@ -4,7 +4,6 @@ import java.nio.charset.Charset;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 
-@Deprecated
 public class ScriptImpl implements io.vertx.redis.Script {
   private final String script;
   private final String sha1;

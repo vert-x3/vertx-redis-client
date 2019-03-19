@@ -32,12 +32,7 @@ import io.vertx.redis.op.*;
 import java.util.List;
 import java.util.Map;
 
-/**
- * @deprecated
- * @see io.vertx.redis.client.Redis for the new API.
- */
 @VertxGen
-@Deprecated
 public interface RedisClient {
 
   static RedisClient create(Vertx vertx) {

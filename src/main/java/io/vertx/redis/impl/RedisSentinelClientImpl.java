@@ -22,7 +22,6 @@ import static io.vertx.redis.client.Command.*;
 /**
  * Implementation of {@link RedisSentinel}
  */
-@Deprecated
 public class RedisSentinelClientImpl implements RedisSentinel {
 
   private final Vertx vertx;
