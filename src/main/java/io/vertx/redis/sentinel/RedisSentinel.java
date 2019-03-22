@@ -13,11 +13,8 @@ import io.vertx.redis.impl.RedisSentinelClientImpl;
 
 /**
  * Interface for sentinel commands
- * @deprecated
- * @see io.vertx.redis.client.Redis for the new API.
  */
 @VertxGen
-@Deprecated
 public interface RedisSentinel {
 
   static RedisSentinel create(Vertx vertx) {

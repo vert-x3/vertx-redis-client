@@ -41,7 +41,6 @@ import java.util.stream.Stream;
 
 import static io.vertx.redis.client.Command.*;
 
-@Deprecated
 public final class RedisClientImpl implements RedisClient {
 
   private final Vertx vertx;

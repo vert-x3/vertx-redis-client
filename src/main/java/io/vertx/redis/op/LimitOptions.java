@@ -23,7 +23,6 @@ import io.vertx.core.json.JsonObject;
  * @author <a href="mailto:marko.strukelj@gmail.com">Marko Strukelj</a>
  */
 @DataObject
-@Deprecated
 public class LimitOptions {
 
   public static final LimitOptions NONE = new LimitOptions();
@@ -44,10 +43,6 @@ public class LimitOptions {
     count = obj.getLong("count");
   }
 
-  /**
-   * @deprecated use {@link #setCount(Long)} and {@link #setOffset(Long)} instead
-   */
-  @Deprecated
   public LimitOptions setLimit(long offset, long count) {
     this.offset = offset;
     this.count = count;

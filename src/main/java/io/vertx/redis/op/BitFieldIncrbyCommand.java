@@ -4,7 +4,6 @@ import io.vertx.codegen.annotations.DataObject;
 import io.vertx.core.json.JsonObject;
 
 @DataObject
-@Deprecated
 public class BitFieldIncrbyCommand {
 
   private String type;

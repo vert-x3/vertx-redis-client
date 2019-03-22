@@ -32,7 +32,6 @@ package io.vertx.redis.impl;
  *
  * @author <a href="mailto:marko.strukelj@gmail.com">Marko Strukelj</a>
  */
-@Deprecated
 public class RedisEncoding {
 
   private static final char[] NUMERALS = "0123456789abcdef".toCharArray();

@@ -23,7 +23,6 @@ import io.vertx.codegen.annotations.VertxGen;
  * @author <a href="mailto:plopes@redhat.com">Paulo Lopes</a>
  */
 @VertxGen
-@Deprecated
 public enum GeoUnit {
 
   /**
