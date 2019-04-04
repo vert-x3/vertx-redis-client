@@ -797,13 +797,51 @@ public final class RedisClientImpl implements RedisClient {
 
   @Override
   public RedisClient info(Handler<AsyncResult<JsonObject>> handler) {
-    sendJsonObject(INFO, Collections.emptyList(), handler);
+    sendString(INFO, Collections.emptyList(), info -> {
+      if (info.failed()) {
+        handler.handle(Future.failedFuture(info.cause()));
+      } else {
+        JsonObject result = new JsonObject();
+        JsonObject section = result;
+        for (String line : info.result().split("\r?\n")) {
+          if (line.length() > 0) {
+            if (line.charAt(0) == '#') {
+              section = new JsonObject();
+              result.put(line.substring(2).toLowerCase(), section);
+            } else {
+              int sep = line.indexOf(':');
+              section.put(line.substring(0, sep), line.substring(sep + 1));
+            }
+          }
+        }
+        handler.handle(Future.succeededFuture(result));
+      }
+    });
     return this;
   }
 
   @Override
   public RedisClient infoSection(String section, Handler<AsyncResult<JsonObject>> handler) {
-    sendJsonObject(INFO, toPayload(section), handler);
+    sendString(INFO, toPayload(section), info -> {
+      if (info.failed()) {
+        handler.handle(Future.failedFuture(info.cause()));
+      } else {
+        JsonObject result = new JsonObject();
+        JsonObject sectionJson = result;
+        for (String line : info.result().split("\r?\n")) {
+          if (line.length() > 0) {
+            if (line.charAt(0) == '#') {
+              sectionJson = new JsonObject();
+              result.put(line.substring(2).toLowerCase(), sectionJson);
+            } else {
+              int sep = line.indexOf(':');
+              sectionJson.put(line.substring(0, sep), line.substring(sep + 1));
+            }
+          }
+        }
+        handler.handle(Future.succeededFuture(result));
+      }
+    });
     return this;
   }
 

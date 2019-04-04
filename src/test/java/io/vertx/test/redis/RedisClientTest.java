@@ -366,28 +366,27 @@ public class RedisClientTest {
 
   }
 
-//  @Test
-//  public void testConfigResetstat(TestContext should) {
-//    final Async test = should.async();
-//
-//    redis.info(reply -> {
-//      should.assertTrue(reply.succeeded());
-//      JsonObject result = reply.result().getJsonObject("stats");
-//      Integer conn = Integer.valueOf(result.getString("total_connections_received"));
-//      should.assertTrue(conn > 0);
-//      redis.configResetstat(reply2 -> {
-//        should.assertTrue(reply2.succeeded());
-//        redis.info(reply3 -> {
-//          should.assertTrue(reply3.succeeded());
-//          //Note, this may appear strange, but the embedded server handles stats differently
-//          //Many are not reset correctly. Here we just test the flow of the COMMANDS
-//          test.complete();
-//        });
-//
-//      });
-//    });
-//
-//  }
+  @Test
+  public void testConfigResetstat(TestContext should) {
+    final Async test = should.async();
+
+    redis.info(reply -> {
+      should.assertTrue(reply.succeeded());
+      JsonObject result = reply.result().getJsonObject("stats");
+      Integer conn = Integer.valueOf(result.getString("total_connections_received"));
+      should.assertTrue(conn > 0);
+      redis.configResetstat(reply2 -> {
+        should.assertTrue(reply2.succeeded());
+        redis.info(reply3 -> {
+          should.assertTrue(reply3.succeeded());
+          //Note, this may appear strange, but the embedded server handles stats differently
+          //Many are not reset correctly. Here we just test the flow of the COMMANDS
+          test.complete();
+        });
+
+      });
+    });
+  }
 
   @Test
   public void testDbsize(TestContext should) {
@@ -1206,16 +1205,16 @@ public class RedisClientTest {
 
   }
 
-//  @Test
-//  public void testInfo(TestContext should) {
-//    final Async test = should.async();
-//    redis.info(reply0 -> {
-//      should.assertTrue(reply0.succeeded());
-//      should.assertNotNull(reply0.result());
-//      test.complete();
-//    });
-//
-//  }
+  @Test
+  public void testInfo(TestContext should) {
+    final Async test = should.async();
+    redis.info(reply0 -> {
+      should.assertTrue(reply0.succeeded());
+      should.assertNotNull(reply0.result());
+      test.complete();
+    });
+
+  }
 
   @Test
   public void testKeys(TestContext should) {
