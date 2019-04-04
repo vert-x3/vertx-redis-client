@@ -5,11 +5,8 @@ import io.vertx.redis.impl.ScriptImpl;
 
 /**
  * Container for a script and its sha1 hash.
- * @deprecated
- * @see io.vertx.redis.client.Redis for the new API.
  */
 @VertxGen
-@Deprecated
 public interface Script {
   static Script create(String script) {
     return new ScriptImpl(script);

@@ -23,7 +23,6 @@ import io.vertx.core.json.JsonObject;
  * @author <a href="mailto:marko.strukelj@gmail.com">Marko Strukelj</a>
  */
 @DataObject
-@Deprecated
 public class KillFilter {
 
   private String addr;

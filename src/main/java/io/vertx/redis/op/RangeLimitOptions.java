@@ -23,7 +23,6 @@ import io.vertx.core.json.JsonObject;
  * @author <a href="mailto:marko.strukelj@gmail.com">Marko Strukelj</a>
  */
 @DataObject
-@Deprecated
 public class RangeLimitOptions extends LimitOptions {
 
   public static final RangeLimitOptions NONE = new RangeLimitOptions();
@@ -43,10 +42,6 @@ public class RangeLimitOptions extends LimitOptions {
     withscores = obj.getBoolean("withscores");
   }
 
-  /**
-   * @deprecated use {@link #setWithscores(Boolean)} instead
-   */
-  @Deprecated
   public RangeLimitOptions useWithScores() {
     withscores = true;
     return this;

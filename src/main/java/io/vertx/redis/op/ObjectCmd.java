@@ -21,7 +21,6 @@ import io.vertx.codegen.annotations.VertxGen;
  * @author <a href="mailto:marko.strukelj@gmail.com">Marko Strukelj</a>
  */
 @VertxGen
-@Deprecated
 public enum ObjectCmd {
   REFCOUNT,
   ENCODING,

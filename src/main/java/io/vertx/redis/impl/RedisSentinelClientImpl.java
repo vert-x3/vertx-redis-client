@@ -7,10 +7,14 @@ import io.vertx.core.Vertx;
 import io.vertx.core.buffer.Buffer;
 import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;
+import io.vertx.core.net.SocketAddress;
+import io.vertx.redis.RedisOptions;
 import io.vertx.redis.client.*;
 import io.vertx.redis.sentinel.RedisSentinel;
 
 import java.util.*;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.atomic.AtomicReference;
 import java.util.stream.Stream;
 
 import static io.vertx.redis.client.Command.*;
@@ -18,11 +22,13 @@ import static io.vertx.redis.client.Command.*;
 /**
  * Implementation of {@link RedisSentinel}
  */
-@Deprecated
 public class RedisSentinelClientImpl implements RedisSentinel {
 
-  private final Redis client;
+  private final Vertx vertx;
+  private final io.vertx.redis.RedisOptions options;
+  private final AtomicReference<CompletableFuture<Redis>> redis = new AtomicReference<>();
 
+/*
   public static void create(Vertx vertx, io.vertx.redis.client.RedisOptions options, Handler<AsyncResult<RedisSentinel>> ready) {
     Redis.createClient(vertx, options.setType(RedisClientType.SENTINEL)).connect(onReady -> {
       if (onReady.succeeded()) {
@@ -31,6 +37,12 @@ public class RedisSentinelClientImpl implements RedisSentinel {
         ready.handle(Future.failedFuture(onReady.cause()));
       }
     });
+  }
+*/
+
+  public RedisSentinelClientImpl(Vertx vertx, RedisOptions options) {
+    this.vertx = vertx;
+    this.options = options;
   }
 
   /**
@@ -92,7 +104,34 @@ public class RedisSentinelClientImpl implements RedisSentinel {
       }
     }
 
-    client.send(req, handler);
+    CompletableFuture<Redis> fut = redis.get();
+    if (fut == null) {
+      CompletableFuture f = new CompletableFuture<>();
+      if (redis.compareAndSet(null, f)) {
+        fut = f;
+        Redis.createClient(vertx, new io.vertx.redis.client.RedisOptions()
+          .setNetClientOptions(options)
+          .setEndpoint(options.isDomainSocket() ? SocketAddress.domainSocketAddress(options.getDomainSocketAddress()) : SocketAddress.inetSocketAddress(options.getPort(), options.getHost()))
+          .setPassword(options.getAuth())
+          .setSelect(options.getSelect())).connect(onReady -> {
+          if (onReady.succeeded()) {
+            f.complete(onReady.result());
+          } else {
+            f.completeExceptionally(onReady.cause());
+          }
+        });
+      } else {
+        fut = redis.get();
+      }
+    }
+
+    fut.whenComplete((client, err) -> {
+      if (err == null) {
+        client.send(req, handler);
+      } else {
+        handler.handle(Future.failedFuture(err));
+      }
+    });
   }
 
   private void sendString(io.vertx.redis.client.Command command, List arguments, Handler<AsyncResult<String>> handler) {
@@ -145,15 +184,22 @@ public class RedisSentinelClientImpl implements RedisSentinel {
     });
   }
 
-  public RedisSentinelClientImpl(Redis redis) {
-    this.client = redis;
-  }
-
   @Override
   public void close(Handler<AsyncResult<Void>> handler) {
-    client.close();
-    if (handler != null) {
-      handler.handle(Future.succeededFuture());
+    CompletableFuture<Redis> prev = redis.getAndSet(null);
+    if (prev != null) {
+      prev.whenComplete((client, err) -> {
+        if (err == null) {
+          client.close();
+          if (handler != null) {
+            handler.handle(Future.succeededFuture());
+          }
+        } else {
+          if (handler != null) {
+            handler.handle(Future.failedFuture(err.getCause()));
+          }
+        }
+      });
     }
   }
 

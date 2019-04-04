@@ -23,7 +23,6 @@ import io.vertx.core.json.JsonObject;
  * @author <a href="mailto:marko.strukelj@gmail.com">Marko Strukelj</a>
  */
 @DataObject
-@Deprecated
 public class MigrateOptions {
 
   public static final MigrateOptions NONE = new MigrateOptions();
@@ -54,18 +53,11 @@ public class MigrateOptions {
     return this;
   }
 
-  /**
-   * @deprecated use {@link #setCopy(Boolean)} instead
-   */
-  @Deprecated
   public MigrateOptions useCopy() {
     copy = true;
     return this;
   }
-  /**
-   * @deprecated use {@link #setReplace(Boolean)} instead
-   */
-  @Deprecated
+
   public MigrateOptions useReplace() {
     replace = true;
     return this;

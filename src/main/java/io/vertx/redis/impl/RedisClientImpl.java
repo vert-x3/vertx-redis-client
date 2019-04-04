@@ -22,37 +22,34 @@ import io.vertx.core.Vertx;
 import io.vertx.core.buffer.Buffer;
 import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;
+import io.vertx.core.net.SocketAddress;
 import io.vertx.redis.RedisClient;
+import io.vertx.redis.RedisOptions;
 import io.vertx.redis.RedisTransaction;
 import io.vertx.redis.Script;
-import io.vertx.redis.client.*;
 import io.vertx.redis.client.Command;
+import io.vertx.redis.client.Redis;
+import io.vertx.redis.client.Request;
+import io.vertx.redis.client.Response;
+import io.vertx.redis.client.ResponseType;
 import io.vertx.redis.op.*;
 
 import java.util.*;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.atomic.AtomicReference;
 import java.util.stream.Stream;
 
 import static io.vertx.redis.client.Command.*;
 
-@Deprecated
 public final class RedisClientImpl implements RedisClient {
 
-  private final Redis client;
-  private final RedisTransaction transaction;
+  private final Vertx vertx;
+  private final RedisOptions options;
+  private final AtomicReference<CompletableFuture<Redis>> redis = new AtomicReference<>();
 
-  public static void create(Vertx vertx, RedisOptions options, Handler<AsyncResult<RedisClient>> ready) {
-    Redis.createClient(vertx, options).connect(onReady -> {
-      if (onReady.succeeded()) {
-        ready.handle(Future.succeededFuture(new RedisClientImpl(onReady.result())));
-      } else {
-        ready.handle(Future.failedFuture(onReady.cause()));
-      }
-    });
-  }
-
-  public RedisClientImpl(Redis redis) {
-    this.client = redis;
-    this.transaction = new RedisTransactionImpl();
+  public RedisClientImpl(Vertx vertx, RedisOptions options) {
+    this.vertx = vertx;
+    this.options = options;
   }
 
   /**
@@ -114,7 +111,34 @@ public final class RedisClientImpl implements RedisClient {
       }
     }
 
-    client.send(req, handler);
+    CompletableFuture<Redis> fut = redis.get();
+    if (fut == null) {
+      CompletableFuture f = new CompletableFuture<>();
+      if (redis.compareAndSet(null, f)) {
+        fut = f;
+        Redis.createClient(vertx, new io.vertx.redis.client.RedisOptions()
+          .setNetClientOptions(options)
+          .setEndpoint(options.isDomainSocket() ? SocketAddress.domainSocketAddress(options.getDomainSocketAddress()) : SocketAddress.inetSocketAddress(options.getPort(), options.getHost()))
+          .setPassword(options.getAuth())
+          .setSelect(options.getSelect())).connect(onReady -> {
+          if (onReady.succeeded()) {
+            f.complete(onReady.result());
+          } else {
+            f.completeExceptionally(onReady.cause());
+          }
+        });
+      } else {
+        fut = redis.get();
+      }
+    }
+
+    fut.whenComplete((client, err) -> {
+      if (err == null) {
+        client.send(req, handler);
+      } else {
+        handler.handle(Future.failedFuture(err));
+      }
+    });
   }
 
   private void sendLong(Command command, List arguments, Handler<AsyncResult<Long>> handler) {
@@ -234,9 +258,20 @@ public final class RedisClientImpl implements RedisClient {
 
   @Override
   public void close(Handler<AsyncResult<Void>> handler) {
-    client.close();
-    if (handler != null) {
-      handler.handle(Future.succeededFuture());
+    CompletableFuture<Redis> prev = redis.getAndSet(null);
+    if (prev != null) {
+      prev.whenComplete((client, err) -> {
+        if (err == null) {
+          client.close();
+          if (handler != null) {
+            handler.handle(Future.succeededFuture());
+          }
+        } else {
+          if (handler != null) {
+            handler.handle(Future.failedFuture(err.getCause()));
+          }
+        }
+      });
     }
   }
 
@@ -1404,7 +1439,7 @@ public final class RedisClientImpl implements RedisClient {
 
   @Override
   public RedisTransaction transaction() {
-    return transaction;
+    return new RedisTransactionImpl();
   }
 
 

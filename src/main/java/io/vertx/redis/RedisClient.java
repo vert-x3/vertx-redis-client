@@ -16,6 +16,7 @@
 package io.vertx.redis;
 
 import io.vertx.codegen.annotations.Fluent;
+import io.vertx.codegen.annotations.GenIgnore;
 import io.vertx.codegen.annotations.Nullable;
 import io.vertx.codegen.annotations.VertxGen;
 import io.vertx.core.AsyncResult;
@@ -31,27 +32,20 @@ import io.vertx.redis.op.*;
 import java.util.List;
 import java.util.Map;
 
-/**
- * @deprecated
- * @see io.vertx.redis.client.Redis for the new API.
- */
 @VertxGen
-@Deprecated
 public interface RedisClient {
 
-  static void create(Vertx vertx, Handler<AsyncResult<RedisClient>> handler) {
-    RedisClientImpl.create(vertx, new io.vertx.redis.client.RedisOptions(), handler);
+  static RedisClient create(Vertx vertx) {
+    return new RedisClientImpl(vertx, new RedisOptions());
   }
 
-  static void create(Vertx vertx, RedisOptions options, Handler<AsyncResult<RedisClient>> handler) {
-    RedisClientImpl.create(vertx,
-      // need to convert from the old options to the new one...
-      new io.vertx.redis.client.RedisOptions()
-        .setNetClientOptions(options)
-        .setEndpoint(options.isDomainSocket() ? SocketAddress.domainSocketAddress(options.getDomainSocketAddress()) : SocketAddress.inetSocketAddress(options.getPort(), options.getHost()))
-        .setPassword(options.getAuth())
-        .setSelect(options.getSelect()),
-      handler);
+  static RedisClient create(Vertx vertx, JsonObject config) {
+    return new RedisClientImpl(vertx, new RedisOptions(config));
+  }
+
+  @GenIgnore
+  static RedisClient create(Vertx vertx, RedisOptions config) {
+    return new RedisClientImpl(vertx, config);
   }
 
   /**

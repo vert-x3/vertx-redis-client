@@ -1,37 +1,33 @@
 package io.vertx.redis.sentinel;
 
 import io.vertx.codegen.annotations.Fluent;
+import io.vertx.codegen.annotations.GenIgnore;
 import io.vertx.codegen.annotations.VertxGen;
 import io.vertx.core.AsyncResult;
 import io.vertx.core.Handler;
 import io.vertx.core.Vertx;
 import io.vertx.core.json.JsonArray;
-import io.vertx.core.net.SocketAddress;
+import io.vertx.core.json.JsonObject;
 import io.vertx.redis.RedisOptions;
 import io.vertx.redis.impl.RedisSentinelClientImpl;
 
 /**
  * Interface for sentinel commands
- * @deprecated
- * @see io.vertx.redis.client.Redis for the new API.
  */
 @VertxGen
-@Deprecated
 public interface RedisSentinel {
 
-  static void create(Vertx vertx, Handler<AsyncResult<RedisSentinel>> handler) {
-    RedisSentinelClientImpl.create(vertx, new io.vertx.redis.client.RedisOptions(), handler);
+  static RedisSentinel create(Vertx vertx) {
+    return create(vertx, new RedisOptions());
   }
 
-  static void create(Vertx vertx, RedisOptions options, Handler<AsyncResult<RedisSentinel>> handler) {
-    RedisSentinelClientImpl.create(vertx,
-      // need to convert from the old options to the new one...
-      new io.vertx.redis.client.RedisOptions()
-        .setNetClientOptions(options)
-        .setEndpoint(options.isDomainSocket() ? SocketAddress.domainSocketAddress(options.getDomainSocketAddress()) : SocketAddress.inetSocketAddress(options.getPort(), options.getHost()))
-        .setPassword(options.getAuth())
-        .setSelect(options.getSelect()),
-      handler);
+  static RedisSentinel create(Vertx vertx, JsonObject config) {
+    return create(vertx, new RedisOptions(config));
+  }
+
+  @GenIgnore
+  static RedisSentinel create(Vertx vertx, RedisOptions options) {
+    return new RedisSentinelClientImpl(vertx,options);
   }
 
   /**
