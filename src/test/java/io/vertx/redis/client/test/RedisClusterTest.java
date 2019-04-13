@@ -11,10 +11,8 @@ import io.vertx.ext.unit.junit.VertxUnitRunner;
 import io.vertx.redis.client.Redis;
 import io.vertx.redis.client.RedisClientType;
 import io.vertx.redis.client.RedisOptions;
-import io.vertx.redis.client.Request;
 import io.vertx.redis.client.Response;
 
-import org.junit.After;
 import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Rule;
@@ -784,9 +782,9 @@ public class RedisClusterTest {
       cluster.send(cmd(SET).arg("key1").arg("Hello"), set1 -> {
         should.assertTrue(set1.succeeded());
         cluster.send(cmd(SET).arg("key2").arg("World"), set2 -> {
-          should.assertTrue(set1.succeeded());
+          should.assertTrue(set2.succeeded());
           cluster.send(cmd(MGET).arg("key1").arg("key2").arg("nonexisting"), mget -> {
-            should.assertTrue(set1.succeeded());
+            should.assertTrue(mget.succeeded());
             should.assertEquals(3, mget.result().size());
             List<String> values = new ArrayList<>();
             mget.result().forEach(value -> {
