@@ -250,8 +250,7 @@ public class RedisClusterClient implements Redis {
     if (cmd.isMovable()) {
       // in cluster mode we currently do not handle movable keys commands
       try {
-        handler.handle(Future.failedFuture(
-            "RedisClusterClient does not handle movable keys commands, use non cluster client on the right node."));
+        handler.handle(Future.failedFuture("RedisClusterClient does not handle movable keys commands, use non cluster client on the right node."));
       } catch (RuntimeException e) {
         onException.handle(e);
       }
@@ -436,8 +435,7 @@ public class RedisClusterClient implements Redis {
 
       if (cmd.isMovable()) {
         // in cluster mode we currently do not handle movable keys commands
-        handler.handle(Future.failedFuture(
-            "RedisClusterClient does not handle movable keys commands, use non cluster client on the right node."));
+        handler.handle(Future.failedFuture("RedisClusterClient does not handle movable keys commands, use non cluster client on the right node."));
         return this;
       }
 
@@ -462,10 +460,8 @@ public class RedisClusterClient implements Redis {
             continue;
           }
           if (currentSlot != slot) {
-            // in cluster mode we currently do not handle batching commands which keys are
-            // not on the same slot
-            handler.handle(Future.failedFuture(
-                "RedisClusterClient does not handle batching commands with keys across different slots. TODO: Split the command into slots and then batch."));
+            // in cluster mode we currently do not handle batching commands which keys are not on the same slot
+            handler.handle(Future.failedFuture("RedisClusterClient does not handle batching commands with keys across different slots. TODO: Split the command into slots and then batch."));
             return this;
           }
         }
@@ -476,10 +472,8 @@ public class RedisClusterClient implements Redis {
       // last option the command is single key
       int start = cmd.getFirstKey() - 1;
       if (currentSlot != ZModem.generate(args.get(start))) {
-        // in cluster mode we currently do not handle batching commands which keys are
-        // not on the same slot
-        handler.handle(Future.failedFuture(
-            "RedisClusterClient does not handle batching commands with keys across different slots. TODO: Split the command into slots and then batch."));
+        // in cluster mode we currently do not handle batching commands which keys are not on the same slot
+        handler.handle(Future.failedFuture("RedisClusterClient does not handle batching commands with keys across different slots. TODO: Split the command into slots and then batch."));
         return this;
       }
     }
@@ -663,8 +657,9 @@ public class RedisClusterClient implements Redis {
    */
   private Redis getRandomConnection(Set<SocketAddress> exclude) {
     List<Redis> available = connections.entrySet().stream()
-        .filter(kv -> !exclude.contains(kv.getKey()) && kv.getValue() != null).map(Map.Entry::getValue)
-        .collect(Collectors.toList());
+      .filter(kv -> !exclude.contains(kv.getKey()) && kv.getValue() != null)
+      .map(Map.Entry::getValue)
+      .collect(Collectors.toList());
 
     if (available.size() == 0) {
       // signal no client
@@ -702,8 +697,7 @@ public class RedisClusterClient implements Redis {
     }
   }
 
-  private void send(final Redis client, final RedisOptions options, final int retries, Request command,
-      Handler<AsyncResult<Response>> handler) {
+  private void send(final Redis client, final RedisOptions options, final int retries, Request command, Handler<AsyncResult<Response>> handler) {
         
     if (client == null) {
       try {
@@ -741,8 +735,9 @@ public class RedisClusterClient implements Redis {
 
             if (sep != -1) {
               // InetAddress
-              socketAddress = SocketAddress.inetSocketAddress(Integer.parseInt(addr.substring(sep + 1)),
-                  addr.substring(0, sep));
+              socketAddress = SocketAddress.inetSocketAddress(
+                Integer.parseInt(addr.substring(sep + 1)),
+                addr.substring(0, sep));
             } else {
               // assume unix domain
               socketAddress = SocketAddress.domainSocketAddress(addr);
@@ -789,8 +784,7 @@ public class RedisClusterClient implements Redis {
     });
   }
 
-  private void batch(final Redis client, final RedisOptions options, final int retries, List<Request> commands,
-      Handler<AsyncResult<List<Response>>> handler) {
+  private void batch(final Redis client, final RedisOptions options, final int retries, List<Request> commands, Handler<AsyncResult<List<Response>>> handler) {
 
     if (client == null) {
       try {
@@ -828,8 +822,9 @@ public class RedisClusterClient implements Redis {
 
             if (sep != -1) {
               // InetAddress
-              socketAddress = SocketAddress.inetSocketAddress(Integer.parseInt(addr.substring(sep + 1)),
-                  addr.substring(0, sep));
+              socketAddress = SocketAddress.inetSocketAddress(
+                Integer.parseInt(addr.substring(sep + 1)),
+                addr.substring(0, sep));
             } else {
               // assume unix domain
               socketAddress = SocketAddress.domainSocketAddress(addr);
@@ -881,8 +876,7 @@ public class RedisClusterClient implements Redis {
    */
   private Redis selectClient(int keySlot, boolean readOnly) {
     // this command doesn't have keys, return any connection
-    // NOTE: this means slaves may be used for no key commands regardless of slave
-    // config
+    // NOTE: this means slaves may be used for no key commands regardless of slave config
     if (keySlot == -1) {
       return getRandomConnection(Collections.emptySet());
     }
