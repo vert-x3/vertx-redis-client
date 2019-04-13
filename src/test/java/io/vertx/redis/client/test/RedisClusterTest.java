@@ -13,6 +13,7 @@ import io.vertx.redis.client.RedisClientType;
 import io.vertx.redis.client.RedisOptions;
 import io.vertx.redis.client.Response;
 
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Rule;
@@ -52,15 +53,15 @@ public class RedisClusterTest {
     return params;
   }
 
-  @Before
-  public void cleanRedis() {
+  @After
+  public void cleanRedis(TestContext should) {
+    final Async test = should.async();
     Redis.createClient(rule.vertx(), options).connect(onCreate -> {
+      should.assertTrue(onCreate.succeeded());
       final Redis cluster = onCreate.result();
       cluster.send(cmd(FLUSHDB), flushDB -> {
-        if (flushDB.failed()) {
-          System.out.println("Failed to flushDB and clean Redis after Test with Error = " + flushDB.cause().getMessage() + ", terminating!");
-          System.exit(-1);
-        }
+        should.assertTrue(flushDB.succeeded());
+        test.complete();
       });
     });
   }
