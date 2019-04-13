@@ -782,7 +782,6 @@ public class RedisClusterClient implements Redis {
       }
 
       try {
-        send.result().toString();
         handler.handle(send);
       } catch (RuntimeException e) {
         onException.handle(e);
