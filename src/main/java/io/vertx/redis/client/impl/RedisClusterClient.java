@@ -27,6 +27,7 @@ import io.vertx.redis.client.impl.types.IntegerType;
 import io.vertx.redis.client.impl.types.MultiType;
 import io.vertx.redis.client.impl.types.SimpleStringType;
 
+import java.nio.charset.StandardCharsets;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicReference;
@@ -51,8 +52,19 @@ public class RedisClusterClient implements Redis {
   // reduce from list fo responses to a single response
   private static final Map<Command, Function<List<Response>, Response>> REDUCERS = new HashMap<>();
 
+  private static final Map<Command, String> UNSUPPORTEDCOMMANDS = new HashMap<>();
+
   public static void addReducer(Command command, Function<List<Response>, Response> fn) {
     REDUCERS.put(command, fn);
+  }
+
+  public static void addUnSupportedCommand(Command command, String error) {
+    if(error == null || error.isEmpty()) {
+      UNSUPPORTEDCOMMANDS.put(command, "RedisClusterClient does not handle command " + 
+      new String(command.getBytes(), StandardCharsets.ISO_8859_1).split("\r\n")[1] + ", use non cluster client on the right node.");
+    } else {
+      UNSUPPORTEDCOMMANDS.put(command, error);
+    }
   }
 
   public static Redis create(Vertx vertx, RedisOptions options) {
@@ -68,12 +80,7 @@ public class RedisClusterClient implements Redis {
     });
 
     addReducer(DEL, list -> {
-      long total = 0;
-
-      for (Response resp : list) {
-        total += resp.toLong();
-      }
-      return IntegerType.create(total);
+      return IntegerType.create(list.stream().mapToLong(Response::toLong).sum());
     });
 
     addReducer(MGET, list -> {
@@ -91,8 +98,38 @@ public class RedisClusterClient implements Redis {
 
       return multi;
     });
-  }
 
+    addReducer(KEYS, list -> {
+      int total = 0;
+      for (Response resp : list) {
+        total += resp.size();
+      }
+
+      MultiType multi = MultiType.create(total);
+      for (Response resp : list) {
+        for (Response child : resp) {
+          multi.add(child);
+        }
+      }
+
+      return multi;
+    });
+
+    // Simple string reply: always OK since FLUSHDB can't fail.
+    addReducer(FLUSHDB, list -> SimpleStringType.OK);
+
+    // Sum of key numbers on all Key Slots
+    addReducer(DBSIZE, list -> {
+      return IntegerType.create(list.stream().mapToLong(Response::toLong).sum());
+    });
+
+    Arrays.asList(ASKING, AUTH, BGREWRITEAOF, BGSAVE, CLIENT, CLUSTER, COMMAND, CONFIG,
+    DEBUG, DISCARD, HOST, INFO, LASTSAVE, LATENCY, LOLWUT, MEMORY, MODULE, MONITOR, PFDEBUG, PFSELFTEST,
+    PING, READONLY, READWRITE, REPLCONF, REPLICAOF, ROLE, SAVE, SCAN, SCRIPT, SELECT, SHUTDOWN, SLAVEOF, SLOWLOG, SWAPDB,
+    SYNC, SENTINEL).forEach(command -> addUnSupportedCommand(command, null));
+
+    addUnSupportedCommand(FLUSHALL, "RedisClusterClient does not handle command FLUSHALL, use FLUSHDB");
+  }
 
   private final Vertx vertx;
   private final RedisSlaves slaves;
@@ -106,6 +143,7 @@ public class RedisClusterClient implements Redis {
 
   private Handler<Void> onEnd;
   private Handler<Response> onMessage;
+  private int slotNumber;
 
   private RedisClusterClient(Vertx vertx, RedisOptions options) {
     this.vertx = vertx;
@@ -200,6 +238,15 @@ public class RedisClusterClient implements Redis {
     final RequestImpl req = (RequestImpl) request;
     final Command cmd = req.command();
 
+    if(UNSUPPORTEDCOMMANDS.containsKey(cmd)) {
+      try {
+        handler.handle(Future.failedFuture(UNSUPPORTEDCOMMANDS.get(cmd)));
+      } catch (RuntimeException e) {
+        onException.handle(e);
+      }
+      return this;
+    }
+
     if (cmd.isMovable()) {
       // in cluster mode we currently do not handle movable keys commands
       try {
@@ -207,6 +254,37 @@ public class RedisClusterClient implements Redis {
       } catch (RuntimeException e) {
         onException.handle(e);
       }
+      return this;
+    }
+
+    if (cmd.isKeyless() && REDUCERS.containsKey(cmd)) {
+      final List<Future> responses = new ArrayList<>(slotNumber);
+
+      for (int i = 1; i <= slotNumber; i++) {
+
+        Redis[] clients = slots[(slots.length / slotNumber - 1) * i];
+
+        final Future<Response> f = Future.future();
+        send(selectMasterOrSlave(req.command().isReadOnly(), clients), options, RETRIES, req, f);
+        responses.add(f);
+      }
+      CompositeFuture.all(responses).setHandler(composite -> {
+        if (composite.failed()) {
+          // means if one of the operations failed, then we can fail the handler
+          try {
+            handler.handle(Future.failedFuture(composite.cause()));
+          } catch (RuntimeException e) {
+            onException.handle(e);
+          }
+        } else {
+          try {
+            handler.handle(Future.succeededFuture(REDUCERS.get(cmd).apply(composite.result().list())));
+          } catch (RuntimeException e) {
+            onException.handle(e);
+          }
+        }
+      });
+
       return this;
     }
 
@@ -339,6 +417,15 @@ public class RedisClusterClient implements Redis {
       final RequestImpl req = (RequestImpl) requests.get(i);
       final Command cmd = req.command();
 
+      if(UNSUPPORTEDCOMMANDS.containsKey(cmd)) {
+        try {
+          handler.handle(Future.failedFuture(UNSUPPORTEDCOMMANDS.get(cmd)));
+        } catch (RuntimeException e) {
+          onException.handle(e);
+        }
+        return this;
+      }
+
       readOnly |= cmd.isReadOnly();
 
       // this command can run anywhere
@@ -394,7 +481,6 @@ public class RedisClusterClient implements Redis {
     batch(selectClient(currentSlot, readOnly), options, RETRIES, requests, handler);
     return this;
   }
-
 
   @Override
   public SocketAddress socketAddress() {
@@ -518,6 +604,7 @@ public class RedisClusterClient implements Redis {
           // from the connections list
           final Set<SocketAddress> seenClients = new HashSet<>();
           final AtomicInteger slotCounter = new AtomicInteger(reply.size());
+          slotNumber = reply.size();
 
           for (int i = 0; i < reply.size(); i++) {
             // multibulk
@@ -611,6 +698,7 @@ public class RedisClusterClient implements Redis {
   }
 
   private void send(final Redis client, final RedisOptions options, final int retries, Request command, Handler<AsyncResult<Response>> handler) {
+        
     if (client == null) {
       try {
         handler.handle(Future.failedFuture("No connection available."));
@@ -649,8 +737,7 @@ public class RedisClusterClient implements Redis {
               // InetAddress
               socketAddress = SocketAddress.inetSocketAddress(
                 Integer.parseInt(addr.substring(sep + 1)),
-                addr.substring(0, sep)
-              );
+                addr.substring(0, sep));
             } else {
               // assume unix domain
               socketAddress = SocketAddress.domainSocketAddress(addr);
@@ -737,8 +824,7 @@ public class RedisClusterClient implements Redis {
               // InetAddress
               socketAddress = SocketAddress.inetSocketAddress(
                 Integer.parseInt(addr.substring(sep + 1)),
-                addr.substring(0, sep)
-              );
+                addr.substring(0, sep));
             } else {
               // assume unix domain
               socketAddress = SocketAddress.domainSocketAddress(addr);
@@ -801,7 +887,10 @@ public class RedisClusterClient implements Redis {
     if (clients == null || clients.length == 0) {
       return getRandomConnection(Collections.emptySet());
     }
+    return selectMasterOrSlave(readOnly, clients);
+  }
 
+  private Redis selectMasterOrSlave(boolean readOnly, Redis[] clients) {
     int index = 0;
 
     // always, never, share
@@ -815,7 +904,6 @@ public class RedisClusterClient implements Redis {
         index = RANDOM.nextInt(clients.length);
       }
     }
-
     return clients[index];
   }
 }
