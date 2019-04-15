@@ -21,3 +21,4 @@ test-tmp
 ScratchPad.java
 *.swp
 cscope.*
+node_modules

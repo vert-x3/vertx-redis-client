@@ -17,6 +17,7 @@ package io.vertx.redis.client;
 
 import io.vertx.codegen.annotations.Fluent;
 import io.vertx.codegen.annotations.GenIgnore;
+import io.vertx.codegen.annotations.Nullable;
 import io.vertx.codegen.annotations.VertxGen;
 import io.vertx.core.AsyncResult;
 import io.vertx.core.Future;
@@ -37,7 +38,7 @@ public interface RedisAPI {
 
 {{#each .}}
   @Fluent
-  default RedisAPI {{ camelcase safename }}({{{ types }}}{{#if argLen}}, {{/if}}Handler<AsyncResult<Response>> handler) {
+  default RedisAPI {{ camelcase safename }}({{{ types }}}{{#if argLen}}, {{/if}}Handler<AsyncResult<@Nullable Response>> handler) {
     send(Command.{{ enum }}{{#if argLen}}, {{{ args }}}{{#if variable}}.toArray(){{/if}}{{/if}}).setHandler(handler);
     return this;
   }
