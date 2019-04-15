@@ -1030,28 +1030,28 @@ public class RedisClientTest {
 
   }
 
-//  @Test
-//  public void testHmget(TestContext should) {
-//    final Async test = should.async();
-//    final String myhash = makeKey();
-//
-//    redis.hset(myhash, "field1", "Hello", reply0 -> {
-//      should.assertTrue(reply0.succeeded());
-//      should.assertEquals(1, reply0.result().longValue());
-//
-//      redis.hset(myhash, "field2", "World", reply1 -> {
-//        should.assertTrue(reply1.succeeded());
-//        should.assertEquals(1, reply1.result().longValue());
-//
-//        redis.hmget(myhash, toList("field1", "field2", "nofield"), reply2 -> {
-//          should.assertTrue(reply2.succeeded());
-//          should.assertArrayEquals(toArray("Hello", "World", null), reply2.result().getList().toArray());
-//          test.complete();
-//        });
-//      });
-//    });
-//
-//  }
+  @Test
+  public void testHmget(TestContext should) {
+    final Async test = should.async();
+    final String myhash = makeKey();
+
+    redis.hset(myhash, "field1", "Hello", reply0 -> {
+      should.assertTrue(reply0.succeeded());
+      should.assertEquals(1L, reply0.result().longValue());
+
+      redis.hset(myhash, "field2", "World", reply1 -> {
+        should.assertTrue(reply1.succeeded());
+        should.assertEquals(1L, reply1.result().longValue());
+
+        redis.hmget(myhash, toList("field1", "field2", "nofield"), reply2 -> {
+          should.assertTrue(reply2.succeeded());
+          should.assertEquals(toList("Hello", "World", null), reply2.result().getList());
+          test.complete();
+        });
+      });
+    });
+
+  }
 
   @Test
   public void testHmset(TestContext should) {
@@ -1114,28 +1114,28 @@ public class RedisClientTest {
 
   }
 
-//  @Test
-//  public void testHvals(TestContext should) {
-//    final Async test = should.async();
-//    final String myhash = makeKey();
-//
-//    redis.hset(myhash, "field1", "Hello", reply0 -> {
-//      should.assertTrue(reply0.succeeded());
-//      should.assertEquals(1, reply0.result().longValue());
-//
-//      redis.hset(myhash, "field2", "World", reply1 -> {
-//        should.assertTrue(reply1.succeeded());
-//        should.assertEquals(1, reply1.result().longValue());
-//
-//        redis.hvals(myhash, reply2 -> {
-//          should.assertTrue(reply2.succeeded());
-//          should.assertArrayEquals(toArray("Hello", "World"), reply2.result().getList().toArray());
-//          test.complete();
-//        });
-//      });
-//    });
-//
-//  }
+  @Test
+  public void testHvals(TestContext should) {
+    final Async test = should.async();
+    final String myhash = makeKey();
+
+    redis.hset(myhash, "field1", "Hello", reply0 -> {
+      should.assertTrue(reply0.succeeded());
+      should.assertEquals(1L, reply0.result().longValue());
+
+      redis.hset(myhash, "field2", "World", reply1 -> {
+        should.assertTrue(reply1.succeeded());
+        should.assertEquals(1L, reply1.result().longValue());
+
+        redis.hvals(myhash, reply2 -> {
+          should.assertTrue(reply2.succeeded());
+          should.assertEquals(toList("Hello", "World"), reply2.result().getList());
+          test.complete();
+        });
+      });
+    });
+
+  }
 
   @Test
   public void testIncr(TestContext should) {
@@ -1342,45 +1342,45 @@ public class RedisClientTest {
 
   }
 
-//  @Test
-//  public void testLpushOne(TestContext should) {
-//    final Async test = should.async();
-//    final String mykey = makeKey();
-//    redis.lpush(mykey, "world", reply0 -> {
-//      should.assertTrue(reply0.succeeded());
-//      should.assertEquals(1, reply0.result().longValue());
-//      redis.lpush(mykey, "hello", reply1 -> {
-//        should.assertTrue(reply1.succeeded());
-//        should.assertEquals(2, reply1.result().longValue());
-//        redis.lrange(mykey, 0, -1, reply2 -> {
-//          should.assertTrue(reply2.succeeded());
-//          should.assertArrayEquals(toArray("hello", "world"), reply2.result().getList().toArray());
-//          test.complete();
-//        });
-//      });
-//    });
-//
-//  }
+  @Test
+  public void testLpushOne(TestContext should) {
+    final Async test = should.async();
+    final String mykey = makeKey();
+    redis.lpush(mykey, "world", reply0 -> {
+      should.assertTrue(reply0.succeeded());
+      should.assertEquals(1L, reply0.result().longValue());
+      redis.lpush(mykey, "hello", reply1 -> {
+        should.assertTrue(reply1.succeeded());
+        should.assertEquals(2L, reply1.result().longValue());
+        redis.lrange(mykey, 0, -1, reply2 -> {
+          should.assertTrue(reply2.succeeded());
+          should.assertEquals(toList("hello", "world"), reply2.result().getList());
+          test.complete();
+        });
+      });
+    });
 
-//  @Test
-//  public void testLpush(TestContext should) {
-//    final Async test = should.async();
-//    final String mykey = makeKey();
-//    redis.lpushMany(mykey, toList("!", "world"), reply0 -> {
-//      should.assertTrue(reply0.succeeded());
-//      should.assertEquals(2, reply0.result().longValue());
-//      redis.lpushMany(mykey, toList(",", "hello"), reply1 -> {
-//        should.assertTrue(reply1.succeeded());
-//        should.assertEquals(4, reply1.result().longValue());
-//        redis.lrange(mykey, 0, -1, reply2 -> {
-//          should.assertTrue(reply2.succeeded());
-//          should.assertArrayEquals(toArray("hello", ",", "world", "!"), reply2.result().getList().toArray());
-//          test.complete();
-//        });
-//      });
-//    });
-//
-//  }
+  }
+
+  @Test
+  public void testLpush(TestContext should) {
+    final Async test = should.async();
+    final String mykey = makeKey();
+    redis.lpushMany(mykey, toList("!", "world"), reply0 -> {
+      should.assertTrue(reply0.succeeded());
+      should.assertEquals(2L, reply0.result().longValue());
+      redis.lpushMany(mykey, toList(",", "hello"), reply1 -> {
+        should.assertTrue(reply1.succeeded());
+        should.assertEquals(4L, reply1.result().longValue());
+        redis.lrange(mykey, 0, -1, reply2 -> {
+          should.assertTrue(reply2.succeeded());
+          should.assertEquals(toList("hello", ",", "world", "!"), reply2.result().getList());
+          test.complete();
+        });
+      });
+    });
+
+  }
 
   @Test
   public void testLpushx(TestContext should) {

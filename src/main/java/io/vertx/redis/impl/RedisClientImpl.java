@@ -178,17 +178,21 @@ public final class RedisClientImpl implements RedisClient {
     }
 
     for (Response r : response) {
-      switch (r.type()) {
-        case INTEGER:
-          json.add(r.toLong());
-          break;
-        case SIMPLE:
-        case BULK:
-          json.add(r.toString());
-          break;
-        case MULTI:
-          json.add(toJsonArray(r));
-          break;
+      if (r == null) {
+        json.addNull();
+      } else {
+        switch (r.type()) {
+          case INTEGER:
+            json.add(r.toLong());
+            break;
+          case SIMPLE:
+          case BULK:
+            json.add(r.toString());
+            break;
+          case MULTI:
+            json.add(toJsonArray(r));
+            break;
+        }
       }
     }
 
