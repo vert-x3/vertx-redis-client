@@ -92,8 +92,6 @@ public final class RedisClientImpl implements RedisClient {
             result.add(e);
           }
         });
-      } else if (param instanceof Buffer) {
-        result.add(((Buffer) param).getBytes());
       } else if (param != null) {
         result.add(param);
       }
@@ -108,6 +106,8 @@ public final class RedisClientImpl implements RedisClient {
       for (Object o : arguments) {
         if (o == null) {
           req.nullArg();
+        } else if (o instanceof Buffer) {
+          req.arg((Buffer) o);
         } else {
           req.arg(o.toString());
         }

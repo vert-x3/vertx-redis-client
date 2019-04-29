@@ -15,6 +15,7 @@
  */
 package io.vertx.test.redis;
 
+import io.vertx.core.buffer.Buffer;
 import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;
 import io.vertx.core.net.SocketAddress;
@@ -1755,10 +1756,10 @@ public class RedisClientTest {
         should.assertEquals(1L, reply1.result().longValue());
         redis.ttl(mykey, reply2 -> {
           should.assertTrue(reply2.succeeded());
-          should.assertTrue(200000000 > reply2.result() && reply2.result() > 0);
+          should.assertTrue(reply2.result() == -2);
           redis.pttl(mykey, reply3 -> {
             should.assertTrue(reply3.succeeded());
-            should.assertTrue(1555555555005L > reply3.result() && reply3.result() > 0);
+            should.assertTrue(reply3.result() == -2);
             test.complete();
           });
         });
@@ -3297,25 +3298,24 @@ public class RedisClientTest {
 //
 //  }
 
-//  @Test
-//  public void testBinarySetAndGet(TestContext should) {
-//    final Async test = should.async();
-//    final String key = makeKey();
-//    final byte[] value = new byte[256];
-//    for (int i = 0; i < value.length; i++) {
-//      value[i] = (byte) i;
-//    }
-//    redis.setBinary(key, Buffer.buffer(value), reply0 -> {
-//      should.assertTrue(reply0.succeeded());
-//      redis.getBinary(key, reply1 -> {
-//        should.assertTrue(String.valueOf(reply1.cause()), reply1.succeeded());
-//        should.assertArrayEquals(value, reply1.result().getBytes());
-//
-//        test.complete();
-//      });
-//    });
-//
-//  }
+  @Test
+  public void testBinarySetAndGet(TestContext should) {
+    final Async test = should.async();
+    final String key = makeKey();
+    final byte[] value = new byte[256];
+    for (int i = 0; i < value.length; i++) {
+      value[i] = (byte) i;
+    }
+    redis.setBinary(key, Buffer.buffer(value), reply0 -> {
+      should.assertTrue(reply0.succeeded());
+      redis.getBinary(key, reply1 -> {
+        should.assertTrue(reply1.succeeded(), String.valueOf(reply1.cause()));
+        should.assertTrue(Arrays.equals(value, reply1.result().getBytes()));
+        test.complete();
+      });
+    });
+
+  }
 
   @Test
   public void testIssue5BlockingCall_shouldWork(TestContext should) {
