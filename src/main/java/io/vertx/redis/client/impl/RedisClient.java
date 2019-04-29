@@ -17,8 +17,8 @@ package io.vertx.redis.client.impl;
 
 import io.vertx.core.*;
 import io.vertx.core.buffer.Buffer;
-import io.vertx.core.logging.Logger;
-import io.vertx.core.logging.LoggerFactory;
+import io.vertx.core.impl.logging.Logger;
+import io.vertx.core.impl.logging.LoggerFactory;
 import io.vertx.core.net.NetClient;
 import io.vertx.core.net.NetSocket;
 import io.vertx.core.net.SocketAddress;
@@ -119,6 +119,7 @@ public class RedisClient implements Redis, ParserHandler {
 
       // socket connection succeeded
       netSocket = clientConnect.result();
+      this.connected = true;
 
       // parser utility
       netSocket
@@ -162,7 +163,6 @@ public class RedisClient implements Redis, ParserHandler {
           }
 
           // initialization complete
-          this.connected = true;
           onConnect.handle(Future.succeededFuture(this));
         });
       });
