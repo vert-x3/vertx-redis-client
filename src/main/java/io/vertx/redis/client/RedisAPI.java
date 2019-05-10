@@ -22,6 +22,7 @@ import io.vertx.codegen.annotations.VertxGen;
 import io.vertx.core.AsyncResult;
 import io.vertx.core.Future;
 import io.vertx.core.Handler;
+import io.vertx.redis.RedisConnection;
 import io.vertx.redis.client.impl.RedisAPIImpl;
 
 import java.util.List;
@@ -32,7 +33,7 @@ import java.util.List;
 @VertxGen
 public interface RedisAPI {
 
-  static RedisAPI api(Redis client) {
+  static RedisAPI api(RedisConnection client) {
     return new RedisAPIImpl(client);
   }
 

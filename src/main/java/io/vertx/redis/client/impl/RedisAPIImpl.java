@@ -16,13 +16,14 @@
 package io.vertx.redis.client.impl;
 
 import io.vertx.core.Future;
+import io.vertx.redis.RedisConnection;
 import io.vertx.redis.client.*;
 
 public class RedisAPIImpl implements RedisAPI {
 
-  private final Redis client;
+  private final RedisConnection client;
 
-  public RedisAPIImpl(Redis client) {
+  public RedisAPIImpl(RedisConnection client) {
     this.client = client;
   }
 

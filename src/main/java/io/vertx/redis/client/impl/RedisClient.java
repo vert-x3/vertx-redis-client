@@ -22,6 +22,8 @@ import io.vertx.core.impl.logging.LoggerFactory;
 import io.vertx.core.net.NetClient;
 import io.vertx.core.net.NetSocket;
 import io.vertx.core.net.SocketAddress;
+import io.vertx.redis.Redis;
+import io.vertx.redis.RedisConnection;
 import io.vertx.redis.client.*;
 import io.vertx.redis.client.impl.types.ErrorType;
 
@@ -30,7 +32,7 @@ import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 
-public class RedisClient implements Redis, ParserHandler {
+public class RedisClient implements Redis, RedisConnection, ParserHandler {
 
   private static final Logger LOG = LoggerFactory.getLogger(RedisClient.class);
 
@@ -44,7 +46,7 @@ public class RedisClient implements Redis, ParserHandler {
     return new RedisClient(vertx, options, address);
   }
 
-  private static void authenticate(Redis client, RedisOptions options, Handler<AsyncResult<Void>> handler) {
+  private static void authenticate(RedisConnection client, RedisOptions options, Handler<AsyncResult<Void>> handler) {
     if (options.getPassword() == null) {
       handler.handle(Future.succeededFuture());
       return;
@@ -59,7 +61,7 @@ public class RedisClient implements Redis, ParserHandler {
     });
   }
 
-  private static void select(Redis client, RedisOptions options, Handler<AsyncResult<Void>> handler) {
+  private static void select(RedisConnection client, RedisOptions options, Handler<AsyncResult<Void>> handler) {
     if (options.getSelect() == null) {
       handler.handle(Future.succeededFuture());
       return;
@@ -78,6 +80,7 @@ public class RedisClient implements Redis, ParserHandler {
   // the queue is only accessed from the event loop
   private final ArrayQueue waiting;
 
+  private final Context context;
   private final NetClient netClient;
   private final SocketAddress socketAddress;
 
@@ -95,6 +98,7 @@ public class RedisClient implements Redis, ParserHandler {
   private boolean connected = false;
 
   private RedisClient(Vertx vertx, RedisOptions options, SocketAddress endpoint) {
+    this.context = vertx.getOrCreateContext();
     this.netClient = vertx.createNetClient(options.getNetClientOptions());
     this.waiting = new ArrayQueue(options.getMaxWaitingHandlers());
     this.socketAddress = endpoint;
@@ -102,7 +106,7 @@ public class RedisClient implements Redis, ParserHandler {
   }
 
   @Override
-  public Redis connect(Handler<AsyncResult<Redis>> onConnect) {
+  public Redis connect(Handler<AsyncResult<RedisConnection>> onConnect) {
 
     if (connected) {
       onConnect.handle(Future.succeededFuture(this));
@@ -181,37 +185,37 @@ public class RedisClient implements Redis, ParserHandler {
   }
 
   @Override
-  public Redis exceptionHandler(Handler<Throwable> handler) {
+  public RedisConnection exceptionHandler(Handler<Throwable> handler) {
     this.onException = handler;
     return this;
   }
 
   @Override
-  public Redis endHandler(Handler<Void> handler) {
+  public RedisConnection endHandler(Handler<Void> handler) {
     this.onEnd = handler;
     return this;
   }
 
   @Override
-  public Redis handler(Handler<Response> handler) {
+  public RedisConnection handler(Handler<Response> handler) {
     this.onMessage = handler;
     return this;
   }
 
   @Override
-  public Redis pause() {
+  public RedisConnection pause() {
     netSocket.pause();
     return this;
   }
 
   @Override
-  public Redis resume() {
+  public RedisConnection resume() {
     netSocket.resume();
     return this;
   }
 
   @Override
-  public Redis fetch(long size) {
+  public RedisConnection fetch(long size) {
     // no-op
     return this;
   }
@@ -231,7 +235,7 @@ public class RedisClient implements Redis, ParserHandler {
   }
 
   @Override
-  public Redis send(final Request request, Handler<AsyncResult<Response>> handler) {
+  public RedisConnection send(final Request request, Handler<AsyncResult<Response>> handler) {
     if (!connected) {
       // this avoids entering the socket exception handler as it is well known
       // that the transport is broken.
@@ -243,20 +247,35 @@ public class RedisClient implements Redis, ParserHandler {
       handler.handle(Future.failedFuture("Redis waiting Queue is full"));
       return this;
     }
-    try {
-      // encode the message to a buffer
-      final Buffer message = ((RequestImpl) request).encode();
-      // write to the socket
-      waiting.offer(handler);
-      netSocket.write(message);
-    } catch (RuntimeException e) {
-      onException.handle(e);
+    // ensure we run on the right context
+    if (Vertx.currentContext() == context) {
+      try {
+        // encode the message to a buffer
+        final Buffer message = ((RequestImpl) request).encode();
+        // write to the socket
+        waiting.offer(handler);
+        netSocket.write(message);
+      } catch (RuntimeException e) {
+        onException.handle(e);
+      }
+    } else {
+      context.runOnContext(v -> {
+        try {
+          // encode the message to a buffer
+          final Buffer message = ((RequestImpl) request).encode();
+          // write to the socket
+          waiting.offer(handler);
+          netSocket.write(message);
+        } catch (RuntimeException e) {
+          onException.handle(e);
+        }
+      });
     }
     return this;
   }
 
   @Override
-  public Redis batch(List<Request> commands, Handler<AsyncResult<List<Response>>> handler) {
+  public RedisConnection batch(List<Request> commands, Handler<AsyncResult<List<Response>>> handler) {
     if (waiting.freeSlots() < commands.size()) {
       handler.handle(Future.failedFuture("Redis waiting Queue is full"));
       return this;
@@ -299,24 +318,48 @@ public class RedisClient implements Redis, ParserHandler {
       });
     }
 
-    // write to the socket
-    netSocket.write(messages, write -> {
-      if (write.succeeded()) {
-        for (Handler<AsyncResult<Response>> callback : callbacks) {
-          waiting.offer(callback);
+    // ensure we run on the right context
+    if (Vertx.currentContext() == context) {
+      // write to the socket
+      netSocket.write(messages, write -> {
+        if (write.succeeded()) {
+          for (Handler<AsyncResult<Response>> callback : callbacks) {
+            waiting.offer(callback);
+          }
+        } else {
+          try {
+            handler.handle(Future.failedFuture(write.cause()));
+          } catch (Throwable t) {
+            fail(t);
+          }
         }
-      } else {
-        try {
-          handler.handle(Future.failedFuture(write.cause()));
-        } catch (Throwable t) {
-          fail(t);
-        }
-      }
-    });
+      });
+    } else {
+      context.runOnContext(v -> {
+        // write to the socket
+        netSocket.write(messages, write -> {
+          if (write.succeeded()) {
+            for (Handler<AsyncResult<Response>> callback : callbacks) {
+              waiting.offer(callback);
+            }
+          } else {
+            try {
+              handler.handle(Future.failedFuture(write.cause()));
+            } catch (Throwable t) {
+              fail(t);
+            }
+          }
+        });
+      });
+    }
 
     return this;
   }
 
+  @Override
+  public boolean isConnected() {
+    return connected;
+  }
 
   @Override
   public void handle(Response reply) {

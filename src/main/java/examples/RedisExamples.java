@@ -5,6 +5,8 @@ import io.vertx.core.AsyncResult;
 import io.vertx.core.Handler;
 import io.vertx.core.Vertx;
 import io.vertx.core.net.SocketAddress;
+import io.vertx.redis.Redis;
+import io.vertx.redis.RedisConnection;
 import io.vertx.redis.client.*;
 
 /**
@@ -18,7 +20,7 @@ public class RedisExamples {
     Redis.createClient(vertx, new RedisOptions())
       .connect(onConnect -> {
         if (onConnect.succeeded()) {
-          Redis client = onConnect.result();
+          RedisConnection client = onConnect.result();
         }
       });
   }
@@ -31,12 +33,12 @@ public class RedisExamples {
     Redis.createClient(vertx, options)
       .connect(onConnect -> {
         if (onConnect.succeeded()) {
-          Redis client = onConnect.result();
+          RedisConnection client = onConnect.result();
         }
       });
   }
 
-  public void example3(Redis client) {
+  public void example3(RedisConnection client) {
     RedisAPI redis = RedisAPI.api(client);
 
     redis.get("mykey", res -> {
@@ -90,7 +92,7 @@ public class RedisExamples {
     Redis.createClient(vertx, new RedisOptions())
       .connect(onConnect -> {
         if (onConnect.succeeded()) {
-          Redis client = onConnect.result();
+          RedisConnection client = onConnect.result();
 
           client.handler(message -> {
             // do whatever you need to do with your message
@@ -99,7 +101,7 @@ public class RedisExamples {
       });
   }
 
-  public void example8(Redis redis) {
+  public void example8(RedisConnection redis) {
 
     redis.send(Request.cmd(Command.PUBLISH).arg("channel1").arg("Hello World!"), res -> {
       if (res.succeeded()) {
@@ -113,7 +115,7 @@ public class RedisExamples {
     Redis.createClient(vertx, SocketAddress.domainSocketAddress("/tmp/redis.sock"))
       .connect(onConnect -> {
         if (onConnect.succeeded()) {
-          Redis client = onConnect.result();
+          RedisConnection client = onConnect.result();
         }
       });
   }
@@ -125,7 +127,7 @@ public class RedisExamples {
       private static final int MAX_RECONNECT_RETRIES = 16;
 
       private RedisOptions options = new RedisOptions();
-      private Redis client;
+      private RedisConnection client;
 
       @Override
       public void start() {
@@ -140,7 +142,7 @@ public class RedisExamples {
        * Will create a redis client and setup a reconnect handler when there is
        * an exception in the connection.
        */
-      private void createRedisClient(Handler<AsyncResult<Redis>> handler) {
+      private void createRedisClient(Handler<AsyncResult<RedisConnection>> handler) {
         Redis.createClient(vertx, options)
           .connect(onConnect -> {
             if (onConnect.succeeded()) {

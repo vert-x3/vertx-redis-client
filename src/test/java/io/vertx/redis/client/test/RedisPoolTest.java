@@ -7,7 +7,12 @@ import io.vertx.ext.unit.junit.RunTestOnContext;
 import io.vertx.ext.unit.junit.VertxUnitRunner;
 import io.vertx.redis.Redis;
 import io.vertx.redis.RedisConnection;
-import io.vertx.redis.client.*;
+import io.vertx.redis.RedisPool;
+import io.vertx.redis.RedisPoolOptions;
+import io.vertx.redis.client.Command;
+import io.vertx.redis.client.RedisAPI;
+import io.vertx.redis.client.RedisOptions;
+import io.vertx.redis.client.Request;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -15,10 +20,10 @@ import org.junit.runner.RunWith;
 import java.util.Arrays;
 
 import static io.vertx.redis.client.Command.*;
-import static io.vertx.redis.client.Request.*;
+import static io.vertx.redis.client.Request.cmd;
 
 @RunWith(VertxUnitRunner.class)
-public class RedisTest {
+public class RedisPoolTest {
 
   @Rule
   public RunTestOnContext rule = new RunTestOnContext();
@@ -27,23 +32,13 @@ public class RedisTest {
   public void simpleTest(TestContext should) {
     final Async test = should.async();
 
-    Redis.createClient(rule.vertx(), SocketAddress.inetSocketAddress(7006, "127.0.0.1"))
-      .connect(create -> {
-        should.assertTrue(create.succeeded());
+    RedisPool.create(rule.vertx(), new RedisPoolOptions().addEndpoint(SocketAddress.inetSocketAddress(7006, "127.0.0.1")))
+      .send(Request.cmd(Command.PING), send -> {
+        should.assertTrue(send.succeeded());
+        should.assertNotNull(send.result());
 
-        final RedisConnection redis = create.result();
-
-        redis.exceptionHandler(ex -> {
-
-        });
-
-        redis.send(Request.cmd(Command.PING), send -> {
-          should.assertTrue(send.succeeded());
-          should.assertNotNull(send.result());
-
-          should.assertEquals("PONG", send.result().toString());
-          test.complete();
-        });
+        should.assertEquals("PONG", send.result().toString());
+        test.complete();
       });
   }
 
