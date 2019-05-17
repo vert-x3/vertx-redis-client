@@ -122,7 +122,7 @@ public final class RedisClientImpl implements RedisClient {
       if (ar.failed()) {
         handler.handle(Future.failedFuture(ar.cause()));
       } else {
-        handler.handle(Future.succeededFuture(ar.result().toLong()));
+        handler.handle(Future.succeededFuture(ar.result() != null ? ar.result().toLong() : null));
       }
     });
   }
@@ -200,7 +200,7 @@ public final class RedisClientImpl implements RedisClient {
       if (ar.failed()) {
         handler.handle(Future.failedFuture(ar.cause()));
       } else {
-        handler.handle(Future.succeededFuture(ar.result().toBuffer()));
+        handler.handle(Future.succeededFuture(ar.result() != null ? ar.result().toBuffer() : null));
       }
     });
   }
