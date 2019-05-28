@@ -21,6 +21,8 @@ package io.vertx.redis.client;
  *
  * @author Paulo Lopes
  */
+
+@Deprecated
 public final class RedisException extends RuntimeException {
 
   public RedisException(String message) {
@@ -57,7 +59,7 @@ public final class RedisException extends RuntimeException {
    * Some messages are well formatted and allow extracting data from.
    * This method will extract the indexed slice of the message given the seperator sep.
    *
-   * @param sep a char seperator
+   * @param sep   a char seperator
    * @param index the desired index.
    * @return the slice or null.
    */
