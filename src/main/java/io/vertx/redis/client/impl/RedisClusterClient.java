@@ -619,8 +619,7 @@ public class RedisClusterClient implements Redis {
     }
   }
 
-  private void send(final Redis client, final RedisOptions options, final int retries, Request
-    command, Handler<AsyncResult<Response>> handler) {
+  private void send(final Redis client, final RedisOptions options, final int retries, Request command, Handler<AsyncResult<Response>> handler) {
     if (client == null) {
       try {
         handler.handle(Future.failedFuture("No connection available."));
@@ -707,8 +706,7 @@ public class RedisClusterClient implements Redis {
     });
   }
 
-  private void batch(final Redis client, final RedisOptions options, final int retries, List<
-    Request> commands, Handler<AsyncResult<List<Response>>> handler) {
+  private void batch(final Redis client, final RedisOptions options, final int retries, List<Request> commands, Handler<AsyncResult<List<Response>>> handler) {
 
     if (client == null) {
       try {
