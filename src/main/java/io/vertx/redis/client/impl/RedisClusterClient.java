@@ -254,9 +254,9 @@ public class RedisClusterClient implements Redis {
           final List<Future> responses = new ArrayList<>(requests.size());
 
           for (Map.Entry<Integer, Request> kv : requests.entrySet()) {
-            final Future<Response> f = Future.future();
-            send(selectClient(kv.getKey(), cmd.isReadOnly()), options, RETRIES, kv.getValue(), f);
-            responses.add(f);
+            final Promise<Response> p = Promise.promise();
+            send(selectClient(kv.getKey(), cmd.isReadOnly()), options, RETRIES, kv.getValue(), p);
+            responses.add(p.future());
           }
 
           CompositeFuture.all(responses).setHandler(composite -> {

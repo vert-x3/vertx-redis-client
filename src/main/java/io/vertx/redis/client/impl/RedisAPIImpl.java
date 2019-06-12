@@ -16,6 +16,7 @@
 package io.vertx.redis.client.impl;
 
 import io.vertx.core.Future;
+import io.vertx.core.Promise;
 import io.vertx.redis.client.*;
 
 public class RedisAPIImpl implements RedisAPI {
@@ -28,7 +29,7 @@ public class RedisAPIImpl implements RedisAPI {
 
   @Override
   public Future<Response> send(Command cmd, Object... args) {
-    final Future<Response> future = Future.future();
+    final Promise<Response> promise = Promise.promise();
     final Request req = Request.cmd(cmd);
 
     if (args != null) {
@@ -41,7 +42,7 @@ public class RedisAPIImpl implements RedisAPI {
       }
     }
 
-    client.send(req, future);
-    return future;
+    client.send(req, promise);
+    return promise.future();
   }
 }
