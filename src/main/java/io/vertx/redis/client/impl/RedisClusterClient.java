@@ -264,9 +264,9 @@ public class RedisClusterClient implements Redis {
 
         Redis[] clients = slots[(slots.length / slotNumber - 1) * i];
 
-        final Future<Response> f = Future.future();
-        send(selectMasterOrSlave(req.command().isReadOnly(), clients), options, RETRIES, req, f);
-        responses.add(f);
+        final Promise<Response> p = Promise.promise();
+        send(selectMasterOrSlave(req.command().isReadOnly(), clients), options, RETRIES, req, p);
+        responses.add(p.future());
       }
       CompositeFuture.all(responses).setHandler(composite -> {
         if (composite.failed()) {
@@ -332,9 +332,9 @@ public class RedisClusterClient implements Redis {
           final List<Future> responses = new ArrayList<>(requests.size());
 
           for (Map.Entry<Integer, Request> kv : requests.entrySet()) {
-            final Future<Response> f = Future.future();
-            send(selectClient(kv.getKey(), cmd.isReadOnly()), options, RETRIES, kv.getValue(), f);
-            responses.add(f);
+            final Promise<Response> p = Promise.promise();
+            send(selectClient(kv.getKey(), cmd.isReadOnly()), options, RETRIES, kv.getValue(), p);
+            responses.add(p.future());
           }
 
           CompositeFuture.all(responses).setHandler(composite -> {

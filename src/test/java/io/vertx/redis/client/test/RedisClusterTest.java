@@ -2,6 +2,7 @@ package io.vertx.redis.client.test;
 
 import io.vertx.core.CompositeFuture;
 import io.vertx.core.Future;
+import io.vertx.core.Promise;
 import io.vertx.core.buffer.Buffer;
 import io.vertx.core.net.SocketAddress;
 import io.vertx.ext.unit.Async;
@@ -204,9 +205,9 @@ public class RedisClusterTest {
     List<Future> futures = new ArrayList<>(24);
 
     for (int i = 0; i < 24; i++) {
-      Future f = Future.future();
-      Redis.createClient(rule.vertx(), options).connect(f);
-      futures.add(f);
+      Promise p = Promise.promise();
+      Redis.createClient(rule.vertx(), options).connect(p);
+      futures.add(p.future());
     }
 
 
