@@ -143,9 +143,7 @@ public class RedisClient implements Redis, ParserHandler {
           // the underlying socket connection is broken
           connected  = false;
           // call the exception handler if any
-          if (onException != null) {
-            onException.handle(exception);
-          }
+          fail(exception);
         });
 
       // perform authentication
@@ -250,7 +248,7 @@ public class RedisClient implements Redis, ParserHandler {
       waiting.offer(handler);
       netSocket.write(message);
     } catch (RuntimeException e) {
-      onException.handle(e);
+      fail(e);
     }
     return this;
   }
@@ -340,7 +338,7 @@ public class RedisClient implements Redis, ParserHandler {
         try {
           req.handle(Future.succeededFuture());
         } catch (RuntimeException e) {
-          onException.handle(e);
+          fail(e);
         }
         return;
       }
@@ -349,7 +347,7 @@ public class RedisClient implements Redis, ParserHandler {
         try {
           req.handle(Future.failedFuture((ErrorType) reply));
         } catch (RuntimeException e) {
-          onException.handle(e);
+          fail(e);
         }
         return;
       }
@@ -357,7 +355,7 @@ public class RedisClient implements Redis, ParserHandler {
       try {
         req.handle(Future.succeededFuture(reply));
       } catch (RuntimeException e) {
-        onException.handle(e);
+        fail(e);
       }
     } else {
       LOG.error("No handler waiting for message: " + reply);
@@ -380,11 +378,7 @@ public class RedisClient implements Redis, ParserHandler {
 
   @Override
   public void fatal(Throwable t) {
-    if (onException != null) {
-      onException.handle(t);
-    } else {
-      LOG.error("External failure", t);
-    }
+    fail(t);
     close();
     // if there are still on going requests
     // the are all cancelled with the given
