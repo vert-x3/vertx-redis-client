@@ -34,6 +34,11 @@ public final class IntegerType implements Response {
   public ResponseType type() {
     return ResponseType.INTEGER;
   }
+  
+  @Override
+  public Integer toInteger() {
+    return value.intValue();
+  }
 
   @Override
   public Long toLong() {
