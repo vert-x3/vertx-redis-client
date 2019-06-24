@@ -18,8 +18,9 @@ redis.command(function (err, res) {
   var commands = [];
 
   res.forEach(function (cmd) {
-    var types = "";
-    var args = "";
+    let types = "";
+    let args = "";
+    let argLen = 0;
 
     if (cmd[1] > 0) {
       for (let i = 0; i < cmd[1] - 1; i++) {
@@ -30,11 +31,17 @@ redis.command(function (err, res) {
         types += ("String arg" + i);
         args += ("arg" + i);
       }
+      // arg len includes the command name
+      argLen = cmd[1];
+      if (argLen) {
+        argLen--;
+      }
     }
 
     if (cmd[1] < 0) {
       types = "List<String> args";
       args = "args";
+      argLen = Math.abs(cmd[1]);
     }
 
     commands.push({
@@ -43,7 +50,7 @@ redis.command(function (err, res) {
       safename: cmd[0].replace('-', ' ').replace(':', '').toUpperCase(),
       arity: cmd[1],
       variable: cmd[1] < 0,
-      argLen: cmd[1] - 1,
+      argLen: argLen,
       args: args,
       types: types,
       firstKey: cmd[3],
