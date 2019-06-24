@@ -37,13 +37,32 @@ public interface RedisAPI {
   }
 
 {{#each .}}
+  /**
+   * Redis command <a href="https://redis.io/commands/{{ name }}">{{ camelcase safename }}</a>.
+   * @return fluent self
+   */
   @Fluent
   default RedisAPI {{ camelcase safename }}({{{ types }}}{{#if argLen}}, {{/if}}Handler<AsyncResult<@Nullable Response>> handler) {
-    send(Command.{{ enum }}{{#if argLen}}, {{{ args }}}{{#if variable}}.toArray(){{/if}}{{/if}}).setHandler(handler);
+    send(Command.{{ enum }}{{#if argLen}}, {{{ args }}}{{#if variable}}.toArray(new String[0]){{/if}}{{/if}}).setHandler(handler);
     return this;
+  }
+
+  /**
+   * Redis command <a href="https://redis.io/commands/{{ name }}">{{ camelcase safename }}</a>.
+   * @return Future response.
+   */
+  default Future<@Nullable Response> {{ camelcase safename }}({{{ types }}}) {
+    return send(Command.{{ enum }}{{#if argLen}}, {{{ args }}}{{#if variable}}.toArray(new String[0]){{/if}}{{/if}});
   }
 {{/each}}
 
+  /**
+   * Send untyped command to redis.
+   *
+   * @param cmd the command
+   * @param args var args
+   * @return Future response.
+   */
   @GenIgnore
-  Future<Response> send(Command cmd, Object... args);
+  Future<@Nullable Response> send(Command cmd, String... args);
 }

@@ -18,9 +18,7 @@ package io.vertx.redis.client;
 import io.vertx.codegen.annotations.Fluent;
 import io.vertx.codegen.annotations.Nullable;
 import io.vertx.codegen.annotations.VertxGen;
-import io.vertx.core.AsyncResult;
-import io.vertx.core.Handler;
-import io.vertx.core.Vertx;
+import io.vertx.core.*;
 import io.vertx.core.net.SocketAddress;
 import io.vertx.core.streams.ReadStream;
 import io.vertx.redis.client.impl.RedisClient;
@@ -69,6 +67,17 @@ public interface Redis extends ReadStream<Response> {
    */
   @Fluent
   Redis connect(Handler<AsyncResult<Redis>> handler);
+
+  /**
+   * Connects to the redis server.
+   *
+   * @return a future with the result of the operation
+   */
+  default Future<Redis> connect() {
+    final Promise<Redis> promise = Promise.promise();
+    connect(promise);
+    return promise.future();
+  }
 
   /**
    * Set an exception handler on the read stream.
@@ -126,11 +135,49 @@ public interface Redis extends ReadStream<Response> {
   Redis endHandler(@Nullable Handler<Void> endHandler);
 
 
+  /**
+   * Send the given command to the redis server or cluster.
+   * @param command the command to send
+   * @param onSend the asynchronous result handler.
+   * @return fluent self.
+   */
   @Fluent
   Redis send(Request command, Handler<AsyncResult<@Nullable Response>> onSend);
 
+  /**
+   * Send the given command to the redis server or cluster.
+   * @param command the command to send
+   * @return a future with the result of the operation
+   */
+  default Future<@Nullable Response> send(Request command) {
+    final Promise<@Nullable Response> promise = Promise.promise();
+    send(command, promise);
+    return promise.future();
+  }
+
+  /**
+   * Sends a list of commands in a single IO operation, this prevents any inter twinning to happen from other
+   * client users.
+   *
+   * @param commands list of command to send
+   * @param onSend the asynchronous result handler.
+   * @return fluent self.
+   */
   @Fluent
-  Redis batch(List<Request> commands, Handler<AsyncResult<List<@Nullable Response>>> handler);
+  Redis batch(List<Request> commands, Handler<AsyncResult<List<@Nullable Response>>> onSend);
+
+  /**
+   * Sends a list of commands in a single IO operation, this prevents any inter twinning to happen from other
+   * client users.
+   *
+   * @param commands list of command to send
+   * @return a future with the result of the operation
+   */
+  default Future<List<@Nullable Response>> batch(List<Request> commands) {
+    final Promise<List<@Nullable Response>> promise = Promise.promise();
+    batch(commands, promise);
+    return promise.future();
+  }
 
   /**
    * Returns the address associated with this client.
