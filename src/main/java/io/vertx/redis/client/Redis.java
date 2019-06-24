@@ -19,7 +19,6 @@ import io.vertx.codegen.annotations.Fluent;
 import io.vertx.codegen.annotations.Nullable;
 import io.vertx.codegen.annotations.VertxGen;
 import io.vertx.core.*;
-import io.vertx.core.net.SocketAddress;
 import io.vertx.core.streams.ReadStream;
 import io.vertx.redis.client.impl.RedisClient;
 import io.vertx.redis.client.impl.RedisClusterClient;
@@ -39,7 +38,7 @@ public interface Redis extends ReadStream<Response> {
    * This connection will use the default options which are connect
    * to a standalone server on the default port on "localhost".
    */
-  static Redis createClient(Vertx vertx, SocketAddress address) {
+  static Redis createClient(Vertx vertx, String address) {
     return createClient(vertx, new RedisOptions().setEndpoint(address));
   }
 
@@ -183,7 +182,7 @@ public interface Redis extends ReadStream<Response> {
    * Returns the address associated with this client.
    * @return the address.
    */
-  SocketAddress socketAddress();
+  String socketAddress();
 
   void close();
 }

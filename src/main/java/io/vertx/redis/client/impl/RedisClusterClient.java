@@ -16,9 +16,8 @@
 package io.vertx.redis.client.impl;
 
 import io.vertx.core.*;
-import io.vertx.core.logging.Logger;
-import io.vertx.core.logging.LoggerFactory;
-import io.vertx.core.net.SocketAddress;
+import io.vertx.core.impl.logging.Logger;
+import io.vertx.core.impl.logging.LoggerFactory;
 import io.vertx.redis.client.*;
 import io.vertx.redis.client.Redis;
 import io.vertx.redis.client.RedisOptions;
@@ -136,7 +135,7 @@ public class RedisClusterClient implements Redis {
   private final RedisOptions options;
 
   // mutable state
-  private final Map<SocketAddress, Redis> connections = new HashMap<>();
+  private final Map<String, Redis> connections = new HashMap<>();
   private final Redis[][] slots = new Redis[16384][];
 
   private Handler<Throwable> onException = t -> LOG.error("Unhandled Error", t);
@@ -154,12 +153,12 @@ public class RedisClusterClient implements Redis {
   @Override
   public Redis connect(Handler<AsyncResult<Redis>> onCreate) {
     // for each endpoint open a client
-    final List<SocketAddress> endpoints = options.getEndpoints();
+    final List<String> endpoints = options.getEndpoints();
 
     final AtomicInteger counter = new AtomicInteger(endpoints.size());
     // ensure that in case of error, only call the callback once
 
-    for (SocketAddress endpoint : endpoints) {
+    for (String endpoint : endpoints) {
       getClient(endpoint, options, ar -> {
         final int total = counter.decrementAndGet();
 
@@ -483,7 +482,7 @@ public class RedisClusterClient implements Redis {
   }
 
   @Override
-  public SocketAddress socketAddress() {
+  public String socketAddress() {
     throw new UnsupportedOperationException("Cluster Connection is not bound to a socket");
   }
 
@@ -501,7 +500,7 @@ public class RedisClusterClient implements Redis {
   /**
    * Get a Redis client via the connection cache (one per host)
    */
-  private void getClient(SocketAddress address, RedisOptions options, Handler<AsyncResult<Redis>> onClient) {
+  private void getClient(String address, RedisOptions options, Handler<AsyncResult<Redis>> onClient) {
 
     Redis cli = connections.get(address);
 
@@ -565,7 +564,7 @@ public class RedisClusterClient implements Redis {
 
   private void getSlots(RedisOptions options, Handler<AsyncResult<Void>> handler) {
 
-    final Set<SocketAddress> exclude = new HashSet<>();
+    final Set<String> exclude = new HashSet<>();
     final AtomicReference<Throwable> cause = new AtomicReference<>();
 
     final Runnable tryClient = new Runnable() {
@@ -602,7 +601,7 @@ public class RedisClusterClient implements Redis {
 
           // keep a set of seen clients so in the end unseen clients can be removed
           // from the connections list
-          final Set<SocketAddress> seenClients = new HashSet<>();
+          final Set<String> seenClients = new HashSet<>();
           final AtomicInteger slotCounter = new AtomicInteger(reply.size());
           slotNumber = reply.size();
 
@@ -614,10 +613,10 @@ public class RedisClusterClient implements Redis {
             int end = s.get(1).toInteger();
 
             // array of all clients, clients[2] = master, others are slaves
-            List<SocketAddress> addresses = new ArrayList<>();
+            List<String> addresses = new ArrayList<>();
             for (int index = 2; index < s.size(); index++) {
               Response c = s.get(index);
-              SocketAddress address = SocketAddress.inetSocketAddress(c.get(1).toInteger(), c.get(0).toString());
+              String address = "redis://" + c.get(0).toString() + ":" + c.get(1).toInteger();
               addresses.add(address);
               seenClients.add(address);
             }
@@ -655,7 +654,7 @@ public class RedisClusterClient implements Redis {
   /**
    * Get a random Redis connection
    */
-  private Redis getRandomConnection(Set<SocketAddress> exclude) {
+  private Redis getRandomConnection(Set<String> exclude) {
     List<Redis> available = connections.entrySet().stream()
       .filter(kv -> !exclude.contains(kv.getKey()) && kv.getValue() != null)
       .map(Map.Entry::getValue)
@@ -669,13 +668,13 @@ public class RedisClusterClient implements Redis {
     return available.get(RANDOM.nextInt(available.size()));
   }
 
-  private void loadSlot(int start, int end, List<SocketAddress> addresses, RedisOptions options, Handler<Void> onLoad) {
+  private void loadSlot(int start, int end, List<String> addresses, RedisOptions options, Handler<Void> onLoad) {
     // temporal holder for the loaded connections
     final Redis[] connections = new Redis[addresses.size()];
     final AtomicInteger counter = new AtomicInteger(addresses.size());
     for (int i = 0; i < addresses.size(); i++) {
       final int idx = i;
-      final SocketAddress address = addresses.get(idx);
+      final String address = addresses.get(idx);
 
       getClient(address, options, getClient -> {
         // we don't care if we can't get a client, in this case the client is ignored
@@ -730,20 +729,7 @@ public class RedisClusterClient implements Redis {
               return;
             }
 
-            int sep = addr.lastIndexOf(':');
-            SocketAddress socketAddress;
-
-            if (sep != -1) {
-              // InetAddress
-              socketAddress = SocketAddress.inetSocketAddress(
-                Integer.parseInt(addr.substring(sep + 1)),
-                addr.substring(0, sep));
-            } else {
-              // assume unix domain
-              socketAddress = SocketAddress.domainSocketAddress(addr);
-            }
-
-            getClient(socketAddress, options, getClient -> {
+            getClient("redis://" + addr, options, getClient -> {
               if (getClient.failed()) {
                 try {
                   handler.handle(Future.failedFuture(getClient.cause()));
@@ -817,20 +803,7 @@ public class RedisClusterClient implements Redis {
               return;
             }
 
-            int sep = addr.lastIndexOf(':');
-            SocketAddress socketAddress;
-
-            if (sep != -1) {
-              // InetAddress
-              socketAddress = SocketAddress.inetSocketAddress(
-                Integer.parseInt(addr.substring(sep + 1)),
-                addr.substring(0, sep));
-            } else {
-              // assume unix domain
-              socketAddress = SocketAddress.domainSocketAddress(addr);
-            }
-
-            getClient(socketAddress, options, getClient -> {
+            getClient("redis://" + addr, options, getClient -> {
               if (getClient.failed()) {
                 try {
                   handler.handle(Future.failedFuture(getClient.cause()));

@@ -19,9 +19,8 @@ import io.vertx.core.AsyncResult;
 import io.vertx.core.Future;
 import io.vertx.core.Handler;
 import io.vertx.core.Vertx;
-import io.vertx.core.logging.Logger;
-import io.vertx.core.logging.LoggerFactory;
-import io.vertx.core.net.SocketAddress;
+import io.vertx.core.impl.logging.Logger;
+import io.vertx.core.impl.logging.LoggerFactory;
 import io.vertx.redis.client.*;
 import io.vertx.redis.client.impl.types.ErrorType;
 
@@ -161,7 +160,7 @@ public class RedisSentinelClient implements Redis {
   }
 
   @Override
-  public SocketAddress socketAddress() {
+  public String socketAddress() {
     return redis.socketAddress();
   }
 
@@ -177,7 +176,7 @@ public class RedisSentinelClient implements Redis {
 
   private static void createClientInternal(Vertx vertx, RedisOptions options, RedisRole role, Handler<AsyncResult<Redis>> onCreate) {
 
-    final Handler<AsyncResult<SocketAddress>> createAndConnect = resolve -> {
+    final Handler<AsyncResult<String>> createAndConnect = resolve -> {
       if (resolve.failed()) {
         onCreate.handle(Future.failedFuture(resolve.cause()));
         return;
@@ -204,18 +203,18 @@ public class RedisSentinelClient implements Redis {
    * We use the algorithm from http://redis.io/topics/sentinel-clients
    * to get a sentinel client and then do 'stuff' with it
    */
-  private static void resolveClient(final Vertx vertx, final Resolver checkEndpointFn, final RedisOptions options, final Handler<AsyncResult<SocketAddress>> callback) {
+  private static void resolveClient(final Vertx vertx, final Resolver checkEndpointFn, final RedisOptions options, final Handler<AsyncResult<String>> callback) {
     // Because finding the master is going to be an async list we will terminate
     // when we find one then use promises...
     iterate(0, vertx, checkEndpointFn, options, iterate -> {
       if (iterate.failed()) {
         callback.handle(Future.failedFuture(iterate.cause()));
       } else {
-        final Pair<Integer, SocketAddress> found = iterate.result();
+        final Pair<Integer, String> found = iterate.result();
         // This is the endpoint that has responded so stick it on the top of
         // the list
-        final List<SocketAddress> endpoints = options.getEndpoints();
-        SocketAddress endpoint = endpoints.get(found.left);
+        final List<String> endpoints = options.getEndpoints();
+        String endpoint = endpoints.get(found.left);
         endpoints.set(found.left, endpoints.get(0));
         endpoints.set(0, endpoint);
         // now return the right address
@@ -224,9 +223,9 @@ public class RedisSentinelClient implements Redis {
     });
   }
 
-  private static void iterate(final int idx, final Vertx vertx, final Resolver checkEndpointFn, final RedisOptions argument, final Handler<AsyncResult<Pair<Integer, SocketAddress>>> resultHandler) {
+  private static void iterate(final int idx, final Vertx vertx, final Resolver checkEndpointFn, final RedisOptions argument, final Handler<AsyncResult<Pair<Integer, String>>> resultHandler) {
     // stop condition
-    final List<SocketAddress> endpoints = argument.getEndpoints();
+    final List<String> endpoints = argument.getEndpoints();
 
     if (idx >= endpoints.size()) {
       resultHandler.handle(Future.failedFuture("No more endpoints in chain."));
@@ -246,7 +245,7 @@ public class RedisSentinelClient implements Redis {
 
   // begin endpoint check methods
 
-  private static void isSentinelOk(Vertx vertx, SocketAddress endpoint, RedisOptions argument, Handler<AsyncResult<SocketAddress>> handler) {
+  private static void isSentinelOk(Vertx vertx, String endpoint, RedisOptions argument, Handler<AsyncResult<String>> handler) {
 
     RedisClient.create(vertx, argument, endpoint).connect(onCreate -> {
       if (onCreate.failed()) {
@@ -269,7 +268,7 @@ public class RedisSentinelClient implements Redis {
     });
   }
 
-  private static void getMasterFromEndpoint(Vertx vertx, SocketAddress endpoint, RedisOptions options, Handler<AsyncResult<SocketAddress>> handler) {
+  private static void getMasterFromEndpoint(Vertx vertx, String endpoint, RedisOptions options, Handler<AsyncResult<String>> handler) {
     RedisClient.create(vertx, options, endpoint).connect(onCreate -> {
       if (onCreate.failed()) {
         handler.handle(Future.failedFuture(onCreate.cause()));
@@ -290,7 +289,7 @@ public class RedisSentinelClient implements Redis {
         final Response response = getMasterAddrByName.result();
 
         handler.handle(
-          Future.succeededFuture(SocketAddress.inetSocketAddress(response.get(1).toInteger(), response.get(0).toString())));
+          Future.succeededFuture("redis://" + response.get(0).toString() + ":" + response.get(1).toInteger()));
 
         // we don't need this connection anymore
         conn.close();
@@ -298,7 +297,7 @@ public class RedisSentinelClient implements Redis {
     });
   }
 
-  private static void getSlaveFromEndpoint(Vertx vertx, SocketAddress endpoint, RedisOptions options, Handler<AsyncResult<SocketAddress>> handler) {
+  private static void getSlaveFromEndpoint(Vertx vertx, String endpoint, RedisOptions options, Handler<AsyncResult<String>> handler) {
     RedisClient.create(vertx, options, endpoint).connect(onCreate -> {
       if (onCreate.failed()) {
         handler.handle(Future.failedFuture(onCreate.cause()));
@@ -340,7 +339,7 @@ public class RedisSentinelClient implements Redis {
             if (ip == null) {
               handler.handle(Future.failedFuture("No IP found for a SLAVE node!"));
             } else {
-              handler.handle(Future.succeededFuture(SocketAddress.inetSocketAddress(port, ip)));
+              handler.handle(Future.succeededFuture("redis://" + ip + ":" + port));
             }
           }
         }

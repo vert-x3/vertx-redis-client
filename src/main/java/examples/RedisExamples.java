@@ -4,7 +4,6 @@ import io.vertx.core.AbstractVerticle;
 import io.vertx.core.AsyncResult;
 import io.vertx.core.Handler;
 import io.vertx.core.Vertx;
-import io.vertx.core.net.SocketAddress;
 import io.vertx.redis.client.*;
 
 /**
@@ -24,11 +23,7 @@ public class RedisExamples {
   }
 
   public void example2(Vertx vertx) {
-    RedisOptions options = new RedisOptions()
-      .setPassword("abracadabra")
-      .setSelect(1);
-
-    Redis.createClient(vertx, options)
+    Redis.createClient(vertx, "redis://:abracadabra@localhost:6379/1")
       .connect(onConnect -> {
         if (onConnect.succeeded()) {
           Redis client = onConnect.result();
@@ -60,9 +55,9 @@ public class RedisExamples {
       vertx,
       new RedisOptions()
         .setType(RedisClientType.SENTINEL)
-        .addEndpoint(SocketAddress.inetSocketAddress(5000, "127.0.0.1"))
-        .addEndpoint(SocketAddress.inetSocketAddress(5001, "127.0.0.1"))
-        .addEndpoint(SocketAddress.inetSocketAddress(5002, "127.0.0.1"))
+        .addEndpoint("redis://127.0.0.1:5000")
+        .addEndpoint("redis://127.0.0.1:5001")
+        .addEndpoint("redis://127.0.0.1:5002")
         .setMasterName("sentinel7000")
         .setRole(RedisRole.MASTER))
       .connect(onConnect -> {
@@ -77,12 +72,12 @@ public class RedisExamples {
 
   public void example6() {
     final RedisOptions options = new RedisOptions()
-      .addEndpoint(SocketAddress.inetSocketAddress(7000, "127.0.0.1"))
-      .addEndpoint(SocketAddress.inetSocketAddress(7001, "127.0.0.1"))
-      .addEndpoint(SocketAddress.inetSocketAddress(7002, "127.0.0.1"))
-      .addEndpoint(SocketAddress.inetSocketAddress(7003, "127.0.0.1"))
-      .addEndpoint(SocketAddress.inetSocketAddress(7004, "127.0.0.1"))
-      .addEndpoint(SocketAddress.inetSocketAddress(7005, "127.0.0.1"));
+      .addEndpoint("redis://127.0.0.1:7000")
+      .addEndpoint("redis://127.0.0.1:7001")
+      .addEndpoint("redis://127.0.0.1:7002")
+      .addEndpoint("redis://127.0.0.1:7003")
+      .addEndpoint("redis://127.0.0.1:7004")
+      .addEndpoint("redis://127.0.0.1:7005");
   }
 
   public void example7(Vertx vertx) {
@@ -110,7 +105,7 @@ public class RedisExamples {
 
   public void example9(Vertx vertx) {
 
-    Redis.createClient(vertx, SocketAddress.domainSocketAddress("/tmp/redis.sock"))
+    Redis.createClient(vertx, "unix:///tmp/redis.sock")
       .connect(onConnect -> {
         if (onConnect.succeeded()) {
           Redis client = onConnect.result();

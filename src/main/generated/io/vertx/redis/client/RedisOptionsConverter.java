@@ -23,6 +23,21 @@ public class RedisOptionsConverter implements JsonCodec<RedisOptions, JsonObject
   public static void fromJson(Iterable<java.util.Map.Entry<String, Object>> json, RedisOptions obj) {
     for (java.util.Map.Entry<String, Object> member : json) {
       switch (member.getKey()) {
+        case "endpoint":
+          if (member.getValue() instanceof String) {
+            obj.setEndpoint((String)member.getValue());
+          }
+          break;
+        case "endpoints":
+          if (member.getValue() instanceof JsonArray) {
+            java.util.ArrayList<java.lang.String> list =  new java.util.ArrayList<>();
+            ((Iterable<Object>)member.getValue()).forEach( item -> {
+              if (item instanceof String)
+                list.add((String)item);
+            });
+            obj.setEndpoints(list);
+          }
+          break;
         case "masterName":
           if (member.getValue() instanceof String) {
             obj.setMasterName((String)member.getValue());
@@ -43,19 +58,9 @@ public class RedisOptionsConverter implements JsonCodec<RedisOptions, JsonObject
             obj.setNetClientOptions(new io.vertx.core.net.NetClientOptions((JsonObject)member.getValue()));
           }
           break;
-        case "password":
-          if (member.getValue() instanceof String) {
-            obj.setPassword((String)member.getValue());
-          }
-          break;
         case "role":
           if (member.getValue() instanceof String) {
             obj.setRole(io.vertx.redis.client.RedisRole.valueOf((String)member.getValue()));
-          }
-          break;
-        case "select":
-          if (member.getValue() instanceof Number) {
-            obj.setSelect(((Number)member.getValue()).intValue());
           }
           break;
         case "type":
@@ -77,6 +82,14 @@ public class RedisOptionsConverter implements JsonCodec<RedisOptions, JsonObject
   }
 
   public static void toJson(RedisOptions obj, java.util.Map<String, Object> json) {
+    if (obj.getEndpoint() != null) {
+      json.put("endpoint", obj.getEndpoint());
+    }
+    if (obj.getEndpoints() != null) {
+      JsonArray array = new JsonArray();
+      obj.getEndpoints().forEach(item -> array.add(item));
+      json.put("endpoints", array);
+    }
     if (obj.getMasterName() != null) {
       json.put("masterName", obj.getMasterName());
     }
@@ -85,14 +98,8 @@ public class RedisOptionsConverter implements JsonCodec<RedisOptions, JsonObject
     if (obj.getNetClientOptions() != null) {
       json.put("netClientOptions", obj.getNetClientOptions().toJson());
     }
-    if (obj.getPassword() != null) {
-      json.put("password", obj.getPassword());
-    }
     if (obj.getRole() != null) {
       json.put("role", obj.getRole().name());
-    }
-    if (obj.getSelect() != null) {
-      json.put("select", obj.getSelect());
     }
     if (obj.getType() != null) {
       json.put("type", obj.getType().name());

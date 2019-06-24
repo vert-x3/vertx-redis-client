@@ -12,6 +12,13 @@
 [frame="topbot"]
 |===
 ^|Name | Type ^| Description
+|[[endpoint]]`@endpoint`|`String`|+++
+Sets a single endpoint to use while connecting to the redis server. Will replace the previously configured endpoints.
++++
+|[[endpoints]]`@endpoints`|`Array of String`|+++
+Set the endpoints to use while connecting to the redis server. Only the cluster mode will consider more than
+ 1 element. If more are provided, they are not considered by the client when in single server mode.
++++
 |[[masterName]]`@masterName`|`String`|+++
 Set the master name (only considered in HA mode).
 +++
@@ -25,14 +32,8 @@ The client will always work on pipeline mode, this means that messages can start
 |[[netClientOptions]]`@netClientOptions`|`link:dataobjects.html#NetClientOptions[NetClientOptions]`|+++
 Set the net client options to be used while connecting to the redis server. Use this to tune your connection.
 +++
-|[[password]]`@password`|`String`|+++
-Set the provided password to be used when establishing a connection to the server.
-+++
 |[[role]]`@role`|`link:enums.html#RedisRole[RedisRole]`|+++
 Set the role name (only considered in HA mode).
-+++
-|[[select]]`@select`|`Number (Integer)`|+++
-Set the provided database to be selected when establishing a connection to the server.
 +++
 |[[type]]`@type`|`link:enums.html#RedisClientType[RedisClientType]`|+++
 Set the desired client type to be created.
