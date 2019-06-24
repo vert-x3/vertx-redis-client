@@ -26,8 +26,6 @@ import io.vertx.redis.client.impl.RedisAPIImpl;
 
 import java.util.List;
 
-import static io.vertx.codegen.annotations.GenIgnore.PERMITTED_TYPE;
-
 /**
  * <b>Auto generated</b> Redis API client wrapper.
  */
@@ -112,7 +110,7 @@ public interface RedisAPI {
    */
   @Fluent
   default RedisAPI bgsave(List<String> args, Handler<AsyncResult<@Nullable Response>> handler) {
-    send(Command.BGSAVE, args.toArray()).setHandler(handler);
+    send(Command.BGSAVE, args.toArray(new String[0])).setHandler(handler);
     return this;
   }
 
@@ -121,7 +119,7 @@ public interface RedisAPI {
    * @return Future response.
    */
   default Future<@Nullable Response> bgsave(List<String> args) {
-    return send(Command.BGSAVE, args.toArray());
+    return send(Command.BGSAVE, args.toArray(new String[0]));
   }
   /**
    * Redis command <a href="https://redis.io/commands/bitcount">bitcount</a>.
@@ -129,7 +127,7 @@ public interface RedisAPI {
    */
   @Fluent
   default RedisAPI bitcount(List<String> args, Handler<AsyncResult<@Nullable Response>> handler) {
-    send(Command.BITCOUNT, args.toArray()).setHandler(handler);
+    send(Command.BITCOUNT, args.toArray(new String[0])).setHandler(handler);
     return this;
   }
 
@@ -138,7 +136,7 @@ public interface RedisAPI {
    * @return Future response.
    */
   default Future<@Nullable Response> bitcount(List<String> args) {
-    return send(Command.BITCOUNT, args.toArray());
+    return send(Command.BITCOUNT, args.toArray(new String[0]));
   }
   /**
    * Redis command <a href="https://redis.io/commands/bitfield">bitfield</a>.
@@ -146,7 +144,7 @@ public interface RedisAPI {
    */
   @Fluent
   default RedisAPI bitfield(List<String> args, Handler<AsyncResult<@Nullable Response>> handler) {
-    send(Command.BITFIELD, args.toArray()).setHandler(handler);
+    send(Command.BITFIELD, args.toArray(new String[0])).setHandler(handler);
     return this;
   }
 
@@ -155,7 +153,7 @@ public interface RedisAPI {
    * @return Future response.
    */
   default Future<@Nullable Response> bitfield(List<String> args) {
-    return send(Command.BITFIELD, args.toArray());
+    return send(Command.BITFIELD, args.toArray(new String[0]));
   }
   /**
    * Redis command <a href="https://redis.io/commands/bitop">bitop</a>.
@@ -163,7 +161,7 @@ public interface RedisAPI {
    */
   @Fluent
   default RedisAPI bitop(List<String> args, Handler<AsyncResult<@Nullable Response>> handler) {
-    send(Command.BITOP, args.toArray()).setHandler(handler);
+    send(Command.BITOP, args.toArray(new String[0])).setHandler(handler);
     return this;
   }
 
@@ -172,7 +170,7 @@ public interface RedisAPI {
    * @return Future response.
    */
   default Future<@Nullable Response> bitop(List<String> args) {
-    return send(Command.BITOP, args.toArray());
+    return send(Command.BITOP, args.toArray(new String[0]));
   }
   /**
    * Redis command <a href="https://redis.io/commands/bitpos">bitpos</a>.
@@ -180,7 +178,7 @@ public interface RedisAPI {
    */
   @Fluent
   default RedisAPI bitpos(List<String> args, Handler<AsyncResult<@Nullable Response>> handler) {
-    send(Command.BITPOS, args.toArray()).setHandler(handler);
+    send(Command.BITPOS, args.toArray(new String[0])).setHandler(handler);
     return this;
   }
 
@@ -189,7 +187,7 @@ public interface RedisAPI {
    * @return Future response.
    */
   default Future<@Nullable Response> bitpos(List<String> args) {
-    return send(Command.BITPOS, args.toArray());
+    return send(Command.BITPOS, args.toArray(new String[0]));
   }
   /**
    * Redis command <a href="https://redis.io/commands/blpop">blpop</a>.
@@ -197,7 +195,7 @@ public interface RedisAPI {
    */
   @Fluent
   default RedisAPI blpop(List<String> args, Handler<AsyncResult<@Nullable Response>> handler) {
-    send(Command.BLPOP, args.toArray()).setHandler(handler);
+    send(Command.BLPOP, args.toArray(new String[0])).setHandler(handler);
     return this;
   }
 
@@ -206,7 +204,7 @@ public interface RedisAPI {
    * @return Future response.
    */
   default Future<@Nullable Response> blpop(List<String> args) {
-    return send(Command.BLPOP, args.toArray());
+    return send(Command.BLPOP, args.toArray(new String[0]));
   }
   /**
    * Redis command <a href="https://redis.io/commands/brpop">brpop</a>.
@@ -214,7 +212,7 @@ public interface RedisAPI {
    */
   @Fluent
   default RedisAPI brpop(List<String> args, Handler<AsyncResult<@Nullable Response>> handler) {
-    send(Command.BRPOP, args.toArray()).setHandler(handler);
+    send(Command.BRPOP, args.toArray(new String[0])).setHandler(handler);
     return this;
   }
 
@@ -223,7 +221,7 @@ public interface RedisAPI {
    * @return Future response.
    */
   default Future<@Nullable Response> brpop(List<String> args) {
-    return send(Command.BRPOP, args.toArray());
+    return send(Command.BRPOP, args.toArray(new String[0]));
   }
   /**
    * Redis command <a href="https://redis.io/commands/brpoplpush">brpoplpush</a>.
@@ -248,7 +246,7 @@ public interface RedisAPI {
    */
   @Fluent
   default RedisAPI bzpopmax(List<String> args, Handler<AsyncResult<@Nullable Response>> handler) {
-    send(Command.BZPOPMAX, args.toArray()).setHandler(handler);
+    send(Command.BZPOPMAX, args.toArray(new String[0])).setHandler(handler);
     return this;
   }
 
@@ -257,7 +255,7 @@ public interface RedisAPI {
    * @return Future response.
    */
   default Future<@Nullable Response> bzpopmax(List<String> args) {
-    return send(Command.BZPOPMAX, args.toArray());
+    return send(Command.BZPOPMAX, args.toArray(new String[0]));
   }
   /**
    * Redis command <a href="https://redis.io/commands/bzpopmin">bzpopmin</a>.
@@ -265,7 +263,7 @@ public interface RedisAPI {
    */
   @Fluent
   default RedisAPI bzpopmin(List<String> args, Handler<AsyncResult<@Nullable Response>> handler) {
-    send(Command.BZPOPMIN, args.toArray()).setHandler(handler);
+    send(Command.BZPOPMIN, args.toArray(new String[0])).setHandler(handler);
     return this;
   }
 
@@ -274,7 +272,7 @@ public interface RedisAPI {
    * @return Future response.
    */
   default Future<@Nullable Response> bzpopmin(List<String> args) {
-    return send(Command.BZPOPMIN, args.toArray());
+    return send(Command.BZPOPMIN, args.toArray(new String[0]));
   }
   /**
    * Redis command <a href="https://redis.io/commands/client">client</a>.
@@ -282,7 +280,7 @@ public interface RedisAPI {
    */
   @Fluent
   default RedisAPI client(List<String> args, Handler<AsyncResult<@Nullable Response>> handler) {
-    send(Command.CLIENT, args.toArray()).setHandler(handler);
+    send(Command.CLIENT, args.toArray(new String[0])).setHandler(handler);
     return this;
   }
 
@@ -291,7 +289,7 @@ public interface RedisAPI {
    * @return Future response.
    */
   default Future<@Nullable Response> client(List<String> args) {
-    return send(Command.CLIENT, args.toArray());
+    return send(Command.CLIENT, args.toArray(new String[0]));
   }
   /**
    * Redis command <a href="https://redis.io/commands/cluster">cluster</a>.
@@ -299,7 +297,7 @@ public interface RedisAPI {
    */
   @Fluent
   default RedisAPI cluster(List<String> args, Handler<AsyncResult<@Nullable Response>> handler) {
-    send(Command.CLUSTER, args.toArray()).setHandler(handler);
+    send(Command.CLUSTER, args.toArray(new String[0])).setHandler(handler);
     return this;
   }
 
@@ -308,7 +306,7 @@ public interface RedisAPI {
    * @return Future response.
    */
   default Future<@Nullable Response> cluster(List<String> args) {
-    return send(Command.CLUSTER, args.toArray());
+    return send(Command.CLUSTER, args.toArray(new String[0]));
   }
   /**
    * Redis command <a href="https://redis.io/commands/command">command</a>.
@@ -333,7 +331,7 @@ public interface RedisAPI {
    */
   @Fluent
   default RedisAPI config(List<String> args, Handler<AsyncResult<@Nullable Response>> handler) {
-    send(Command.CONFIG, args.toArray()).setHandler(handler);
+    send(Command.CONFIG, args.toArray(new String[0])).setHandler(handler);
     return this;
   }
 
@@ -342,7 +340,7 @@ public interface RedisAPI {
    * @return Future response.
    */
   default Future<@Nullable Response> config(List<String> args) {
-    return send(Command.CONFIG, args.toArray());
+    return send(Command.CONFIG, args.toArray(new String[0]));
   }
   /**
    * Redis command <a href="https://redis.io/commands/dbsize">dbsize</a>.
@@ -367,7 +365,7 @@ public interface RedisAPI {
    */
   @Fluent
   default RedisAPI debug(List<String> args, Handler<AsyncResult<@Nullable Response>> handler) {
-    send(Command.DEBUG, args.toArray()).setHandler(handler);
+    send(Command.DEBUG, args.toArray(new String[0])).setHandler(handler);
     return this;
   }
 
@@ -376,7 +374,7 @@ public interface RedisAPI {
    * @return Future response.
    */
   default Future<@Nullable Response> debug(List<String> args) {
-    return send(Command.DEBUG, args.toArray());
+    return send(Command.DEBUG, args.toArray(new String[0]));
   }
   /**
    * Redis command <a href="https://redis.io/commands/decr">decr</a>.
@@ -418,7 +416,7 @@ public interface RedisAPI {
    */
   @Fluent
   default RedisAPI del(List<String> args, Handler<AsyncResult<@Nullable Response>> handler) {
-    send(Command.DEL, args.toArray()).setHandler(handler);
+    send(Command.DEL, args.toArray(new String[0])).setHandler(handler);
     return this;
   }
 
@@ -427,7 +425,7 @@ public interface RedisAPI {
    * @return Future response.
    */
   default Future<@Nullable Response> del(List<String> args) {
-    return send(Command.DEL, args.toArray());
+    return send(Command.DEL, args.toArray(new String[0]));
   }
   /**
    * Redis command <a href="https://redis.io/commands/discard">discard</a>.
@@ -486,7 +484,7 @@ public interface RedisAPI {
    */
   @Fluent
   default RedisAPI eval(List<String> args, Handler<AsyncResult<@Nullable Response>> handler) {
-    send(Command.EVAL, args.toArray()).setHandler(handler);
+    send(Command.EVAL, args.toArray(new String[0])).setHandler(handler);
     return this;
   }
 
@@ -495,7 +493,7 @@ public interface RedisAPI {
    * @return Future response.
    */
   default Future<@Nullable Response> eval(List<String> args) {
-    return send(Command.EVAL, args.toArray());
+    return send(Command.EVAL, args.toArray(new String[0]));
   }
   /**
    * Redis command <a href="https://redis.io/commands/evalsha">evalsha</a>.
@@ -503,7 +501,7 @@ public interface RedisAPI {
    */
   @Fluent
   default RedisAPI evalsha(List<String> args, Handler<AsyncResult<@Nullable Response>> handler) {
-    send(Command.EVALSHA, args.toArray()).setHandler(handler);
+    send(Command.EVALSHA, args.toArray(new String[0])).setHandler(handler);
     return this;
   }
 
@@ -512,7 +510,7 @@ public interface RedisAPI {
    * @return Future response.
    */
   default Future<@Nullable Response> evalsha(List<String> args) {
-    return send(Command.EVALSHA, args.toArray());
+    return send(Command.EVALSHA, args.toArray(new String[0]));
   }
   /**
    * Redis command <a href="https://redis.io/commands/exec">exec</a>.
@@ -537,7 +535,7 @@ public interface RedisAPI {
    */
   @Fluent
   default RedisAPI exists(List<String> args, Handler<AsyncResult<@Nullable Response>> handler) {
-    send(Command.EXISTS, args.toArray()).setHandler(handler);
+    send(Command.EXISTS, args.toArray(new String[0])).setHandler(handler);
     return this;
   }
 
@@ -546,7 +544,7 @@ public interface RedisAPI {
    * @return Future response.
    */
   default Future<@Nullable Response> exists(List<String> args) {
-    return send(Command.EXISTS, args.toArray());
+    return send(Command.EXISTS, args.toArray(new String[0]));
   }
   /**
    * Redis command <a href="https://redis.io/commands/expire">expire</a>.
@@ -588,7 +586,7 @@ public interface RedisAPI {
    */
   @Fluent
   default RedisAPI flushall(List<String> args, Handler<AsyncResult<@Nullable Response>> handler) {
-    send(Command.FLUSHALL, args.toArray()).setHandler(handler);
+    send(Command.FLUSHALL, args.toArray(new String[0])).setHandler(handler);
     return this;
   }
 
@@ -597,7 +595,7 @@ public interface RedisAPI {
    * @return Future response.
    */
   default Future<@Nullable Response> flushall(List<String> args) {
-    return send(Command.FLUSHALL, args.toArray());
+    return send(Command.FLUSHALL, args.toArray(new String[0]));
   }
   /**
    * Redis command <a href="https://redis.io/commands/flushdb">flushdb</a>.
@@ -605,7 +603,7 @@ public interface RedisAPI {
    */
   @Fluent
   default RedisAPI flushdb(List<String> args, Handler<AsyncResult<@Nullable Response>> handler) {
-    send(Command.FLUSHDB, args.toArray()).setHandler(handler);
+    send(Command.FLUSHDB, args.toArray(new String[0])).setHandler(handler);
     return this;
   }
 
@@ -614,7 +612,7 @@ public interface RedisAPI {
    * @return Future response.
    */
   default Future<@Nullable Response> flushdb(List<String> args) {
-    return send(Command.FLUSHDB, args.toArray());
+    return send(Command.FLUSHDB, args.toArray(new String[0]));
   }
   /**
    * Redis command <a href="https://redis.io/commands/geoadd">geoadd</a>.
@@ -622,7 +620,7 @@ public interface RedisAPI {
    */
   @Fluent
   default RedisAPI geoadd(List<String> args, Handler<AsyncResult<@Nullable Response>> handler) {
-    send(Command.GEOADD, args.toArray()).setHandler(handler);
+    send(Command.GEOADD, args.toArray(new String[0])).setHandler(handler);
     return this;
   }
 
@@ -631,7 +629,7 @@ public interface RedisAPI {
    * @return Future response.
    */
   default Future<@Nullable Response> geoadd(List<String> args) {
-    return send(Command.GEOADD, args.toArray());
+    return send(Command.GEOADD, args.toArray(new String[0]));
   }
   /**
    * Redis command <a href="https://redis.io/commands/geodist">geodist</a>.
@@ -639,7 +637,7 @@ public interface RedisAPI {
    */
   @Fluent
   default RedisAPI geodist(List<String> args, Handler<AsyncResult<@Nullable Response>> handler) {
-    send(Command.GEODIST, args.toArray()).setHandler(handler);
+    send(Command.GEODIST, args.toArray(new String[0])).setHandler(handler);
     return this;
   }
 
@@ -648,7 +646,7 @@ public interface RedisAPI {
    * @return Future response.
    */
   default Future<@Nullable Response> geodist(List<String> args) {
-    return send(Command.GEODIST, args.toArray());
+    return send(Command.GEODIST, args.toArray(new String[0]));
   }
   /**
    * Redis command <a href="https://redis.io/commands/geohash">geohash</a>.
@@ -656,7 +654,7 @@ public interface RedisAPI {
    */
   @Fluent
   default RedisAPI geohash(List<String> args, Handler<AsyncResult<@Nullable Response>> handler) {
-    send(Command.GEOHASH, args.toArray()).setHandler(handler);
+    send(Command.GEOHASH, args.toArray(new String[0])).setHandler(handler);
     return this;
   }
 
@@ -665,7 +663,7 @@ public interface RedisAPI {
    * @return Future response.
    */
   default Future<@Nullable Response> geohash(List<String> args) {
-    return send(Command.GEOHASH, args.toArray());
+    return send(Command.GEOHASH, args.toArray(new String[0]));
   }
   /**
    * Redis command <a href="https://redis.io/commands/geopos">geopos</a>.
@@ -673,7 +671,7 @@ public interface RedisAPI {
    */
   @Fluent
   default RedisAPI geopos(List<String> args, Handler<AsyncResult<@Nullable Response>> handler) {
-    send(Command.GEOPOS, args.toArray()).setHandler(handler);
+    send(Command.GEOPOS, args.toArray(new String[0])).setHandler(handler);
     return this;
   }
 
@@ -682,7 +680,7 @@ public interface RedisAPI {
    * @return Future response.
    */
   default Future<@Nullable Response> geopos(List<String> args) {
-    return send(Command.GEOPOS, args.toArray());
+    return send(Command.GEOPOS, args.toArray(new String[0]));
   }
   /**
    * Redis command <a href="https://redis.io/commands/georadius">georadius</a>.
@@ -690,7 +688,7 @@ public interface RedisAPI {
    */
   @Fluent
   default RedisAPI georadius(List<String> args, Handler<AsyncResult<@Nullable Response>> handler) {
-    send(Command.GEORADIUS, args.toArray()).setHandler(handler);
+    send(Command.GEORADIUS, args.toArray(new String[0])).setHandler(handler);
     return this;
   }
 
@@ -699,7 +697,7 @@ public interface RedisAPI {
    * @return Future response.
    */
   default Future<@Nullable Response> georadius(List<String> args) {
-    return send(Command.GEORADIUS, args.toArray());
+    return send(Command.GEORADIUS, args.toArray(new String[0]));
   }
   /**
    * Redis command <a href="https://redis.io/commands/georadius_ro">georadiusRo</a>.
@@ -707,7 +705,7 @@ public interface RedisAPI {
    */
   @Fluent
   default RedisAPI georadiusRo(List<String> args, Handler<AsyncResult<@Nullable Response>> handler) {
-    send(Command.GEORADIUS_RO, args.toArray()).setHandler(handler);
+    send(Command.GEORADIUS_RO, args.toArray(new String[0])).setHandler(handler);
     return this;
   }
 
@@ -716,7 +714,7 @@ public interface RedisAPI {
    * @return Future response.
    */
   default Future<@Nullable Response> georadiusRo(List<String> args) {
-    return send(Command.GEORADIUS_RO, args.toArray());
+    return send(Command.GEORADIUS_RO, args.toArray(new String[0]));
   }
   /**
    * Redis command <a href="https://redis.io/commands/georadiusbymember">georadiusbymember</a>.
@@ -724,7 +722,7 @@ public interface RedisAPI {
    */
   @Fluent
   default RedisAPI georadiusbymember(List<String> args, Handler<AsyncResult<@Nullable Response>> handler) {
-    send(Command.GEORADIUSBYMEMBER, args.toArray()).setHandler(handler);
+    send(Command.GEORADIUSBYMEMBER, args.toArray(new String[0])).setHandler(handler);
     return this;
   }
 
@@ -733,7 +731,7 @@ public interface RedisAPI {
    * @return Future response.
    */
   default Future<@Nullable Response> georadiusbymember(List<String> args) {
-    return send(Command.GEORADIUSBYMEMBER, args.toArray());
+    return send(Command.GEORADIUSBYMEMBER, args.toArray(new String[0]));
   }
   /**
    * Redis command <a href="https://redis.io/commands/georadiusbymember_ro">georadiusbymemberRo</a>.
@@ -741,7 +739,7 @@ public interface RedisAPI {
    */
   @Fluent
   default RedisAPI georadiusbymemberRo(List<String> args, Handler<AsyncResult<@Nullable Response>> handler) {
-    send(Command.GEORADIUSBYMEMBER_RO, args.toArray()).setHandler(handler);
+    send(Command.GEORADIUSBYMEMBER_RO, args.toArray(new String[0])).setHandler(handler);
     return this;
   }
 
@@ -750,7 +748,7 @@ public interface RedisAPI {
    * @return Future response.
    */
   default Future<@Nullable Response> georadiusbymemberRo(List<String> args) {
-    return send(Command.GEORADIUSBYMEMBER_RO, args.toArray());
+    return send(Command.GEORADIUSBYMEMBER_RO, args.toArray(new String[0]));
   }
   /**
    * Redis command <a href="https://redis.io/commands/get">get</a>.
@@ -826,7 +824,7 @@ public interface RedisAPI {
    */
   @Fluent
   default RedisAPI hdel(List<String> args, Handler<AsyncResult<@Nullable Response>> handler) {
-    send(Command.HDEL, args.toArray()).setHandler(handler);
+    send(Command.HDEL, args.toArray(new String[0])).setHandler(handler);
     return this;
   }
 
@@ -835,7 +833,7 @@ public interface RedisAPI {
    * @return Future response.
    */
   default Future<@Nullable Response> hdel(List<String> args) {
-    return send(Command.HDEL, args.toArray());
+    return send(Command.HDEL, args.toArray(new String[0]));
   }
   /**
    * Redis command <a href="https://redis.io/commands/hexists">hexists</a>.
@@ -962,7 +960,7 @@ public interface RedisAPI {
    */
   @Fluent
   default RedisAPI hmget(List<String> args, Handler<AsyncResult<@Nullable Response>> handler) {
-    send(Command.HMGET, args.toArray()).setHandler(handler);
+    send(Command.HMGET, args.toArray(new String[0])).setHandler(handler);
     return this;
   }
 
@@ -971,7 +969,7 @@ public interface RedisAPI {
    * @return Future response.
    */
   default Future<@Nullable Response> hmget(List<String> args) {
-    return send(Command.HMGET, args.toArray());
+    return send(Command.HMGET, args.toArray(new String[0]));
   }
   /**
    * Redis command <a href="https://redis.io/commands/hmset">hmset</a>.
@@ -979,7 +977,7 @@ public interface RedisAPI {
    */
   @Fluent
   default RedisAPI hmset(List<String> args, Handler<AsyncResult<@Nullable Response>> handler) {
-    send(Command.HMSET, args.toArray()).setHandler(handler);
+    send(Command.HMSET, args.toArray(new String[0])).setHandler(handler);
     return this;
   }
 
@@ -988,7 +986,7 @@ public interface RedisAPI {
    * @return Future response.
    */
   default Future<@Nullable Response> hmset(List<String> args) {
-    return send(Command.HMSET, args.toArray());
+    return send(Command.HMSET, args.toArray(new String[0]));
   }
   /**
    * Redis command <a href="https://redis.io/commands/host:">host</a>.
@@ -996,7 +994,7 @@ public interface RedisAPI {
    */
   @Fluent
   default RedisAPI host(List<String> args, Handler<AsyncResult<@Nullable Response>> handler) {
-    send(Command.HOST, args.toArray()).setHandler(handler);
+    send(Command.HOST, args.toArray(new String[0])).setHandler(handler);
     return this;
   }
 
@@ -1005,7 +1003,7 @@ public interface RedisAPI {
    * @return Future response.
    */
   default Future<@Nullable Response> host(List<String> args) {
-    return send(Command.HOST, args.toArray());
+    return send(Command.HOST, args.toArray(new String[0]));
   }
   /**
    * Redis command <a href="https://redis.io/commands/hscan">hscan</a>.
@@ -1013,7 +1011,7 @@ public interface RedisAPI {
    */
   @Fluent
   default RedisAPI hscan(List<String> args, Handler<AsyncResult<@Nullable Response>> handler) {
-    send(Command.HSCAN, args.toArray()).setHandler(handler);
+    send(Command.HSCAN, args.toArray(new String[0])).setHandler(handler);
     return this;
   }
 
@@ -1022,7 +1020,7 @@ public interface RedisAPI {
    * @return Future response.
    */
   default Future<@Nullable Response> hscan(List<String> args) {
-    return send(Command.HSCAN, args.toArray());
+    return send(Command.HSCAN, args.toArray(new String[0]));
   }
   /**
    * Redis command <a href="https://redis.io/commands/hset">hset</a>.
@@ -1030,7 +1028,7 @@ public interface RedisAPI {
    */
   @Fluent
   default RedisAPI hset(List<String> args, Handler<AsyncResult<@Nullable Response>> handler) {
-    send(Command.HSET, args.toArray()).setHandler(handler);
+    send(Command.HSET, args.toArray(new String[0])).setHandler(handler);
     return this;
   }
 
@@ -1039,7 +1037,7 @@ public interface RedisAPI {
    * @return Future response.
    */
   default Future<@Nullable Response> hset(List<String> args) {
-    return send(Command.HSET, args.toArray());
+    return send(Command.HSET, args.toArray(new String[0]));
   }
   /**
    * Redis command <a href="https://redis.io/commands/hsetnx">hsetnx</a>.
@@ -1149,7 +1147,7 @@ public interface RedisAPI {
    */
   @Fluent
   default RedisAPI info(List<String> args, Handler<AsyncResult<@Nullable Response>> handler) {
-    send(Command.INFO, args.toArray()).setHandler(handler);
+    send(Command.INFO, args.toArray(new String[0])).setHandler(handler);
     return this;
   }
 
@@ -1158,7 +1156,7 @@ public interface RedisAPI {
    * @return Future response.
    */
   default Future<@Nullable Response> info(List<String> args) {
-    return send(Command.INFO, args.toArray());
+    return send(Command.INFO, args.toArray(new String[0]));
   }
   /**
    * Redis command <a href="https://redis.io/commands/keys">keys</a>.
@@ -1200,7 +1198,7 @@ public interface RedisAPI {
    */
   @Fluent
   default RedisAPI latency(List<String> args, Handler<AsyncResult<@Nullable Response>> handler) {
-    send(Command.LATENCY, args.toArray()).setHandler(handler);
+    send(Command.LATENCY, args.toArray(new String[0])).setHandler(handler);
     return this;
   }
 
@@ -1209,7 +1207,7 @@ public interface RedisAPI {
    * @return Future response.
    */
   default Future<@Nullable Response> latency(List<String> args) {
-    return send(Command.LATENCY, args.toArray());
+    return send(Command.LATENCY, args.toArray(new String[0]));
   }
   /**
    * Redis command <a href="https://redis.io/commands/lindex">lindex</a>.
@@ -1268,7 +1266,7 @@ public interface RedisAPI {
    */
   @Fluent
   default RedisAPI lolwut(List<String> args, Handler<AsyncResult<@Nullable Response>> handler) {
-    send(Command.LOLWUT, args.toArray()).setHandler(handler);
+    send(Command.LOLWUT, args.toArray(new String[0])).setHandler(handler);
     return this;
   }
 
@@ -1277,7 +1275,7 @@ public interface RedisAPI {
    * @return Future response.
    */
   default Future<@Nullable Response> lolwut(List<String> args) {
-    return send(Command.LOLWUT, args.toArray());
+    return send(Command.LOLWUT, args.toArray(new String[0]));
   }
   /**
    * Redis command <a href="https://redis.io/commands/lpop">lpop</a>.
@@ -1302,7 +1300,7 @@ public interface RedisAPI {
    */
   @Fluent
   default RedisAPI lpush(List<String> args, Handler<AsyncResult<@Nullable Response>> handler) {
-    send(Command.LPUSH, args.toArray()).setHandler(handler);
+    send(Command.LPUSH, args.toArray(new String[0])).setHandler(handler);
     return this;
   }
 
@@ -1311,7 +1309,7 @@ public interface RedisAPI {
    * @return Future response.
    */
   default Future<@Nullable Response> lpush(List<String> args) {
-    return send(Command.LPUSH, args.toArray());
+    return send(Command.LPUSH, args.toArray(new String[0]));
   }
   /**
    * Redis command <a href="https://redis.io/commands/lpushx">lpushx</a>.
@@ -1319,7 +1317,7 @@ public interface RedisAPI {
    */
   @Fluent
   default RedisAPI lpushx(List<String> args, Handler<AsyncResult<@Nullable Response>> handler) {
-    send(Command.LPUSHX, args.toArray()).setHandler(handler);
+    send(Command.LPUSHX, args.toArray(new String[0])).setHandler(handler);
     return this;
   }
 
@@ -1328,7 +1326,7 @@ public interface RedisAPI {
    * @return Future response.
    */
   default Future<@Nullable Response> lpushx(List<String> args) {
-    return send(Command.LPUSHX, args.toArray());
+    return send(Command.LPUSHX, args.toArray(new String[0]));
   }
   /**
    * Redis command <a href="https://redis.io/commands/lrange">lrange</a>.
@@ -1404,7 +1402,7 @@ public interface RedisAPI {
    */
   @Fluent
   default RedisAPI memory(List<String> args, Handler<AsyncResult<@Nullable Response>> handler) {
-    send(Command.MEMORY, args.toArray()).setHandler(handler);
+    send(Command.MEMORY, args.toArray(new String[0])).setHandler(handler);
     return this;
   }
 
@@ -1413,7 +1411,7 @@ public interface RedisAPI {
    * @return Future response.
    */
   default Future<@Nullable Response> memory(List<String> args) {
-    return send(Command.MEMORY, args.toArray());
+    return send(Command.MEMORY, args.toArray(new String[0]));
   }
   /**
    * Redis command <a href="https://redis.io/commands/mget">mget</a>.
@@ -1421,7 +1419,7 @@ public interface RedisAPI {
    */
   @Fluent
   default RedisAPI mget(List<String> args, Handler<AsyncResult<@Nullable Response>> handler) {
-    send(Command.MGET, args.toArray()).setHandler(handler);
+    send(Command.MGET, args.toArray(new String[0])).setHandler(handler);
     return this;
   }
 
@@ -1430,7 +1428,7 @@ public interface RedisAPI {
    * @return Future response.
    */
   default Future<@Nullable Response> mget(List<String> args) {
-    return send(Command.MGET, args.toArray());
+    return send(Command.MGET, args.toArray(new String[0]));
   }
   /**
    * Redis command <a href="https://redis.io/commands/migrate">migrate</a>.
@@ -1438,7 +1436,7 @@ public interface RedisAPI {
    */
   @Fluent
   default RedisAPI migrate(List<String> args, Handler<AsyncResult<@Nullable Response>> handler) {
-    send(Command.MIGRATE, args.toArray()).setHandler(handler);
+    send(Command.MIGRATE, args.toArray(new String[0])).setHandler(handler);
     return this;
   }
 
@@ -1447,7 +1445,7 @@ public interface RedisAPI {
    * @return Future response.
    */
   default Future<@Nullable Response> migrate(List<String> args) {
-    return send(Command.MIGRATE, args.toArray());
+    return send(Command.MIGRATE, args.toArray(new String[0]));
   }
   /**
    * Redis command <a href="https://redis.io/commands/module">module</a>.
@@ -1455,7 +1453,7 @@ public interface RedisAPI {
    */
   @Fluent
   default RedisAPI module(List<String> args, Handler<AsyncResult<@Nullable Response>> handler) {
-    send(Command.MODULE, args.toArray()).setHandler(handler);
+    send(Command.MODULE, args.toArray(new String[0])).setHandler(handler);
     return this;
   }
 
@@ -1464,7 +1462,7 @@ public interface RedisAPI {
    * @return Future response.
    */
   default Future<@Nullable Response> module(List<String> args) {
-    return send(Command.MODULE, args.toArray());
+    return send(Command.MODULE, args.toArray(new String[0]));
   }
   /**
    * Redis command <a href="https://redis.io/commands/monitor">monitor</a>.
@@ -1506,7 +1504,7 @@ public interface RedisAPI {
    */
   @Fluent
   default RedisAPI mset(List<String> args, Handler<AsyncResult<@Nullable Response>> handler) {
-    send(Command.MSET, args.toArray()).setHandler(handler);
+    send(Command.MSET, args.toArray(new String[0])).setHandler(handler);
     return this;
   }
 
@@ -1515,7 +1513,7 @@ public interface RedisAPI {
    * @return Future response.
    */
   default Future<@Nullable Response> mset(List<String> args) {
-    return send(Command.MSET, args.toArray());
+    return send(Command.MSET, args.toArray(new String[0]));
   }
   /**
    * Redis command <a href="https://redis.io/commands/msetnx">msetnx</a>.
@@ -1523,7 +1521,7 @@ public interface RedisAPI {
    */
   @Fluent
   default RedisAPI msetnx(List<String> args, Handler<AsyncResult<@Nullable Response>> handler) {
-    send(Command.MSETNX, args.toArray()).setHandler(handler);
+    send(Command.MSETNX, args.toArray(new String[0])).setHandler(handler);
     return this;
   }
 
@@ -1532,7 +1530,7 @@ public interface RedisAPI {
    * @return Future response.
    */
   default Future<@Nullable Response> msetnx(List<String> args) {
-    return send(Command.MSETNX, args.toArray());
+    return send(Command.MSETNX, args.toArray(new String[0]));
   }
   /**
    * Redis command <a href="https://redis.io/commands/multi">multi</a>.
@@ -1557,7 +1555,7 @@ public interface RedisAPI {
    */
   @Fluent
   default RedisAPI object(List<String> args, Handler<AsyncResult<@Nullable Response>> handler) {
-    send(Command.OBJECT, args.toArray()).setHandler(handler);
+    send(Command.OBJECT, args.toArray(new String[0])).setHandler(handler);
     return this;
   }
 
@@ -1566,7 +1564,7 @@ public interface RedisAPI {
    * @return Future response.
    */
   default Future<@Nullable Response> object(List<String> args) {
-    return send(Command.OBJECT, args.toArray());
+    return send(Command.OBJECT, args.toArray(new String[0]));
   }
   /**
    * Redis command <a href="https://redis.io/commands/persist">persist</a>.
@@ -1625,7 +1623,7 @@ public interface RedisAPI {
    */
   @Fluent
   default RedisAPI pfadd(List<String> args, Handler<AsyncResult<@Nullable Response>> handler) {
-    send(Command.PFADD, args.toArray()).setHandler(handler);
+    send(Command.PFADD, args.toArray(new String[0])).setHandler(handler);
     return this;
   }
 
@@ -1634,7 +1632,7 @@ public interface RedisAPI {
    * @return Future response.
    */
   default Future<@Nullable Response> pfadd(List<String> args) {
-    return send(Command.PFADD, args.toArray());
+    return send(Command.PFADD, args.toArray(new String[0]));
   }
   /**
    * Redis command <a href="https://redis.io/commands/pfcount">pfcount</a>.
@@ -1642,7 +1640,7 @@ public interface RedisAPI {
    */
   @Fluent
   default RedisAPI pfcount(List<String> args, Handler<AsyncResult<@Nullable Response>> handler) {
-    send(Command.PFCOUNT, args.toArray()).setHandler(handler);
+    send(Command.PFCOUNT, args.toArray(new String[0])).setHandler(handler);
     return this;
   }
 
@@ -1651,7 +1649,7 @@ public interface RedisAPI {
    * @return Future response.
    */
   default Future<@Nullable Response> pfcount(List<String> args) {
-    return send(Command.PFCOUNT, args.toArray());
+    return send(Command.PFCOUNT, args.toArray(new String[0]));
   }
   /**
    * Redis command <a href="https://redis.io/commands/pfdebug">pfdebug</a>.
@@ -1659,7 +1657,7 @@ public interface RedisAPI {
    */
   @Fluent
   default RedisAPI pfdebug(List<String> args, Handler<AsyncResult<@Nullable Response>> handler) {
-    send(Command.PFDEBUG, args.toArray()).setHandler(handler);
+    send(Command.PFDEBUG, args.toArray(new String[0])).setHandler(handler);
     return this;
   }
 
@@ -1668,7 +1666,7 @@ public interface RedisAPI {
    * @return Future response.
    */
   default Future<@Nullable Response> pfdebug(List<String> args) {
-    return send(Command.PFDEBUG, args.toArray());
+    return send(Command.PFDEBUG, args.toArray(new String[0]));
   }
   /**
    * Redis command <a href="https://redis.io/commands/pfmerge">pfmerge</a>.
@@ -1676,7 +1674,7 @@ public interface RedisAPI {
    */
   @Fluent
   default RedisAPI pfmerge(List<String> args, Handler<AsyncResult<@Nullable Response>> handler) {
-    send(Command.PFMERGE, args.toArray()).setHandler(handler);
+    send(Command.PFMERGE, args.toArray(new String[0])).setHandler(handler);
     return this;
   }
 
@@ -1685,7 +1683,7 @@ public interface RedisAPI {
    * @return Future response.
    */
   default Future<@Nullable Response> pfmerge(List<String> args) {
-    return send(Command.PFMERGE, args.toArray());
+    return send(Command.PFMERGE, args.toArray(new String[0]));
   }
   /**
    * Redis command <a href="https://redis.io/commands/pfselftest">pfselftest</a>.
@@ -1710,7 +1708,7 @@ public interface RedisAPI {
    */
   @Fluent
   default RedisAPI ping(List<String> args, Handler<AsyncResult<@Nullable Response>> handler) {
-    send(Command.PING, args.toArray()).setHandler(handler);
+    send(Command.PING, args.toArray(new String[0])).setHandler(handler);
     return this;
   }
 
@@ -1719,7 +1717,7 @@ public interface RedisAPI {
    * @return Future response.
    */
   default Future<@Nullable Response> ping(List<String> args) {
-    return send(Command.PING, args.toArray());
+    return send(Command.PING, args.toArray(new String[0]));
   }
   /**
    * Redis command <a href="https://redis.io/commands/post">post</a>.
@@ -1727,7 +1725,7 @@ public interface RedisAPI {
    */
   @Fluent
   default RedisAPI post(List<String> args, Handler<AsyncResult<@Nullable Response>> handler) {
-    send(Command.POST, args.toArray()).setHandler(handler);
+    send(Command.POST, args.toArray(new String[0])).setHandler(handler);
     return this;
   }
 
@@ -1736,7 +1734,7 @@ public interface RedisAPI {
    * @return Future response.
    */
   default Future<@Nullable Response> post(List<String> args) {
-    return send(Command.POST, args.toArray());
+    return send(Command.POST, args.toArray(new String[0]));
   }
   /**
    * Redis command <a href="https://redis.io/commands/psetex">psetex</a>.
@@ -1761,7 +1759,7 @@ public interface RedisAPI {
    */
   @Fluent
   default RedisAPI psubscribe(List<String> args, Handler<AsyncResult<@Nullable Response>> handler) {
-    send(Command.PSUBSCRIBE, args.toArray()).setHandler(handler);
+    send(Command.PSUBSCRIBE, args.toArray(new String[0])).setHandler(handler);
     return this;
   }
 
@@ -1770,7 +1768,7 @@ public interface RedisAPI {
    * @return Future response.
    */
   default Future<@Nullable Response> psubscribe(List<String> args) {
-    return send(Command.PSUBSCRIBE, args.toArray());
+    return send(Command.PSUBSCRIBE, args.toArray(new String[0]));
   }
   /**
    * Redis command <a href="https://redis.io/commands/psync">psync</a>.
@@ -1829,7 +1827,7 @@ public interface RedisAPI {
    */
   @Fluent
   default RedisAPI pubsub(List<String> args, Handler<AsyncResult<@Nullable Response>> handler) {
-    send(Command.PUBSUB, args.toArray()).setHandler(handler);
+    send(Command.PUBSUB, args.toArray(new String[0])).setHandler(handler);
     return this;
   }
 
@@ -1838,7 +1836,7 @@ public interface RedisAPI {
    * @return Future response.
    */
   default Future<@Nullable Response> pubsub(List<String> args) {
-    return send(Command.PUBSUB, args.toArray());
+    return send(Command.PUBSUB, args.toArray(new String[0]));
   }
   /**
    * Redis command <a href="https://redis.io/commands/punsubscribe">punsubscribe</a>.
@@ -1846,7 +1844,7 @@ public interface RedisAPI {
    */
   @Fluent
   default RedisAPI punsubscribe(List<String> args, Handler<AsyncResult<@Nullable Response>> handler) {
-    send(Command.PUNSUBSCRIBE, args.toArray()).setHandler(handler);
+    send(Command.PUNSUBSCRIBE, args.toArray(new String[0])).setHandler(handler);
     return this;
   }
 
@@ -1855,7 +1853,7 @@ public interface RedisAPI {
    * @return Future response.
    */
   default Future<@Nullable Response> punsubscribe(List<String> args) {
-    return send(Command.PUNSUBSCRIBE, args.toArray());
+    return send(Command.PUNSUBSCRIBE, args.toArray(new String[0]));
   }
   /**
    * Redis command <a href="https://redis.io/commands/randomkey">randomkey</a>.
@@ -1948,7 +1946,7 @@ public interface RedisAPI {
    */
   @Fluent
   default RedisAPI replconf(List<String> args, Handler<AsyncResult<@Nullable Response>> handler) {
-    send(Command.REPLCONF, args.toArray()).setHandler(handler);
+    send(Command.REPLCONF, args.toArray(new String[0])).setHandler(handler);
     return this;
   }
 
@@ -1957,7 +1955,7 @@ public interface RedisAPI {
    * @return Future response.
    */
   default Future<@Nullable Response> replconf(List<String> args) {
-    return send(Command.REPLCONF, args.toArray());
+    return send(Command.REPLCONF, args.toArray(new String[0]));
   }
   /**
    * Redis command <a href="https://redis.io/commands/replicaof">replicaof</a>.
@@ -1982,7 +1980,7 @@ public interface RedisAPI {
    */
   @Fluent
   default RedisAPI restore(List<String> args, Handler<AsyncResult<@Nullable Response>> handler) {
-    send(Command.RESTORE, args.toArray()).setHandler(handler);
+    send(Command.RESTORE, args.toArray(new String[0])).setHandler(handler);
     return this;
   }
 
@@ -1991,7 +1989,7 @@ public interface RedisAPI {
    * @return Future response.
    */
   default Future<@Nullable Response> restore(List<String> args) {
-    return send(Command.RESTORE, args.toArray());
+    return send(Command.RESTORE, args.toArray(new String[0]));
   }
   /**
    * Redis command <a href="https://redis.io/commands/restore-asking">restoreAsking</a>.
@@ -1999,7 +1997,7 @@ public interface RedisAPI {
    */
   @Fluent
   default RedisAPI restoreAsking(List<String> args, Handler<AsyncResult<@Nullable Response>> handler) {
-    send(Command.RESTORE_ASKING, args.toArray()).setHandler(handler);
+    send(Command.RESTORE_ASKING, args.toArray(new String[0])).setHandler(handler);
     return this;
   }
 
@@ -2008,7 +2006,7 @@ public interface RedisAPI {
    * @return Future response.
    */
   default Future<@Nullable Response> restoreAsking(List<String> args) {
-    return send(Command.RESTORE_ASKING, args.toArray());
+    return send(Command.RESTORE_ASKING, args.toArray(new String[0]));
   }
   /**
    * Redis command <a href="https://redis.io/commands/role">role</a>.
@@ -2067,7 +2065,7 @@ public interface RedisAPI {
    */
   @Fluent
   default RedisAPI rpush(List<String> args, Handler<AsyncResult<@Nullable Response>> handler) {
-    send(Command.RPUSH, args.toArray()).setHandler(handler);
+    send(Command.RPUSH, args.toArray(new String[0])).setHandler(handler);
     return this;
   }
 
@@ -2076,7 +2074,7 @@ public interface RedisAPI {
    * @return Future response.
    */
   default Future<@Nullable Response> rpush(List<String> args) {
-    return send(Command.RPUSH, args.toArray());
+    return send(Command.RPUSH, args.toArray(new String[0]));
   }
   /**
    * Redis command <a href="https://redis.io/commands/rpushx">rpushx</a>.
@@ -2084,7 +2082,7 @@ public interface RedisAPI {
    */
   @Fluent
   default RedisAPI rpushx(List<String> args, Handler<AsyncResult<@Nullable Response>> handler) {
-    send(Command.RPUSHX, args.toArray()).setHandler(handler);
+    send(Command.RPUSHX, args.toArray(new String[0])).setHandler(handler);
     return this;
   }
 
@@ -2093,7 +2091,7 @@ public interface RedisAPI {
    * @return Future response.
    */
   default Future<@Nullable Response> rpushx(List<String> args) {
-    return send(Command.RPUSHX, args.toArray());
+    return send(Command.RPUSHX, args.toArray(new String[0]));
   }
   /**
    * Redis command <a href="https://redis.io/commands/sadd">sadd</a>.
@@ -2101,7 +2099,7 @@ public interface RedisAPI {
    */
   @Fluent
   default RedisAPI sadd(List<String> args, Handler<AsyncResult<@Nullable Response>> handler) {
-    send(Command.SADD, args.toArray()).setHandler(handler);
+    send(Command.SADD, args.toArray(new String[0])).setHandler(handler);
     return this;
   }
 
@@ -2110,7 +2108,7 @@ public interface RedisAPI {
    * @return Future response.
    */
   default Future<@Nullable Response> sadd(List<String> args) {
-    return send(Command.SADD, args.toArray());
+    return send(Command.SADD, args.toArray(new String[0]));
   }
   /**
    * Redis command <a href="https://redis.io/commands/save">save</a>.
@@ -2135,7 +2133,7 @@ public interface RedisAPI {
    */
   @Fluent
   default RedisAPI scan(List<String> args, Handler<AsyncResult<@Nullable Response>> handler) {
-    send(Command.SCAN, args.toArray()).setHandler(handler);
+    send(Command.SCAN, args.toArray(new String[0])).setHandler(handler);
     return this;
   }
 
@@ -2144,7 +2142,7 @@ public interface RedisAPI {
    * @return Future response.
    */
   default Future<@Nullable Response> scan(List<String> args) {
-    return send(Command.SCAN, args.toArray());
+    return send(Command.SCAN, args.toArray(new String[0]));
   }
   /**
    * Redis command <a href="https://redis.io/commands/scard">scard</a>.
@@ -2169,7 +2167,7 @@ public interface RedisAPI {
    */
   @Fluent
   default RedisAPI script(List<String> args, Handler<AsyncResult<@Nullable Response>> handler) {
-    send(Command.SCRIPT, args.toArray()).setHandler(handler);
+    send(Command.SCRIPT, args.toArray(new String[0])).setHandler(handler);
     return this;
   }
 
@@ -2178,7 +2176,7 @@ public interface RedisAPI {
    * @return Future response.
    */
   default Future<@Nullable Response> script(List<String> args) {
-    return send(Command.SCRIPT, args.toArray());
+    return send(Command.SCRIPT, args.toArray(new String[0]));
   }
   /**
    * Redis command <a href="https://redis.io/commands/sdiff">sdiff</a>.
@@ -2186,7 +2184,7 @@ public interface RedisAPI {
    */
   @Fluent
   default RedisAPI sdiff(List<String> args, Handler<AsyncResult<@Nullable Response>> handler) {
-    send(Command.SDIFF, args.toArray()).setHandler(handler);
+    send(Command.SDIFF, args.toArray(new String[0])).setHandler(handler);
     return this;
   }
 
@@ -2195,7 +2193,7 @@ public interface RedisAPI {
    * @return Future response.
    */
   default Future<@Nullable Response> sdiff(List<String> args) {
-    return send(Command.SDIFF, args.toArray());
+    return send(Command.SDIFF, args.toArray(new String[0]));
   }
   /**
    * Redis command <a href="https://redis.io/commands/sdiffstore">sdiffstore</a>.
@@ -2203,7 +2201,7 @@ public interface RedisAPI {
    */
   @Fluent
   default RedisAPI sdiffstore(List<String> args, Handler<AsyncResult<@Nullable Response>> handler) {
-    send(Command.SDIFFSTORE, args.toArray()).setHandler(handler);
+    send(Command.SDIFFSTORE, args.toArray(new String[0])).setHandler(handler);
     return this;
   }
 
@@ -2212,7 +2210,7 @@ public interface RedisAPI {
    * @return Future response.
    */
   default Future<@Nullable Response> sdiffstore(List<String> args) {
-    return send(Command.SDIFFSTORE, args.toArray());
+    return send(Command.SDIFFSTORE, args.toArray(new String[0]));
   }
   /**
    * Redis command <a href="https://redis.io/commands/select">select</a>.
@@ -2237,7 +2235,7 @@ public interface RedisAPI {
    */
   @Fluent
   default RedisAPI set(List<String> args, Handler<AsyncResult<@Nullable Response>> handler) {
-    send(Command.SET, args.toArray()).setHandler(handler);
+    send(Command.SET, args.toArray(new String[0])).setHandler(handler);
     return this;
   }
 
@@ -2246,7 +2244,7 @@ public interface RedisAPI {
    * @return Future response.
    */
   default Future<@Nullable Response> set(List<String> args) {
-    return send(Command.SET, args.toArray());
+    return send(Command.SET, args.toArray(new String[0]));
   }
   /**
    * Redis command <a href="https://redis.io/commands/setbit">setbit</a>.
@@ -2322,7 +2320,7 @@ public interface RedisAPI {
    */
   @Fluent
   default RedisAPI shutdown(List<String> args, Handler<AsyncResult<@Nullable Response>> handler) {
-    send(Command.SHUTDOWN, args.toArray()).setHandler(handler);
+    send(Command.SHUTDOWN, args.toArray(new String[0])).setHandler(handler);
     return this;
   }
 
@@ -2331,7 +2329,7 @@ public interface RedisAPI {
    * @return Future response.
    */
   default Future<@Nullable Response> shutdown(List<String> args) {
-    return send(Command.SHUTDOWN, args.toArray());
+    return send(Command.SHUTDOWN, args.toArray(new String[0]));
   }
   /**
    * Redis command <a href="https://redis.io/commands/sinter">sinter</a>.
@@ -2339,7 +2337,7 @@ public interface RedisAPI {
    */
   @Fluent
   default RedisAPI sinter(List<String> args, Handler<AsyncResult<@Nullable Response>> handler) {
-    send(Command.SINTER, args.toArray()).setHandler(handler);
+    send(Command.SINTER, args.toArray(new String[0])).setHandler(handler);
     return this;
   }
 
@@ -2348,7 +2346,7 @@ public interface RedisAPI {
    * @return Future response.
    */
   default Future<@Nullable Response> sinter(List<String> args) {
-    return send(Command.SINTER, args.toArray());
+    return send(Command.SINTER, args.toArray(new String[0]));
   }
   /**
    * Redis command <a href="https://redis.io/commands/sinterstore">sinterstore</a>.
@@ -2356,7 +2354,7 @@ public interface RedisAPI {
    */
   @Fluent
   default RedisAPI sinterstore(List<String> args, Handler<AsyncResult<@Nullable Response>> handler) {
-    send(Command.SINTERSTORE, args.toArray()).setHandler(handler);
+    send(Command.SINTERSTORE, args.toArray(new String[0])).setHandler(handler);
     return this;
   }
 
@@ -2365,7 +2363,7 @@ public interface RedisAPI {
    * @return Future response.
    */
   default Future<@Nullable Response> sinterstore(List<String> args) {
-    return send(Command.SINTERSTORE, args.toArray());
+    return send(Command.SINTERSTORE, args.toArray(new String[0]));
   }
   /**
    * Redis command <a href="https://redis.io/commands/sismember">sismember</a>.
@@ -2407,7 +2405,7 @@ public interface RedisAPI {
    */
   @Fluent
   default RedisAPI slowlog(List<String> args, Handler<AsyncResult<@Nullable Response>> handler) {
-    send(Command.SLOWLOG, args.toArray()).setHandler(handler);
+    send(Command.SLOWLOG, args.toArray(new String[0])).setHandler(handler);
     return this;
   }
 
@@ -2416,7 +2414,7 @@ public interface RedisAPI {
    * @return Future response.
    */
   default Future<@Nullable Response> slowlog(List<String> args) {
-    return send(Command.SLOWLOG, args.toArray());
+    return send(Command.SLOWLOG, args.toArray(new String[0]));
   }
   /**
    * Redis command <a href="https://redis.io/commands/smembers">smembers</a>.
@@ -2458,7 +2456,7 @@ public interface RedisAPI {
    */
   @Fluent
   default RedisAPI sort(List<String> args, Handler<AsyncResult<@Nullable Response>> handler) {
-    send(Command.SORT, args.toArray()).setHandler(handler);
+    send(Command.SORT, args.toArray(new String[0])).setHandler(handler);
     return this;
   }
 
@@ -2467,7 +2465,7 @@ public interface RedisAPI {
    * @return Future response.
    */
   default Future<@Nullable Response> sort(List<String> args) {
-    return send(Command.SORT, args.toArray());
+    return send(Command.SORT, args.toArray(new String[0]));
   }
   /**
    * Redis command <a href="https://redis.io/commands/spop">spop</a>.
@@ -2475,7 +2473,7 @@ public interface RedisAPI {
    */
   @Fluent
   default RedisAPI spop(List<String> args, Handler<AsyncResult<@Nullable Response>> handler) {
-    send(Command.SPOP, args.toArray()).setHandler(handler);
+    send(Command.SPOP, args.toArray(new String[0])).setHandler(handler);
     return this;
   }
 
@@ -2484,7 +2482,7 @@ public interface RedisAPI {
    * @return Future response.
    */
   default Future<@Nullable Response> spop(List<String> args) {
-    return send(Command.SPOP, args.toArray());
+    return send(Command.SPOP, args.toArray(new String[0]));
   }
   /**
    * Redis command <a href="https://redis.io/commands/srandmember">srandmember</a>.
@@ -2492,7 +2490,7 @@ public interface RedisAPI {
    */
   @Fluent
   default RedisAPI srandmember(List<String> args, Handler<AsyncResult<@Nullable Response>> handler) {
-    send(Command.SRANDMEMBER, args.toArray()).setHandler(handler);
+    send(Command.SRANDMEMBER, args.toArray(new String[0])).setHandler(handler);
     return this;
   }
 
@@ -2501,7 +2499,7 @@ public interface RedisAPI {
    * @return Future response.
    */
   default Future<@Nullable Response> srandmember(List<String> args) {
-    return send(Command.SRANDMEMBER, args.toArray());
+    return send(Command.SRANDMEMBER, args.toArray(new String[0]));
   }
   /**
    * Redis command <a href="https://redis.io/commands/srem">srem</a>.
@@ -2509,7 +2507,7 @@ public interface RedisAPI {
    */
   @Fluent
   default RedisAPI srem(List<String> args, Handler<AsyncResult<@Nullable Response>> handler) {
-    send(Command.SREM, args.toArray()).setHandler(handler);
+    send(Command.SREM, args.toArray(new String[0])).setHandler(handler);
     return this;
   }
 
@@ -2518,7 +2516,7 @@ public interface RedisAPI {
    * @return Future response.
    */
   default Future<@Nullable Response> srem(List<String> args) {
-    return send(Command.SREM, args.toArray());
+    return send(Command.SREM, args.toArray(new String[0]));
   }
   /**
    * Redis command <a href="https://redis.io/commands/sscan">sscan</a>.
@@ -2526,7 +2524,7 @@ public interface RedisAPI {
    */
   @Fluent
   default RedisAPI sscan(List<String> args, Handler<AsyncResult<@Nullable Response>> handler) {
-    send(Command.SSCAN, args.toArray()).setHandler(handler);
+    send(Command.SSCAN, args.toArray(new String[0])).setHandler(handler);
     return this;
   }
 
@@ -2535,7 +2533,7 @@ public interface RedisAPI {
    * @return Future response.
    */
   default Future<@Nullable Response> sscan(List<String> args) {
-    return send(Command.SSCAN, args.toArray());
+    return send(Command.SSCAN, args.toArray(new String[0]));
   }
   /**
    * Redis command <a href="https://redis.io/commands/strlen">strlen</a>.
@@ -2560,7 +2558,7 @@ public interface RedisAPI {
    */
   @Fluent
   default RedisAPI subscribe(List<String> args, Handler<AsyncResult<@Nullable Response>> handler) {
-    send(Command.SUBSCRIBE, args.toArray()).setHandler(handler);
+    send(Command.SUBSCRIBE, args.toArray(new String[0])).setHandler(handler);
     return this;
   }
 
@@ -2569,7 +2567,7 @@ public interface RedisAPI {
    * @return Future response.
    */
   default Future<@Nullable Response> subscribe(List<String> args) {
-    return send(Command.SUBSCRIBE, args.toArray());
+    return send(Command.SUBSCRIBE, args.toArray(new String[0]));
   }
   /**
    * Redis command <a href="https://redis.io/commands/substr">substr</a>.
@@ -2594,7 +2592,7 @@ public interface RedisAPI {
    */
   @Fluent
   default RedisAPI sunion(List<String> args, Handler<AsyncResult<@Nullable Response>> handler) {
-    send(Command.SUNION, args.toArray()).setHandler(handler);
+    send(Command.SUNION, args.toArray(new String[0])).setHandler(handler);
     return this;
   }
 
@@ -2603,7 +2601,7 @@ public interface RedisAPI {
    * @return Future response.
    */
   default Future<@Nullable Response> sunion(List<String> args) {
-    return send(Command.SUNION, args.toArray());
+    return send(Command.SUNION, args.toArray(new String[0]));
   }
   /**
    * Redis command <a href="https://redis.io/commands/sunionstore">sunionstore</a>.
@@ -2611,7 +2609,7 @@ public interface RedisAPI {
    */
   @Fluent
   default RedisAPI sunionstore(List<String> args, Handler<AsyncResult<@Nullable Response>> handler) {
-    send(Command.SUNIONSTORE, args.toArray()).setHandler(handler);
+    send(Command.SUNIONSTORE, args.toArray(new String[0])).setHandler(handler);
     return this;
   }
 
@@ -2620,7 +2618,7 @@ public interface RedisAPI {
    * @return Future response.
    */
   default Future<@Nullable Response> sunionstore(List<String> args) {
-    return send(Command.SUNIONSTORE, args.toArray());
+    return send(Command.SUNIONSTORE, args.toArray(new String[0]));
   }
   /**
    * Redis command <a href="https://redis.io/commands/swapdb">swapdb</a>.
@@ -2679,7 +2677,7 @@ public interface RedisAPI {
    */
   @Fluent
   default RedisAPI touch(List<String> args, Handler<AsyncResult<@Nullable Response>> handler) {
-    send(Command.TOUCH, args.toArray()).setHandler(handler);
+    send(Command.TOUCH, args.toArray(new String[0])).setHandler(handler);
     return this;
   }
 
@@ -2688,7 +2686,7 @@ public interface RedisAPI {
    * @return Future response.
    */
   default Future<@Nullable Response> touch(List<String> args) {
-    return send(Command.TOUCH, args.toArray());
+    return send(Command.TOUCH, args.toArray(new String[0]));
   }
   /**
    * Redis command <a href="https://redis.io/commands/ttl">ttl</a>.
@@ -2730,7 +2728,7 @@ public interface RedisAPI {
    */
   @Fluent
   default RedisAPI unlink(List<String> args, Handler<AsyncResult<@Nullable Response>> handler) {
-    send(Command.UNLINK, args.toArray()).setHandler(handler);
+    send(Command.UNLINK, args.toArray(new String[0])).setHandler(handler);
     return this;
   }
 
@@ -2739,7 +2737,7 @@ public interface RedisAPI {
    * @return Future response.
    */
   default Future<@Nullable Response> unlink(List<String> args) {
-    return send(Command.UNLINK, args.toArray());
+    return send(Command.UNLINK, args.toArray(new String[0]));
   }
   /**
    * Redis command <a href="https://redis.io/commands/unsubscribe">unsubscribe</a>.
@@ -2747,7 +2745,7 @@ public interface RedisAPI {
    */
   @Fluent
   default RedisAPI unsubscribe(List<String> args, Handler<AsyncResult<@Nullable Response>> handler) {
-    send(Command.UNSUBSCRIBE, args.toArray()).setHandler(handler);
+    send(Command.UNSUBSCRIBE, args.toArray(new String[0])).setHandler(handler);
     return this;
   }
 
@@ -2756,7 +2754,7 @@ public interface RedisAPI {
    * @return Future response.
    */
   default Future<@Nullable Response> unsubscribe(List<String> args) {
-    return send(Command.UNSUBSCRIBE, args.toArray());
+    return send(Command.UNSUBSCRIBE, args.toArray(new String[0]));
   }
   /**
    * Redis command <a href="https://redis.io/commands/unwatch">unwatch</a>.
@@ -2798,7 +2796,7 @@ public interface RedisAPI {
    */
   @Fluent
   default RedisAPI watch(List<String> args, Handler<AsyncResult<@Nullable Response>> handler) {
-    send(Command.WATCH, args.toArray()).setHandler(handler);
+    send(Command.WATCH, args.toArray(new String[0])).setHandler(handler);
     return this;
   }
 
@@ -2807,7 +2805,7 @@ public interface RedisAPI {
    * @return Future response.
    */
   default Future<@Nullable Response> watch(List<String> args) {
-    return send(Command.WATCH, args.toArray());
+    return send(Command.WATCH, args.toArray(new String[0]));
   }
   /**
    * Redis command <a href="https://redis.io/commands/xack">xack</a>.
@@ -2815,7 +2813,7 @@ public interface RedisAPI {
    */
   @Fluent
   default RedisAPI xack(List<String> args, Handler<AsyncResult<@Nullable Response>> handler) {
-    send(Command.XACK, args.toArray()).setHandler(handler);
+    send(Command.XACK, args.toArray(new String[0])).setHandler(handler);
     return this;
   }
 
@@ -2824,7 +2822,7 @@ public interface RedisAPI {
    * @return Future response.
    */
   default Future<@Nullable Response> xack(List<String> args) {
-    return send(Command.XACK, args.toArray());
+    return send(Command.XACK, args.toArray(new String[0]));
   }
   /**
    * Redis command <a href="https://redis.io/commands/xadd">xadd</a>.
@@ -2832,7 +2830,7 @@ public interface RedisAPI {
    */
   @Fluent
   default RedisAPI xadd(List<String> args, Handler<AsyncResult<@Nullable Response>> handler) {
-    send(Command.XADD, args.toArray()).setHandler(handler);
+    send(Command.XADD, args.toArray(new String[0])).setHandler(handler);
     return this;
   }
 
@@ -2841,7 +2839,7 @@ public interface RedisAPI {
    * @return Future response.
    */
   default Future<@Nullable Response> xadd(List<String> args) {
-    return send(Command.XADD, args.toArray());
+    return send(Command.XADD, args.toArray(new String[0]));
   }
   /**
    * Redis command <a href="https://redis.io/commands/xclaim">xclaim</a>.
@@ -2849,7 +2847,7 @@ public interface RedisAPI {
    */
   @Fluent
   default RedisAPI xclaim(List<String> args, Handler<AsyncResult<@Nullable Response>> handler) {
-    send(Command.XCLAIM, args.toArray()).setHandler(handler);
+    send(Command.XCLAIM, args.toArray(new String[0])).setHandler(handler);
     return this;
   }
 
@@ -2858,7 +2856,7 @@ public interface RedisAPI {
    * @return Future response.
    */
   default Future<@Nullable Response> xclaim(List<String> args) {
-    return send(Command.XCLAIM, args.toArray());
+    return send(Command.XCLAIM, args.toArray(new String[0]));
   }
   /**
    * Redis command <a href="https://redis.io/commands/xdel">xdel</a>.
@@ -2866,7 +2864,7 @@ public interface RedisAPI {
    */
   @Fluent
   default RedisAPI xdel(List<String> args, Handler<AsyncResult<@Nullable Response>> handler) {
-    send(Command.XDEL, args.toArray()).setHandler(handler);
+    send(Command.XDEL, args.toArray(new String[0])).setHandler(handler);
     return this;
   }
 
@@ -2875,7 +2873,7 @@ public interface RedisAPI {
    * @return Future response.
    */
   default Future<@Nullable Response> xdel(List<String> args) {
-    return send(Command.XDEL, args.toArray());
+    return send(Command.XDEL, args.toArray(new String[0]));
   }
   /**
    * Redis command <a href="https://redis.io/commands/xgroup">xgroup</a>.
@@ -2883,7 +2881,7 @@ public interface RedisAPI {
    */
   @Fluent
   default RedisAPI xgroup(List<String> args, Handler<AsyncResult<@Nullable Response>> handler) {
-    send(Command.XGROUP, args.toArray()).setHandler(handler);
+    send(Command.XGROUP, args.toArray(new String[0])).setHandler(handler);
     return this;
   }
 
@@ -2892,7 +2890,7 @@ public interface RedisAPI {
    * @return Future response.
    */
   default Future<@Nullable Response> xgroup(List<String> args) {
-    return send(Command.XGROUP, args.toArray());
+    return send(Command.XGROUP, args.toArray(new String[0]));
   }
   /**
    * Redis command <a href="https://redis.io/commands/xinfo">xinfo</a>.
@@ -2900,7 +2898,7 @@ public interface RedisAPI {
    */
   @Fluent
   default RedisAPI xinfo(List<String> args, Handler<AsyncResult<@Nullable Response>> handler) {
-    send(Command.XINFO, args.toArray()).setHandler(handler);
+    send(Command.XINFO, args.toArray(new String[0])).setHandler(handler);
     return this;
   }
 
@@ -2909,7 +2907,7 @@ public interface RedisAPI {
    * @return Future response.
    */
   default Future<@Nullable Response> xinfo(List<String> args) {
-    return send(Command.XINFO, args.toArray());
+    return send(Command.XINFO, args.toArray(new String[0]));
   }
   /**
    * Redis command <a href="https://redis.io/commands/xlen">xlen</a>.
@@ -2934,7 +2932,7 @@ public interface RedisAPI {
    */
   @Fluent
   default RedisAPI xpending(List<String> args, Handler<AsyncResult<@Nullable Response>> handler) {
-    send(Command.XPENDING, args.toArray()).setHandler(handler);
+    send(Command.XPENDING, args.toArray(new String[0])).setHandler(handler);
     return this;
   }
 
@@ -2943,7 +2941,7 @@ public interface RedisAPI {
    * @return Future response.
    */
   default Future<@Nullable Response> xpending(List<String> args) {
-    return send(Command.XPENDING, args.toArray());
+    return send(Command.XPENDING, args.toArray(new String[0]));
   }
   /**
    * Redis command <a href="https://redis.io/commands/xrange">xrange</a>.
@@ -2951,7 +2949,7 @@ public interface RedisAPI {
    */
   @Fluent
   default RedisAPI xrange(List<String> args, Handler<AsyncResult<@Nullable Response>> handler) {
-    send(Command.XRANGE, args.toArray()).setHandler(handler);
+    send(Command.XRANGE, args.toArray(new String[0])).setHandler(handler);
     return this;
   }
 
@@ -2960,7 +2958,7 @@ public interface RedisAPI {
    * @return Future response.
    */
   default Future<@Nullable Response> xrange(List<String> args) {
-    return send(Command.XRANGE, args.toArray());
+    return send(Command.XRANGE, args.toArray(new String[0]));
   }
   /**
    * Redis command <a href="https://redis.io/commands/xread">xread</a>.
@@ -2968,7 +2966,7 @@ public interface RedisAPI {
    */
   @Fluent
   default RedisAPI xread(List<String> args, Handler<AsyncResult<@Nullable Response>> handler) {
-    send(Command.XREAD, args.toArray()).setHandler(handler);
+    send(Command.XREAD, args.toArray(new String[0])).setHandler(handler);
     return this;
   }
 
@@ -2977,7 +2975,7 @@ public interface RedisAPI {
    * @return Future response.
    */
   default Future<@Nullable Response> xread(List<String> args) {
-    return send(Command.XREAD, args.toArray());
+    return send(Command.XREAD, args.toArray(new String[0]));
   }
   /**
    * Redis command <a href="https://redis.io/commands/xreadgroup">xreadgroup</a>.
@@ -2985,7 +2983,7 @@ public interface RedisAPI {
    */
   @Fluent
   default RedisAPI xreadgroup(List<String> args, Handler<AsyncResult<@Nullable Response>> handler) {
-    send(Command.XREADGROUP, args.toArray()).setHandler(handler);
+    send(Command.XREADGROUP, args.toArray(new String[0])).setHandler(handler);
     return this;
   }
 
@@ -2994,7 +2992,7 @@ public interface RedisAPI {
    * @return Future response.
    */
   default Future<@Nullable Response> xreadgroup(List<String> args) {
-    return send(Command.XREADGROUP, args.toArray());
+    return send(Command.XREADGROUP, args.toArray(new String[0]));
   }
   /**
    * Redis command <a href="https://redis.io/commands/xrevrange">xrevrange</a>.
@@ -3002,7 +3000,7 @@ public interface RedisAPI {
    */
   @Fluent
   default RedisAPI xrevrange(List<String> args, Handler<AsyncResult<@Nullable Response>> handler) {
-    send(Command.XREVRANGE, args.toArray()).setHandler(handler);
+    send(Command.XREVRANGE, args.toArray(new String[0])).setHandler(handler);
     return this;
   }
 
@@ -3011,7 +3009,7 @@ public interface RedisAPI {
    * @return Future response.
    */
   default Future<@Nullable Response> xrevrange(List<String> args) {
-    return send(Command.XREVRANGE, args.toArray());
+    return send(Command.XREVRANGE, args.toArray(new String[0]));
   }
   /**
    * Redis command <a href="https://redis.io/commands/xsetid">xsetid</a>.
@@ -3036,7 +3034,7 @@ public interface RedisAPI {
    */
   @Fluent
   default RedisAPI xtrim(List<String> args, Handler<AsyncResult<@Nullable Response>> handler) {
-    send(Command.XTRIM, args.toArray()).setHandler(handler);
+    send(Command.XTRIM, args.toArray(new String[0])).setHandler(handler);
     return this;
   }
 
@@ -3045,7 +3043,7 @@ public interface RedisAPI {
    * @return Future response.
    */
   default Future<@Nullable Response> xtrim(List<String> args) {
-    return send(Command.XTRIM, args.toArray());
+    return send(Command.XTRIM, args.toArray(new String[0]));
   }
   /**
    * Redis command <a href="https://redis.io/commands/zadd">zadd</a>.
@@ -3053,7 +3051,7 @@ public interface RedisAPI {
    */
   @Fluent
   default RedisAPI zadd(List<String> args, Handler<AsyncResult<@Nullable Response>> handler) {
-    send(Command.ZADD, args.toArray()).setHandler(handler);
+    send(Command.ZADD, args.toArray(new String[0])).setHandler(handler);
     return this;
   }
 
@@ -3062,7 +3060,7 @@ public interface RedisAPI {
    * @return Future response.
    */
   default Future<@Nullable Response> zadd(List<String> args) {
-    return send(Command.ZADD, args.toArray());
+    return send(Command.ZADD, args.toArray(new String[0]));
   }
   /**
    * Redis command <a href="https://redis.io/commands/zcard">zcard</a>.
@@ -3121,7 +3119,7 @@ public interface RedisAPI {
    */
   @Fluent
   default RedisAPI zinterstore(List<String> args, Handler<AsyncResult<@Nullable Response>> handler) {
-    send(Command.ZINTERSTORE, args.toArray()).setHandler(handler);
+    send(Command.ZINTERSTORE, args.toArray(new String[0])).setHandler(handler);
     return this;
   }
 
@@ -3130,7 +3128,7 @@ public interface RedisAPI {
    * @return Future response.
    */
   default Future<@Nullable Response> zinterstore(List<String> args) {
-    return send(Command.ZINTERSTORE, args.toArray());
+    return send(Command.ZINTERSTORE, args.toArray(new String[0]));
   }
   /**
    * Redis command <a href="https://redis.io/commands/zlexcount">zlexcount</a>.
@@ -3155,7 +3153,7 @@ public interface RedisAPI {
    */
   @Fluent
   default RedisAPI zpopmax(List<String> args, Handler<AsyncResult<@Nullable Response>> handler) {
-    send(Command.ZPOPMAX, args.toArray()).setHandler(handler);
+    send(Command.ZPOPMAX, args.toArray(new String[0])).setHandler(handler);
     return this;
   }
 
@@ -3164,7 +3162,7 @@ public interface RedisAPI {
    * @return Future response.
    */
   default Future<@Nullable Response> zpopmax(List<String> args) {
-    return send(Command.ZPOPMAX, args.toArray());
+    return send(Command.ZPOPMAX, args.toArray(new String[0]));
   }
   /**
    * Redis command <a href="https://redis.io/commands/zpopmin">zpopmin</a>.
@@ -3172,7 +3170,7 @@ public interface RedisAPI {
    */
   @Fluent
   default RedisAPI zpopmin(List<String> args, Handler<AsyncResult<@Nullable Response>> handler) {
-    send(Command.ZPOPMIN, args.toArray()).setHandler(handler);
+    send(Command.ZPOPMIN, args.toArray(new String[0])).setHandler(handler);
     return this;
   }
 
@@ -3181,7 +3179,7 @@ public interface RedisAPI {
    * @return Future response.
    */
   default Future<@Nullable Response> zpopmin(List<String> args) {
-    return send(Command.ZPOPMIN, args.toArray());
+    return send(Command.ZPOPMIN, args.toArray(new String[0]));
   }
   /**
    * Redis command <a href="https://redis.io/commands/zrange">zrange</a>.
@@ -3189,7 +3187,7 @@ public interface RedisAPI {
    */
   @Fluent
   default RedisAPI zrange(List<String> args, Handler<AsyncResult<@Nullable Response>> handler) {
-    send(Command.ZRANGE, args.toArray()).setHandler(handler);
+    send(Command.ZRANGE, args.toArray(new String[0])).setHandler(handler);
     return this;
   }
 
@@ -3198,7 +3196,7 @@ public interface RedisAPI {
    * @return Future response.
    */
   default Future<@Nullable Response> zrange(List<String> args) {
-    return send(Command.ZRANGE, args.toArray());
+    return send(Command.ZRANGE, args.toArray(new String[0]));
   }
   /**
    * Redis command <a href="https://redis.io/commands/zrangebylex">zrangebylex</a>.
@@ -3206,7 +3204,7 @@ public interface RedisAPI {
    */
   @Fluent
   default RedisAPI zrangebylex(List<String> args, Handler<AsyncResult<@Nullable Response>> handler) {
-    send(Command.ZRANGEBYLEX, args.toArray()).setHandler(handler);
+    send(Command.ZRANGEBYLEX, args.toArray(new String[0])).setHandler(handler);
     return this;
   }
 
@@ -3215,7 +3213,7 @@ public interface RedisAPI {
    * @return Future response.
    */
   default Future<@Nullable Response> zrangebylex(List<String> args) {
-    return send(Command.ZRANGEBYLEX, args.toArray());
+    return send(Command.ZRANGEBYLEX, args.toArray(new String[0]));
   }
   /**
    * Redis command <a href="https://redis.io/commands/zrangebyscore">zrangebyscore</a>.
@@ -3223,7 +3221,7 @@ public interface RedisAPI {
    */
   @Fluent
   default RedisAPI zrangebyscore(List<String> args, Handler<AsyncResult<@Nullable Response>> handler) {
-    send(Command.ZRANGEBYSCORE, args.toArray()).setHandler(handler);
+    send(Command.ZRANGEBYSCORE, args.toArray(new String[0])).setHandler(handler);
     return this;
   }
 
@@ -3232,7 +3230,7 @@ public interface RedisAPI {
    * @return Future response.
    */
   default Future<@Nullable Response> zrangebyscore(List<String> args) {
-    return send(Command.ZRANGEBYSCORE, args.toArray());
+    return send(Command.ZRANGEBYSCORE, args.toArray(new String[0]));
   }
   /**
    * Redis command <a href="https://redis.io/commands/zrank">zrank</a>.
@@ -3257,7 +3255,7 @@ public interface RedisAPI {
    */
   @Fluent
   default RedisAPI zrem(List<String> args, Handler<AsyncResult<@Nullable Response>> handler) {
-    send(Command.ZREM, args.toArray()).setHandler(handler);
+    send(Command.ZREM, args.toArray(new String[0])).setHandler(handler);
     return this;
   }
 
@@ -3266,7 +3264,7 @@ public interface RedisAPI {
    * @return Future response.
    */
   default Future<@Nullable Response> zrem(List<String> args) {
-    return send(Command.ZREM, args.toArray());
+    return send(Command.ZREM, args.toArray(new String[0]));
   }
   /**
    * Redis command <a href="https://redis.io/commands/zremrangebylex">zremrangebylex</a>.
@@ -3325,7 +3323,7 @@ public interface RedisAPI {
    */
   @Fluent
   default RedisAPI zrevrange(List<String> args, Handler<AsyncResult<@Nullable Response>> handler) {
-    send(Command.ZREVRANGE, args.toArray()).setHandler(handler);
+    send(Command.ZREVRANGE, args.toArray(new String[0])).setHandler(handler);
     return this;
   }
 
@@ -3334,7 +3332,7 @@ public interface RedisAPI {
    * @return Future response.
    */
   default Future<@Nullable Response> zrevrange(List<String> args) {
-    return send(Command.ZREVRANGE, args.toArray());
+    return send(Command.ZREVRANGE, args.toArray(new String[0]));
   }
   /**
    * Redis command <a href="https://redis.io/commands/zrevrangebylex">zrevrangebylex</a>.
@@ -3342,7 +3340,7 @@ public interface RedisAPI {
    */
   @Fluent
   default RedisAPI zrevrangebylex(List<String> args, Handler<AsyncResult<@Nullable Response>> handler) {
-    send(Command.ZREVRANGEBYLEX, args.toArray()).setHandler(handler);
+    send(Command.ZREVRANGEBYLEX, args.toArray(new String[0])).setHandler(handler);
     return this;
   }
 
@@ -3351,7 +3349,7 @@ public interface RedisAPI {
    * @return Future response.
    */
   default Future<@Nullable Response> zrevrangebylex(List<String> args) {
-    return send(Command.ZREVRANGEBYLEX, args.toArray());
+    return send(Command.ZREVRANGEBYLEX, args.toArray(new String[0]));
   }
   /**
    * Redis command <a href="https://redis.io/commands/zrevrangebyscore">zrevrangebyscore</a>.
@@ -3359,7 +3357,7 @@ public interface RedisAPI {
    */
   @Fluent
   default RedisAPI zrevrangebyscore(List<String> args, Handler<AsyncResult<@Nullable Response>> handler) {
-    send(Command.ZREVRANGEBYSCORE, args.toArray()).setHandler(handler);
+    send(Command.ZREVRANGEBYSCORE, args.toArray(new String[0])).setHandler(handler);
     return this;
   }
 
@@ -3368,7 +3366,7 @@ public interface RedisAPI {
    * @return Future response.
    */
   default Future<@Nullable Response> zrevrangebyscore(List<String> args) {
-    return send(Command.ZREVRANGEBYSCORE, args.toArray());
+    return send(Command.ZREVRANGEBYSCORE, args.toArray(new String[0]));
   }
   /**
    * Redis command <a href="https://redis.io/commands/zrevrank">zrevrank</a>.
@@ -3393,7 +3391,7 @@ public interface RedisAPI {
    */
   @Fluent
   default RedisAPI zscan(List<String> args, Handler<AsyncResult<@Nullable Response>> handler) {
-    send(Command.ZSCAN, args.toArray()).setHandler(handler);
+    send(Command.ZSCAN, args.toArray(new String[0])).setHandler(handler);
     return this;
   }
 
@@ -3402,7 +3400,7 @@ public interface RedisAPI {
    * @return Future response.
    */
   default Future<@Nullable Response> zscan(List<String> args) {
-    return send(Command.ZSCAN, args.toArray());
+    return send(Command.ZSCAN, args.toArray(new String[0]));
   }
   /**
    * Redis command <a href="https://redis.io/commands/zscore">zscore</a>.
@@ -3427,7 +3425,7 @@ public interface RedisAPI {
    */
   @Fluent
   default RedisAPI zunionstore(List<String> args, Handler<AsyncResult<@Nullable Response>> handler) {
-    send(Command.ZUNIONSTORE, args.toArray()).setHandler(handler);
+    send(Command.ZUNIONSTORE, args.toArray(new String[0])).setHandler(handler);
     return this;
   }
 
@@ -3436,7 +3434,7 @@ public interface RedisAPI {
    * @return Future response.
    */
   default Future<@Nullable Response> zunionstore(List<String> args) {
-    return send(Command.ZUNIONSTORE, args.toArray());
+    return send(Command.ZUNIONSTORE, args.toArray(new String[0]));
   }
 
   /**
@@ -3447,5 +3445,5 @@ public interface RedisAPI {
    * @return Future response.
    */
   @GenIgnore
-  Future<@Nullable Response> send(Command cmd, Object... args);
+  Future<@Nullable Response> send(Command cmd, String... args);
 }
