@@ -1,3 +1,18 @@
+/*
+ * Copyright 2019 Red Hat, Inc.
+ * <p>
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * and Apache License v2.0 which accompanies this distribution.
+ * <p>
+ * The Eclipse Public License is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ * <p>
+ * The Apache License v2.0 is available at
+ * http://www.opensource.org/licenses/apache2.0.php
+ * <p>
+ * You may elect to redistribute this code under either of these licenses.
+ */
 package io.vertx.redis.client.impl;
 
 import io.vertx.core.net.SocketAddress;
@@ -8,6 +23,10 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
+/**
+ * Utility to parse redis URLs
+ * @author <a href="mailto:plopes@redhat.com">Paulo Lopes</a>
+ */
 public final class RedisURI {
 
   private final String address;
@@ -20,10 +39,14 @@ public final class RedisURI {
     try {
       final URI uri = new URI(address);
 
+      final String host = uri.getHost() == null ? "localhost" : uri.getHost();
+      final int port = uri.getPort() == -1 ? 6379 : uri.getPort();
+      final String path = (uri.getPath() == null || uri.getPath().isEmpty()) ? "/" : uri.getPath();
+
       switch (uri.getScheme()) {
         case "redis":
-          socketAddress = SocketAddress.inetSocketAddress(uri.getPort(), uri.getHost());
-          if (uri.getPath() != null && !uri.getPath().isEmpty()) {
+          socketAddress = SocketAddress.inetSocketAddress(port, host);
+          if (path.length() > 1) {
             // skip initial slash
             select = Integer.parseInt(uri.getPath().substring(1));
           } else {
@@ -31,7 +54,7 @@ public final class RedisURI {
           }
           break;
         case "unix":
-          socketAddress = SocketAddress.domainSocketAddress(uri.getPath());
+          socketAddress = SocketAddress.domainSocketAddress(path);
           Map<String, String> query = parseQuery(uri);
           if (query.containsKey("select")) {
             select = Integer.parseInt(query.get("select"));
@@ -45,10 +68,12 @@ public final class RedisURI {
 
       String userInfo = uri.getUserInfo();
       if (userInfo != null) {
-        if (userInfo.length() == 0 || userInfo.charAt(0) != ':') {
-          throw new RuntimeException("Invalid userinfo [" + uri.getUserInfo() + "] expected format [:password]");
+        int col = userInfo.indexOf(':');
+        if (col != -1) {
+          password = uri.getUserInfo().substring(col + 1);
+        } else {
+          password = null;
         }
-        password = uri.getUserInfo().substring(1);
       } else {
         password = null;
       }
