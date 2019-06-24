@@ -9,10 +9,7 @@ import io.vertx.ext.unit.Async;
 import io.vertx.ext.unit.TestContext;
 import io.vertx.ext.unit.junit.RunTestOnContext;
 import io.vertx.ext.unit.junit.VertxUnitRunner;
-import io.vertx.redis.client.Redis;
-import io.vertx.redis.client.RedisClientType;
-import io.vertx.redis.client.RedisOptions;
-import io.vertx.redis.client.Response;
+import io.vertx.redis.client.*;
 
 import org.junit.After;
 import org.junit.Ignore;
