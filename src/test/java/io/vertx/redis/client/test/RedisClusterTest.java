@@ -9,10 +9,7 @@ import io.vertx.ext.unit.Async;
 import io.vertx.ext.unit.TestContext;
 import io.vertx.ext.unit.junit.RunTestOnContext;
 import io.vertx.ext.unit.junit.VertxUnitRunner;
-import io.vertx.redis.client.Redis;
-import io.vertx.redis.client.RedisClientType;
-import io.vertx.redis.client.RedisOptions;
-import io.vertx.redis.client.Response;
+import io.vertx.redis.client.*;
 import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
@@ -34,6 +31,7 @@ public class RedisClusterTest {
   // Server: https://github.com/Grokzen/docker-redis-cluster
   final RedisOptions options = new RedisOptions()
     .setType(RedisClientType.CLUSTER)
+    .setUseSlave(RedisSlaves.SHARE)
     // we will flood the redis server
     .setMaxWaitingHandlers(128 * 1024)
     .addEndpoint(SocketAddress.inetSocketAddress(7000, "127.0.0.1"))

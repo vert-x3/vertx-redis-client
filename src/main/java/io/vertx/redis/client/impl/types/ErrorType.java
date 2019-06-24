@@ -61,4 +61,29 @@ public final class ErrorType extends Throwable implements Response {
   public String toString() {
     return getMessage();
   }
+
+  public String slice(char sep, int index) {
+    String message = getMessage();
+    if (message == null) {
+      return null;
+    }
+
+    int start = 0;
+    int count = 0;
+    for (int i = 0; i < message.length(); i++) {
+      if (message.charAt(i) == sep) {
+        if (++count > index) {
+          return message.substring(start, i);
+        } else {
+          start = i + 1;
+        }
+      }
+    }
+    // EOL
+    if (count == index) {
+      return message.substring(start);
+    }
+
+    return null;
+  }
 }
