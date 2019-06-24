@@ -26,6 +26,8 @@ import io.vertx.redis.client.impl.RedisAPIImpl;
 
 import java.util.List;
 
+import static io.vertx.codegen.annotations.GenIgnore.PERMITTED_TYPE;
+
 /**
  * <b>Auto generated</b> Redis API client wrapper.
  */
@@ -3437,6 +3439,13 @@ public interface RedisAPI {
     return send(Command.ZUNIONSTORE, args.toArray());
   }
 
+  /**
+   * Send untyped command to redis.
+   *
+   * @param cmd the command
+   * @param args var args
+   * @return Future response.
+   */
   @GenIgnore
   Future<@Nullable Response> send(Command cmd, Object... args);
 }
