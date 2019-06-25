@@ -28,16 +28,16 @@ public class RedisAPIImpl implements RedisAPI {
   }
 
   @Override
-  public Future<Response> send(Command cmd, Object... args) {
+  public Future<Response> send(Command cmd, String... args) {
     final Promise<Response> promise = Promise.promise();
     final Request req = Request.cmd(cmd);
 
     if (args != null) {
-      for (Object o : args) {
+      for (String o : args) {
         if (o == null) {
           req.nullArg();
         } else {
-          req.arg(o.toString());
+          req.arg(o);
         }
       }
     }

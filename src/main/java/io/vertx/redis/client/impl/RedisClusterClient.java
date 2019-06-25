@@ -708,8 +708,8 @@ public class RedisClusterClient implements Redis {
     }
 
     client.send(command, send -> {
-      if (send.failed() && send.cause() instanceof RedisException && retries >= 0) {
-        final RedisException cause = (RedisException) send.cause();
+      if (send.failed() && send.cause() instanceof ErrorType && retries >= 0) {
+        final ErrorType cause = (ErrorType) send.cause();
 
         boolean ask = cause.is("ASK");
         boolean moved = !ask && cause.is("MOVED");
@@ -782,8 +782,8 @@ public class RedisClusterClient implements Redis {
     }
 
     client.batch(commands, send -> {
-      if (send.failed() && send.cause() instanceof RedisException && retries >= 0) {
-        final RedisException cause = (RedisException) send.cause();
+      if (send.failed() && send.cause() instanceof ErrorType && retries >= 0) {
+        final ErrorType cause = (ErrorType) send.cause();
 
         boolean ask = cause.is("ASK");
         boolean moved = !ask && cause.is("MOVED");
