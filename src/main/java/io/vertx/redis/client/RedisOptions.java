@@ -18,9 +18,11 @@ package io.vertx.redis.client;
 import io.vertx.codegen.annotations.DataObject;
 import io.vertx.core.json.JsonObject;
 import io.vertx.core.net.NetClientOptions;
-import io.vertx.core.net.SocketAddress;
 
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -33,14 +35,12 @@ public class RedisOptions {
 
   private RedisClientType type;
   private NetClientOptions netClientOptions;
-  private List<SocketAddress> endpoints;
+  private List<String> endpoints;
   private int maxWaitingHandlers;
   private int maxNestedArrays;
   private String masterName;
   private RedisRole role;
   private RedisSlaves slaves;
-  private String password;
-  private Integer select;
 
   private void init() {
     netClientOptions =
@@ -76,8 +76,6 @@ public class RedisOptions {
     this.masterName = other.masterName;
     this.role = other.role;
     this.slaves = other.slaves;
-    this.password = other.password;
-    this.select = other.select;
   }
 
   /**
@@ -131,7 +129,7 @@ public class RedisOptions {
    * Gets the list of redis endpoints to use (mostly used while connecting to a cluster)
    * @return list of socket addresses.
    */
-  public List<SocketAddress> getEndpoints() {
+  public List<String> getEndpoints() {
     return endpoints;
   }
 
@@ -139,9 +137,9 @@ public class RedisOptions {
    * Gets the redis endpoint to use
    * @return socket address.
    */
-  public SocketAddress getEndpoint() {
+  public String getEndpoint() {
     if (endpoints == null || endpoints.size() == 0) {
-      return SocketAddress.inetSocketAddress(6379, "localhost");
+      return "redis://localhost:6379";
     }
 
     return endpoints.get(0);
@@ -154,7 +152,7 @@ public class RedisOptions {
    * @param endpoints list of socket addresses.
    * @return fluent self.
    */
-  public RedisOptions setEndpoints(List<SocketAddress> endpoints) {
+  public RedisOptions setEndpoints(List<String> endpoints) {
     this.endpoints = endpoints;
     return this;
   }
@@ -166,7 +164,7 @@ public class RedisOptions {
    * @param endpoint a socket addresses.
    * @return fluent self.
    */
-  public RedisOptions addEndpoint(SocketAddress endpoint) {
+  public RedisOptions addEndpoint(String endpoint) {
     if (endpoints == null) {
       endpoints = new ArrayList<>();
     }
@@ -180,7 +178,7 @@ public class RedisOptions {
    * @param endpoint a socket addresses.
    * @return fluent self.
    */
-  public RedisOptions setEndpoint(SocketAddress endpoint) {
+  public RedisOptions setEndpoint(String endpoint) {
     if (endpoints == null) {
       endpoints = new ArrayList<>();
     } else {
@@ -287,42 +285,6 @@ public class RedisOptions {
   }
 
   /**
-   * Get the provided password to be used when establishing a connection to the server.
-   * @return the password
-   */
-  public String getPassword() {
-    return password;
-  }
-
-  /**
-   * Set the provided password to be used when establishing a connection to the server.
-   * @param password the password
-   * @return fluent self.
-   */
-  public RedisOptions setPassword(String password) {
-    this.password = password;
-    return this;
-  }
-
-  /**
-   * Get the provided database to be selected when establishing a connection to the server.
-   * @return the database id.
-   */
-  public Integer getSelect() {
-    return select;
-  }
-
-  /**
-   * Set the provided database to be selected when establishing a connection to the server.
-   * @param select the database id.
-   * @return fluent self.
-   */
-  public RedisOptions setSelect(Integer select) {
-    this.select = select;
-    return this;
-  }
-
-  /**
    * Converts this object to JSON notation.
    * @return JSON
    */
@@ -330,5 +292,30 @@ public class RedisOptions {
     final JsonObject json = new JsonObject();
     RedisOptionsConverter.toJson(this, json);
     return json;
+  }
+
+  public static void main(String[] args) throws URISyntaxException {
+
+    List<String> uris = Arrays.asList(
+      "redis://localhost",
+      "redis://localhost:7936",
+      "redis://user:password@localhost:7936",
+      "redis://user@localhost:7936",
+      "redis://:password@localhost:7936",
+      "redis://localhost:7936/1",
+      "redis:///tmp/redis.sock",
+      "unix:///tmp/redis.sock?select=1");
+
+    for (String uri : uris) {
+      URI conn = new URI(uri);
+      System.out.println(conn);
+      System.out.println(conn.getScheme());
+      System.out.println(conn.getUserInfo());
+      System.out.println(conn.getHost());
+      System.out.println(conn.getPort());
+      System.out.println(conn.getPath());
+      System.out.println(conn.getQuery());
+      System.out.println("---");
+    }
   }
 }

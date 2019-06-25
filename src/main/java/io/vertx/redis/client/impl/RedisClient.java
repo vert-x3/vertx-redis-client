@@ -21,7 +21,6 @@ import io.vertx.core.impl.logging.Logger;
 import io.vertx.core.impl.logging.LoggerFactory;
 import io.vertx.core.net.NetClient;
 import io.vertx.core.net.NetSocket;
-import io.vertx.core.net.SocketAddress;
 import io.vertx.redis.client.*;
 import io.vertx.redis.client.impl.types.ErrorType;
 
@@ -40,17 +39,17 @@ public class RedisClient implements Redis, ParserHandler {
     return create(vertx, options, options.getEndpoint());
   }
 
-  static Redis create(Vertx vertx, RedisOptions options, SocketAddress address) {
+  static Redis create(Vertx vertx, RedisOptions options, String address) {
     return new RedisClient(vertx, options, address);
   }
 
-  private static void authenticate(Redis client, RedisOptions options, Handler<AsyncResult<Void>> handler) {
-    if (options.getPassword() == null) {
+  private static void authenticate(Redis client, String password, Handler<AsyncResult<Void>> handler) {
+    if (password == null) {
       handler.handle(Future.succeededFuture());
       return;
     }
     // perform authentication
-    client.send(Request.cmd(Command.AUTH).arg(options.getPassword()), auth -> {
+    client.send(Request.cmd(Command.AUTH).arg(password), auth -> {
       if (auth.failed()) {
         handler.handle(Future.failedFuture(auth.cause()));
       } else {
@@ -59,13 +58,13 @@ public class RedisClient implements Redis, ParserHandler {
     });
   }
 
-  private static void select(Redis client, RedisOptions options, Handler<AsyncResult<Void>> handler) {
-    if (options.getSelect() == null) {
+  private static void select(Redis client, Integer select, Handler<AsyncResult<Void>> handler) {
+    if (select == null) {
       handler.handle(Future.succeededFuture());
       return;
     }
     // perform select
-    client.send(Request.cmd(Command.SELECT).arg(options.getSelect()), auth -> {
+    client.send(Request.cmd(Command.SELECT).arg(select), auth -> {
       if (auth.failed()) {
         handler.handle(Future.failedFuture(auth.cause()));
       } else {
@@ -79,7 +78,7 @@ public class RedisClient implements Redis, ParserHandler {
   private final ArrayQueue waiting;
 
   private final NetClient netClient;
-  private final SocketAddress socketAddress;
+  private final RedisURI redisURI;
 
   private final RedisOptions options;
 
@@ -94,10 +93,10 @@ public class RedisClient implements Redis, ParserHandler {
   // connection is operational.
   private boolean connected = false;
 
-  private RedisClient(Vertx vertx, RedisOptions options, SocketAddress endpoint) {
+  private RedisClient(Vertx vertx, RedisOptions options, String endpoint) {
     this.netClient = vertx.createNetClient(options.getNetClientOptions());
     this.waiting = new ArrayQueue(options.getMaxWaitingHandlers());
-    this.socketAddress = endpoint;
+    this.redisURI = new RedisURI(endpoint);
     this.options = options;
   }
 
@@ -109,7 +108,7 @@ public class RedisClient implements Redis, ParserHandler {
       return this;
     }
 
-    netClient.connect(socketAddress, clientConnect -> {
+    netClient.connect(redisURI.socketAddress(), clientConnect -> {
       if (clientConnect.failed()) {
         // connection failed
         netClient.close();
@@ -147,14 +146,14 @@ public class RedisClient implements Redis, ParserHandler {
         });
 
       // perform authentication
-      authenticate(this, options, authenticate -> {
+      authenticate(this, redisURI.password(), authenticate -> {
         if (authenticate.failed()) {
           onConnect.handle(Future.failedFuture(authenticate.cause()));
           return;
         }
 
         // perform select
-        select(this, options, select -> {
+        select(this, redisURI.select(), select -> {
           if (select.failed()) {
             onConnect.handle(Future.failedFuture(select.cause()));
             return;
@@ -363,8 +362,8 @@ public class RedisClient implements Redis, ParserHandler {
   }
 
   @Override
-  public SocketAddress socketAddress() {
-    return socketAddress;
+  public String socketAddress() {
+    return redisURI.address();
   }
 
   @Override

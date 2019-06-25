@@ -1,6 +1,5 @@
 package io.vertx.redis.client.test;
 
-import io.vertx.core.net.SocketAddress;
 import io.vertx.ext.unit.Async;
 import io.vertx.ext.unit.TestContext;
 import io.vertx.ext.unit.junit.RunTestOnContext;
@@ -23,9 +22,9 @@ public class RedisSentinelTest {
       rule.vertx(),
       new RedisOptions()
         .setType(RedisClientType.SENTINEL)
-        .addEndpoint(SocketAddress.inetSocketAddress(5000, "127.0.0.1"))
-        .addEndpoint(SocketAddress.inetSocketAddress(5001, "127.0.0.1"))
-        .addEndpoint(SocketAddress.inetSocketAddress(5002, "127.0.0.1"))
+        .addEndpoint("redis://localhost:5000")
+        .addEndpoint("redis://localhost:5001")
+        .addEndpoint("redis://localhost:5002")
         .setMasterName("sentinel7000")
         .setRole(RedisRole.MASTER))
       .connect(onCreate -> {
@@ -49,9 +48,9 @@ public class RedisSentinelTest {
       rule.vertx(),
       new RedisOptions()
         .setType(RedisClientType.SENTINEL)
-        .addEndpoint(SocketAddress.inetSocketAddress(5000, "127.0.0.1"))
-        .addEndpoint(SocketAddress.inetSocketAddress(5001, "127.0.0.1"))
-        .addEndpoint(SocketAddress.inetSocketAddress(5002, "127.0.0.1"))
+        .addEndpoint("redis://localhost:5000")
+        .addEndpoint("redis://localhost:5001")
+        .addEndpoint("redis://localhost:5002")
         .setMasterName("sentinel7000")
         .setRole(RedisRole.SLAVE))
       .connect(onCreate -> {
@@ -75,9 +74,9 @@ public class RedisSentinelTest {
       rule.vertx(),
       new RedisOptions()
         .setType(RedisClientType.SENTINEL)
-        .addEndpoint(SocketAddress.inetSocketAddress(5000, "127.0.0.1"))
-        .addEndpoint(SocketAddress.inetSocketAddress(5001, "127.0.0.1"))
-        .addEndpoint(SocketAddress.inetSocketAddress(5002, "127.0.0.1"))
+        .addEndpoint("redis://localhost:5000")
+        .addEndpoint("redis://localhost:5001")
+        .addEndpoint("redis://localhost:5002")
         .setMasterName("sentinel7000")
         .setRole(RedisRole.SENTINEL))
       .connect(onCreate -> {

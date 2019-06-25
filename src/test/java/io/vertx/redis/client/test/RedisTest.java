@@ -1,6 +1,5 @@
 package io.vertx.redis.client.test;
 
-import io.vertx.core.net.SocketAddress;
 import io.vertx.ext.unit.Async;
 import io.vertx.ext.unit.TestContext;
 import io.vertx.ext.unit.junit.RunTestOnContext;
@@ -25,7 +24,7 @@ public class RedisTest {
   public void simpleTest(TestContext should) {
     final Async test = should.async();
 
-    Redis.createClient(rule.vertx(), SocketAddress.inetSocketAddress(7006, "127.0.0.1"))
+    Redis.createClient(rule.vertx(), "redis://localhost:7006")
       .connect(create -> {
         should.assertTrue(create.succeeded());
 
@@ -49,7 +48,7 @@ public class RedisTest {
   public void simpleSelectTest(TestContext should) {
     final Async test = should.async();
 
-    Redis.createClient(rule.vertx(), new RedisOptions().addEndpoint(SocketAddress.inetSocketAddress(7006, "127.0.0.1")).setSelect(0))
+    Redis.createClient(rule.vertx(), new RedisOptions().addEndpoint("redis://localhost:7006/0"))
       .connect(create -> {
         should.assertTrue(create.succeeded());
 
@@ -73,7 +72,7 @@ public class RedisTest {
   public void batchTest(TestContext should) {
     final Async test = should.async();
 
-    Redis.createClient(rule.vertx(), SocketAddress.inetSocketAddress(7006, "127.0.0.1"))
+    Redis.createClient(rule.vertx(), "redis://localhost:7006")
       .connect(create -> {
         should.assertTrue(create.succeeded());
 
@@ -95,7 +94,7 @@ public class RedisTest {
   public void simpleTestAPI(TestContext should) {
     final Async test = should.async();
 
-    Redis.createClient(rule.vertx(), SocketAddress.inetSocketAddress(7006, "127.0.0.1"))
+    Redis.createClient(rule.vertx(), "redis://localhost:7006")
       .connect(create -> {
         should.assertTrue(create.succeeded());
 

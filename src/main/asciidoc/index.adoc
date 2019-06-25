@@ -59,7 +59,7 @@ configured using a {@link io.vertx.redis.client.RedisOptions} data object. By de
 initialized with the following values:
 
 * `netClientOptions`: default is `TcpKeepAlive: true`, `TcpNoDelay: true`
-* `endpoint`: default is `localhost:6379`
+* `endpoint`: default is `redis://localhost:6379`
 * `masterName`: default is `mymaster`
 * `role` default is `MASTER`
 * `slaves` default is `NEVER`
@@ -78,6 +78,23 @@ once a successful connection is established to the server.
 ----
 {@link examples.RedisExamples#example2}
 ----
+
+== Connection String
+
+The client will recognize addresses that follow the expression:
+
+----
+redis://[:password@]host[:port][/db-number]
+----
+
+Or
+
+----
+unix://[:password@]/domain/docker.sock[?select=db-number]
+----
+
+When specifying a password or a database those commands are always executed on connection start.
+
 
 == Running commands
 

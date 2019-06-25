@@ -4,7 +4,6 @@ import io.vertx.core.CompositeFuture;
 import io.vertx.core.Future;
 import io.vertx.core.Promise;
 import io.vertx.core.buffer.Buffer;
-import io.vertx.core.net.SocketAddress;
 import io.vertx.ext.unit.Async;
 import io.vertx.ext.unit.TestContext;
 import io.vertx.ext.unit.junit.RunTestOnContext;
@@ -36,12 +35,12 @@ public class RedisClusterTest {
     .setUseSlave(RedisSlaves.SHARE)
     // we will flood the redis server
     .setMaxWaitingHandlers(128 * 1024)
-    .addEndpoint(SocketAddress.inetSocketAddress(7000, "127.0.0.1"))
-    .addEndpoint(SocketAddress.inetSocketAddress(7001, "127.0.0.1"))
-    .addEndpoint(SocketAddress.inetSocketAddress(7002, "127.0.0.1"))
-    .addEndpoint(SocketAddress.inetSocketAddress(7003, "127.0.0.1"))
-    .addEndpoint(SocketAddress.inetSocketAddress(7004, "127.0.0.1"))
-    .addEndpoint(SocketAddress.inetSocketAddress(7005, "127.0.0.1"));
+    .addEndpoint("redis://127.0.0.1:7000")
+    .addEndpoint("redis://127.0.0.1:7001")
+    .addEndpoint("redis://127.0.0.1:7002")
+    .addEndpoint("redis://127.0.0.1:7003")
+    .addEndpoint("redis://127.0.0.1:7004")
+    .addEndpoint("redis://127.0.0.1:7005");
 
   private static String makeKey() {
     return UUID.randomUUID().toString();
@@ -108,9 +107,9 @@ public class RedisClusterTest {
       .setType(RedisClientType.CLUSTER)
       // we will flood the redis server
       .setMaxWaitingHandlers(128 * 1024)
-      .addEndpoint(SocketAddress.inetSocketAddress(7000, "127.0.0.1"))
-      .addEndpoint(SocketAddress.inetSocketAddress(7002, "127.0.0.1"))
-      .addEndpoint(SocketAddress.inetSocketAddress(7004, "127.0.0.1"));
+      .addEndpoint("redis://127.0.0.1:7000")
+      .addEndpoint("redis://127.0.0.1:7002")
+      .addEndpoint("redis://127.0.0.1:7004");
 
     // we miss add the odd port nodes on purpose
 
@@ -154,7 +153,7 @@ public class RedisClusterTest {
       .setType(RedisClientType.CLUSTER)
       // we will flood the redis server
       .setMaxWaitingHandlers(128 * 1024)
-      .addEndpoint(SocketAddress.inetSocketAddress(7000, "127.0.0.1"));
+      .addEndpoint("redis://127.0.0.1:7000");
 
     // we only provide 1 node
 
@@ -198,7 +197,7 @@ public class RedisClusterTest {
       .setType(RedisClientType.CLUSTER)
       // we will flood the redis server
       .setMaxWaitingHandlers(128 * 1024)
-      .addEndpoint(SocketAddress.inetSocketAddress(7000, "127.0.0.1"));
+      .addEndpoint("redis://127.0.0.1:7000");
 
     List<Future> futures = new ArrayList<>(24);
 
