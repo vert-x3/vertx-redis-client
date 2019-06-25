@@ -1,5 +1,6 @@
 package io.vertx.redis.client.test;
 
+import io.vertx.core.Vertx;
 import io.vertx.ext.unit.Async;
 import io.vertx.ext.unit.TestContext;
 import io.vertx.ext.unit.junit.RunTestOnContext;
@@ -10,6 +11,8 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 
 import java.util.Arrays;
+import java.util.concurrent.atomic.AtomicInteger;
+import java.util.stream.IntStream;
 
 import static io.vertx.redis.client.Command.*;
 import static io.vertx.redis.client.Request.*;
@@ -109,4 +112,38 @@ public class RedisTest {
         });
       });
   }
-}
+
+  @Test
+  public void simpleStream(TestContext should) {
+
+    final AtomicInteger cnt = new AtomicInteger(100);
+    final Async test = should.async();
+    final Vertx vertx = rule.vertx();
+
+    Redis.createClient(vertx, "redis://localhost:7006")
+      .connect(create -> {
+        should.assertTrue(create.succeeded());
+
+        RedisAPI redis = RedisAPI.api(create.result());
+
+        IntStream.range(0, 100).forEach(i -> {
+          vertx.setTimer(1, timerid -> {
+            redis.set(Arrays.asList("foo", "bar"), res -> {
+            });
+
+            // EXPECTED NULL
+            redis.get("redis_test", res -> {
+              if (res.failed()) {
+                should.fail(res.cause());
+              } else {
+                should.assertNull(res.result());
+              }
+              if (cnt.decrementAndGet() == 0) {
+                test.complete();
+              }
+            });
+          });
+        });
+      });
+  }
+  }

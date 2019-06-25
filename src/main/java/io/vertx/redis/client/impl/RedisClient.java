@@ -243,9 +243,10 @@ public class RedisClient implements Redis, ParserHandler {
     try {
       // encode the message to a buffer
       final Buffer message = ((RequestImpl) request).encode();
-      // write to the socket
-      waiting.offer(handler);
-      netSocket.write(message);
+      netSocket.write(message, write -> {
+        // write to the socket
+        waiting.offer(handler);
+      });
     } catch (RuntimeException e) {
       fail(e);
     }
