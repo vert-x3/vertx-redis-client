@@ -31,7 +31,7 @@ public class RedisTest {
       .connect(create -> {
         should.assertTrue(create.succeeded());
 
-        final Redis redis = create.result();
+        final RedisConnection redis = create.result();
 
         redis.exceptionHandler(ex -> {
 
@@ -55,7 +55,7 @@ public class RedisTest {
       .connect(create -> {
         should.assertTrue(create.succeeded());
 
-        final Redis redis = create.result();
+        final RedisConnection redis = create.result();
 
         redis.exceptionHandler(ex -> {
 
@@ -79,7 +79,7 @@ public class RedisTest {
       .connect(create -> {
         should.assertTrue(create.succeeded());
 
-        final Redis redis = create.result();
+        final RedisConnection redis = create.result();
 
         redis.batch(Arrays.asList(
           cmd(MULTI),

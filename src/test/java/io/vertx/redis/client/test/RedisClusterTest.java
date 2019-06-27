@@ -55,7 +55,7 @@ public class RedisClusterTest {
     final Async test = should.async();
     Redis.createClient(rule.vertx(), options).connect(onCreate -> {
       should.assertTrue(onCreate.succeeded());
-      final Redis cluster = onCreate.result();
+      final RedisConnection cluster = onCreate.result();
       cluster.send(cmd(FLUSHDB), flushDB -> {
         should.assertTrue(flushDB.succeeded());
         test.complete();
@@ -71,7 +71,7 @@ public class RedisClusterTest {
       .connect(onCreate -> {
         should.assertTrue(onCreate.succeeded());
 
-        final Redis cluster = onCreate.result();
+        final RedisConnection cluster = onCreate.result();
         cluster.exceptionHandler(should::fail);
 
         final int len = (int) Math.pow(2, 17);
@@ -117,7 +117,7 @@ public class RedisClusterTest {
       .connect(onCreate -> {
         should.assertTrue(onCreate.succeeded());
 
-        final Redis cluster = onCreate.result();
+        final RedisConnection cluster = onCreate.result();
         cluster.exceptionHandler(should::fail);
 
         final int len = (int) Math.pow(2, 17);
@@ -161,7 +161,7 @@ public class RedisClusterTest {
       .connect(onCreate -> {
         should.assertTrue(onCreate.succeeded());
 
-        final Redis cluster = onCreate.result();
+        final RedisConnection cluster = onCreate.result();
         cluster.exceptionHandler(should::fail);
 
         final int len = (int) Math.pow(2, 17);
@@ -212,7 +212,7 @@ public class RedisClusterTest {
       should.assertFalse(all.failed());
 
       final Random rnd = new Random();
-      final List<Redis> clients = all.result().list();
+      final List<RedisConnection> clients = all.result().list();
       // ensure we fail on client error
       clients.forEach(client -> client.exceptionHandler(should::fail));
 
@@ -254,7 +254,7 @@ public class RedisClusterTest {
       .connect(onCreate -> {
         should.assertTrue(onCreate.succeeded());
 
-        final Redis cluster = onCreate.result();
+        final RedisConnection cluster = onCreate.result();
         cluster.exceptionHandler(should::fail);
 
         cluster.send(cmd(HSET).arg("testKey").arg("field1").arg("Hello"), hset1 -> {
@@ -286,7 +286,7 @@ public class RedisClusterTest {
       .connect(onCreate -> {
         should.assertTrue(onCreate.succeeded());
 
-        final Redis cluster = onCreate.result();
+        final RedisConnection cluster = onCreate.result();
         cluster.exceptionHandler(should::fail);
 
         cluster.send(cmd(DEL).arg(key), del -> {
@@ -320,7 +320,7 @@ public class RedisClusterTest {
       .connect(onCreate -> {
         should.assertTrue(onCreate.succeeded());
 
-        final Redis cluster = onCreate.result();
+        final RedisConnection cluster = onCreate.result();
         cluster.exceptionHandler(should::fail);
 
         cluster.send(cmd(SET).arg(key).arg("foobar"), set -> {
@@ -357,7 +357,7 @@ public class RedisClusterTest {
       .connect(onCreate -> {
         should.assertTrue(onCreate.succeeded());
 
-        final Redis cluster = onCreate.result();
+        final RedisConnection cluster = onCreate.result();
         cluster.exceptionHandler(should::fail);
 
         cluster.send(cmd(SET).arg(key1).arg("foobar"), set1 -> {
@@ -388,7 +388,7 @@ public class RedisClusterTest {
       .connect(onCreate -> {
         should.assertTrue(onCreate.succeeded());
 
-        final Redis cluster = onCreate.result();
+        final RedisConnection cluster = onCreate.result();
         cluster.exceptionHandler(should::fail);
 
         cluster.send(cmd(DEL).arg(list1), del1 -> {
@@ -425,7 +425,7 @@ public class RedisClusterTest {
       .connect(onCreate -> {
         should.assertTrue(onCreate.succeeded());
 
-        final Redis cluster = onCreate.result();
+        final RedisConnection cluster = onCreate.result();
         cluster.exceptionHandler(should::fail);
 
         cluster.send(cmd(SET).arg(key).arg(Buffer.buffer(value1)), set1 -> {
@@ -460,7 +460,7 @@ public class RedisClusterTest {
       .connect(onCreate -> {
         should.assertTrue(onCreate.succeeded());
 
-        final Redis cluster = onCreate.result();
+        final RedisConnection cluster = onCreate.result();
         cluster.exceptionHandler(should::fail);
 
         cluster.send(cmd(DEL).arg(list1), del1 -> {
@@ -492,7 +492,7 @@ public class RedisClusterTest {
       .connect(onCreate -> {
         should.assertTrue(onCreate.succeeded());
 
-        final Redis cluster = onCreate.result();
+        final RedisConnection cluster = onCreate.result();
         cluster.exceptionHandler(should::fail);
 
         cluster.send(cmd(SET).arg(key).arg(10), set -> {
@@ -516,7 +516,7 @@ public class RedisClusterTest {
       .connect(onCreate -> {
         should.assertTrue(onCreate.succeeded());
 
-        final Redis cluster = onCreate.result();
+        final RedisConnection cluster = onCreate.result();
         cluster.exceptionHandler(should::fail);
 
         cluster.send(cmd(SET).arg(key).arg(10), set -> {
@@ -541,7 +541,7 @@ public class RedisClusterTest {
       .connect(onCreate -> {
         should.assertTrue(onCreate.succeeded());
 
-        final Redis cluster = onCreate.result();
+        final RedisConnection cluster = onCreate.result();
         cluster.exceptionHandler(should::fail);
 
         cluster.send(cmd(SET).arg(key1).arg("Hello"), set1 -> {
@@ -568,7 +568,7 @@ public class RedisClusterTest {
       .connect(onCreate -> {
         should.assertTrue(onCreate.succeeded());
 
-        final Redis cluster = onCreate.result();
+        final RedisConnection cluster = onCreate.result();
         cluster.exceptionHandler(should::fail);
 
         cluster.send(cmd(ECHO).arg("Hello Wordl"), echo -> {
@@ -591,7 +591,7 @@ public class RedisClusterTest {
       .connect(onCreate -> {
         should.assertTrue(onCreate.succeeded());
 
-        final Redis cluster = onCreate.result();
+        final RedisConnection cluster = onCreate.result();
         cluster.exceptionHandler(should::fail);
 
         cluster.send(cmd(SET).arg(key1).arg("Hello"), set -> {
@@ -625,7 +625,7 @@ public class RedisClusterTest {
       .connect(onCreate -> {
         should.assertTrue(onCreate.succeeded());
 
-        final Redis cluster = onCreate.result();
+        final RedisConnection cluster = onCreate.result();
         cluster.exceptionHandler(should::fail);
 
         cluster.send(cmd(SET).arg(key).arg("Hello"), set1 -> {
@@ -664,7 +664,7 @@ public class RedisClusterTest {
       .connect(onCreate -> {
         should.assertTrue(onCreate.succeeded());
 
-        final Redis cluster = onCreate.result();
+        final RedisConnection cluster = onCreate.result();
         cluster.exceptionHandler(should::fail);
 
         cluster.send(cmd(SET).arg(key).arg("Hello"), set1 -> {
@@ -701,7 +701,7 @@ public class RedisClusterTest {
       .connect(onCreate -> {
         should.assertTrue(onCreate.succeeded());
 
-        final Redis cluster = onCreate.result();
+        final RedisConnection cluster = onCreate.result();
 
         cluster.exceptionHandler(should::fail);
 
@@ -729,7 +729,7 @@ public class RedisClusterTest {
     Redis.createClient(rule.vertx(), options).connect(onCreate -> {
       should.assertTrue(onCreate.succeeded());
 
-      final Redis cluster = onCreate.result();
+      final RedisConnection cluster = onCreate.result();
       cluster.exceptionHandler(should::fail);
 
       final long len = (long) Math.pow(2, 17);
@@ -756,7 +756,7 @@ public class RedisClusterTest {
     Redis.createClient(rule.vertx(), options).connect(onCreate -> {
       should.assertTrue(onCreate.succeeded());
 
-      final Redis cluster = onCreate.result();
+      final RedisConnection cluster = onCreate.result();
       cluster.exceptionHandler(should::fail);
 
       final int len = (int) Math.pow(2, 17);
@@ -788,7 +788,7 @@ public class RedisClusterTest {
     Redis.createClient(rule.vertx(), options).connect(onCreate -> {
       should.assertTrue(onCreate.succeeded());
 
-      final Redis cluster = onCreate.result();
+      final RedisConnection cluster = onCreate.result();
       cluster.exceptionHandler(should::fail);
 
       cluster.send(cmd(MSET).arg("1").arg("1").arg("2").arg("2").arg("3").arg("3").arg("key").arg("value"), mset -> {
@@ -809,7 +809,7 @@ public class RedisClusterTest {
     Redis.createClient(rule.vertx(), options).connect(onCreate -> {
       should.assertTrue(onCreate.succeeded());
 
-      final Redis cluster = onCreate.result();
+      final RedisConnection cluster = onCreate.result();
       cluster.exceptionHandler(should::fail);
 
       cluster.send(cmd(SET).arg("key1").arg("Hello"), set1 -> {

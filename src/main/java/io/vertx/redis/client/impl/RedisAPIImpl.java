@@ -21,10 +21,10 @@ import io.vertx.redis.client.*;
 
 public class RedisAPIImpl implements RedisAPI {
 
-  private final Redis client;
+  private final RedisConnection connection;
 
-  public RedisAPIImpl(Redis client) {
-    this.client = client;
+  public RedisAPIImpl(RedisConnection connection) {
+    this.connection = connection;
   }
 
   @Override
@@ -42,7 +42,7 @@ public class RedisAPIImpl implements RedisAPI {
       }
     }
 
-    client.send(req, promise);
+    connection.send(req, promise);
     return promise.future();
   }
 }

@@ -36,7 +36,7 @@ import java.util.stream.Collectors;
 import static io.vertx.redis.client.Command.*;
 import static io.vertx.redis.client.Request.cmd;
 
-public class RedisClusterClient implements Redis {
+public class RedisClusterClient implements Redis, RedisConnection {
 
   // number of attempts/redirects when we get connection errors
   // or when we get MOVED/ASK responses
@@ -135,8 +135,8 @@ public class RedisClusterClient implements Redis {
   private final RedisOptions options;
 
   // mutable state
-  private final Map<String, Redis> connections = new HashMap<>();
-  private final Redis[][] slots = new Redis[16384][];
+  private final Map<String, RedisConnection> connections = new HashMap<>();
+  private final RedisConnection[][] slots = new RedisConnection[16384][];
 
   private Handler<Throwable> onException = t -> LOG.error("Unhandled Error", t);
 
@@ -151,7 +151,7 @@ public class RedisClusterClient implements Redis {
   }
 
   @Override
-  public Redis connect(Handler<AsyncResult<Redis>> onCreate) {
+  public Redis connect(Handler<AsyncResult<RedisConnection>> onCreate) {
     // for each endpoint open a client
     final List<String> endpoints = options.getEndpoints();
 
@@ -194,25 +194,25 @@ public class RedisClusterClient implements Redis {
   }
 
   @Override
-  public Redis exceptionHandler(Handler<Throwable> handler) {
+  public RedisConnection exceptionHandler(Handler<Throwable> handler) {
     this.onException = handler;
     return this;
   }
 
   @Override
-  public Redis endHandler(Handler<Void> handler) {
+  public RedisConnection endHandler(Handler<Void> handler) {
     this.onEnd = handler;
     return this;
   }
 
   @Override
-  public Redis handler(Handler<Response> handler) {
+  public RedisConnection handler(Handler<Response> handler) {
     this.onMessage = handler;
     return this;
   }
 
   @Override
-  public Redis pause() {
+  public RedisConnection pause() {
     this.connections.values().forEach(conn -> {
       if (conn != null) {
         conn.pause();
@@ -222,7 +222,7 @@ public class RedisClusterClient implements Redis {
   }
 
   @Override
-  public Redis resume() {
+  public RedisConnection resume() {
     this.connections.values().forEach(conn -> {
       if (conn != null) {
         conn.resume();
@@ -232,7 +232,7 @@ public class RedisClusterClient implements Redis {
   }
 
   @Override
-  public Redis send(Request request, Handler<AsyncResult<Response>> handler) {
+  public RedisConnection send(Request request, Handler<AsyncResult<Response>> handler) {
     // process commands for cluster mode
     final RequestImpl req = (RequestImpl) request;
     final Command cmd = req.command();
@@ -261,7 +261,7 @@ public class RedisClusterClient implements Redis {
 
       for (int i = 1; i <= slotNumber; i++) {
 
-        Redis[] clients = slots[(slots.length / slotNumber - 1) * i];
+        RedisConnection[] clients = slots[(slots.length / slotNumber - 1) * i];
 
         final Promise<Response> p = Promise.promise();
         send(selectMasterOrSlave(req.command().isReadOnly(), clients), options, RETRIES, req, p);
@@ -406,7 +406,7 @@ public class RedisClusterClient implements Redis {
   }
 
   @Override
-  public Redis batch(List<Request> requests, Handler<AsyncResult<List<Response>>> handler) {
+  public RedisConnection batch(List<Request> requests, Handler<AsyncResult<List<Response>>> handler) {
     int currentSlot = -1;
     boolean readOnly = false;
 
@@ -487,7 +487,7 @@ public class RedisClusterClient implements Redis {
   }
 
   @Override
-  public Redis fetch(long amount) {
+  public RedisConnection fetch(long amount) {
     this.connections.values().forEach(conn -> {
       if (conn != null) {
         conn.fetch(amount);
@@ -500,9 +500,9 @@ public class RedisClusterClient implements Redis {
   /**
    * Get a Redis client via the connection cache (one per host)
    */
-  private void getClient(String address, RedisOptions options, Handler<AsyncResult<Redis>> onClient) {
+  private void getClient(String address, RedisOptions options, Handler<AsyncResult<RedisConnection>> onClient) {
 
-    Redis cli = connections.get(address);
+    RedisConnection cli = connections.get(address);
 
     // already have a connection to this client, return that
     if (cli != null) {
@@ -516,7 +516,7 @@ public class RedisClusterClient implements Redis {
         return;
       }
 
-      final Redis conn = create.result();
+      final RedisConnection conn = create.result();
 
       conn.exceptionHandler(t -> {
         // broken connection so force a new client to be created
@@ -570,7 +570,7 @@ public class RedisClusterClient implements Redis {
     final Runnable tryClient = new Runnable() {
       @Override
       public void run() {
-        final Redis conn = getRandomConnection(exclude);
+        final RedisConnection conn = getRandomConnection(exclude);
         if (conn == null) {
           // no more clients available
           handler.handle(Future.failedFuture(ErrorType.create("SLOTS No client's available.")));
@@ -654,8 +654,8 @@ public class RedisClusterClient implements Redis {
   /**
    * Get a random Redis connection
    */
-  private Redis getRandomConnection(Set<String> exclude) {
-    List<Redis> available = connections.entrySet().stream()
+  private RedisConnection getRandomConnection(Set<String> exclude) {
+    List<RedisConnection> available = connections.entrySet().stream()
       .filter(kv -> !exclude.contains(kv.getKey()) && kv.getValue() != null)
       .map(Map.Entry::getValue)
       .collect(Collectors.toList());
@@ -670,7 +670,7 @@ public class RedisClusterClient implements Redis {
 
   private void loadSlot(int start, int end, List<String> addresses, RedisOptions options, Handler<Void> onLoad) {
     // temporal holder for the loaded connections
-    final Redis[] connections = new Redis[addresses.size()];
+    final RedisConnection[] connections = new RedisConnection[addresses.size()];
     final AtomicInteger counter = new AtomicInteger(addresses.size());
 
     final Handler<Void> done = v -> {
@@ -696,8 +696,8 @@ public class RedisClusterClient implements Redis {
           done.handle(null);
         } else {
           if (RedisSlaves.NEVER != options.getUseSlave()) {
-            final Redis client = getClient.result();
-            client.send(cmd(READONLY), send -> {
+            final RedisConnection connection = getClient.result();
+            connection.send(cmd(READONLY), send -> {
               if (send.succeeded()) {
                 connections[idx] = getClient.result();
               }
@@ -712,9 +712,9 @@ public class RedisClusterClient implements Redis {
     }
   }
 
-  private void send(final Redis client, final RedisOptions options, final int retries, Request command, Handler<AsyncResult<Response>> handler) {
+  private void send(final RedisConnection connection, final RedisOptions options, final int retries, Request command, Handler<AsyncResult<Response>> handler) {
         
-    if (client == null) {
+    if (connection == null) {
       try {
         handler.handle(Future.failedFuture("No connection available."));
       } catch (RuntimeException e) {
@@ -723,7 +723,7 @@ public class RedisClusterClient implements Redis {
       return;
     }
 
-    client.send(command, send -> {
+    connection.send(command, send -> {
       if (send.failed() && send.cause() instanceof ErrorType && retries >= 0) {
         final ErrorType cause = (ErrorType) send.cause();
 
@@ -773,7 +773,7 @@ public class RedisClusterClient implements Redis {
         if (cause.is("TRYAGAIN") || cause.is("CLUSTERDOWN")) {
           // TRYAGAIN response or cluster down, retry with backoff up to 1280ms
           long backoff = (long) (Math.pow(2, 16 - Math.max(retries, 9)) * 10);
-          vertx.setTimer(backoff, t -> send(client, options, retries - 1, command, handler));
+          vertx.setTimer(backoff, t -> send(connection, options, retries - 1, command, handler));
           return;
         }
       }
@@ -786,9 +786,9 @@ public class RedisClusterClient implements Redis {
     });
   }
 
-  private void batch(final Redis client, final RedisOptions options, final int retries, List<Request> commands, Handler<AsyncResult<List<Response>>> handler) {
+  private void batch(final RedisConnection connection, final RedisOptions options, final int retries, List<Request> commands, Handler<AsyncResult<List<Response>>> handler) {
 
-    if (client == null) {
+    if (connection == null) {
       try {
         handler.handle(Future.failedFuture("No connection available."));
       } catch (RuntimeException e) {
@@ -797,7 +797,7 @@ public class RedisClusterClient implements Redis {
       return;
     }
 
-    client.batch(commands, send -> {
+    connection.batch(commands, send -> {
       if (send.failed() && send.cause() instanceof ErrorType && retries >= 0) {
         final ErrorType cause = (ErrorType) send.cause();
 
@@ -847,7 +847,7 @@ public class RedisClusterClient implements Redis {
         if (cause.is("TRYAGAIN") || cause.is("CLUSTERDOWN")) {
           // TRYAGAIN response or cluster down, retry with backoff up to 1280ms
           long backoff = (long) (Math.pow(2, 16 - Math.max(retries, 9)) * 10);
-          vertx.setTimer(backoff, t -> batch(client, options, retries - 1, commands, handler));
+          vertx.setTimer(backoff, t -> batch(connection, options, retries - 1, commands, handler));
           return;
         }
       }
@@ -863,14 +863,14 @@ public class RedisClusterClient implements Redis {
   /**
    * Select a Redis client for the given key
    */
-  private Redis selectClient(int keySlot, boolean readOnly) {
+  private RedisConnection selectClient(int keySlot, boolean readOnly) {
     // this command doesn't have keys, return any connection
     // NOTE: this means slaves may be used for no key commands regardless of slave config
     if (keySlot == -1) {
       return getRandomConnection(Collections.emptySet());
     }
 
-    Redis[] clients = slots[keySlot];
+    RedisConnection[] clients = slots[keySlot];
 
     // if we haven't got config for this slot, try any connection
     if (clients == null || clients.length == 0) {
@@ -879,7 +879,7 @@ public class RedisClusterClient implements Redis {
     return selectMasterOrSlave(readOnly, clients);
   }
 
-  private Redis selectMasterOrSlave(boolean readOnly, Redis[] clients) {
+  private RedisConnection selectMasterOrSlave(boolean readOnly, RedisConnection[] clients) {
     int index = 0;
 
     // always, never, share

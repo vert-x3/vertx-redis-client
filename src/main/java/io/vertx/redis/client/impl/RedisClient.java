@@ -29,7 +29,7 @@ import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 
-public class RedisClient implements Redis, ParserHandler {
+public class RedisClient implements Redis, RedisConnection, ParserHandler {
 
   private static final Logger LOG = LoggerFactory.getLogger(RedisClient.class);
 
@@ -43,13 +43,13 @@ public class RedisClient implements Redis, ParserHandler {
     return new RedisClient(vertx, options, address);
   }
 
-  private static void authenticate(Redis client, String password, Handler<AsyncResult<Void>> handler) {
+  private static void authenticate(RedisConnection connection, String password, Handler<AsyncResult<Void>> handler) {
     if (password == null) {
       handler.handle(Future.succeededFuture());
       return;
     }
     // perform authentication
-    client.send(Request.cmd(Command.AUTH).arg(password), auth -> {
+    connection.send(Request.cmd(Command.AUTH).arg(password), auth -> {
       if (auth.failed()) {
         handler.handle(Future.failedFuture(auth.cause()));
       } else {
@@ -58,13 +58,13 @@ public class RedisClient implements Redis, ParserHandler {
     });
   }
 
-  private static void select(Redis client, Integer select, Handler<AsyncResult<Void>> handler) {
+  private static void select(RedisConnection connection, Integer select, Handler<AsyncResult<Void>> handler) {
     if (select == null) {
       handler.handle(Future.succeededFuture());
       return;
     }
     // perform select
-    client.send(Request.cmd(Command.SELECT).arg(select), auth -> {
+    connection.send(Request.cmd(Command.SELECT).arg(select), auth -> {
       if (auth.failed()) {
         handler.handle(Future.failedFuture(auth.cause()));
       } else {
@@ -101,7 +101,7 @@ public class RedisClient implements Redis, ParserHandler {
   }
 
   @Override
-  public Redis connect(Handler<AsyncResult<Redis>> onConnect) {
+  public Redis connect(Handler<AsyncResult<RedisConnection>> onConnect) {
 
     if (connected) {
       onConnect.handle(Future.succeededFuture(this));
@@ -178,37 +178,37 @@ public class RedisClient implements Redis, ParserHandler {
   }
 
   @Override
-  public Redis exceptionHandler(Handler<Throwable> handler) {
+  public RedisConnection exceptionHandler(Handler<Throwable> handler) {
     this.onException = handler;
     return this;
   }
 
   @Override
-  public Redis endHandler(Handler<Void> handler) {
+  public RedisConnection endHandler(Handler<Void> handler) {
     this.onEnd = handler;
     return this;
   }
 
   @Override
-  public Redis handler(Handler<Response> handler) {
+  public RedisConnection handler(Handler<Response> handler) {
     this.onMessage = handler;
     return this;
   }
 
   @Override
-  public Redis pause() {
+  public RedisConnection pause() {
     netSocket.pause();
     return this;
   }
 
   @Override
-  public Redis resume() {
+  public RedisConnection resume() {
     netSocket.resume();
     return this;
   }
 
   @Override
-  public Redis fetch(long size) {
+  public RedisConnection fetch(long size) {
     // no-op
     return this;
   }
@@ -228,7 +228,7 @@ public class RedisClient implements Redis, ParserHandler {
   }
 
   @Override
-  public Redis send(final Request request, Handler<AsyncResult<Response>> handler) {
+  public RedisConnection send(final Request request, Handler<AsyncResult<Response>> handler) {
     if (!connected) {
       // this avoids entering the socket exception handler as it is well known
       // that the transport is broken.
@@ -254,7 +254,7 @@ public class RedisClient implements Redis, ParserHandler {
   }
 
   @Override
-  public Redis batch(List<Request> commands, Handler<AsyncResult<List<Response>>> handler) {
+  public RedisConnection batch(List<Request> commands, Handler<AsyncResult<List<Response>>> handler) {
     if (waiting.freeSlots() < commands.size()) {
       handler.handle(Future.failedFuture("Redis waiting Queue is full"));
       return this;

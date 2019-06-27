@@ -30,7 +30,7 @@ import java.util.Random;
 import static io.vertx.redis.client.Command.*;
 import static io.vertx.redis.client.Request.cmd;
 
-public class RedisSentinelClient implements Redis {
+public class RedisSentinelClient implements Redis, RedisConnection {
 
   // We don't need to be secure, we just want so simple
   // randomization to avoid picking the same slave all the time
@@ -51,7 +51,7 @@ public class RedisSentinelClient implements Redis {
   private final Vertx vertx;
   private final RedisOptions options;
 
-  private Redis sentinel;
+  private RedisConnection sentinel;
   private RedisClient redis;
 
   private RedisSentinelClient(Vertx vertx, RedisOptions options) {
@@ -60,7 +60,7 @@ public class RedisSentinelClient implements Redis {
   }
 
   @Override
-  public Redis connect(Handler<AsyncResult<Redis>> onCreate) {
+  public Redis connect(Handler<AsyncResult<RedisConnection>> onCreate) {
     // sentinel (HA) requires 2 connections, one to watch for sentinel events and the connection itself
     createClientInternal(vertx, options, RedisRole.SENTINEL, create -> {
       if (create.failed()) {
@@ -118,43 +118,43 @@ public class RedisSentinelClient implements Redis {
   }
 
   @Override
-  public Redis exceptionHandler(Handler<Throwable> handler) {
+  public RedisConnection exceptionHandler(Handler<Throwable> handler) {
     redis.exceptionHandler(handler);
     return this;
   }
 
   @Override
-  public Redis endHandler(Handler<Void> handler) {
+  public RedisConnection endHandler(Handler<Void> handler) {
     redis.endHandler(handler);
     return this;
   }
 
   @Override
-  public Redis handler(Handler<Response> handler) {
+  public RedisConnection handler(Handler<Response> handler) {
     redis.handler(handler);
     return this;
   }
 
   @Override
-  public Redis pause() {
+  public RedisConnection pause() {
     redis.pause();
     return this;
   }
 
   @Override
-  public Redis resume() {
+  public RedisConnection resume() {
     redis.resume();
     return null;
   }
 
   @Override
-  public Redis send(Request command, Handler<AsyncResult<Response>> handler) {
+  public RedisConnection send(Request command, Handler<AsyncResult<Response>> handler) {
     redis.send(command, handler);
     return this;
   }
 
   @Override
-  public Redis batch(List<Request> commands, Handler<AsyncResult<List<Response>>> handler) {
+  public RedisConnection batch(List<Request> commands, Handler<AsyncResult<List<Response>>> handler) {
     redis.batch(commands, handler);
     return this;
   }
@@ -165,7 +165,7 @@ public class RedisSentinelClient implements Redis {
   }
 
   @Override
-  public Redis fetch(long amount) {
+  public RedisConnection fetch(long amount) {
     redis.fetch(amount);
     return this;
   }
@@ -174,7 +174,7 @@ public class RedisSentinelClient implements Redis {
     return new RedisSentinelClient(vertx, options);
   }
 
-  private static void createClientInternal(Vertx vertx, RedisOptions options, RedisRole role, Handler<AsyncResult<Redis>> onCreate) {
+  private static void createClientInternal(Vertx vertx, RedisOptions options, RedisRole role, Handler<AsyncResult<RedisConnection>> onCreate) {
 
     final Handler<AsyncResult<String>> createAndConnect = resolve -> {
       if (resolve.failed()) {
@@ -253,7 +253,7 @@ public class RedisSentinelClient implements Redis {
         return;
       }
 
-      final Redis conn = onCreate.result();
+      final RedisConnection conn = onCreate.result();
 
       // Send a command just to check we have a working node
       conn.send(cmd(PING), info -> {
@@ -275,7 +275,7 @@ public class RedisSentinelClient implements Redis {
         return;
       }
 
-      final Redis conn = onCreate.result();
+      final RedisConnection conn = onCreate.result();
       final String masterName = options.getMasterName();
 
       // Send a command just to check we have a working node
@@ -304,7 +304,7 @@ public class RedisSentinelClient implements Redis {
         return;
       }
 
-      final Redis conn = onCreate.result();
+      final RedisConnection conn = onCreate.result();
       final String masterName = options.getMasterName();
 
       // Send a command just to check we have a working node
