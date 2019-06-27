@@ -20,8 +20,6 @@ import io.vertx.core.logging.Logger;
 import io.vertx.core.logging.LoggerFactory;
 import io.vertx.core.net.SocketAddress;
 import io.vertx.redis.client.*;
-import io.vertx.redis.client.Redis;
-import io.vertx.redis.client.RedisOptions;
 import io.vertx.redis.client.impl.types.ErrorType;
 import io.vertx.redis.client.impl.types.IntegerType;
 import io.vertx.redis.client.impl.types.MultiType;
@@ -590,7 +588,18 @@ public class RedisClusterClient implements Redis {
       final int idx = i;
       final SocketAddress address = addresses.get(idx);
 
-      getClient(address, options, getClient -> {
+      final Future<Redis> getClientFuture = Future.future();
+      getClient(address, options, getClientFuture);
+
+      getClientFuture.compose(getClient -> {
+        if (RedisSlaves.NEVER != options.getUseSlave()) {
+          final Future<Response> readOnlyFuture = Future.future();
+          getClient.send(cmd(READONLY), readOnlyFuture);
+          return readOnlyFuture.map(getClient);
+        } else {
+          return Future.succeededFuture(getClient);
+        }
+      }).setHandler(getClient -> {
         // we don't care if we can't get a client, in this case the client is ignored
         if (getClient.failed()) {
           LOG.warn("Could not get a connection to node [" + address + "]");
