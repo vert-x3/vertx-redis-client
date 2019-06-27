@@ -672,6 +672,19 @@ public class RedisClusterClient implements Redis {
     // temporal holder for the loaded connections
     final Redis[] connections = new Redis[addresses.size()];
     final AtomicInteger counter = new AtomicInteger(addresses.size());
+
+    final Handler<Void> done = v -> {
+      // end condition
+      if (counter.decrementAndGet() == 0) {
+        // update the slot table
+        for (int j = start; j <= end; j++) {
+          slots[j] = connections;
+        }
+        // notify
+        onLoad.handle(null);
+      }
+    };
+
     for (int i = 0; i < addresses.size(); i++) {
       final int idx = i;
       final String address = addresses.get(idx);
@@ -680,17 +693,20 @@ public class RedisClusterClient implements Redis {
         // we don't care if we can't get a client, in this case the client is ignored
         if (getClient.failed()) {
           LOG.warn("Could not get a connection to node [" + address + "]");
+          done.handle(null);
         } else {
-          connections[idx] = getClient.result();
-        }
-        // end condition
-        if (counter.decrementAndGet() == 0) {
-          // update the slot table
-          for (int j = start; j <= end; j++) {
-            slots[j] = connections;
+          if (RedisSlaves.NEVER != options.getUseSlave()) {
+            final Redis client = getClient.result();
+            client.send(cmd(READONLY), send -> {
+              if (send.succeeded()) {
+                connections[idx] = getClient.result();
+              }
+              done.handle(null);
+            });
+          } else {
+            connections[idx] = getClient.result();
+            done.handle(null);
           }
-          // notify
-          onLoad.handle(null);
         }
       });
     }
