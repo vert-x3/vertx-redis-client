@@ -49,6 +49,43 @@ public class RedisClusterTest {
     return params;
   }
 
+  @Test(timeout = 10_000)
+  public void testBatchSingleKeyRequests(TestContext should) {
+    Redis.createClient(rule.vertx(), options)
+      .connect(should.asyncAssertSuccess(cluster -> {
+        cluster.exceptionHandler(should::fail);
+
+        cluster.batch(Arrays.asList(
+          Request.cmd(MULTI),
+          Request.cmd(INCR).arg("test-batch-key"),
+          Request.cmd(EXPIRE).arg("test-batch-key").arg(1),
+          Request.cmd(EXEC)
+        ), should.asyncAssertSuccess(responses -> {
+          // one response for each batched request
+          should.assertEquals(responses.size(), 4);
+          // final EXEC yields all data from INCR and EXPIRE
+          final Response execResponse = responses.get(3);
+          should.assertEquals(execResponse.get(0).toInteger(), 1);
+          should.assertEquals(execResponse.get(1).toInteger(), 1);
+        }));
+      }));
+  }
+
+  @Test(timeout = 10_000)
+  public void testCannotBatchSingleKeyCommandsWithDifferentKeys(TestContext should) {
+    Redis.createClient(rule.vertx(), options)
+      .connect(should.asyncAssertSuccess(cluster -> {
+        cluster.exceptionHandler(should::fail);
+
+        cluster.batch(Arrays.asList(
+          Request.cmd(MULTI),
+          Request.cmd(INCR).arg("test-batch-key"),
+          Request.cmd(INCR).arg("other-batch-key"),
+          Request.cmd(EXEC)
+        ), should.asyncAssertFailure());
+      }));
+  }
+
   @Test(timeout = 30_000)
   public void runTheSlotScope(TestContext should) {
     final Async test = should.async();
