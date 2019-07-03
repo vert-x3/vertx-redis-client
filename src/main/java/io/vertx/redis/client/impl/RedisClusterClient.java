@@ -382,7 +382,13 @@ public class RedisClusterClient implements Redis {
 
       // last option the command is single key
       int start = cmd.getFirstKey() - 1;
-      if (currentSlot != ZModem.generate(args.get(start))) {
+      final int slot = ZModem.generate(args.get(start));
+      // we are checking the first request key
+      if (currentSlot == -1) {
+        currentSlot = slot;
+        continue;
+      }
+      if (currentSlot != slot) {
         // in cluster mode we currently do not handle batching commands which keys are not on the same slot
         handler.handle(Future.failedFuture("RedisClusterClient does not handle batching commands with keys across different slots. TODO: Split the command into slots and then batch."));
         return this;
