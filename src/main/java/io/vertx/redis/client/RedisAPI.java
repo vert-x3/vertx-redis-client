@@ -36,6 +36,8 @@ public interface RedisAPI {
     return new RedisAPIImpl(client);
   }
 
+  void close();
+
   /**
    * Redis command <a href="https://redis.io/commands/append">append</a>.
    * @return fluent self

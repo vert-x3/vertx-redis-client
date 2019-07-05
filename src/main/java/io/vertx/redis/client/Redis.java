@@ -29,26 +29,38 @@ import io.vertx.redis.client.impl.RedisSentinelClient;
 public interface Redis {
 
   /**
-   * Connect to redis, the {@code onConnect} will get the {@link Redis} instance.
-   *
-   * This connection will use the default options which are connect
-   * to a standalone server on the default port on "localhost".
+   * Create a new redis client using the default client options.
+   * @param vertx the vertx instance
+   * @return the client
    */
-  static Redis createClient(Vertx vertx, String address) {
-    return createClient(vertx, new RedisOptions().setEndpoint(address));
+  static Redis createClient(Vertx vertx) {
+    return createClient(vertx, new RedisOptions());
   }
 
   /**
-   * Connect to redis, the {@code onConnect} will get the {@link Redis} instance.
+   * Create a new redis client using the default client options.
+   * @param endpoint the server address to connect to
+   * @param vertx the vertx instance
+   * @return the client
+   */
+  static Redis createClient(Vertx vertx, String endpoint) {
+    return createClient(vertx, new RedisOptions().setEndpoint(endpoint));
+  }
+
+  /**
+   * Create a new redis client using the given client options.
+   * @param vertx the vertx instance
+   * @param options the user provided options
+   * @return the client
    */
   static Redis createClient(Vertx vertx, RedisOptions options) {
     switch (options.getType()) {
       case STANDALONE:
-        return RedisClient.create(vertx, options);
+        return new RedisClient(vertx, options);
       case SENTINEL:
-        return RedisSentinelClient.create(vertx, options);
+        return new RedisSentinelClient(vertx, options);
       case CLUSTER:
-        return RedisClusterClient.create(vertx, options);
+        return new RedisClusterClient(vertx, options);
       default:
         throw new IllegalStateException("Unknown Redis Client type: " + options.getType());
     }
@@ -73,4 +85,9 @@ public interface Redis {
     connect(promise);
     return promise.future();
   }
+
+  /**
+   * Closes the client and terminates any connection.
+   */
+  void close();
 }

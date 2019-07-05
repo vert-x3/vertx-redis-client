@@ -19,10 +19,7 @@ import io.vertx.codegen.annotations.DataObject;
 import io.vertx.core.json.JsonObject;
 import io.vertx.core.net.NetClientOptions;
 
-import java.net.URI;
-import java.net.URISyntaxException;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -44,6 +41,7 @@ public class RedisOptions {
   // pool related options
   private int poolCleanerInterval;
   private int maxPoolSize;
+  private int maxPoolWaiting;
 
   private void init() {
     netClientOptions =
@@ -59,6 +57,7 @@ public class RedisOptions {
     type = RedisClientType.STANDALONE;
     poolCleanerInterval = -1;
     maxPoolSize = 1;
+    maxPoolWaiting = 1;
   }
 
   /**
@@ -84,6 +83,7 @@ public class RedisOptions {
     // pool related options
     this.poolCleanerInterval = other.poolCleanerInterval;
     this.maxPoolSize = other.maxPoolSize;
+    this.maxPoolWaiting = other.maxPoolWaiting;
   }
 
   /**
@@ -302,11 +302,20 @@ public class RedisOptions {
   }
 
   public int getMaxPoolSize() {
-    return maxPoolSize;
+    return Math.max(maxPoolSize, endpoints.size());
   }
 
   public RedisOptions setMaxPoolSize(int maxPoolSize) {
     this.maxPoolSize = maxPoolSize;
+    return this;
+  }
+
+  public int getMaxPoolWaiting() {
+    return Math.max(maxPoolWaiting, 8 * getMaxPoolSize());
+  }
+
+  public RedisOptions setMaxPoolWaiting(int maxPoolWaiting) {
+    this.maxPoolWaiting = maxPoolWaiting;
     return this;
   }
 

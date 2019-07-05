@@ -48,6 +48,16 @@ public class RedisOptionsConverter implements JsonCodec<RedisOptions, JsonObject
             obj.setMaxNestedArrays(((Number)member.getValue()).intValue());
           }
           break;
+        case "maxPoolSize":
+          if (member.getValue() instanceof Number) {
+            obj.setMaxPoolSize(((Number)member.getValue()).intValue());
+          }
+          break;
+        case "maxPoolWaiting":
+          if (member.getValue() instanceof Number) {
+            obj.setMaxPoolWaiting(((Number)member.getValue()).intValue());
+          }
+          break;
         case "maxWaitingHandlers":
           if (member.getValue() instanceof Number) {
             obj.setMaxWaitingHandlers(((Number)member.getValue()).intValue());
@@ -56,6 +66,11 @@ public class RedisOptionsConverter implements JsonCodec<RedisOptions, JsonObject
         case "netClientOptions":
           if (member.getValue() instanceof JsonObject) {
             obj.setNetClientOptions(new io.vertx.core.net.NetClientOptions((JsonObject)member.getValue()));
+          }
+          break;
+        case "poolCleanerInterval":
+          if (member.getValue() instanceof Number) {
+            obj.setPoolCleanerInterval(((Number)member.getValue()).intValue());
           }
           break;
         case "role":
@@ -94,10 +109,13 @@ public class RedisOptionsConverter implements JsonCodec<RedisOptions, JsonObject
       json.put("masterName", obj.getMasterName());
     }
     json.put("maxNestedArrays", obj.getMaxNestedArrays());
+    json.put("maxPoolSize", obj.getMaxPoolSize());
+    json.put("maxPoolWaiting", obj.getMaxPoolWaiting());
     json.put("maxWaitingHandlers", obj.getMaxWaitingHandlers());
     if (obj.getNetClientOptions() != null) {
       json.put("netClientOptions", obj.getNetClientOptions().toJson());
     }
+    json.put("poolCleanerInterval", obj.getPoolCleanerInterval());
     if (obj.getRole() != null) {
       json.put("role", obj.getRole().name());
     }

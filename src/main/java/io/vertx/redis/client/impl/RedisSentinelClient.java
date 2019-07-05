@@ -30,7 +30,7 @@ import java.util.Random;
 import static io.vertx.redis.client.Command.*;
 import static io.vertx.redis.client.Request.cmd;
 
-public class RedisSentinelClient implements Redis, RedisConnection {
+public class RedisSentinelClient implements Redis {
 
   // We don't need to be secure, we just want so simple
   // randomization to avoid picking the same slave all the time
@@ -48,133 +48,74 @@ public class RedisSentinelClient implements Redis, RedisConnection {
 
   private static final Logger LOG = LoggerFactory.getLogger(RedisSentinelClient.class);
 
-  private final Vertx vertx;
+  private final ConnectionManager connectionManager;
   private final RedisOptions options;
 
   private RedisConnection sentinel;
-  private RedisClient redis;
 
-  private RedisSentinelClient(Vertx vertx, RedisOptions options) {
-    this.vertx = vertx;
+  public RedisSentinelClient(Vertx vertx, RedisOptions options) {
     this.options = options;
+    // sentinel (HA) requires 2 connections, one to watch for sentinel events and the connection itself
+    this.connectionManager = new ConnectionManager(vertx, options);
+
+    this.connectionManager.start();
+  }
+
+  @Override
+  public void close() {
+    this.connectionManager.close();
   }
 
   @Override
   public Redis connect(Handler<AsyncResult<RedisConnection>> onCreate) {
     // sentinel (HA) requires 2 connections, one to watch for sentinel events and the connection itself
-    createClientInternal(vertx, options, RedisRole.SENTINEL, create -> {
-      if (create.failed()) {
-        LOG.error("Redis PUB/SUB wrap failed.", create.cause());
+    createConnectionInternal(options, options.getRole(), createConnection -> {
+      if (createConnection.failed()) {
+        onCreate.handle(Future.failedFuture(createConnection.cause()));
         return;
       }
 
-      sentinel = create.result();
+      final RedisConnection conn = createConnection.result();
 
-      sentinel
-        .handler(msg -> {
-          if (msg.type() == ResponseType.MULTI) {
-            if ("MESSAGE".equalsIgnoreCase(msg.get(0).toString())) {
-              // we don't care about the payload
-              if (redis != null) {
-                redis.fail(ErrorType.create("SWITCH-MASTER Received +switch-master message from Redis Sentinel."));
-              } else {
-                LOG.warn("Received +switch-master message from Redis Sentinel.");
+      createConnectionInternal(options, RedisRole.SENTINEL, create -> {
+        if (create.failed()) {
+          LOG.error("Redis PUB/SUB wrap failed.", create.cause());
+          return;
+        }
+
+        sentinel = create.result();
+
+        sentinel
+          .handler(msg -> {
+            if (msg.type() == ResponseType.MULTI) {
+              if ("MESSAGE".equalsIgnoreCase(msg.get(0).toString())) {
+                // we don't care about the payload
+                if (conn != null) {
+                  ((RedisConnectionImpl) conn).fail(ErrorType.create("SWITCH-MASTER Received +switch-master message from Redis Sentinel."));
+                } else {
+                  LOG.warn("Received +switch-master message from Redis Sentinel.");
+                }
               }
             }
+          });
+
+        sentinel.send(cmd(SUBSCRIBE).arg("+switch-master"), send -> {
+          if (send.failed()) {
+            LOG.error("Unable to subscribe to Sentinel PUBSUB", send.cause());
           }
         });
 
-      sentinel.send(cmd(SUBSCRIBE).arg("+switch-master"), send -> {
-        if (send.failed()) {
-          LOG.error("Unable to subscribe to Sentinel PUBSUB", send.cause());
-          sentinel.close();
-        }
+        sentinel.exceptionHandler(t -> LOG.error("Unhandled exception in Sentinel PUBSUB", t));
       });
 
-      sentinel.exceptionHandler(t -> {
-        LOG.error("Unhandled exception in Sentinel PUBSUB", t);
-        sentinel.close();
-      });
-    });
-
-    createClientInternal(vertx, options, options.getRole(), create -> {
-      if (create.failed()) {
-        onCreate.handle(create);
-        return;
-      }
-
-      redis = (RedisClient) create.result();
-
-      onCreate.handle(Future.succeededFuture(this));
+      // no need to wait just return it
+      onCreate.handle(Future.succeededFuture(conn));
     });
 
     return this;
   }
 
-  @Override
-  public void close() {
-    sentinel.close();
-    redis.close();
-  }
-
-  @Override
-  public RedisConnection exceptionHandler(Handler<Throwable> handler) {
-    redis.exceptionHandler(handler);
-    return this;
-  }
-
-  @Override
-  public RedisConnection endHandler(Handler<Void> handler) {
-    redis.endHandler(handler);
-    return this;
-  }
-
-  @Override
-  public RedisConnection handler(Handler<Response> handler) {
-    redis.handler(handler);
-    return this;
-  }
-
-  @Override
-  public RedisConnection pause() {
-    redis.pause();
-    return this;
-  }
-
-  @Override
-  public RedisConnection resume() {
-    redis.resume();
-    return null;
-  }
-
-  @Override
-  public RedisConnection send(Request command, Handler<AsyncResult<Response>> handler) {
-    redis.send(command, handler);
-    return this;
-  }
-
-  @Override
-  public RedisConnection batch(List<Request> commands, Handler<AsyncResult<List<Response>>> handler) {
-    redis.batch(commands, handler);
-    return this;
-  }
-
-  @Override
-  public String socketAddress() {
-    return redis.socketAddress();
-  }
-
-  @Override
-  public RedisConnection fetch(long amount) {
-    redis.fetch(amount);
-    return this;
-  }
-
-  public static Redis create(Vertx vertx, RedisOptions options) {
-    return new RedisSentinelClient(vertx, options);
-  }
-
-  private static void createClientInternal(Vertx vertx, RedisOptions options, RedisRole role, Handler<AsyncResult<RedisConnection>> onCreate) {
+  private void createConnectionInternal(RedisOptions options, RedisRole role, Handler<AsyncResult<RedisConnection>> onCreate) {
 
     final Handler<AsyncResult<String>> createAndConnect = resolve -> {
       if (resolve.failed()) {
@@ -182,20 +123,20 @@ public class RedisSentinelClient implements Redis, RedisConnection {
         return;
       }
       // wrap a new client
-      RedisClient.create(vertx, options, resolve.result()).connect(onCreate);
+      connectionManager.getConnection(resolve.result(), null, onCreate);
     };
 
     switch (role) {
       case SENTINEL:
-        resolveClient(vertx, RedisSentinelClient::isSentinelOk, options, createAndConnect);
+        resolveClient(this::isSentinelOk, options, createAndConnect);
         break;
 
       case MASTER:
-        resolveClient(vertx, RedisSentinelClient::getMasterFromEndpoint, options, createAndConnect);
+        resolveClient(this::getMasterFromEndpoint, options, createAndConnect);
         break;
 
       case SLAVE:
-        resolveClient(vertx, RedisSentinelClient::getSlaveFromEndpoint, options, createAndConnect);
+        resolveClient(this::getSlaveFromEndpoint, options, createAndConnect);
     }
   }
 
@@ -203,10 +144,10 @@ public class RedisSentinelClient implements Redis, RedisConnection {
    * We use the algorithm from http://redis.io/topics/sentinel-clients
    * to get a sentinel client and then do 'stuff' with it
    */
-  private static void resolveClient(final Vertx vertx, final Resolver checkEndpointFn, final RedisOptions options, final Handler<AsyncResult<String>> callback) {
+  private static void resolveClient(final Resolver checkEndpointFn, final RedisOptions options, final Handler<AsyncResult<String>> callback) {
     // Because finding the master is going to be an async list we will terminate
     // when we find one then use promises...
-    iterate(0, vertx, checkEndpointFn, options, iterate -> {
+    iterate(0, checkEndpointFn, options, iterate -> {
       if (iterate.failed()) {
         callback.handle(Future.failedFuture(iterate.cause()));
       } else {
@@ -223,7 +164,7 @@ public class RedisSentinelClient implements Redis, RedisConnection {
     });
   }
 
-  private static void iterate(final int idx, final Vertx vertx, final Resolver checkEndpointFn, final RedisOptions argument, final Handler<AsyncResult<Pair<Integer, String>>> resultHandler) {
+  private static void iterate(final int idx, final Resolver checkEndpointFn, final RedisOptions argument, final Handler<AsyncResult<Pair<Integer, String>>> resultHandler) {
     // stop condition
     final List<String> endpoints = argument.getEndpoints();
 
@@ -233,21 +174,21 @@ public class RedisSentinelClient implements Redis, RedisConnection {
     }
 
     // attempt to perform operation
-    checkEndpointFn.resolve(vertx, endpoints.get(idx), argument, res -> {
+    checkEndpointFn.resolve(endpoints.get(idx), argument, res -> {
       if (res.succeeded()) {
         resultHandler.handle(Future.succeededFuture(new Pair<>(idx, res.result())));
       } else {
         // try again with next endpoint
-        iterate(idx + 1, vertx, checkEndpointFn, argument, resultHandler);
+        iterate(idx + 1, checkEndpointFn, argument, resultHandler);
       }
     });
   }
 
   // begin endpoint check methods
 
-  private static void isSentinelOk(Vertx vertx, String endpoint, RedisOptions argument, Handler<AsyncResult<String>> handler) {
+  private void isSentinelOk(String endpoint, RedisOptions argument, Handler<AsyncResult<String>> handler) {
 
-    RedisClient.create(vertx, argument, endpoint).connect(onCreate -> {
+    connectionManager.getConnection(endpoint, null, onCreate -> {
       if (onCreate.failed()) {
         handler.handle(Future.failedFuture(onCreate.cause()));
         return;
@@ -259,17 +200,17 @@ public class RedisSentinelClient implements Redis, RedisConnection {
       conn.send(cmd(PING), info -> {
         if (info.failed()) {
           handler.handle(Future.failedFuture(info.cause()));
-          return;
+        } else {
+          handler.handle(Future.succeededFuture(endpoint));
         }
-
-        handler.handle(Future.succeededFuture(endpoint));
+        // connection is not needed anymore
         conn.close();
       });
     });
   }
 
-  private static void getMasterFromEndpoint(Vertx vertx, String endpoint, RedisOptions options, Handler<AsyncResult<String>> handler) {
-    RedisClient.create(vertx, options, endpoint).connect(onCreate -> {
+  private void getMasterFromEndpoint(String endpoint, RedisOptions options, Handler<AsyncResult<String>> handler) {
+    connectionManager.getConnection(endpoint, null, onCreate -> {
       if (onCreate.failed()) {
         handler.handle(Future.failedFuture(onCreate.cause()));
         return;
@@ -282,23 +223,21 @@ public class RedisSentinelClient implements Redis, RedisConnection {
       conn.send(cmd(SENTINEL).arg("GET-MASTER-ADDR-BY-NAME").arg(masterName), getMasterAddrByName -> {
         if (getMasterAddrByName.failed()) {
           handler.handle(Future.failedFuture(getMasterAddrByName.cause()));
-          return;
+        } else {
+          // Test the response
+          final Response response = getMasterAddrByName.result();
+
+          handler.handle(
+            Future.succeededFuture("redis://" + response.get(0).toString() + ":" + response.get(1).toInteger()));
         }
-
-        // Test the response
-        final Response response = getMasterAddrByName.result();
-
-        handler.handle(
-          Future.succeededFuture("redis://" + response.get(0).toString() + ":" + response.get(1).toInteger()));
-
         // we don't need this connection anymore
         conn.close();
       });
     });
   }
 
-  private static void getSlaveFromEndpoint(Vertx vertx, String endpoint, RedisOptions options, Handler<AsyncResult<String>> handler) {
-    RedisClient.create(vertx, options, endpoint).connect(onCreate -> {
+  private void getSlaveFromEndpoint(String endpoint, RedisOptions options, Handler<AsyncResult<String>> handler) {
+    connectionManager.getConnection(endpoint, null, onCreate -> {
       if (onCreate.failed()) {
         handler.handle(Future.failedFuture(onCreate.cause()));
         return;
@@ -311,38 +250,38 @@ public class RedisSentinelClient implements Redis, RedisConnection {
       conn.send(cmd(SENTINEL).arg("SLAVES").arg(masterName), sentinelSlaves -> {
         if (sentinelSlaves.failed()) {
           handler.handle(Future.failedFuture(sentinelSlaves.cause()));
-          return;
-        }
-
-        final Response response = sentinelSlaves.result();
-
-        // Test the response
-        if (response.size() == 0) {
-          handler.handle(Future.failedFuture("No slaves linked to the master: " + masterName));
         } else {
-          Response slaveInfoArr = response.get(RANDOM.nextInt(response.size()));
-          if ((slaveInfoArr.size() % 2) > 0) {
-            handler.handle(Future.failedFuture("Corrupted response from the sentinel"));
+          final Response response = sentinelSlaves.result();
+
+          // Test the response
+          if (response.size() == 0) {
+            handler.handle(Future.failedFuture("No slaves linked to the master: " + masterName));
           } else {
-            int port = 6379;
-            String ip = null;
-
-            for (int i = 0; i < slaveInfoArr.size(); i += 2) {
-              if ("port".equals(slaveInfoArr.get(i).toString())) {
-                port = slaveInfoArr.get(i + 1).toInteger();
-              }
-              if ("ip".equals(slaveInfoArr.get(i).toString())) {
-                ip = slaveInfoArr.get(i + 1).toString();
-              }
-            }
-
-            if (ip == null) {
-              handler.handle(Future.failedFuture("No IP found for a SLAVE node!"));
+            Response slaveInfoArr = response.get(RANDOM.nextInt(response.size()));
+            if ((slaveInfoArr.size() % 2) > 0) {
+              handler.handle(Future.failedFuture("Corrupted response from the sentinel"));
             } else {
-              handler.handle(Future.succeededFuture("redis://" + ip + ":" + port));
+              int port = 6379;
+              String ip = null;
+
+              for (int i = 0; i < slaveInfoArr.size(); i += 2) {
+                if ("port".equals(slaveInfoArr.get(i).toString())) {
+                  port = slaveInfoArr.get(i + 1).toInteger();
+                }
+                if ("ip".equals(slaveInfoArr.get(i).toString())) {
+                  ip = slaveInfoArr.get(i + 1).toString();
+                }
+              }
+
+              if (ip == null) {
+                handler.handle(Future.failedFuture("No IP found for a SLAVE node!"));
+              } else {
+                handler.handle(Future.succeededFuture("redis://" + ip + ":" + port));
+              }
             }
           }
         }
+        // connection is not needed anymore
         conn.close();
       });
     });

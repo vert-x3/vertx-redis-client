@@ -45,4 +45,9 @@ public class RedisAPIImpl implements RedisAPI {
     connection.send(req, promise);
     return promise.future();
   }
+
+  @Override
+  public void close() {
+    connection.close();
+  }
 }

@@ -1,9 +1,8 @@
 package io.vertx.redis.client.impl;
 
-import io.vertx.core.AsyncResult;
-import io.vertx.core.Future;
-import io.vertx.core.Handler;
+import io.vertx.core.*;
 import io.vertx.core.buffer.Buffer;
+import io.vertx.core.http.impl.pool.ConnectionListener;
 import io.vertx.core.impl.logging.Logger;
 import io.vertx.core.impl.logging.LoggerFactory;
 import io.vertx.core.net.NetSocket;
@@ -15,6 +14,7 @@ import io.vertx.redis.client.impl.types.ErrorType;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.RejectedExecutionException;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -24,28 +24,38 @@ public class RedisConnectionImpl implements RedisConnection, ParserHandler {
 
   private static final ErrorType CONNECTION_CLOSED = ErrorType.create("CONNECTION_CLOSED");
 
-  private final String address;
+  private final ConnectionListener<RedisConnection> listener;
+  private final Context context;
   private final NetSocket netSocket;
   // waiting: commands that have been sent but not answered
   // the queue is only accessed from the event loop
   private final ArrayQueue waiting;
 
   // state
-  private Handler<Throwable> onException = t -> LOG.error("Unhandled Error", t);
+  private Handler<Throwable> onException;
   private Handler<Void> onEnd;
   private Handler<Response> onMessage;
 
-  public RedisConnectionImpl(String address, NetSocket netSocket, int maxWaitingHandlers) {
-    this.address = address;
+  public RedisConnectionImpl(Vertx vertx, ConnectionListener<RedisConnection> connectionListener, NetSocket netSocket, int maxWaitingHandlers) {
+    this.listener = connectionListener;
+    this.context = vertx.getOrCreateContext();
     this.netSocket = netSocket;
     this.waiting = new ArrayQueue(maxWaitingHandlers);
   }
 
+  void forceClose() {
+    netSocket.close();
+  }
+
   @Override
   public void close() {
-    if (netSocket != null) {
-      netSocket.close();
-    }
+    // recycle this connection from the pool
+    listener.onRecycle(15_000L);
+  }
+
+  @Override
+  public boolean pendingQueueFull() {
+    return waiting.isFull();
   }
 
   @Override
@@ -90,16 +100,23 @@ public class RedisConnectionImpl implements RedisConnection, ParserHandler {
       handler.handle(Future.failedFuture("Redis waiting Queue is full"));
       return this;
     }
-    try {
-      // encode the message to a buffer
-      final Buffer message = ((RequestImpl) request).encode();
+
+    // encode the message to a buffer
+    final Buffer message = ((RequestImpl) request).encode();
+    // all update operations happen inside the context
+    context.runOnContext(v -> {
+      // offer the handler to the waiting queue
+      waiting.offer(handler);
+      // write to the socket
       netSocket.write(message, write -> {
-        // write to the socket
-        waiting.offer(handler);
+        if (write.failed()) {
+          // if the write fails, this connection enters a unknown state
+          // which means it should be terminated
+          fatal(write.cause());
+        }
       });
-    } catch (RuntimeException e) {
-      fail(e);
-    }
+    });
+
     return this;
   }
 
@@ -147,19 +164,20 @@ public class RedisConnectionImpl implements RedisConnection, ParserHandler {
       });
     }
 
-    // write to the socket
-    netSocket.write(messages, write -> {
-      if (write.succeeded()) {
-        for (Handler<AsyncResult<Response>> callback : callbacks) {
-          waiting.offer(callback);
-        }
-      } else {
-        try {
-          handler.handle(Future.failedFuture(write.cause()));
-        } catch (Throwable t) {
-          fail(t);
-        }
+    // all update operations happen inside the context
+    context.runOnContext(v -> {
+      // offer all handlers to the waiting queue
+      for (Handler<AsyncResult<Response>> callback : callbacks) {
+        waiting.offer(callback);
       }
+      // write to the socket
+      netSocket.write(messages, write -> {
+        if (write.failed()) {
+          // if the write fails, this connection enters a unknown state
+          // which means it should be terminated
+          fatal(write.cause());
+        }
+      });
     });
 
     return this;
@@ -178,49 +196,56 @@ public class RedisConnectionImpl implements RedisConnection, ParserHandler {
       return;
     }
 
-    final Handler<AsyncResult<Response>> req = waiting.poll();
+    // all update operations happen inside the context
+    context.runOnContext(v -> {
+      final Handler<AsyncResult<Response>> req = waiting.poll();
 
-    if (req != null) {
-      // special case (nulls are always a success)
-      // the reason is that nil is only a valid value for
-      // bulk or multi
-      if (reply == null) {
+      if (req != null) {
+        // special case (nulls are always a success)
+        // the reason is that nil is only a valid value for
+        // bulk or multi
+        if (reply == null) {
+          try {
+            req.handle(Future.succeededFuture());
+          } catch (RuntimeException e) {
+            fail(e);
+          }
+          return;
+        }
+        // errors
+        if (reply.type() == ResponseType.ERROR) {
+          try {
+            req.handle(Future.failedFuture((ErrorType) reply));
+          } catch (RuntimeException e) {
+            fail(e);
+          }
+          return;
+        }
+        // everything else
         try {
-          req.handle(Future.succeededFuture());
+          req.handle(Future.succeededFuture(reply));
         } catch (RuntimeException e) {
           fail(e);
         }
-        return;
+      } else {
+        LOG.error("No handler waiting for message: " + reply);
       }
-      // errors
-      if (reply.type() == ResponseType.ERROR) {
-        try {
-          req.handle(Future.failedFuture((ErrorType) reply));
-        } catch (RuntimeException e) {
-          fail(e);
-        }
-        return;
-      }
-      // everything else
-      try {
-        req.handle(Future.succeededFuture(reply));
-      } catch (RuntimeException e) {
-        fail(e);
-      }
-    } else {
-      LOG.error("No handler waiting for message: " + reply);
-    }
-  }
-
-  @Override
-  public String socketAddress() {
-    return address;
+    });
   }
 
   public void end(Void v) {
     // clean up the pending queue
     cleanupQueue(CONNECTION_CLOSED);
-    // call the close handler if any
+    // evict this connection
+    try {
+      listener.onEvict();
+    } catch (RejectedExecutionException e) {
+      // call the exception handler if any
+      if (onException != null) {
+        onException.handle(e);
+      }
+    }
+    // call the forceClose handler if any
     if (onEnd != null) {
       onEnd.handle(v);
     }
@@ -228,34 +253,56 @@ public class RedisConnectionImpl implements RedisConnection, ParserHandler {
 
   @Override
   public void fail(Throwable t) {
+    // evict this connection from the pool
+    try {
+      listener.onEvict();
+    } catch (RejectedExecutionException e) {
+      // call the exception handler if any
+      if (onException != null) {
+        onException.handle(e);
+      }
+    }
+    // call the exception handler if any
     if (onException != null) {
       onException.handle(t);
-    } else {
-      LOG.error("External failure", t);
     }
   }
 
   @Override
   public void fatal(Throwable t) {
-    fail(t);
-    close();
     // if there are still on going requests
     // the are all cancelled with the given
     // throwable
     cleanupQueue(t);
+    // evict this connection from the pool
+    try {
+      listener.onEvict();
+    } catch (RejectedExecutionException e) {
+      // call the exception handler if any
+      if (onException != null) {
+        onException.handle(e);
+      }
+    }
+    // call the exception handler if any
+    if (onException != null) {
+      onException.handle(t);
+    }
   }
 
   private void cleanupQueue(Throwable t) {
-    Handler<AsyncResult<Response>> req;
+    // all update operations happen inside the context
+    context.runOnContext(v -> {
+      Handler<AsyncResult<Response>> req;
 
-    while ((req = waiting.poll()) != null) {
-      if (t != null) {
-        try {
-          req.handle(Future.failedFuture(t));
-        } catch (RuntimeException e) {
-          LOG.warn("Exception during cleanup", e);
+      while ((req = waiting.poll()) != null) {
+        if (t != null) {
+          try {
+            req.handle(Future.failedFuture(t));
+          } catch (RuntimeException e) {
+            LOG.warn("Exception during cleanup", e);
+          }
         }
       }
-    }
+    });
   }
 }

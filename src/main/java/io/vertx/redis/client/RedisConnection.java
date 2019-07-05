@@ -130,10 +130,17 @@ public interface RedisConnection extends ReadStream<Response> {
   }
 
   /**
-   * Returns the address associated with this client.
-   * @return the address.
+   * Closes the connection or returns to the pool.
    */
-  String socketAddress();
-
   void close();
+
+  /**
+   * Flag to notify if the pending message queue (commands in transit) is full.
+   *
+   * When the pending message queue is full and a new send command is issued it will result in a exception to be thrown.
+   * Checking this flag before sending can allow the application to wait before sending the next message.
+   *
+   * @return true is queue is full.
+   */
+  boolean pendingQueueFull();
 }
