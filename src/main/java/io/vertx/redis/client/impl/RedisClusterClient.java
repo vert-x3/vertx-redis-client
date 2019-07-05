@@ -157,18 +157,28 @@ public class RedisClusterClient implements Redis {
               // failed try with the next endpoint
               failed.set(true);
             } else {
-              connections.put(endpoint, getClusterConnection.result());
+              // there can be concurrent access to the connection map
+              // since this is a one time operation we can pay the penalty of
+              // synchronizing on each write (hopefully is only a few writes)
+              synchronized (connections) {
+                connections.put(endpoint, getClusterConnection.result());
+              }
             }
 
             if (counter.incrementAndGet() == slots.endpoints().length) {
               // end condition
               if (failed.get()) {
                 // cleanup
-                connections.forEach((key, value) -> {
-                  if (value != null) {
-                    value.close();
-                  }
-                });
+
+                // during an error we lock the map because we will change it
+                // probably this isn't an issue as no more write should happen anyway
+                synchronized (connections) {
+                  connections.forEach((key, value) -> {
+                    if (value != null) {
+                      value.close();
+                    }
+                  });
+                }
                 // return
                 onConnect.handle(Future.failedFuture("Failed to connect to all nodes of the cluster"));
               } else {
