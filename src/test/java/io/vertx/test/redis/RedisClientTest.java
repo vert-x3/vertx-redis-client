@@ -1,183 +1,189 @@
-///*
-// * Copyright 2015 Red Hat, Inc.
-// * <p>
-// * All rights reserved. This program and the accompanying materials
-// * are made available under the terms of the Eclipse Public License v1.0
-// * and Apache License v2.0 which accompanies this distribution.
-// * <p>
-// * The Eclipse Public License is available at
-// * http://www.eclipse.org/legal/epl-v10.html
-// * <p>
-// * The Apache License v2.0 is available at
-// * http://www.opensource.org/licenses/apache2.0.php
-// * <p>
-// * You may elect to redistribute this code under either of these licenses.
-// */
-//package io.vertx.test.redis;
-//
-//import io.vertx.core.buffer.Buffer;
-//import io.vertx.core.json.JsonArray;
-//import io.vertx.core.json.JsonObject;
-//import io.vertx.ext.unit.Async;
-//import io.vertx.ext.unit.TestContext;
-//import io.vertx.ext.unit.junit.RunTestOnContext;
-//import io.vertx.ext.unit.junit.VertxUnitRunner;
-//import org.junit.*;
-//import org.junit.runner.RunWith;
-//
-//import java.util.*;
-//
-///**
-// * This test relies on a Redis server, by default it will start and stop a Redis server unless
-// * the <code>host</code> or <code>port</code> system property is specified. In this case the
-// * test assumes an external database will be used.
-// */
-//@RunWith(VertxUnitRunner.class)
-//public class RedisClientTest {
-//
-//  @Rule
-//  public RunTestOnContext rule = new RunTestOnContext();
-//
-//  private RedisClient redis;
-//
-//  @Before
-//  public void before(TestContext should) {
-//    final Async before = should.async();
-//
-//    RedisClient.create(rule.vertx(), new RedisOptions().setPort(7006), create -> {
-//      should.assertTrue(create.succeeded());
-//
-//      redis = create.result();
-//      before.complete();
-//    });
-//  }
-//
-//  @After
-//  public void after(TestContext should) {
-//    redis.close(null);
-//  }
-//
-//  private static String getProperty(String name) {
-//    String s = System.getProperty(name);
-//    return (s != null && s.trim().length() > 0) ? s : null;
-//  }
-//
-//  private static JsonArray toJsonArray(final Object... params) {
-//    return (params != null) ? new JsonArray(Arrays.asList(params)) : null;
-//  }
-//
-//  private static Object[] toArray(final Object... params) {
-//    return params;
-//  }
-//
-//  private static String errorMessage(Throwable t) {
-//    return t != null ? t.getMessage() : "";
-//  }
-//
-//  private static String makeKey() {
-//    return UUID.randomUUID().toString();
-//  }
-//
-//  private static Map<String, Object> toMap(final String... params) {
-//    if (params.length % 2 != 0) {
-//      throw new IllegalArgumentException("Last key has no value");
-//    }
-//    Map<String, Object> result = new HashMap<>();
-//    String key = null;
-//    for (String param : params) {
-//      if (key == null) {
-//        key = param;
-//      } else {
-//        result.put(key, param);
-//        key = null;
-//      }
-//    }
-//    return result;
-//  }
-//
-//  @SafeVarargs
-//  private static <T> List<T> toList(final T... params) {
-//    return Arrays.asList(params);
-//  }
-//
-//  @Test
-//  public void testAppend(TestContext should) {
-//    final Async test = should.async();
-//    final String key = makeKey();
-//
-//    redis.delMany(toList(key), reply0 -> {
-//      should.assertTrue(reply0.succeeded());
-//
-//      redis.append(key, "Hello", reply1 -> {
-//        should.assertTrue(reply1.succeeded());
-//        should.assertEquals(5L, reply1.result().longValue());
-//
-//        redis.append(key, " World", reply2 -> {
-//          should.assertTrue(reply2.succeeded());
-//          should.assertEquals(11L, reply2.result().longValue());
-//
-//          redis.get(key, reply3 -> {
-//            should.assertTrue(reply3.succeeded());
-//            should.assertTrue(reply3.succeeded());
-//            should.assertEquals("Hello World", reply3.result());
-//            test.complete();
-//          });
-//        });
-//      });
-//    });
-//
-//
-//  }
-//
-//  @Test
-//  public void testBgrewriteaof(TestContext should) {
-//    final Async test = should.async();
-//    redis.bgrewriteaof(reply -> {
-//      should.assertTrue(reply.succeeded());
-//      test.complete();
-//    });
-//
-//  }
-//
-//  @Test
-//  public void testBgsave(TestContext should) {
-//    final Async test = should.async();
-//
-//    redis.bgsave(reply -> {
-//      should.assertTrue(reply.succeeded());
-//      should.assertEquals("Background saving started", reply.result());
-//      test.complete();
-//    });
-//
-//  }
-//
-//  @Test
-//  public void testBitcount(TestContext should) {
-//    final Async test = should.async();
-//    final String key = makeKey();
-//
-//    redis.set(key, "foobar", reply0 -> {
-//      should.assertTrue(reply0.succeeded());
-//
-//      redis.bitcount(key, reply1 -> {
-//        should.assertTrue(reply1.succeeded());
-//        should.assertEquals(26L, reply1.result().longValue());
-//
-//        redis.bitcountRange(key, 0, 0, reply2 -> {
-//          should.assertTrue(reply2.succeeded());
-//          should.assertEquals(4L, reply2.result().longValue());
-//
-//          redis.bitcountRange(key, 1, 1, reply3 -> {
-//            should.assertTrue(reply3.succeeded());
-//            should.assertEquals(6L, reply3.result().longValue());
-//            test.complete();
-//          });
-//        });
-//      });
-//    });
-//
-//  }
-//
+/*
+ * Copyright 2015 Red Hat, Inc.
+ * <p>
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * and Apache License v2.0 which accompanies this distribution.
+ * <p>
+ * The Eclipse Public License is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ * <p>
+ * The Apache License v2.0 is available at
+ * http://www.opensource.org/licenses/apache2.0.php
+ * <p>
+ * You may elect to redistribute this code under either of these licenses.
+ */
+package io.vertx.test.redis;
+
+import io.vertx.core.buffer.Buffer;
+import io.vertx.core.json.JsonArray;
+import io.vertx.core.json.JsonObject;
+import io.vertx.ext.unit.Async;
+import io.vertx.ext.unit.TestContext;
+import io.vertx.ext.unit.junit.RunTestOnContext;
+import io.vertx.ext.unit.junit.VertxUnitRunner;
+import io.vertx.redis.client.Redis;
+import io.vertx.redis.client.RedisAPI;
+import io.vertx.redis.client.RedisConnection;
+import io.vertx.redis.client.RedisOptions;
+import org.junit.*;
+import org.junit.runner.RunWith;
+
+import java.util.*;
+
+/**
+ * This test relies on a Redis server, by default it will start and stop a Redis server unless
+ * the <code>host</code> or <code>port</code> system property is specified. In this case the
+ * test assumes an external database will be used.
+ */
+@RunWith(VertxUnitRunner.class)
+public class RedisClientTest {
+
+  @Rule
+  public RunTestOnContext rule = new RunTestOnContext();
+
+  private Redis client;
+  private RedisAPI redis;
+
+  @Before
+  public void before(TestContext should) {
+    final Async before = should.async();
+
+    client = Redis.createClient(rule.vertx(), new RedisOptions().setEndpoint("redis://localhost:7006"));
+    client.connect(onConnect -> {
+      should.assertTrue(onConnect.succeeded());
+      redis = RedisAPI.api(onConnect.result());
+      before.complete();
+    });
+  }
+
+  @After
+  public void after(TestContext should) {
+    redis.close();
+    client.close();
+  }
+
+  private static String getProperty(String name) {
+    String s = System.getProperty(name);
+    return (s != null && s.trim().length() > 0) ? s : null;
+  }
+
+  private static JsonArray toJsonArray(final Object... params) {
+    return (params != null) ? new JsonArray(Arrays.asList(params)) : null;
+  }
+
+  private static Object[] toArray(final Object... params) {
+    return params;
+  }
+
+  private static String errorMessage(Throwable t) {
+    return t != null ? t.getMessage() : "";
+  }
+
+  private static String makeKey() {
+    return UUID.randomUUID().toString();
+  }
+
+  private static Map<String, Object> toMap(final String... params) {
+    if (params.length % 2 != 0) {
+      throw new IllegalArgumentException("Last key has no value");
+    }
+    Map<String, Object> result = new HashMap<>();
+    String key = null;
+    for (String param : params) {
+      if (key == null) {
+        key = param;
+      } else {
+        result.put(key, param);
+        key = null;
+      }
+    }
+    return result;
+  }
+
+  @SafeVarargs
+  private static <T> List<T> toList(final T... params) {
+    return Arrays.asList(params);
+  }
+
+  @Test
+  public void testAppend(TestContext should) {
+    final Async test = should.async();
+    final String key = makeKey();
+
+    redis.del(toList(key), reply0 -> {
+      should.assertTrue(reply0.succeeded());
+
+      redis.append(key, "Hello", reply1 -> {
+        should.assertTrue(reply1.succeeded());
+        should.assertEquals(5L, reply1.result().toLong());
+
+        redis.append(key, " World", reply2 -> {
+          should.assertTrue(reply2.succeeded());
+          should.assertEquals(11L, reply2.result().toLong());
+
+          redis.get(key, reply3 -> {
+            should.assertTrue(reply3.succeeded());
+            should.assertTrue(reply3.succeeded());
+            should.assertEquals("Hello World", reply3.result().toString());
+            test.complete();
+          });
+        });
+      });
+    });
+
+
+  }
+
+  @Test
+  public void testBgrewriteaof(TestContext should) {
+    final Async test = should.async();
+    redis.bgrewriteaof(reply -> {
+      should.assertTrue(reply.succeeded());
+      test.complete();
+    });
+
+  }
+
+  @Test
+  public void testBgsave(TestContext should) {
+    final Async test = should.async();
+
+    redis.bgsave(Collections.emptyList(), reply -> {
+      should.assertTrue(reply.succeeded());
+      should.assertEquals("Background saving started", reply.result().toString());
+      test.complete();
+    });
+
+  }
+
+  @Test
+  public void testBitcount(TestContext should) {
+    final Async test = should.async();
+    final String key = makeKey();
+
+    redis.set(toList(key, "foobar"), reply0 -> {
+      should.assertTrue(reply0.succeeded());
+
+      redis.bitcount(toList(key), reply1 -> {
+        should.assertTrue(reply1.succeeded());
+        should.assertEquals(26L, reply1.result().toLong());
+
+        redis.bitcount(toList(key, "0", "0"), reply2 -> {
+          should.assertTrue(reply2.succeeded());
+          should.assertEquals(4L, reply2.result().toLong());
+
+          redis.bitcount(toList(key, "1", "1"), reply3 -> {
+            should.assertTrue(reply3.succeeded());
+            should.assertEquals(6L, reply3.result().toLong());
+            test.complete();
+          });
+        });
+      });
+    });
+
+  }
+
 //  @Test
 //  public void testBitop(TestContext should) {
 //    final Async test = should.async();
@@ -212,7 +218,7 @@
 ////
 ////      redis.rpushMany(list1, toList("a", "b", "c"), reply1 -> {
 ////        should.assertTrue(reply1.succeeded());
-////        should.assertEquals(3, reply1.result().longValue());
+////        should.assertEquals(3, reply1.result().toLong());
 ////
 ////        redis.blpopMany(toList(list1, list2), 0, reply2 -> {
 ////          should.assertTrue(reply2.succeeded());
@@ -235,7 +241,7 @@
 ////
 ////      redis.rpushMany(list1, toList("a", "b", "c"), reply1 -> {
 ////        should.assertTrue(reply1.succeeded());
-////        should.assertEquals(3, reply1.result().longValue());
+////        should.assertEquals(3, reply1.result().toLong());
 ////
 ////        redis.brpopMany(toList(list1, list2), 0, reply2 -> {
 ////          should.assertTrue(errorMessage(reply2.cause()), reply2.succeeded());
@@ -434,7 +440,7 @@
 //      should.assertTrue(reply0.succeeded());
 //      redis.decr(mykey, reply1 -> {
 //        should.assertTrue(reply1.succeeded());
-//        should.assertEquals(9L, reply1.result().longValue());
+//        should.assertEquals(9L, reply1.result().toLong());
 //        test.complete();
 //      });
 //    });
@@ -450,7 +456,7 @@
 //      should.assertTrue(reply0.succeeded());
 //      redis.decrby(mykey, 5, reply1 -> {
 //        should.assertTrue(reply1.succeeded());
-//        should.assertEquals(5L, reply1.result().longValue());
+//        should.assertEquals(5L, reply1.result().toLong());
 //        test.complete();
 //      });
 //    });
@@ -470,7 +476,7 @@
 //        should.assertTrue(reply1.succeeded());
 //        redis.delMany(toList(key1, key2, key3), reply2 -> {
 //          should.assertTrue(reply2.succeeded());
-//          should.assertEquals(2L, reply2.result().longValue());
+//          should.assertEquals(2L, reply2.result().toLong());
 //          test.complete();
 //        });
 //      });
@@ -603,11 +609,11 @@
 //      should.assertTrue(reply0.succeeded());
 //      redis.exists(key1, reply1 -> {
 //        should.assertTrue(reply1.succeeded());
-//        should.assertEquals(1L, reply1.result().longValue());
+//        should.assertEquals(1L, reply1.result().toLong());
 //
 //        redis.exists(key2, reply2 -> {
 //          should.assertTrue(reply2.succeeded());
-//          should.assertEquals(0L, reply2.result().longValue());
+//          should.assertEquals(0L, reply2.result().toLong());
 //          test.complete();
 //        });
 //      });
@@ -623,12 +629,12 @@
 ////    String key2 = makeKey();
 ////    redis.set(key1, "Hello", onSuccess(reply0 -> {
 ////      redis.existsMany(toList(key1, key2), onSuccess(reply1 -> {
-////        should.assertEquals(1, reply1.longValue());
+////        should.assertEquals(1, reply1.toLong());
 ////        redis.set(key2, "Hello", onSuccess(reply2 -> {
 ////          redis.existsMany(toList(key1, key2), onSuccess(reply3 -> {
-////            should.assertEquals(2, reply3.longValue());
+////            should.assertEquals(2, reply3.toLong());
 ////            redis.existsMany(toList(key1), onSuccess(reply4 -> {
-////              should.assertEquals(1, reply4.longValue());
+////              should.assertEquals(1, reply4.toLong());
 ////              test.complete();
 ////            }));
 ////          }));
@@ -647,17 +653,17 @@
 //      should.assertTrue(reply0.succeeded());
 //      redis.expire(mykey, 10, reply1 -> {
 //        should.assertTrue(reply1.succeeded());
-//        should.assertEquals(1L, reply1.result().longValue());
+//        should.assertEquals(1L, reply1.result().toLong());
 //
 //        redis.ttl(mykey, reply2 -> {
 //          should.assertTrue(reply2.succeeded());
-//          should.assertEquals(10L, reply2.result().longValue());
+//          should.assertEquals(10L, reply2.result().toLong());
 //
 //          redis.set(mykey, "Hello World", reply3 -> {
 //            should.assertTrue(reply3.succeeded());
 //            redis.ttl(mykey, reply4 -> {
 //              should.assertTrue(reply4.succeeded());
-//              should.assertEquals(-1L, reply4.result().longValue());
+//              should.assertEquals(-1L, reply4.result().toLong());
 //              test.complete();
 //            });
 //          });
@@ -676,15 +682,15 @@
 //      should.assertTrue(reply0.succeeded());
 //      redis.exists(mykey, reply1 -> {
 //        should.assertTrue(reply1.succeeded());
-//        should.assertEquals(1L, reply1.result().longValue());
+//        should.assertEquals(1L, reply1.result().toLong());
 //
 //        redis.expireat(mykey, 1293840000, reply2 -> {
 //          should.assertTrue(reply2.succeeded());
-//          should.assertEquals(1L, reply2.result().longValue());
+//          should.assertEquals(1L, reply2.result().toLong());
 //
 //          redis.exists(mykey, reply3 -> {
 //            should.assertTrue(reply3.succeeded());
-//            should.assertEquals(0L, reply3.result().longValue());
+//            should.assertEquals(0L, reply3.result().toLong());
 //            test.complete();
 //          });
 //        });
@@ -762,19 +768,19 @@
 //
 //    redis.setbit(mykey, 7, 1, reply0 -> {
 //      should.assertTrue(reply0.succeeded());
-//      should.assertEquals(0L, reply0.result().longValue());
+//      should.assertEquals(0L, reply0.result().toLong());
 //
 //      redis.getbit(mykey, 0, reply1 -> {
 //        should.assertTrue(reply1.succeeded());
-//        should.assertEquals(0L, reply1.result().longValue());
+//        should.assertEquals(0L, reply1.result().toLong());
 //
 //        redis.getbit(mykey, 7, reply2 -> {
 //          should.assertTrue(reply2.succeeded());
-//          should.assertEquals(1L, reply2.result().longValue());
+//          should.assertEquals(1L, reply2.result().toLong());
 //
 //          redis.getbit(mykey, 100, reply3 -> {
 //            should.assertTrue(reply3.succeeded());
-//            should.assertEquals(0L, reply3.result().longValue());
+//            should.assertEquals(0L, reply3.result().toLong());
 //            test.complete();
 //          });
 //        });
@@ -821,7 +827,7 @@
 //
 //    redis.incr(mycounter, reply0 -> {
 //      should.assertTrue(reply0.succeeded());
-//      should.assertEquals(1L, reply0.result().longValue());
+//      should.assertEquals(1L, reply0.result().toLong());
 //
 //      redis.getset(mycounter, "0", reply1 -> {
 //        should.assertTrue(reply1.succeeded());
@@ -844,15 +850,15 @@
 //
 //    redis.hset(myhash, "field1", "foo", reply0 -> {
 //      should.assertTrue(reply0.succeeded());
-//      should.assertEquals(1L, reply0.result().longValue());
+//      should.assertEquals(1L, reply0.result().toLong());
 //
 //      redis.hdel(myhash, "field1", reply1 -> {
 //        should.assertTrue(reply1.succeeded());
-//        should.assertEquals(1L, reply1.result().longValue());
+//        should.assertEquals(1L, reply1.result().toLong());
 //
 //        redis.hdel(myhash, "field2", reply2 -> {
 //          should.assertTrue(reply2.succeeded());
-//          should.assertEquals(0L, reply2.result().longValue());
+//          should.assertEquals(0L, reply2.result().toLong());
 //          test.complete();
 //        });
 //      });
@@ -867,15 +873,15 @@
 //
 //    redis.hset(myhash, "field1", "foo", reply0 -> {
 //      should.assertTrue(reply0.succeeded());
-//      should.assertEquals(1L, reply0.result().longValue());
+//      should.assertEquals(1L, reply0.result().toLong());
 //
 //      redis.hexists(myhash, "field1", reply1 -> {
 //        should.assertTrue(reply1.succeeded());
-//        should.assertEquals(1L, reply1.result().longValue());
+//        should.assertEquals(1L, reply1.result().toLong());
 //
 //        redis.hexists(myhash, "field2", reply2 -> {
 //          should.assertTrue(reply2.succeeded());
-//          should.assertEquals(0L, reply2.result().longValue());
+//          should.assertEquals(0L, reply2.result().toLong());
 //          test.complete();
 //        });
 //      });
@@ -890,7 +896,7 @@
 //
 //    redis.hset(myhash, "field1", "foo", reply0 -> {
 //      should.assertTrue(reply0.succeeded());
-//      should.assertEquals(1L, reply0.result().longValue());
+//      should.assertEquals(1L, reply0.result().toLong());
 //
 //      redis.hget(myhash, "field1", reply1 -> {
 //        should.assertTrue(reply1.succeeded());
@@ -913,11 +919,11 @@
 //
 //    redis.hset(myhash, "field1", "Hello", reply0 -> {
 //      should.assertTrue(reply0.succeeded());
-//      should.assertEquals(1L, reply0.result().longValue());
+//      should.assertEquals(1L, reply0.result().toLong());
 //
 //      redis.hset(myhash, "field2", "World", reply1 -> {
 //        should.assertTrue(reply1.succeeded());
-//        should.assertEquals(1L, reply1.result().longValue());
+//        should.assertEquals(1L, reply1.result().toLong());
 //
 //        redis.hgetall(myhash, reply2 -> {
 //          should.assertTrue(reply2.succeeded());
@@ -938,19 +944,19 @@
 //
 //    redis.hset(myhash, "field", "5", reply0 -> {
 //      should.assertTrue(reply0.succeeded());
-//      should.assertEquals(1L, reply0.result().longValue());
+//      should.assertEquals(1L, reply0.result().toLong());
 //
 //      redis.hincrby(myhash, "field", 1, reply1 -> {
 //        should.assertTrue(reply1.succeeded());
-//        should.assertEquals(6L, reply1.result().longValue());
+//        should.assertEquals(6L, reply1.result().toLong());
 //
 //        redis.hincrby(myhash, "field", -1, reply2 -> {
 //          should.assertTrue(reply2.succeeded());
-//          should.assertEquals(5L, reply2.result().longValue());
+//          should.assertEquals(5L, reply2.result().toLong());
 //
 //          redis.hincrby(myhash, "field", -10, reply3 -> {
 //            should.assertTrue(reply3.succeeded());
-//            should.assertEquals(-5L, reply3.result().longValue());
+//            should.assertEquals(-5L, reply3.result().toLong());
 //            test.complete();
 //          });
 //        });
@@ -966,7 +972,7 @@
 //
 //    redis.hset(mykey, "field", "10.50", reply0 -> {
 //      should.assertTrue(reply0.succeeded());
-//      should.assertEquals(1L, reply0.result().longValue());
+//      should.assertEquals(1L, reply0.result().toLong());
 //
 //      redis.hincrbyfloat(mykey, "field", 0.1, reply1 -> {
 //        should.assertTrue(reply1.succeeded());
@@ -974,7 +980,7 @@
 //
 //        redis.hset(mykey, "field", "5.0e3", reply2 -> {
 //          should.assertTrue(reply2.succeeded());
-//          should.assertEquals(0L, reply2.result().longValue());
+//          should.assertEquals(0L, reply2.result().toLong());
 //
 //          redis.hincrbyfloat(mykey, "field", 2.0e2, reply3 -> {
 //            should.assertTrue(reply3.succeeded());
@@ -994,11 +1000,11 @@
 ////
 ////    redis.hset(myhash, "field1", "Hello", reply0 -> {
 ////      should.assertTrue(reply0.succeeded());
-////      should.assertEquals(1, reply0.result().longValue());
+////      should.assertEquals(1, reply0.result().toLong());
 ////
 ////      redis.hset(myhash, "field2", "World", reply1 -> {
 ////        should.assertTrue(reply1.succeeded());
-////        should.assertEquals(1, reply1.result().longValue());
+////        should.assertEquals(1, reply1.result().toLong());
 ////
 ////        redis.hkeys(myhash, reply2 -> {
 ////          should.assertTrue(reply2.succeeded());
@@ -1017,15 +1023,15 @@
 //
 //    redis.hset(myhash, "field1", "Hello", reply0 -> {
 //      should.assertTrue(reply0.succeeded());
-//      should.assertEquals(1L, reply0.result().longValue());
+//      should.assertEquals(1L, reply0.result().toLong());
 //
 //      redis.hset(myhash, "field2", "World", reply1 -> {
 //        should.assertTrue(reply1.succeeded());
-//        should.assertEquals(1L, reply1.result().longValue());
+//        should.assertEquals(1L, reply1.result().toLong());
 //
 //        redis.hlen(myhash, reply2 -> {
 //          should.assertTrue(reply2.succeeded());
-//          should.assertEquals(2L, reply2.result().longValue());
+//          should.assertEquals(2L, reply2.result().toLong());
 //          test.complete();
 //        });
 //      });
@@ -1040,11 +1046,11 @@
 //
 //    redis.hset(myhash, "field1", "Hello", reply0 -> {
 //      should.assertTrue(reply0.succeeded());
-//      should.assertEquals(1L, reply0.result().longValue());
+//      should.assertEquals(1L, reply0.result().toLong());
 //
 //      redis.hset(myhash, "field2", "World", reply1 -> {
 //        should.assertTrue(reply1.succeeded());
-//        should.assertEquals(1L, reply1.result().longValue());
+//        should.assertEquals(1L, reply1.result().toLong());
 //
 //        redis.hmget(myhash, toList("field1", "field2", "nofield"), reply2 -> {
 //          should.assertTrue(reply2.succeeded());
@@ -1083,7 +1089,7 @@
 //
 //    redis.hset(myhash, "field1", "Hello", reply0 -> {
 //      should.assertTrue(reply0.succeeded());
-//      should.assertEquals(1L, reply0.result().longValue());
+//      should.assertEquals(1L, reply0.result().toLong());
 //
 //      redis.hget(myhash, "field1", reply1 -> {
 //        should.assertTrue(reply1.succeeded());
@@ -1101,11 +1107,11 @@
 //
 //    redis.hsetnx(myhash, "field", "Hello", reply0 -> {
 //      should.assertTrue(reply0.succeeded());
-//      should.assertEquals(1L, reply0.result().longValue());
+//      should.assertEquals(1L, reply0.result().toLong());
 //
 //      redis.hsetnx(myhash, "field", "World", reply1 -> {
 //        should.assertTrue(reply1.succeeded());
-//        should.assertEquals(0L, reply1.result().longValue());
+//        should.assertEquals(0L, reply1.result().toLong());
 //
 //        redis.hget(myhash, "field", reply2 -> {
 //          should.assertTrue(reply2.succeeded());
@@ -1124,11 +1130,11 @@
 //
 //    redis.hset(myhash, "field1", "Hello", reply0 -> {
 //      should.assertTrue(reply0.succeeded());
-//      should.assertEquals(1L, reply0.result().longValue());
+//      should.assertEquals(1L, reply0.result().toLong());
 //
 //      redis.hset(myhash, "field2", "World", reply1 -> {
 //        should.assertTrue(reply1.succeeded());
-//        should.assertEquals(1L, reply1.result().longValue());
+//        should.assertEquals(1L, reply1.result().toLong());
 //
 //        redis.hvals(myhash, reply2 -> {
 //          should.assertTrue(reply2.succeeded());
@@ -1149,7 +1155,7 @@
 //      should.assertTrue(reply0.succeeded());
 //      redis.incr(mykey, reply1 -> {
 //        should.assertTrue(reply1.succeeded());
-//        should.assertEquals(11L, reply1.result().longValue());
+//        should.assertEquals(11L, reply1.result().toLong());
 //
 //        redis.get(mykey, reply2 -> {
 //          should.assertTrue(reply2.succeeded());
@@ -1170,7 +1176,7 @@
 //      should.assertTrue(reply0.succeeded());
 //      redis.incrby(mykey, 5, reply1 -> {
 //        should.assertTrue(reply1.succeeded());
-//        should.assertEquals(15L, reply1.result().longValue());
+//        should.assertEquals(15L, reply1.result().toLong());
 //        test.complete();
 //      });
 //    });
@@ -1257,11 +1263,11 @@
 //
 //    redis.lpush(mykey, "World", reply0 -> {
 //      should.assertTrue(reply0.succeeded());
-//      should.assertEquals(1L, reply0.result().longValue());
+//      should.assertEquals(1L, reply0.result().toLong());
 //
 //      redis.lpush(mykey, "Hello", reply1 -> {
 //        should.assertTrue(reply1.succeeded());
-//        should.assertEquals(2L, reply1.result().longValue());
+//        should.assertEquals(2L, reply1.result().toLong());
 //
 //        redis.lindex(mykey, 0, reply2 -> {
 //          should.assertTrue(reply2.succeeded());
@@ -1285,15 +1291,15 @@
 //
 //    redis.rpush(mykey, "Hello", reply0 -> {
 //      should.assertTrue(reply0.succeeded());
-//      should.assertEquals(1L, reply0.result().longValue());
+//      should.assertEquals(1L, reply0.result().toLong());
 //
 //      redis.rpush(mykey, "World", reply1 -> {
 //        should.assertTrue(reply1.succeeded());
-//        should.assertEquals(2L, reply1.result().longValue());
+//        should.assertEquals(2L, reply1.result().toLong());
 //
 //        redis.linsert(mykey, InsertOptions.BEFORE, "World", "There", reply2 -> {
 //          should.assertTrue(reply2.succeeded());
-//          should.assertEquals(3L, reply2.result().longValue());
+//          should.assertEquals(3L, reply2.result().toLong());
 //          test.complete();
 //        });
 //      });
@@ -1307,13 +1313,13 @@
 //    final String mykey = makeKey();
 //    redis.lpush(mykey, "World", reply0 -> {
 //      should.assertTrue(reply0.succeeded());
-//      should.assertEquals(1L, reply0.result().longValue());
+//      should.assertEquals(1L, reply0.result().toLong());
 //      redis.lpush(mykey, "Hello", reply1 -> {
 //        should.assertTrue(reply1.succeeded());
-//        should.assertEquals(2L, reply1.result().longValue());
+//        should.assertEquals(2L, reply1.result().toLong());
 //        redis.llen(mykey, reply2 -> {
 //          should.assertTrue(reply2.succeeded());
-//          should.assertEquals(2L, reply2.result().longValue());
+//          should.assertEquals(2L, reply2.result().toLong());
 //          test.complete();
 //        });
 //      });
@@ -1327,13 +1333,13 @@
 //    final String mykey = makeKey();
 //    redis.rpush(mykey, "one", reply0 -> {
 //      should.assertTrue(reply0.succeeded());
-//      should.assertEquals(1L, reply0.result().longValue());
+//      should.assertEquals(1L, reply0.result().toLong());
 //      redis.rpush(mykey, "two", reply1 -> {
 //        should.assertTrue(reply1.succeeded());
-//        should.assertEquals(2L, reply1.result().longValue());
+//        should.assertEquals(2L, reply1.result().toLong());
 //        redis.rpush(mykey, "three", reply2 -> {
 //          should.assertTrue(reply2.succeeded());
-//          should.assertEquals(3L, reply2.result().longValue());
+//          should.assertEquals(3L, reply2.result().toLong());
 //          redis.lpop(mykey, reply3 -> {
 //            should.assertTrue(reply3.succeeded());
 //            should.assertEquals("one", reply3.result());
@@ -1351,10 +1357,10 @@
 //    final String mykey = makeKey();
 //    redis.lpush(mykey, "world", reply0 -> {
 //      should.assertTrue(reply0.succeeded());
-//      should.assertEquals(1L, reply0.result().longValue());
+//      should.assertEquals(1L, reply0.result().toLong());
 //      redis.lpush(mykey, "hello", reply1 -> {
 //        should.assertTrue(reply1.succeeded());
-//        should.assertEquals(2L, reply1.result().longValue());
+//        should.assertEquals(2L, reply1.result().toLong());
 //        redis.lrange(mykey, 0, -1, reply2 -> {
 //          should.assertTrue(reply2.succeeded());
 //          should.assertEquals(toList("hello", "world"), reply2.result().getList());
@@ -1371,10 +1377,10 @@
 //    final String mykey = makeKey();
 //    redis.lpushMany(mykey, toList("!", "world"), reply0 -> {
 //      should.assertTrue(reply0.succeeded());
-//      should.assertEquals(2L, reply0.result().longValue());
+//      should.assertEquals(2L, reply0.result().toLong());
 //      redis.lpushMany(mykey, toList(",", "hello"), reply1 -> {
 //        should.assertTrue(reply1.succeeded());
-//        should.assertEquals(4L, reply1.result().longValue());
+//        should.assertEquals(4L, reply1.result().toLong());
 //        redis.lrange(mykey, 0, -1, reply2 -> {
 //          should.assertTrue(reply2.succeeded());
 //          should.assertEquals(toList("hello", ",", "world", "!"), reply2.result().getList());
@@ -1393,13 +1399,13 @@
 //
 //    redis.lpush(mykey, "World", reply0 -> {
 //      should.assertTrue(reply0.succeeded());
-//      should.assertEquals(1L, reply0.result().longValue());
+//      should.assertEquals(1L, reply0.result().toLong());
 //      redis.lpushx(mykey, "Hello", reply1 -> {
 //        should.assertTrue(reply1.succeeded());
-//        should.assertEquals(2L, reply1.result().longValue());
+//        should.assertEquals(2L, reply1.result().toLong());
 //        redis.lpushx(myotherkey, "Hello", reply2 -> {
 //          should.assertTrue(reply2.succeeded());
-//          should.assertEquals(0L, reply2.result().longValue());
+//          should.assertEquals(0L, reply2.result().toLong());
 //          redis.lrange(mykey, 0, -1, reply3 -> {
 //            should.assertTrue(reply3.succeeded());
 //            JsonArray array3 = reply3.result();
@@ -1425,13 +1431,13 @@
 //    final String mykey = makeKey();
 //    redis.rpush(mykey, "one", reply0 -> {
 //      should.assertTrue(reply0.succeeded());
-//      should.assertEquals(1L, reply0.result().longValue());
+//      should.assertEquals(1L, reply0.result().toLong());
 //      redis.rpush(mykey, "two", reply1 -> {
 //        should.assertTrue(reply1.succeeded());
-//        should.assertEquals(2L, reply1.result().longValue());
+//        should.assertEquals(2L, reply1.result().toLong());
 //        redis.rpush(mykey, "three", reply2 -> {
 //          should.assertTrue(reply2.succeeded());
-//          should.assertEquals(3L, reply2.result().longValue());
+//          should.assertEquals(3L, reply2.result().toLong());
 //          redis.lrange(mykey, 0, 0, reply3 -> {
 //            should.assertTrue(reply3.succeeded());
 //            should.assertEquals("one", reply3.result().getString(0));
@@ -1449,19 +1455,19 @@
 ////    final String mykey = makeKey();
 ////    redis.rpush(mykey, "hello", reply0 -> {
 ////      should.assertTrue(reply0.succeeded());
-////      should.assertEquals(1, reply0.result().longValue());
+////      should.assertEquals(1, reply0.result().toLong());
 ////      redis.rpush(mykey, "hello", reply1 -> {
 ////        should.assertTrue(reply1.succeeded());
-////        should.assertEquals(2, reply1.result().longValue());
+////        should.assertEquals(2, reply1.result().toLong());
 ////        redis.rpush(mykey, "foo", reply2 -> {
 ////          should.assertTrue(reply2.succeeded());
-////          should.assertEquals(3, reply2.result().longValue());
+////          should.assertEquals(3, reply2.result().toLong());
 ////          redis.rpush(mykey, "hello", reply3 -> {
 ////            should.assertTrue(reply3.succeeded());
-////            should.assertEquals(4, reply3.result().longValue());
+////            should.assertEquals(4, reply3.result().toLong());
 ////            redis.lrem(mykey, -2, "hello", reply4 -> {
 ////              should.assertTrue(reply4.succeeded());
-////              should.assertEquals(2, reply4.result().longValue());
+////              should.assertEquals(2, reply4.result().toLong());
 ////              redis.lrange(mykey, 0, -1, reply5 -> {
 ////                should.assertTrue(reply5.succeeded());
 ////                should.assertArrayEquals(toArray("hello", "foo"), reply5.result().getList().toArray());
@@ -1481,13 +1487,13 @@
 ////    final String mykey = makeKey();
 ////    redis.rpush(mykey, "one", reply0 -> {
 ////      should.assertTrue(reply0.succeeded());
-////      should.assertEquals(1, reply0.result().longValue());
+////      should.assertEquals(1, reply0.result().toLong());
 ////      redis.rpush(mykey, "two", reply1 -> {
 ////        should.assertTrue(reply1.succeeded());
-////        should.assertEquals(2, reply1.result().longValue());
+////        should.assertEquals(2, reply1.result().toLong());
 ////        redis.rpush(mykey, "three", reply2 -> {
 ////          should.assertTrue(reply2.succeeded());
-////          should.assertEquals(3, reply2.result().longValue());
+////          should.assertEquals(3, reply2.result().toLong());
 ////          redis.lset(mykey, 0, "four", reply3 -> {
 ////            should.assertTrue(reply3.succeeded());
 ////            redis.lset(mykey, -2, "five", reply4 -> {
@@ -1511,13 +1517,13 @@
 ////    final String mykey = makeKey();
 ////    redis.rpush(mykey, "one", reply0 -> {
 ////      should.assertTrue(reply0.succeeded());
-////      should.assertEquals(1, reply0.result().longValue());
+////      should.assertEquals(1, reply0.result().toLong());
 ////      redis.rpush(mykey, "two", reply1 -> {
 ////        should.assertTrue(reply1.succeeded());
-////        should.assertEquals(2, reply1.result().longValue());
+////        should.assertEquals(2, reply1.result().toLong());
 ////        redis.rpush(mykey, "three", reply2 -> {
 ////          should.assertTrue(reply2.succeeded());
-////          should.assertEquals(3, reply2.result().longValue());
+////          should.assertEquals(3, reply2.result().toLong());
 ////          redis.ltrim(mykey, 1, -1, reply3 -> {
 ////            should.assertTrue(reply3.succeeded());
 ////            redis.lrange(mykey, 0, -1, reply5 -> {
@@ -1637,10 +1643,10 @@
 ////
 ////    redis.msetnx(new JsonObject(toMap(mykey1, "Hello", mykey2, "there")), reply0 -> {
 ////      should.assertTrue(reply0.succeeded());
-////      should.assertEquals(1, reply0.result().longValue());
+////      should.assertEquals(1, reply0.result().toLong());
 ////      redis.msetnx(new JsonObject(toMap(mykey2, "there", mykey3, "world")), reply1 -> {
 ////        should.assertTrue(reply1.succeeded());
-////        should.assertEquals(0, reply1.result().longValue());
+////        should.assertEquals(0, reply1.result().toLong());
 ////        redis.mgetMany(toList(mykey1, mykey2, mykey3), reply2 -> {
 ////          should.assertTrue(reply2.succeeded());
 ////          should.assertArrayEquals(toArray("Hello", "there", null), reply2.result().getList().toArray());
@@ -1703,16 +1709,16 @@
 //      should.assertTrue(reply0.succeeded());
 //      redis.expire(mykey, 10, reply1 -> {
 //        should.assertTrue(reply1.succeeded());
-//        should.assertEquals(1L, reply1.result().longValue());
+//        should.assertEquals(1L, reply1.result().toLong());
 //        redis.ttl(mykey, reply2 -> {
 //          should.assertTrue(reply2.succeeded());
-//          should.assertEquals(10L, reply2.result().longValue());
+//          should.assertEquals(10L, reply2.result().toLong());
 //          redis.persist(mykey, reply3 -> {
 //            should.assertTrue(reply3.succeeded());
-//            should.assertEquals(1L, reply3.result().longValue());
+//            should.assertEquals(1L, reply3.result().toLong());
 //            redis.ttl(mykey, reply4 -> {
 //              should.assertTrue(reply4.succeeded());
-//              should.assertEquals(-1L, reply4.result().longValue());
+//              should.assertEquals(-1L, reply4.result().toLong());
 //              test.complete();
 //            });
 //          });
@@ -1730,7 +1736,7 @@
 //      should.assertTrue(reply0.succeeded());
 //      redis.pexpire(mykey, 1000, reply1 -> {
 //        should.assertTrue(reply1.succeeded());
-//        should.assertEquals(1L, reply1.result().longValue());
+//        should.assertEquals(1L, reply1.result().toLong());
 //        redis.get(mykey, reply2 -> {
 //          should.assertTrue(reply2.succeeded());
 //          test.complete();
@@ -1748,7 +1754,7 @@
 //      should.assertTrue(reply0.succeeded());
 //      redis.pexpireat(mykey, 1555555555005L, reply1 -> {
 //        should.assertTrue(reply1.succeeded());
-//        should.assertEquals(1L, reply1.result().longValue());
+//        should.assertEquals(1L, reply1.result().toLong());
 //        redis.ttl(mykey, reply2 -> {
 //          should.assertTrue(reply2.succeeded());
 //          should.assertTrue(reply2.result() == -2);
@@ -1800,7 +1806,7 @@
 //      should.assertTrue(reply0.succeeded());
 //      redis.expire(mykey, 3, reply1 -> {
 //        should.assertTrue(reply1.succeeded());
-//        should.assertEquals(1L, reply1.result().longValue());
+//        should.assertEquals(1L, reply1.result().toLong());
 //        redis.pttl(mykey, reply2 -> {
 //          should.assertTrue(reply2.succeeded());
 //          should.assertTrue(3000 >= reply2.result() && reply2.result() > 0);
@@ -1875,7 +1881,7 @@
 //        should.assertTrue(reply1.succeeded());
 //        redis.renamenx(mykey, myotherkey, reply2 -> {
 //          should.assertTrue(reply2.succeeded());
-//          should.assertEquals(0L, reply2.result().longValue());
+//          should.assertEquals(0L, reply2.result().toLong());
 //          redis.get(myotherkey, reply3 -> {
 //            should.assertTrue(reply3.succeeded());
 //            should.assertEquals("World", reply3.result());
@@ -1918,13 +1924,13 @@
 ////    final String mykey = makeKey();
 ////    redis.rpush(mykey, "one", reply0 -> {
 ////      should.assertTrue(reply0.succeeded());
-////      should.assertEquals(1, reply0.result().longValue());
+////      should.assertEquals(1, reply0.result().toLong());
 ////      redis.rpush(mykey, "two", reply1 -> {
 ////        should.assertTrue(reply1.succeeded());
-////        should.assertEquals(2, reply1.result().longValue());
+////        should.assertEquals(2, reply1.result().toLong());
 ////        redis.rpush(mykey, "three", reply2 -> {
 ////          should.assertTrue(reply2.succeeded());
-////          should.assertEquals(3, reply2.result().longValue());
+////          should.assertEquals(3, reply2.result().toLong());
 ////          redis.rpop(mykey, reply3 -> {
 ////            should.assertTrue(reply3.succeeded());
 ////            should.assertEquals("three", reply3.result());
@@ -1947,13 +1953,13 @@
 ////    final String myotherkey = makeKey();
 ////    redis.rpush(mykey, "one", reply0 -> {
 ////        should.assertTrue(reply0.succeeded());
-////        should.assertEquals(1, reply0.result().longValue());
+////        should.assertEquals(1, reply0.result().toLong());
 ////        redis.rpush(mykey, "two", reply1 -> {
 ////          should.assertTrue(reply1.succeeded());
-////          should.assertEquals(2, reply1.result().longValue());
+////          should.assertEquals(2, reply1.result().toLong());
 ////          redis.rpush(mykey, "three", reply2 -> {
 ////            should.assertTrue(reply2.succeeded());
-////            should.assertEquals(3, reply2.result().longValue());
+////            should.assertEquals(3, reply2.result().toLong());
 ////            redis.rpoplpush(mykey, myotherkey, reply3 -> {
 ////              should.assertTrue(reply3.succeeded());
 ////              should.assertEquals("three", reply3.result());
@@ -1981,10 +1987,10 @@
 ////    final String mykey = makeKey();
 ////    redis.rpush(mykey, "hello", reply0 -> {
 ////      should.assertTrue(reply0.succeeded());
-////      should.assertEquals(1, reply0.result().longValue());
+////      should.assertEquals(1, reply0.result().toLong());
 ////      redis.rpush(mykey, "world", reply1 -> {
 ////        should.assertTrue(reply1.succeeded());
-////        should.assertEquals(2, reply1.result().longValue());
+////        should.assertEquals(2, reply1.result().toLong());
 ////        redis.lrange(mykey, 0, -1, reply2 -> {
 ////          should.assertTrue(reply2.succeeded());
 ////          should.assertArrayEquals(toArray("hello", "world"), reply2.result().getList().toArray());
@@ -2002,13 +2008,13 @@
 ////    final String myotherkey = makeKey();
 ////    redis.rpush(mykey, "Hello", reply0 -> {
 ////      should.assertTrue(reply0.succeeded());
-////      should.assertEquals(1, reply0.result().longValue());
+////      should.assertEquals(1, reply0.result().toLong());
 ////      redis.rpushx(mykey, "World", reply1 -> {
 ////        should.assertTrue(reply1.succeeded());
-////        should.assertEquals(2, reply1.result().longValue());
+////        should.assertEquals(2, reply1.result().toLong());
 ////        redis.rpushx(myotherkey, "World", reply2 -> {
 ////          should.assertTrue(reply2.succeeded());
-////          should.assertEquals(0, reply2.result().longValue());
+////          should.assertEquals(0, reply2.result().toLong());
 ////          redis.lrange(mykey, 0, -1, reply3 -> {
 ////            should.assertTrue(reply3.succeeded());
 ////            should.assertArrayEquals(toArray("Hello", "World"), reply3.result().getList().toArray());
@@ -2029,13 +2035,13 @@
 ////    final String mykey = makeKey();
 ////    redis.sadd(mykey, "Hello", reply0 -> {
 ////      should.assertTrue(reply0.succeeded());
-////      should.assertEquals(1, reply0.result().longValue());
+////      should.assertEquals(1, reply0.result().toLong());
 ////      redis.sadd(mykey, "World", reply1 -> {
 ////        should.assertTrue(reply1.succeeded());
-////        should.assertEquals(1, reply1.result().longValue());
+////        should.assertEquals(1, reply1.result().toLong());
 ////        redis.sadd(mykey, "World", reply2 -> {
 ////          should.assertTrue(reply2.succeeded());
-////          should.assertEquals(0, reply2.result().longValue());
+////          should.assertEquals(0, reply2.result().toLong());
 ////          redis.smembers(mykey, reply3 -> {
 ////            should.assertTrue(reply3.succeeded());
 ////            Object[] expected = new Object[]{"Hello", "World"};
@@ -2067,10 +2073,10 @@
 //    final String mykey = makeKey();
 //    redis.saddMany(mykey, toList("Hello", "World"), reply0 -> {
 //      should.assertTrue(reply0.succeeded());
-//      should.assertEquals(2L, reply0.result().longValue());
+//      should.assertEquals(2L, reply0.result().toLong());
 //      redis.scard(mykey, reply2 -> {
 //        should.assertTrue(reply2.succeeded());
-//        should.assertEquals(2L, reply2.result().longValue());
+//        should.assertEquals(2L, reply2.result().toLong());
 //        test.complete();
 //      });
 //    });
@@ -2136,10 +2142,10 @@
 ////
 ////    redis.saddMany(mykey1, toList("a", "b", "c"), reply0 -> {
 ////      should.assertTrue(reply0.succeeded());
-////      should.assertEquals(3, reply0.result().longValue());
+////      should.assertEquals(3, reply0.result().toLong());
 ////      redis.saddMany(mykey2, toList("c", "d", "e"), reply1 -> {
 ////        should.assertTrue(reply1.succeeded());
-////        should.assertEquals(3, reply1.result().longValue());
+////        should.assertEquals(3, reply1.result().toLong());
 ////        redis.sdiff(mykey1, toList(mykey2), reply2 -> {
 ////          should.assertTrue(reply2.succeeded());
 ////          Object[] expected = new Object[]{"a", "b"};
@@ -2162,10 +2168,10 @@
 //
 //    redis.saddMany(mykey1, toList("a", "b", "c"), reply0 -> {
 //      should.assertTrue(reply0.succeeded());
-//      should.assertEquals(3L, reply0.result().longValue());
+//      should.assertEquals(3L, reply0.result().toLong());
 //      redis.saddMany(mykey2, toList("c", "d", "e"), reply1 -> {
 //        should.assertTrue(reply1.succeeded());
-//        should.assertEquals(3L, reply1.result().longValue());
+//        should.assertEquals(3L, reply1.result().toLong());
 //        redis.sdiffstore(mykey, mykey1, toList(mykey2), reply2 -> {
 //          should.assertTrue(reply2.succeeded());
 //          Long diff = reply2.result();
@@ -2274,10 +2280,10 @@
 //    final String mykey = makeKey();
 //    redis.setbit(mykey, 7, 1, reply0 -> {
 //      should.assertTrue(reply0.succeeded());
-//      should.assertEquals(0L, reply0.result().longValue());
+//      should.assertEquals(0L, reply0.result().toLong());
 //      redis.setbit(mykey, 7, 0, reply1 -> {
 //        should.assertTrue(reply1.succeeded());
-//        should.assertEquals(1L, reply1.result().longValue());
+//        should.assertEquals(1L, reply1.result().toLong());
 //        redis.get(mykey, reply2 -> {
 //          should.assertTrue(reply2.succeeded());
 //          should.assertEquals("\u0000", reply2.result());
@@ -2296,7 +2302,7 @@
 //      should.assertTrue(reply0.succeeded());
 //      redis.ttl(mykey, reply1 -> {
 //        should.assertTrue(reply1.succeeded());
-//        should.assertEquals(10L, reply1.result().longValue());
+//        should.assertEquals(10L, reply1.result().toLong());
 //        redis.get(mykey, reply2 -> {
 //          should.assertTrue(reply2.succeeded());
 //          should.assertEquals("Hello", reply2.result());
@@ -2313,10 +2319,10 @@
 //    final String mykey = makeKey();
 //    redis.setnx(mykey, "Hello", reply0 -> {
 //      should.assertTrue(reply0.succeeded());
-//      should.assertEquals(1L, reply0.result().longValue());
+//      should.assertEquals(1L, reply0.result().toLong());
 //      redis.setnx(mykey, "World", reply1 -> {
 //        should.assertTrue(reply1.succeeded());
-//        should.assertEquals(0L, reply1.result().longValue());
+//        should.assertEquals(0L, reply1.result().toLong());
 //        redis.get(mykey, reply2 -> {
 //          should.assertTrue(reply2.succeeded());
 //          should.assertEquals("Hello", reply2.result());
@@ -2335,7 +2341,7 @@
 //      should.assertTrue(reply0.succeeded());
 //      redis.setrange(mykey, 6, "Redis", reply1 -> {
 //        should.assertTrue(reply1.succeeded());
-//        should.assertEquals(11L, reply1.result().longValue());
+//        should.assertEquals(11L, reply1.result().toLong());
 //        redis.get(mykey, reply2 -> {
 //          should.assertTrue(reply2.succeeded());
 //          should.assertEquals("Hello Redis", reply2.result());
@@ -2354,10 +2360,10 @@
 ////
 ////    redis.saddMany(mykey1, toList("a", "b", "c"), reply0 -> {
 ////      should.assertTrue(reply0.succeeded());
-////      should.assertEquals(3, reply0.result().longValue());
+////      should.assertEquals(3, reply0.result().toLong());
 ////      redis.saddMany(mykey2, toList("c", "d", "e"), reply1 -> {
 ////        should.assertTrue(reply1.succeeded());
-////        should.assertEquals(3, reply1.result().longValue());
+////        should.assertEquals(3, reply1.result().toLong());
 ////        redis.sinter(toList(mykey1, mykey2), reply2 -> {
 ////          should.assertTrue(reply2.succeeded());
 ////          should.assertArrayEquals(new Object[]{"c"}, reply2.result().getList().toArray());
@@ -2377,10 +2383,10 @@
 ////
 ////    redis.saddMany(mykey1, toList("a", "b", "c"), reply0 -> {
 ////      should.assertTrue(reply0.succeeded());
-////      should.assertEquals(3, reply0.result().longValue());
+////      should.assertEquals(3, reply0.result().toLong());
 ////      redis.saddMany(mykey2, toList("c", "d", "e"), reply1 -> {
 ////        should.assertTrue(reply1.succeeded());
-////        should.assertEquals(3, reply1.result().longValue());
+////        should.assertEquals(3, reply1.result().toLong());
 ////        redis.sinterstore(mykey, toList(mykey1, mykey2), reply2 -> {
 ////          should.assertTrue(reply2.succeeded());
 ////          should.assertTrue(reply2.result() == 1);
@@ -2400,10 +2406,10 @@
 //      should.assertTrue(reply0.succeeded());
 //      redis.sismember(mykey, "one", reply1 -> {
 //        should.assertTrue(reply1.succeeded());
-//        should.assertEquals(1L, reply1.result().longValue());
+//        should.assertEquals(1L, reply1.result().toLong());
 //        redis.sismember(mykey, "two", reply2 -> {
 //          should.assertTrue(reply2.succeeded());
-//          should.assertEquals(0L, reply2.result().longValue());
+//          should.assertEquals(0L, reply2.result().toLong());
 //          test.complete();
 //        });
 //      });
@@ -2417,7 +2423,7 @@
 ////    final String mykey = makeKey();
 ////    redis.saddMany(mykey, toList("Hello", "World"), reply0 -> {
 ////      should.assertTrue(reply0.succeeded());
-////      should.assertEquals(2, reply0.result().longValue());
+////      should.assertEquals(2, reply0.result().toLong());
 ////      redis.smembers(mykey, reply1 -> {
 ////        should.assertTrue(reply1.succeeded());
 ////        Object[] expected = new Object[]{"Hello", "World"};
@@ -2437,13 +2443,13 @@
 ////    final String myotherkey = makeKey();
 ////    redis.saddMany(mykey, toList("one", "two"), reply0 -> {
 ////      should.assertTrue(reply0.succeeded());
-////      should.assertEquals(2, reply0.result().longValue());
+////      should.assertEquals(2, reply0.result().toLong());
 ////      redis.sadd(myotherkey, "three", reply1 -> {
 ////        should.assertTrue(reply1.succeeded());
-////        should.assertEquals(1, reply1.result().longValue());
+////        should.assertEquals(1, reply1.result().toLong());
 ////        redis.smove(mykey, myotherkey, "two", reply2 -> {
 ////          should.assertTrue(reply2.succeeded());
-////          should.assertEquals(1, reply2.result().longValue());
+////          should.assertEquals(1, reply2.result().toLong());
 ////          redis.smembers(mykey, reply3 -> {
 ////            should.assertTrue(reply3.succeeded());
 ////            Object[] expected = new Object[]{"one"};
@@ -2477,7 +2483,7 @@
 ////
 ////    redis.saddMany(mykey, toList("1", "2", "3"), reply0 -> {
 ////      should.assertTrue(reply0.succeeded());
-////      should.assertEquals(3, reply0.result().longValue());
+////      should.assertEquals(3, reply0.result().toLong());
 ////      redis.set(k1, "one", reply1 -> {
 ////        should.assertTrue(reply1.succeeded());
 ////        redis.set(k2, "two", reply2 -> {
@@ -2502,7 +2508,7 @@
 ////    final String mykey = makeKey();
 ////    redis.saddMany(mykey, toList("one", "two", "three"), reply0 -> {
 ////      should.assertTrue(reply0.succeeded());
-////      should.assertEquals(3, reply0.result().longValue());
+////      should.assertEquals(3, reply0.result().toLong());
 ////      redis.spop(mykey, reply1 -> {
 ////        should.assertTrue(String.valueOf(reply1.cause()), reply1.succeeded());
 ////        String ret = reply1.result();
@@ -2537,7 +2543,7 @@
 ////    final String mykey = makeKey();
 ////    redis.saddMany(mykey, toList("one", "two", "three"), reply0 -> {
 ////      should.assertTrue(reply0.succeeded());
-////      should.assertEquals(3, reply0.result().longValue());
+////      should.assertEquals(3, reply0.result().toLong());
 ////      redis.spopMany(mykey, 3, reply1 -> {
 ////        should.assertTrue(String.valueOf(reply1.cause()), reply1.succeeded());
 ////        JsonArray ret = reply1.result();
@@ -2553,7 +2559,7 @@
 //    final String mykey = makeKey();
 //    redis.saddMany(mykey, toList("one", "two", "three"), reply0 -> {
 //      should.assertTrue(reply0.succeeded());
-//      should.assertEquals(3L, reply0.result().longValue());
+//      should.assertEquals(3L, reply0.result().toLong());
 //      redis.srandmember(mykey, reply1 -> {
 //        should.assertTrue(reply1.succeeded());
 //        String randmember = reply1.result();
@@ -2570,13 +2576,13 @@
 //    final String mykey = makeKey();
 //    redis.saddMany(mykey, toList("one", "two", "three"), reply0 -> {
 //      should.assertTrue(reply0.succeeded());
-//      should.assertEquals(3L, reply0.result().longValue());
+//      should.assertEquals(3L, reply0.result().toLong());
 //      redis.srem(mykey, "one", reply1 -> {
 //        should.assertTrue(reply1.succeeded());
-//        should.assertEquals(1L, reply1.result().longValue());
+//        should.assertEquals(1L, reply1.result().toLong());
 //        redis.srem(mykey, "four", reply2 -> {
 //          should.assertTrue(reply2.succeeded());
-//          should.assertEquals(0L, reply2.result().longValue());
+//          should.assertEquals(0L, reply2.result().toLong());
 //          test.complete();
 //        });
 //      });
@@ -2592,10 +2598,10 @@
 //      should.assertTrue(reply0.succeeded());
 //      redis.strlen(mykey, reply1 -> {
 //        should.assertTrue(reply1.succeeded());
-//        should.assertEquals(11L, reply1.result().longValue());
+//        should.assertEquals(11L, reply1.result().toLong());
 //        redis.strlen("nonexisting", reply2 -> {
 //          should.assertTrue(reply2.succeeded());
-//          should.assertEquals(0L, reply2.result().longValue());
+//          should.assertEquals(0L, reply2.result().toLong());
 //          test.complete();
 //        });
 //      });
@@ -2628,32 +2634,32 @@
 ////
 ////    redis.sadd(mykey1, "a", reply0 -> {
 ////      should.assertTrue(reply0.succeeded());
-////      should.assertEquals(1, reply0.result().longValue());
+////      should.assertEquals(1, reply0.result().toLong());
 ////      latch.countDown();
 ////
 ////      redis.sadd(mykey1, "b", reply1 -> {
 ////        should.assertTrue(reply1.succeeded());
-////        should.assertEquals(1, reply1.result().longValue());
+////        should.assertEquals(1, reply1.result().toLong());
 ////        latch.countDown();
 ////      });
 ////      redis.sadd(mykey1, "c", reply2 -> {
 ////        should.assertTrue(reply2.succeeded());
-////        should.assertEquals(1, reply2.result().longValue());
+////        should.assertEquals(1, reply2.result().toLong());
 ////        latch.countDown();
 ////      });
 ////      redis.sadd(mykey2, "c", reply3 -> {
 ////        should.assertTrue(reply3.succeeded());
-////        should.assertEquals(1, reply3.result().longValue());
+////        should.assertEquals(1, reply3.result().toLong());
 ////        latch.countDown();
 ////      });
 ////      redis.sadd(mykey2, "d", reply4 -> {
 ////        should.assertTrue(reply4.succeeded());
-////        should.assertEquals(1, reply4.result().longValue());
+////        should.assertEquals(1, reply4.result().toLong());
 ////        latch.countDown();
 ////      });
 ////      redis.sadd(mykey2, "e", reply5 -> {
 ////        should.assertTrue(reply5.succeeded());
-////        should.assertEquals(1, reply5.result().longValue());
+////        should.assertEquals(1, reply5.result().toLong());
 ////        latch.countDown();
 ////        try {
 ////          latch.await(10, TimeUnit.SECONDS);
@@ -2684,10 +2690,10 @@
 //
 //    redis.saddMany(mykey1, toList("a", "b", "c"), reply0 -> {
 //      should.assertTrue(reply0.succeeded());
-//      should.assertEquals(3L, reply0.result().longValue());
+//      should.assertEquals(3L, reply0.result().toLong());
 //      redis.saddMany(mykey2, toList("c", "d", "e"), reply1 -> {
 //        should.assertTrue(reply1.succeeded());
-//        should.assertEquals(3L, reply1.result().longValue());
+//        should.assertEquals(3L, reply1.result().toLong());
 //        redis.sunionstore(mykey, toList(mykey1, mykey2), reply2 -> {
 //          should.assertTrue(reply2.succeeded());
 //          should.assertTrue(reply2.result() == 5);
@@ -2733,10 +2739,10 @@
 //      should.assertTrue(reply0.succeeded());
 //      redis.expire(mykey, 10, reply1 -> {
 //        should.assertTrue(reply1.succeeded());
-//        should.assertEquals(1L, reply1.result().longValue());
+//        should.assertEquals(1L, reply1.result().toLong());
 //        redis.ttl(mykey, reply2 -> {
 //          should.assertTrue(reply2.succeeded());
-//          should.assertEquals(10L, reply2.result().longValue());
+//          should.assertEquals(10L, reply2.result().toLong());
 //          test.complete();
 //        });
 //      });
@@ -2755,10 +2761,10 @@
 //      should.assertTrue(reply0.succeeded());
 //      redis.lpush(key2, "value", reply1 -> {
 //        should.assertTrue(reply1.succeeded());
-//        should.assertEquals(1L, reply1.result().longValue());
+//        should.assertEquals(1L, reply1.result().toLong());
 //        redis.sadd(key3, "value", reply2 -> {
 //          should.assertTrue(reply2.succeeded());
-//          should.assertEquals(1L, reply2.result().longValue());
+//          should.assertEquals(1L, reply2.result().toLong());
 //          redis.type(key1, reply3 -> {
 //            should.assertTrue(reply3.succeeded());
 //            should.assertEquals("string", reply3.result());
@@ -2843,20 +2849,20 @@
 ////    final String key = makeKey();
 ////    redis.zadd(key, 1, "one", reply0 -> {
 ////      should.assertTrue(reply0.succeeded());
-////      should.assertEquals(1, reply0.result().longValue());
+////      should.assertEquals(1, reply0.result().toLong());
 ////      redis.zadd(key, 1, "uno", reply1 -> {
 ////        should.assertTrue(reply1.succeeded());
-////        should.assertEquals(1, reply1.result().longValue());
+////        should.assertEquals(1, reply1.result().toLong());
 ////        Map<String, Double> values = new HashMap<>();
 ////        values.put("one", 1.0);
 ////        values.put("two", 2.0);
 ////        values.put("two", 3.0);
 ////        redis.zaddMany(key, values, reply2 -> {
 ////          should.assertTrue(reply2.succeeded());
-////          should.assertEquals(1, reply2.result().longValue());
+////          should.assertEquals(1, reply2.result().toLong());
 ////          redis.zadd(key, 3, "two", reply3 -> {
 ////            should.assertTrue(reply3.succeeded());
-////            should.assertEquals(0, reply3.result().longValue());
+////            should.assertEquals(0, reply3.result().toLong());
 ////            redis.zrangeWithOptions(key, 0, -1, RangeOptions.WITHSCORES, reply4 -> {
 ////              should.assertTrue(reply4.succeeded());
 ////              should.assertArrayEquals(toArray("one", "1", "uno", "1", "two", "3"), reply4.result().getList().toArray());
@@ -2875,13 +2881,13 @@
 //    final String key = makeKey();
 //    redis.zadd(key, 1, "one", reply0 -> {
 //      should.assertTrue(reply0.succeeded());
-//      should.assertEquals(1L, reply0.result().longValue());
+//      should.assertEquals(1L, reply0.result().toLong());
 //      redis.zadd(key, 2, "two", reply1 -> {
 //        should.assertTrue(reply1.succeeded());
-//        should.assertEquals(1L, reply1.result().longValue());
+//        should.assertEquals(1L, reply1.result().toLong());
 //        redis.zcard(key, reply2 -> {
 //          should.assertTrue(reply2.succeeded());
-//          should.assertEquals(2L, reply2.result().longValue());
+//          should.assertEquals(2L, reply2.result().toLong());
 //          test.complete();
 //        });
 //      });
@@ -2895,16 +2901,16 @@
 //    final String key = makeKey();
 //    redis.zadd(key, 1, "one", reply0 -> {
 //      should.assertTrue(reply0.succeeded());
-//      should.assertEquals(1L, reply0.result().longValue());
+//      should.assertEquals(1L, reply0.result().toLong());
 //      redis.zadd(key, 2, "two", reply1 -> {
 //        should.assertTrue(reply1.succeeded());
-//        should.assertEquals(1L, reply1.result().longValue());
+//        should.assertEquals(1L, reply1.result().toLong());
 //        redis.zadd(key, 3, "three", reply2 -> {
 //          should.assertTrue(reply2.succeeded());
-//          should.assertEquals(1L, reply2.result().longValue());
+//          should.assertEquals(1L, reply2.result().toLong());
 //          redis.zcount(key, Double.NEGATIVE_INFINITY, Double.POSITIVE_INFINITY, reply3 -> {
 //            should.assertTrue(reply3.succeeded());
-//            should.assertEquals(3L, reply3.result().longValue());
+//            should.assertEquals(3L, reply3.result().toLong());
 //            test.complete();
 //          });
 //        });
@@ -2919,10 +2925,10 @@
 //    final String key = makeKey();
 //    redis.zadd(key, 1, "one", reply0 -> {
 //      should.assertTrue(reply0.succeeded());
-//      should.assertEquals(1L, reply0.result().longValue());
+//      should.assertEquals(1L, reply0.result().toLong());
 //      redis.zadd(key, 2, "two", reply1 -> {
 //        should.assertTrue(reply1.succeeded());
-//        should.assertEquals(1L, reply1.result().longValue());
+//        should.assertEquals(1L, reply1.result().toLong());
 //        redis.zincrby(key, 2, "one", reply2 -> {
 //          should.assertTrue(reply2.succeeded());
 //          should.assertEquals("3", reply2.result());
@@ -2942,25 +2948,25 @@
 //
 //    redis.zadd(key1, 1, "one", reply0 -> {
 //      should.assertTrue(reply0.succeeded());
-//      should.assertEquals(1L, reply0.result().longValue());
+//      should.assertEquals(1L, reply0.result().toLong());
 //      redis.zadd(key1, 2, "two", reply1 -> {
 //        should.assertTrue(reply1.succeeded());
-//        should.assertEquals(1L, reply1.result().longValue());
+//        should.assertEquals(1L, reply1.result().toLong());
 //        redis.zadd(key2, 1, "one", reply2 -> {
 //          should.assertTrue(reply2.succeeded());
-//          should.assertEquals(1L, reply2.result().longValue());
+//          should.assertEquals(1L, reply2.result().toLong());
 //          redis.zadd(key2, 2, "two", reply3 -> {
 //            should.assertTrue(reply3.succeeded());
-//            should.assertEquals(1L, reply3.result().longValue());
+//            should.assertEquals(1L, reply3.result().toLong());
 //            redis.zadd(key2, 3, "three", reply4 -> {
 //              should.assertTrue(reply4.succeeded());
-//              should.assertEquals(1L, reply4.result().longValue());
+//              should.assertEquals(1L, reply4.result().toLong());
 //              Map<String, Double> sets = new HashMap<>();
 //              sets.put(key1, 2.0);
 //              sets.put(key2, 3.0);
 //              redis.zinterstoreWeighed(key3, sets, AggregateOptions.NONE, reply5 -> {
 //                should.assertTrue(reply5.succeeded());
-//                should.assertEquals(2L, reply5.result().longValue());
+//                should.assertEquals(2L, reply5.result().toLong());
 //                test.complete();
 //              });
 //            });
@@ -2977,13 +2983,13 @@
 ////    final String key = makeKey();
 ////    redis.zadd(key, 1, "one", reply0 -> {
 ////      should.assertTrue(reply0.succeeded());
-////      should.assertEquals(1, reply0.result().longValue());
+////      should.assertEquals(1, reply0.result().toLong());
 ////      redis.zadd(key, 2, "two", reply1 -> {
 ////        should.assertTrue(reply1.succeeded());
-////        should.assertEquals(1, reply1.result().longValue());
+////        should.assertEquals(1, reply1.result().toLong());
 ////        redis.zadd(key, 3, "three", reply2 -> {
 ////          should.assertTrue(reply2.succeeded());
-////          should.assertEquals(1, reply2.result().longValue());
+////          should.assertEquals(1, reply2.result().toLong());
 ////          redis.zrange(key, 0, -1, reply3 -> {
 ////            should.assertTrue(reply3.succeeded());
 ////            should.assertArrayEquals(toArray("one", "two", "three"), reply3.result().getList().toArray());
@@ -3001,13 +3007,13 @@
 ////    final String key = makeKey();
 ////    redis.zadd(key, 1, "one", reply0 -> {
 ////      should.assertTrue(reply0.succeeded());
-////      should.assertEquals(1, reply0.result().longValue());
+////      should.assertEquals(1, reply0.result().toLong());
 ////      redis.zadd(key, 2, "two", reply1 -> {
 ////        should.assertTrue(reply1.succeeded());
-////        should.assertEquals(1, reply1.result().longValue());
+////        should.assertEquals(1, reply1.result().toLong());
 ////        redis.zadd(key, 3, "three", reply2 -> {
 ////          should.assertTrue(reply2.succeeded());
-////          should.assertEquals(1, reply2.result().longValue());
+////          should.assertEquals(1, reply2.result().toLong());
 ////          redis.zrangebyscore(key, "-inf", "+inf", RangeLimitOptions.NONE, reply3 -> {
 ////            should.assertTrue(reply3.succeeded());
 ////            should.assertArrayEquals(toArray("one", "two", "three"), reply3.result().getList().toArray());
@@ -3042,10 +3048,10 @@
 //    values.put("three", 3.0);
 //    redis.zaddMany(key, values, reply0 -> {
 //      should.assertTrue(reply0.succeeded());
-//      should.assertEquals(3L, reply0.result().longValue());
+//      should.assertEquals(3L, reply0.result().toLong());
 //      redis.zrank(key, "three", reply3 -> {
 //        should.assertTrue(reply3.succeeded());
-//        should.assertEquals(2L, reply3.result().longValue());
+//        should.assertEquals(2L, reply3.result().toLong());
 //        test.complete();
 //      });
 //    });
@@ -3062,10 +3068,10 @@
 //    values.put("three", 3.0);
 //    redis.zaddMany(key, values, reply0 -> {
 //      should.assertTrue(reply0.succeeded());
-//      should.assertEquals(3L, reply0.result().longValue());
+//      should.assertEquals(3L, reply0.result().toLong());
 //      redis.zrem(key, "two", reply3 -> {
 //        should.assertTrue(reply3.succeeded());
-//        should.assertEquals(1L, reply3.result().longValue());
+//        should.assertEquals(1L, reply3.result().toLong());
 //        test.complete();
 //      });
 //    });
@@ -3082,10 +3088,10 @@
 //    values.put("three", 3.0);
 //    redis.zaddMany(key, values, reply0 -> {
 //      should.assertTrue(reply0.succeeded());
-//      should.assertEquals(3L, reply0.result().longValue());
+//      should.assertEquals(3L, reply0.result().toLong());
 //      redis.zremrangebyrank(key, 0, 1, reply3 -> {
 //        should.assertTrue(reply3.succeeded());
-//        should.assertEquals(2L, reply3.result().longValue());
+//        should.assertEquals(2L, reply3.result().toLong());
 //        test.complete();
 //      });
 //    });
@@ -3102,10 +3108,10 @@
 //    values.put("three", 3.0);
 //    redis.zaddMany(key, values, reply0 -> {
 //      should.assertTrue(reply0.succeeded());
-//      should.assertEquals(3L, reply0.result().longValue());
+//      should.assertEquals(3L, reply0.result().toLong());
 //      redis.zremrangebyscore(key, "-inf", "(2", reply3 -> {
 //        should.assertTrue(reply3.succeeded());
-//        should.assertEquals(1L, reply3.result().longValue());
+//        should.assertEquals(1L, reply3.result().toLong());
 //        test.complete();
 //      });
 //    });
@@ -3122,7 +3128,7 @@
 ////    values.put("three", 3.0);
 ////    redis.zaddMany(key, values, reply0 -> {
 ////      should.assertTrue(reply0.succeeded());
-////      should.assertEquals(3, reply0.result().longValue());
+////      should.assertEquals(3, reply0.result().toLong());
 ////      redis.zrevrange(key, 0, -1, RangeOptions.NONE, reply3 -> {
 ////        should.assertTrue(reply3.succeeded());
 ////        should.assertArrayEquals(toArray("three", "two", "one"), reply3.result().getList().toArray());
@@ -3142,7 +3148,7 @@
 ////    values.put("three", 3.0);
 ////    redis.zaddMany(key, values, reply0 -> {
 ////      should.assertTrue(reply0.succeeded());
-////      should.assertEquals(3, reply0.result().longValue());
+////      should.assertEquals(3, reply0.result().toLong());
 ////      redis.zrevrangebyscore(key, "+inf", "-inf", RangeLimitOptions.NONE, reply3 -> {
 ////        should.assertTrue(reply3.succeeded());
 ////        should.assertArrayEquals(toArray("three", "two", "one"), reply3.result().getList().toArray());
@@ -3162,10 +3168,10 @@
 //    values.put("three", 3.0);
 //    redis.zaddMany(key, values, reply0 -> {
 //      should.assertTrue(reply0.succeeded());
-//      should.assertEquals(3L, reply0.result().longValue());
+//      should.assertEquals(3L, reply0.result().toLong());
 //      redis.zrevrank(key, "one", reply3 -> {
 //        should.assertTrue(reply3.succeeded());
-//        should.assertEquals(2L, reply3.result().longValue());
+//        should.assertEquals(2L, reply3.result().toLong());
 //        test.complete();
 //      });
 //    });
@@ -3178,7 +3184,7 @@
 //    final String key = makeKey();
 //    redis.zadd(key, 1, "one", reply0 -> {
 //      should.assertTrue(reply0.succeeded());
-//      should.assertEquals(1L, reply0.result().longValue());
+//      should.assertEquals(1L, reply0.result().toLong());
 //      redis.zscore(key, "one", reply1 -> {
 //        should.assertTrue(reply1.succeeded());
 //        should.assertEquals("1", reply1.result());
@@ -3200,19 +3206,19 @@
 ////    values.put("two", 2.0);
 ////    redis.zaddMany(key1, values, reply0 -> {
 ////      should.assertTrue(reply0.succeeded());
-////      should.assertEquals(2, reply0.result().longValue());
+////      should.assertEquals(2, reply0.result().toLong());
 ////
 ////      values.put("three", 3.0);
 ////      redis.zaddMany(key2, values, reply2 -> {
 ////        should.assertTrue(reply2.succeeded());
-////        should.assertEquals(3, reply2.result().longValue());
+////        should.assertEquals(3, reply2.result().toLong());
 ////
 ////        Map<String, Double> weighedSets = new HashMap<>();
 ////        weighedSets.put(key1, 2.0);
 ////        weighedSets.put(key2, 3.0);
 ////        redis.zunionstoreWeighed(key3, weighedSets, AggregateOptions.NONE, reply5 -> {
 ////          should.assertTrue(String.valueOf(reply5.cause()), reply5.succeeded());
-////          should.assertEquals(3, reply5.result().longValue());
+////          should.assertEquals(3, reply5.result().toLong());
 ////          test.complete();
 ////        });
 ////      });
@@ -3255,14 +3261,14 @@
 ////      should.assertTrue(reply0.succeeded());
 ////      redis.bitpos(key, 0, reply1 -> {
 ////        should.assertTrue(String.valueOf(reply1.cause()), reply1.succeeded());
-////        should.assertEquals(12, reply1.result().longValue());
+////        should.assertEquals(12, reply1.result().toLong());
 ////
 ////        final byte[] value2 = new byte[]{0, 0, 0};
 ////        redis.setBinary(key, Buffer.buffer(value2), reply2 -> {
 ////          should.assertTrue(reply2.succeeded());
 ////          redis.bitpos(key, 1, reply3 -> {
 ////            should.assertTrue(String.valueOf(reply3.cause()), reply3.succeeded());
-////            should.assertEquals(-1, reply3.result().longValue());
+////            should.assertEquals(-1, reply3.result().toLong());
 ////
 ////            test.complete();
 ////          });
@@ -3281,10 +3287,10 @@
 ////      should.assertTrue(reply0.succeeded());
 ////      redis.bitposFrom(key, 1, 0, reply1 -> {
 ////        should.assertTrue(String.valueOf(reply1.cause()), reply1.succeeded());
-////        should.assertEquals(8, reply1.result().longValue());
+////        should.assertEquals(8, reply1.result().toLong());
 ////        redis.bitposFrom(key, 1, 2, reply2 -> {
 ////          should.assertTrue(String.valueOf(reply2.cause()), reply2.succeeded());
-////          should.assertEquals(16, reply2.result().longValue());
+////          should.assertEquals(16, reply2.result().toLong());
 ////
 ////          test.complete();
 ////        });
@@ -3321,7 +3327,7 @@
 //    redis.rpushMany(list1, toList("a", "b", "c"), reply0 -> {
 //      should.assertTrue(reply0.succeeded());
 //
-//      should.assertEquals(3L, reply0.result().longValue());
+//      should.assertEquals(3L, reply0.result().toLong());
 //
 //      redis.brpopMany(toList(list1, list2), 0, reply1 -> {
 //        should.assertTrue(reply1.succeeded());
@@ -3356,7 +3362,7 @@
 //    final String key = makeKey();
 //    redis.saddMany(key, toList("1", "2", "3", "foo", "bar", "feelsgood"), reply1 -> {
 //      should.assertTrue(reply1.succeeded());
-//      should.assertEquals(6L, reply1.result().longValue());
+//      should.assertEquals(6L, reply1.result().toLong());
 //      redis.sscan(key, "0", new ScanOptions().setMatch("f*"), reply2 -> {
 //        should.assertTrue(reply2.succeeded());
 //        should.assertEquals("0", reply2.result().getString(0));
@@ -3369,4 +3375,4 @@
 //    });
 //
 //  }
-//}
+}
