@@ -10,6 +10,7 @@ import io.vertx.ext.unit.TestContext;
 import io.vertx.ext.unit.junit.RunTestOnContext;
 import io.vertx.ext.unit.junit.VertxUnitRunner;
 import io.vertx.redis.client.*;
+import org.junit.After;
 import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
@@ -84,6 +85,19 @@ public class RedisClusterTest {
           Request.cmd(EXEC)
         ), should.asyncAssertFailure());
       }));
+  }
+
+  @After
+  public void cleanRedis(TestContext should) {
+    final Async test = should.async();
+    Redis.createClient(rule.vertx(), options).connect(onCreate -> {
+      should.assertTrue(onCreate.succeeded());
+      final Redis cluster = onCreate.result();
+      cluster.send(cmd(FLUSHDB), flushDB -> {
+        should.assertTrue(flushDB.succeeded());
+        test.complete();
+      });
+    });
   }
 
   @Test(timeout = 30_000)
@@ -743,5 +757,120 @@ public class RedisClusterTest {
           });
         });
       });
+  }
+
+  @Test(timeout = 30_000)
+  public void dbSize(TestContext should) {
+    final Async test = should.async();
+
+    Redis.createClient(rule.vertx(), options).connect(onCreate -> {
+      should.assertTrue(onCreate.succeeded());
+
+      final Redis cluster = onCreate.result();
+      cluster.exceptionHandler(should::fail);
+
+      final long len = (long) Math.pow(2, 17);
+
+      for (int i = 0; i < len; i++) {
+        final String id = Integer.toString(i);
+        cluster.send(cmd(SET).arg(id).arg(id), set -> {
+          should.assertTrue(set.succeeded());
+        });
+      }
+
+      cluster.send(cmd(DBSIZE), dbSize -> {
+        should.assertTrue(dbSize.succeeded());
+        should.assertEquals(len, dbSize.result().toLong());
+        test.complete();
+      });
+    });
+  }
+
+  @Test(timeout = 30_000)
+  public void flushDB(TestContext should) {
+    final Async test = should.async();
+
+    Redis.createClient(rule.vertx(), options).connect(onCreate -> {
+      should.assertTrue(onCreate.succeeded());
+
+      final Redis cluster = onCreate.result();
+      cluster.exceptionHandler(should::fail);
+
+      final int len = (int) Math.pow(2, 17);
+      final AtomicInteger counter = new AtomicInteger();
+      for (int i = 0; i < len; i++) {
+        final String id = Integer.toString(i);
+        cluster.send(cmd(SET).arg(id).arg(id), set -> {
+          should.assertTrue(set.succeeded());
+        });
+      }
+
+      cluster.send(cmd(FLUSHDB), flushDb -> {
+        should.assertTrue(flushDb.succeeded());
+
+        cluster.send(cmd(DBSIZE), dbSize -> {
+          should.assertTrue(dbSize.succeeded());
+          should.assertEquals(0L, dbSize.result().toLong());
+          test.complete();
+        });
+      });
+
+    });
+  }
+
+  @Test(timeout = 30_000)
+  public void keys(TestContext should) {
+    final Async test = should.async();
+
+    Redis.createClient(rule.vertx(), options).connect(onCreate -> {
+      should.assertTrue(onCreate.succeeded());
+
+      final Redis cluster = onCreate.result();
+      cluster.exceptionHandler(should::fail);
+
+      cluster.send(cmd(MSET).arg("1").arg("1").arg("2").arg("2").arg("3").arg("3").arg("key").arg("value"), mset -> {
+        should.assertTrue(mset.succeeded());
+        cluster.send(cmd(KEYS).arg("[0-9]"), keys -> {
+          should.assertTrue(keys.succeeded());
+          should.assertEquals(3, keys.result().size());
+          test.complete();
+        });
+      });
+    });
+  }
+
+  @Test(timeout = 30_000)
+  public void mget(TestContext should) {
+    final Async test = should.async();
+
+    Redis.createClient(rule.vertx(), options).connect(onCreate -> {
+      should.assertTrue(onCreate.succeeded());
+
+      final Redis cluster = onCreate.result();
+      cluster.exceptionHandler(should::fail);
+
+      cluster.send(cmd(SET).arg("key1").arg("Hello"), set1 -> {
+        should.assertTrue(set1.succeeded());
+        cluster.send(cmd(SET).arg("key2").arg("World"), set2 -> {
+          should.assertTrue(set2.succeeded());
+          cluster.send(cmd(MGET).arg("key1").arg("key2").arg("nonexisting"), mget -> {
+            should.assertTrue(mget.succeeded());
+            should.assertEquals(3, mget.result().size());
+            List<String> values = new ArrayList<>();
+            mget.result().forEach(value -> {
+              if(value != null) {
+                values.add(value.toString());
+              } else {
+                values.add(null);
+              }
+            });
+            should.assertTrue(values.contains("Hello"));
+            should.assertTrue(values.contains("World"));
+            should.assertTrue(values.contains(null));
+            test.complete();
+          });
+        });
+      }); 
+    });
   }
 }
