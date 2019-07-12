@@ -770,19 +770,23 @@ public class RedisClusterTest {
       cluster.exceptionHandler(should::fail);
 
       final long len = (long) Math.pow(2, 17);
+      final AtomicInteger counter = new AtomicInteger();
 
       for (int i = 0; i < len; i++) {
         final String id = Integer.toString(i);
         cluster.send(cmd(SET).arg(id).arg(id), set -> {
           should.assertTrue(set.succeeded());
+          counter.incrementAndGet();
+          // all sent
+          if (counter.get() == len) {
+            cluster.send(cmd(DBSIZE), dbSize -> {
+              should.assertTrue(dbSize.succeeded());
+              should.assertEquals(len, dbSize.result().toLong());
+              test.complete();
+            });
+          }
         });
       }
-
-      cluster.send(cmd(DBSIZE), dbSize -> {
-        should.assertTrue(dbSize.succeeded());
-        should.assertEquals(len, dbSize.result().toLong());
-        test.complete();
-      });
     });
   }
 
