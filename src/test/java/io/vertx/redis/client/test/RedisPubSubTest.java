@@ -5,7 +5,9 @@ import io.vertx.ext.unit.TestContext;
 import io.vertx.ext.unit.junit.RunTestOnContext;
 import io.vertx.ext.unit.junit.VertxUnitRunner;
 import io.vertx.redis.client.Redis;
+import io.vertx.redis.client.RedisConnection;
 import io.vertx.redis.client.ResponseType;
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -20,8 +22,8 @@ public class RedisPubSubTest {
   @Rule
   public RunTestOnContext rule = new RunTestOnContext();
 
-  private Redis pub;
-  private Redis sub;
+  private RedisConnection pub;
+  private RedisConnection sub;
 
   @Before
   public void setUp(TestContext should) {
@@ -42,6 +44,12 @@ public class RedisPubSubTest {
             setUp.complete();
           });
       });
+  }
+
+  @After
+  public void tearDown() {
+    pub.close();
+    sub.close();
   }
 
   @Test

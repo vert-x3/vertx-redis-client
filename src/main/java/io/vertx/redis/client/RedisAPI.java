@@ -32,9 +32,11 @@ import java.util.List;
 @VertxGen
 public interface RedisAPI {
 
-  static RedisAPI api(Redis client) {
+  static RedisAPI api(RedisConnection client) {
     return new RedisAPIImpl(client);
   }
+
+  void close();
 
   /**
    * Redis command <a href="https://redis.io/commands/append">append</a>.

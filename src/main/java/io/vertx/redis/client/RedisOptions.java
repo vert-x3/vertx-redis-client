@@ -19,10 +19,7 @@ import io.vertx.codegen.annotations.DataObject;
 import io.vertx.core.json.JsonObject;
 import io.vertx.core.net.NetClientOptions;
 
-import java.net.URI;
-import java.net.URISyntaxException;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -41,6 +38,11 @@ public class RedisOptions {
   private String masterName;
   private RedisRole role;
   private RedisSlaves slaves;
+  // pool related options
+  private int poolCleanerInterval;
+  private int maxPoolSize;
+  private int maxPoolWaiting;
+  private int poolRecycleTimeout;
 
   private void init() {
     netClientOptions =
@@ -54,6 +56,10 @@ public class RedisOptions {
     role = RedisRole.MASTER;
     slaves = RedisSlaves.NEVER;
     type = RedisClientType.STANDALONE;
+    poolCleanerInterval = -1;
+    maxPoolSize = 1;
+    maxPoolWaiting = 1;
+    poolRecycleTimeout = 15_000;
   }
 
   /**
@@ -76,6 +82,11 @@ public class RedisOptions {
     this.masterName = other.masterName;
     this.role = other.role;
     this.slaves = other.slaves;
+    // pool related options
+    this.poolCleanerInterval = other.poolCleanerInterval;
+    this.maxPoolSize = other.maxPoolSize;
+    this.maxPoolWaiting = other.maxPoolWaiting;
+    this.poolRecycleTimeout = other.poolRecycleTimeout;
   }
 
   /**
@@ -284,6 +295,41 @@ public class RedisOptions {
     return this;
   }
 
+  public int getPoolCleanerInterval() {
+    return poolCleanerInterval;
+  }
+
+  public RedisOptions setPoolCleanerInterval(int poolCleanerInterval) {
+    this.poolCleanerInterval = poolCleanerInterval;
+    return this;
+  }
+
+  public int getMaxPoolSize() {
+    return Math.max(maxPoolSize, endpoints.size());
+  }
+
+  public RedisOptions setMaxPoolSize(int maxPoolSize) {
+    this.maxPoolSize = maxPoolSize;
+    return this;
+  }
+
+  public int getMaxPoolWaiting() {
+    return Math.max(maxPoolWaiting, 8 * getMaxPoolSize());
+  }
+
+  public RedisOptions setMaxPoolWaiting(int maxPoolWaiting) {
+    this.maxPoolWaiting = maxPoolWaiting;
+    return this;
+  }
+
+  public int getPoolRecycleTimeout() {
+    return poolRecycleTimeout;
+  }
+
+  public RedisOptions setPoolRecycleTimeout(int poolRecycleTimeout) {
+    this.poolRecycleTimeout = poolRecycleTimeout;
+    return this;
+  }
   /**
    * Converts this object to JSON notation.
    * @return JSON
@@ -292,30 +338,5 @@ public class RedisOptions {
     final JsonObject json = new JsonObject();
     RedisOptionsConverter.toJson(this, json);
     return json;
-  }
-
-  public static void main(String[] args) throws URISyntaxException {
-
-    List<String> uris = Arrays.asList(
-      "redis://localhost",
-      "redis://localhost:7936",
-      "redis://user:password@localhost:7936",
-      "redis://user@localhost:7936",
-      "redis://:password@localhost:7936",
-      "redis://localhost:7936/1",
-      "redis:///tmp/redis.sock",
-      "unix:///tmp/redis.sock?select=1");
-
-    for (String uri : uris) {
-      URI conn = new URI(uri);
-      System.out.println(conn);
-      System.out.println(conn.getScheme());
-      System.out.println(conn.getUserInfo());
-      System.out.println(conn.getHost());
-      System.out.println(conn.getPort());
-      System.out.println(conn.getPath());
-      System.out.println(conn.getQuery());
-      System.out.println("---");
-    }
   }
 }

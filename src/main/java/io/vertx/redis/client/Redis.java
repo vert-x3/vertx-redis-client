@@ -16,43 +16,51 @@
 package io.vertx.redis.client;
 
 import io.vertx.codegen.annotations.Fluent;
-import io.vertx.codegen.annotations.Nullable;
 import io.vertx.codegen.annotations.VertxGen;
 import io.vertx.core.*;
-import io.vertx.core.streams.ReadStream;
 import io.vertx.redis.client.impl.RedisClient;
 import io.vertx.redis.client.impl.RedisClusterClient;
 import io.vertx.redis.client.impl.RedisSentinelClient;
-
-import java.util.List;
 
 /**
  * A simple Redis client.
  */
 @VertxGen
-public interface Redis extends ReadStream<Response> {
+public interface Redis {
 
   /**
-   * Connect to redis, the {@code onConnect} will get the {@link Redis} instance.
-   *
-   * This connection will use the default options which are connect
-   * to a standalone server on the default port on "localhost".
+   * Create a new redis client using the default client options.
+   * @param vertx the vertx instance
+   * @return the client
    */
-  static Redis createClient(Vertx vertx, String address) {
-    return createClient(vertx, new RedisOptions().setEndpoint(address));
+  static Redis createClient(Vertx vertx) {
+    return createClient(vertx, new RedisOptions());
   }
 
   /**
-   * Connect to redis, the {@code onConnect} will get the {@link Redis} instance.
+   * Create a new redis client using the default client options.
+   * @param endpoint the server address to connect to
+   * @param vertx the vertx instance
+   * @return the client
+   */
+  static Redis createClient(Vertx vertx, String endpoint) {
+    return createClient(vertx, new RedisOptions().setEndpoint(endpoint));
+  }
+
+  /**
+   * Create a new redis client using the given client options.
+   * @param vertx the vertx instance
+   * @param options the user provided options
+   * @return the client
    */
   static Redis createClient(Vertx vertx, RedisOptions options) {
     switch (options.getType()) {
       case STANDALONE:
-        return RedisClient.create(vertx, options);
+        return new RedisClient(vertx, options);
       case SENTINEL:
-        return RedisSentinelClient.create(vertx, options);
+        return new RedisSentinelClient(vertx, options);
       case CLUSTER:
-        return RedisClusterClient.create(vertx, options);
+        return new RedisClusterClient(vertx, options);
       default:
         throw new IllegalStateException("Unknown Redis Client type: " + options.getType());
     }
@@ -65,124 +73,21 @@ public interface Redis extends ReadStream<Response> {
    * @return a reference to this, so the API can be used fluently
    */
   @Fluent
-  Redis connect(Handler<AsyncResult<Redis>> handler);
+  Redis connect(Handler<AsyncResult<RedisConnection>> handler);
 
   /**
    * Connects to the redis server.
    *
    * @return a future with the result of the operation
    */
-  default Future<Redis> connect() {
-    final Promise<Redis> promise = Promise.promise();
+  default Future<RedisConnection> connect() {
+    final Promise<RedisConnection> promise = Promise.promise();
     connect(promise);
     return promise.future();
   }
 
   /**
-   * Set an exception handler on the read stream.
-   *
-   * @param handler  the exception handler
-   * @return a reference to this, so the API can be used fluently
+   * Closes the client and terminates any connection.
    */
-  @Fluent
-  Redis exceptionHandler(Handler<Throwable> handler);
-
-  /**
-   * Set a data handler. As data is read, the handler will be called with the data.
-   *
-   * @return a reference to this, so the API can be used fluently
-   */
-  @Fluent
-  Redis handler(Handler<Response> handler);
-
-  /**
-   * Pause the {@code ReadStream}, it sets the buffer in {@code fetch} mode and clears the actual demand.
-   * <p>
-   * While it's paused, no data will be sent to the data {@code handler}.
-   *
-   * @return a reference to this, so the API can be used fluently
-   */
-  @Fluent
-  Redis pause();
-
-  /**
-   * Resume reading, and sets the buffer in {@code flowing} mode.
-   * <p/>
-   * If the {@code ReadStream} has been paused, reading will recommence on it.
-   *
-   * @return a reference to this, so the API can be used fluently
-   */
-  @Fluent
-  Redis resume();
-
-  /**
-   * Fetch the specified {@code amount} of elements. If the {@code ReadStream} has been paused, reading will
-   * recommence with the specified {@code amount} of items, otherwise the specified {@code amount} will
-   * be added to the current stream demand.
-   *
-   * @return a reference to this, so the API can be used fluently
-   */
-  @Fluent
-  Redis fetch(long amount);
-
-  /**
-   * Set an end handler. Once the stream has ended, and there is no more data to be read, this handler will be called.
-   *
-   * @return a reference to this, so the API can be used fluently
-   */
-  @Fluent
-  Redis endHandler(@Nullable Handler<Void> endHandler);
-
-
-  /**
-   * Send the given command to the redis server or cluster.
-   * @param command the command to send
-   * @param onSend the asynchronous result handler.
-   * @return fluent self.
-   */
-  @Fluent
-  Redis send(Request command, Handler<AsyncResult<@Nullable Response>> onSend);
-
-  /**
-   * Send the given command to the redis server or cluster.
-   * @param command the command to send
-   * @return a future with the result of the operation
-   */
-  default Future<@Nullable Response> send(Request command) {
-    final Promise<@Nullable Response> promise = Promise.promise();
-    send(command, promise);
-    return promise.future();
-  }
-
-  /**
-   * Sends a list of commands in a single IO operation, this prevents any inter twinning to happen from other
-   * client users.
-   *
-   * @param commands list of command to send
-   * @param onSend the asynchronous result handler.
-   * @return fluent self.
-   */
-  @Fluent
-  Redis batch(List<Request> commands, Handler<AsyncResult<List<@Nullable Response>>> onSend);
-
-  /**
-   * Sends a list of commands in a single IO operation, this prevents any inter twinning to happen from other
-   * client users.
-   *
-   * @param commands list of command to send
-   * @return a future with the result of the operation
-   */
-  default Future<List<@Nullable Response>> batch(List<Request> commands) {
-    final Promise<List<@Nullable Response>> promise = Promise.promise();
-    batch(commands, promise);
-    return promise.future();
-  }
-
-  /**
-   * Returns the address associated with this client.
-   * @return the address.
-   */
-  String socketAddress();
-
   void close();
 }
