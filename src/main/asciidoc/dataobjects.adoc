@@ -35,6 +35,7 @@ The client will always work on pipeline mode, this means that messages can start
 Set the net client options to be used while connecting to the redis server. Use this to tune your connection.
 +++
 |[[poolCleanerInterval]]`@poolCleanerInterval`|`Number (int)`|-
+|[[poolRecycleTimeout]]`@poolRecycleTimeout`|`Number (int)`|-
 |[[role]]`@role`|`link:enums.html#RedisRole[RedisRole]`|+++
 Set the role name (only considered in HA mode).
 +++

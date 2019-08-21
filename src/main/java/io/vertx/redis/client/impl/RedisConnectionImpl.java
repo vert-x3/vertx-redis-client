@@ -6,10 +6,7 @@ import io.vertx.core.http.impl.pool.ConnectionListener;
 import io.vertx.core.impl.logging.Logger;
 import io.vertx.core.impl.logging.LoggerFactory;
 import io.vertx.core.net.NetSocket;
-import io.vertx.redis.client.RedisConnection;
-import io.vertx.redis.client.Request;
-import io.vertx.redis.client.Response;
-import io.vertx.redis.client.ResponseType;
+import io.vertx.redis.client.*;
 import io.vertx.redis.client.impl.types.ErrorType;
 
 import java.util.ArrayList;
@@ -30,27 +27,30 @@ public class RedisConnectionImpl implements RedisConnection, ParserHandler {
   // waiting: commands that have been sent but not answered
   // the queue is only accessed from the event loop
   private final ArrayQueue waiting;
+  private final int recycleTimeout;
 
   // state
   private Handler<Throwable> onException;
   private Handler<Void> onEnd;
   private Handler<Response> onMessage;
 
-  public RedisConnectionImpl(Vertx vertx, ConnectionListener<RedisConnection> connectionListener, NetSocket netSocket, int maxWaitingHandlers) {
+  public RedisConnectionImpl(Vertx vertx, ConnectionListener<RedisConnection> connectionListener, NetSocket netSocket, RedisOptions options) {
     this.listener = connectionListener;
     this.context = vertx.getOrCreateContext();
     this.netSocket = netSocket;
-    this.waiting = new ArrayQueue(maxWaitingHandlers);
+    this.waiting = new ArrayQueue(options.getMaxWaitingHandlers());
+    this.recycleTimeout = options.getPoolRecycleTimeout();
   }
 
   void forceClose() {
+    listener.onEvict();
     netSocket.close();
   }
 
   @Override
   public void close() {
     // recycle this connection from the pool
-    listener.onRecycle(15_000L);
+    listener.onRecycle(recycleTimeout);
   }
 
   @Override
@@ -236,15 +236,15 @@ public class RedisConnectionImpl implements RedisConnection, ParserHandler {
   public void end(Void v) {
     // clean up the pending queue
     cleanupQueue(CONNECTION_CLOSED);
-    // evict this connection
-    try {
-      listener.onEvict();
-    } catch (RejectedExecutionException e) {
-      // call the exception handler if any
-      if (onException != null) {
-        onException.handle(e);
-      }
-    }
+//    // evict this connection
+//    try {
+//      listener.onEvict();
+//    } catch (RejectedExecutionException e) {
+//      // call the exception handler if any
+//      if (onException != null) {
+//        onException.handle(e);
+//      }
+//    }
     // call the forceClose handler if any
     if (onEnd != null) {
       onEnd.handle(v);

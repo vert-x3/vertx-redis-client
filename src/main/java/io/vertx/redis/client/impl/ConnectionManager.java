@@ -75,7 +75,7 @@ class ConnectionManager {
         // socket connection succeeded
         final NetSocket netSocket = clientConnect.result();
         // the connection
-        final RedisConnectionImpl connection = new RedisConnectionImpl(vertx, connectionListener, netSocket, options.getMaxWaitingHandlers());
+        final RedisConnectionImpl connection = new RedisConnectionImpl(vertx, connectionListener, netSocket, options);
 
         // parser utility
         netSocket

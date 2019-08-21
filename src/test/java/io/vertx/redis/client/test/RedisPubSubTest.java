@@ -7,6 +7,7 @@ import io.vertx.ext.unit.junit.VertxUnitRunner;
 import io.vertx.redis.client.Redis;
 import io.vertx.redis.client.RedisConnection;
 import io.vertx.redis.client.ResponseType;
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -43,6 +44,12 @@ public class RedisPubSubTest {
             setUp.complete();
           });
       });
+  }
+
+  @After
+  public void tearDown() {
+    pub.close();
+    sub.close();
   }
 
   @Test

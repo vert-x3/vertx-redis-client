@@ -42,6 +42,7 @@ public class RedisOptions {
   private int poolCleanerInterval;
   private int maxPoolSize;
   private int maxPoolWaiting;
+  private int poolRecycleTimeout;
 
   private void init() {
     netClientOptions =
@@ -58,6 +59,7 @@ public class RedisOptions {
     poolCleanerInterval = -1;
     maxPoolSize = 1;
     maxPoolWaiting = 1;
+    poolRecycleTimeout = 15_000;
   }
 
   /**
@@ -84,6 +86,7 @@ public class RedisOptions {
     this.poolCleanerInterval = other.poolCleanerInterval;
     this.maxPoolSize = other.maxPoolSize;
     this.maxPoolWaiting = other.maxPoolWaiting;
+    this.poolRecycleTimeout = other.poolRecycleTimeout;
   }
 
   /**
@@ -319,6 +322,14 @@ public class RedisOptions {
     return this;
   }
 
+  public int getPoolRecycleTimeout() {
+    return poolRecycleTimeout;
+  }
+
+  public RedisOptions setPoolRecycleTimeout(int poolRecycleTimeout) {
+    this.poolRecycleTimeout = poolRecycleTimeout;
+    return this;
+  }
   /**
    * Converts this object to JSON notation.
    * @return JSON

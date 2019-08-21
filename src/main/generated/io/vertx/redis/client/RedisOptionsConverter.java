@@ -73,6 +73,11 @@ public class RedisOptionsConverter implements JsonCodec<RedisOptions, JsonObject
             obj.setPoolCleanerInterval(((Number)member.getValue()).intValue());
           }
           break;
+        case "poolRecycleTimeout":
+          if (member.getValue() instanceof Number) {
+            obj.setPoolRecycleTimeout(((Number)member.getValue()).intValue());
+          }
+          break;
         case "role":
           if (member.getValue() instanceof String) {
             obj.setRole(io.vertx.redis.client.RedisRole.valueOf((String)member.getValue()));
@@ -116,6 +121,7 @@ public class RedisOptionsConverter implements JsonCodec<RedisOptions, JsonObject
       json.put("netClientOptions", obj.getNetClientOptions().toJson());
     }
     json.put("poolCleanerInterval", obj.getPoolCleanerInterval());
+    json.put("poolRecycleTimeout", obj.getPoolRecycleTimeout());
     if (obj.getRole() != null) {
       json.put("role", obj.getRole().name());
     }

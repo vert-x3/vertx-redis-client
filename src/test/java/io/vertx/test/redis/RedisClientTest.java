@@ -15,16 +15,13 @@
  */
 package io.vertx.test.redis;
 
-import io.vertx.core.buffer.Buffer;
 import io.vertx.core.json.JsonArray;
-import io.vertx.core.json.JsonObject;
 import io.vertx.ext.unit.Async;
 import io.vertx.ext.unit.TestContext;
 import io.vertx.ext.unit.junit.RunTestOnContext;
 import io.vertx.ext.unit.junit.VertxUnitRunner;
 import io.vertx.redis.client.Redis;
 import io.vertx.redis.client.RedisAPI;
-import io.vertx.redis.client.RedisConnection;
 import io.vertx.redis.client.RedisOptions;
 import org.junit.*;
 import org.junit.runner.RunWith;
@@ -58,8 +55,7 @@ public class RedisClientTest {
   }
 
   @After
-  public void after(TestContext should) {
-    redis.close();
+  public void after() {
     client.close();
   }
 
@@ -149,9 +145,9 @@ public class RedisClientTest {
   public void testBgsave(TestContext should) {
     final Async test = should.async();
 
-    redis.bgsave(Collections.emptyList(), reply -> {
+    redis.bgsave(toList("SCHEDULE"), reply -> {
       should.assertTrue(reply.succeeded());
-      should.assertEquals("Background saving started", reply.result().toString());
+      should.assertEquals("Background saving scheduled", reply.result().toString());
       test.complete();
     });
 
@@ -184,29 +180,28 @@ public class RedisClientTest {
 
   }
 
-//  @Test
-//  public void testBitop(TestContext should) {
-//    final Async test = should.async();
-//    final String key1 = makeKey();
-//    final String key2 = makeKey();
-//    final String destkey = makeKey();
-//
-//    redis.set(key1, "foobar", reply0 -> {
-//      should.assertTrue(reply0.succeeded());
-//      redis.set(key2, "abcdef", reply1 -> {
-//        should.assertTrue(reply1.succeeded());
-//        redis.bitop(BitOperation.AND, destkey, toList(key1, key2), reply2 -> {
-//          should.assertTrue(reply2.succeeded());
-//          redis.get(destkey, reply3 -> {
-//            should.assertTrue(reply3.succeeded());
-//            test.complete();
-//          });
-//        });
-//      });
-//    });
-//
-//  }
-//
+  @Test
+  public void testBitop(TestContext should) {
+    final Async test = should.async();
+    final String key1 = makeKey();
+    final String key2 = makeKey();
+    final String destkey = makeKey();
+
+    redis.set(toList(key1, "foobar"), reply0 -> {
+      should.assertTrue(reply0.succeeded());
+      redis.set(toList(key2, "abcdef"), reply1 -> {
+        should.assertTrue(reply1.succeeded());
+        redis.bitop(toList("AND", destkey, key1, key2), reply2 -> {
+          should.assertTrue(reply2.succeeded());
+          redis.get(destkey, reply3 -> {
+            should.assertTrue(reply3.succeeded());
+            test.complete();
+          });
+        });
+      });
+    });
+  }
+
 ////  @Test
 ////  public void testBlpop(TestContext should) {
 ////    final Async test = should.async();

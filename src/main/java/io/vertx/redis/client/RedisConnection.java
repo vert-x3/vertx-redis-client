@@ -30,58 +30,45 @@ import java.util.List;
 public interface RedisConnection extends ReadStream<Response> {
 
   /**
-   * Set an exception handler on the read stream.
-   *
-   * @param handler  the exception handler
-   * @return a reference to this, so the API can be used fluently
+   * {@inheritDoc}
    */
   @Fluent
+  @Override
   RedisConnection exceptionHandler(Handler<Throwable> handler);
 
   /**
-   * Set a data handler. As data is read, the handler will be called with the data.
-   *
-   * @return a reference to this, so the API can be used fluently
+   * {@inheritDoc}
    */
   @Fluent
+  @Override
   RedisConnection handler(Handler<Response> handler);
 
   /**
-   * Pause the {@code ReadStream}, it sets the buffer in {@code fetch} mode and clears the actual demand.
-   * <p>
-   * While it's paused, no data will be sent to the data {@code handler}.
-   *
-   * @return a reference to this, so the API can be used fluently
+   * {@inheritDoc}
    */
   @Fluent
+  @Override
   RedisConnection pause();
 
   /**
-   * Resume reading, and sets the buffer in {@code flowing} mode.
-   * <p/>
-   * If the {@code ReadStream} has been paused, reading will recommence on it.
-   *
-   * @return a reference to this, so the API can be used fluently
+   * {@inheritDoc}
    */
   @Fluent
+  @Override
   RedisConnection resume();
 
   /**
-   * Fetch the specified {@code amount} of elements. If the {@code ReadStream} has been paused, reading will
-   * recommence with the specified {@code amount} of items, otherwise the specified {@code amount} will
-   * be added to the current stream demand.
-   *
-   * @return a reference to this, so the API can be used fluently
+   * {@inheritDoc}
    */
   @Fluent
+  @Override
   RedisConnection fetch(long amount);
 
   /**
-   * Set an end handler. Once the stream has ended, and there is no more data to be read, this handler will be called.
-   *
-   * @return a reference to this, so the API can be used fluently
+   * {@inheritDoc}
    */
   @Fluent
+  @Override
   RedisConnection endHandler(@Nullable Handler<Void> endHandler);
 
 
