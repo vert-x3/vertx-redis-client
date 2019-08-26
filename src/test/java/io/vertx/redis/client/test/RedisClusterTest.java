@@ -37,7 +37,9 @@ public class RedisClusterTest {
     .addEndpoint("redis://127.0.0.1:7002")
     .addEndpoint("redis://127.0.0.1:7003")
     .addEndpoint("redis://127.0.0.1:7004")
-    .addEndpoint("redis://127.0.0.1:7005");
+    .addEndpoint("redis://127.0.0.1:7005")
+    .setMaxPoolSize(8)
+    .setMaxPoolWaiting(16);
 
   private static String makeKey() {
     return UUID.randomUUID().toString();
@@ -118,7 +120,9 @@ public class RedisClusterTest {
       .setMaxWaitingHandlers(128 * 1024)
       .addEndpoint("redis://127.0.0.1:7000")
       .addEndpoint("redis://127.0.0.1:7002")
-      .addEndpoint("redis://127.0.0.1:7004");
+      .addEndpoint("redis://127.0.0.1:7004")
+      .setMaxPoolSize(8)
+      .setMaxPoolWaiting(16);
 
     // we miss add the odd port nodes on purpose
 
@@ -165,7 +169,9 @@ public class RedisClusterTest {
       .setType(RedisClientType.CLUSTER)
       // we will flood the redis server
       .setMaxWaitingHandlers(128 * 1024)
-      .addEndpoint("redis://127.0.0.1:7000");
+      .addEndpoint("redis://127.0.0.1:7000")
+      .setMaxPoolSize(8)
+      .setMaxPoolWaiting(16);
 
     // we only provide 1 node
 
@@ -212,7 +218,9 @@ public class RedisClusterTest {
       .setType(RedisClientType.CLUSTER)
       // we will flood the redis server
       .setMaxWaitingHandlers(128 * 1024)
-      .addEndpoint("redis://127.0.0.1:7000");
+      .addEndpoint("redis://127.0.0.1:7000")
+      .setMaxPoolSize(8)
+      .setMaxPoolWaiting(16);
 
     List<Future> futures = new ArrayList<>(24);
 

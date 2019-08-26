@@ -304,37 +304,75 @@ public class RedisOptions {
     return this;
   }
 
+  /**
+   * Tune how often in milliseconds should the connection pool cleaner execute.
+   * @return the cleaning internal
+   */
   public int getPoolCleanerInterval() {
     return poolCleanerInterval;
   }
 
+  /**
+   * Tune how often in milliseconds should the connection pool cleaner execute.
+   * @param poolCleanerInterval the interval in milliseconds (-1 for never)
+   * @return fluent self.
+   */
   public RedisOptions setPoolCleanerInterval(int poolCleanerInterval) {
     this.poolCleanerInterval = poolCleanerInterval;
     return this;
   }
 
+  /**
+   * Tune the maximum size of the connection pool.
+   * @return the size.
+   */
   public int getMaxPoolSize() {
-    return Math.max(maxPoolSize, endpoints == null ? 1 : endpoints.size());
+    return maxPoolSize;
   }
 
+  /**
+   * Tune the maximum size of the connection pool. When working with cluster or sentinel
+   * this value should be atleast the total number of cluster member (or number of sentinels + 1)
+   *
+   * @param maxPoolSize the max pool size.
+   * @return fluent self.
+   */
   public RedisOptions setMaxPoolSize(int maxPoolSize) {
     this.maxPoolSize = maxPoolSize;
     return this;
   }
 
+  /**
+   * Tune the maximum waiting requests for a connection from the pool.
+   * @return the maximum waiting requests.
+   */
   public int getMaxPoolWaiting() {
-    return Math.max(maxPoolWaiting, 8 * getMaxPoolSize());
+    return maxPoolWaiting;
   }
 
+  /**
+   * Tune the maximum waiting requests for a connection from the pool.
+   * @param maxPoolWaiting max waiting requests
+   * @return fluent self.
+   */
   public RedisOptions setMaxPoolWaiting(int maxPoolWaiting) {
     this.maxPoolWaiting = maxPoolWaiting;
     return this;
   }
 
+  /**
+   * Tune when a connection should be recycled in milliseconds.
+   * @return the timeout for recycling.
+   */
   public int getPoolRecycleTimeout() {
     return poolRecycleTimeout;
   }
 
+  /**
+   * Tune when a connection should be recycled in milliseconds.
+   * @param poolRecycleTimeout the timeout for recycling.
+   * @return fluent self.
+   */
   public RedisOptions setPoolRecycleTimeout(int poolRecycleTimeout) {
     this.poolRecycleTimeout = poolRecycleTimeout;
     return this;

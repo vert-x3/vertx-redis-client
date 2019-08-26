@@ -55,6 +55,14 @@ public class RedisSentinelClient implements Redis {
 
   public RedisSentinelClient(Vertx vertx, RedisOptions options) {
     this.options = options;
+    // validate options
+    // validate options
+    if (options.getMaxPoolSize() < 2) {
+      throw new IllegalStateException("Invalid options: maxPoolSize must be at least 2");
+    }
+    if (options.getMaxPoolWaiting() < options.getMaxPoolSize()) {
+      throw new IllegalStateException("Invalid options: maxPoolWaiting < maxPoolSize");
+    }
     // sentinel (HA) requires 2 connections, one to watch for sentinel events and the connection itself
     this.connectionManager = new ConnectionManager(vertx, options);
 

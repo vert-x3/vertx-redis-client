@@ -25,8 +25,13 @@ Set the master name (only considered in HA mode).
 |[[maxNestedArrays]]`@maxNestedArrays`|`Number (int)`|+++
 Tune how much nested arrays are allowed on a redis response. This affects the parser performance.
 +++
-|[[maxPoolSize]]`@maxPoolSize`|`Number (int)`|-
-|[[maxPoolWaiting]]`@maxPoolWaiting`|`Number (int)`|-
+|[[maxPoolSize]]`@maxPoolSize`|`Number (int)`|+++
+Tune the maximum size of the connection pool. When working with cluster or sentinel
+ this value should be atleast the total number of cluster member (or number of sentinels + 1)
++++
+|[[maxPoolWaiting]]`@maxPoolWaiting`|`Number (int)`|+++
+Tune the maximum waiting requests for a connection from the pool.
++++
 |[[maxWaitingHandlers]]`@maxWaitingHandlers`|`Number (int)`|+++
 The client will always work on pipeline mode, this means that messages can start queueing. You can control how much
  backlog you're willing to accept. This methods sets how much handlers is the client willing to queue.
@@ -34,8 +39,12 @@ The client will always work on pipeline mode, this means that messages can start
 |[[netClientOptions]]`@netClientOptions`|`link:dataobjects.html#NetClientOptions[NetClientOptions]`|+++
 Set the net client options to be used while connecting to the redis server. Use this to tune your connection.
 +++
-|[[poolCleanerInterval]]`@poolCleanerInterval`|`Number (int)`|-
-|[[poolRecycleTimeout]]`@poolRecycleTimeout`|`Number (int)`|-
+|[[poolCleanerInterval]]`@poolCleanerInterval`|`Number (int)`|+++
+Tune how often in milliseconds should the connection pool cleaner execute.
++++
+|[[poolRecycleTimeout]]`@poolRecycleTimeout`|`Number (int)`|+++
+Tune when a connection should be recycled in milliseconds.
++++
 |[[role]]`@role`|`link:enums.html#RedisRole[RedisRole]`|+++
 Set the role name (only considered in HA mode).
 +++

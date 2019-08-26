@@ -26,7 +26,9 @@ public class RedisSentinelTest {
         .addEndpoint("redis://localhost:5001")
         .addEndpoint("redis://localhost:5002")
         .setMasterName("sentinel7000")
-        .setRole(RedisRole.MASTER))
+        .setRole(RedisRole.MASTER)
+        .setMaxPoolSize(4)
+        .setMaxPoolWaiting(16))
       .connect(onCreate -> {
         // get a connection to the master node
         should.assertTrue(onCreate.succeeded());
@@ -52,7 +54,9 @@ public class RedisSentinelTest {
         .addEndpoint("redis://localhost:5001")
         .addEndpoint("redis://localhost:5002")
         .setMasterName("sentinel7000")
-        .setRole(RedisRole.SLAVE))
+        .setRole(RedisRole.SLAVE)
+        .setMaxPoolSize(4)
+        .setMaxPoolWaiting(16))
       .connect(onCreate -> {
         // get a connection to the master node
         should.assertTrue(onCreate.succeeded());
@@ -78,7 +82,9 @@ public class RedisSentinelTest {
         .addEndpoint("redis://localhost:5001")
         .addEndpoint("redis://localhost:5002")
         .setMasterName("sentinel7000")
-        .setRole(RedisRole.SENTINEL))
+        .setRole(RedisRole.SENTINEL)
+        .setMaxPoolSize(4)
+        .setMaxPoolWaiting(16))
       .connect(onCreate -> {
         // get a connection to the master node
         should.assertTrue(onCreate.succeeded());

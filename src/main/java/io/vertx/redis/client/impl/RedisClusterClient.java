@@ -106,6 +106,12 @@ public class RedisClusterClient implements Redis {
   public RedisClusterClient(Vertx vertx, RedisOptions options) {
     this.vertx = vertx;
     this.options = options;
+    // validate options
+    if (options.getMaxPoolWaiting() < options.getMaxPoolSize()) {
+      throw new IllegalStateException("Invalid options: maxPoolWaiting < maxPoolSize");
+      // we can't validate the max pool size yet as we need to know the slots first
+      // the remaining validation will happen at the connect time
+    }
     this.connectionManager = new ConnectionManager(vertx, options);
     this.connectionManager.start();
   }
@@ -150,6 +156,13 @@ public class RedisClusterClient implements Redis {
         final AtomicBoolean failed = new AtomicBoolean(false);
         final AtomicInteger counter = new AtomicInteger();
         final Map<String, RedisConnection> connections = new HashMap<>();
+
+        // validate if the pool config is valid
+        if (options.getMaxPoolSize() < slots.size()) {
+          // this isn't a valid setup, the connection pool will not accommodate all the required connections
+          onConnect.handle(Future.failedFuture("RedisOptions maxPoolSize < Cluster size(" + slots.size() + "): The pool is not able to hold all required connections!"));
+          return;
+        }
 
         for (String endpoint: slots.endpoints()) {
           connectionManager.getConnection(endpoint, RedisSlaves.NEVER != options.getUseSlave() ? cmd(READONLY) : null, getClusterConnection -> {
