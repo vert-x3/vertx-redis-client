@@ -147,7 +147,8 @@ public class RedisClientTest {
 
     redis.bgsave(toList("SCHEDULE"), reply -> {
       should.assertTrue(reply.succeeded());
-      should.assertEquals("Background saving scheduled", reply.result().toString());
+      should.assertNotNull(reply.result().toString());
+      should.assertTrue(reply.result().toString().startsWith("Background saving"));
       test.complete();
     });
 
