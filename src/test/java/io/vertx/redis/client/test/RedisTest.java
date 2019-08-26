@@ -11,6 +11,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 
 import java.util.Arrays;
+import java.util.UUID;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.IntStream;
 
@@ -42,6 +43,28 @@ public class RedisTest {
           should.assertNotNull(send.result());
 
           should.assertEquals("PONG", send.result().toString());
+          test.complete();
+        });
+      });
+  }
+
+  @Test
+  public void emptyStringTest(TestContext should) {
+    final Async test = should.async();
+
+    Redis.createClient(rule.vertx(), "redis://localhost:7006")
+      .connect(create -> {
+        should.assertTrue(create.succeeded());
+
+        final RedisConnection redis = create.result();
+
+        redis.exceptionHandler(should::fail);
+
+        redis.send(Request.cmd(Command.SET).arg(UUID.randomUUID().toString()).arg(""), send -> {
+          should.assertTrue(send.succeeded());
+          should.assertNotNull(send.result());
+
+          should.assertEquals("OK", send.result().toString());
           test.complete();
         });
       });
