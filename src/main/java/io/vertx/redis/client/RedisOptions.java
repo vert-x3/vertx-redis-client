@@ -30,6 +30,11 @@ import java.util.List;
 @DataObject(generateConverter = true)
 public class RedisOptions {
 
+  /**
+   * The default redis endpoint = {@code redis://localhost:6379}
+   */
+  public static final String DEFAULT_ENDPOINT = "redis://localhost:6379";
+
   private RedisClientType type;
   private NetClientOptions netClientOptions;
   private List<String> endpoints;
@@ -141,6 +146,10 @@ public class RedisOptions {
    * @return list of socket addresses.
    */
   public List<String> getEndpoints() {
+    if (endpoints == null) {
+      endpoints = new ArrayList<>();
+      endpoints.add(DEFAULT_ENDPOINT);
+    }
     return endpoints;
   }
 
@@ -150,7 +159,7 @@ public class RedisOptions {
    */
   public String getEndpoint() {
     if (endpoints == null || endpoints.size() == 0) {
-      return "redis://localhost:6379";
+      return DEFAULT_ENDPOINT;
     }
 
     return endpoints.get(0);
@@ -305,7 +314,7 @@ public class RedisOptions {
   }
 
   public int getMaxPoolSize() {
-    return Math.max(maxPoolSize, endpoints.size());
+    return Math.max(maxPoolSize, endpoints == null ? 1 : endpoints.size());
   }
 
   public RedisOptions setMaxPoolSize(int maxPoolSize) {
