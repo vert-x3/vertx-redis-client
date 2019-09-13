@@ -4,21 +4,13 @@ import io.vertx.core.json.JsonObject;
 import io.vertx.core.json.JsonArray;
 import java.time.Instant;
 import java.time.format.DateTimeFormatter;
-import io.vertx.core.spi.json.JsonCodec;
 
 /**
- * Converter and Codec for {@link io.vertx.redis.client.RedisOptions}.
+ * Converter and mapper for {@link io.vertx.redis.client.RedisOptions}.
  * NOTE: This class has been automatically generated from the {@link io.vertx.redis.client.RedisOptions} original class using Vert.x codegen.
  */
-public class RedisOptionsConverter implements JsonCodec<RedisOptions, JsonObject> {
+public class RedisOptionsConverter {
 
-  public static final RedisOptionsConverter INSTANCE = new RedisOptionsConverter();
-
-  @Override public JsonObject encode(RedisOptions value) { return (value != null) ? value.toJson() : null; }
-
-  @Override public RedisOptions decode(JsonObject value) { return (value != null) ? new RedisOptions(value) : null; }
-
-  @Override public Class<RedisOptions> getTargetClass() { return RedisOptions.class; }
 
   public static void fromJson(Iterable<java.util.Map.Entry<String, Object>> json, RedisOptions obj) {
     for (java.util.Map.Entry<String, Object> member : json) {
