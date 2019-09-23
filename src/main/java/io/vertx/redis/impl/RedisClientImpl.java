@@ -20,6 +20,7 @@ import io.vertx.core.Future;
 import io.vertx.core.Handler;
 import io.vertx.core.Vertx;
 import io.vertx.core.buffer.Buffer;
+import io.vertx.core.eventbus.EventBus;
 import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;
 import io.vertx.core.net.SocketAddress;
@@ -32,6 +33,7 @@ import io.vertx.redis.client.Redis;
 import io.vertx.redis.client.Request;
 import io.vertx.redis.client.Response;
 import io.vertx.redis.client.ResponseType;
+import io.vertx.redis.client.impl.types.MultiType;
 import io.vertx.redis.op.*;
 
 import java.util.*;
@@ -43,13 +45,17 @@ import static io.vertx.redis.client.Command.*;
 
 public final class RedisClientImpl implements RedisClient {
 
+  private final String BASE_ADDRESS = "io.vertx.redis";
+  
   private final Vertx vertx;
   private final RedisOptions options;
   private final AtomicReference<CompletableFuture<Redis>> redis = new AtomicReference<>();
+  private final EventBus eb;
 
   public RedisClientImpl(Vertx vertx, RedisOptions options) {
     this.vertx = vertx;
     this.options = options;
+    this.eb = vertx.eventBus();
   }
 
   /**
@@ -126,7 +132,7 @@ public final class RedisClientImpl implements RedisClient {
           } else {
             f.completeExceptionally(onReady.cause());
           }
-        });
+        }).handler(this::handlePubSubMessage);
       } else {
         fut = redis.get();
       }
@@ -139,6 +145,22 @@ public final class RedisClientImpl implements RedisClient {
         handler.handle(Future.failedFuture(err));
       }
     });
+  }
+  
+  private void handlePubSubMessage(Response response) {
+    JsonArray data = toJsonArray(response);
+    // Detect valid published messages according to https://redis.io/topics/pubsub
+    if (!"message".equals(data.getString(0)))
+      return;
+    String channel = data.getString(1);
+    final String vertxChannel = BASE_ADDRESS + "." + channel;
+    JsonObject replyMessage = new JsonObject();
+    replyMessage.put("status", "ok");
+    JsonObject message = new JsonObject();
+    message.put("channel", channel);
+    message.put("message", data.getString(2));
+    replyMessage.put("value", message);
+    eb.send(vertxChannel, replyMessage);
   }
 
   private void sendLong(Command command, List arguments, Handler<AsyncResult<Long>> handler) {
