@@ -3311,6 +3311,16 @@ public class RedisClientTest {
   }
 
   @Test
+  public void testBinaryNonExisting(TestContext should) {
+    final Async test = should.async();
+    final String key = makeKey();
+    redis.getBinary(key, reply1 -> {
+      should.assertTrue(reply1.succeeded(), String.valueOf(reply1.cause()));
+      test.complete();
+    });
+  }
+
+  @Test
   public void testIssue5BlockingCall_shouldWork(TestContext should) {
     final Async test = should.async();
     final String list1 = makeKey();

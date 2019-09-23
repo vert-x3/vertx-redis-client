@@ -224,7 +224,11 @@ public final class RedisClientImpl implements RedisClient {
       if (ar.failed()) {
         handler.handle(Future.failedFuture(ar.cause()));
       } else {
-        handler.handle(Future.succeededFuture(ar.result().toBuffer()));
+        if (ar.result() == null) {
+          handler.handle(Future.succeededFuture(null));
+        } else {
+          handler.handle(Future.succeededFuture(ar.result().toBuffer()));
+        }
       }
     });
   }
