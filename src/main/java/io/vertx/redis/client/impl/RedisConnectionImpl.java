@@ -50,7 +50,8 @@ public class RedisConnectionImpl implements RedisConnection, ParserHandler {
   @Override
   public void close() {
     // recycle this connection from the pool
-    listener.onRecycle(recycleTimeout);
+    long expired = recycleTimeout > 0 ? System.currentTimeMillis() + recycleTimeout : 0L;
+    listener.onRecycle(expired);
   }
 
   @Override

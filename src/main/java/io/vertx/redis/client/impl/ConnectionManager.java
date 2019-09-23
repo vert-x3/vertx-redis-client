@@ -167,6 +167,7 @@ class ConnectionManager {
       connection.handler(null);
       connection.endHandler(null);
       connection.exceptionHandler(null);
+      ((RedisConnectionImpl) connection).forceClose();
     }
   }
 
