@@ -155,10 +155,10 @@ public class RedisOptions {
 
   /**
    * Gets the redis endpoint to use
-   * @return socket address.
+   * @return the Redis connection string URI
    */
   public String getEndpoint() {
-    if (endpoints == null || endpoints.size() == 0) {
+    if (endpoints == null || endpoints.isEmpty()) {
       return DEFAULT_ENDPOINT;
     }
 
@@ -181,31 +181,32 @@ public class RedisOptions {
    * Adds a endpoint to use while connecting to the redis server. Only the cluster mode will consider more than
    * 1 element. If more are provided, they are not considered by the client when in single server mode.
    *
-   * @param endpoint a socket addresses.
+   * @param connectionString a string following the scheme: redis://[username:password@][host][:port][/[database]
    * @return fluent self.
    */
-  public RedisOptions addEndpoint(String endpoint) {
+  public RedisOptions addEndpoint(String connectionString) {
     if (endpoints == null) {
       endpoints = new ArrayList<>();
     }
-    this.endpoints.add(endpoint);
+    this.endpoints.add(connectionString);
     return this;
   }
 
   /**
-   * Sets a single endpoint to use while connecting to the redis server. Will replace the previously configured endpoints.
+   * Sets a single connection string to use while connecting to the redis server.
+   * Will replace the previously configured connection strings.
    *
-   * @param endpoint a socket addresses.
+   * @param connectionString a string following the scheme: redis://[username:password@][host][:port][/[database]
    * @return fluent self.
    */
-  public RedisOptions setEndpoint(String endpoint) {
+  public RedisOptions setEndpoint(String connectionString) {
     if (endpoints == null) {
       endpoints = new ArrayList<>();
     } else {
       endpoints.clear();
     }
 
-    this.endpoints.add(endpoint);
+    this.endpoints.add(connectionString);
     return this;
   }
 
