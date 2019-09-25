@@ -24,7 +24,8 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * Utility to parse redis URLs. An example URI can be found at <a href="https://redis.io/topics/rediscli">Redis cli docs</a>
+ * Utility to parse redis URLs. The URI should follow the scheme: redis://[username:password@][host][:port][/[database]
+ * An example URI can be found at <a href="https://redis.io/topics/rediscli">Redis cli docs</a>
  * @author <a href="mailto:plopes@redhat.com">Paulo Lopes</a>
  */
 public final class RedisURI {

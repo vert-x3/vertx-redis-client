@@ -39,7 +39,7 @@ public interface Redis {
 
   /**
    * Create a new redis client using the default client options.
-   * @param connectionString the Redis connection string URI
+   * @param connectionString a string URI following the scheme: redis://[username:password@][host][:port][/database]
    * @param vertx the vertx instance
    * @return the client
    */
