@@ -24,20 +24,32 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * Utility to parse redis URLs
+ * Utility to parse redis URLs. An example URI can be found at <a href="https://redis.io/topics/rediscli">Redis cli docs</a>
  * @author <a href="mailto:plopes@redhat.com">Paulo Lopes</a>
  */
 public final class RedisURI {
 
-  private final String address;
+  /**
+   * Original address string
+   */
+  private final String connectionString;
+  /**
+   * Address, including host and port
+   */
   private final SocketAddress socketAddress;
+  /**
+   * Password to the Redis instance
+   */
   private final String password;
+  /**
+   * Database number
+   */
   private final Integer select;
 
-  public RedisURI(String address) {
-    this.address = address;
+  public RedisURI(String connectionString) {
+    this.connectionString = connectionString;
     try {
-      final URI uri = new URI(address);
+      final URI uri = new URI(connectionString);
 
       final String host = uri.getHost() == null ? "localhost" : uri.getHost();
       final int port = uri.getPort() == -1 ? 6379 : uri.getPort();
@@ -63,14 +75,14 @@ public final class RedisURI {
           }
           break;
         default:
-          throw new RuntimeException("Unsupported scheme [" + uri.getScheme() + "]");
+          throw new RuntimeException("Unsupported Redis connection string scheme [" + uri.getScheme() + "]");
       }
 
       String userInfo = uri.getUserInfo();
       if (userInfo != null) {
-        int col = userInfo.indexOf(':');
-        if (col != -1) {
-          password = uri.getUserInfo().substring(col + 1);
+        String[] userInfoArray = userInfo.split(":");
+        if (userInfoArray.length > 0) {
+          password = userInfoArray[userInfoArray.length - 1];
         } else {
           password = null;
         }
@@ -79,7 +91,7 @@ public final class RedisURI {
       }
 
     } catch (URISyntaxException e) {
-     throw new RuntimeException("Failed to parse the endpoint address", e);
+     throw new RuntimeException("Failed to parse the connection string", e);
     }
   }
 
@@ -112,12 +124,12 @@ public final class RedisURI {
     return select;
   }
 
-  public String address() {
-    return address;
+  public String connectionString() {
+    return connectionString;
   }
 
   @Override
   public String toString() {
-    return address;
+    return connectionString;
   }
 }
