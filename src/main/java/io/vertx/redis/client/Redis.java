@@ -39,12 +39,12 @@ public interface Redis {
 
   /**
    * Create a new redis client using the default client options.
-   * @param endpoint the server address to connect to
+   * @param connectionString a string URI following the scheme: redis://[username:password@][host][:port][/database]
    * @param vertx the vertx instance
    * @return the client
    */
-  static Redis createClient(Vertx vertx, String endpoint) {
-    return createClient(vertx, new RedisOptions().setEndpoint(endpoint));
+  static Redis createClient(Vertx vertx, String connectionString) {
+    return createClient(vertx, new RedisOptions().setConnectionString(connectionString));
   }
 
   /**

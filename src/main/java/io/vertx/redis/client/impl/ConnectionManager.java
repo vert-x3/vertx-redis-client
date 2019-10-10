@@ -13,7 +13,10 @@ import io.vertx.core.impl.logging.Logger;
 import io.vertx.core.impl.logging.LoggerFactory;
 import io.vertx.core.net.NetClient;
 import io.vertx.core.net.NetSocket;
-import io.vertx.redis.client.*;
+import io.vertx.redis.client.Command;
+import io.vertx.redis.client.RedisConnection;
+import io.vertx.redis.client.RedisOptions;
+import io.vertx.redis.client.Request;
 
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -58,8 +61,8 @@ class ConnectionManager {
     private final RedisURI redisURI;
     private final Request setup;
 
-    public RedisConnectionProvider(String address, Request setup) {
-      this.redisURI = new RedisURI(address);
+    public RedisConnectionProvider(String connectionString, Request setup) {
+      this.redisURI = new RedisURI(connectionString);
       this.setup = setup;
     }
 
@@ -98,9 +101,9 @@ class ConnectionManager {
             }
 
             // perform setup
-            setup(connection, setup, setup -> {
-              if (setup.failed()) {
-                onConnect.handle(Future.failedFuture(setup.cause()));
+            setup(connection, setup, setupResult -> {
+              if (setupResult.failed()) {
+                onConnect.handle(Future.failedFuture(setupResult.cause()));
                 return;
               }
 
@@ -170,10 +173,10 @@ class ConnectionManager {
     }
   }
 
-  public void getConnection(String address, Request setup, Handler<AsyncResult<RedisConnection>> handler) {
-    final ConnectionProvider<RedisConnection> connectionProvider = new RedisConnectionProvider(address, setup);
+  public void getConnection(String connectionString, Request setup, Handler<AsyncResult<RedisConnection>> handler) {
+    final ConnectionProvider<RedisConnection> connectionProvider = new RedisConnectionProvider(connectionString, setup);
     while (true) {
-      Pool<RedisConnection> endpoint = endpointMap.computeIfAbsent(address, targetAddress ->
+      Pool<RedisConnection> endpoint = endpointMap.computeIfAbsent(connectionString, targetAddress ->
         new Pool<>(
           ctx,
           connectionProvider,
@@ -181,9 +184,9 @@ class ConnectionManager {
           options.getMaxPoolWaiting(),
           options.getMaxPoolSize(),
           options.getMaxPoolSize() * 4,
-          v -> endpointMap.remove(address),
-          conn -> connectionMap.put(address, conn),
-          conn -> connectionMap.remove(address, conn),
+          v -> endpointMap.remove(connectionString),
+          conn -> connectionMap.put(connectionString, conn),
+          conn -> connectionMap.remove(connectionString, conn),
           false));
       if (endpoint.getConnection(handler)) {
         break;
