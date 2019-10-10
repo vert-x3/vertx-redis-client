@@ -38,10 +38,11 @@ public interface Redis {
   }
 
   /**
-   * Create a new redis client using the default client options.
+   * Create a new redis client using the default client options. Does not support rediss (redis over ssl scheme) for now.
    * @param connectionString a string URI following the scheme: redis://[username:password@][host][:port][/database]
    * @param vertx the vertx instance
    * @return the client
+   * @see <a href="https://www.iana.org/assignments/uri-schemes/prov/redis">Redis scheme on www.iana.org</a>
    */
   static Redis createClient(Vertx vertx, String connectionString) {
     return createClient(vertx, new RedisOptions().setConnectionString(connectionString));

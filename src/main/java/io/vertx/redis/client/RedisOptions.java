@@ -76,6 +76,7 @@ public class RedisOptions {
 
   /**
    * Copy constructor.
+   *
    * @param other the object to clone.
    */
   public RedisOptions(RedisOptions other) {
@@ -96,6 +97,7 @@ public class RedisOptions {
 
   /**
    * Copy from JSON constructor.
+   *
    * @param json source json
    */
   public RedisOptions(JsonObject json) {
@@ -105,6 +107,7 @@ public class RedisOptions {
 
   /**
    * Get the type of client to be created.
+   *
    * @return the desired client type.
    */
   public RedisClientType getType() {
@@ -113,6 +116,7 @@ public class RedisOptions {
 
   /**
    * Set the desired client type to be created.
+   *
    * @param type the client type.
    * @return fluent self.
    */
@@ -124,6 +128,7 @@ public class RedisOptions {
 
   /**
    * Get the net client options used to connect to the server.
+   *
    * @return the net socket options.
    */
   public NetClientOptions getNetClientOptions() {
@@ -143,6 +148,7 @@ public class RedisOptions {
 
   /**
    * Gets the list of redis endpoints to use (mostly used while connecting to a cluster)
+   *
    * @return list of socket addresses.
    */
   public List<String> getEndpoints() {
@@ -155,6 +161,7 @@ public class RedisOptions {
 
   /**
    * Gets the redis endpoint to use
+   *
    * @return the Redis connection string URI
    */
   public String getEndpoint() {
@@ -178,12 +185,14 @@ public class RedisOptions {
   }
 
   /**
-   * Adds a endpoint to use while connecting to the redis server. Only the cluster mode will consider more than
+   * Adds an endpoint to use while connecting to the redis server. Only the cluster mode will consider more than
    * 1 element. If more are provided, they are not considered by the client when in single server mode.
    *
    * @param connectionString a string URI following the scheme: redis://[username:password@][host][:port][/database]
    * @return fluent self.
+   * @deprecated see {@link #setConnectionString(String connectionString)} for a better naming
    */
+  @Deprecated
   public RedisOptions addEndpoint(String connectionString) {
     if (endpoints == null) {
       endpoints = new ArrayList<>();
@@ -198,7 +207,6 @@ public class RedisOptions {
    *
    * @param connectionString a string following the scheme: redis://[username:password@][host][:port][/[database]
    * @return fluent self.
-   *
    * @deprecated see {@link #setConnectionString(String connectionString)} for a better naming
    */
   @Deprecated
@@ -214,14 +222,33 @@ public class RedisOptions {
   }
 
   /**
-   * Sets a single connection string to use while connecting to the redis server.
+   * Adds a connection string (endpoint) to use while connecting to the redis server. Only the cluster mode will
+   * consider more than 1 element. If more are provided, they are not considered by the client when in single server mode.
+   * <p>
+   * Does not support rediss (redis over ssl scheme) for now.
+   *
+   * @param connectionString a string URI following the scheme: redis://[username:password@][host][:port][/database]
+   * @return fluent self.
+   *
+   * @see <a href="https://www.iana.org/assignments/uri-schemes/prov/redis">Redis scheme on www.iana.org</a>
+   */
+  public RedisOptions addConnectionString(String connectionString) {
+    if (endpoints == null) {
+      endpoints = new ArrayList<>();
+    }
+    this.endpoints.add(connectionString);
+    return this;
+  }
+
+  /**
+   * Sets a single connection string (endpoint) to use while connecting to the redis server.
    * Will replace the previously configured connection strings.
    * <p>
    * Does not support rediss (redis over ssl scheme) for now.
    *
    * @param connectionString a string following the scheme: redis://[username:password@][host][:port][/[database].
-   * @see <a href="https://www.iana.org/assignments/uri-schemes/prov/redis">Redis scheme on www.iana.org</a>
    * @return fluent self.
+   * @see <a href="https://www.iana.org/assignments/uri-schemes/prov/redis">Redis scheme on www.iana.org</a>
    */
   public RedisOptions setConnectionString(String connectionString) {
     if (endpoints == null) {
@@ -258,6 +285,7 @@ public class RedisOptions {
 
   /**
    * Get the master name (only considered in HA mode).
+   *
    * @return the master name.
    */
   public String getMasterName() {
@@ -266,6 +294,7 @@ public class RedisOptions {
 
   /**
    * Set the master name (only considered in HA mode).
+   *
    * @param masterName the master name.
    * @return fluent self.
    */
@@ -276,6 +305,7 @@ public class RedisOptions {
 
   /**
    * Get the role name (only considered in HA mode).
+   *
    * @return the master name.
    */
   public RedisRole getRole() {
@@ -284,6 +314,7 @@ public class RedisOptions {
 
   /**
    * Set the role name (only considered in HA mode).
+   *
    * @param role the master name.
    * @return fluent self.
    */
@@ -294,6 +325,7 @@ public class RedisOptions {
 
   /**
    * Get whether or not to use slave nodes (only considered in Cluster mode).
+   *
    * @return the cluster slave mode.
    */
   public RedisSlaves getUseSlave() {
@@ -302,6 +334,7 @@ public class RedisOptions {
 
   /**
    * Set whether or not to use slave nodes (only considered in Cluster mode).
+   *
    * @param slaves the cluster slave mode.
    * @return fluent self.
    */
@@ -313,6 +346,7 @@ public class RedisOptions {
 
   /**
    * Tune how much nested arrays are allowed on a redis response. This affects the parser performance.
+   *
    * @return the configured max nested arrays allowance.
    */
   public int getMaxNestedArrays() {
@@ -321,6 +355,7 @@ public class RedisOptions {
 
   /**
    * Tune how much nested arrays are allowed on a redis response. This affects the parser performance.
+   *
    * @param maxNestedArrays the configured max nested arrays allowance.
    * @return fluent self.
    */
@@ -331,6 +366,7 @@ public class RedisOptions {
 
   /**
    * Tune how often in milliseconds should the connection pool cleaner execute.
+   *
    * @return the cleaning internal
    */
   public int getPoolCleanerInterval() {
@@ -339,6 +375,7 @@ public class RedisOptions {
 
   /**
    * Tune how often in milliseconds should the connection pool cleaner execute.
+   *
    * @param poolCleanerInterval the interval in milliseconds (-1 for never)
    * @return fluent self.
    */
@@ -349,6 +386,7 @@ public class RedisOptions {
 
   /**
    * Tune the maximum size of the connection pool.
+   *
    * @return the size.
    */
   public int getMaxPoolSize() {
@@ -369,6 +407,7 @@ public class RedisOptions {
 
   /**
    * Tune the maximum waiting requests for a connection from the pool.
+   *
    * @return the maximum waiting requests.
    */
   public int getMaxPoolWaiting() {
@@ -377,6 +416,7 @@ public class RedisOptions {
 
   /**
    * Tune the maximum waiting requests for a connection from the pool.
+   *
    * @param maxPoolWaiting max waiting requests
    * @return fluent self.
    */
@@ -387,6 +427,7 @@ public class RedisOptions {
 
   /**
    * Tune when a connection should be recycled in milliseconds.
+   *
    * @return the timeout for recycling.
    */
   public int getPoolRecycleTimeout() {
@@ -395,6 +436,7 @@ public class RedisOptions {
 
   /**
    * Tune when a connection should be recycled in milliseconds.
+   *
    * @param poolRecycleTimeout the timeout for recycling.
    * @return fluent self.
    */
@@ -402,8 +444,10 @@ public class RedisOptions {
     this.poolRecycleTimeout = poolRecycleTimeout;
     return this;
   }
+
   /**
    * Converts this object to JSON notation.
+   *
    * @return JSON
    */
   public JsonObject toJson() {
