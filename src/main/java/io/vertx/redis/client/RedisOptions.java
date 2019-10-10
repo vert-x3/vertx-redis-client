@@ -198,8 +198,30 @@ public class RedisOptions {
    *
    * @param connectionString a string following the scheme: redis://[username:password@][host][:port][/[database]
    * @return fluent self.
+   *
+   * @deprecated see {@link #setConnectionString(String connectionString)} for a better naming
    */
+  @Deprecated
   public RedisOptions setEndpoint(String connectionString) {
+    if (endpoints == null) {
+      endpoints = new ArrayList<>();
+    } else {
+      endpoints.clear();
+    }
+
+    this.endpoints.add(connectionString);
+    return this;
+  }
+
+  /**
+   * Sets a single connection string to use while connecting to the redis server.
+   * Will replace the previously configured connection strings.
+   *
+   * @param connectionString a string following the scheme: redis://[username:password@][host][:port][/[database].
+   * @see <a href="https://www.iana.org/assignments/uri-schemes/prov/redis">Redis scheme on www.iana.org</a>
+   * @return fluent self.
+   */
+  public RedisOptions setConnectionString(String connectionString) {
     if (endpoints == null) {
       endpoints = new ArrayList<>();
     } else {

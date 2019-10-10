@@ -44,7 +44,7 @@ public interface Redis {
    * @return the client
    */
   static Redis createClient(Vertx vertx, String connectionString) {
-    return createClient(vertx, new RedisOptions().setEndpoint(connectionString));
+    return createClient(vertx, new RedisOptions().setConnectionString(connectionString));
   }
 
   /**
