@@ -21,10 +21,17 @@ import io.vertx.redis.client.*;
 
 public class RedisAPIImpl implements RedisAPI {
 
+  private final Redis redis;
   private final RedisConnection connection;
 
   public RedisAPIImpl(RedisConnection connection) {
     this.connection = connection;
+    this.redis = null;
+  }
+
+  public RedisAPIImpl(Redis redis) {
+    this.connection = null;
+    this.redis = redis;
   }
 
   @Override
@@ -42,12 +49,24 @@ public class RedisAPIImpl implements RedisAPI {
       }
     }
 
-    connection.send(req, promise);
+    if (redis != null) {
+      // operating in pooled mode
+      redis.send(req, promise);
+    } else if (connection != null) {
+      // operating on connection mode
+      connection.send(req, promise);
+    }
     return promise.future();
   }
 
   @Override
   public void close() {
-    connection.close();
+    if (redis != null) {
+      // operating in pooled mode
+      redis.close();
+    } else if (connection != null) {
+      // operating on connection mode
+      connection.close();
+    }
   }
 }

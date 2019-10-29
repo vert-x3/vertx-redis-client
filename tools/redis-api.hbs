@@ -36,6 +36,10 @@ public interface RedisAPI {
     return new RedisAPIImpl(client);
   }
 
+  static RedisAPI api(RedisConnection connection) {
+    return new RedisAPIImpl(connection);
+  }
+
 {{#each .}}
   /**
    * Redis command <a href="https://redis.io/commands/{{ name }}">{{ camelcase safename }}</a>.

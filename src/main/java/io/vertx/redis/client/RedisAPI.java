@@ -32,8 +32,12 @@ import java.util.List;
 @VertxGen
 public interface RedisAPI {
 
-  static RedisAPI api(RedisConnection client) {
+  static RedisAPI api(Redis client) {
     return new RedisAPIImpl(client);
+  }
+
+  static RedisAPI api(RedisConnection connection) {
+    return new RedisAPIImpl(connection);
   }
 
   void close();
