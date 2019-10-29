@@ -26,16 +26,20 @@ import io.vertx.redis.client.impl.RedisAPIImpl;
 
 import java.util.List;
 
+import static io.vertx.codegen.annotations.GenIgnore.PERMITTED_TYPE;
+
 /**
  * <b>Auto generated</b> Redis API client wrapper.
  */
 @VertxGen
 public interface RedisAPI {
 
+  @GenIgnore(PERMITTED_TYPE)
   static RedisAPI api(Redis client) {
     return new RedisAPIImpl(client);
   }
 
+  @GenIgnore(PERMITTED_TYPE)
   static RedisAPI api(RedisConnection connection) {
     return new RedisAPIImpl(connection);
   }
