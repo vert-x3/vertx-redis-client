@@ -2,9 +2,11 @@ package io.vertx.redis.client.impl;
 
 import io.vertx.core.*;
 import io.vertx.core.buffer.Buffer;
+import io.vertx.core.eventbus.EventBus;
 import io.vertx.core.http.impl.pool.ConnectionListener;
 import io.vertx.core.impl.logging.Logger;
 import io.vertx.core.impl.logging.LoggerFactory;
+import io.vertx.core.json.JsonObject;
 import io.vertx.core.net.NetSocket;
 import io.vertx.redis.client.*;
 import io.vertx.redis.client.impl.types.ErrorType;
@@ -17,12 +19,15 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 public class RedisConnectionImpl implements RedisConnection, ParserHandler {
 
+  private static final String BASE_ADDRESS = "io.vertx.redis";
+
   private static final Logger LOG = LoggerFactory.getLogger(RedisConnectionImpl.class);
 
   private static final ErrorType CONNECTION_CLOSED = ErrorType.create("CONNECTION_CLOSED");
 
   private final ConnectionListener<RedisConnection> listener;
   private final Context context;
+  private final EventBus eventBus;
   private final NetSocket netSocket;
   // waiting: commands that have been sent but not answered
   // the queue is only accessed from the event loop
@@ -36,6 +41,7 @@ public class RedisConnectionImpl implements RedisConnection, ParserHandler {
 
   public RedisConnectionImpl(Vertx vertx, ConnectionListener<RedisConnection> connectionListener, NetSocket netSocket, RedisOptions options) {
     this.listener = connectionListener;
+    this.eventBus = vertx.eventBus();
     this.context = vertx.getOrCreateContext();
     this.netSocket = netSocket;
     this.waiting = new ArrayQueue(options.getMaxWaitingHandlers());
@@ -192,6 +198,36 @@ public class RedisConnectionImpl implements RedisConnection, ParserHandler {
       if (onMessage != null) {
         onMessage.handle(reply);
       } else {
+        // pub/sub messages are arrays
+        if (reply.type() == ResponseType.MULTI) {
+          // Detect valid published messages according to https://redis.io/topics/pubsub
+
+          if (reply.size() == 3 && "message".equals(reply.get(0).toString())) {
+            // channel
+            eventBus.send(
+              BASE_ADDRESS + "." + reply.get(1).toString(),
+              new JsonObject()
+                .put("status", "OK")
+                .put("value", new JsonObject()
+                  .put("channel", reply.get(1).toString())
+                  .put("message", reply.get(2).toString())));
+            return;
+          }
+
+          if (reply.size() == 4 && "pmessage".equals(reply.get(0).toString())) {
+            // pattern
+            eventBus.send(
+              BASE_ADDRESS + "." + reply.get(1).toString(),
+              new JsonObject()
+                .put("status", "OK")
+                .put("value", new JsonObject()
+                  .put("pattern", reply.get(1).toString())
+                  .put("channel", reply.get(2).toString())
+                  .put("message", reply.get(3).toString())));
+            return;
+          }
+          // fallback will just go to the log
+        }
         LOG.warn("No handler waiting for message: " + reply);
       }
       return;
