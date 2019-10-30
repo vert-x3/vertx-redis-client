@@ -23,7 +23,10 @@ import io.vertx.ext.unit.junit.VertxUnitRunner;
 import io.vertx.redis.client.Redis;
 import io.vertx.redis.client.RedisAPI;
 import io.vertx.redis.client.RedisOptions;
-import org.junit.*;
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Rule;
+import org.junit.Test;
 import org.junit.runner.RunWith;
 
 import java.util.*;
@@ -46,7 +49,7 @@ public class RedisClientTest {
   public void before(TestContext should) {
     final Async before = should.async();
 
-    client = Redis.createClient(rule.vertx(), new RedisOptions().setEndpoint("redis://localhost:7006"));
+    client = Redis.createClient(rule.vertx(), new RedisOptions().setConnectionString("redis://localhost:7006"));
     client.connect(onConnect -> {
       should.assertTrue(onConnect.succeeded());
       redis = RedisAPI.api(onConnect.result());

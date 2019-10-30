@@ -1,9 +1,7 @@
 package io.vertx.redis.client;
 
-import io.vertx.core.json.JsonObject;
 import io.vertx.core.json.JsonArray;
-import java.time.Instant;
-import java.time.format.DateTimeFormatter;
+import io.vertx.core.json.JsonObject;
 
 /**
  * Converter and mapper for {@link io.vertx.redis.client.RedisOptions}.
@@ -17,7 +15,7 @@ public class RedisOptionsConverter {
       switch (member.getKey()) {
         case "endpoint":
           if (member.getValue() instanceof String) {
-            obj.setEndpoint((String)member.getValue());
+            obj.setConnectionString((String)member.getValue());
           }
           break;
         case "endpoints":

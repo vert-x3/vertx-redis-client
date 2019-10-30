@@ -9,11 +9,13 @@ import io.vertx.ext.unit.TestContext;
 import io.vertx.ext.unit.junit.RunTestOnContext;
 import io.vertx.ext.unit.junit.VertxUnitRunner;
 import io.vertx.redis.client.*;
-
 import org.junit.*;
 import org.junit.runner.RunWith;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Random;
+import java.util.UUID;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import static io.vertx.redis.client.Command.*;
@@ -32,12 +34,12 @@ public class RedisClusterTest {
     .setUseSlave(RedisSlaves.SHARE)
     // we will flood the redis server
     .setMaxWaitingHandlers(128 * 1024)
-    .addEndpoint("redis://127.0.0.1:7000")
-    .addEndpoint("redis://127.0.0.1:7001")
-    .addEndpoint("redis://127.0.0.1:7002")
-    .addEndpoint("redis://127.0.0.1:7003")
-    .addEndpoint("redis://127.0.0.1:7004")
-    .addEndpoint("redis://127.0.0.1:7005")
+    .addConnectionString("redis://127.0.0.1:7000")
+    .addConnectionString("redis://127.0.0.1:7001")
+    .addConnectionString("redis://127.0.0.1:7002")
+    .addConnectionString("redis://127.0.0.1:7003")
+    .addConnectionString("redis://127.0.0.1:7004")
+    .addConnectionString("redis://127.0.0.1:7005")
     .setMaxPoolSize(8)
     .setMaxPoolWaiting(16);
 
@@ -118,9 +120,9 @@ public class RedisClusterTest {
       .setType(RedisClientType.CLUSTER)
       // we will flood the redis server
       .setMaxWaitingHandlers(128 * 1024)
-      .addEndpoint("redis://127.0.0.1:7000")
-      .addEndpoint("redis://127.0.0.1:7002")
-      .addEndpoint("redis://127.0.0.1:7004")
+      .addConnectionString("redis://127.0.0.1:7000")
+      .addConnectionString("redis://127.0.0.1:7002")
+      .addConnectionString("redis://127.0.0.1:7004")
       .setMaxPoolSize(8)
       .setMaxPoolWaiting(16);
 
@@ -169,7 +171,7 @@ public class RedisClusterTest {
       .setType(RedisClientType.CLUSTER)
       // we will flood the redis server
       .setMaxWaitingHandlers(128 * 1024)
-      .addEndpoint("redis://127.0.0.1:7000")
+      .addConnectionString("redis://127.0.0.1:7000")
       .setMaxPoolSize(8)
       .setMaxPoolWaiting(16);
 
@@ -218,7 +220,7 @@ public class RedisClusterTest {
       .setType(RedisClientType.CLUSTER)
       // we will flood the redis server
       .setMaxWaitingHandlers(128 * 1024)
-      .addEndpoint("redis://127.0.0.1:7000")
+      .addConnectionString("redis://127.0.0.1:7000")
       .setMaxPoolSize(8)
       .setMaxPoolWaiting(16);
 

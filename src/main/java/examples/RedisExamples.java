@@ -55,9 +55,9 @@ public class RedisExamples {
       vertx,
       new RedisOptions()
         .setType(RedisClientType.SENTINEL)
-        .addEndpoint("redis://127.0.0.1:5000")
-        .addEndpoint("redis://127.0.0.1:5001")
-        .addEndpoint("redis://127.0.0.1:5002")
+        .addConnectionString("redis://127.0.0.1:5000")
+        .addConnectionString("redis://127.0.0.1:5001")
+        .addConnectionString("redis://127.0.0.1:5002")
         .setMasterName("sentinel7000")
         .setRole(RedisRole.MASTER))
       .connect(onConnect -> {
@@ -72,12 +72,12 @@ public class RedisExamples {
 
   public void example6() {
     final RedisOptions options = new RedisOptions()
-      .addEndpoint("redis://127.0.0.1:7000")
-      .addEndpoint("redis://127.0.0.1:7001")
-      .addEndpoint("redis://127.0.0.1:7002")
-      .addEndpoint("redis://127.0.0.1:7003")
-      .addEndpoint("redis://127.0.0.1:7004")
-      .addEndpoint("redis://127.0.0.1:7005");
+      .addConnectionString("redis://127.0.0.1:7000")
+      .addConnectionString("redis://127.0.0.1:7001")
+      .addConnectionString("redis://127.0.0.1:7002")
+      .addConnectionString("redis://127.0.0.1:7003")
+      .addConnectionString("redis://127.0.0.1:7004")
+      .addConnectionString("redis://127.0.0.1:7005");
   }
 
   public void example7(Vertx vertx) {
