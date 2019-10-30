@@ -48,18 +48,26 @@ public class RedisURITest {
   @Test
   public void testDbNumberGiven() {
     RedisURI redisURI = new RedisURI("redis://redundantName:p%40ssw0rd@redis-1234.hosted.com:1234/2");
-    Assert.assertEquals("DB number is not correct", 2, (long) redisURI.select());
+    Assert.assertEquals("DB number is not correct", 2, (int) redisURI.select());
   }
 
   @Test
   public void testDbNumberGivenInQuery() {
     RedisURI redisURI = new RedisURI("redis://redundantName:p%40ssw0rd@redis-1234.hosted.com:1234?db=2");
-    Assert.assertEquals("DB number is not correct", 2, (long) redisURI.select());
+    Assert.assertEquals("DB number is not correct", 2, (int) redisURI.select());
   }
 
   @Test
   public void testDbNumberPriorityPathOverQuery() {
     RedisURI redisURI = new RedisURI("redis://redundantName:p%40ssw0rd@redis-1234.hosted.com:1234/1?db=2");
-    Assert.assertEquals("DB number is not correct", 1, (long) redisURI.select());
+    Assert.assertEquals("DB number is not correct", 1, (int) redisURI.select());
+  }
+
+  @Test
+  public void testUNIX() {
+    RedisURI redisURI = new RedisURI("unix:///some/file.sock?db=2&password=p%40ssw0rd");
+    Assert.assertEquals("Password is not correct", "p@ssw0rd", redisURI.password());
+    Assert.assertEquals("UNIX file is not correct", "/some/file.sock", redisURI.socketAddress().path());
+    Assert.assertEquals("DB number is not correct", 2, (int) redisURI.select());
   }
 }

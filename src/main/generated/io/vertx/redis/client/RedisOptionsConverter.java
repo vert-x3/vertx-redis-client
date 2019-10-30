@@ -1,7 +1,9 @@
 package io.vertx.redis.client;
 
-import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;
+import io.vertx.core.json.JsonArray;
+import java.time.Instant;
+import java.time.format.DateTimeFormatter;
 
 /**
  * Converter and mapper for {@link io.vertx.redis.client.RedisOptions}.
@@ -13,9 +15,22 @@ public class RedisOptionsConverter {
   public static void fromJson(Iterable<java.util.Map.Entry<String, Object>> json, RedisOptions obj) {
     for (java.util.Map.Entry<String, Object> member : json) {
       switch (member.getKey()) {
-        case "endpoint":
+        case "connectionString":
           if (member.getValue() instanceof String) {
             obj.setConnectionString((String)member.getValue());
+          }
+          break;
+        case "connectionStrings":
+          if (member.getValue() instanceof JsonArray) {
+            ((Iterable<Object>)member.getValue()).forEach( item -> {
+              if (item instanceof String)
+                obj.addConnectionString((String)item);
+            });
+          }
+          break;
+        case "endpoint":
+          if (member.getValue() instanceof String) {
+            obj.setEndpoint((String)member.getValue());
           }
           break;
         case "endpoints":

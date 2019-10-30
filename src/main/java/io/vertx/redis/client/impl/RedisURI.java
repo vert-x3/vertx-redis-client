@@ -65,6 +65,7 @@ public final class RedisURI {
       // Implementation uses the query values as a fallback if another one is missing.
       Map<String, String> query = parseQuery(uri);
       switch (uri.getScheme()) {
+        case "rediss":
         case "redis":
           socketAddress = SocketAddress.inetSocketAddress(port, host);
           if (path.length() > 1) {
@@ -78,8 +79,8 @@ public final class RedisURI {
           break;
         case "unix":
           socketAddress = SocketAddress.domainSocketAddress(path);
-          if (query.containsKey("select")) {
-            select = Integer.parseInt(query.get("select"));
+          if (query.containsKey("db")) {
+            select = Integer.parseInt(query.get("db"));
           } else {
             select = null;
           }
