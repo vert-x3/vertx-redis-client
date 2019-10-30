@@ -16,7 +16,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.IntStream;
 
 import static io.vertx.redis.client.Command.*;
-import static io.vertx.redis.client.Request.*;
+import static io.vertx.redis.client.Request.cmd;
 
 @RunWith(VertxUnitRunner.class)
 public class RedisTest {
@@ -74,7 +74,7 @@ public class RedisTest {
   public void simpleSelectTest(TestContext should) {
     final Async test = should.async();
 
-    Redis.createClient(rule.vertx(), new RedisOptions().addEndpoint("redis://localhost:7006/0"))
+    Redis.createClient(rule.vertx(), new RedisOptions().addConnectionString("redis://localhost:7006/0"))
       .connect(create -> {
         should.assertTrue(create.succeeded());
 

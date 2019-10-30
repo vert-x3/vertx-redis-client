@@ -5,7 +5,8 @@ import io.vertx.ext.unit.TestContext;
 import io.vertx.ext.unit.junit.RunTestOnContext;
 import io.vertx.ext.unit.junit.VertxUnitRunner;
 import io.vertx.redis.client.*;
-import org.junit.*;
+import org.junit.Rule;
+import org.junit.Test;
 import org.junit.runner.RunWith;
 
 @RunWith(VertxUnitRunner.class)
@@ -22,9 +23,9 @@ public class RedisSentinelTest {
       rule.vertx(),
       new RedisOptions()
         .setType(RedisClientType.SENTINEL)
-        .addEndpoint("redis://localhost:5000")
-        .addEndpoint("redis://localhost:5001")
-        .addEndpoint("redis://localhost:5002")
+        .addConnectionString("redis://localhost:5000")
+        .addConnectionString("redis://localhost:5001")
+        .addConnectionString("redis://localhost:5002")
         .setMasterName("sentinel7000")
         .setRole(RedisRole.MASTER)
         .setMaxPoolSize(4)
@@ -50,9 +51,9 @@ public class RedisSentinelTest {
       rule.vertx(),
       new RedisOptions()
         .setType(RedisClientType.SENTINEL)
-        .addEndpoint("redis://localhost:5000")
-        .addEndpoint("redis://localhost:5001")
-        .addEndpoint("redis://localhost:5002")
+        .addConnectionString("redis://localhost:5000")
+        .addConnectionString("redis://localhost:5001")
+        .addConnectionString("redis://localhost:5002")
         .setMasterName("sentinel7000")
         .setRole(RedisRole.SLAVE)
         .setMaxPoolSize(4)
@@ -78,9 +79,9 @@ public class RedisSentinelTest {
       rule.vertx(),
       new RedisOptions()
         .setType(RedisClientType.SENTINEL)
-        .addEndpoint("redis://localhost:5000")
-        .addEndpoint("redis://localhost:5001")
-        .addEndpoint("redis://localhost:5002")
+        .addConnectionString("redis://localhost:5000")
+        .addConnectionString("redis://localhost:5001")
+        .addConnectionString("redis://localhost:5002")
         .setMasterName("sentinel7000")
         .setRole(RedisRole.SENTINEL)
         .setMaxPoolSize(4)
