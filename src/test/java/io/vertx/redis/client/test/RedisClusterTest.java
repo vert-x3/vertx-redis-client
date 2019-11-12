@@ -1,5 +1,6 @@
 package io.vertx.redis.client.test;
 
+import io.vertx.codegen.annotations.Nullable;
 import io.vertx.core.CompositeFuture;
 import io.vertx.core.Future;
 import io.vertx.core.Promise;
@@ -862,7 +863,7 @@ public class RedisClusterTest {
             should.assertEquals(3, mget.result().size());
             List<String> values = new ArrayList<>();
             mget.result().forEach(value -> {
-              if(value != null) {
+              if (value != null) {
                 values.add(value.toString());
               } else {
                 values.add(null);
@@ -890,7 +891,7 @@ public class RedisClusterTest {
           should.asyncAssertSuccess(response -> {
             should.assertEquals("OK", response.toString());
             test.complete();
-        }));
+          }));
       }
     ));
   }
@@ -907,12 +908,12 @@ public class RedisClusterTest {
     cmdList.add(req);
     cmdList.add(req);
     Redis.createClient(rule.vertx(), options).connect(should.asyncAssertSuccess(cluster -> {
-      cluster.batch(cmdList,
+        cluster.batch(cmdList,
           should.asyncAssertSuccess(response -> {
             should.assertEquals(2, response.size());
             response.forEach(r -> should.assertEquals("OK", r.toString()));
             test.complete();
-        }));
+          }));
       }
     ));
   }
@@ -934,7 +935,7 @@ public class RedisClusterTest {
             should.assertEquals(2, response.size());
             response.forEach(r -> should.assertEquals("OK", r.toString()));
             test.complete();
-        }));
+          }));
       }
     ));
   }
@@ -949,13 +950,13 @@ public class RedisClusterTest {
     final String argv2 = "other-value";
 
     Redis.createClient(rule.vertx(), options).connect(should.asyncAssertSuccess(cluster -> {
-      cluster.send(cmd(EVAL).arg("local r1 = redis.call('SET', KEYS[1], ARGV[1]) \n" +
-          "local r2 = redis.call('SET', KEYS[2], ARGV[2]) \n" +
-          "return {r1, r2}").arg(2).arg(key1).arg(key2).arg(argv1).arg(argv2),
-        should.asyncAssertFailure(throwable ->  {
-          should.assertTrue(throwable.getMessage().startsWith("Keys of command or batch"));
-          test.complete();
-        }));
+        cluster.send(cmd(EVAL).arg("local r1 = redis.call('SET', KEYS[1], ARGV[1]) \n" +
+            "local r2 = redis.call('SET', KEYS[2], ARGV[2]) \n" +
+            "return {r1, r2}").arg(2).arg(key1).arg(key2).arg(argv1).arg(argv2),
+          should.asyncAssertFailure(throwable -> {
+            should.assertTrue(throwable.getMessage().startsWith("Keys of command or batch"));
+            test.complete();
+          }));
       }
     ));
   }
@@ -971,10 +972,61 @@ public class RedisClusterTest {
     cmdList.add(cmd(EVAL).arg("return redis.call('SET', KEYS[1], ARGV[1])").arg(1).arg("{other_hash_tag}.some-key").arg(argv));
     Redis.createClient(rule.vertx(), options).connect(should.asyncAssertSuccess(cluster -> {
         cluster.batch(cmdList,
-          should.asyncAssertFailure(throwable ->  {
+          should.asyncAssertFailure(throwable -> {
             should.assertTrue(throwable.getMessage().startsWith("Keys of command or batch"));
             test.complete();
           }));
+      }
+    ));
+  }
+
+  /**
+   * Wait must run every time against a master node.
+   *
+   * @param should
+   */
+  @Test(timeout = 30_000)
+  public void setAndWait(TestContext should) {
+    final int runs = 10;
+    final Async test = should.async(runs);
+
+    Redis.createClient(rule.vertx(), options).connect(should.asyncAssertSuccess(cluster -> {
+        for (int i = 0; i < runs; i++) {
+          cluster.send(cmd(SET).arg("key").arg("value"),
+            should.asyncAssertSuccess(setResponse -> {
+              should.assertEquals("OK", setResponse.toString().toUpperCase());
+
+              cluster.send(cmd(WAIT).arg(1).arg(2000), should.asyncAssertSuccess(waitResponse -> {
+                should.assertEquals(1, waitResponse.toInteger());
+                test.countDown();
+              }));
+            }));
+        }
+      }
+    ));
+  }
+
+  @Test(timeout = 30_000)
+  public void setAndWaitBatch(TestContext should) {
+    final int runs = 10;
+    final Async test = should.async(runs);
+
+    final List<Request> cmdList = new ArrayList<>();
+    cmdList.add(cmd(SET).arg("key").arg("value"));
+    cmdList.add(cmd(WAIT).arg(1).arg(2000));
+    Redis.createClient(rule.vertx(), options).connect(should.asyncAssertSuccess(cluster -> {
+      for (int i = 0; i < runs; i++) {
+          cluster.batch(cmdList,
+            should.asyncAssertSuccess(responses -> {
+              should.assertEquals(2, responses.size());
+              Response setResponse = responses.get(0);
+              should.assertEquals("OK", setResponse.toString().toUpperCase());
+              Response waitResponse = responses.get(1);
+              should.assertEquals(1, waitResponse.toInteger());
+
+              test.countDown();
+            }));
+        }
       }
     ));
   }
