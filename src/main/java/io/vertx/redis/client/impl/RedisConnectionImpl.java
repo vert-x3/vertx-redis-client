@@ -110,10 +110,11 @@ public class RedisConnectionImpl implements RedisConnection, ParserHandler {
 
     // encode the message to a buffer
     final Buffer message = ((RequestImpl) request).encode();
+    final ContextAwareHandler<AsyncResult<Response>> ctxAwareHandler = new ContextAwareHandler<>(handler);
     // all update operations happen inside the context
     context.runOnContext(v -> {
       // offer the handler to the waiting queue
-      waiting.offer(handler);
+      waiting.offer(ctxAwareHandler);
       // write to the socket
       netSocket.write(message, write -> {
         if (write.failed()) {
@@ -171,11 +172,13 @@ public class RedisConnectionImpl implements RedisConnection, ParserHandler {
       });
     }
 
+    final Context currentContext = Vertx.currentContext();
+
     // all update operations happen inside the context
     context.runOnContext(v -> {
       // offer all handlers to the waiting queue
       for (Handler<AsyncResult<Response>> callback : callbacks) {
-        waiting.offer(callback);
+        waiting.offer(new ContextAwareHandler<AsyncResult<Response>>(currentContext, callback));
       }
       // write to the socket
       netSocket.write(messages, write -> {
@@ -235,7 +238,7 @@ public class RedisConnectionImpl implements RedisConnection, ParserHandler {
 
     // all update operations happen inside the context
     context.runOnContext(v -> {
-      final Handler<AsyncResult<Response>> req = waiting.poll();
+      final ContextAwareHandler<AsyncResult<Response>> req = waiting.poll();
 
       if (req != null) {
         // special case (nulls are always a success)
@@ -329,7 +332,7 @@ public class RedisConnectionImpl implements RedisConnection, ParserHandler {
   private void cleanupQueue(Throwable t) {
     // all update operations happen inside the context
     context.runOnContext(v -> {
-      Handler<AsyncResult<Response>> req;
+      ContextAwareHandler<AsyncResult<Response>> req;
 
       while ((req = waiting.poll()) != null) {
         if (t != null) {
@@ -341,5 +344,27 @@ public class RedisConnectionImpl implements RedisConnection, ParserHandler {
         }
       }
     });
+  }
+}
+
+class ContextAwareHandler<T> {
+  private final Handler<T> handler;
+  private final Context context;
+
+  ContextAwareHandler(Context context, Handler<T> handler) {
+    this.handler = handler;
+    this.context = context;
+  }
+
+  ContextAwareHandler(Handler<T> handler) {
+    this(Vertx.currentContext(), handler);
+  }
+
+  void handle(T event) {
+    if (context == null || context == Vertx.currentContext()) {
+      handler.handle(event);
+    } else {
+      context.runOnContext(v -> handler.handle(event));
+    }
   }
 }
