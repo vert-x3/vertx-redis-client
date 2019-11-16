@@ -9,6 +9,7 @@ import io.vertx.core.http.impl.pool.ConnectionListener;
 import io.vertx.core.http.impl.pool.ConnectionProvider;
 import io.vertx.core.http.impl.pool.Pool;
 import io.vertx.core.impl.ContextInternal;
+import io.vertx.core.impl.PromiseInternal;
 import io.vertx.core.impl.logging.Logger;
 import io.vertx.core.impl.logging.LoggerFactory;
 import io.vertx.core.net.NetClient;
@@ -78,7 +79,7 @@ class ConnectionManager {
         // socket connection succeeded
         final NetSocket netSocket = clientConnect.result();
         // the connection
-        final RedisConnectionImpl connection = new RedisConnectionImpl(vertx, connectionListener, netSocket, options);
+        final RedisConnectionImpl connection = new RedisConnectionImpl(vertx.eventBus(), contextInternal, connectionListener, netSocket, options);
 
         // parser utility
         netSocket
@@ -176,6 +177,8 @@ class ConnectionManager {
 
   public void getConnection(String connectionString, Request setup, Handler<AsyncResult<RedisConnection>> handler) {
     final ConnectionProvider<RedisConnection> connectionProvider = new RedisConnectionProvider(connectionString, setup);
+    PromiseInternal<RedisConnection> promise = ctx.promise();
+    promise.future().setHandler(handler);
     while (true) {
       Pool<RedisConnection> endpoint = endpointMap.computeIfAbsent(connectionString, targetAddress ->
         new Pool<>(
@@ -189,7 +192,7 @@ class ConnectionManager {
           conn -> connectionMap.put(connectionString, conn),
           conn -> connectionMap.remove(connectionString, conn),
           false));
-      if (endpoint.getConnection(handler)) {
+      if (endpoint.getConnection(promise)) {
         break;
       }
     }
