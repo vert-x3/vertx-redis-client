@@ -1,6 +1,7 @@
 package io.vertx.redis.client.test;
 
 import io.vertx.core.CompositeFuture;
+import io.vertx.core.Context;
 import io.vertx.core.Future;
 import io.vertx.core.Promise;
 import io.vertx.core.buffer.Buffer;
@@ -70,6 +71,16 @@ public class RedisClusterTest {
         client.close();
         test.complete();
       });
+    });
+  }
+
+  @Test
+  public void testContextReturn(TestContext should) {
+    final Async test = should.async();
+    Context context = rule.vertx().getOrCreateContext();
+    client.connect(onCreate -> {
+      should.assertEquals(context, rule.vertx().getOrCreateContext());
+      test.complete();
     });
   }
 
