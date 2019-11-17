@@ -4,8 +4,6 @@ import io.vertx.core.*;
 import io.vertx.core.buffer.Buffer;
 import io.vertx.core.eventbus.EventBus;
 import io.vertx.core.http.impl.pool.ConnectionListener;
-import io.vertx.core.impl.ContextInternal;
-import io.vertx.core.impl.PromiseInternal;
 import io.vertx.core.impl.logging.Logger;
 import io.vertx.core.impl.logging.LoggerFactory;
 import io.vertx.core.json.JsonObject;
@@ -27,7 +25,6 @@ public class RedisConnectionImpl implements RedisConnection, ParserHandler {
   private static final ErrorType CONNECTION_CLOSED = ErrorType.create("CONNECTION_CLOSED");
 
   private final ConnectionListener<RedisConnection> listener;
-  private final ContextInternal context;
   private final EventBus eventBus;
   private final NetSocket netSocket;
   // waiting: commands that have been sent but not answered
@@ -40,10 +37,9 @@ public class RedisConnectionImpl implements RedisConnection, ParserHandler {
   private Handler<Void> onEnd;
   private Handler<Response> onMessage;
 
-  public RedisConnectionImpl(EventBus eventBus, ContextInternal context, ConnectionListener<RedisConnection> connectionListener, NetSocket netSocket, RedisOptions options) {
+  public RedisConnectionImpl(EventBus eventBus, ConnectionListener<RedisConnection> connectionListener, NetSocket netSocket, RedisOptions options) {
     this.listener = connectionListener;
     this.eventBus = eventBus;
-    this.context = context;
     this.netSocket = netSocket;
     this.waiting = new ArrayQueue(options.getMaxWaitingHandlers());
     this.recycleTimeout = options.getPoolRecycleTimeout();
@@ -192,7 +188,7 @@ public class RedisConnectionImpl implements RedisConnection, ParserHandler {
     // pub/sub mode
     if (waiting.isEmpty()) {
       if (onMessage != null) {
-        context.runOnContext(v -> onMessage.handle(reply));
+        onMessage.handle(reply);
       } else {
         // pub/sub messages are arrays
         if (reply.type() == ResponseType.MULTI) {
@@ -231,14 +227,12 @@ public class RedisConnectionImpl implements RedisConnection, ParserHandler {
 
     final Handler<AsyncResult<Response>> req = waiting.poll();
     if (req != null) {
-      PromiseInternal<Response> promise = context.promise();
-      promise.future().setHandler(req);
       // special case (nulls are always a success)
       // the reason is that nil is only a valid value for
       // bulk or multi
       if (reply == null) {
         try {
-          promise.complete();
+          req.handle(Future.succeededFuture());
         } catch (RuntimeException e) {
           fail(e);
         }
@@ -247,7 +241,7 @@ public class RedisConnectionImpl implements RedisConnection, ParserHandler {
       // errors
       if (reply.type() == ResponseType.ERROR) {
         try {
-          promise.fail((ErrorType) reply);
+          req.handle(Future.failedFuture((ErrorType) reply));
         } catch (RuntimeException e) {
           fail(e);
         }
@@ -255,7 +249,7 @@ public class RedisConnectionImpl implements RedisConnection, ParserHandler {
       }
       // everything else
       try {
-        promise.complete(reply);
+        req.handle(Future.succeededFuture(reply));
       } catch (RuntimeException e) {
         fail(e);
       }
@@ -269,7 +263,7 @@ public class RedisConnectionImpl implements RedisConnection, ParserHandler {
     cleanupQueue(CONNECTION_CLOSED);
     // call the forceClose handler if any
     if (onEnd != null) {
-      context.runOnContext(e -> onEnd.handle(v));
+      onEnd.handle(v);
     }
   }
 
@@ -279,7 +273,7 @@ public class RedisConnectionImpl implements RedisConnection, ParserHandler {
     listener.onEvict();
     // call the exception handler if any
     if (onException != null) {
-      context.runOnContext(v -> onException.handle(t));
+      onException.handle(t);
     }
   }
 
@@ -293,20 +287,16 @@ public class RedisConnectionImpl implements RedisConnection, ParserHandler {
   }
 
   private void cleanupQueue(Throwable t) {
-    if (Vertx.currentContext() == context) {
-      Handler<AsyncResult<Response>> req;
+    Handler<AsyncResult<Response>> req;
 
-      while ((req = waiting.poll()) != null) {
-        if (t != null) {
-          try {
-            req.handle(Future.failedFuture(t));
-          } catch (RuntimeException e) {
-            LOG.warn("Exception during cleanup", e);
-          }
+    while ((req = waiting.poll()) != null) {
+      if (t != null) {
+        try {
+          req.handle(Future.failedFuture(t));
+        } catch (RuntimeException e) {
+          LOG.warn("Exception during cleanup", e);
         }
       }
-    } else {
-      context.runOnContext(v -> cleanupQueue(t));
     }
   }
 }
