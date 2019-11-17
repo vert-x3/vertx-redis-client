@@ -15,6 +15,7 @@
  */
 package io.vertx.test.redis;
 
+import io.vertx.core.Context;
 import io.vertx.core.json.JsonArray;
 import io.vertx.ext.unit.Async;
 import io.vertx.ext.unit.TestContext;
@@ -49,9 +50,11 @@ public class RedisClientTest {
   public void before(TestContext should) {
     final Async before = should.async();
 
+    Context context = rule.vertx().getOrCreateContext();
     client = Redis.createClient(rule.vertx(), new RedisOptions().setConnectionString("redis://localhost:7006"));
     client.connect(onConnect -> {
       should.assertTrue(onConnect.succeeded());
+      should.assertEquals(context, rule.vertx().getOrCreateContext());
       redis = RedisAPI.api(onConnect.result());
       before.complete();
     });
@@ -103,6 +106,16 @@ public class RedisClientTest {
   @SafeVarargs
   private static <T> List<T> toList(final T... params) {
     return Arrays.asList(params);
+  }
+
+  @Test
+  public void testContextReturn(TestContext should) {
+    final Async test = should.async();
+    Context context = rule.vertx().getOrCreateContext();
+    redis.append(makeKey(), "Hello", reply1 -> {
+      should.assertEquals(context, rule.vertx().getOrCreateContext());
+      test.complete();
+    });
   }
 
   @Test
