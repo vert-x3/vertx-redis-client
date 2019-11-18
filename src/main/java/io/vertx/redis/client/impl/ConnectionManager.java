@@ -1,9 +1,6 @@
 package io.vertx.redis.client.impl;
 
-import io.vertx.core.AsyncResult;
-import io.vertx.core.Future;
-import io.vertx.core.Handler;
-import io.vertx.core.Vertx;
+import io.vertx.core.*;
 import io.vertx.core.http.impl.pool.ConnectResult;
 import io.vertx.core.http.impl.pool.ConnectionListener;
 import io.vertx.core.http.impl.pool.ConnectionProvider;
@@ -30,7 +27,6 @@ class ConnectionManager {
   private static final Handler<Throwable> DEFAULT_EXCEPTION_HANDLER = t -> LOG.error("Unhandled Error", t);
 
   private final Vertx vertx;
-  private final ContextInternal ctx;
   private final NetClient netClient;
 
   private final RedisOptions options;
@@ -41,8 +37,6 @@ class ConnectionManager {
   ConnectionManager(Vertx vertx, RedisOptions options) {
     this.vertx = vertx;
     this.options = options;
-
-    this.ctx = (ContextInternal) vertx.getOrCreateContext();
     this.netClient = vertx.createNetClient(options.getNetClientOptions());
   }
 
@@ -67,18 +61,19 @@ class ConnectionManager {
     }
 
     @Override
-    public void connect(ConnectionListener<RedisConnection> connectionListener, ContextInternal contextInternal, Handler<AsyncResult<ConnectResult<RedisConnection>>> onConnect) {
+    public void connect(ConnectionListener<RedisConnection> connectionListener, ContextInternal ctx, Handler<AsyncResult<ConnectResult<RedisConnection>>> onConnect) {
+      // all calls the user handler will happen in the user context (ctx)
       netClient.connect(redisURI.socketAddress(), clientConnect -> {
         if (clientConnect.failed()) {
           // connection failed
-          onConnect.handle(Future.failedFuture(clientConnect.cause()));
+          ctx.runOnContext(v -> onConnect.handle(Future.failedFuture(clientConnect.cause())));
           return;
         }
 
         // socket connection succeeded
         final NetSocket netSocket = clientConnect.result();
-        // the connection
-        final RedisConnectionImpl connection = new RedisConnectionImpl(vertx, connectionListener, netSocket, options);
+        // the connection will inherit the user event loop context
+        final RedisConnectionImpl connection = new RedisConnectionImpl(vertx, ctx, connectionListener, netSocket, options);
 
         // parser utility
         netSocket
@@ -89,21 +84,21 @@ class ConnectionManager {
         // perform authentication
         authenticate(connection, redisURI.password(), authenticate -> {
           if (authenticate.failed()) {
-            onConnect.handle(Future.failedFuture(authenticate.cause()));
+            ctx.runOnContext(v -> onConnect.handle(Future.failedFuture(authenticate.cause())));
             return;
           }
 
           // perform select
           select(connection, redisURI.select(), select -> {
             if (select.failed()) {
-              onConnect.handle(Future.failedFuture(select.cause()));
+              ctx.runOnContext(v -> onConnect.handle(Future.failedFuture(select.cause())));
               return;
             }
 
             // perform setup
             setup(connection, setup, setupResult -> {
               if (setupResult.failed()) {
-                onConnect.handle(Future.failedFuture(setupResult.cause()));
+                ctx.runOnContext(v -> onConnect.handle(Future.failedFuture(setupResult.cause())));
                 return;
               }
 
@@ -112,7 +107,7 @@ class ConnectionManager {
               connection.endHandler(null);
               connection.exceptionHandler(DEFAULT_EXCEPTION_HANDLER);
 
-              onConnect.handle(Future.succeededFuture(new ConnectResult<>(connection, 1, options.getMaxPoolSize())));
+              ctx.runOnContext(v -> onConnect.handle(Future.succeededFuture(new ConnectResult<>(connection, 1, options.getMaxPoolSize()))));
             });
           });
         });
@@ -175,11 +170,12 @@ class ConnectionManager {
   }
 
   public void getConnection(String connectionString, Request setup, Handler<AsyncResult<RedisConnection>> handler) {
+    final Context userContext = vertx.getOrCreateContext();
     final ConnectionProvider<RedisConnection> connectionProvider = new RedisConnectionProvider(connectionString, setup);
     while (true) {
       Pool<RedisConnection> endpoint = endpointMap.computeIfAbsent(connectionString, targetAddress ->
         new Pool<>(
-          ctx,
+          userContext,
           connectionProvider,
           CLOCK,
           options.getMaxPoolWaiting(),
