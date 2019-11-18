@@ -20,17 +20,19 @@ import io.vertx.redis.client.*;
 
 public class RedisClient implements Redis {
 
+  private final Context context;
   private final ConnectionManager connectionManager;
   private final String defaultAddress;
 
   public RedisClient(Vertx vertx, RedisOptions options) {
+    this.context = vertx.getOrCreateContext();
     this.connectionManager = new ConnectionManager(vertx, options);
     this.defaultAddress = options.getEndpoint();
   }
 
   @Override
   public Redis connect(Handler<AsyncResult<RedisConnection>> onConnect) {
-    connectionManager.getConnection(defaultAddress, null, onConnect);
+    connectionManager.getConnection(context, defaultAddress, null, onConnect);
     return this;
   }
 

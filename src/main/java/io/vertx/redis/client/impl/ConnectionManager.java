@@ -169,8 +169,7 @@ class ConnectionManager {
     }
   }
 
-  public void getConnection(String connectionString, Request setup, Handler<AsyncResult<RedisConnection>> handler) {
-    final Context userContext = vertx.getOrCreateContext();
+  public void getConnection(Context userContext, String connectionString, Request setup, Handler<AsyncResult<RedisConnection>> handler) {
     final ConnectionProvider<RedisConnection> connectionProvider = new RedisConnectionProvider(connectionString, setup);
     while (true) {
       Pool<RedisConnection> endpoint = endpointMap.computeIfAbsent(connectionString, targetAddress ->

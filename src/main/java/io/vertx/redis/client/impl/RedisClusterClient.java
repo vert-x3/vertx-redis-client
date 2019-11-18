@@ -100,11 +100,13 @@ public class RedisClusterClient implements Redis {
   }
 
   private final Vertx vertx;
+  private final Context context;
   private final ConnectionManager connectionManager;
   private final RedisOptions options;
 
   public RedisClusterClient(Vertx vertx, RedisOptions options) {
     this.vertx = vertx;
+    this.context = vertx.getOrCreateContext();
     this.options = options;
     // validate options
     if (options.getMaxPoolWaiting() < options.getMaxPoolSize()) {
@@ -130,7 +132,7 @@ public class RedisClusterClient implements Redis {
       return;
     }
 
-    connectionManager.getConnection(endpoints.get(index), RedisSlaves.NEVER != options.getUseSlave() ? cmd(READONLY) : null, getConnection -> {
+    connectionManager.getConnection(context, endpoints.get(index), RedisSlaves.NEVER != options.getUseSlave() ? cmd(READONLY) : null, getConnection -> {
       if (getConnection.failed()) {
         // failed try with the next endpoint
         connect(endpoints, index + 1, onConnect);
@@ -165,7 +167,7 @@ public class RedisClusterClient implements Redis {
         }
 
         for (String endpoint: slots.endpoints()) {
-          connectionManager.getConnection(endpoint, RedisSlaves.NEVER != options.getUseSlave() ? cmd(READONLY) : null, getClusterConnection -> {
+          connectionManager.getConnection(context, endpoint, RedisSlaves.NEVER != options.getUseSlave() ? cmd(READONLY) : null, getClusterConnection -> {
             if (getClusterConnection.failed()) {
               // failed try with the next endpoint
               failed.set(true);

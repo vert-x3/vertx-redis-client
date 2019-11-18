@@ -15,10 +15,7 @@
  */
 package io.vertx.redis.client.impl;
 
-import io.vertx.core.AsyncResult;
-import io.vertx.core.Future;
-import io.vertx.core.Handler;
-import io.vertx.core.Vertx;
+import io.vertx.core.*;
 import io.vertx.core.impl.logging.Logger;
 import io.vertx.core.impl.logging.LoggerFactory;
 import io.vertx.redis.client.*;
@@ -48,12 +45,14 @@ public class RedisSentinelClient implements Redis {
 
   private static final Logger LOG = LoggerFactory.getLogger(RedisSentinelClient.class);
 
+  private final Context context;
   private final ConnectionManager connectionManager;
   private final RedisOptions options;
 
   private RedisConnection sentinel;
 
   public RedisSentinelClient(Vertx vertx, RedisOptions options) {
+    this.context = vertx.getOrCreateContext();
     this.options = options;
     // validate options
     // validate options
@@ -131,7 +130,7 @@ public class RedisSentinelClient implements Redis {
         return;
       }
       // wrap a new client
-      connectionManager.getConnection(resolve.result(), null, onCreate);
+      connectionManager.getConnection(context, resolve.result(), null, onCreate);
     };
 
     switch (role) {
@@ -196,7 +195,7 @@ public class RedisSentinelClient implements Redis {
 
   private void isSentinelOk(String endpoint, RedisOptions argument, Handler<AsyncResult<String>> handler) {
 
-    connectionManager.getConnection(endpoint, null, onCreate -> {
+    connectionManager.getConnection(context, endpoint, null, onCreate -> {
       if (onCreate.failed()) {
         handler.handle(Future.failedFuture(onCreate.cause()));
         return;
@@ -218,7 +217,7 @@ public class RedisSentinelClient implements Redis {
   }
 
   private void getMasterFromEndpoint(String endpoint, RedisOptions options, Handler<AsyncResult<String>> handler) {
-    connectionManager.getConnection(endpoint, null, onCreate -> {
+    connectionManager.getConnection(context, endpoint, null, onCreate -> {
       if (onCreate.failed()) {
         handler.handle(Future.failedFuture(onCreate.cause()));
         return;
@@ -245,7 +244,7 @@ public class RedisSentinelClient implements Redis {
   }
 
   private void getSlaveFromEndpoint(String endpoint, RedisOptions options, Handler<AsyncResult<String>> handler) {
-    connectionManager.getConnection(endpoint, null, onCreate -> {
+    connectionManager.getConnection(context, endpoint, null, onCreate -> {
       if (onCreate.failed()) {
         handler.handle(Future.failedFuture(onCreate.cause()));
         return;
