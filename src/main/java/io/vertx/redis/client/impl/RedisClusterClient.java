@@ -41,6 +41,10 @@ public class RedisClusterClient implements Redis {
     RedisClusterConnection.addUnSupportedCommand(command, error);
   }
 
+  public static void addMasterOnlyCommand(Command command) {
+    RedisClusterConnection.addMasterOnlyCommand(command);
+  }
+
   static {
     // provided reducers
 
@@ -97,6 +101,8 @@ public class RedisClusterClient implements Redis {
       SYNC, SENTINEL).forEach(command -> addUnSupportedCommand(command, null));
 
     addUnSupportedCommand(FLUSHALL, "RedisClusterClient does not handle command FLUSHALL, use FLUSHDB");
+
+    addMasterOnlyCommand(WAIT);
   }
 
   private final Vertx vertx;

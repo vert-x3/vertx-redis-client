@@ -977,4 +977,55 @@ public class RedisClusterTest {
       }
     ));
   }
+
+  /**
+   * Wait must run every time against a master node.
+   *
+   * @param should
+   */
+  @Test(timeout = 30_000)
+  public void setAndWait(TestContext should) {
+    final int runs = 10;
+    final Async test = should.async(runs);
+
+    Redis.createClient(rule.vertx(), options).connect(should.asyncAssertSuccess(cluster -> {
+        for (int i = 0; i < runs; i++) {
+          cluster.send(cmd(SET).arg("key").arg("value"),
+            should.asyncAssertSuccess(setResponse -> {
+              should.assertEquals("OK", setResponse.toString().toUpperCase());
+
+              cluster.send(cmd(WAIT).arg(1).arg(2000), should.asyncAssertSuccess(waitResponse -> {
+                should.assertEquals(1, waitResponse.toInteger());
+                test.countDown();
+              }));
+            }));
+        }
+      }
+    ));
+  }
+
+  @Test(timeout = 30_000)
+  public void setAndWaitBatch(TestContext should) {
+    final int runs = 10;
+    final Async test = should.async(runs);
+
+    final List<Request> cmdList = new ArrayList<>();
+    cmdList.add(cmd(SET).arg("key").arg("value"));
+    cmdList.add(cmd(WAIT).arg(1).arg(2000));
+    Redis.createClient(rule.vertx(), options).connect(should.asyncAssertSuccess(cluster -> {
+        for (int i = 0; i < runs; i++) {
+          cluster.batch(cmdList,
+            should.asyncAssertSuccess(responses -> {
+              should.assertEquals(2, responses.size());
+              Response setResponse = responses.get(0);
+              should.assertEquals("OK", setResponse.toString().toUpperCase());
+              Response waitResponse = responses.get(1);
+              should.assertEquals(1, waitResponse.toInteger());
+
+              test.countDown();
+            }));
+        }
+      }
+    ));
+  }
 }
