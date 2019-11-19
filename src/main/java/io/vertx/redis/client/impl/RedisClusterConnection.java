@@ -123,8 +123,17 @@ public class RedisClusterConnection implements RedisConnection {
     }
 
     if (cmd.isMovable()) {
-      // in cluster mode we currently do not handle movable keys commands
-      handler.handle(Future.failedFuture("RedisClusterClient does not handle movable keys commands, use non cluster client on the right node."));
+      final byte[][] keys = KeyExtractor.extractMovableKeys(req);
+
+      int hashSlot = ZModem.generateMulti(keys);
+      // -1 indicates that not all keys of the command targets the same hash slot, so Redis would not be able to execute it.
+      if (hashSlot == -1) {
+        handler.handle(Future.failedFuture(buildCrossslotFailureMsg(req)));
+        return this;
+      }
+
+      String[] endpoints = slots.endpointsForKey(hashSlot);
+      send(selectMasterOrSlaveEndpoint(req.command().isReadOnly(), endpoints), RETRIES, req, handler);
       return this;
     }
 
@@ -183,7 +192,7 @@ public class RedisClusterConnection implements RedisConnection {
 
           if (!REDUCERS.containsKey(cmd)) {
             // we can't continue as we don't know how to reduce this
-            handler.handle(Future.failedFuture("No Reducer available for: " + cmd));
+            handler.handle(Future.failedFuture(buildCrossslotFailureMsg(req)));
             return this;
           }
 
@@ -339,9 +348,15 @@ public class RedisClusterConnection implements RedisConnection {
       }
 
       if (cmd.isMovable()) {
-        // in cluster mode we currently do not handle movable keys commands
-        handler.handle(Future.failedFuture("RedisClusterClient does not handle movable keys commands, use non cluster client on the right node."));
-        return this;
+        final byte[][] keys = KeyExtractor.extractMovableKeys(req);
+
+        int slot = ZModem.generateMulti(keys);
+        if (slot == -1 || (currentSlot != -1 && currentSlot != slot)) {
+          handler.handle(Future.failedFuture(buildCrossslotFailureMsg(req)));
+          return this;
+        }
+        currentSlot = slot;
+        continue;
       }
 
       final List<byte[]> args = req.getArgs();
@@ -366,7 +381,7 @@ public class RedisClusterConnection implements RedisConnection {
           }
           if (currentSlot != slot) {
             // in cluster mode we currently do not handle batching commands which keys are not on the same slot
-            handler.handle(Future.failedFuture("RedisClusterClient does not handle batching commands with keys across different slots. TODO: Split the command into slots and then batch."));
+            handler.handle(Future.failedFuture(buildCrossslotFailureMsg(req)));
             return this;
           }
         }
@@ -378,7 +393,7 @@ public class RedisClusterConnection implements RedisConnection {
       int start = cmd.getFirstKey() - 1;
       if (currentSlot != ZModem.generate(args.get(start))) {
         // in cluster mode we currently do not handle batching commands which keys are not on the same slot
-        handler.handle(Future.failedFuture("RedisClusterClient does not handle batching commands with keys across different slots. TODO: Split the command into slots and then batch."));
+        handler.handle(Future.failedFuture(buildCrossslotFailureMsg(req)));
         return this;
       }
     }
@@ -497,5 +512,9 @@ public class RedisClusterConnection implements RedisConnection {
       }
     }
     return endpoints[index];
+  }
+
+  private String buildCrossslotFailureMsg(RequestImpl req) {
+    return "Keys of command or batch: \"" + req.toString() + "\" targets not all in the same hash slot (CROSSSLOT) and client side resharding is not supported";
   }
 }
