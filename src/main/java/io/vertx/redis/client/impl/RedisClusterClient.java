@@ -91,7 +91,7 @@ public class RedisClusterClient implements Redis {
       // Sum of key numbers on all Key Slots
       IntegerType.create(list.stream().mapToLong(Response::toLong).sum()));
 
-    Arrays.asList(ASKING, AUTH, BGREWRITEAOF, BGSAVE, CLIENT, CLUSTER, COMMAND, CONFIG,
+    Arrays.asList(ASKING, AUTH, BGREWRITEAOF, BGSAVE, CLIENT, COMMAND, CONFIG,
       DEBUG, DISCARD, HOST, INFO, LASTSAVE, LATENCY, LOLWUT, MEMORY, MODULE, MONITOR, PFDEBUG, PFSELFTEST,
       PING, READONLY, READWRITE, REPLCONF, REPLICAOF, ROLE, SAVE, SCAN, SCRIPT, SELECT, SHUTDOWN, SLAVEOF, SLOWLOG, SWAPDB,
       SYNC, SENTINEL).forEach(command -> addUnSupportedCommand(command, null));
