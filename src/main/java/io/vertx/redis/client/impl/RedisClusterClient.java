@@ -52,13 +52,16 @@ public class RedisClusterClient implements Redis {
 
   private static final Map<Command, String> UNSUPPORTEDCOMMANDS = new HashMap<>();
 
+  // List of command they should run every time only against master nodes
+  private static final List<Command> MASTER_ONLY_COMMANDS = new ArrayList<>();
+
   public static void addReducer(Command command, Function<List<Response>, Response> fn) {
     REDUCERS.put(command, fn);
   }
 
   public static void addUnSupportedCommand(Command command, String error) {
     if(error == null || error.isEmpty()) {
-      UNSUPPORTEDCOMMANDS.put(command, "RedisClusterClient does not handle command " + 
+      UNSUPPORTEDCOMMANDS.put(command, "RedisClusterClient does not handle command " +
       new String(command.getBytes(), StandardCharsets.ISO_8859_1).split("\r\n")[1] + ", use non cluster client on the right node.");
     } else {
       UNSUPPORTEDCOMMANDS.put(command, error);
@@ -127,6 +130,8 @@ public class RedisClusterClient implements Redis {
     SYNC, SENTINEL).forEach(command -> addUnSupportedCommand(command, null));
 
     addUnSupportedCommand(FLUSHALL, "RedisClusterClient does not handle command FLUSHALL, use FLUSHDB");
+
+    MASTER_ONLY_COMMANDS.add(WAIT);
   }
 
   private final Vertx vertx;
@@ -135,6 +140,8 @@ public class RedisClusterClient implements Redis {
 
   // mutable state
   private final Map<SocketAddress, Redis> connections = new HashMap<>();
+  // Addresses of all slave nodes
+  private final Set<SocketAddress> slaveAddresses = new HashSet<>();
   private final Redis[][] slots = new Redis[16384][];
 
   private Handler<Throwable> onException = t -> LOG.error("Unhandled Error", t);
@@ -168,10 +175,12 @@ public class RedisClusterClient implements Redis {
 
         if (total == 0) {
           // fetch slots from the cluster immediately to ensure slots are correct
-          getSlots(options, getSlots -> {
-            if (getSlots.failed()) {
-              onCreate.handle(Future.failedFuture(getSlots.cause()));
+          getSlots(options, getSlotsResult -> {
+            if (getSlotsResult.failed()) {
+              onCreate.handle(Future.failedFuture(getSlotsResult.cause()));
             } else {
+              slaveAddresses.addAll(getSlotsResult.result());
+
               onCreate.handle(Future.succeededFuture(this));
             }
           });
@@ -235,8 +244,9 @@ public class RedisClusterClient implements Redis {
     // process commands for cluster mode
     final RequestImpl req = (RequestImpl) request;
     final Command cmd = req.command();
+    final boolean forceMasterNode = MASTER_ONLY_COMMANDS.contains(cmd);
 
-    if(UNSUPPORTEDCOMMANDS.containsKey(cmd)) {
+    if (UNSUPPORTEDCOMMANDS.containsKey(cmd)) {
       try {
         handler.handle(Future.failedFuture(UNSUPPORTEDCOMMANDS.get(cmd)));
       } catch (RuntimeException e) {
@@ -246,12 +256,17 @@ public class RedisClusterClient implements Redis {
     }
 
     if (cmd.isMovable()) {
-      // in cluster mode we currently do not handle movable keys commands
-      try {
-        handler.handle(Future.failedFuture("RedisClusterClient does not handle movable keys commands, use non cluster client on the right node."));
-      } catch (RuntimeException e) {
-        onException.handle(e);
+      final byte[][] keys = KeyExtractor.extractMovableKeys(req);
+
+      int hashSlot = ZModem.generateMulti(keys);
+      // -1 indicates that not all keys of the command targets the same hash slot, so Redis would not be able to execute it.
+      if (hashSlot == -1) {
+        handler.handle(Future.failedFuture(buildCrossslotFailureMsg(req)));
+        return this;
       }
+
+      Redis[] clients = slots[hashSlot];
+      send(selectMasterOrSlave(req.command().isReadOnly(), forceMasterNode, clients), options, RETRIES, req, handler);
       return this;
     }
 
@@ -263,7 +278,7 @@ public class RedisClusterClient implements Redis {
         Redis[] clients = slots[(slots.length / slotNumber - 1) * i];
 
         final Future<Response> f = Future.future();
-        send(selectMasterOrSlave(req.command().isReadOnly(), clients), options, RETRIES, req, f);
+        send(selectMasterOrSlave(req.command().isReadOnly(), forceMasterNode, clients), options, RETRIES, req, f);
         responses.add(f);
       }
       CompositeFuture.all(responses).setHandler(composite -> {
@@ -288,7 +303,7 @@ public class RedisClusterClient implements Redis {
 
     if (cmd.isKeyless()) {
       // it doesn't matter which node to use
-      send(selectClient(-1, cmd.isReadOnly()), options, RETRIES, req, handler);
+      send(selectClient(-1, cmd.isReadOnly(), forceMasterNode), options, RETRIES, req, handler);
       return this;
     }
 
@@ -319,7 +334,7 @@ public class RedisClusterClient implements Redis {
           if (!REDUCERS.containsKey(cmd)) {
             // we can't continue as we don't know how to reduce this
             try {
-              handler.handle(Future.failedFuture("No Reducer available for: " + cmd));
+              handler.handle(Future.failedFuture(buildCrossslotFailureMsg(req)));
             } catch (RuntimeException e) {
               onException.handle(e);
             }
@@ -331,7 +346,7 @@ public class RedisClusterClient implements Redis {
 
           for (Map.Entry<Integer, Request> kv : requests.entrySet()) {
             final Promise<Response> p = Promise.promise();
-            send(selectClient(kv.getKey(), cmd.isReadOnly()), options, RETRIES, kv.getValue(), p);
+            send(selectClient(kv.getKey(), cmd.isReadOnly(), forceMasterNode), options, RETRIES, kv.getValue(), p);
             responses.add(p.future());
           }
 
@@ -357,13 +372,13 @@ public class RedisClusterClient implements Redis {
       }
 
       // all keys are on the same slot!
-      send(selectClient(currentSlot, cmd.isReadOnly()), options, RETRIES, req, handler);
+      send(selectClient(currentSlot, cmd.isReadOnly(), forceMasterNode), options, RETRIES, req, handler);
       return this;
     }
 
     // last option the command is single key
     int start = cmd.getFirstKey() - 1;
-    send(selectClient(ZModem.generate(args.get(start)), cmd.isReadOnly()), options, RETRIES, req, handler);
+    send(selectClient(ZModem.generate(args.get(start)), cmd.isReadOnly(), forceMasterNode), options, RETRIES, req, handler);
     return this;
   }
 
@@ -408,6 +423,7 @@ public class RedisClusterClient implements Redis {
   public Redis batch(List<Request> requests, Handler<AsyncResult<List<Response>>> handler) {
     int currentSlot = -1;
     boolean readOnly = false;
+    boolean forceMasterNode = false;
 
     // look up the base slot for the batch
     for (int i = 0; i < requests.size(); i++) {
@@ -425,6 +441,7 @@ public class RedisClusterClient implements Redis {
       }
 
       readOnly |= cmd.isReadOnly();
+      forceMasterNode |= MASTER_ONLY_COMMANDS.contains(cmd);
 
       // this command can run anywhere
       if (cmd.isKeyless()) {
@@ -432,9 +449,15 @@ public class RedisClusterClient implements Redis {
       }
 
       if (cmd.isMovable()) {
-        // in cluster mode we currently do not handle movable keys commands
-        handler.handle(Future.failedFuture("RedisClusterClient does not handle movable keys commands, use non cluster client on the right node."));
-        return this;
+        final byte[][] keys = KeyExtractor.extractMovableKeys(req);
+
+        int slot = ZModem.generateMulti(keys);
+        if (slot == -1 || (currentSlot != -1 && currentSlot != slot)) {
+          handler.handle(Future.failedFuture(buildCrossslotFailureMsg(req)));
+          return this;
+        }
+        currentSlot = slot;
+        continue;
       }
 
       final List<byte[]> args = req.getArgs();
@@ -459,7 +482,7 @@ public class RedisClusterClient implements Redis {
           }
           if (currentSlot != slot) {
             // in cluster mode we currently do not handle batching commands which keys are not on the same slot
-            handler.handle(Future.failedFuture("RedisClusterClient does not handle batching commands with keys across different slots. TODO: Split the command into slots and then batch."));
+            handler.handle(Future.failedFuture(buildCrossslotFailureMsg(req)));
             return this;
           }
         }
@@ -482,7 +505,7 @@ public class RedisClusterClient implements Redis {
       }
     }
 
-    batch(selectClient(currentSlot, readOnly), options, RETRIES, requests, handler);
+    batch(selectClient(currentSlot, readOnly, forceMasterNode), options, RETRIES, requests, handler);
     return this;
   }
 
@@ -567,7 +590,7 @@ public class RedisClusterClient implements Redis {
     });
   }
 
-  private void getSlots(RedisOptions options, Handler<AsyncResult<Void>> handler) {
+  private void getSlots(RedisOptions options, Handler<AsyncResult<List<SocketAddress>>> handler) {
 
     final Set<SocketAddress> exclude = new HashSet<>();
     final AtomicReference<Throwable> cause = new AtomicReference<>();
@@ -608,6 +631,7 @@ public class RedisClusterClient implements Redis {
           // from the connections list
           final Set<SocketAddress> seenClients = new HashSet<>();
           final AtomicInteger slotCounter = new AtomicInteger(reply.size());
+          final List<SocketAddress> slaveAddresses = new ArrayList<>();
           slotNumber = reply.size();
 
           for (int i = 0; i < reply.size(); i++) {
@@ -624,6 +648,9 @@ public class RedisClusterClient implements Redis {
               SocketAddress address = SocketAddress.inetSocketAddress(c.get(1).toInteger(), c.get(0).toString());
               addresses.add(address);
               seenClients.add(address);
+              if (index != 2) {
+                slaveAddresses.add(address);
+              }
             }
             // load this slot
             loadSlot(start, end, addresses, options, onLoad -> {
@@ -644,7 +671,7 @@ public class RedisClusterClient implements Redis {
                   return false;
                 });
 
-                handler.handle(Future.succeededFuture());
+                handler.handle(Future.succeededFuture(slaveAddresses));
               }
             });
           }
@@ -713,7 +740,7 @@ public class RedisClusterClient implements Redis {
   }
 
   private void send(final Redis client, final RedisOptions options, final int retries, Request command, Handler<AsyncResult<Response>> handler) {
-        
+
     if (client == null) {
       try {
         handler.handle(Future.failedFuture("No connection available."));
@@ -889,11 +916,15 @@ public class RedisClusterClient implements Redis {
   /**
    * Select a Redis client for the given key
    */
-  private Redis selectClient(int keySlot, boolean readOnly) {
+  private Redis selectClient(int keySlot, boolean readOnly, boolean forceMasterNode) {
     // this command doesn't have keys, return any connection
-    // NOTE: this means slaves may be used for no key commands regardless of slave config
+    // NOTE: this means slaves may be used for no key commands regardless of slave config, except it's a command that have to run against master node only
     if (keySlot == -1) {
-      return getRandomConnection(Collections.emptySet());
+      if (forceMasterNode) {
+        return getRandomConnection(slaveAddresses);
+      } else {
+        return getRandomConnection(Collections.emptySet());
+      }
     }
 
     Redis[] clients = slots[keySlot];
@@ -902,11 +933,15 @@ public class RedisClusterClient implements Redis {
     if (clients == null || clients.length == 0) {
       return getRandomConnection(Collections.emptySet());
     }
-    return selectMasterOrSlave(readOnly, clients);
+    return selectMasterOrSlave(readOnly, forceMasterNode, clients);
   }
 
-  private Redis selectMasterOrSlave(boolean readOnly, Redis[] clients) {
+  private Redis selectMasterOrSlave(boolean readOnly, boolean forceMasterNode, Redis[] clients) {
     int index = 0;
+
+    if (forceMasterNode) {
+      return clients[index];
+    }
 
     // always, never, share
     if (readOnly && slaves != RedisSlaves.NEVER && clients.length > 1) {
@@ -920,5 +955,9 @@ public class RedisClusterClient implements Redis {
       }
     }
     return clients[index];
+  }
+
+  private String buildCrossslotFailureMsg(RequestImpl req) {
+    return "Keys of command or batch: \"" + req.toString() + "\" targets not all in the same hash slot (CROSSSLOT) and client side resharding is not supported";
   }
 }
