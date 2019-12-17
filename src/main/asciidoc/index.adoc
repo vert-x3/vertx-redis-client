@@ -187,7 +187,7 @@ All client variations are backed by a connection pool. By default the configurat
 that it operates just like a single connection. There are 4 tunnables for the pool:
 
 * `maxPoolSize` the max number of connections on the pool
-* `maxPoolWaiting` the max waiting handlers to get a connection on a queue
+* `maxPoolWaiting` the max waiting handlers to get a connection on a queue (default `6`)
 * `poolCleanerInterval` the interval when connections will be clean default is `-1` (disabled)
 * `poolRecycleTimeout` the timeout to keep an open connection on the pool waiting and then close (default `15_000`)
 
