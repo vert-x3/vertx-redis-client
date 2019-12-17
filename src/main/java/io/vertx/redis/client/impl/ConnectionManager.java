@@ -62,6 +62,7 @@ class ConnectionManager {
 
     @Override
     public void init(RedisConnection conn) {
+      // NO OP!
     }
 
     @Override
@@ -116,11 +117,6 @@ class ConnectionManager {
           });
         });
       });
-    }
-
-    @Override
-    public void init(RedisConnection conn) {
-      // NO-OP
     }
 
     private void authenticate(RedisConnection connection, String password, Handler<AsyncResult<Void>> handler) {
