@@ -61,6 +61,10 @@ class ConnectionManager {
     }
 
     @Override
+    public void init(RedisConnection conn) {
+    }
+
+    @Override
     public void connect(ConnectionListener<RedisConnection> connectionListener, ContextInternal ctx, Handler<AsyncResult<ConnectResult<RedisConnection>>> onConnect) {
       // all calls the user handler will happen in the user context (ctx)
       netClient.connect(redisURI.socketAddress(), clientConnect -> {
