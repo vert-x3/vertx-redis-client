@@ -63,7 +63,8 @@ public class RedisOptions {
     type = RedisClientType.STANDALONE;
     poolCleanerInterval = -1;
     maxPoolSize = 1;
-    maxPoolWaiting = 1;
+    // thumb guess based on web browser defaults
+    maxPoolWaiting = 6;
     poolRecycleTimeout = 15_000;
   }
 
