@@ -170,4 +170,30 @@ public class RedisExamples {
       }
     }
   }
+
+  public void example11(Vertx vertx) {
+    Redis.createClient(vertx, "redis://localhost:7006")
+      .send(Request.cmd(Command.PING), send -> {
+        if (send.succeeded()) {
+          // Should have received a pong...
+        }
+      });
+  }
+
+  public void example12(Vertx vertx) {
+    Redis.createClient(
+      vertx,
+      new RedisOptions()
+        .setConnectionString("redis://localhost:7006")
+        // allow at max 8 connections to redis
+        .setMaxPoolSize(8)
+        // allow 32 connection requests to queue waiting
+        // for a connection to be available.
+        .setMaxWaitingHandlers(32))
+      .send(Request.cmd(Command.PING), send -> {
+        if (send.succeeded()) {
+          // Should have received a pong...
+        }
+      });
+  }
 }

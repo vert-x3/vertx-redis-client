@@ -114,6 +114,11 @@ class ConnectionManager {
       });
     }
 
+    @Override
+    public void init(RedisConnection conn) {
+      // NO-OP
+    }
+
     private void authenticate(RedisConnection connection, String password, Handler<AsyncResult<Void>> handler) {
       if (password == null) {
         handler.handle(Future.succeededFuture());

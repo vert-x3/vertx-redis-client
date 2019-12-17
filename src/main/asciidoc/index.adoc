@@ -3,10 +3,9 @@
 
 Vert.x-redis is redis client to be used with Vert.x.
 
-This module allows data to be saved, retrieved, searched for, and deleted in a Redis. Redis is an open source, BSD
-licensed, advanced key-value store. It is often referred to as a data structure server since keys can contain
-strings, hashes, lists, sets and sorted sets. To use this module you must have a Redis server instance running on
-your network.
+This module allows data to be saved, retrieved, searched for, and deleted in a Redis. Redis is an open source, advanced
+key-value store. It is often referred to as a data structure server since keys can contain  strings, hashes, lists, sets
+and sorted sets. To use this module you must have a Redis server instance running on your network.
 
 Redis has a rich API and it can be organized in the following groups:
 
@@ -23,6 +22,7 @@ Redis has a rich API and it can be organized in the following groups:
 * Sorted Sets - Commands to work with sorted sets.
 * Strings - Commands to work with Strings.
 * Transactions - Commands to handle transaction lifecycle.
+* Streams - Commands to handle streaming.
 
 == Using Vert.x-Redis
 
@@ -181,7 +181,37 @@ domain docket:
 Be aware that HA and cluster modes report server addresses always on TCP addresses not domain sockets. So the
 combination is not possible. Not because of this client but how Redis works.
 
+== Connection Pooling
+
+All client variations are backed by a connection pool. By default the configuration sets the pool size to 1, which means
+that it operates just like a single connection. There are 4 tunnables for the pool:
+
+* `maxPoolSize` the max number of connections on the pool
+* `maxPoolWaiting` the max waiting handlers to get a connection on a queue
+* `poolCleanerInterval` the interval when connections will be clean default is `-1` (disabled)
+* `poolRecycleTimeout` the timeout to keep an open connection on the pool waiting and then close (default `15_000`)
+
+Pooling is quite useful to avoid custom connection management, for example you can just use as:
+
+[source,$lang]
+----
+{@link examples.RedisExamples#example11}
+----
+
+It is important to observe that no connection was acquired or returned, it's all handled by the pool. However there might
+be some scalability issues when more than 1 concurrent request attempts to get a connection from the pool, in order to
+overcome this we need to tune the pool. A common configuration is to set the maximum size of the pool to the number of
+available CPU cores and allow requests to get a connection from the pool to queue:
+
+[source,$lang]
+----
+{@link examples.RedisExamples#example12}
+----
+
 == Implementing Reconnect on Error
+
+While the connection pool is quite useful, for performance, a connection should not be auto managed but controlled by
+you. In this case you will need to handle connection recovery, error handling and reconnect.
 
 A typical scenario is that a user will want to reconnect to the server whenever an error occurs. The automatic reconnect
 is not part of the redis client has it will force a behaviour that might not match the user expectations, for example:
