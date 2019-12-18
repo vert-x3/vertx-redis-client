@@ -186,8 +186,8 @@ combination is not possible. Not because of this client but how Redis works.
 All client variations are backed by a connection pool. By default the configuration sets the pool size to 1, which means
 that it operates just like a single connection. There are 4 tunnables for the pool:
 
-* `maxPoolSize` the max number of connections on the pool
-* `maxPoolWaiting` the max waiting handlers to get a connection on a queue (default `6`)
+* `maxPoolSize` the max number of connections on the pool (default `6`)
+* `maxPoolWaiting` the max waiting handlers to get a connection on a queue (default `24`)
 * `poolCleanerInterval` the interval when connections will be clean default is `-1` (disabled)
 * `poolRecycleTimeout` the timeout to keep an open connection on the pool waiting and then close (default `15_000`)
 
@@ -207,6 +207,9 @@ available CPU cores and allow requests to get a connection from the pool to queu
 ----
 {@link examples.RedisExamples#example12}
 ----
+
+NOTE: Pooling is not compatible with `SUBSCRIBE`, `UNSUBSCRIBE`, `PSUBSCRIBE` or `PUNSUBSCRIBE` because these commands
+will modify the way the connection operates and the connection cannot be reused.
 
 == Implementing Reconnect on Error
 

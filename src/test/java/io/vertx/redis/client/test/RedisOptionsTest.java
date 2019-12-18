@@ -11,7 +11,7 @@ public class RedisOptionsTest {
 
   @Test
   public void testRedisOptions() {
-    assertEquals(1, new RedisOptions().getMaxPoolSize());
+    assertEquals(6, new RedisOptions().getMaxPoolSize());
     assertEquals("redis://localhost:6379", new RedisOptions().getEndpoint());
     assertEquals(Collections.singletonList("redis://localhost:6379"), new RedisOptions().getEndpoints());
   }
