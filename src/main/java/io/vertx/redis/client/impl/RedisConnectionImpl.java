@@ -4,6 +4,7 @@ import io.vertx.core.*;
 import io.vertx.core.buffer.Buffer;
 import io.vertx.core.eventbus.EventBus;
 import io.vertx.core.http.impl.pool.ConnectionListener;
+import io.vertx.core.impl.ContextInternal;
 import io.vertx.core.impl.logging.Logger;
 import io.vertx.core.impl.logging.LoggerFactory;
 import io.vertx.core.json.JsonObject;
@@ -26,7 +27,7 @@ public class RedisConnectionImpl implements RedisConnection, ParserHandler {
   private static final ErrorType CONNECTION_CLOSED = ErrorType.create("CONNECTION_CLOSED");
 
   private final ConnectionListener<RedisConnection> listener;
-  private final Context context;
+  private final ContextInternal context;
   private final EventBus eventBus;
   private final NetSocket netSocket;
   // waiting: commands that have been sent but not answered
@@ -39,7 +40,7 @@ public class RedisConnectionImpl implements RedisConnection, ParserHandler {
   private Handler<Void> onEnd;
   private Handler<Response> onMessage;
 
-  public RedisConnectionImpl(Vertx vertx, Context context, ConnectionListener<RedisConnection> connectionListener, NetSocket netSocket, RedisOptions options) {
+  public RedisConnectionImpl(Vertx vertx, ContextInternal context, ConnectionListener<RedisConnection> connectionListener, NetSocket netSocket, RedisOptions options) {
     this.listener = connectionListener;
     this.eventBus = vertx.eventBus();
     this.context = context;
@@ -110,10 +111,12 @@ public class RedisConnectionImpl implements RedisConnection, ParserHandler {
 
     // encode the message to a buffer
     final Buffer message = ((RequestImpl) request).encode();
+    // wrap the handler into a promise
+    final Promise<Response> promise = context.promise(handler);
     // all update operations happen inside the context
     context.runOnContext(v -> {
       // offer the handler to the waiting queue
-      waiting.offer(handler);
+      waiting.offer(promise);
       // write to the socket
       netSocket.write(message, write -> {
         if (write.failed()) {
@@ -134,8 +137,8 @@ public class RedisConnectionImpl implements RedisConnection, ParserHandler {
       return this;
     }
 
-    // will re-encode the handler into a list of handlers
-    final List<Handler<AsyncResult<Response>>> callbacks = new ArrayList<>(commands.size());
+    // will re-encode the handler into a list of promises
+    final List<Promise<Response>> callbacks = new ArrayList<>(commands.size());
     final List<Response> replies = new ArrayList<>(commands.size());
     final AtomicInteger count = new AtomicInteger(commands.size());
     final AtomicBoolean failed = new AtomicBoolean(false);
@@ -149,7 +152,7 @@ public class RedisConnectionImpl implements RedisConnection, ParserHandler {
       // encode to the single buffer
       req.encode(messages);
       // unwrap the handler into a single handler
-      callbacks.add(index, command -> {
+      callbacks.add(index, context.promise(command -> {
         if (!failed.get()) {
           if (command.failed()) {
             failed.set(true);
@@ -168,13 +171,13 @@ public class RedisConnectionImpl implements RedisConnection, ParserHandler {
             }
           }
         }
-      });
+      }));
     }
 
     // all update operations happen inside the context
     context.runOnContext(v -> {
       // offer all handlers to the waiting queue
-      for (Handler<AsyncResult<Response>> callback : callbacks) {
+      for (Promise<Response> callback : callbacks) {
         waiting.offer(callback);
       }
       // write to the socket
@@ -235,7 +238,7 @@ public class RedisConnectionImpl implements RedisConnection, ParserHandler {
 
     // all update operations happen inside the context
     context.runOnContext(v -> {
-      final Handler<AsyncResult<Response>> req = waiting.poll();
+      final Promise<Response> req = waiting.poll();
 
       if (req != null) {
         // special case (nulls are always a success)
@@ -243,7 +246,7 @@ public class RedisConnectionImpl implements RedisConnection, ParserHandler {
         // bulk or multi
         if (reply == null) {
           try {
-            req.handle(Future.succeededFuture());
+            req.complete();
           } catch (RuntimeException e) {
             fail(e);
           }
@@ -252,7 +255,7 @@ public class RedisConnectionImpl implements RedisConnection, ParserHandler {
         // errors
         if (reply.type() == ResponseType.ERROR) {
           try {
-            req.handle(Future.failedFuture((ErrorType) reply));
+            req.fail((ErrorType) reply);
           } catch (RuntimeException e) {
             fail(e);
           }
@@ -260,7 +263,7 @@ public class RedisConnectionImpl implements RedisConnection, ParserHandler {
         }
         // everything else
         try {
-          req.handle(Future.succeededFuture(reply));
+          req.complete(reply);
         } catch (RuntimeException e) {
           fail(e);
         }
@@ -320,12 +323,12 @@ public class RedisConnectionImpl implements RedisConnection, ParserHandler {
   private void cleanupQueue(Throwable t) {
     // all update operations happen inside the context
     context.runOnContext(v -> {
-      Handler<AsyncResult<Response>> req;
+      Promise<Response> req;
 
       while ((req = waiting.poll()) != null) {
         if (t != null) {
           try {
-            req.handle(Future.failedFuture(t));
+            req.fail(t);
           } catch (RuntimeException e) {
             LOG.warn("Exception during cleanup", e);
           }
