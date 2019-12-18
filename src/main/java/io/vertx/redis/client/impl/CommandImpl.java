@@ -36,6 +36,7 @@ public class CommandImpl implements Command {
   private final boolean keyless;
   private final boolean readOnly;
   private final boolean movable;
+  private final boolean noreturn;
 
   public CommandImpl(String command, int arity, int firstKey, int lastKey, int interval, boolean readOnly, boolean movable) {
     bytes = ("$" + command.length() + "\r\n" + command + "\r\n").getBytes(StandardCharsets.ISO_8859_1);
@@ -47,6 +48,17 @@ public class CommandImpl implements Command {
     this.keyless = interval == 0 && !movable;
     this.readOnly = readOnly;
     this.movable = movable;
+    // void commands are special and apply to pub/sub
+    if (
+      "subscribe".equalsIgnoreCase(command)
+        || "unsubscribe".equalsIgnoreCase(command)
+        || "psubscribe".equalsIgnoreCase(command)
+        || "punsubscribe".equalsIgnoreCase(command)) {
+
+      noreturn = true;
+    } else {
+      noreturn = false;
+    }
   }
 
   @Override
@@ -92,5 +104,10 @@ public class CommandImpl implements Command {
   @Override
   public boolean isMovable() {
     return movable;
+  }
+
+  @Override
+  public boolean isVoid() {
+    return noreturn;
   }
 }

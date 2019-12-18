@@ -104,7 +104,8 @@ public class RedisConnectionImpl implements RedisConnection, ParserHandler {
 
   @Override
   public RedisConnection send(final Request request, Handler<AsyncResult<Response>> handler) {
-    if (waiting.isFull()) {
+    final boolean voidCmd = request.command().isVoid();
+    if (!voidCmd && waiting.isFull()) {
       handler.handle(Future.failedFuture("Redis waiting Queue is full"));
       return this;
     }
@@ -115,14 +116,21 @@ public class RedisConnectionImpl implements RedisConnection, ParserHandler {
     final Promise<Response> promise = context.promise(handler);
     // all update operations happen inside the context
     context.runOnContext(v -> {
-      // offer the handler to the waiting queue
-      waiting.offer(promise);
+      // offer the handler to the waiting queue if not void command
+      if (!voidCmd) {
+        waiting.offer(promise);
+      }
       // write to the socket
       netSocket.write(message, write -> {
         if (write.failed()) {
           // if the write fails, this connection enters a unknown state
           // which means it should be terminated
           fatal(write.cause());
+        } else {
+          if (voidCmd) {
+            // only on this case notify the promise
+            promise.complete();
+          }
         }
       });
     });
