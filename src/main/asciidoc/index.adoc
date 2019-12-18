@@ -168,6 +168,10 @@ And from another place in the code publish messages to the queue:
 {@link examples.RedisExamples#example8}
 ----
 
+NOTE: It is important to remember that the commands `SUBSCRIBE`, `UNSUBSCRIBE`, `PSUBSCRIBE` and `PUNSUBSCRIBE` are `void`.
+This means that the result in case of success is `null` not a instance of response. All messages are then routed through
+the handler on the client.
+
 == Domain Sockets
 
 Most of the examples shown connecting to a TCP sockets, however it is also possible to use Redis connecting to a UNIX
