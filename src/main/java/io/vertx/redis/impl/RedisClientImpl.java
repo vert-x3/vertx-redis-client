@@ -46,7 +46,7 @@ import static io.vertx.redis.client.Command.*;
 public final class RedisClientImpl implements RedisClient {
 
   private final String BASE_ADDRESS = "io.vertx.redis";
-  
+
   private final Vertx vertx;
   private final RedisOptions options;
   private final AtomicReference<CompletableFuture<Redis>> redis = new AtomicReference<>();
@@ -146,7 +146,7 @@ public final class RedisClientImpl implements RedisClient {
       }
     });
   }
-  
+
   private void handlePubSubMessage(Response response) {
     JsonArray data = toJsonArray(response);
     // Detect valid published messages according to https://redis.io/topics/pubsub
@@ -246,11 +246,7 @@ public final class RedisClientImpl implements RedisClient {
       if (ar.failed()) {
         handler.handle(Future.failedFuture(ar.cause()));
       } else {
-        if (ar.result() == null) {
-          handler.handle(Future.succeededFuture(null));
-        } else {
-          handler.handle(Future.succeededFuture(ar.result().toBuffer()));
-        }
+        handler.handle(Future.succeededFuture(ar.result() != null ? ar.result().toBuffer() : null));
       }
     });
   }
@@ -281,7 +277,7 @@ public final class RedisClientImpl implements RedisClient {
       if (ar.failed()) {
         handler.handle(Future.failedFuture(ar.cause()));
       } else {
-        handler.handle(Future.succeededFuture(toJsonObject(ar.result())));
+        handler.handle(Future.succeededFuture(ar.result() != null ? toJsonObject(ar.result()) : null));
       }
     });
   }
