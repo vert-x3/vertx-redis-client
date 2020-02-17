@@ -158,8 +158,8 @@ public class RedisExamples {
         if (retry > MAX_RECONNECT_RETRIES) {
           // we should stop now, as there's nothing we can do.
         } else {
-          // retry with backoff up to 1280ms
-          long backoff = (long) (Math.pow(2, MAX_RECONNECT_RETRIES - Math.max(MAX_RECONNECT_RETRIES - retry, 9)) * 10);
+          // retry with backoff up to 10240 ms
+          long backoff = (long) (Math.pow(2, Math.min(retry, 10)) * 10);
 
           vertx.setTimer(backoff, timer -> createRedisClient(onReconnect -> {
             if (onReconnect.failed()) {
