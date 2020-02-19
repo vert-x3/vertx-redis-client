@@ -22,11 +22,13 @@ import static io.vertx.redis.client.Command.*;
 /**
  * Implementation of {@link RedisSentinel}
  */
+@Deprecated
 public class RedisSentinelClientImpl implements RedisSentinel {
 
   private final Vertx vertx;
   private final io.vertx.redis.RedisOptions options;
   private final AtomicReference<CompletableFuture<Redis>> redis = new AtomicReference<>();
+  private final String connectionString;
 
 /*
   public static void create(Vertx vertx, io.vertx.redis.client.RedisOptions options, Handler<AsyncResult<RedisSentinel>> ready) {
@@ -43,6 +45,25 @@ public class RedisSentinelClientImpl implements RedisSentinel {
   public RedisSentinelClientImpl(Vertx vertx, RedisOptions options) {
     this.vertx = vertx;
     this.options = options;
+    // parse the options to a connection string
+    String connString = "";
+    if (options.isDomainSocket()) {
+      connString += "unix://" + options.getDomainSocketAddress() + "?";
+    } else {
+      connString += "redis";
+      if (options.isSsl()) {
+        connString += "s";
+      }
+      connString += "://" + options.getHost() + ":" + options.getPort() + "/?";
+    }
+    if (options.getAuth() != null) {
+      connString += "password=" + options.getAuth() + "&";
+    }
+    if (options.getSelect() != null) {
+      connString += "db=" + options.getSelect();
+    }
+
+    this.connectionString = connString;
   }
 
   /**
@@ -111,9 +132,7 @@ public class RedisSentinelClientImpl implements RedisSentinel {
         fut = f;
         Redis.createClient(vertx, new io.vertx.redis.client.RedisOptions()
           .setNetClientOptions(options)
-          .setEndpoint(options.isDomainSocket() ? SocketAddress.domainSocketAddress(options.getDomainSocketAddress()) : SocketAddress.inetSocketAddress(options.getPort(), options.getHost()))
-          .setPassword(options.getAuth())
-          .setSelect(options.getSelect())).connect(onReady -> {
+          .setConnectionString(connectionString)).connect(onReady -> {
           if (onReady.succeeded()) {
             f.complete(onReady.result());
           } else {

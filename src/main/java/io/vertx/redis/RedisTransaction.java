@@ -28,9 +28,11 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * This Interface represents a TX
+ * This factory is deprecated use {@link io.vertx.redis.client.Redis} instead,
+ * or for a typed API {@link io.vertx.redis.client.RedisAPI}.
  */
 @VertxGen
+@Deprecated
 public interface RedisTransaction {
   /**
    * Close the client - when it is fully closed the handler will be called.

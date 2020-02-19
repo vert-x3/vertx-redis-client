@@ -24,8 +24,9 @@ import java.util.LinkedList;
 import java.util.List;
 
 /**
- * @author <a href="mailto:marko.strukelj@gmail.com">Marko Strukelj</a>
+ * @deprecated Use {@link io.vertx.redis.client.Redis}
  */
+@Deprecated
 @DataObject
 public class SortOptions {
 

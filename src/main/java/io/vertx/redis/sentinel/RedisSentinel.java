@@ -12,9 +12,11 @@ import io.vertx.redis.RedisOptions;
 import io.vertx.redis.impl.RedisSentinelClientImpl;
 
 /**
- * Interface for sentinel commands
+ * This factory is deprecated use {@link io.vertx.redis.client.Redis} instead,
+ * or for a typed API {@link io.vertx.redis.client.RedisAPI}.
  */
 @VertxGen
+@Deprecated
 public interface RedisSentinel {
 
   static RedisSentinel create(Vertx vertx) {

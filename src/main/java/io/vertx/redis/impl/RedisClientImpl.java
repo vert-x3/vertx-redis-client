@@ -28,11 +28,7 @@ import io.vertx.redis.RedisClient;
 import io.vertx.redis.RedisOptions;
 import io.vertx.redis.RedisTransaction;
 import io.vertx.redis.Script;
-import io.vertx.redis.client.Command;
-import io.vertx.redis.client.Redis;
-import io.vertx.redis.client.Request;
-import io.vertx.redis.client.Response;
-import io.vertx.redis.client.ResponseType;
+import io.vertx.redis.client.*;
 import io.vertx.redis.client.impl.types.MultiType;
 import io.vertx.redis.op.*;
 
@@ -43,19 +39,40 @@ import java.util.stream.Stream;
 
 import static io.vertx.redis.client.Command.*;
 
+@Deprecated
 public final class RedisClientImpl implements RedisClient {
 
   private final String BASE_ADDRESS = "io.vertx.redis";
 
   private final Vertx vertx;
   private final RedisOptions options;
-  private final AtomicReference<CompletableFuture<Redis>> redis = new AtomicReference<>();
+  private final AtomicReference<CompletableFuture<RedisConnection>> redis = new AtomicReference<>();
   private final EventBus eb;
+  private final String connectionString;
 
   public RedisClientImpl(Vertx vertx, RedisOptions options) {
     this.vertx = vertx;
     this.options = options;
     this.eb = vertx.eventBus();
+    // parse the options to a connection string
+    String connString = "";
+    if (options.isDomainSocket()) {
+      connString += "unix://" + options.getDomainSocketAddress() + "?";
+    } else {
+      connString += "redis";
+      if (options.isSsl()) {
+        connString += "s";
+      }
+      connString += "://" + options.getHost() + ":" + options.getPort() + "/?";
+    }
+    if (options.getAuth() != null) {
+      connString += "password=" + options.getAuth() + "&";
+    }
+    if (options.getSelect() != null) {
+      connString += "db=" + options.getSelect();
+    }
+
+    this.connectionString = connString;
   }
 
   /**
@@ -117,22 +134,22 @@ public final class RedisClientImpl implements RedisClient {
       }
     }
 
-    CompletableFuture<Redis> fut = redis.get();
+    CompletableFuture<RedisConnection> fut = redis.get();
     if (fut == null) {
       CompletableFuture f = new CompletableFuture<>();
       if (redis.compareAndSet(null, f)) {
         fut = f;
         Redis.createClient(vertx, new io.vertx.redis.client.RedisOptions()
           .setNetClientOptions(options)
-          .setEndpoint(options.isDomainSocket() ? SocketAddress.domainSocketAddress(options.getDomainSocketAddress()) : SocketAddress.inetSocketAddress(options.getPort(), options.getHost()))
-          .setPassword(options.getAuth())
-          .setSelect(options.getSelect())).connect(onReady -> {
+          .setConnectionString(connectionString)).connect(onReady -> {
           if (onReady.succeeded()) {
+            // handle pub/sub
+            onReady.result().handler(this::handlePubSubMessage);
             f.complete(onReady.result());
           } else {
             f.completeExceptionally(onReady.cause());
           }
-        }).handler(this::handlePubSubMessage);
+        });
       } else {
         fut = redis.get();
       }
@@ -284,7 +301,7 @@ public final class RedisClientImpl implements RedisClient {
 
   @Override
   public void close(Handler<AsyncResult<Void>> handler) {
-    CompletableFuture<Redis> prev = redis.getAndSet(null);
+    CompletableFuture<RedisConnection> prev = redis.getAndSet(null);
     if (prev != null) {
       prev.whenComplete((client, err) -> {
         if (err == null) {

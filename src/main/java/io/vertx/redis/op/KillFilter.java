@@ -20,8 +20,9 @@ import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;
 
 /**
- * @author <a href="mailto:marko.strukelj@gmail.com">Marko Strukelj</a>
+ * @deprecated Use {@link io.vertx.redis.client.Redis}
  */
+@Deprecated
 @DataObject
 public class KillFilter {
 

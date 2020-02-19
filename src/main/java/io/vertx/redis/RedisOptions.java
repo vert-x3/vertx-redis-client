@@ -24,6 +24,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
+ * @deprecated Use {@link io.vertx.redis.client.RedisOptions} with the new client API.
+ *
  * This object controls the connection setting to the Redis Server. There is no need to specify most of the settings
  * since it has built the following sensible defaults:
  * <p>
@@ -45,6 +47,7 @@ import java.util.List;
  * yourself in case of connection failure the client will not be able to perform the correct authentication handshake.
  */
 @DataObject(generateConverter = true)
+@Deprecated
 public class RedisOptions extends NetClientOptions {
 
   private static final String DEFAULT_ENCODING = "UTF-8";

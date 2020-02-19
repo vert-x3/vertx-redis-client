@@ -19,6 +19,7 @@ import io.vertx.core.buffer.Buffer;
 import io.vertx.redis.client.Request;
 import io.vertx.redis.client.Command;
 
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -26,6 +27,11 @@ import java.util.List;
 import static io.vertx.redis.client.impl.RESPEncoder.*;
 
 public final class RequestImpl implements Request {
+
+  private static final byte[] EMPTY_BULK = "$0\r\n\r\n".getBytes(StandardCharsets.ISO_8859_1);
+  private static final byte[] EMPTY_BYTES = new byte[0];
+  private static final byte[] NULL_BULK = "$-1\r\n".getBytes(StandardCharsets.ISO_8859_1);
+  private static final byte[] EOL = "\r\n".getBytes(StandardCharsets.ISO_8859_1);
 
   private final Command cmd;
   private final List<byte[]> args;
@@ -59,7 +65,7 @@ public final class RequestImpl implements Request {
 
   @Override
   public Request nullArg() {
-    args.add(NULL_BULK);
+    args.add(null);
     return this;
   }
 
@@ -72,7 +78,7 @@ public final class RequestImpl implements Request {
     }
 
     if (arg.length == 0) {
-      args.add(EMPTY_BULK);
+      args.add(arg);
       return this;
     }
 
@@ -87,7 +93,7 @@ public final class RequestImpl implements Request {
     }
 
     if (arg.length() == 0) {
-      args.add(EMPTY_BULK);
+      args.add(EMPTY_BYTES);
       return this;
     }
 
@@ -109,6 +115,16 @@ public final class RequestImpl implements Request {
       .appendBytes(cmd.getBytes());
 
     for (final byte[] arg : args) {
+      if (arg == null) {
+        buffer.appendBytes(NULL_BULK);
+        continue;
+      }
+
+      if (arg.length == 0) {
+        buffer.appendBytes(EMPTY_BULK);
+        continue;
+      }
+
       buffer
         .appendByte((byte) '$')
         .appendBytes(numToBytes(arg.length))

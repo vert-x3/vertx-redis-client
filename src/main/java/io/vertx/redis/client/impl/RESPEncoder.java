@@ -15,8 +15,6 @@
  */
 package io.vertx.redis.client.impl;
 
-import java.nio.charset.StandardCharsets;
-
 public final class RESPEncoder {
 
   // precache -1
@@ -26,10 +24,6 @@ public final class RESPEncoder {
   // percentage of numbers passed over the wire.
   private static final int NUM_MAP_LENGTH = 256;
   private static final byte[][] NUM_MAP = new byte[NUM_MAP_LENGTH][];
-
-  public static final byte[] EMPTY_BULK = "$0\r\n\r\n".getBytes(StandardCharsets.ISO_8859_1);
-  public static final byte[] NULL_BULK = "$-1\r\n".getBytes(StandardCharsets.ISO_8859_1);
-  public static final byte[] EOL = "\r\n".getBytes(StandardCharsets.ISO_8859_1);
 
   static {
     for (int i = 0; i < NUM_MAP_LENGTH; i++) {

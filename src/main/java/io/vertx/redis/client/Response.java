@@ -22,6 +22,8 @@ import io.vertx.core.buffer.Buffer;
 import java.nio.charset.Charset;
 import java.util.Iterator;
 import java.util.Set;
+import java.util.stream.Stream;
+import java.util.stream.StreamSupport;
 
 /**
  * The response received from the REDIS server. Redis responses can have several representations:
@@ -185,5 +187,14 @@ public interface Response extends Iterable<Response> {
   @GenIgnore
   default Iterator<Response> iterator() {
     throw new UnsupportedOperationException("This type doesn't hold a Array type");
+  }
+
+  /**
+   * Return a stream of responses based on the iterable of this object.
+   * @return a stream of response
+   */
+  @GenIgnore
+  default Stream<Response> stream() {
+    return StreamSupport.stream(spliterator(), false);
   }
 }

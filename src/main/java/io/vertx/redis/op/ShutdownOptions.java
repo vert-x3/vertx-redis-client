@@ -19,8 +19,9 @@ import io.vertx.codegen.annotations.VertxGen;
 import io.vertx.core.json.JsonArray;
 
 /**
- * @author <a href="mailto:marko.strukelj@gmail.com">Marko Strukelj</a>
+ * @deprecated Use {@link io.vertx.redis.client.Redis}
  */
+@Deprecated
 @VertxGen
 public enum ShutdownOptions {
   NONE,
