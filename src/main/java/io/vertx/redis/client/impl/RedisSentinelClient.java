@@ -46,7 +46,7 @@ public class RedisSentinelClient implements Redis {
   private static final Logger LOG = LoggerFactory.getLogger(RedisSentinelClient.class);
 
   private final Context context;
-  private final ConnectionManager connectionManager;
+  private final RedisConnectionManager connectionManager;
   private final RedisOptions options;
 
   private RedisConnection sentinel;
@@ -63,7 +63,7 @@ public class RedisSentinelClient implements Redis {
       throw new IllegalStateException("Invalid options: maxPoolWaiting < maxPoolSize");
     }
     // sentinel (HA) requires 2 connections, one to watch for sentinel events and the connection itself
-    this.connectionManager = new ConnectionManager(vertx, options);
+    this.connectionManager = new RedisConnectionManager(vertx, options);
 
     this.connectionManager.start();
   }

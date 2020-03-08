@@ -1,27 +1,29 @@
 package io.vertx.redis.client.impl;
 
 import io.vertx.core.*;
-import io.vertx.core.http.impl.pool.ConnectResult;
-import io.vertx.core.http.impl.pool.ConnectionListener;
-import io.vertx.core.http.impl.pool.ConnectionProvider;
-import io.vertx.core.http.impl.pool.Pool;
 import io.vertx.core.impl.ContextInternal;
 import io.vertx.core.impl.logging.Logger;
 import io.vertx.core.impl.logging.LoggerFactory;
 import io.vertx.core.net.NetClient;
 import io.vertx.core.net.NetSocket;
+import io.vertx.core.net.impl.clientconnection.ConnectResult;
+import io.vertx.core.net.impl.clientconnection.ConnectionListener;
+import io.vertx.core.net.impl.clientconnection.ConnectionManager;
+import io.vertx.core.net.impl.clientconnection.ConnectionProvider;
+import io.vertx.core.net.impl.clientconnection.Endpoint;
+import io.vertx.core.net.impl.clientconnection.EndpointProvider;
+import io.vertx.core.net.impl.clientconnection.Pool;
 import io.vertx.redis.client.Command;
 import io.vertx.redis.client.RedisConnection;
 import io.vertx.redis.client.RedisOptions;
 import io.vertx.redis.client.Request;
 
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
+import java.util.Objects;
 import java.util.function.LongSupplier;
 
-class ConnectionManager {
+class RedisConnectionManager {
 
-  private static final Logger LOG = LoggerFactory.getLogger(ConnectionManager.class);
+  private static final Logger LOG = LoggerFactory.getLogger(RedisConnectionManager.class);
 
   private static final LongSupplier CLOCK = System::currentTimeMillis;
   private static final Handler<Throwable> DEFAULT_EXCEPTION_HANDLER = t -> LOG.error("Unhandled Error", t);
@@ -30,14 +32,18 @@ class ConnectionManager {
   private final NetClient netClient;
 
   private final RedisOptions options;
-  private final Map<String, RedisConnection> connectionMap = new ConcurrentHashMap<>();
-  private final Map<String, Pool<RedisConnection>> endpointMap = new ConcurrentHashMap<>();
+  private final ConnectionManager<ConnectionKey, RedisConnection> pooledConnectionManager;
   private long timerID;
 
-  ConnectionManager(Vertx vertx, RedisOptions options) {
+  RedisConnectionManager(Vertx vertx, RedisOptions options) {
     this.vertx = vertx;
     this.options = options;
     this.netClient = vertx.createNetClient(options.getNetClientOptions());
+    this.pooledConnectionManager = new ConnectionManager<>(this::connectionEndpointProvider);
+  }
+
+  private Endpoint<RedisConnection> connectionEndpointProvider(ConnectionKey key, ContextInternal ctx, Runnable dispose) {
+    return new RedisEndpoint(dispose, ctx, key);
   }
 
   synchronized void start() {
@@ -46,8 +52,28 @@ class ConnectionManager {
   }
 
   private synchronized void checkExpired(long period) {
-    endpointMap.values().forEach(Pool::closeIdle);
+    pooledConnectionManager.forEach(e -> ((RedisEndpoint)e).pool.closeIdle());
     timerID = vertx.setTimer(period, id -> checkExpired(period));
+  }
+
+  private static class ConnectionKey {
+    private final String string;
+    private final Request setup;
+    ConnectionKey(String string, Request setup) {
+      this.string = string;
+      this.setup = setup;
+    }
+    @Override
+    public boolean equals(Object o) {
+      if (this == o) return true;
+      if (o == null || getClass() != o.getClass()) return false;
+      ConnectionKey that = (ConnectionKey) o;
+      return Objects.equals(string, that.string);
+    }
+    @Override
+    public int hashCode() {
+      return Objects.hash(string);
+    }
   }
 
   class RedisConnectionProvider implements ConnectionProvider<RedisConnection> {
@@ -175,24 +201,7 @@ class ConnectionManager {
   }
 
   public void getConnection(Context userContext, String connectionString, Request setup, Handler<AsyncResult<RedisConnection>> handler) {
-    final ConnectionProvider<RedisConnection> connectionProvider = new RedisConnectionProvider(connectionString, setup);
-    while (true) {
-      Pool<RedisConnection> endpoint = endpointMap.computeIfAbsent(connectionString, targetAddress ->
-        new Pool<>(
-          userContext,
-          connectionProvider,
-          CLOCK,
-          options.getMaxPoolWaiting(),
-          options.getMaxPoolSize(),
-          options.getMaxPoolSize() * 4,
-          v -> endpointMap.remove(connectionString),
-          conn -> connectionMap.put(connectionString, conn),
-          conn -> connectionMap.remove(connectionString, conn),
-          false));
-      if (endpoint.getConnection(handler)) {
-        break;
-      }
-    }
+    pooledConnectionManager.getConnection((ContextInternal) userContext, new ConnectionKey(connectionString, setup), handler);
   }
 
   public void close() {
@@ -202,11 +211,44 @@ class ConnectionManager {
         timerID = -1;
       }
     }
-    endpointMap.clear();
+    pooledConnectionManager.close();
+//    endpointMap.clear();
+/*
     for (RedisConnection conn : connectionMap.values()) {
       ((RedisConnectionImpl) conn).forceClose();
     }
+*/
     // forceClose the underlying netclient
     netClient.close();
+  }
+
+  private class RedisEndpoint extends Endpoint<RedisConnection> {
+
+    final Pool<RedisConnection> pool;
+
+    public RedisEndpoint(Runnable dispose, ContextInternal ctx, ConnectionKey key) {
+      super(dispose);
+      ConnectionProvider<RedisConnection> connectionProvider = new RedisConnectionProvider(key.string, key.setup);
+      pool = new Pool<>(
+        ctx,
+        connectionProvider,
+        CLOCK,
+        options.getMaxPoolWaiting(),
+        options.getMaxPoolSize(),
+        options.getMaxPoolSize() * 4,
+        this::connectionAdded,
+        this::connectionRemoved,
+        false);
+    }
+
+    @Override
+    public void requestConnection(ContextInternal ctx, Handler<AsyncResult<RedisConnection>> handler) {
+      pool.getConnection(handler);
+    }
+
+    @Override
+    protected void close(RedisConnection conn) {
+      ((RedisConnectionImpl) conn).forceClose();
+    }
   }
 }

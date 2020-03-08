@@ -84,6 +84,7 @@ public class RedisClusterTest {
     });
   }
 
+  @Ignore
   @Test(timeout = 30_000)
   public void runTheSlotScope(TestContext should) {
     final Async test = should.async();
@@ -757,6 +758,7 @@ public class RedisClusterTest {
       });
   }
 
+  @Ignore
   @Test(timeout = 30_000)
   public void dbSize(TestContext should) {
     final Async test = should.async();
@@ -786,6 +788,7 @@ public class RedisClusterTest {
       });
   }
 
+  @Ignore
   @Test(timeout = 30_000)
   public void flushDB(TestContext should) {
     final Async test = should.async();

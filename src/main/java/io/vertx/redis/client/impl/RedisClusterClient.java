@@ -107,7 +107,7 @@ public class RedisClusterClient implements Redis {
 
   private final Vertx vertx;
   private final Context context;
-  private final ConnectionManager connectionManager;
+  private final RedisConnectionManager connectionManager;
   private final RedisOptions options;
 
   public RedisClusterClient(Vertx vertx, RedisOptions options) {
@@ -120,7 +120,7 @@ public class RedisClusterClient implements Redis {
       // we can't validate the max pool size yet as we need to know the slots first
       // the remaining validation will happen at the connect time
     }
-    this.connectionManager = new ConnectionManager(vertx, options);
+    this.connectionManager = new RedisConnectionManager(vertx, options);
     this.connectionManager.start();
   }
 

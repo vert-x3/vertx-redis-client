@@ -21,12 +21,12 @@ import io.vertx.redis.client.*;
 public class RedisClient implements Redis {
 
   private final Context context;
-  private final ConnectionManager connectionManager;
+  private final RedisConnectionManager connectionManager;
   private final String defaultAddress;
 
   public RedisClient(Vertx vertx, RedisOptions options) {
     this.context = vertx.getOrCreateContext();
-    this.connectionManager = new ConnectionManager(vertx, options);
+    this.connectionManager = new RedisConnectionManager(vertx, options);
     this.defaultAddress = options.getEndpoint();
   }
 

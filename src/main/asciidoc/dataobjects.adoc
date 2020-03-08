@@ -49,9 +49,6 @@ Tune the maximum waiting requests for a connection from the pool.
 The client will always work on pipeline mode, this means that messages can start queueing. You can control how much
  backlog you're willing to accept. This methods sets how much handlers is the client willing to queue.
 +++
-|[[netClientOptions]]`@netClientOptions`|`link:dataobjects.html#NetClientOptions[NetClientOptions]`|+++
-Set the net client options to be used while connecting to the redis server. Use this to tune your connection.
-+++
 |[[poolCleanerInterval]]`@poolCleanerInterval`|`Number (int)`|+++
 Tune how often in milliseconds should the connection pool cleaner execute.
 +++
