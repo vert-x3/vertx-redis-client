@@ -59,7 +59,10 @@ public class RedisSentinelTest {
         .setMaxPoolSize(4)
         .setMaxPoolWaiting(16))
       .connect(onCreate -> {
-        // get a connection to the master node
+        // get a connection to the slave node
+        if (onCreate.failed()) {
+          onCreate.cause().printStackTrace();
+        }
         should.assertTrue(onCreate.succeeded());
         // query the info
         onCreate.result()
