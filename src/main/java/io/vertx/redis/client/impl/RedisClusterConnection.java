@@ -155,7 +155,7 @@ public class RedisClusterConnection implements RedisConnection {
         send(selectMasterOrSlaveEndpoint(req.command().isReadOnly(), endpoints, forceMasterEndpoint), RETRIES, req, p);
         responses.add(p.future());
       }
-      CompositeFuture.all(responses).setHandler(composite -> {
+      CompositeFuture.all(responses).onComplete(composite -> {
         if (composite.failed()) {
           // means if one of the operations failed, then we can fail the handler
           handler.handle(Future.failedFuture(composite.cause()));
@@ -212,7 +212,7 @@ public class RedisClusterConnection implements RedisConnection {
             responses.add(p.future());
           }
 
-          CompositeFuture.all(responses).setHandler(composite -> {
+          CompositeFuture.all(responses).onComplete(composite -> {
             if (composite.failed()) {
               // means if one of the operations failed, then we can fail the handler
               handler.handle(Future.failedFuture(composite.cause()));

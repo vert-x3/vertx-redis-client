@@ -245,7 +245,7 @@ public class RedisClusterTest {
     }
 
 
-    CompositeFuture.all(futures).setHandler(all -> {
+    CompositeFuture.all(futures).onComplete(all -> {
       should.assertFalse(all.failed());
 
       final Random rnd = new Random();
