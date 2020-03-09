@@ -56,6 +56,10 @@ final class ArrayQueue {
       throw new IndexOutOfBoundsException();
     }
     back++;
+    if (back == Integer.MAX_VALUE) {
+      // ensure the indexes stay positive
+      back = 0;
+    }
     queue[back % queue.length] = value;
     cur++;
   }
@@ -74,7 +78,7 @@ final class ArrayQueue {
   }
 
   /**
-   * Returns and removes the front element of the queuee. It works with wraparound.
+   * Returns and removes the front element of the queue. It works with wraparound.
    *
    * @return element at front of the queue
    * @throws NoSuchElementException if the queue is empty.
@@ -83,6 +87,10 @@ final class ArrayQueue {
     T e = peek();
     queue[front % queue.length] = null; // for garbage collection
     front++;
+    if (front == Integer.MAX_VALUE) {
+      // ensure the indexes stay positive
+      front = 0;
+    }
     cur--;
     return e;
   }
