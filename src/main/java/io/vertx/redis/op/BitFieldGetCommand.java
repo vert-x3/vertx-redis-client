@@ -1,8 +1,13 @@
 package io.vertx.redis.op;
 
 import io.vertx.codegen.annotations.DataObject;
+import io.vertx.codegen.annotations.VertxGen;
 import io.vertx.core.json.JsonObject;
 
+/**
+ * @deprecated Use {@link io.vertx.redis.client.Redis}
+ */
+@Deprecated
 @DataObject
 public class BitFieldGetCommand {
 

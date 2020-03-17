@@ -20,8 +20,9 @@ import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;
 
 /**
- * @author <a href="mailto:plopes@redhat.com">Paulo Lopes</a>
+ * @deprecated Use {@link io.vertx.redis.client.Redis}
  */
+@Deprecated
 @DataObject
 public class GeoMember {
 

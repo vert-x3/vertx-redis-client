@@ -21,28 +21,52 @@ import io.vertx.redis.client.*;
 
 public class RedisAPIImpl implements RedisAPI {
 
-  private final Redis client;
+  private final Redis redis;
+  private final RedisConnection connection;
 
-  public RedisAPIImpl(Redis client) {
-    this.client = client;
+  public RedisAPIImpl(RedisConnection connection) {
+    this.connection = connection;
+    this.redis = null;
+  }
+
+  public RedisAPIImpl(Redis redis) {
+    this.connection = null;
+    this.redis = redis;
   }
 
   @Override
-  public Future<Response> send(Command cmd, Object... args) {
+  public Future<Response> send(Command cmd, String... args) {
     final Promise<Response> promise = Promise.promise();
     final Request req = Request.cmd(cmd);
 
     if (args != null) {
-      for (Object o : args) {
+      for (String o : args) {
         if (o == null) {
           req.nullArg();
         } else {
-          req.arg(o.toString());
+          req.arg(o);
         }
       }
     }
 
-    client.send(req, promise);
+    if (redis != null) {
+      // operating in pooled mode
+      redis.send(req, promise);
+    } else if (connection != null) {
+      // operating on connection mode
+      connection.send(req, promise);
+    }
     return promise.future();
+  }
+
+  @Override
+  public void close() {
+    if (redis != null) {
+      // operating in pooled mode
+      redis.close();
+    } else if (connection != null) {
+      // operating on connection mode
+      connection.close();
+    }
   }
 }

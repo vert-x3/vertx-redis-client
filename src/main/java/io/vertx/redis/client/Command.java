@@ -273,4 +273,6 @@ public interface Command {
   boolean isReadOnly();
 
   boolean isMovable();
+
+  boolean isVoid();
 }

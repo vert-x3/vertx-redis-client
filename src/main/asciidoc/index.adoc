@@ -3,10 +3,9 @@
 
 Vert.x-redis is redis client to be used with Vert.x.
 
-This module allows data to be saved, retrieved, searched for, and deleted in a Redis. Redis is an open source, BSD
-licensed, advanced key-value store. It is often referred to as a data structure server since keys can contain
-strings, hashes, lists, sets and sorted sets. To use this module you must have a Redis server instance running on
-your network.
+This module allows data to be saved, retrieved, searched for, and deleted in a Redis. Redis is an open source, advanced
+key-value store. It is often referred to as a data structure server since keys can contain  strings, hashes, lists, sets
+and sorted sets. To use this module you must have a Redis server instance running on your network.
 
 Redis has a rich API and it can be organized in the following groups:
 
@@ -23,6 +22,7 @@ Redis has a rich API and it can be organized in the following groups:
 * Sorted Sets - Commands to work with sorted sets.
 * Strings - Commands to work with Strings.
 * Transactions - Commands to handle transaction lifecycle.
+* Streams - Commands to handle streaming.
 
 == Using Vert.x-Redis
 
@@ -59,7 +59,7 @@ configured using a {@link io.vertx.redis.client.RedisOptions} data object. By de
 initialized with the following values:
 
 * `netClientOptions`: default is `TcpKeepAlive: true`, `TcpNoDelay: true`
-* `endpoint`: default is `localhost:6379`
+* `endpoint`: default is `redis://localhost:6379`
 * `masterName`: default is `mymaster`
 * `role` default is `MASTER`
 * `slaves` default is `NEVER`
@@ -78,6 +78,23 @@ once a successful connection is established to the server.
 ----
 {@link examples.RedisExamples#example2}
 ----
+
+== Connection String
+
+The client will recognize addresses that follow the expression:
+
+----
+redis://[:password@]host[:port][/db-number]
+----
+
+Or
+
+----
+unix://[:password@]/domain/docker.sock[?select=db-number]
+----
+
+When specifying a password or a database those commands are always executed on connection start.
+
 
 == Running commands
 
@@ -151,6 +168,10 @@ And from another place in the code publish messages to the queue:
 {@link examples.RedisExamples#example8}
 ----
 
+NOTE: It is important to remember that the commands `SUBSCRIBE`, `UNSUBSCRIBE`, `PSUBSCRIBE` and `PUNSUBSCRIBE` are `void`.
+This means that the result in case of success is `null` not a instance of response. All messages are then routed through
+the handler on the client.
+
 == Domain Sockets
 
 Most of the examples shown connecting to a TCP sockets, however it is also possible to use Redis connecting to a UNIX
@@ -164,10 +185,43 @@ domain docket:
 Be aware that HA and cluster modes report server addresses always on TCP addresses not domain sockets. So the
 combination is not possible. Not because of this client but how Redis works.
 
+== Connection Pooling
+
+All client variations are backed by a connection pool. By default the configuration sets the pool size to 1, which means
+that it operates just like a single connection. There are 4 tunnables for the pool:
+
+* `maxPoolSize` the max number of connections on the pool (default `6`)
+* `maxPoolWaiting` the max waiting handlers to get a connection on a queue (default `24`)
+* `poolCleanerInterval` the interval when connections will be clean default is `-1` (disabled)
+* `poolRecycleTimeout` the timeout to keep an open connection on the pool waiting and then close (default `15_000`)
+
+Pooling is quite useful to avoid custom connection management, for example you can just use as:
+
+[source,$lang]
+----
+{@link examples.RedisExamples#example11}
+----
+
+It is important to observe that no connection was acquired or returned, it's all handled by the pool. However there might
+be some scalability issues when more than 1 concurrent request attempts to get a connection from the pool, in order to
+overcome this we need to tune the pool. A common configuration is to set the maximum size of the pool to the number of
+available CPU cores and allow requests to get a connection from the pool to queue:
+
+[source,$lang]
+----
+{@link examples.RedisExamples#example12}
+----
+
+NOTE: Pooling is not compatible with `SUBSCRIBE`, `UNSUBSCRIBE`, `PSUBSCRIBE` or `PUNSUBSCRIBE` because these commands
+will modify the way the connection operates and the connection cannot be reused.
+
 == Implementing Reconnect on Error
 
+While the connection pool is quite useful, for performance, a connection should not be auto managed but controlled by
+you. In this case you will need to handle connection recovery, error handling and reconnect.
+
 A typical scenario is that a user will want to reconnect to the server whenever an error occurs. The automatic reconnect
-is not part of the redis client has it will force a behaviour that might not match the user expectations, for example:
+is not part of the redis client as it will force a behaviour that might not match the user expectations, for example:
 
 1. What should happen to current in-flight requests?
 2. Should the exception handler be invoked or not?

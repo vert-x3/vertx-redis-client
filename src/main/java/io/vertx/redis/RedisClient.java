@@ -32,7 +32,12 @@ import io.vertx.redis.op.*;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * This factory is deprecated use {@link io.vertx.redis.client.Redis} instead,
+ * or for a typed API {@link io.vertx.redis.client.RedisAPI}.
+ */
 @VertxGen
+@Deprecated
 public interface RedisClient {
 
   static RedisClient create(Vertx vertx) {

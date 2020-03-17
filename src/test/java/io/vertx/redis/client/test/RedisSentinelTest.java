@@ -1,12 +1,12 @@
 package io.vertx.redis.client.test;
 
-import io.vertx.core.net.SocketAddress;
 import io.vertx.ext.unit.Async;
 import io.vertx.ext.unit.TestContext;
 import io.vertx.ext.unit.junit.RunTestOnContext;
 import io.vertx.ext.unit.junit.VertxUnitRunner;
 import io.vertx.redis.client.*;
-import org.junit.*;
+import org.junit.Rule;
+import org.junit.Test;
 import org.junit.runner.RunWith;
 
 @RunWith(VertxUnitRunner.class)
@@ -23,11 +23,13 @@ public class RedisSentinelTest {
       rule.vertx(),
       new RedisOptions()
         .setType(RedisClientType.SENTINEL)
-        .addEndpoint(SocketAddress.inetSocketAddress(5000, "127.0.0.1"))
-        .addEndpoint(SocketAddress.inetSocketAddress(5001, "127.0.0.1"))
-        .addEndpoint(SocketAddress.inetSocketAddress(5002, "127.0.0.1"))
+        .addConnectionString("redis://localhost:5000")
+        .addConnectionString("redis://localhost:5001")
+        .addConnectionString("redis://localhost:5002")
         .setMasterName("sentinel7000")
-        .setRole(RedisRole.MASTER))
+        .setRole(RedisRole.MASTER)
+        .setMaxPoolSize(4)
+        .setMaxPoolWaiting(16))
       .connect(onCreate -> {
         // get a connection to the master node
         should.assertTrue(onCreate.succeeded());
@@ -49,11 +51,13 @@ public class RedisSentinelTest {
       rule.vertx(),
       new RedisOptions()
         .setType(RedisClientType.SENTINEL)
-        .addEndpoint(SocketAddress.inetSocketAddress(5000, "127.0.0.1"))
-        .addEndpoint(SocketAddress.inetSocketAddress(5001, "127.0.0.1"))
-        .addEndpoint(SocketAddress.inetSocketAddress(5002, "127.0.0.1"))
+        .addConnectionString("redis://localhost:5000")
+        .addConnectionString("redis://localhost:5001")
+        .addConnectionString("redis://localhost:5002")
         .setMasterName("sentinel7000")
-        .setRole(RedisRole.SLAVE))
+        .setRole(RedisRole.SLAVE)
+        .setMaxPoolSize(4)
+        .setMaxPoolWaiting(16))
       .connect(onCreate -> {
         // get a connection to the master node
         should.assertTrue(onCreate.succeeded());
@@ -75,11 +79,13 @@ public class RedisSentinelTest {
       rule.vertx(),
       new RedisOptions()
         .setType(RedisClientType.SENTINEL)
-        .addEndpoint(SocketAddress.inetSocketAddress(5000, "127.0.0.1"))
-        .addEndpoint(SocketAddress.inetSocketAddress(5001, "127.0.0.1"))
-        .addEndpoint(SocketAddress.inetSocketAddress(5002, "127.0.0.1"))
+        .addConnectionString("redis://localhost:5000")
+        .addConnectionString("redis://localhost:5001")
+        .addConnectionString("redis://localhost:5002")
         .setMasterName("sentinel7000")
-        .setRole(RedisRole.SENTINEL))
+        .setRole(RedisRole.SENTINEL)
+        .setMaxPoolSize(4)
+        .setMaxPoolWaiting(16))
       .connect(onCreate -> {
         // get a connection to the master node
         should.assertTrue(onCreate.succeeded());

@@ -18,8 +18,9 @@ package io.vertx.redis.op;
 import io.vertx.codegen.annotations.VertxGen;
 
 /**
- * @author <a href="mailto:plopes@redhat.com">Paulo Lopes</a>
+ * @deprecated Use {@link io.vertx.redis.client.Redis}
  */
+@Deprecated
 @VertxGen
 public enum ClientReplyOptions {
   ON,

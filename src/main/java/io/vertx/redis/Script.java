@@ -4,9 +4,11 @@ import io.vertx.codegen.annotations.VertxGen;
 import io.vertx.redis.impl.ScriptImpl;
 
 /**
- * Container for a script and its sha1 hash.
+ * This factory is deprecated use {@link io.vertx.redis.client.Redis} instead,
+ * or for a typed API {@link io.vertx.redis.client.RedisAPI}.
  */
 @VertxGen
+@Deprecated
 public interface Script {
   static Script create(String script) {
     return new ScriptImpl(script);

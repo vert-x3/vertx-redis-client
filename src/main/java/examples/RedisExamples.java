@@ -4,7 +4,6 @@ import io.vertx.core.AbstractVerticle;
 import io.vertx.core.AsyncResult;
 import io.vertx.core.Handler;
 import io.vertx.core.Vertx;
-import io.vertx.core.net.SocketAddress;
 import io.vertx.redis.client.*;
 
 /**
@@ -18,25 +17,21 @@ public class RedisExamples {
     Redis.createClient(vertx, new RedisOptions())
       .connect(onConnect -> {
         if (onConnect.succeeded()) {
-          Redis client = onConnect.result();
+          RedisConnection client = onConnect.result();
         }
       });
   }
 
   public void example2(Vertx vertx) {
-    RedisOptions options = new RedisOptions()
-      .setPassword("abracadabra")
-      .setSelect(1);
-
-    Redis.createClient(vertx, options)
+    Redis.createClient(vertx, "redis://:abracadabra@localhost:6379/1")
       .connect(onConnect -> {
         if (onConnect.succeeded()) {
-          Redis client = onConnect.result();
+          RedisConnection client = onConnect.result();
         }
       });
   }
 
-  public void example3(Redis client) {
+  public void example3(RedisConnection client) {
     RedisAPI redis = RedisAPI.api(client);
 
     redis.get("mykey", res -> {
@@ -60,9 +55,9 @@ public class RedisExamples {
       vertx,
       new RedisOptions()
         .setType(RedisClientType.SENTINEL)
-        .addEndpoint(SocketAddress.inetSocketAddress(5000, "127.0.0.1"))
-        .addEndpoint(SocketAddress.inetSocketAddress(5001, "127.0.0.1"))
-        .addEndpoint(SocketAddress.inetSocketAddress(5002, "127.0.0.1"))
+        .addConnectionString("redis://127.0.0.1:5000")
+        .addConnectionString("redis://127.0.0.1:5001")
+        .addConnectionString("redis://127.0.0.1:5002")
         .setMasterName("sentinel7000")
         .setRole(RedisRole.MASTER))
       .connect(onConnect -> {
@@ -77,12 +72,12 @@ public class RedisExamples {
 
   public void example6() {
     final RedisOptions options = new RedisOptions()
-      .addEndpoint(SocketAddress.inetSocketAddress(7000, "127.0.0.1"))
-      .addEndpoint(SocketAddress.inetSocketAddress(7001, "127.0.0.1"))
-      .addEndpoint(SocketAddress.inetSocketAddress(7002, "127.0.0.1"))
-      .addEndpoint(SocketAddress.inetSocketAddress(7003, "127.0.0.1"))
-      .addEndpoint(SocketAddress.inetSocketAddress(7004, "127.0.0.1"))
-      .addEndpoint(SocketAddress.inetSocketAddress(7005, "127.0.0.1"));
+      .addConnectionString("redis://127.0.0.1:7000")
+      .addConnectionString("redis://127.0.0.1:7001")
+      .addConnectionString("redis://127.0.0.1:7002")
+      .addConnectionString("redis://127.0.0.1:7003")
+      .addConnectionString("redis://127.0.0.1:7004")
+      .addConnectionString("redis://127.0.0.1:7005");
   }
 
   public void example7(Vertx vertx) {
@@ -90,7 +85,7 @@ public class RedisExamples {
     Redis.createClient(vertx, new RedisOptions())
       .connect(onConnect -> {
         if (onConnect.succeeded()) {
-          Redis client = onConnect.result();
+          RedisConnection client = onConnect.result();
 
           client.handler(message -> {
             // do whatever you need to do with your message
@@ -99,7 +94,7 @@ public class RedisExamples {
       });
   }
 
-  public void example8(Redis redis) {
+  public void example8(RedisConnection redis) {
 
     redis.send(Request.cmd(Command.PUBLISH).arg("channel1").arg("Hello World!"), res -> {
       if (res.succeeded()) {
@@ -110,10 +105,10 @@ public class RedisExamples {
 
   public void example9(Vertx vertx) {
 
-    Redis.createClient(vertx, SocketAddress.domainSocketAddress("/tmp/redis.sock"))
+    Redis.createClient(vertx, "unix:///tmp/redis.sock")
       .connect(onConnect -> {
         if (onConnect.succeeded()) {
-          Redis client = onConnect.result();
+          RedisConnection client = onConnect.result();
         }
       });
   }
@@ -125,7 +120,7 @@ public class RedisExamples {
       private static final int MAX_RECONNECT_RETRIES = 16;
 
       private RedisOptions options = new RedisOptions();
-      private Redis client;
+      private RedisConnection client;
 
       @Override
       public void start() {
@@ -140,7 +135,7 @@ public class RedisExamples {
        * Will create a redis client and setup a reconnect handler when there is
        * an exception in the connection.
        */
-      private void createRedisClient(Handler<AsyncResult<Redis>> handler) {
+      private void createRedisClient(Handler<AsyncResult<RedisConnection>> handler) {
         Redis.createClient(vertx, options)
           .connect(onConnect -> {
             if (onConnect.succeeded()) {
@@ -163,8 +158,8 @@ public class RedisExamples {
         if (retry > MAX_RECONNECT_RETRIES) {
           // we should stop now, as there's nothing we can do.
         } else {
-          // retry with backoff up to 1280ms
-          long backoff = (long) (Math.pow(2, MAX_RECONNECT_RETRIES - Math.max(MAX_RECONNECT_RETRIES - retry, 9)) * 10);
+          // retry with backoff up to 10240 ms
+          long backoff = (long) (Math.pow(2, Math.min(retry, 10)) * 10);
 
           vertx.setTimer(backoff, timer -> createRedisClient(onReconnect -> {
             if (onReconnect.failed()) {
@@ -174,5 +169,31 @@ public class RedisExamples {
         }
       }
     }
+  }
+
+  public void example11(Vertx vertx) {
+    Redis.createClient(vertx, "redis://localhost:7006")
+      .send(Request.cmd(Command.PING), send -> {
+        if (send.succeeded()) {
+          // Should have received a pong...
+        }
+      });
+  }
+
+  public void example12(Vertx vertx) {
+    Redis.createClient(
+      vertx,
+      new RedisOptions()
+        .setConnectionString("redis://localhost:7006")
+        // allow at max 8 connections to redis
+        .setMaxPoolSize(8)
+        // allow 32 connection requests to queue waiting
+        // for a connection to be available.
+        .setMaxWaitingHandlers(32))
+      .send(Request.cmd(Command.PING), send -> {
+        if (send.succeeded()) {
+          // Should have received a pong...
+        }
+      });
   }
 }

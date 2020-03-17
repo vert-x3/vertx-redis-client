@@ -18,7 +18,6 @@ package io.vertx.redis.client;
 import io.vertx.codegen.annotations.DataObject;
 import io.vertx.core.json.JsonObject;
 import io.vertx.core.net.NetClientOptions;
-import io.vertx.core.net.SocketAddress;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -31,16 +30,24 @@ import java.util.List;
 @DataObject(generateConverter = true)
 public class RedisOptions {
 
+  /**
+   * The default redis endpoint = {@code redis://localhost:6379}
+   */
+  public static final String DEFAULT_ENDPOINT = "redis://localhost:6379";
+
   private RedisClientType type;
   private NetClientOptions netClientOptions;
-  private List<SocketAddress> endpoints;
+  private List<String> endpoints;
   private int maxWaitingHandlers;
   private int maxNestedArrays;
   private String masterName;
   private RedisRole role;
   private RedisSlaves slaves;
-  private String password;
-  private Integer select;
+  // pool related options
+  private int poolCleanerInterval;
+  private int maxPoolSize;
+  private int maxPoolWaiting;
+  private int poolRecycleTimeout;
 
   private void init() {
     netClientOptions =
@@ -54,6 +61,11 @@ public class RedisOptions {
     role = RedisRole.MASTER;
     slaves = RedisSlaves.NEVER;
     type = RedisClientType.STANDALONE;
+    poolCleanerInterval = -1;
+    // thumb guess based on web browser defaults
+    maxPoolSize = 6;
+    maxPoolWaiting = 24;
+    poolRecycleTimeout = 15_000;
   }
 
   /**
@@ -65,6 +77,7 @@ public class RedisOptions {
 
   /**
    * Copy constructor.
+   *
    * @param other the object to clone.
    */
   public RedisOptions(RedisOptions other) {
@@ -76,12 +89,16 @@ public class RedisOptions {
     this.masterName = other.masterName;
     this.role = other.role;
     this.slaves = other.slaves;
-    this.password = other.password;
-    this.select = other.select;
+    // pool related options
+    this.poolCleanerInterval = other.poolCleanerInterval;
+    this.maxPoolSize = other.maxPoolSize;
+    this.maxPoolWaiting = other.maxPoolWaiting;
+    this.poolRecycleTimeout = other.poolRecycleTimeout;
   }
 
   /**
    * Copy from JSON constructor.
+   *
    * @param json source json
    */
   public RedisOptions(JsonObject json) {
@@ -91,6 +108,7 @@ public class RedisOptions {
 
   /**
    * Get the type of client to be created.
+   *
    * @return the desired client type.
    */
   public RedisClientType getType() {
@@ -99,6 +117,7 @@ public class RedisOptions {
 
   /**
    * Set the desired client type to be created.
+   *
    * @param type the client type.
    * @return fluent self.
    */
@@ -110,6 +129,7 @@ public class RedisOptions {
 
   /**
    * Get the net client options used to connect to the server.
+   *
    * @return the net socket options.
    */
   public NetClientOptions getNetClientOptions() {
@@ -129,19 +149,25 @@ public class RedisOptions {
 
   /**
    * Gets the list of redis endpoints to use (mostly used while connecting to a cluster)
+   *
    * @return list of socket addresses.
    */
-  public List<SocketAddress> getEndpoints() {
+  public List<String> getEndpoints() {
+    if (endpoints == null) {
+      endpoints = new ArrayList<>();
+      endpoints.add(DEFAULT_ENDPOINT);
+    }
     return endpoints;
   }
 
   /**
    * Gets the redis endpoint to use
-   * @return socket address.
+   *
+   * @return the Redis connection string URI
    */
-  public SocketAddress getEndpoint() {
-    if (endpoints == null || endpoints.size() == 0) {
-      return SocketAddress.inetSocketAddress(6379, "localhost");
+  public String getEndpoint() {
+    if (endpoints == null || endpoints.isEmpty()) {
+      return DEFAULT_ENDPOINT;
     }
 
     return endpoints.get(0);
@@ -154,40 +180,85 @@ public class RedisOptions {
    * @param endpoints list of socket addresses.
    * @return fluent self.
    */
-  public RedisOptions setEndpoints(List<SocketAddress> endpoints) {
+  public RedisOptions setEndpoints(List<String> endpoints) {
     this.endpoints = endpoints;
     return this;
   }
 
   /**
-   * Adds a endpoint to use while connecting to the redis server. Only the cluster mode will consider more than
+   * Adds an endpoint to use while connecting to the redis server. Only the cluster mode will consider more than
    * 1 element. If more are provided, they are not considered by the client when in single server mode.
    *
-   * @param endpoint a socket addresses.
+   * @param connectionString a string URI following the scheme: redis://[username:password@][host][:port][/database]
    * @return fluent self.
+   * @deprecated see {@link #setConnectionString(String connectionString)} for a better naming
    */
-  public RedisOptions addEndpoint(SocketAddress endpoint) {
+  @Deprecated
+  public RedisOptions addEndpoint(String connectionString) {
     if (endpoints == null) {
       endpoints = new ArrayList<>();
     }
-    this.endpoints.add(endpoint);
+    this.endpoints.add(connectionString);
     return this;
   }
 
   /**
-   * Sets a single endpoint to use while connecting to the redis server. Will replace the previously configured endpoints.
+   * Sets a single connection string to use while connecting to the redis server.
+   * Will replace the previously configured connection strings.
    *
-   * @param endpoint a socket addresses.
+   * @param connectionString a string following the scheme: redis://[username:password@][host][:port][/[database]
    * @return fluent self.
+   * @deprecated see {@link #setConnectionString(String connectionString)} for a better naming
    */
-  public RedisOptions setEndpoint(SocketAddress endpoint) {
+  @Deprecated
+  public RedisOptions setEndpoint(String connectionString) {
     if (endpoints == null) {
       endpoints = new ArrayList<>();
     } else {
       endpoints.clear();
     }
 
-    this.endpoints.add(endpoint);
+    this.endpoints.add(connectionString);
+    return this;
+  }
+
+  /**
+   * Adds a connection string (endpoint) to use while connecting to the redis server. Only the cluster mode will
+   * consider more than 1 element. If more are provided, they are not considered by the client when in single server mode.
+   * <p>
+   * Does not support rediss (redis over ssl scheme) for now.
+   *
+   * @param connectionString a string URI following the scheme: redis://[username:password@][host][:port][/database]
+   * @return fluent self.
+   *
+   * @see <a href="https://www.iana.org/assignments/uri-schemes/prov/redis">Redis scheme on www.iana.org</a>
+   */
+  public RedisOptions addConnectionString(String connectionString) {
+    if (endpoints == null) {
+      endpoints = new ArrayList<>();
+    }
+    this.endpoints.add(connectionString);
+    return this;
+  }
+
+  /**
+   * Sets a single connection string (endpoint) to use while connecting to the redis server.
+   * Will replace the previously configured connection strings.
+   * <p>
+   * Does not support rediss (redis over ssl scheme) for now.
+   *
+   * @param connectionString a string following the scheme: redis://[username:password@][host][:port][/[database].
+   * @return fluent self.
+   * @see <a href="https://www.iana.org/assignments/uri-schemes/prov/redis">Redis scheme on www.iana.org</a>
+   */
+  public RedisOptions setConnectionString(String connectionString) {
+    if (endpoints == null) {
+      endpoints = new ArrayList<>();
+    } else {
+      endpoints.clear();
+    }
+
+    this.endpoints.add(connectionString);
     return this;
   }
 
@@ -215,6 +286,7 @@ public class RedisOptions {
 
   /**
    * Get the master name (only considered in HA mode).
+   *
    * @return the master name.
    */
   public String getMasterName() {
@@ -223,6 +295,7 @@ public class RedisOptions {
 
   /**
    * Set the master name (only considered in HA mode).
+   *
    * @param masterName the master name.
    * @return fluent self.
    */
@@ -233,6 +306,7 @@ public class RedisOptions {
 
   /**
    * Get the role name (only considered in HA mode).
+   *
    * @return the master name.
    */
   public RedisRole getRole() {
@@ -241,6 +315,7 @@ public class RedisOptions {
 
   /**
    * Set the role name (only considered in HA mode).
+   *
    * @param role the master name.
    * @return fluent self.
    */
@@ -251,6 +326,7 @@ public class RedisOptions {
 
   /**
    * Get whether or not to use slave nodes (only considered in Cluster mode).
+   *
    * @return the cluster slave mode.
    */
   public RedisSlaves getUseSlave() {
@@ -259,6 +335,7 @@ public class RedisOptions {
 
   /**
    * Set whether or not to use slave nodes (only considered in Cluster mode).
+   *
    * @param slaves the cluster slave mode.
    * @return fluent self.
    */
@@ -270,6 +347,7 @@ public class RedisOptions {
 
   /**
    * Tune how much nested arrays are allowed on a redis response. This affects the parser performance.
+   *
    * @return the configured max nested arrays allowance.
    */
   public int getMaxNestedArrays() {
@@ -278,6 +356,7 @@ public class RedisOptions {
 
   /**
    * Tune how much nested arrays are allowed on a redis response. This affects the parser performance.
+   *
    * @param maxNestedArrays the configured max nested arrays allowance.
    * @return fluent self.
    */
@@ -287,43 +366,89 @@ public class RedisOptions {
   }
 
   /**
-   * Get the provided password to be used when establishing a connection to the server.
-   * @return the password
+   * Tune how often in milliseconds should the connection pool cleaner execute.
+   *
+   * @return the cleaning internal
    */
-  public String getPassword() {
-    return password;
+  public int getPoolCleanerInterval() {
+    return poolCleanerInterval;
   }
 
   /**
-   * Set the provided password to be used when establishing a connection to the server.
-   * @param password the password
+   * Tune how often in milliseconds should the connection pool cleaner execute.
+   *
+   * @param poolCleanerInterval the interval in milliseconds (-1 for never)
    * @return fluent self.
    */
-  public RedisOptions setPassword(String password) {
-    this.password = password;
+  public RedisOptions setPoolCleanerInterval(int poolCleanerInterval) {
+    this.poolCleanerInterval = poolCleanerInterval;
     return this;
   }
 
   /**
-   * Get the provided database to be selected when establishing a connection to the server.
-   * @return the database id.
+   * Tune the maximum size of the connection pool.
+   *
+   * @return the size.
    */
-  public Integer getSelect() {
-    return select;
+  public int getMaxPoolSize() {
+    return maxPoolSize;
   }
 
   /**
-   * Set the provided database to be selected when establishing a connection to the server.
-   * @param select the database id.
+   * Tune the maximum size of the connection pool. When working with cluster or sentinel
+   * this value should be atleast the total number of cluster member (or number of sentinels + 1)
+   *
+   * @param maxPoolSize the max pool size.
    * @return fluent self.
    */
-  public RedisOptions setSelect(Integer select) {
-    this.select = select;
+  public RedisOptions setMaxPoolSize(int maxPoolSize) {
+    this.maxPoolSize = maxPoolSize;
+    return this;
+  }
+
+  /**
+   * Tune the maximum waiting requests for a connection from the pool.
+   *
+   * @return the maximum waiting requests.
+   */
+  public int getMaxPoolWaiting() {
+    return maxPoolWaiting;
+  }
+
+  /**
+   * Tune the maximum waiting requests for a connection from the pool.
+   *
+   * @param maxPoolWaiting max waiting requests
+   * @return fluent self.
+   */
+  public RedisOptions setMaxPoolWaiting(int maxPoolWaiting) {
+    this.maxPoolWaiting = maxPoolWaiting;
+    return this;
+  }
+
+  /**
+   * Tune when a connection should be recycled in milliseconds.
+   *
+   * @return the timeout for recycling.
+   */
+  public int getPoolRecycleTimeout() {
+    return poolRecycleTimeout;
+  }
+
+  /**
+   * Tune when a connection should be recycled in milliseconds.
+   *
+   * @param poolRecycleTimeout the timeout for recycling.
+   * @return fluent self.
+   */
+  public RedisOptions setPoolRecycleTimeout(int poolRecycleTimeout) {
+    this.poolRecycleTimeout = poolRecycleTimeout;
     return this;
   }
 
   /**
    * Converts this object to JSON notation.
+   *
    * @return JSON
    */
   public JsonObject toJson() {
