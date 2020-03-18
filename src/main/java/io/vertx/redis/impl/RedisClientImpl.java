@@ -170,7 +170,7 @@ public final class RedisClientImpl implements RedisClient {
     if (!"message".equals(data.getString(0)))
       return;
     String channel = data.getString(1);
-    final String vertxChannel = BASE_ADDRESS + "." + channel;
+    final String vertxChannel = options.getAddress() + "." + channel;
     JsonObject replyMessage = new JsonObject();
     replyMessage.put("status", "ok");
     JsonObject message = new JsonObject();
