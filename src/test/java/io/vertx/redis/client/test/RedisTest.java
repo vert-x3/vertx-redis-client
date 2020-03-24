@@ -1,5 +1,8 @@
 package io.vertx.redis.client.test;
 
+import io.vertx.core.CompositeFuture;
+import io.vertx.core.Future;
+import io.vertx.core.Promise;
 import io.vertx.core.Vertx;
 import io.vertx.ext.unit.Async;
 import io.vertx.ext.unit.TestContext;
@@ -10,7 +13,9 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.IntStream;
@@ -169,4 +174,46 @@ public class RedisTest {
         });
       });
   }
+
+  @Test(timeout = 10_000L)
+  public void simpleFullQueue(TestContext should) {
+    final Async test = should.async();
+    final Vertx vertx = rule.vertx();
+
+    RedisOptions options = new RedisOptions()
+      .setMaxWaitingHandlers(10)
+      .addConnectionString("redis://localhost:7006");
+
+    Redis.createClient(rule.vertx(), options)
+      .connect(create -> {
+        should.assertTrue(create.succeeded());
+
+        final RedisConnection redis = create.result();
+        final RedisAPI redisApi = RedisAPI.api(redis);
+
+        AtomicInteger cnt = new AtomicInteger();
+        List<Future> futures = new ArrayList<>();
+        IntStream.range(0, 100).forEach(i ->{
+          Promise<Response> p = Promise.promise();
+          vertx.setTimer(1, timerid ->{
+            redisApi.set(Arrays.asList("foo","bar"), p);
+          });
+          futures.add(p.future().map(res -> {
+            System.out.println("SUCCESS " + cnt.incrementAndGet());
+            return null;
+          }));
+        });
+
+        CompositeFuture.all(futures)
+          .onFailure(f -> {
+            should.assertEquals("Redis waiting Queue is full", f.getMessage());
+            test.complete();
+          })
+        .onSuccess(r -> {
+          if (cnt.get() == 100) {
+            should.fail("Should not succeed!");
+          }
+        });
+      });
   }
+}
