@@ -119,6 +119,12 @@ public class RedisConnectionImpl implements RedisConnection, ParserHandler {
     context.runOnContext(v -> {
       // offer the handler to the waiting queue if not void command
       if (!voidCmd) {
+        // we might have switch thread/context
+        // this means the check needs to be performed again
+        if (waiting.isFull()) {
+          handler.handle(Future.failedFuture("Redis waiting Queue is full"));
+          return;
+        }
         waiting.offer(promise);
       }
       // write to the socket
@@ -187,6 +193,13 @@ public class RedisConnectionImpl implements RedisConnection, ParserHandler {
 
     // all update operations happen inside the context
     context.runOnContext(v -> {
+      // we might have switch thread/context
+      // this means the check needs to be performed again
+      if (waiting.freeSlots() < callbacks.size()) {
+        handler.handle(Future.failedFuture("Redis waiting Queue is full"));
+        return;
+      }
+
       // offer all handlers to the waiting queue
       for (Promise<Response> callback : callbacks) {
         waiting.offer(callback);
