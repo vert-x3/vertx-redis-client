@@ -233,9 +233,9 @@ class RedisConnectionManager {
         ctx,
         connectionProvider,
         CLOCK,
-        options.getMaxPoolWaiting(),
         options.getMaxPoolSize(),
-        options.getMaxPoolSize() * 4,
+        1,
+        options.getMaxPoolWaiting() * options.getMaxPoolSize(),
         this::connectionAdded,
         this::connectionRemoved,
         false);
