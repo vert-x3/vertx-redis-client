@@ -129,4 +129,35 @@ public class RedisPooledTest {
       });
     });
   }
+
+  @Test(timeout = 30_000L)
+  public void acquireConnectionsTest(TestContext should) {
+    final Vertx vertx = rule.vertx();
+    final Async test = should.async();
+
+    Redis client = Redis.createClient(
+      vertx,
+      new RedisOptions()
+        .addConnectionString("redis://localhost:7006")
+        .setMaxPoolSize(10)
+        .setMaxPoolWaiting(10));
+
+    final AtomicInteger counter = new AtomicInteger();
+
+    // this test asserts that the pools behaves as expected it shall return 10 new connections
+    // and will fail on the 21st call as the 10 waiting slots are taken
+
+    vertx.setPeriodic(500, event -> {
+      counter.incrementAndGet();
+      client.connect(event1 -> {
+        if (event1.succeeded()) {
+          should.assertTrue(counter.get() <= 10);
+        } else {
+          should.assertTrue(counter.get() == 21);
+          vertx.cancelTimer(event);
+          test.complete();
+        }
+      });
+    });
+  }
 }
