@@ -25,7 +25,6 @@ class RedisConnectionManager {
 
   private static final Logger LOG = LoggerFactory.getLogger(RedisConnectionManager.class);
 
-  private static final LongSupplier CLOCK = System::currentTimeMillis;
   private static final Handler<Throwable> DEFAULT_EXCEPTION_HANDLER = t -> LOG.error("Unhandled Error", t);
 
   private final Vertx vertx;
@@ -84,6 +83,11 @@ class RedisConnectionManager {
     public RedisConnectionProvider(String connectionString, Request setup) {
       this.redisURI = new RedisURI(connectionString);
       this.setup = setup;
+    }
+
+    @Override
+    public boolean isValid(RedisConnection conn) {
+      return ((RedisConnectionImpl)conn).isValid();
     }
 
     @Override
@@ -232,7 +236,6 @@ class RedisConnectionManager {
       pool = new Pool<>(
         ctx,
         connectionProvider,
-        CLOCK,
         options.getMaxPoolSize(),
         1,
         options.getMaxPoolWaiting() * options.getMaxPoolSize(),
