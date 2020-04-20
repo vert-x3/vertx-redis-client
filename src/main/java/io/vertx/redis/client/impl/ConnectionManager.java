@@ -17,13 +17,11 @@ import io.vertx.redis.client.Request;
 
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.function.LongSupplier;
 
 class ConnectionManager {
 
   private static final Logger LOG = LoggerFactory.getLogger(ConnectionManager.class);
 
-  private static final LongSupplier CLOCK = System::currentTimeMillis;
   private static final Handler<Throwable> DEFAULT_EXCEPTION_HANDLER = t -> LOG.error("Unhandled Error", t);
 
   private final Vertx vertx;
@@ -58,6 +56,11 @@ class ConnectionManager {
     public RedisConnectionProvider(String connectionString, Request setup) {
       this.redisURI = new RedisURI(connectionString);
       this.setup = setup;
+    }
+
+    @Override
+    public boolean isValid(RedisConnection conn) {
+      return ((RedisConnectionImpl)conn).isValid();
     }
 
     @Override
@@ -176,7 +179,6 @@ class ConnectionManager {
         new Pool<>(
           userContext,
           connectionProvider,
-          CLOCK,
           options.getMaxPoolWaiting(),
           options.getMaxPoolSize(),
           options.getMaxPoolSize() * 4,

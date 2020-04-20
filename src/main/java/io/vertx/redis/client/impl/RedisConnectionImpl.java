@@ -39,6 +39,7 @@ public class RedisConnectionImpl implements RedisConnection, ParserHandler {
   private Handler<Throwable> onException;
   private Handler<Void> onEnd;
   private Handler<Response> onMessage;
+  private long expirationTimestamp;
 
   public RedisConnectionImpl(Vertx vertx, ContextInternal context, ConnectionListener<RedisConnection> connectionListener, NetSocket netSocket, RedisOptions options) {
     this.listener = connectionListener;
@@ -54,11 +55,15 @@ public class RedisConnectionImpl implements RedisConnection, ParserHandler {
     netSocket.close();
   }
 
+  public boolean isValid() {
+    return expirationTimestamp > 0 && System.currentTimeMillis() <= expirationTimestamp;
+  }
+
   @Override
   public void close() {
     // recycle this connection from the pool
-    long expired = recycleTimeout > 0 ? System.currentTimeMillis() + recycleTimeout : 0L;
-    listener.onRecycle(expired);
+    expirationTimestamp = recycleTimeout > 0 ? System.currentTimeMillis() + recycleTimeout : 0L;
+    listener.onRecycle();
   }
 
   @Override
