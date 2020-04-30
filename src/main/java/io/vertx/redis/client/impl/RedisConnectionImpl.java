@@ -222,7 +222,6 @@ public class RedisConnectionImpl implements RedisConnection, ParserHandler {
     return this;
   }
 
-
   @Override
   public void handle(Response reply) {
     // pub/sub mode
@@ -305,6 +304,8 @@ public class RedisConnectionImpl implements RedisConnection, ParserHandler {
   public void end(Void v) {
     // clean up the pending queue
     cleanupQueue(CONNECTION_CLOSED);
+    // evict this connection from the pool
+    evict();
     // call the forceClose handler if any
     if (onEnd != null) {
       context.runOnContext(x -> onEnd.handle(v));
@@ -314,14 +315,7 @@ public class RedisConnectionImpl implements RedisConnection, ParserHandler {
   @Override
   public void fail(Throwable t) {
     // evict this connection from the pool
-    try {
-      listener.onEvict();
-    } catch (RejectedExecutionException e) {
-      // call the exception handler if any
-      if (onException != null) {
-        context.runOnContext(x -> onException.handle(e));
-      }
-    }
+    evict();
     // call the exception handler if any
     if (onException != null) {
       context.runOnContext(x -> onException.handle(t));
@@ -335,6 +329,15 @@ public class RedisConnectionImpl implements RedisConnection, ParserHandler {
     // throwable
     cleanupQueue(t);
     // evict this connection from the pool
+    evict();
+    // call the exception handler if any
+    if (onException != null) {
+      context.runOnContext(x -> onException.handle(t));
+    }
+  }
+
+  private void evict(){
+    // evict this connection from the pool
     try {
       listener.onEvict();
     } catch (RejectedExecutionException e) {
@@ -342,10 +345,6 @@ public class RedisConnectionImpl implements RedisConnection, ParserHandler {
       if (onException != null) {
         context.runOnContext(x -> onException.handle(e));
       }
-    }
-    // call the exception handler if any
-    if (onException != null) {
-      context.runOnContext(x -> onException.handle(t));
     }
   }
 
