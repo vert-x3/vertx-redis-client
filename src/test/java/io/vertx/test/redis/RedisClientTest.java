@@ -16,20 +16,25 @@
 package io.vertx.test.redis;
 
 import io.vertx.core.Context;
+import io.vertx.core.http.impl.pool.ConnectionListener;
 import io.vertx.core.json.JsonArray;
+import io.vertx.core.net.NetSocket;
 import io.vertx.ext.unit.Async;
 import io.vertx.ext.unit.TestContext;
 import io.vertx.ext.unit.junit.RunTestOnContext;
 import io.vertx.ext.unit.junit.VertxUnitRunner;
 import io.vertx.redis.client.Redis;
 import io.vertx.redis.client.RedisAPI;
+import io.vertx.redis.client.RedisConnection;
 import io.vertx.redis.client.RedisOptions;
+import io.vertx.redis.client.impl.RedisConnectionImpl;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
+import java.lang.reflect.Field;
 import java.util.*;
 
 /**
@@ -106,6 +111,60 @@ public class RedisClientTest {
   @SafeVarargs
   private static <T> List<T> toList(final T... params) {
     return Arrays.asList(params);
+  }
+
+  private static Field getAccessibleField(Class<?> clazz, String name) throws NoSuchFieldException {
+    Field field = clazz.getDeclaredField(name);
+    field.setAccessible(true);
+    return field;
+  }
+
+  @Test
+  public void testConnectionClose(TestContext should) {
+    final Async before = should.async();
+
+    Context context = rule.vertx().getOrCreateContext();
+    client.connect(onConnect -> {
+      should.assertTrue(onConnect.succeeded());
+      should.assertEquals(context, rule.vertx().getOrCreateContext());
+
+      // Redis server has a client timeout feature where it will close idle clients after a certain point. So by closing
+      // the socket, we are simulating what happens.
+      RedisConnection conn = onConnect.result();
+      try {
+        Field listenerField = getAccessibleField(RedisConnectionImpl.class,"listener");
+        ConnectionListener<RedisConnection> originalListener = (ConnectionListener<RedisConnection>) listenerField.get(conn);
+
+        listenerField.set(conn, new ConnectionListener<RedisConnection>() {
+          @Override
+          public void onConcurrencyChange(long concurrency) {
+            originalListener.onConcurrencyChange(concurrency);
+          }
+
+          @Override
+          public void onRecycle() {
+            originalListener.onRecycle();
+          }
+
+          @Override
+          public void onEvict() {
+            originalListener.onEvict();
+            // When the socket is closed, evict should be call on the listener
+            before.complete();
+          }
+        });
+      } catch (NoSuchFieldException | IllegalAccessException e) {
+        should.fail(e);
+      }
+
+     try {
+        Field socketField = getAccessibleField(RedisConnectionImpl.class,"netSocket");
+        NetSocket socket = (NetSocket)socketField.get(conn);
+        socket.close(); // this should cause the evict to occur
+      } catch (NoSuchFieldException | IllegalAccessException e) {
+        should.fail(e);
+      }
+    });
   }
 
   @Test
