@@ -16,9 +16,9 @@
 package io.vertx.test.redis;
 
 import io.vertx.core.Context;
-import io.vertx.core.http.impl.pool.ConnectionListener;
 import io.vertx.core.json.JsonArray;
 import io.vertx.core.net.NetSocket;
+import io.vertx.core.net.impl.clientconnection.ConnectionListener;
 import io.vertx.ext.unit.Async;
 import io.vertx.ext.unit.TestContext;
 import io.vertx.ext.unit.junit.RunTestOnContext;

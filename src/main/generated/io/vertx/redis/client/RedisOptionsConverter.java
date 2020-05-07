@@ -70,7 +70,7 @@ public class RedisOptionsConverter {
           break;
         case "netClientOptions":
           if (member.getValue() instanceof JsonObject) {
-            obj.setNetClientOptions(new io.vertx.core.net.NetClientOptions((JsonObject)member.getValue()));
+            obj.setNetClientOptions(new io.vertx.core.net.NetClientOptions((io.vertx.core.json.JsonObject)member.getValue()));
           }
           break;
         case "poolCleanerInterval":
