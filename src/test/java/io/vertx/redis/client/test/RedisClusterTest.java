@@ -27,7 +27,7 @@ import static io.vertx.redis.client.Request.cmd;
 public class RedisClusterTest {
 
   @Rule
-  public RunTestOnContext rule = new RunTestOnContext();
+  public final RunTestOnContext rule = new RunTestOnContext();
 
   // Server: https://github.com/Grokzen/docker-redis-cluster
   private final RedisOptions options = new RedisOptions()
@@ -804,9 +804,7 @@ public class RedisClusterTest {
         final AtomicInteger counter = new AtomicInteger();
         for (int i = 0; i < len; i++) {
           final String id = Integer.toString(i);
-          cluster.send(cmd(SET).arg(id).arg(id), set -> {
-            should.assertTrue(set.succeeded());
-          });
+          cluster.send(cmd(SET).arg(id).arg(id), set -> should.assertTrue(set.succeeded()));
         }
 
         cluster.send(cmd(FLUSHDB), flushDb -> {
@@ -887,13 +885,11 @@ public class RedisClusterTest {
     final String key = "{hash_tag}.some-key";
     final String argv = "some-value";
 
-    Redis.createClient(rule.vertx(), options).connect(should.asyncAssertSuccess(cluster -> {
-        cluster.send(cmd(EVAL).arg("return redis.call('SET', KEYS[1], ARGV[1])").arg(1).arg(key).arg(argv),
-          should.asyncAssertSuccess(response -> {
-            should.assertEquals("OK", response.toString());
-            test.complete();
-        }));
-      }
+    Redis.createClient(rule.vertx(), options).connect(should.asyncAssertSuccess(cluster -> cluster.send(cmd(EVAL).arg("return redis.call('SET', KEYS[1], ARGV[1])").arg(1).arg(key).arg(argv),
+      should.asyncAssertSuccess(response -> {
+        should.assertEquals("OK", response.toString());
+        test.complete();
+    }))
     ));
   }
 
@@ -908,14 +904,12 @@ public class RedisClusterTest {
     final List<Request> cmdList = new ArrayList<>();
     cmdList.add(req);
     cmdList.add(req);
-    Redis.createClient(rule.vertx(), options).connect(should.asyncAssertSuccess(cluster -> {
-      cluster.batch(cmdList,
-          should.asyncAssertSuccess(response -> {
-            should.assertEquals(2, response.size());
-            response.forEach(r -> should.assertEquals("OK", r.toString()));
-            test.complete();
-        }));
-      }
+    Redis.createClient(rule.vertx(), options).connect(should.asyncAssertSuccess(cluster -> cluster.batch(cmdList,
+        should.asyncAssertSuccess(response -> {
+          should.assertEquals(2, response.size());
+          response.forEach(r -> should.assertEquals("OK", r.toString()));
+          test.complete();
+      }))
     ));
   }
 
@@ -928,16 +922,14 @@ public class RedisClusterTest {
     final String key2 = "{hash_tag}.other-key";
     final String argv2 = "other-value";
 
-    Redis.createClient(rule.vertx(), options).connect(should.asyncAssertSuccess(cluster -> {
-        cluster.send(cmd(EVAL).arg("local r1 = redis.call('SET', KEYS[1], ARGV[1]) \n" +
-            "local r2 = redis.call('SET', KEYS[2], ARGV[2]) \n" +
-            "return {r1, r2}").arg(2).arg(key1).arg(key2).arg(argv1).arg(argv2),
-          should.asyncAssertSuccess(response -> {
-            should.assertEquals(2, response.size());
-            response.forEach(r -> should.assertEquals("OK", r.toString()));
-            test.complete();
-        }));
-      }
+    Redis.createClient(rule.vertx(), options).connect(should.asyncAssertSuccess(cluster -> cluster.send(cmd(EVAL).arg("local r1 = redis.call('SET', KEYS[1], ARGV[1]) \n" +
+        "local r2 = redis.call('SET', KEYS[2], ARGV[2]) \n" +
+        "return {r1, r2}").arg(2).arg(key1).arg(key2).arg(argv1).arg(argv2),
+      should.asyncAssertSuccess(response -> {
+        should.assertEquals(2, response.size());
+        response.forEach(r -> should.assertEquals("OK", r.toString()));
+        test.complete();
+    }))
     ));
   }
 
@@ -950,15 +942,13 @@ public class RedisClusterTest {
     final String key2 = "{other_hash_tag}.other-key";
     final String argv2 = "other-value";
 
-    Redis.createClient(rule.vertx(), options).connect(should.asyncAssertSuccess(cluster -> {
-      cluster.send(cmd(EVAL).arg("local r1 = redis.call('SET', KEYS[1], ARGV[1]) \n" +
-          "local r2 = redis.call('SET', KEYS[2], ARGV[2]) \n" +
-          "return {r1, r2}").arg(2).arg(key1).arg(key2).arg(argv1).arg(argv2),
-        should.asyncAssertFailure(throwable ->  {
-          should.assertTrue(throwable.getMessage().startsWith("Keys of command or batch"));
-          test.complete();
-        }));
-      }
+    Redis.createClient(rule.vertx(), options).connect(should.asyncAssertSuccess(cluster -> cluster.send(cmd(EVAL).arg("local r1 = redis.call('SET', KEYS[1], ARGV[1]) \n" +
+        "local r2 = redis.call('SET', KEYS[2], ARGV[2]) \n" +
+        "return {r1, r2}").arg(2).arg(key1).arg(key2).arg(argv1).arg(argv2),
+      should.asyncAssertFailure(throwable ->  {
+        should.assertTrue(throwable.getMessage().startsWith("Keys of command or batch"));
+        test.complete();
+      }))
     ));
   }
 
@@ -971,20 +961,16 @@ public class RedisClusterTest {
     final List<Request> cmdList = new ArrayList<>();
     cmdList.add(cmd(EVAL).arg("return redis.call('SET', KEYS[1], ARGV[1])").arg(1).arg("{hash_tag}.some-key").arg(argv));
     cmdList.add(cmd(EVAL).arg("return redis.call('SET', KEYS[1], ARGV[1])").arg(1).arg("{other_hash_tag}.some-key").arg(argv));
-    Redis.createClient(rule.vertx(), options).connect(should.asyncAssertSuccess(cluster -> {
-        cluster.batch(cmdList,
-          should.asyncAssertFailure(throwable ->  {
-            should.assertTrue(throwable.getMessage().startsWith("Keys of command or batch"));
-            test.complete();
-          }));
-      }
+    Redis.createClient(rule.vertx(), options).connect(should.asyncAssertSuccess(cluster -> cluster.batch(cmdList,
+      should.asyncAssertFailure(throwable ->  {
+        should.assertTrue(throwable.getMessage().startsWith("Keys of command or batch"));
+        test.complete();
+      }))
     ));
   }
 
   /**
    * Wait must run every time against a master node.
-   *
-   * @param should
    */
   @Test(timeout = 30_000)
   public void setAndWait(TestContext should) {

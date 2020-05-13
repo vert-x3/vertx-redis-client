@@ -119,7 +119,7 @@ public class RedisExamples {
 
       private static final int MAX_RECONNECT_RETRIES = 16;
 
-      private RedisOptions options = new RedisOptions();
+      private final RedisOptions options = new RedisOptions();
       private RedisConnection client;
 
       @Override

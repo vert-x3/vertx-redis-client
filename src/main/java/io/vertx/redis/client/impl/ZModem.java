@@ -147,7 +147,7 @@ public class ZModem {
    * Convert an array of multiple strings into a redis slot hash.
    * Returns -1 if one of the keys is not for the same slot as the others
    * @param keys list of keys
-   * @returns the overall hash
+   * @return the overall hash
    */
   public static int generateMulti(List<String> keys) {
     int i = 1;
@@ -167,7 +167,7 @@ public class ZModem {
    * Convert an array of multiple strings into a redis slot hash.
    * Returns -1 if one of the keys is not for the same slot as the others
    * @param keys array of keys
-   * @returns the overall hash
+   * @return the overall hash
    */
   public static int generateMulti(byte[]... keys) {
     int i = 1;

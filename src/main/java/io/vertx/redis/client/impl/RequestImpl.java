@@ -77,11 +77,6 @@ public final class RequestImpl implements Request {
       return nullArg();
     }
 
-    if (arg.length == 0) {
-      args.add(arg);
-      return this;
-    }
-
     args.add(arg);
     return this;
   }

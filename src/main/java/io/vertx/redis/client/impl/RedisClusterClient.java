@@ -17,8 +17,6 @@ package io.vertx.redis.client.impl;
 
 import io.vertx.core.*;
 import io.vertx.redis.client.*;
-import io.vertx.redis.client.Redis;
-import io.vertx.redis.client.RedisOptions;
 import io.vertx.redis.client.impl.types.IntegerType;
 import io.vertx.redis.client.impl.types.MultiType;
 import io.vertx.redis.client.impl.types.SimpleStringType;

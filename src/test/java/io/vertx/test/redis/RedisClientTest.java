@@ -46,7 +46,7 @@ import java.util.*;
 public class RedisClientTest {
 
   @Rule
-  public RunTestOnContext rule = new RunTestOnContext();
+  public final RunTestOnContext rule = new RunTestOnContext();
 
   private Redis client;
   private RedisAPI redis;

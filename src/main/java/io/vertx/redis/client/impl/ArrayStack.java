@@ -29,6 +29,7 @@ final class ArrayStack {
     stack[++pointer] = item;
   }
 
+  @SuppressWarnings("unchecked")
   <T> T pop() {
     final Object o = stack[pointer];
     stack[pointer--] = null;
@@ -39,6 +40,7 @@ final class ArrayStack {
     return pointer == -1;
   }
 
+  @SuppressWarnings("unchecked")
   <T> T peek() {
     if (pointer == -1) {
       return null;

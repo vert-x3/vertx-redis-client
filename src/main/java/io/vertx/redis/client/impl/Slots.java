@@ -78,7 +78,7 @@ class Slots {
     for (String endpoint : uniqueEndpoints) {
       endpoints[i++] = endpoint;
     }
-    this.masterEndpoints = masterEndpoints.toArray(new String[masterEndpoints.size()]);
+    this.masterEndpoints = masterEndpoints.toArray(new String[0]);
   }
 
   boolean contains(String endpoint) {

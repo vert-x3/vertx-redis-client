@@ -24,7 +24,7 @@ import static io.vertx.redis.client.Command.*;
 public class RedisPubSubTest {
 
   @Rule
-  public RunTestOnContext rule = new RunTestOnContext();
+  public final RunTestOnContext rule = new RunTestOnContext();
 
   private RedisConnection pub;
   private RedisConnection sub;
@@ -83,12 +83,10 @@ public class RedisPubSubTest {
     sub.send(cmd(SUBSCRIBE).arg("mychannel"), subscribe -> {
       should.assertTrue(subscribe.succeeded());
 
-      rule.vertx().setTimer(100L, t -> {
-        pub.send(cmd(PUBLISH).arg("mychannel").arg(123456), publish -> {
-          should.assertTrue(publish.succeeded());
-          should.assertNotNull(publish.result());
-        });
-      });
+      rule.vertx().setTimer(100L, t -> pub.send(cmd(PUBLISH).arg("mychannel").arg(123456), publish -> {
+        should.assertTrue(publish.succeeded());
+        should.assertNotNull(publish.result());
+      }));
     });
   }
 
@@ -129,19 +127,15 @@ public class RedisPubSubTest {
 
     Request psub_request = cmd(PSUBSCRIBE);
     // Add all patterns to subscribe to
-    patterns.stream().forEach(psub_request::arg);
+    patterns.forEach(psub_request::arg);
 
     sub.send(psub_request, subscribe -> {
       should.assertTrue(subscribe.succeeded());
 
-      rule.vertx().setTimer(100L, t -> {
-        patterns.stream().forEach(p -> {
-          pub.send(cmd(PUBLISH).arg(p).arg(System.nanoTime()), publish -> {
-            should.assertTrue(publish.succeeded());
-            should.assertNotNull(publish.result());
-          });
-        });
-      });
+      rule.vertx().setTimer(100L, t -> patterns.forEach(p -> pub.send(cmd(PUBLISH).arg(p).arg(System.nanoTime()), publish -> {
+          should.assertTrue(publish.succeeded());
+          should.assertNotNull(publish.result());
+        })));
     });
   }
 }

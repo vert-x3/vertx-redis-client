@@ -69,6 +69,7 @@ final class ArrayQueue {
    *
    * @return element at front of the queue, null if empty.
    */
+  @SuppressWarnings("unchecked")
   <T> T peek() {
     if (isEmpty()) {
       return null;

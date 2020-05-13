@@ -34,7 +34,7 @@ import java.util.*;
 public class RedisClientPubSubTest {
 
   @Rule
-  public RunTestOnContext rule = new RunTestOnContext();
+  public final RunTestOnContext rule = new RunTestOnContext();
 
   private Redis redisPublish;
   private Redis redisSubscribe;
@@ -77,9 +77,7 @@ public class RedisClientPubSubTest {
     redisSubscribe.send(Request.cmd(Command.SUBSCRIBE).arg("news"), reply -> {
       should.assertTrue(reply.succeeded());
       rule.vertx().eventBus().consumer("io.vertx.redis.news", msg -> test.complete());
-      redisPublish.send(Request.cmd(Command.PUBLISH).arg("news").arg("foo"), preply -> {
-        should.assertTrue(preply.succeeded());
-      });
+      redisPublish.send(Request.cmd(Command.PUBLISH).arg("news").arg("foo"), preply -> should.assertTrue(preply.succeeded()));
     });
   }
 
@@ -89,9 +87,7 @@ public class RedisClientPubSubTest {
     redisSubscribe.send(Request.cmd(Command.PSUBSCRIBE).arg("new*"), reply -> {
       should.assertTrue(reply.succeeded());
       rule.vertx().eventBus().consumer("io.vertx.redis.new*", msg -> test.complete());
-      redisPublish.send(Request.cmd(Command.PUBLISH).arg("news").arg("foo"), preply -> {
-        should.assertTrue(preply.succeeded());
-      });
+      redisPublish.send(Request.cmd(Command.PUBLISH).arg("news").arg("foo"), preply -> should.assertTrue(preply.succeeded()));
     });
   }
 }

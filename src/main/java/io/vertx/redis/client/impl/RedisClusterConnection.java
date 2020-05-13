@@ -338,9 +338,9 @@ public class RedisClusterConnection implements RedisConnection {
     boolean forceMasterEndpoint = false;
 
     // look up the base slot for the batch
-    for (int i = 0; i < requests.size(); i++) {
+    for (Request request : requests) {
       // process commands for cluster mode
-      final RequestImpl req = (RequestImpl) requests.get(i);
+      final RequestImpl req = (RequestImpl) request;
       final Command cmd = req.command();
 
       if (UNSUPPORTEDCOMMANDS.containsKey(cmd)) {

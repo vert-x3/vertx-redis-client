@@ -27,7 +27,7 @@ import static io.vertx.redis.client.Request.cmd;
 public class RedisTest {
 
   @Rule
-  public RunTestOnContext rule = new RunTestOnContext();
+  public final RunTestOnContext rule = new RunTestOnContext();
 
   @Test
   public void simpleTest(TestContext should) {
@@ -154,24 +154,22 @@ public class RedisTest {
 
         RedisAPI redis = RedisAPI.api(create.result());
 
-        IntStream.range(0, 100).forEach(i -> {
-          vertx.setTimer(1, timerid -> {
-            redis.set(Arrays.asList("foo", "bar"), res -> {
-            });
-
-            // EXPECTED NULL
-            redis.get("redis_test", res -> {
-              if (res.failed()) {
-                should.fail(res.cause());
-              } else {
-                should.assertNull(res.result());
-              }
-              if (cnt.decrementAndGet() == 0) {
-                test.complete();
-              }
-            });
+        IntStream.range(0, 100).forEach(i -> vertx.setTimer(1, timerid -> {
+          redis.set(Arrays.asList("foo", "bar"), res -> {
           });
-        });
+
+          // EXPECTED NULL
+          redis.get("redis_test", res -> {
+            if (res.failed()) {
+              should.fail(res.cause());
+            } else {
+              should.assertNull(res.result());
+            }
+            if (cnt.decrementAndGet() == 0) {
+              test.complete();
+            }
+          });
+        }));
       });
   }
 
@@ -195,9 +193,7 @@ public class RedisTest {
         List<Future> futures = new ArrayList<>();
         IntStream.range(0, 100).forEach(i ->{
           Promise<Response> p = Promise.promise();
-          vertx.setTimer(1, timerid ->{
-            redisApi.set(Arrays.asList("foo","bar"), p);
-          });
+          vertx.setTimer(1, timerid -> redisApi.set(Arrays.asList("foo","bar"), p));
           futures.add(p.future().map(res -> {
             System.out.println("SUCCESS " + cnt.incrementAndGet());
             return null;

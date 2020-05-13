@@ -22,7 +22,7 @@ import static io.vertx.redis.client.Request.cmd;
 public class RedisPooledTest {
 
   @Rule
-  public RunTestOnContext rule = new RunTestOnContext();
+  public final RunTestOnContext rule = new RunTestOnContext();
 
   @Test
   public void simpleTest(TestContext should) {
@@ -56,7 +56,7 @@ public class RedisPooledTest {
   public void simpleSelectTest(TestContext should) {
     final Async test = should.async();
 
-    Redis.createClient(rule.vertx(), new RedisOptions().addEndpoint("redis://localhost:7006/0"))
+    Redis.createClient(rule.vertx(), "redis://localhost:7006/0")
       .send(Request.cmd(Command.PING), send -> {
         should.assertTrue(send.succeeded());
         should.assertNotNull(send.result());
@@ -108,26 +108,24 @@ public class RedisPooledTest {
       rule.vertx(),
       new RedisOptions()
         .setMaxPoolWaiting(8)
-        .setEndpoint("redis://localhost:7006")));
+        .addConnectionString("redis://localhost:7006")));
 
-    IntStream.range(0, 5).forEach(i -> {
-      vertx.setTimer(1, timerid -> {
-        redis.set(Arrays.asList("foo", "bar"), res -> {
-        });
-
-        // EXPECTED NULL
-        redis.get("redis_test", res -> {
-          if (res.failed()) {
-            should.fail(res.cause());
-          } else {
-            should.assertNull(res.result());
-          }
-          if (cnt.decrementAndGet() == 0) {
-            test.complete();
-          }
-        });
+    IntStream.range(0, 5).forEach(i -> vertx.setTimer(1, timerid -> {
+      redis.set(Arrays.asList("foo", "bar"), res -> {
       });
-    });
+
+      // EXPECTED NULL
+      redis.get("redis_test", res -> {
+        if (res.failed()) {
+          should.fail(res.cause());
+        } else {
+          should.assertNull(res.result());
+        }
+        if (cnt.decrementAndGet() == 0) {
+          test.complete();
+        }
+      });
+    }));
   }
 
   @Test(timeout = 30_000L)

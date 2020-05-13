@@ -13,7 +13,7 @@ import org.junit.runner.RunWith;
 public class RedisSentinelTest {
 
   @Rule
-  public RunTestOnContext rule = new RunTestOnContext();
+  public final RunTestOnContext rule = new RunTestOnContext();
 
   @Test
   public void testGetClientToMaster(TestContext should) {

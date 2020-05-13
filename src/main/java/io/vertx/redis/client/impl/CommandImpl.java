@@ -49,16 +49,11 @@ public class CommandImpl implements Command {
     this.readOnly = readOnly;
     this.movable = movable;
     // void commands are special and apply to pub/sub
-    if (
+    noreturn =
       "subscribe".equalsIgnoreCase(command)
         || "unsubscribe".equalsIgnoreCase(command)
         || "psubscribe".equalsIgnoreCase(command)
-        || "punsubscribe".equalsIgnoreCase(command)) {
-
-      noreturn = true;
-    } else {
-      noreturn = false;
-    }
+        || "punsubscribe".equalsIgnoreCase(command);
   }
 
   @Override

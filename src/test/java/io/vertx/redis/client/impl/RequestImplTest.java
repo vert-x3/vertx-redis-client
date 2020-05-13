@@ -4,8 +4,6 @@ import io.vertx.redis.client.Command;
 import io.vertx.redis.client.Request;
 import org.junit.Test;
 
-import static org.junit.Assert.*;
-
 public class RequestImplTest {
 
   @Test

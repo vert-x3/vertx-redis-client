@@ -11,7 +11,6 @@ import io.vertx.core.net.impl.clientconnection.ConnectionListener;
 import io.vertx.core.net.impl.clientconnection.ConnectionManager;
 import io.vertx.core.net.impl.clientconnection.ConnectionProvider;
 import io.vertx.core.net.impl.clientconnection.Endpoint;
-import io.vertx.core.net.impl.clientconnection.EndpointProvider;
 import io.vertx.core.net.impl.clientconnection.Pool;
 import io.vertx.redis.client.Command;
 import io.vertx.redis.client.RedisConnection;
@@ -19,7 +18,6 @@ import io.vertx.redis.client.RedisOptions;
 import io.vertx.redis.client.Request;
 
 import java.util.Objects;
-import java.util.function.LongSupplier;
 
 class RedisConnectionManager {
 
