@@ -106,7 +106,7 @@ class RedisConnectionManager {
       if (connectionStringInetSocket) {
         // net client is ssl and connection string is not ssl is not allowed
         if (netClientSsl && !connectionStringSsl) {
-          onConnect.handle(Future.failedFuture("Pool initialized with SSL but connection request plain socket"));
+          onConnect.handle(Future.failedFuture("Pool initialized with SSL but connection requested plain socket"));
           return;
         }
       }
