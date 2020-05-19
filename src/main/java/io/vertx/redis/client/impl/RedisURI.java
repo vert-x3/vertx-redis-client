@@ -50,6 +50,11 @@ public final class RedisURI {
    * Database number. With a default Redis config it might be a number from 0 to 15. Not supported in clustered mode.
    */
   private final Integer select;
+  /**
+   * SSL
+   */
+  private final boolean ssl;
+
 
   public RedisURI(String connectionString) {
     this.connectionString = connectionString;
@@ -66,7 +71,19 @@ public final class RedisURI {
       Map<String, String> query = parseQuery(uri);
       switch (uri.getScheme()) {
         case "rediss":
+          ssl = true;
+          socketAddress = SocketAddress.inetSocketAddress(port, host);
+          if (path.length() > 1) {
+            // skip initial slash
+            select = Integer.parseInt(uri.getPath().substring(1));
+          } else if (query.containsKey("db")) {
+            select = Integer.parseInt(query.get("db"));
+          } else {
+            select = null;
+          }
+          break;
         case "redis":
+          ssl = false;
           socketAddress = SocketAddress.inetSocketAddress(port, host);
           if (path.length() > 1) {
             // skip initial slash
@@ -78,6 +95,7 @@ public final class RedisURI {
           }
           break;
         case "unix":
+          ssl = false;
           socketAddress = SocketAddress.domainSocketAddress(path);
           if (query.containsKey("db")) {
             select = Integer.parseInt(query.get("db"));
@@ -137,6 +155,10 @@ public final class RedisURI {
 
   public String connectionString() {
     return connectionString;
+  }
+
+  public boolean ssl() {
+    return ssl;
   }
 
   @Override
