@@ -42,7 +42,7 @@ class Slots {
   private final String[] endpoints;
   private final String[] masterEndpoints;
 
-  Slots(Response reply) {
+  Slots(String connectionString, Response reply) {
     size = reply.size();
     slots = new Slot[size];
 
@@ -61,10 +61,13 @@ class Slots {
         // size
         s.size() - 2);
 
+      // inherit protocol config from the current connection
+      final String protocol = !connectionString.contains("://") ? "redis" : connectionString.substring(0, connectionString.indexOf("://"));
+
       // array of all clients, clients[2] = master, others are slaves
       for (int index = 2; index < s.size(); index++) {
         Response c = s.get(index);
-        final String endpoint = "redis://" + c.get(0).toString() + ":" + c.get(1).toInteger();
+        final String endpoint = protocol + "://" + c.get(0).toString() + ":" + c.get(1).toInteger();
         slots[i].endpoints[index - 2] = endpoint;
         uniqueEndpoints.add(endpoint);
         if (index == 2) {

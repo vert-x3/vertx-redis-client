@@ -95,6 +95,22 @@ class RedisConnectionManager {
 
     @Override
     public void connect(ConnectionListener<RedisConnection> connectionListener, ContextInternal ctx, Handler<AsyncResult<ConnectResult<RedisConnection>>> onConnect) {
+
+      // verify if we can make this connection
+      final boolean netClientSsl = options.getNetClientOptions().isSsl();
+      final boolean connectionStringSsl = redisURI.ssl();
+      final boolean connectionStringInetSocket = redisURI.socketAddress().isInetSocket();
+
+      // when dealing with sockets, ssl is only covered in case of inet sockets
+      // not domain sockets
+      if (connectionStringInetSocket) {
+        // net client is ssl and connection string is not ssl is not allowed
+        if (netClientSsl && !connectionStringSsl) {
+          onConnect.handle(Future.failedFuture("Pool initialized with SSL but connection request plain socket"));
+          return;
+        }
+      }
+
       // all calls the user handler will happen in the user context (ctx)
       netClient.connect(redisURI.socketAddress(), clientConnect -> {
         if (clientConnect.failed()) {
@@ -105,45 +121,64 @@ class RedisConnectionManager {
 
         // socket connection succeeded
         final NetSocket netSocket = clientConnect.result();
-        // the connection will inherit the user event loop context
-        final RedisConnectionImpl connection = new RedisConnectionImpl(vertx, ctx, connectionListener, netSocket, options);
 
-        // parser utility
-        netSocket
-          .handler(new RESPParser(connection, options.getMaxNestedArrays()))
-          .closeHandler(connection::end)
-          .exceptionHandler(connection::fatal);
+        final Handler<Void> completeConnection = v -> {
+          // the connection will inherit the user event loop context
+          final RedisConnectionImpl connection = new RedisConnectionImpl(vertx, ctx, connectionListener, netSocket, options);
 
-        // perform authentication
-        authenticate(connection, redisURI.password(), authenticate -> {
-          if (authenticate.failed()) {
-            ctx.runOnContext(v -> onConnect.handle(Future.failedFuture(authenticate.cause())));
-            return;
-          }
+          // parser utility
+          netSocket
+            .handler(new RESPParser(connection, options.getMaxNestedArrays()))
+            .closeHandler(connection::end)
+            .exceptionHandler(connection::fatal);
 
-          // perform select
-          select(connection, redisURI.select(), select -> {
-            if (select.failed()) {
-              ctx.runOnContext(v -> onConnect.handle(Future.failedFuture(select.cause())));
+          // perform authentication
+          authenticate(connection, redisURI.password(), authenticate -> {
+            if (authenticate.failed()) {
+              ctx.runOnContext(v2 -> onConnect.handle(Future.failedFuture(authenticate.cause())));
               return;
             }
 
-            // perform setup
-            setup(connection, setup, setupResult -> {
-              if (setupResult.failed()) {
-                ctx.runOnContext(v -> onConnect.handle(Future.failedFuture(setupResult.cause())));
+            // perform select
+            select(connection, redisURI.select(), select -> {
+              if (select.failed()) {
+                ctx.runOnContext(v2 -> onConnect.handle(Future.failedFuture(select.cause())));
                 return;
               }
 
-              // initialization complete
-              connection.handler(null);
-              connection.endHandler(null);
-              connection.exceptionHandler(DEFAULT_EXCEPTION_HANDLER);
+              // perform setup
+              setup(connection, setup, setupResult -> {
+                if (setupResult.failed()) {
+                  ctx.runOnContext(v2 -> onConnect.handle(Future.failedFuture(setupResult.cause())));
+                  return;
+                }
 
-              ctx.runOnContext(v -> onConnect.handle(Future.succeededFuture(new ConnectResult<>(connection, 1, options.getMaxPoolSize()))));
+                // initialization complete
+                connection.handler(null);
+                connection.endHandler(null);
+                connection.exceptionHandler(DEFAULT_EXCEPTION_HANDLER);
+
+                ctx.runOnContext(v2 -> onConnect.handle(Future.succeededFuture(new ConnectResult<>(connection, 1, options.getMaxPoolSize()))));
+              });
             });
           });
-        });
+        };
+
+        // upgrade to ssl is only possible for inet sockets
+        if (connectionStringInetSocket && !netClientSsl && connectionStringSsl) {
+          // must upgrade protocol
+          netSocket.upgradeToSsl(upgradeToSsl -> {
+            if (upgradeToSsl.failed()) {
+              onConnect.handle(Future.failedFuture(upgradeToSsl.cause()));
+            } else {
+              // complete the connection
+              completeConnection.handle(null);
+            }
+          });
+        } else {
+          // no need to upgrade
+          completeConnection.handle(null);
+        }
       });
     }
 
@@ -214,13 +249,6 @@ class RedisConnectionManager {
       }
     }
     pooledConnectionManager.close();
-//    endpointMap.clear();
-/*
-    for (RedisConnection conn : connectionMap.values()) {
-      ((RedisConnectionImpl) conn).forceClose();
-    }
-*/
-    // forceClose the underlying netclient
     netClient.close();
   }
 

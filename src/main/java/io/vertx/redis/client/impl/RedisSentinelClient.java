@@ -55,7 +55,6 @@ public class RedisSentinelClient implements Redis {
     this.context = vertx.getOrCreateContext();
     this.options = options;
     // validate options
-    // validate options
     if (options.getMaxPoolSize() < 2) {
       throw new IllegalStateException("Invalid options: maxPoolSize must be at least 2");
     }
@@ -233,9 +232,10 @@ public class RedisSentinelClient implements Redis {
         } else {
           // Test the response
           final Response response = getMasterAddrByName.result();
-
+          // inherit protocol config from the current connection
+          final String protocol = !endpoint.contains("://") ? "redis" : endpoint.substring(0, endpoint.indexOf("://"));
           handler.handle(
-            Future.succeededFuture("redis://" + response.get(0).toString() + ":" + response.get(1).toInteger()));
+            Future.succeededFuture(protocol + "://" + response.get(0).toString() + ":" + response.get(1).toInteger()));
         }
         // we don't need this connection anymore
         conn.close();
@@ -283,7 +283,9 @@ public class RedisSentinelClient implements Redis {
               if (ip == null) {
                 handler.handle(Future.failedFuture("No IP found for a SLAVE node!"));
               } else {
-                handler.handle(Future.succeededFuture("redis://" + ip + ":" + port));
+                // inherit protocol config from the current connection
+                final String protocol = !endpoint.contains("://") ? "redis" : endpoint.substring(0, endpoint.indexOf("://"));
+                handler.handle(Future.succeededFuture(protocol + "://" + ip + ":" + port));
               }
             }
           }

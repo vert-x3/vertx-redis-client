@@ -15,14 +15,10 @@
 |[[connectionString]]`@connectionString`|`String`|+++
 Sets a single connection string (endpoint) to use while connecting to the redis server.
  Will replace the previously configured connection strings.
- <p>
- Does not support rediss (redis over ssl scheme) for now.
 +++
 |[[connectionStrings]]`@connectionStrings`|`Array of String`|+++
 Adds a connection string (endpoint) to use while connecting to the redis server. Only the cluster mode will
  consider more than 1 element. If more are provided, they are not considered by the client when in single server mode.
- <p>
- Does not support rediss (redis over ssl scheme) for now.
 +++
 |[[endpoint]]`@endpoint`|`String`|+++
 Sets a single connection string to use while connecting to the redis server.
