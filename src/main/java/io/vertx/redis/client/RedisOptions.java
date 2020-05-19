@@ -225,8 +225,6 @@ public class RedisOptions {
   /**
    * Adds a connection string (endpoint) to use while connecting to the redis server. Only the cluster mode will
    * consider more than 1 element. If more are provided, they are not considered by the client when in single server mode.
-   * <p>
-   * Does not support rediss (redis over ssl scheme) for now.
    *
    * @param connectionString a string URI following the scheme: redis://[username:password@][host][:port][/database]
    * @return fluent self.
@@ -244,8 +242,6 @@ public class RedisOptions {
   /**
    * Sets a single connection string (endpoint) to use while connecting to the redis server.
    * Will replace the previously configured connection strings.
-   * <p>
-   * Does not support rediss (redis over ssl scheme) for now.
    *
    * @param connectionString a string following the scheme: redis://[username:password@][host][:port][/[database].
    * @return fluent self.
