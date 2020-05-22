@@ -29,9 +29,10 @@ import io.vertx.redis.RedisOptions;
 import io.vertx.redis.RedisTransaction;
 import io.vertx.redis.Script;
 import io.vertx.redis.client.*;
-import io.vertx.redis.client.impl.types.MultiType;
 import io.vertx.redis.op.*;
 
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
 import java.util.*;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.atomic.AtomicReference;
@@ -65,8 +66,14 @@ public final class RedisClientImpl implements RedisClient {
       }
       connString += "://" + options.getHost() + ":" + options.getPort() + "/?";
     }
-    if (options.getAuth() != null) {
-      connString += "password=" + options.getAuth() + "&";
+    String auth = options.getAuth();
+    if (auth != null) {
+      try {
+        auth = URLEncoder.encode(auth, "UTF-8");
+      } catch (UnsupportedEncodingException ignored) {
+
+      }
+      connString += "password=" + auth + "&";
     }
     if (options.getSelect() != null) {
       connString += "db=" + options.getSelect();
@@ -1820,6 +1827,14 @@ public final class RedisClientImpl implements RedisClient {
   public RedisClient swapdb(int index1, int index2, Handler<AsyncResult<String>> handler) {
     sendString(SWAPDB, toPayload(index1, index2), handler);
     return this;
+  }
+
+  /**
+   * return connection uri for unit test
+   * @return connection uri
+   */
+  String getConnectionString() {
+    return connectionString;
   }
 
   public class RedisTransactionImpl implements RedisTransaction {
