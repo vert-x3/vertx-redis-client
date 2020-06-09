@@ -55,7 +55,7 @@ The Redis client can operate in 3 distinct modes:
 * Cluster (when working with Redis in Clustered mode).
 
 The connection mode is selected by the factory method on the Redis interface. Regardless of the mode the client can be
-configured using a {@link io.vertx.redis.client.RedisOptions} data object. By default some configuration values are
+configured using a {@link io.vertx.redis.client.RedisOptions} data object. By default, some configuration values are
 initialized with the following values:
 
 * `netClientOptions`: default is `TcpKeepAlive: true`, `TcpNoDelay: true`

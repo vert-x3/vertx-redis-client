@@ -1,9 +1,6 @@
 package examples;
 
-import io.vertx.core.AbstractVerticle;
-import io.vertx.core.AsyncResult;
-import io.vertx.core.Handler;
-import io.vertx.core.Vertx;
+import io.vertx.core.*;
 import io.vertx.redis.client.*;
 
 /**
@@ -14,35 +11,38 @@ import io.vertx.redis.client.*;
 public class RedisExamples {
 
   public void example1(Vertx vertx) {
-    Redis.createClient(vertx, new RedisOptions())
-      .connect(onConnect -> {
-        if (onConnect.succeeded()) {
-          RedisConnection client = onConnect.result();
-        }
+    Redis.createClient(vertx)
+      .connect()
+      .onSuccess(conn -> {
+        // use the connection
       });
   }
 
   public void example2(Vertx vertx) {
+    // The client handles REDIS URLs. The select database as per spec is the
+    // numerical path of the URL and the password is the password field of
+    // the URL authority
     Redis.createClient(vertx, "redis://:abracadabra@localhost:6379/1")
-      .connect(onConnect -> {
-        if (onConnect.succeeded()) {
-          RedisConnection client = onConnect.result();
-        }
+      .connect()
+      .onSuccess(conn -> {
+        // use the connection
       });
   }
 
   public void example3(RedisConnection client) {
+    // wrap the client in a API object that is aware
+    // of the redis commands and it's arity
     RedisAPI redis = RedisAPI.api(client);
 
-    redis.get("mykey", res -> {
-      if (res.succeeded()) {
-        // so something...
-      }
-    });
+    redis
+      .get("mykey")
+      .onSuccess(value -> {
+        // do something...
+      });
   }
 
   public void example4(Response response) {
-    // this is a multi redis response (think of it as an array
+    // this is a multi redis response (think of it as an array)
     if (response.type() == ResponseType.MULTI) {
       for (Response item : response) {
         // do something with item...
@@ -60,11 +60,10 @@ public class RedisExamples {
         .addConnectionString("redis://127.0.0.1:5002")
         .setMasterName("sentinel7000")
         .setRole(RedisRole.MASTER))
-      .connect(onConnect -> {
-        // assuming we got a connection to the master node
-        // query the info for the node
-        onConnect.result()
-          .send(Request.cmd(Command.INFO), info -> {
+      .connect()
+      .onSuccess(conn -> {
+        conn.send(Request.cmd(Command.INFO))
+          .onSuccess(info -> {
             // do something...
           });
       });
@@ -83,33 +82,28 @@ public class RedisExamples {
   public void example7(Vertx vertx) {
 
     Redis.createClient(vertx, new RedisOptions())
-      .connect(onConnect -> {
-        if (onConnect.succeeded()) {
-          RedisConnection client = onConnect.result();
-
-          client.handler(message -> {
-            // do whatever you need to do with your message
-          });
-        }
+      .connect()
+      .onSuccess(conn -> {
+        conn.handler(message -> {
+          // do whatever you need to do with your message
+        });
       });
   }
 
   public void example8(RedisConnection redis) {
 
-    redis.send(Request.cmd(Command.PUBLISH).arg("channel1").arg("Hello World!"), res -> {
-      if (res.succeeded()) {
+    redis.send(Request.cmd(Command.PUBLISH).arg("channel1").arg("Hello World!"))
+      .onSuccess(res -> {
         // published!
-      }
-    });
+      });
   }
 
   public void example9(Vertx vertx) {
 
     Redis.createClient(vertx, "unix:///tmp/redis.sock")
-      .connect(onConnect -> {
-        if (onConnect.succeeded()) {
-          RedisConnection client = onConnect.result();
-        }
+      .connect()
+      .onSuccess(conn -> {
+        // so something...
       });
   }
 
@@ -124,31 +118,32 @@ public class RedisExamples {
 
       @Override
       public void start() {
-        createRedisClient(onCreate -> {
-          if (onCreate.succeeded()) {
+        createRedisClient()
+          .onSuccess(conn -> {
             // connected to redis!
-          }
-        });
+          });
       }
 
       /**
        * Will create a redis client and setup a reconnect handler when there is
        * an exception in the connection.
        */
-      private void createRedisClient(Handler<AsyncResult<RedisConnection>> handler) {
+      private Future<RedisConnection> createRedisClient() {
+        Promise<RedisConnection> promise = Promise.promise();
+
         Redis.createClient(vertx, options)
-          .connect(onConnect -> {
-            if (onConnect.succeeded()) {
-              client = onConnect.result();
-              // make sure the client is reconnected on error
-              client.exceptionHandler(e -> {
-                // attempt to reconnect
-                attemptReconnect(0);
-              });
-            }
+          .connect()
+          .onSuccess(conn -> {
+            // make sure the client is reconnected on error
+            conn.exceptionHandler(e -> {
+              // attempt to reconnect
+              attemptReconnect(0);
+            });
             // allow further processing
-            handler.handle(onConnect);
+            promise.complete(conn);
           });
+
+        return promise.future();
       }
 
       /**
@@ -161,11 +156,10 @@ public class RedisExamples {
           // retry with backoff up to 10240 ms
           long backoff = (long) (Math.pow(2, Math.min(retry, 10)) * 10);
 
-          vertx.setTimer(backoff, timer -> createRedisClient(onReconnect -> {
-            if (onReconnect.failed()) {
-              attemptReconnect(retry + 1);
-            }
-          }));
+          vertx.setTimer(backoff, timer -> {
+            createRedisClient()
+              .onFailure(t -> attemptReconnect(retry + 1));
+          });
         }
       }
     }
@@ -173,10 +167,9 @@ public class RedisExamples {
 
   public void example11(Vertx vertx) {
     Redis.createClient(vertx, "redis://localhost:7006")
-      .send(Request.cmd(Command.PING), send -> {
-        if (send.succeeded()) {
-          // Should have received a pong...
-        }
+      .send(Request.cmd(Command.PING))
+      .onSuccess(res -> {
+        // Should have received a pong...
       });
   }
 
@@ -190,10 +183,9 @@ public class RedisExamples {
         // allow 32 connection requests to queue waiting
         // for a connection to be available.
         .setMaxWaitingHandlers(32))
-      .send(Request.cmd(Command.PING), send -> {
-        if (send.succeeded()) {
-          // Should have received a pong...
-        }
+      .send(Request.cmd(Command.PING))
+      .onSuccess(res -> {
+        // Should have received a pong...
       });
   }
 }
