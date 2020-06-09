@@ -58,7 +58,7 @@ final class ArrayQueue {
     back++;
     if (back == Integer.MAX_VALUE) {
       // ensure the indexes stay positive
-      back = 0;
+      back %= queue.length;
     }
     queue[back % queue.length] = value;
     cur++;
