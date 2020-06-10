@@ -90,7 +90,7 @@ final class ArrayQueue {
     front++;
     if (front == Integer.MAX_VALUE) {
       // ensure the indexes stay positive
-      front = 0;
+      front %= queue.length;
     }
     cur--;
     return e;
