@@ -149,8 +149,10 @@ public class RedisPooledTest {
       counter.incrementAndGet();
       client.connect(event1 -> {
         if (event1.succeeded()) {
+          System.out.println(counter.get());
           should.assertTrue(counter.get() <= 10);
         } else {
+          System.out.println(counter.get());
           should.assertTrue(counter.get() == 21);
           vertx.cancelTimer(event);
           test.complete();

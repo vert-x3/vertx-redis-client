@@ -158,7 +158,7 @@ class RedisConnectionManager {
                 connection.endHandler(null);
                 connection.exceptionHandler(DEFAULT_EXCEPTION_HANDLER);
 
-                ctx.runOnContext(v2 -> onConnect.handle(Future.succeededFuture(new ConnectResult<>(connection, 1, options.getMaxPoolSize()))));
+                ctx.runOnContext(v2 -> onConnect.handle(Future.succeededFuture(new ConnectResult<>(connection, 1, 1))));
               });
             });
           });
@@ -264,7 +264,7 @@ class RedisConnectionManager {
         connectionProvider,
         options.getMaxPoolSize(),
         1,
-        options.getMaxPoolWaiting() * options.getMaxPoolSize(),
+        options.getMaxPoolWaiting(),
         this::connectionAdded,
         this::connectionRemoved,
         false);
