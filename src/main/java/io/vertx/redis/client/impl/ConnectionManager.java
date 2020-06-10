@@ -179,9 +179,9 @@ class ConnectionManager {
         new Pool<>(
           userContext,
           connectionProvider,
-          options.getMaxPoolWaiting(),
           options.getMaxPoolSize(),
-          options.getMaxPoolSize() * 4,
+          options.getMaxPoolSize(),
+          options.getMaxPoolSize() * options.getMaxPoolWaiting(),
           v -> endpointMap.remove(connectionString),
           conn -> connectionMap.put(connectionString, conn),
           conn -> connectionMap.remove(connectionString, conn),
