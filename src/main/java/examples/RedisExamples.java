@@ -19,10 +19,12 @@ public class RedisExamples {
   }
 
   public void example2(Vertx vertx) {
-    // The client handles REDIS URLs. The select database as per spec is the
-    // numerical path of the URL and the password is the password field of
-    // the URL authority
-    Redis.createClient(vertx, "redis://:abracadabra@localhost:6379/1")
+    Redis.createClient(
+      vertx,
+      // The client handles REDIS URLs. The select database as per spec is the
+      // numerical path of the URL and the password is the password field of
+      // the URL authority
+      "redis://:abracadabra@localhost:6379/1")
       .connect()
       .onSuccess(conn -> {
         // use the connection
