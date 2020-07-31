@@ -2,6 +2,8 @@ package io.vertx.redis.client.impl;
 
 import io.vertx.codegen.annotations.Nullable;
 import io.vertx.core.*;
+import io.vertx.core.impl.logging.Logger;
+import io.vertx.core.impl.logging.LoggerFactory;
 import io.vertx.redis.client.*;
 import io.vertx.redis.client.impl.types.ErrorType;
 
@@ -10,9 +12,12 @@ import java.util.*;
 import java.util.function.Function;
 
 import static io.vertx.redis.client.Command.ASKING;
+import static io.vertx.redis.client.Command.AUTH;
 import static io.vertx.redis.client.Request.cmd;
 
 public class RedisClusterConnection implements RedisConnection {
+
+  private static final Logger LOG = LoggerFactory.getLogger(RedisClusterConnection.class);
 
   // we need some randomness, it doesn't need
   // to be secure or unpredictable
@@ -322,14 +327,26 @@ public class RedisClusterConnection implements RedisConnection {
           vertx.setTimer(backoff, t -> send(endpoint, retries - 1, command, handler));
           return;
         }
+
+        if (cause.is("NOAUTH") && options.getPassword() != null) {
+          // NOAUTH will try to authenticate
+          connection.send(cmd(AUTH).arg(options.getPassword()), auth -> {
+            if (auth.failed()) {
+              handler.handle(Future.failedFuture(auth.cause()));
+              return;
+            }
+            // again
+            send(endpoint, retries - 1, command, handler);
+          });
+          return;
+        }
       }
 
       try {
         handler.handle(send);
       } catch (RuntimeException e) {
-        e.printStackTrace();
+        LOG.error("Handler failure", e);
       }
-
     });
   }
 
@@ -468,9 +485,26 @@ public class RedisClusterConnection implements RedisConnection {
           vertx.setTimer(backoff, t -> batch(endpoint, retries - 1, commands, handler));
           return;
         }
+
+        if (cause.is("NOAUTH") && options.getPassword() != null) {
+          // try to authenticate
+          connection.send(cmd(AUTH).arg(options.getPassword()), auth -> {
+            if (auth.failed()) {
+              handler.handle(Future.failedFuture(auth.cause()));
+              return;
+            }
+            // again
+            batch(endpoint, retries - 1, commands, handler);
+          });
+          return;
+        }
       }
 
-      handler.handle(send);
+      try {
+        handler.handle(send);
+      } catch (RuntimeException e) {
+        LOG.error("Handler failure", e);
+      }
     });
   }
 

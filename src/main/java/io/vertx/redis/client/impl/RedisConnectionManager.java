@@ -132,8 +132,8 @@ class RedisConnectionManager {
             .closeHandler(connection::end)
             .exceptionHandler(connection::fatal);
 
-          // perform authentication
-          authenticate(connection, redisURI.password(), authenticate -> {
+          // perform authentication (url takes precedence) then fallback on the options
+          authenticate(connection, redisURI.password() != null ? redisURI.password() : options.getPassword(), authenticate -> {
             if (authenticate.failed()) {
               ctx.runOnContext(v2 -> onConnect.handle(Future.failedFuture(authenticate.cause())));
               return;

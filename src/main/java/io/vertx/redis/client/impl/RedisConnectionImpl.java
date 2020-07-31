@@ -333,7 +333,7 @@ public class RedisConnectionImpl implements RedisConnection, ParserHandler {
     }
   }
 
-  private void evict(){
+  private void evict() {
     // evict this connection from the pool
     try {
       listener.onEvict();

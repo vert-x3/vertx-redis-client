@@ -73,6 +73,11 @@ public class RedisOptionsConverter {
             obj.setNetClientOptions(new io.vertx.core.net.NetClientOptions((io.vertx.core.json.JsonObject)member.getValue()));
           }
           break;
+        case "password":
+          if (member.getValue() instanceof String) {
+            obj.setPassword((String)member.getValue());
+          }
+          break;
         case "poolCleanerInterval":
           if (member.getValue() instanceof Number) {
             obj.setPoolCleanerInterval(((Number)member.getValue()).intValue());
@@ -124,6 +129,9 @@ public class RedisOptionsConverter {
     json.put("maxWaitingHandlers", obj.getMaxWaitingHandlers());
     if (obj.getNetClientOptions() != null) {
       json.put("netClientOptions", obj.getNetClientOptions().toJson());
+    }
+    if (obj.getPassword() != null) {
+      json.put("password", obj.getPassword());
     }
     json.put("poolCleanerInterval", obj.getPoolCleanerInterval());
     json.put("poolRecycleTimeout", obj.getPoolRecycleTimeout());

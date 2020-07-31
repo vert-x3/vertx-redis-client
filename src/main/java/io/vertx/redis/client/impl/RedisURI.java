@@ -45,6 +45,10 @@ public final class RedisURI {
   /**
    * Password to the Redis instance
    */
+  private final String user;
+  /**
+   * Password to the Redis instance
+   */
   private final String password;
   /**
    * Database number. With a default Redis config it might be a number from 0 to 15. Not supported in clustered mode.
@@ -109,13 +113,20 @@ public final class RedisURI {
 
       String userInfo = uri.getUserInfo();
       if (userInfo != null) {
-        String[] userInfoArray = userInfo.split(":");
-        if (userInfoArray.length > 0) {
-          password = userInfoArray[userInfoArray.length - 1];
+        int sep = userInfo.lastIndexOf(':');
+        if (sep != -1) {
+          if (sep > 0) {
+            user = userInfo.substring(0, sep);
+          } else {
+            user = query.getOrDefault("user", null);
+          }
+          password = userInfo.substring(sep + 1);
         } else {
+          user = query.getOrDefault("user", null);
           password = query.getOrDefault("password", null);
         }
       } else {
+        user = query.getOrDefault("user", null);
         password = query.getOrDefault("password", null);
       }
 
@@ -145,16 +156,16 @@ public final class RedisURI {
     return socketAddress;
   }
 
+  public String user() {
+    return user;
+  }
+
   public String password() {
     return password;
   }
 
   public Integer select() {
     return select;
-  }
-
-  public String connectionString() {
-    return connectionString;
   }
 
   public boolean ssl() {

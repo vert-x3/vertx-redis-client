@@ -15,9 +15,9 @@
  */
 package io.vertx.redis.client;
 
-import java.nio.charset.StandardCharsets;
-
+import io.vertx.codegen.annotations.GenIgnore;
 import io.vertx.codegen.annotations.VertxGen;
+import io.vertx.redis.client.impl.CommandImpl;
 
 /**
  * <b>Auto generated</b> API Commands to interact with REDIS.
@@ -25,67 +25,57 @@ import io.vertx.codegen.annotations.VertxGen;
  * @author <a href="mailto:plopes@redhat.com">Paulo Lopes</a>
  */
 @VertxGen
-public enum Command {
+public interface Command {
+
 {{#each .}}
-  {{ enum }}("{{ name }}", {{ arity }}, {{ firstKey }}, {{ lastKey }}, {{ interval }}, {{ readOnly }}, {{ movable }}),
-{{/each}}  SENTINEL("sentinel", -1, 0, 0, 0, false, false);
+  Command {{ enum }} = Command.create("{{ name }}", {{ arity }}, {{ firstKey }}, {{ lastKey }}, {{ interval }}, {{ readOnly }}, {{ movable }});
+{{/each}}
+  Command SENTINEL = Command.create("sentinel", -1, 0, 0, 0, false, false);
 
-  private final byte[] bytes;
-  private final int arity;
-
-  private final boolean multiKey;
-  private final int firstKey;
-  private final int lastKey;
-  private final int interval;
-  private final boolean keyless;
-  private final boolean readOnly;
-  private final boolean movable;
-
-  Command(String command, int arity, int firstKey, int lastKey, int interval, boolean readOnly, boolean movable) {
-    bytes = ("$" + command.length() + "\r\n" + command + "\r\n").getBytes(StandardCharsets.ISO_8859_1);
-    this.arity = arity;
-    this.firstKey = firstKey;
-    this.lastKey = lastKey;
-    this.interval = interval;
-    this.multiKey = lastKey < 0;
-    this.keyless = interval == 0 && !movable;
-    this.readOnly = readOnly;
-    this.movable = movable;
+  /**
+   * Creates a Redis Command from METADATA. The metadata comes from the REDIS command "COMMAND"
+   * https://redis.io/commands/command
+   *
+   * Each top-level result contains six nested results. Each nested result is:
+   *
+   *     command name
+   *     command arity specification
+   *     nested Array reply of command flags
+   *     position of first key in argument list
+   *     position of last key in argument list
+   *     step count for locating repeating keys
+   *
+   * @param command command name
+   * @param arity arity
+   * @param firstKey position of the first key
+   * @param lastKey position of the last key
+   * @param interval step count for locating repeating keys
+   * @param readOnly readOnly flag extracted from the nested Array reply of command flags
+   * @param movable movable flag extracted from the nested Array reply of command flags
+   * @return a command instance
+   */
+  static Command create(String command, int arity, int firstKey, int lastKey, int interval, boolean readOnly, boolean movable) {
+    return new CommandImpl(command, arity, firstKey, lastKey, interval, readOnly, movable);
   }
 
-  public byte[] getBytes() {
-    return bytes;
-  }
+  @GenIgnore(GenIgnore.PERMITTED_TYPE)
+  byte[] getBytes();
 
-  public int getArity() {
-    return arity;
-  }
+  int getArity();
 
-  public boolean isMultiKey() {
-    return multiKey;
-  }
+  boolean isMultiKey();
 
-  public int getFirstKey() {
-    return firstKey;
-  }
+  int getFirstKey();
 
-  public int getLastKey() {
-    return lastKey;
-  }
+  int getLastKey();
 
-  public int getInterval() {
-    return interval;
-  }
+  int getInterval();
 
-  public boolean isKeyless() {
-    return keyless;
-  }
+  boolean isKeyless();
 
-  public boolean isReadOnly() {
-    return readOnly;
-  }
+  boolean isReadOnly();
 
-  public boolean isMovable() {
-    return movable;
-  }
+  boolean isMovable();
+
+  boolean isVoid();
 }

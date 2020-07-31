@@ -18,6 +18,7 @@ package io.vertx.redis.client;
 import io.vertx.codegen.annotations.DataObject;
 import io.vertx.core.json.JsonObject;
 import io.vertx.core.net.NetClientOptions;
+import io.vertx.redis.client.impl.RedisURI;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -43,6 +44,8 @@ public class RedisOptions {
   private String masterName;
   private RedisRole role;
   private RedisSlaves slaves;
+  private String password;
+
   // pool related options
   private int poolCleanerInterval;
   private int maxPoolSize;
@@ -94,6 +97,7 @@ public class RedisOptions {
     this.maxPoolSize = other.maxPoolSize;
     this.maxPoolWaiting = other.maxPoolWaiting;
     this.poolRecycleTimeout = other.poolRecycleTimeout;
+    this.password = other.password;
   }
 
   /**
@@ -439,6 +443,37 @@ public class RedisOptions {
    */
   public RedisOptions setPoolRecycleTimeout(int poolRecycleTimeout) {
     this.poolRecycleTimeout = poolRecycleTimeout;
+    return this;
+  }
+
+  /**
+   * Get the default password for cluster/sentinel connections, if not set it will try to
+   * extract it from the current default endpoint.
+   *
+   * @return password
+   */
+  public String getPassword() {
+    if (password == null) {
+      // try to fetch it from the endpoint
+      synchronized (this) {
+        if (password == null) {
+          RedisURI uri = new RedisURI(getEndpoint());
+          // use the parsed value
+          password = uri.password();
+        }
+      }
+    }
+    return password;
+  }
+
+  /**
+   * Set the default password for cluster/sentinel connections.
+   *
+   * @param password the default password
+   * @return fluent self
+   */
+  public RedisOptions setPassword(String password) {
+    this.password = password;
     return this;
   }
 
