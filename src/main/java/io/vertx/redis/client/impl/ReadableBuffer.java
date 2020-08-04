@@ -42,10 +42,10 @@ final class ReadableBuffer {
     if (
       // the offset (read operations) must be further than the last checkpoint
       offset >= mark &&
-      // there must be already read more than water mark
-      mark > MARK_WATERMARK &&
-      // and there are more bytes to read already
-      buffer.length() > mark) {
+        // there must be already read more than water mark
+        mark > MARK_WATERMARK &&
+        // and there are more bytes to read already
+        buffer.length() > mark) {
 
       // clean up when there's too much data
       buffer = buffer.getBuffer(mark, buffer.length());
@@ -159,6 +159,24 @@ final class ReadableBuffer {
     if (readableBytes() >= count) {
       offset += count;
       return true;
+    }
+
+    return false;
+  }
+
+  boolean skipEOL() {
+    while (readableBytes() > 0) {
+      byte b;
+
+      b = readByte();
+      if (b == '\r') {
+        if (readableBytes() > 0) {
+          b = readByte();
+          if (b == '\n') {
+            return true;
+          }
+        }
+      }
     }
 
     return false;

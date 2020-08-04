@@ -6,12 +6,7 @@ import io.vertx.core.impl.logging.Logger;
 import io.vertx.core.impl.logging.LoggerFactory;
 import io.vertx.core.net.NetClient;
 import io.vertx.core.net.NetSocket;
-import io.vertx.core.net.impl.clientconnection.ConnectResult;
-import io.vertx.core.net.impl.clientconnection.ConnectionListener;
-import io.vertx.core.net.impl.clientconnection.ConnectionManager;
-import io.vertx.core.net.impl.clientconnection.ConnectionProvider;
-import io.vertx.core.net.impl.clientconnection.Endpoint;
-import io.vertx.core.net.impl.clientconnection.Pool;
+import io.vertx.core.net.impl.clientconnection.*;
 import io.vertx.redis.client.Command;
 import io.vertx.redis.client.RedisConnection;
 import io.vertx.redis.client.RedisOptions;
@@ -49,17 +44,19 @@ class RedisConnectionManager {
   }
 
   private synchronized void checkExpired(long period) {
-    pooledConnectionManager.forEach(e -> ((RedisEndpoint)e).pool.closeIdle());
+    pooledConnectionManager.forEach(e -> ((RedisEndpoint) e).pool.closeIdle());
     timerID = vertx.setTimer(period, id -> checkExpired(period));
   }
 
   private static class ConnectionKey {
     private final String string;
     private final Request setup;
+
     ConnectionKey(String string, Request setup) {
       this.string = string;
       this.setup = setup;
     }
+
     @Override
     public boolean equals(Object o) {
       if (this == o) return true;
@@ -67,6 +64,7 @@ class RedisConnectionManager {
       ConnectionKey that = (ConnectionKey) o;
       return Objects.equals(string, that.string);
     }
+
     @Override
     public int hashCode() {
       return Objects.hash(string);
@@ -85,7 +83,7 @@ class RedisConnectionManager {
 
     @Override
     public boolean isValid(RedisConnection conn) {
-      return ((RedisConnectionImpl)conn).isValid();
+      return ((RedisConnectionImpl) conn).isValid();
     }
 
     @Override
@@ -132,10 +130,10 @@ class RedisConnectionManager {
             .closeHandler(connection::end)
             .exceptionHandler(connection::fatal);
 
-          // perform authentication (url takes precedence) then fallback on the options
-          authenticate(connection, redisURI.password() != null ? redisURI.password() : options.getPassword(), authenticate -> {
-            if (authenticate.failed()) {
-              ctx.runOnContext(v2 -> onConnect.handle(Future.failedFuture(authenticate.cause())));
+          // initial handshake
+          hello(connection, redisURI, hello -> {
+            if (hello.failed()) {
+              ctx.runOnContext(v1 -> onConnect.handle(Future.failedFuture(hello.cause())));
               return;
             }
 
@@ -178,6 +176,40 @@ class RedisConnectionManager {
         } else {
           // no need to upgrade
           completeConnection.handle(null);
+        }
+      });
+    }
+
+    private void hello(RedisConnection connection, RedisURI redisURI, Handler<AsyncResult<Void>> handler) {
+      Request hello = Request.cmd(Command.HELLO).arg(RESPParser.VERSION);
+
+      String password = redisURI.password() != null ? redisURI.password() : options.getPassword();
+
+      if (password != null) {
+        // will perform auth at hello level
+        hello
+          .arg("AUTH")
+          .arg(redisURI.user())
+          .arg(password);
+      }
+
+      String client = redisURI.param("client");
+      if (client != null) {
+        hello.arg("SETNAME").arg(client);
+      }
+
+      connection.send(hello, onSend -> {
+        if (onSend.succeeded()) {
+          LOG.debug(onSend.result());
+          handler.handle(Future.succeededFuture());
+          return;
+        }
+
+        if (onSend.cause().getMessage().startsWith("ERR unknown command")) {
+          // chatting to an old server
+          authenticate(connection, password, handler);
+        } else {
+          handler.handle(Future.failedFuture(onSend.cause()));
         }
       });
     }

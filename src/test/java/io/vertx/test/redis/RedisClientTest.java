@@ -33,6 +33,7 @@ import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.testcontainers.containers.GenericContainer;
 
 import java.lang.reflect.Field;
 import java.util.*;
@@ -47,6 +48,10 @@ public class RedisClientTest {
 
   @Rule
   public final RunTestOnContext rule = new RunTestOnContext();
+
+  @Rule
+  public final GenericContainer<?> container = new GenericContainer<>("redis:6")
+    .withExposedPorts(6379);
 
   private Redis client;
   private RedisAPI redis;

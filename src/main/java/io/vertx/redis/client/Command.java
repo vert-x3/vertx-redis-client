@@ -259,6 +259,16 @@ public interface Command {
     return new CommandImpl(command, arity, firstKey, lastKey, interval, readOnly, movable);
   }
 
+  /**
+   * Generic command generator for extensions.
+   *
+   * @param command
+   * @return the cachable immutable command instance
+   */
+  static Command create(String command) {
+    return new CommandImpl(command, -1, 0, 0, 0, false, false);
+  }
+
   @GenIgnore(GenIgnore.PERMITTED_TYPE)
   byte[] getBytes();
 

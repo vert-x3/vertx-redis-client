@@ -203,9 +203,9 @@ public class RedisSentinelClient implements Redis {
       final RedisConnection conn = onCreate.result();
 
       // Send a command just to check we have a working node
-      conn.send(cmd(PING), info -> {
-        if (info.failed()) {
-          handler.handle(Future.failedFuture(info.cause()));
+      conn.send(cmd(PING), ping -> {
+        if (ping.failed()) {
+          handler.handle(Future.failedFuture(ping.cause()));
         } else {
           handler.handle(Future.succeededFuture(endpoint));
         }
@@ -234,8 +234,9 @@ public class RedisSentinelClient implements Redis {
           final Response response = getMasterAddrByName.result();
           // inherit protocol config from the current connection
           final String protocol = !endpoint.contains("://") ? "redis" : endpoint.substring(0, endpoint.indexOf("://"));
+          final String host = response.get(0).toString().contains(":") ? "[" + response.get(0).toString() + "]" : response.get(0).toString();
           handler.handle(
-            Future.succeededFuture(protocol + "://" + response.get(0).toString() + ":" + response.get(1).toInteger()));
+            Future.succeededFuture(protocol + "://" + host + ":" + response.get(1).toInteger()));
         }
         // we don't need this connection anymore
         conn.close();
@@ -285,7 +286,9 @@ public class RedisSentinelClient implements Redis {
               } else {
                 // inherit protocol config from the current connection
                 final String protocol = !endpoint.contains("://") ? "redis" : endpoint.substring(0, endpoint.indexOf("://"));
-                handler.handle(Future.succeededFuture(protocol + "://" + ip + ":" + port));
+                final String host = ip.contains(":") ? "[" + ip + "]" : ip;
+
+                handler.handle(Future.succeededFuture(protocol + "://" + host + ":" + port));
               }
             }
           }

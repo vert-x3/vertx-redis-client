@@ -66,8 +66,10 @@ class Slots {
 
       // array of all clients, clients[2] = master, others are slaves
       for (int index = 2; index < s.size(); index++) {
-        Response c = s.get(index);
-        final String endpoint = protocol + "://" + c.get(0).toString() + ":" + c.get(1).toInteger();
+        final Response c = s.get(index);
+        final String host = c.get(0).toString().contains(":") ? "[" + c.get(0).toString() + "]" : c.get(0).toString();
+
+        final String endpoint = protocol + "://" + host + ":" + c.get(1).toInteger();
         slots[i].endpoints[index - 2] = endpoint;
         uniqueEndpoints.add(endpoint);
         if (index == 2) {

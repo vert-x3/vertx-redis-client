@@ -84,7 +84,6 @@ public class RedisClusterTest {
     });
   }
 
-  @Ignore
   @Test(timeout = 30_000)
   public void runTheSlotScope(TestContext should) {
     final Async test = should.async();
@@ -415,7 +414,7 @@ public class RedisClusterTest {
       });
   }
 
-  @Test//(timeout = 5_000)
+  @Test(timeout = 30_000)
   public void testBlPop(TestContext should) {
     final Async test = should.async();
     final String list1 = makeKey();
@@ -758,7 +757,6 @@ public class RedisClusterTest {
       });
   }
 
-  @Ignore
   @Test(timeout = 30_000)
   public void dbSize(TestContext should) {
     final Async test = should.async();
@@ -788,7 +786,6 @@ public class RedisClusterTest {
       });
   }
 
-  @Ignore
   @Test(timeout = 30_000)
   public void flushDB(TestContext should) {
     final Async test = should.async();

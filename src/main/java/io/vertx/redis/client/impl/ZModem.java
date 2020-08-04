@@ -37,7 +37,7 @@ import java.util.List;
  */
 public class ZModem {
 
-  private static final int[] lookup = new int[] {
+  private static final int[] lookup = new int[]{
     0x0000, 0x1021, 0x2042, 0x3063, 0x4084, 0x50a5, 0x60c6, 0x70e7,
     0x8108, 0x9129, 0xa14a, 0xb16b, 0xc18c, 0xd1ad, 0xe1ce, 0xf1ef,
     0x1231, 0x0210, 0x3273, 0x2252, 0x52b5, 0x4294, 0x72f7, 0x62d6,
@@ -74,6 +74,7 @@ public class ZModem {
 
   /**
    * Convert a string into a redis slot hash.
+   *
    * @param str string
    * @return hash
    */
@@ -83,6 +84,7 @@ public class ZModem {
 
   /**
    * Convert a string into a redis slot hash.
+   *
    * @param utf8 bytes
    * @return hash
    */
@@ -114,6 +116,7 @@ public class ZModem {
 
   /**
    * Convert a buffer into a redis slot hash.
+   *
    * @param buffer buffer
    * @return hash
    */
@@ -146,6 +149,7 @@ public class ZModem {
   /**
    * Convert an array of multiple strings into a redis slot hash.
    * Returns -1 if one of the keys is not for the same slot as the others
+   *
    * @param keys list of keys
    * @return the overall hash
    */
@@ -166,6 +170,7 @@ public class ZModem {
   /**
    * Convert an array of multiple strings into a redis slot hash.
    * Returns -1 if one of the keys is not for the same slot as the others
+   *
    * @param keys array of keys
    * @return the overall hash
    */

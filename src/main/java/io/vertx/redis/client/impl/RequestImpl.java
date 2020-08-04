@@ -16,15 +16,15 @@
 package io.vertx.redis.client.impl;
 
 import io.vertx.core.buffer.Buffer;
-import io.vertx.redis.client.Request;
 import io.vertx.redis.client.Command;
+import io.vertx.redis.client.Request;
 
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import static io.vertx.redis.client.impl.RESPEncoder.*;
+import static io.vertx.redis.client.impl.RESPEncoder.numToBytes;
 
 public final class RequestImpl implements Request {
 

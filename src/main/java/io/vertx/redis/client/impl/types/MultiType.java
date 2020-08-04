@@ -18,7 +18,9 @@ package io.vertx.redis.client.impl.types;
 import io.vertx.redis.client.Response;
 import io.vertx.redis.client.ResponseType;
 
-import java.util.*;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.Set;
 
 public final class MultiType implements Response {
 
@@ -27,6 +29,7 @@ public final class MultiType implements Response {
   public static MultiType create(int length) {
     return new MultiType(length);
   }
+
   public static MultiType create(Response[] replies) {
     return new MultiType(replies);
   }
@@ -65,9 +68,9 @@ public final class MultiType implements Response {
   @Override
   public Response get(String key) {
     if (replies.length % 2 == 0) {
-      for (int i = 0; i < replies.length; i+=2) {
+      for (int i = 0; i < replies.length; i += 2) {
         if (key.equals(replies[i].toString())) {
-          return replies[i+1];
+          return replies[i + 1];
         }
       }
     }
@@ -78,7 +81,7 @@ public final class MultiType implements Response {
   public Set<String> getKeys() {
     if (replies.length % 2 == 0) {
       final Set<String> keys = new HashSet<>();
-      for (int i = 0; i < replies.length; i+=2) {
+      for (int i = 0; i < replies.length; i += 2) {
         keys.add(replies[i].toString());
       }
 
@@ -119,6 +122,7 @@ public final class MultiType implements Response {
   public Iterator<Response> iterator() {
     return new Iterator<Response>() {
       private int idx = 0;
+
       @Override
       public boolean hasNext() {
         return idx < replies.length;

@@ -58,7 +58,10 @@ public final class RedisURI {
    * SSL
    */
   private final boolean ssl;
-
+  /**
+   * Params
+   */
+  private final Map<String, String> params;
 
   public RedisURI(String connectionString) {
     this.connectionString = connectionString;
@@ -72,7 +75,7 @@ public final class RedisURI {
       // According to https://www.iana.org/assignments/uri-schemes/prov/redis there is no specified order of decision
       // in case if db number or password are given in 2 different ways (e.g. in path and query).
       // Implementation uses the query values as a fallback if another one is missing.
-      Map<String, String> query = parseQuery(uri);
+      params = parseQuery(uri);
       switch (uri.getScheme()) {
         case "rediss":
           ssl = true;
@@ -80,8 +83,8 @@ public final class RedisURI {
           if (path.length() > 1) {
             // skip initial slash
             select = Integer.parseInt(uri.getPath().substring(1));
-          } else if (query.containsKey("db")) {
-            select = Integer.parseInt(query.get("db"));
+          } else if (params.containsKey("db")) {
+            select = Integer.parseInt(params.get("db"));
           } else {
             select = null;
           }
@@ -92,8 +95,8 @@ public final class RedisURI {
           if (path.length() > 1) {
             // skip initial slash
             select = Integer.parseInt(uri.getPath().substring(1));
-          } else if (query.containsKey("db")) {
-            select = Integer.parseInt(query.get("db"));
+          } else if (params.containsKey("db")) {
+            select = Integer.parseInt(params.get("db"));
           } else {
             select = null;
           }
@@ -101,8 +104,8 @@ public final class RedisURI {
         case "unix":
           ssl = false;
           socketAddress = SocketAddress.domainSocketAddress(path);
-          if (query.containsKey("db")) {
-            select = Integer.parseInt(query.get("db"));
+          if (params.containsKey("db")) {
+            select = Integer.parseInt(params.get("db"));
           } else {
             select = null;
           }
@@ -118,16 +121,16 @@ public final class RedisURI {
           if (sep > 0) {
             user = userInfo.substring(0, sep);
           } else {
-            user = query.getOrDefault("user", null);
+            user = params.getOrDefault("user", "default");
           }
           password = userInfo.substring(sep + 1);
         } else {
-          user = query.getOrDefault("user", null);
-          password = query.getOrDefault("password", null);
+          user = params.getOrDefault("user", "default");
+          password = params.getOrDefault("password", null);
         }
       } else {
-        user = query.getOrDefault("user", null);
-        password = query.getOrDefault("password", null);
+        user = params.getOrDefault("user", "default");
+        password = params.getOrDefault("password", null);
       }
 
     } catch (URISyntaxException e) {
@@ -170,6 +173,10 @@ public final class RedisURI {
 
   public boolean ssl() {
     return ssl;
+  }
+
+  public String param(String key) {
+    return params.get(key);
   }
 
   @Override

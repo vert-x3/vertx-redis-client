@@ -17,11 +17,14 @@ package io.vertx.redis.client.impl;
 
 import io.vertx.core.*;
 import io.vertx.redis.client.*;
-import io.vertx.redis.client.impl.types.IntegerType;
+import io.vertx.redis.client.impl.types.NumberType;
 import io.vertx.redis.client.impl.types.MultiType;
 import io.vertx.redis.client.impl.types.SimpleStringType;
 
-import java.util.*;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Function;
@@ -51,7 +54,7 @@ public class RedisClusterClient implements Redis {
       SimpleStringType.OK);
 
     addReducer(DEL, list ->
-      IntegerType.create(list.stream().mapToLong(Response::toLong).sum()));
+      NumberType.create(list.stream().mapToLong(Response::toLong).sum()));
 
     addReducer(MGET, list -> {
       int total = 0;
@@ -91,7 +94,7 @@ public class RedisClusterClient implements Redis {
 
     addReducer(DBSIZE, list ->
       // Sum of key numbers on all Key Slots
-      IntegerType.create(list.stream().mapToLong(Response::toLong).sum()));
+      NumberType.create(list.stream().mapToLong(Response::toLong).sum()));
 
     Arrays.asList(ASKING, AUTH, BGREWRITEAOF, BGSAVE, CLIENT, COMMAND, CONFIG,
       DEBUG, DISCARD, HOST, INFO, LASTSAVE, LATENCY, LOLWUT, MEMORY, MODULE, MONITOR, PFDEBUG, PFSELFTEST,
@@ -170,7 +173,7 @@ public class RedisClusterClient implements Redis {
           return;
         }
 
-        for (String endpoint: slots.endpoints()) {
+        for (String endpoint : slots.endpoints()) {
           connectionManager.getConnection(context, endpoint, RedisSlaves.NEVER != options.getUseSlave() ? cmd(READONLY) : null, getClusterConnection -> {
             if (getClusterConnection.failed()) {
               // failed try with the next endpoint

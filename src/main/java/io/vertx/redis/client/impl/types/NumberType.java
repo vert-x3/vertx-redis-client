@@ -18,15 +18,15 @@ package io.vertx.redis.client.impl.types;
 import io.vertx.redis.client.Response;
 import io.vertx.redis.client.ResponseType;
 
-public final class IntegerType implements Response {
+public final class NumberType implements Response {
 
-  public static IntegerType create(Long value) {
-    return new IntegerType(value);
+  public static NumberType create(Long value) {
+    return new NumberType(value);
   }
 
-  private final Long value;
+  private final Number value;
 
-  private IntegerType(long value) {
+  private NumberType(long value) {
     this.value = value;
   }
 
@@ -34,7 +34,7 @@ public final class IntegerType implements Response {
   public ResponseType type() {
     return ResponseType.INTEGER;
   }
-  
+
   @Override
   public Integer toInteger() {
     return value.intValue();
@@ -42,7 +42,7 @@ public final class IntegerType implements Response {
 
   @Override
   public Long toLong() {
-    return value;
+    return value.longValue();
   }
 
   @Override
