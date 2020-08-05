@@ -18,6 +18,8 @@ package io.vertx.redis.client.impl.types;
 import io.vertx.redis.client.Response;
 import io.vertx.redis.client.ResponseType;
 
+import java.math.BigInteger;
+
 public final class NumberType implements Response {
 
   public static NumberType create(Number value) {
@@ -41,13 +43,42 @@ public final class NumberType implements Response {
   }
 
   @Override
-  public Integer toInteger() {
-    return value.intValue();
+  public BigInteger toBigInteger() {
+    if (value instanceof BigInteger) {
+      return (BigInteger) value;
+    } else {
+      return BigInteger.valueOf(value.longValue());
+    }
+  }
+
+  @Override
+  public Double toDouble() {
+    return value.doubleValue();
+  }
+
+  @Override
+  public Float toFloat() {
+    return value.floatValue();
   }
 
   @Override
   public Long toLong() {
     return value.longValue();
+  }
+
+  @Override
+  public Integer toInteger() {
+    return value.intValue();
+  }
+
+  @Override
+  public Short toShort() {
+    return value.shortValue();
+  }
+
+  @Override
+  public Byte toByte() {
+    return value.byteValue();
   }
 
   @Override

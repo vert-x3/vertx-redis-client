@@ -19,6 +19,7 @@ import io.vertx.codegen.annotations.GenIgnore;
 import io.vertx.codegen.annotations.VertxGen;
 import io.vertx.core.buffer.Buffer;
 
+import java.math.BigInteger;
 import java.nio.charset.Charset;
 import java.util.Collections;
 import java.util.Iterator;
@@ -75,6 +76,43 @@ public interface Response extends Iterable<Response> {
   @GenIgnore(GenIgnore.PERMITTED_TYPE)
   default Number toNumber() {
     throw new UnsupportedOperationException("This type doesn't hold a Numeric type");
+  }
+
+  /**
+   * Get this response as a Double.
+   * @return double value.
+   */
+  default Double toDouble() {
+    final String msg = toString();
+    if (msg != null) {
+      return Double.parseDouble(msg);
+    }
+    return null;
+  }
+
+  /**
+   * Get this response as a Float.
+   * @return double value.
+   */
+  default Float toFloat() {
+    final String msg = toString();
+    if (msg != null) {
+      return Float.parseFloat(msg);
+    }
+    return null;
+  }
+
+  /**
+   * Get this response as a BigInteger.
+   * @return long value.
+   */
+  @GenIgnore(GenIgnore.PERMITTED_TYPE)
+  default BigInteger toBigInteger() {
+    final String msg = toString();
+    if (msg != null) {
+      return new BigInteger(msg);
+    }
+    return null;
   }
 
   /**
