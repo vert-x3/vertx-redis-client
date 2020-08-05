@@ -37,7 +37,7 @@ public final class ErrorType extends Throwable implements Response {
         }
       }
     }
-    kind = message;
+    kind = null;
   }
 
   @Override

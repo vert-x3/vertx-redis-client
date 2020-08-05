@@ -33,9 +33,14 @@ public enum ResponseType {
   ERROR,
 
   /**
-   * 64 bit integer value.
+   * boolean value.
    */
-  INTEGER,
+  BOOLEAN,
+
+  /**
+   * numeric value.
+   */
+  NUMBER,
 
   /**
    * byte array value.

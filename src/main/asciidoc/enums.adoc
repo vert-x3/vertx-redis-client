@@ -91,8 +91,11 @@ C String simple String.
 |[[ERROR]]`ERROR`|+++
 C String simple String representing an error.
 +++
-|[[INTEGER]]`INTEGER`|+++
-64 bit integer value.
+|[[BOOLEAN]]`BOOLEAN`|+++
+boolean value.
++++
+|[[NUMBER]]`NUMBER`|+++
+numeric value.
 +++
 |[[BULK]]`BULK`|+++
 byte array value.

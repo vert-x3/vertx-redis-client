@@ -18,36 +18,29 @@ package io.vertx.redis.client.impl.types;
 import io.vertx.redis.client.Response;
 import io.vertx.redis.client.ResponseType;
 
-public final class NumberType implements Response {
+public final class BooleanType implements Response {
 
-  public static NumberType create(Number value) {
-    return new NumberType(value);
+  public static final BooleanType TRUE = new BooleanType(true);
+  public static final BooleanType FALSE = new BooleanType(false);
+
+  public static BooleanType create(Boolean value) {
+    return new BooleanType(value);
   }
 
-  private final Number value;
+  private final Boolean value;
 
-  private NumberType(Number value) {
+  private BooleanType(Boolean value) {
     this.value = value;
   }
 
   @Override
-  public Number toNumber() {
-    return value;
-  }
-
-  @Override
   public ResponseType type() {
-    return ResponseType.NUMBER;
+    return ResponseType.BOOLEAN;
   }
 
   @Override
-  public Integer toInteger() {
-    return value.intValue();
-  }
-
-  @Override
-  public Long toLong() {
-    return value.longValue();
+  public Boolean toBoolean() {
+    return value;
   }
 
   @Override

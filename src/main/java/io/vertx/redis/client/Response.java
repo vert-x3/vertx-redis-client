@@ -20,7 +20,9 @@ import io.vertx.codegen.annotations.VertxGen;
 import io.vertx.core.buffer.Buffer;
 
 import java.nio.charset.Charset;
+import java.util.Collections;
 import java.util.Iterator;
+import java.util.Map;
 import java.util.Set;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
@@ -51,11 +53,29 @@ public interface Response extends Iterable<Response> {
   ResponseType type();
 
   /**
+   * RESP3 responses may include attributes
+   * @return the a key value map of attributes to this response.
+   */
+  default Map<String, Response> attributes() {
+    return Collections.emptyMap();
+  }
+
+  /**
    * Get this response as a String.
    * @return string value
    */
   @Override
   String toString();
+
+  /**
+   * Get this response as a Number. In contrast to other numeric getters, this will not
+   * perform any conversion if the underlying type is not numeric.
+   * @return number value
+   */
+  @GenIgnore(GenIgnore.PERMITTED_TYPE)
+  default Number toNumber() {
+    throw new UnsupportedOperationException("This type doesn't hold a Numeric type");
+  }
 
   /**
    * Get this response as a Long.

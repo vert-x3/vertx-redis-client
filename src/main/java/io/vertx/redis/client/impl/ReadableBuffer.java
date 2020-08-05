@@ -17,9 +17,16 @@ package io.vertx.redis.client.impl;
 
 import io.vertx.core.buffer.Buffer;
 
-import java.nio.charset.Charset;
+import java.math.BigInteger;
+import java.nio.charset.StandardCharsets;
 
 final class ReadableBuffer {
+
+  enum NumericType {
+    INTEGER,
+    DECIMAL,
+    BIGINTEGER
+  }
 
   // limit of integer parsing before overflowing
   private static final long MAX_INTEGER_DIV_10 = Long.MAX_VALUE / 10;
@@ -93,31 +100,42 @@ final class ReadableBuffer {
     return value;
   }
 
-  Buffer readLine() {
-    return readLine(findLineEnd());
-  }
+  Number readNumber(int end, NumericType type) {
+    Number number = null;
 
-  String readLine(Charset charset) {
-    return readLine(findLineEnd(), charset);
-  }
-
-  private Buffer readLine(int end) {
-    Buffer bytes = null;
     if (end >= offset) {
-      bytes = buffer.getBuffer(offset, end - 1);
+      byte[] bytes = buffer.getBytes(offset, end - 1);
+      switch (type) {
+        case INTEGER:
+          number = Long.parseLong(new String(bytes, StandardCharsets.US_ASCII));
+          break;
+        case DECIMAL:
+          if (bytes.length == 3 && bytes[0] == 'i' && bytes[1] == 'n' && bytes[2] == 'f') {
+            number = Double.POSITIVE_INFINITY;
+          } else if (bytes.length == 4 && bytes[0] == '-' && bytes[1] == 'i' && bytes[2] == 'n' && bytes[3] == 'f') {
+            number = Double.NEGATIVE_INFINITY;
+          } else {
+            number = Double.parseDouble(new String(bytes, StandardCharsets.US_ASCII));
+          }
+          break;
+        case BIGINTEGER:
+          number = new BigInteger(bytes);
+          break;
+      }
       offset = end + 1;
     }
-    return bytes;
+
+    return number;
   }
 
-  String readLine(int end, Charset charset) {
+  String readLine(int end) {
     byte[] bytes = null;
     if (end >= offset) {
       bytes = buffer.getBytes(offset, end - 1);
       offset = end + 1;
     }
     if (bytes != null) {
-      return new String(bytes, charset);
+      return new String(bytes, StandardCharsets.ISO_8859_1);
     }
     return null;
   }
@@ -153,15 +171,6 @@ final class ReadableBuffer {
 
   int offset() {
     return offset;
-  }
-
-  boolean skip(int count) {
-    if (readableBytes() >= count) {
-      offset += count;
-      return true;
-    }
-
-    return false;
   }
 
   boolean skipEOL() {

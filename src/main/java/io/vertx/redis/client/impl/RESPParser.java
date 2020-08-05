@@ -20,8 +20,6 @@ import io.vertx.core.buffer.Buffer;
 import io.vertx.redis.client.Response;
 import io.vertx.redis.client.impl.types.*;
 
-import java.nio.charset.StandardCharsets;
-
 public final class RESPParser implements Handler<Buffer> {
 
   public static final String VERSION = "2";
@@ -82,39 +80,39 @@ public final class RESPParser implements Handler<Buffer> {
             handleSimpleString(start, eol);
             break;
           case '-':
+          case '!':
             handleError(start, eol);
             break;
           case ':':
-            handleInteger(start, eol);
+          case ',':
+          case '(':
+            handleNumber(type, start, eol);
             break;
           case '$':
+          case '=':
             handleBulk(start, eol);
             break;
           case '*':
             handleMulti(start, eol);
             break;
-          // begin RESP3 types
           case '_':
             handleNull(start, eol);
             break;
-          case ',':
-            handleFloat(start, eol);
           case '#':
             handleBoolean(start, eol);
-          case '!':
-            handleBlobError(start, eol);
-          case '=':
-            handleVerbatinString(start, eol);
-          case '(':
-            handleBigInteger(start, eol);
+            break;
           case '%':
             handleMap(start, eol);
+            break;
           case '~':
             handleSet(start, eol);
+            break;
           case '|':
             handleAttribute(start, eol);
+            break;
           case '>':
             handlePush(start, eol);
+            break;
           default:
             // notify
             handler.fatal(ErrorType.create("ILLEGAL_STATE Unknown RESP type " + (char) type));
@@ -141,6 +139,24 @@ public final class RESPParser implements Handler<Buffer> {
     }
   }
 
+  private void handleNumber(byte type, int start, int eol) {
+    try {
+      switch (type) {
+        case ':':
+          handleResponse(NumberType.create(buffer.readNumber(eol, ReadableBuffer.NumericType.INTEGER)), false);
+          break;
+        case ',':
+          handleResponse(NumberType.create(buffer.readNumber(eol, ReadableBuffer.NumericType.DECIMAL)), false);
+          break;
+        case '(':
+          handleResponse(NumberType.create(buffer.readNumber(eol, ReadableBuffer.NumericType.BIGINTEGER)), false);
+          break;
+      }
+    } catch (RuntimeException e) {
+      handler.fatal(e);
+    }
+  }
+
   private void handlePush(int start, int eol) {
     throw new UnsupportedOperationException();
   }
@@ -157,24 +173,18 @@ public final class RESPParser implements Handler<Buffer> {
     throw new UnsupportedOperationException();
   }
 
-  private void handleBigInteger(int start, int eol) {
-    throw new UnsupportedOperationException();
-  }
-
-  private void handleVerbatinString(int start, int eol) {
-    throw new UnsupportedOperationException();
-  }
-
-  private void handleBlobError(int start, int eol) {
-    throw new UnsupportedOperationException();
-  }
-
   private void handleBoolean(int start, int eol) {
-    throw new UnsupportedOperationException();
-  }
-
-  private void handleFloat(int start, int eol) {
-    throw new UnsupportedOperationException();
+    byte value = buffer.readByte();
+    switch (value) {
+      case 't':
+        handleResponse(BooleanType.TRUE, false);
+        break;
+      case 'f':
+        handleResponse(BooleanType.FALSE, false);
+        break;
+      default:
+        handler.fatal(ErrorType.create("Invalid boolean value: " + ((char) value)));
+    }
   }
 
   private void handleSimpleString(int start, int eol) {
@@ -183,25 +193,12 @@ public final class RESPParser implements Handler<Buffer> {
     if (length == 2 && buffer.getByte(start) == 'O' && buffer.getByte(start + 1) == 'K') {
       handleResponse(SimpleStringType.OK, false);
     } else {
-      handleResponse(SimpleStringType.create(buffer.readLine(eol, StandardCharsets.ISO_8859_1)), false);
+      handleResponse(SimpleStringType.create(buffer.readLine(eol)), false);
     }
   }
 
   private void handleError(int start, int eol) {
-    handleResponse(ErrorType.create(buffer.readLine(eol, StandardCharsets.ISO_8859_1)), false);
-  }
-
-  private void handleInteger(int start, int eol) {
-    final long integer;
-
-    try {
-      integer = buffer.readLong(eol);
-    } catch (RuntimeException e) {
-      handler.fatal(e);
-      return;
-    }
-
-    handleResponse(NumberType.create(integer), false);
+    handleResponse(ErrorType.create(buffer.readLine(eol)), false);
   }
 
   private void handleBulk(int start, int eol) {
