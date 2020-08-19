@@ -213,7 +213,7 @@ public class ReplyParserTest {
       @Override
       public void handle(Response response) {
         should.assertEquals(0, response.size());
-        should.assertTrue(response == MultiType.EMPTY);
+        should.assertTrue(response == MultiType.EMPTY_MULTI);
         test.complete();
       }
 

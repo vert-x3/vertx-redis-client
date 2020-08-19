@@ -23,10 +23,7 @@ import io.vertx.ext.unit.Async;
 import io.vertx.ext.unit.TestContext;
 import io.vertx.ext.unit.junit.RunTestOnContext;
 import io.vertx.ext.unit.junit.VertxUnitRunner;
-import io.vertx.redis.client.Redis;
-import io.vertx.redis.client.RedisAPI;
-import io.vertx.redis.client.RedisConnection;
-import io.vertx.redis.client.RedisOptions;
+import io.vertx.redis.client.*;
 import io.vertx.redis.client.impl.RedisConnectionImpl;
 import org.junit.After;
 import org.junit.Before;
@@ -50,7 +47,7 @@ public class RedisClientTest {
   public final RunTestOnContext rule = new RunTestOnContext();
 
   @Rule
-  public final GenericContainer<?> container = new GenericContainer<>("redis:6")
+  public final GenericContainer<?> container = new GenericContainer<>("redis:6.0.6")
     .withExposedPorts(6379);
 
   private Redis client;
@@ -61,7 +58,7 @@ public class RedisClientTest {
     final Async before = should.async();
 
     Context context = rule.vertx().getOrCreateContext();
-    client = Redis.createClient(rule.vertx(), new RedisOptions().setConnectionString("redis://localhost:7006"));
+    client = Redis.createClient(rule.vertx(), new RedisOptions().setConnectionString("redis://" + container.getContainerIpAddress() + ":" + container.getFirstMappedPort()));
     client.connect(onConnect -> {
       should.assertTrue(onConnect.succeeded());
       should.assertEquals(context, rule.vertx().getOrCreateContext());
@@ -283,78 +280,76 @@ public class RedisClientTest {
     });
   }
 
-//  @Test
-//  public void testBlpop(TestContext should) {
-//    final Async test = should.async();
-//    final String list1 = makeKey();
-//    final String list2 = makeKey();
-//
-//    redis.delMany(toList(list1, list2), reply0 -> {
-//      should.assertTrue(reply0.succeeded());
-//
-//      redis.rpushMany(list1, toList("a", "b", "c"), reply1 -> {
-//        should.assertTrue(reply1.succeeded());
-//        should.assertEquals(3, reply1.result().toLong());
-//
-//        redis.blpopMany(toList(list1, list2), 0, reply2 -> {
-//          should.assertTrue(reply2.succeeded());
-//          should.assertArrayEquals(toArray(list1, "a"), reply2.result().getList().toArray());
-//          test.complete();
-//        });
-//      });
-//    });
-//
-//  }
+  @Test
+  public void testBlpop(TestContext should) {
+    final Async test = should.async();
+    final String list1 = makeKey();
+    final String list2 = makeKey();
 
-//  @Test
-//  public void testBrpop(TestContext should) {
-//    final Async test = should.async();
-//    final String list1 = makeKey();
-//    final String list2 = makeKey();
-//
-//    redis.delMany(toList(list1, list2), reply0 -> {
-//      should.assertTrue(reply0.succeeded());
-//
-//      redis.rpushMany(list1, toList("a", "b", "c"), reply1 -> {
-//        should.assertTrue(reply1.succeeded());
-//        should.assertEquals(3, reply1.result().toLong());
-//
-//        redis.brpopMany(toList(list1, list2), 0, reply2 -> {
-//          should.assertTrue(errorMessage(reply2.cause()), reply2.succeeded());
-//          should.assertArrayEquals(toArray(list1, "c"), reply2.result().getList().toArray());
-//          test.complete();
-//        });
-//      });
-//    });
-//
-//  }
+    redis.del(toList(list1, list2), reply0 -> {
+      should.assertTrue(reply0.succeeded());
 
-//  @Test
-//  public void testBrpoplpush(TestContext should) {
-//    final Async test = should.async();
-//    redis.brpoplpush("list1", "list2", 100, result -> {
-//
-//      if (result.succeeded()) {
-//        redis.lpop("list2", result2 -> {
-//          if (result2.succeeded()) {
-//            System.out.println(result2.result());
-//            should.assertTrue("hello".equals(result2.result()));
-//          }
-//          test.complete();
-//        });
-//      } else {
-//        result.cause().printStackTrace();
-//        fail();
-//      }
-//    });
-//
-//    RedisClient redis2 = RedisClient.create(vertx, getConfig());
-//
-//    redis2.lpush("list1", "hello", result -> {
-//    });
-//
-//
-//  }
+      redis.rpush(toList(list1,"a", "b", "c"), reply1 -> {
+        should.assertTrue(reply1.succeeded());
+        should.assertEquals(3, reply1.result().toInteger());
+
+        redis.blpop(toList(list1, list2, "0"), reply2 -> {
+          should.assertTrue(reply2.succeeded());
+          should.assertEquals(list1, reply2.result().get(0).toString());
+          should.assertEquals("a", reply2.result().get(1).toString());
+          test.complete();
+        });
+      });
+    });
+
+  }
+
+  @Test
+  public void testBrpop(TestContext should) {
+    final Async test = should.async();
+    final String list1 = makeKey();
+    final String list2 = makeKey();
+
+    redis.del(toList(list1, list2), reply0 -> {
+      should.assertTrue(reply0.succeeded());
+
+      redis.rpush(toList(list1, "a", "b", "c"), reply1 -> {
+        should.assertTrue(reply1.succeeded());
+        should.assertEquals(3, reply1.result().toInteger());
+
+        redis.brpop(toList(list1, list2, "0"), reply2 -> {
+          should.assertTrue(reply2.succeeded());
+          should.assertEquals(list1, reply2.result().get(0).toString());
+          should.assertEquals("c", reply2.result().get(1).toString());
+          test.complete();
+        });
+      });
+    });
+  }
+
+  @Test
+  public void testBrpoplpush(TestContext should) {
+    final Async test = should.async();
+    redis.brpoplpush("list1", "list2", "10000", result -> {
+
+      if (result.succeeded()) {
+        redis.lpop("list2", result2 -> {
+          if (result2.succeeded()) {
+            should.assertTrue("hello".equals(result2.result().toString()));
+          }
+          test.complete();
+        });
+      } else {
+        result.cause().printStackTrace();
+        should.fail();
+      }
+    });
+
+    Redis redis2 = Redis.createClient(rule.vertx(), new RedisOptions().setConnectionString("redis://" + container.getContainerIpAddress() + ":" + container.getFirstMappedPort()));
+
+    redis2.send(Request.cmd(Command.LPUSH).arg("list1").arg("hello"), result -> {
+    });
+  }
 
 //  @Test
 //  public void testClientKill(TestContext should) {
@@ -2925,7 +2920,7 @@ public class RedisClientTest {
         should.assertEquals(1L, reply1.result().toLong());
         redis.zincrby(key, "2", "one", reply2 -> {
           should.assertTrue(reply2.succeeded());
-          should.assertEquals("3", reply2.result().toString());
+          should.assertEquals(3.0, reply2.result().toDouble());
           test.complete();
         });
       });
@@ -3169,7 +3164,7 @@ public class RedisClientTest {
       should.assertEquals(1L, reply0.result().toLong());
       redis.zscore(key, "one", reply1 -> {
         should.assertTrue(reply1.succeeded());
-        should.assertEquals("1", reply1.result().toString());
+        should.assertEquals(1.0, reply1.result().toDouble());
         test.complete();
       });
     });

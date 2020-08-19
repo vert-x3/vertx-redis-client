@@ -25,6 +25,7 @@ import java.util.Collections;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
+import java.util.function.Consumer;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 
@@ -217,7 +218,7 @@ public interface Response extends Iterable<Response> {
    * @return Response value.
    */
   default Response get(String key) {
-    throw new UnsupportedOperationException("This type doesn't hold an Array type");
+    throw new UnsupportedOperationException("This type doesn't hold a Map type");
   }
 
   /**
@@ -226,7 +227,7 @@ public interface Response extends Iterable<Response> {
    * @return the set of keys.
    */
   default Set<String> getKeys() {
-    throw new UnsupportedOperationException("This type doesn't hold an Array type");
+    throw new UnsupportedOperationException("This type doesn't hold a Map type");
   }
 
   /**
@@ -234,7 +235,7 @@ public interface Response extends Iterable<Response> {
    * @return the size of the multi.
    */
   default int size() {
-    throw new UnsupportedOperationException("This type doesn't hold an Array type");
+    throw new UnsupportedOperationException("This type doesn't hold an Array/Map type");
   }
 
   /**

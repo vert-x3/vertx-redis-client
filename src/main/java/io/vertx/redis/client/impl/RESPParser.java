@@ -18,11 +18,14 @@ package io.vertx.redis.client.impl;
 import io.vertx.core.Handler;
 import io.vertx.core.buffer.Buffer;
 import io.vertx.redis.client.Response;
+import io.vertx.redis.client.ResponseType;
 import io.vertx.redis.client.impl.types.*;
+
+import java.util.concurrent.atomic.AtomicReference;
 
 public final class RESPParser implements Handler<Buffer> {
 
-  public static final String VERSION = "2";
+  public static final String VERSION = "3";
 
   // 512Mb
   private static final long MAX_STRING_LENGTH = 536870912;
@@ -93,19 +96,15 @@ public final class RESPParser implements Handler<Buffer> {
             handleBulk(start, eol);
             break;
           case '*':
-            handleMulti(start, eol);
+          case '%':
+          case '~':
+            handleMulti(type, start, eol);
             break;
           case '_':
             handleNull(start, eol);
             break;
           case '#':
             handleBoolean(start, eol);
-            break;
-          case '%':
-            handleMap(start, eol);
-            break;
-          case '~':
-            handleSet(start, eol);
             break;
           case '|':
             handleAttribute(start, eol);
@@ -158,19 +157,71 @@ public final class RESPParser implements Handler<Buffer> {
   }
 
   private void handlePush(int start, int eol) {
-    throw new UnsupportedOperationException();
+    final long integer;
+
+    try {
+      integer = buffer.readLong(eol);
+    } catch (RuntimeException e) {
+      handler.fatal(e);
+      return;
+    }
+
+    // special cases
+    // redis multi cannot have more than 2GB elements
+    if (integer > Integer.MAX_VALUE) {
+      handler.fatal(ErrorType.create("ILLEGAL_STATE Redis Multi cannot be larger 2GB elements"));
+      return;
+    }
+    if (integer < 0) {
+      if (integer == -1L) {
+        // this is a NULL array
+        handleResponse(null, false);
+        return;
+      }
+      // other negative values are not valid
+      handler.fatal(ErrorType.create("ILLEGAL_STATE Redis Push cannot have negative length"));
+    }
+
+    if (integer == 0L) {
+      // push always have 1 entry
+      handler.fatal(ErrorType.create("ILLEGAL_STATE Redis Push must have at least 1 element"));
+    } else {
+      handleResponse(PushType.create(integer), true);
+    }
   }
 
   private void handleAttribute(int start, int eol) {
-    throw new UnsupportedOperationException();
-  }
+    final long integer;
 
-  private void handleSet(int start, int eol) {
-    throw new UnsupportedOperationException();
-  }
+    try {
+      integer = buffer.readLong(eol);
+    } catch (RuntimeException e) {
+      handler.fatal(e);
+      return;
+    }
 
-  private void handleMap(int start, int eol) {
-    throw new UnsupportedOperationException();
+    // special cases
+    // redis multi cannot have more than 2GB elements
+    if (integer > Integer.MAX_VALUE) {
+      handler.fatal(ErrorType.create("ILLEGAL_STATE Redis Multi cannot be larger 2GB elements"));
+      return;
+    }
+    if (integer < 0) {
+      if (integer == -1L) {
+        // this is a NULL array
+        handleResponse(null, false);
+        return;
+      }
+      // other negative values are not valid
+      handler.fatal(ErrorType.create("ILLEGAL_STATE Redis Push cannot have negative length"));
+    }
+
+    if (integer == 0L) {
+      // push always have 1 entry
+      handler.fatal(ErrorType.create("ILLEGAL_STATE Redis Push must have at least 1 element"));
+    } else {
+      handleResponse(AttributeType.create(integer), true);
+    }
   }
 
   private void handleBoolean(int start, int eol) {
@@ -233,7 +284,7 @@ public final class RESPParser implements Handler<Buffer> {
     this.eol = false;
   }
 
-  private void handleMulti(int start, int eol) {
+  private void handleMulti(byte type, int start, int eol) {
     final long integer;
 
     try {
@@ -260,19 +311,20 @@ public final class RESPParser implements Handler<Buffer> {
     }
     // empty arrays can be cached and require no further processing
     if (integer == 0L) {
-      handleResponse(MultiType.EMPTY, false);
+      handleResponse(type == '%' ? MultiType.EMPTY_MAP : MultiType.EMPTY_MULTI, false);
     } else {
-      // safe cast
-      handleResponse(MultiType.create((int) integer), true);
+      handleResponse(MultiType.create(integer, type == '%'), true);
     }
   }
 
   private void handleNull(int start, int eol) {
+    // clean up the buffer, skip to the last \r\n
+    buffer.skipEOL();
     handleResponse(null, false);
   }
 
   private void handleResponse(Response response, boolean push) {
-    final MultiType multi = stack.peek();
+    final Multi multi = stack.peek();
     // verify if there are multi's on the stack
     if (multi != null) {
       // add the parsed response to the multi
@@ -282,7 +334,7 @@ public final class RESPParser implements Handler<Buffer> {
         stack.push(response);
       } else {
         // break the chain and verify end condition
-        MultiType m = multi;
+        Multi m = multi;
         // clean up complete messages
         while (m.complete()) {
           stack.pop();
@@ -290,8 +342,10 @@ public final class RESPParser implements Handler<Buffer> {
           // in case of chaining we need to take into account
           // if the stack is empty or not
           if (stack.empty()) {
-            // handle the multi to the listener
-            handler.handle(m);
+            if (m.type() != ResponseType.ATTRIBUTE) {
+              // handle the multi to the listener
+              handler.handle(m);
+            }
             return;
           }
           // peek into the next entry
