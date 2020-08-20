@@ -21,8 +21,6 @@ import io.vertx.redis.client.Response;
 import io.vertx.redis.client.ResponseType;
 import io.vertx.redis.client.impl.types.*;
 
-import java.util.concurrent.atomic.AtomicReference;
-
 public final class RESPParser implements Handler<Buffer> {
 
   public static final String VERSION = "3";
@@ -84,33 +82,33 @@ public final class RESPParser implements Handler<Buffer> {
             break;
           case '-':
           case '!':
-            handleError(start, eol);
+            handleError(eol);
             break;
           case ':':
           case ',':
           case '(':
-            handleNumber(type, start, eol);
+            handleNumber(type, eol);
             break;
           case '$':
           case '=':
-            handleBulk(start, eol);
+            handleBulk(eol);
             break;
           case '*':
           case '%':
           case '~':
-            handleMulti(type, start, eol);
+            handleMulti(type, eol);
             break;
           case '_':
-            handleNull(start, eol);
+            handleNull();
             break;
           case '#':
-            handleBoolean(start, eol);
+            handleBoolean();
             break;
           case '|':
-            handleAttribute(start, eol);
+            handleAttribute(eol);
             break;
           case '>':
-            handlePush(start, eol);
+            handlePush(eol);
             break;
           default:
             // notify
@@ -138,7 +136,7 @@ public final class RESPParser implements Handler<Buffer> {
     }
   }
 
-  private void handleNumber(byte type, int start, int eol) {
+  private void handleNumber(byte type, int eol) {
     try {
       switch (type) {
         case ':':
@@ -156,81 +154,71 @@ public final class RESPParser implements Handler<Buffer> {
     }
   }
 
-  private void handlePush(int start, int eol) {
+  private long handleLength(int eol) {
     final long integer;
 
     try {
       integer = buffer.readLong(eol);
     } catch (RuntimeException e) {
       handler.fatal(e);
-      return;
+      return -1;
     }
 
     // special cases
     // redis multi cannot have more than 2GB elements
     if (integer > Integer.MAX_VALUE) {
       handler.fatal(ErrorType.create("ILLEGAL_STATE Redis Multi cannot be larger 2GB elements"));
-      return;
+      return -1;
     }
+
     if (integer < 0) {
       if (integer == -1L) {
         // this is a NULL array
         handleResponse(null, false);
-        return;
+        return -1;
       }
       // other negative values are not valid
-      handler.fatal(ErrorType.create("ILLEGAL_STATE Redis Push cannot have negative length"));
+      handler.fatal(ErrorType.create("ILLEGAL_STATE Redis Multi cannot have negative length"));
+      return -1;
     }
 
-    if (integer == 0L) {
-      // push always have 1 entry
-      handler.fatal(ErrorType.create("ILLEGAL_STATE Redis Push must have at least 1 element"));
-    } else {
-      handleResponse(PushType.create(integer), true);
+    return integer;
+  }
+
+  private void handlePush(int eol) {
+    long len = handleLength(eol);
+    if (len >= 0) {
+      if (len == 0L) {
+        // push always have 1 entry
+        handler.fatal(ErrorType.create("ILLEGAL_STATE Redis Push must have at least 1 element"));
+      } else {
+        handleResponse(PushType.create(len), true);
+      }
     }
   }
 
-  private void handleAttribute(int start, int eol) {
-    final long integer;
-
-    try {
-      integer = buffer.readLong(eol);
-    } catch (RuntimeException e) {
-      handler.fatal(e);
-      return;
-    }
-
-    // special cases
-    // redis multi cannot have more than 2GB elements
-    if (integer > Integer.MAX_VALUE) {
-      handler.fatal(ErrorType.create("ILLEGAL_STATE Redis Multi cannot be larger 2GB elements"));
-      return;
-    }
-    if (integer < 0) {
-      if (integer == -1L) {
-        // this is a NULL array
-        handleResponse(null, false);
-        return;
+  private void handleAttribute(int eol) {
+    long len = handleLength(eol);
+    if (len >= 0L) {
+      if (len == 0L) {
+        // push always have 1 entry
+        handler.fatal(ErrorType.create("ILLEGAL_STATE Redis Push must have at least 1 element"));
+      } else {
+        handleResponse(AttributeType.create(len), true);
       }
-      // other negative values are not valid
-      handler.fatal(ErrorType.create("ILLEGAL_STATE Redis Push cannot have negative length"));
-    }
 
-    if (integer == 0L) {
-      // push always have 1 entry
-      handler.fatal(ErrorType.create("ILLEGAL_STATE Redis Push must have at least 1 element"));
-    } else {
-      handleResponse(AttributeType.create(integer), true);
     }
   }
 
-  private void handleBoolean(int start, int eol) {
+  private void handleBoolean() {
     byte value = buffer.readByte();
     switch (value) {
       case 't':
+        buffer.skipEOL();
         handleResponse(BooleanType.TRUE, false);
         break;
       case 'f':
+        buffer.skipEOL();
         handleResponse(BooleanType.FALSE, false);
         break;
       default:
@@ -248,76 +236,40 @@ public final class RESPParser implements Handler<Buffer> {
     }
   }
 
-  private void handleError(int start, int eol) {
+  private void handleError(int eol) {
     handleResponse(ErrorType.create(buffer.readLine(eol)), false);
   }
 
-  private void handleBulk(int start, int eol) {
-    final long integer;
-
-    try {
-      integer = buffer.readLong(eol);
-    } catch (RuntimeException e) {
-      handler.fatal(e);
-      return;
-    }
-
-    // redis strings cannot be longer than 512Mb
-    if (integer > MAX_STRING_LENGTH) {
-      handler.fatal(ErrorType.create("ILLEGAL_STATE Redis Bulk cannot be larger than 512MB"));
-      return;
-    }
-    // special cases
-    if (integer < 0) {
-      if (integer == -1L) {
-        // this is a NULL string
-        handleResponse(null, false);
+  private void handleBulk(int eol) {
+    long len = handleLength(eol);
+    if (len >= 0L) {
+      // redis strings cannot be longer than 512Mb
+      if (len > MAX_STRING_LENGTH) {
+        handler.fatal(ErrorType.create("ILLEGAL_STATE Redis Bulk cannot be larger than 512MB"));
         return;
       }
-      // other negative values are not valid
-      handler.fatal(ErrorType.create("ILLEGAL_STATE Redis Bulk cannot have negative length"));
-      return;
-    }
-    // safe cast
-    bytesNeeded = (int) integer;
-    // in this case we switch from eol parsing to fixed len parsing
-    this.eol = false;
-  }
-
-  private void handleMulti(byte type, int start, int eol) {
-    final long integer;
-
-    try {
-      integer = buffer.readLong(eol);
-    } catch (RuntimeException e) {
-      handler.fatal(e);
-      return;
-    }
-
-    // special cases
-    // redis multi cannot have more than 2GB elements
-    if (integer > Integer.MAX_VALUE) {
-      handler.fatal(ErrorType.create("ILLEGAL_STATE Redis Multi cannot be larger 2GB elements"));
-      return;
-    }
-    if (integer < 0) {
-      if (integer == -1L) {
-        // this is a NULL array
-        handleResponse(null, false);
-        return;
-      }
-      // other negative values are not valid
-      handler.fatal(ErrorType.create("ILLEGAL_STATE Redis Multi cannot have negative length"));
-    }
-    // empty arrays can be cached and require no further processing
-    if (integer == 0L) {
-      handleResponse(type == '%' ? MultiType.EMPTY_MAP : MultiType.EMPTY_MULTI, false);
-    } else {
-      handleResponse(MultiType.create(integer, type == '%'), true);
+      // safe cast
+      bytesNeeded = (int) len;
+      // in this case we switch from eol parsing to fixed len parsing
+      this.eol = false;
     }
   }
 
-  private void handleNull(int start, int eol) {
+  private void handleMulti(byte type, int eol) {
+
+    long len = handleLength(eol);
+
+    if (len >= 0L) {
+      // empty arrays can be cached and require no further processing
+      if (len == 0L) {
+        handleResponse(type == '%' ? MultiType.EMPTY_MAP : MultiType.EMPTY_MULTI, false);
+      } else {
+        handleResponse(MultiType.create(len, type == '%'), true);
+      }
+    }
+  }
+
+  private void handleNull() {
     // clean up the buffer, skip to the last \r\n
     buffer.skipEOL();
     handleResponse(null, false);

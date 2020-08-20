@@ -29,7 +29,7 @@ import java.util.Set;
 public final class AttributeType implements Multi {
 
   public static AttributeType create(long length) {
-    return new AttributeType(new Response[(int) length * 2], 0);
+    return new AttributeType(new Response[(int) length * 2]);
   }
 
   private final Map<String, Response> map;
@@ -38,9 +38,9 @@ public final class AttributeType implements Multi {
   private int count;
   private String key;
 
-  private AttributeType(Response[] replies, int count) {
+  private AttributeType(Response[] replies) {
     this.replies = replies;
-    this.count = count;
+    this.count = 0;
     this.map = new HashMap<>();
   }
 

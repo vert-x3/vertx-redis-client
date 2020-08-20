@@ -25,14 +25,14 @@ import java.util.*;
  */
 public final class MultiType implements Multi {
 
-  public static final MultiType EMPTY_MULTI = new MultiType(new Response[0], 0, false);
-  public static final MultiType EMPTY_MAP = new MultiType(new Response[0], 0, true);
+  public static final MultiType EMPTY_MULTI = new MultiType(new Response[0], false);
+  public static final MultiType EMPTY_MAP = new MultiType(new Response[0], true);
 
   public static MultiType create(long length, boolean asMap) {
     if (asMap) {
-      return new MultiType(new Response[(int) length * 2], 0, true);
+      return new MultiType(new Response[(int) length * 2], true);
     } else {
-      return new MultiType(new Response[(int) length], 0, length % 2 == 0);
+      return new MultiType(new Response[(int) length], length % 2 == 0);
     }
   }
 
@@ -43,9 +43,9 @@ public final class MultiType implements Multi {
   private int count;
   private String key;
 
-  private MultiType(Response[] replies, int count, boolean asMap) {
+  private MultiType(Response[] replies, boolean asMap) {
     this.replies = replies;
-    this.count = count;
+    this.count = 0;
     this.asMap = asMap;
     this.map = asMap ? new HashMap<>() : Collections.emptyMap();
   }

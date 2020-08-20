@@ -23,16 +23,16 @@ import java.util.Iterator;
 public final class PushType implements Multi {
 
   public static PushType create(long length) {
-    return new PushType(new Response[(int) length], 0);
+    return new PushType(new Response[(int) length]);
   }
 
   private final Response[] replies;
   // mutable temporary state
   private int count;
 
-  private PushType(Response[] replies, int count) {
+  private PushType(Response[] replies) {
     this.replies = replies;
-    this.count = count;
+    this.count = 0;
   }
 
   @Override
