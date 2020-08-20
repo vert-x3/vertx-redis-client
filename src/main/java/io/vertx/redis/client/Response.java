@@ -171,7 +171,7 @@ public interface Response extends Iterable<Response> {
   default Boolean toBoolean() {
     final String msg = toString();
     if (msg != null) {
-      return 1L == Long.parseLong(msg);
+      return Boolean.parseBoolean(msg);
     }
     return null;
   }
