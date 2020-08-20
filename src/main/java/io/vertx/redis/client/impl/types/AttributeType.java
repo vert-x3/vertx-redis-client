@@ -18,58 +18,43 @@ package io.vertx.redis.client.impl.types;
 import io.vertx.redis.client.Response;
 import io.vertx.redis.client.ResponseType;
 
-import java.util.*;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Map;
+import java.util.Set;
 
 /**
  * A Redis MULTI response can represent a List/Set/Map type.
  */
-public final class MultiType implements Multi {
+public final class AttributeType implements Multi {
 
-  public static final MultiType EMPTY_MULTI = new MultiType(new Response[0], false);
-  public static final MultiType EMPTY_MAP = new MultiType(new Response[0], true);
-
-  public static MultiType create(long length, boolean asMap) {
-    if (asMap) {
-      return new MultiType(new Response[(int) length * 2], true);
-    } else {
-      return new MultiType(new Response[(int) length], length % 2 == 0);
-    }
+  public static AttributeType create(long length) {
+    return new AttributeType(new Response[(int) length * 2]);
   }
 
   private final Map<String, Response> map;
   private final Response[] replies;
-  private final boolean asMap;
   // mutable temporary state
   private int count;
   private String key;
 
-  private MultiType(Response[] replies, boolean asMap) {
+  private AttributeType(Response[] replies) {
     this.replies = replies;
     this.count = 0;
-    this.asMap = asMap;
-    this.map = asMap ? new HashMap<>() : Collections.emptyMap();
+    this.map = new HashMap<>();
   }
 
   @Override
   public ResponseType type() {
-    return ResponseType.MULTI;
+    return ResponseType.ATTRIBUTE;
   }
 
   public void add(Response reply) {
-    if (asMap) {
-      if (count % 2 == 0) {
-        switch (reply.type()) {
-          case BULK:
-          case SIMPLE:
-            key = reply.toString();
-            break;
-          default:
-            key = null;
-        }
-      } else {
-        if (key != null) {
-          map.put(key, reply);
-        }
+    if (count % 2 == 0) {
+      key = reply.toString();
+    } else {
+      if (key != null) {
+        map.put(key, reply);
       }
     }
     this.replies[this.count++] = reply;
@@ -86,18 +71,12 @@ public final class MultiType implements Multi {
 
   @Override
   public Response get(String key) {
-    if (asMap) {
-      return map.get(key);
-    }
-    throw new RuntimeException("Number of key is not even");
+    return map.get(key);
   }
 
   @Override
   public Set<String> getKeys() {
-    if (asMap) {
-      return map.keySet();
-    }
-    throw new RuntimeException("Number of key is not even");
+    return map.keySet();
   }
 
   @Override
@@ -109,21 +88,34 @@ public final class MultiType implements Multi {
   public String toString() {
     final StringBuilder sb = new StringBuilder();
 
-    sb.append('[');
+    sb.append('{');
     boolean more = false;
-    for (Response r : replies) {
+    for (Map.Entry<String, Response> kv : map.entrySet()) {
       if (more) {
         sb.append(", ");
       }
 
-      if (r == null) {
+      String key = kv.getKey();
+
+      if (key == null) {
         sb.append("null");
       } else {
-        sb.append(r.toString());
+        sb.append(key);
       }
+
+      sb.append(':');
+
+      Response value = kv.getValue();
+
+      if (value == null) {
+        sb.append("null");
+      } else {
+        sb.append(value.toString());
+      }
+
       more = true;
     }
-    sb.append(']');
+    sb.append('}');
 
     return sb.toString();
   }
@@ -142,11 +134,7 @@ public final class MultiType implements Multi {
       public Response next() {
         final Response value = replies[idx];
 
-        if (asMap) {
-          idx += 2;
-        } else {
-          idx++;
-        }
+        idx += 2;
 
         return value;
       }

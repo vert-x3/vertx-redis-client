@@ -65,18 +65,23 @@ public class RedisPubSubTest {
 
     sub.handler(message -> {
       System.out.println(message);
-      should.assertTrue(message.type() == ResponseType.MULTI);
-
-      if (message.get(0).toString().equals("message")) {
-        should.assertEquals(3, message.size());
-        pmessageCnt.incrementAndGet();
-      }
-      if (message.get(0).toString().equals("subscribe")) {
-        should.assertEquals(3, message.size());
-        psubscribeCnt.incrementAndGet();
-      }
-      if (psubscribeCnt.get() + pmessageCnt.get() == 2) {
-        test.complete();
+      switch (message.type()) {
+        case PUSH:
+        case MULTI:
+          if (message.get(0).toString().equals("message")) {
+            should.assertEquals(3, message.size());
+            pmessageCnt.incrementAndGet();
+          }
+          if (message.get(0).toString().equals("subscribe")) {
+            should.assertEquals(3, message.size());
+            psubscribeCnt.incrementAndGet();
+          }
+          if (psubscribeCnt.get() + pmessageCnt.get() == 2) {
+            test.complete();
+          }
+          break;
+        default:
+          should.fail();
       }
     });
 
@@ -99,18 +104,23 @@ public class RedisPubSubTest {
 
     sub.handler(message -> {
       System.out.println(message);
-      should.assertTrue(message.type() == ResponseType.MULTI);
-
-      if (message.get(0).toString().equals("pmessage")) {
-        should.assertEquals(4, message.size());
-        pmessageCnt.incrementAndGet();
-      }
-      if (message.get(0).toString().equals("psubscribe")) {
-        should.assertEquals(3, message.size());
-        psubscribeCnt.incrementAndGet();
-      }
-      if (psubscribeCnt.get() + pmessageCnt.get() == 12) {
-        test.complete();
+      switch (message.type()) {
+        case PUSH:
+        case MULTI:
+          if (message.get(0).toString().equals("pmessage")) {
+            should.assertEquals(4, message.size());
+            pmessageCnt.incrementAndGet();
+          }
+          if (message.get(0).toString().equals("psubscribe")) {
+            should.assertEquals(3, message.size());
+            psubscribeCnt.incrementAndGet();
+          }
+          if (psubscribeCnt.get() + pmessageCnt.get() == 12) {
+            test.complete();
+          }
+          break;
+        default:
+          should.fail();
       }
     });
 

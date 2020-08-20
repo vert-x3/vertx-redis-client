@@ -100,8 +100,14 @@ numeric value.
 |[[BULK]]`BULK`|+++
 byte array value.
 +++
+|[[PUSH]]`PUSH`|+++
+Push message
++++
+|[[ATTRIBUTE]]`ATTRIBUTE`|+++
+Attribute message
++++
 |[[MULTI]]`MULTI`|+++
-List of multiple bulk responses.
+List of multiple bulk responses (List, Set, Map).
 +++
 |===
 

@@ -170,7 +170,7 @@ public interface Response extends Iterable<Response> {
   default Boolean toBoolean() {
     final String msg = toString();
     if (msg != null) {
-      return 1L == Long.parseLong(msg);
+      return Boolean.parseBoolean(msg);
     }
     return null;
   }
@@ -217,7 +217,7 @@ public interface Response extends Iterable<Response> {
    * @return Response value.
    */
   default Response get(String key) {
-    throw new UnsupportedOperationException("This type doesn't hold an Array type");
+    throw new UnsupportedOperationException("This type doesn't hold a Map type");
   }
 
   /**
@@ -226,7 +226,7 @@ public interface Response extends Iterable<Response> {
    * @return the set of keys.
    */
   default Set<String> getKeys() {
-    throw new UnsupportedOperationException("This type doesn't hold an Array type");
+    throw new UnsupportedOperationException("This type doesn't hold a Map type");
   }
 
   /**
@@ -234,7 +234,7 @@ public interface Response extends Iterable<Response> {
    * @return the size of the multi.
    */
   default int size() {
-    throw new UnsupportedOperationException("This type doesn't hold an Array type");
+    throw new UnsupportedOperationException("This type doesn't hold an Array/Map type");
   }
 
   /**

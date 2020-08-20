@@ -62,7 +62,7 @@ public class RedisClusterClient implements Redis {
         total += resp.size();
       }
 
-      MultiType multi = MultiType.create(total);
+      MultiType multi = MultiType.create(total, false);
       for (Response resp : list) {
         for (Response child : resp) {
           multi.add(child);
@@ -78,7 +78,7 @@ public class RedisClusterClient implements Redis {
         total += resp.size();
       }
 
-      MultiType multi = MultiType.create(total);
+      MultiType multi = MultiType.create(total, false);
       for (Response resp : list) {
         for (Response child : resp) {
           multi.add(child);

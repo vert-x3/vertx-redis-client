@@ -18,60 +18,29 @@ package io.vertx.redis.client.impl.types;
 import io.vertx.redis.client.Response;
 import io.vertx.redis.client.ResponseType;
 
-import java.util.*;
+import java.util.Iterator;
 
-/**
- * A Redis MULTI response can represent a List/Set/Map type.
- */
-public final class MultiType implements Multi {
+public final class PushType implements Multi {
 
-  public static final MultiType EMPTY_MULTI = new MultiType(new Response[0], false);
-  public static final MultiType EMPTY_MAP = new MultiType(new Response[0], true);
-
-  public static MultiType create(long length, boolean asMap) {
-    if (asMap) {
-      return new MultiType(new Response[(int) length * 2], true);
-    } else {
-      return new MultiType(new Response[(int) length], length % 2 == 0);
-    }
+  public static PushType create(long length) {
+    return new PushType(new Response[(int) length]);
   }
 
-  private final Map<String, Response> map;
   private final Response[] replies;
-  private final boolean asMap;
   // mutable temporary state
   private int count;
-  private String key;
 
-  private MultiType(Response[] replies, boolean asMap) {
+  private PushType(Response[] replies) {
     this.replies = replies;
     this.count = 0;
-    this.asMap = asMap;
-    this.map = asMap ? new HashMap<>() : Collections.emptyMap();
   }
 
   @Override
   public ResponseType type() {
-    return ResponseType.MULTI;
+    return ResponseType.PUSH;
   }
 
   public void add(Response reply) {
-    if (asMap) {
-      if (count % 2 == 0) {
-        switch (reply.type()) {
-          case BULK:
-          case SIMPLE:
-            key = reply.toString();
-            break;
-          default:
-            key = null;
-        }
-      } else {
-        if (key != null) {
-          map.put(key, reply);
-        }
-      }
-    }
     this.replies[this.count++] = reply;
   }
 
@@ -82,22 +51,6 @@ public final class MultiType implements Multi {
   @Override
   public Response get(int index) {
     return replies[index];
-  }
-
-  @Override
-  public Response get(String key) {
-    if (asMap) {
-      return map.get(key);
-    }
-    throw new RuntimeException("Number of key is not even");
-  }
-
-  @Override
-  public Set<String> getKeys() {
-    if (asMap) {
-      return map.keySet();
-    }
-    throw new RuntimeException("Number of key is not even");
   }
 
   @Override
@@ -140,15 +93,7 @@ public final class MultiType implements Multi {
 
       @Override
       public Response next() {
-        final Response value = replies[idx];
-
-        if (asMap) {
-          idx += 2;
-        } else {
-          idx++;
-        }
-
-        return value;
+        return replies[idx++];
       }
     };
   }

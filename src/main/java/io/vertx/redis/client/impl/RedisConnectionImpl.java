@@ -11,6 +11,7 @@ import io.vertx.core.net.NetSocket;
 import io.vertx.core.net.impl.clientconnection.ConnectionListener;
 import io.vertx.redis.client.*;
 import io.vertx.redis.client.impl.types.ErrorType;
+import io.vertx.redis.client.impl.types.Multi;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -222,12 +223,12 @@ public class RedisConnectionImpl implements RedisConnection, ParserHandler {
   @Override
   public void handle(Response reply) {
     // pub/sub mode
-    if (waiting.isEmpty()) {
+    if ((reply != null && reply.type() == ResponseType.PUSH) || waiting.isEmpty()) {
       if (onMessage != null) {
         context.runOnContext(v -> onMessage.handle(reply));
       } else {
         // pub/sub messages are arrays
-        if (reply.type() == ResponseType.MULTI) {
+        if (reply instanceof Multi) {
           // Detect valid published messages according to https://redis.io/topics/pubsub
 
           if (reply.size() == 3 && "message".equals(reply.get(0).toString())) {

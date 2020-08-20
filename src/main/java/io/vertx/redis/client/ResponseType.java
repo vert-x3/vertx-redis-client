@@ -48,7 +48,17 @@ public enum ResponseType {
   BULK,
 
   /**
-   * List of multiple bulk responses.
+   * Push message
+   */
+  PUSH,
+
+  /**
+   * Attribute message
+   */
+  ATTRIBUTE,
+
+  /**
+   * List of multiple bulk responses (List, Set, Map).
    */
   MULTI
 }
