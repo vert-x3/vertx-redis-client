@@ -133,7 +133,7 @@ public interface Request {
    */
   @Fluent
   default Request arg(boolean arg) {
-    arg(arg ? 1L : 0L);
+    arg(arg ? 't' : 'f');
     return this;
   }
 

@@ -170,6 +170,11 @@ public interface Response extends Iterable<Response> {
   default Boolean toBoolean() {
     final String msg = toString();
     if (msg != null) {
+      if (msg.length() == 1) {
+        // the format used by redis RESP3
+        return msg.charAt(0) == 't';
+      }
+      // fallback for full string representations ("true"/"false")
       return Boolean.parseBoolean(msg);
     }
     return null;
