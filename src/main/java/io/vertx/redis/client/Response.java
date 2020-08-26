@@ -174,8 +174,8 @@ public interface Response extends Iterable<Response> {
         // the format used by redis RESP3
         return msg.charAt(0) == 't';
       }
-      // fallback for full string representations ("true"/"false")
-      return Boolean.parseBoolean(msg);
+      // anything else is considered "false"
+      return Boolean.FALSE;
     }
     return null;
   }
