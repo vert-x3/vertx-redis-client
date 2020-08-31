@@ -312,11 +312,10 @@ public class RedisClusterConnection implements RedisConnection {
               handler.handle(Future.failedFuture(cause));
               return;
             }
-
             // inherit protocol config from the current connection
-            final String protocol = !endpoint.contains("://") ? "redis" : endpoint.substring(0, endpoint.indexOf("://"));
+            final RedisURI uri = new RedisURI(endpoint);
             // re-run on the new endpoint
-            send(protocol + "://" + addr, retries - 1, command, handler);
+            send(uri.protocol() + "://" + uri.userinfo() + addr, retries - 1, command, handler);
           });
           return;
         }
@@ -472,9 +471,9 @@ public class RedisClusterConnection implements RedisConnection {
             }
 
             // inherit protocol config from the current connection
-            final String protocol = !endpoint.contains("://") ? "redis" : endpoint.substring(0, endpoint.indexOf("://"));
+            final RedisURI uri = new RedisURI(endpoint);
             // re-run on the new endpoint
-            batch(protocol + "://" + addr, retries - 1, commands, handler);
+            batch(uri.protocol() + "://" + uri.userinfo() + addr, retries - 1, commands, handler);
           });
           return;
         }
