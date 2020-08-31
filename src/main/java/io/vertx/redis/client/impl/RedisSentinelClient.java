@@ -129,7 +129,12 @@ public class RedisSentinelClient implements Redis {
         return;
       }
       // wrap a new client
-      connectionManager.getConnection(context, resolve.result(), null, onCreate);
+      if (role == RedisRole.SENTINEL) {// sentinel cannot select
+        final RedisURI uri = new RedisURI(resolve.result());
+        connectionManager.getConnection(context, getSentinelEndpoint(uri), null, onCreate);
+      } else {
+        connectionManager.getConnection(context, resolve.result(), null, onCreate);
+      }
     };
 
     switch (role) {
