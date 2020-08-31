@@ -46,6 +46,8 @@ class Slots {
     size = reply.size();
     slots = new Slot[size];
 
+    final RedisURI uri = new RedisURI(connectionString);
+
     Set<String> uniqueEndpoints = new HashSet<>();
     final List<String> masterEndpoints = new ArrayList<>();
 
@@ -61,15 +63,12 @@ class Slots {
         // size
         s.size() - 2);
 
-      // inherit protocol config from the current connection
-      final String protocol = !connectionString.contains("://") ? "redis" : connectionString.substring(0, connectionString.indexOf("://"));
-
       // array of all clients, clients[2] = master, others are slaves
       for (int index = 2; index < s.size(); index++) {
         final Response c = s.get(index);
         final String host = c.get(0).toString().contains(":") ? "[" + c.get(0).toString() + "]" : c.get(0).toString();
 
-        final String endpoint = protocol + "://" + host + ":" + c.get(1).toInteger();
+        final String endpoint = uri.protocol() + "://" + uri.userinfo() + host + ":" + c.get(1).toInteger();
         slots[i].endpoints[index - 2] = endpoint;
         uniqueEndpoints.add(endpoint);
         if (index == 2) {

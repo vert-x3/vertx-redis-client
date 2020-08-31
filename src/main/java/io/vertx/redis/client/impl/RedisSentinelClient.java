@@ -129,7 +129,12 @@ public class RedisSentinelClient implements Redis {
         return;
       }
       // wrap a new client
-      connectionManager.getConnection(context, resolve.result(), null, onCreate);
+      if (role == RedisRole.SENTINEL) {// sentinel cannot select
+        final RedisURI uri = new RedisURI(resolve.result());
+        connectionManager.getConnection(context, getSentinelEndpoint(uri), null, onCreate);
+      } else {
+        connectionManager.getConnection(context, resolve.result(), null, onCreate);
+      }
     };
 
     switch (role) {
@@ -193,8 +198,11 @@ public class RedisSentinelClient implements Redis {
   // begin endpoint check methods
 
   private void isSentinelOk(String endpoint, RedisOptions argument, Handler<AsyncResult<String>> handler) {
+    // we can't use the endpoint as is, it should not contain a database selection,
+    // but can contain authentication
+    final RedisURI uri = new RedisURI(endpoint);
 
-    connectionManager.getConnection(context, endpoint, null, onCreate -> {
+    connectionManager.getConnection(context, getSentinelEndpoint(uri), null, onCreate -> {
       if (onCreate.failed()) {
         handler.handle(Future.failedFuture(onCreate.cause()));
         return;
@@ -216,7 +224,10 @@ public class RedisSentinelClient implements Redis {
   }
 
   private void getMasterFromEndpoint(String endpoint, RedisOptions options, Handler<AsyncResult<String>> handler) {
-    connectionManager.getConnection(context, endpoint, null, onCreate -> {
+    // we can't use the endpoint as is, it should not contain a database selection,
+    // but can contain authentication
+    final RedisURI uri = new RedisURI(endpoint);
+    connectionManager.getConnection(context, getSentinelEndpoint(uri), null, onCreate -> {
       if (onCreate.failed()) {
         handler.handle(Future.failedFuture(onCreate.cause()));
         return;
@@ -232,11 +243,9 @@ public class RedisSentinelClient implements Redis {
         } else {
           // Test the response
           final Response response = getMasterAddrByName.result();
-          // inherit protocol config from the current connection
-          final String protocol = !endpoint.contains("://") ? "redis" : endpoint.substring(0, endpoint.indexOf("://"));
           final String host = response.get(0).toString().contains(":") ? "[" + response.get(0).toString() + "]" : response.get(0).toString();
           handler.handle(
-            Future.succeededFuture(protocol + "://" + host + ":" + response.get(1).toInteger()));
+            Future.succeededFuture(uri.protocol() + "://" + uri.userinfo() + host + ":" + response.get(1).toInteger()));
         }
         // we don't need this connection anymore
         conn.close();
@@ -245,7 +254,10 @@ public class RedisSentinelClient implements Redis {
   }
 
   private void getSlaveFromEndpoint(String endpoint, RedisOptions options, Handler<AsyncResult<String>> handler) {
-    connectionManager.getConnection(context, endpoint, null, onCreate -> {
+    // we can't use the endpoint as is, it should not contain a database selection,
+    // but can contain authentication
+    final RedisURI uri = new RedisURI(endpoint);
+    connectionManager.getConnection(context, getSentinelEndpoint(uri), null, onCreate -> {
       if (onCreate.failed()) {
         handler.handle(Future.failedFuture(onCreate.cause()));
         return;
@@ -284,11 +296,9 @@ public class RedisSentinelClient implements Redis {
               if (ip == null) {
                 handler.handle(Future.failedFuture("No IP found for a SLAVE node!"));
               } else {
-                // inherit protocol config from the current connection
-                final String protocol = !endpoint.contains("://") ? "redis" : endpoint.substring(0, endpoint.indexOf("://"));
                 final String host = ip.contains(":") ? "[" + ip + "]" : ip;
 
-                handler.handle(Future.succeededFuture(protocol + "://" + host + ":" + port));
+                handler.handle(Future.succeededFuture(uri.protocol() + "://" + uri.userinfo() + host + ":" + port));
               }
             }
           }
@@ -297,5 +307,38 @@ public class RedisSentinelClient implements Redis {
         conn.close();
       });
     });
+  }
+
+  private String getSentinelEndpoint(RedisURI uri) {
+    StringBuilder sb = new StringBuilder();
+
+    if (uri.unix()) {
+      sb.append("unix://");
+      sb.append(uri.socketAddress().path());
+    } else {
+      sb.append("redis");
+      if (uri.ssl()) {
+        sb.append('s');
+      }
+      sb.append("://");
+      boolean userinfo = false;
+      if (uri.user() != null) {
+        userinfo = true;
+        sb.append(uri.user());
+      }
+      if (uri.password() != null) {
+        userinfo = true;
+        sb.append(':');
+        sb.append(uri.password());
+      }
+      if (userinfo) {
+        sb.append('@');
+      }
+      sb.append(uri.socketAddress().host());
+      sb.append(':');
+      sb.append(uri.socketAddress().port());
+    }
+
+    return sb.toString();
   }
 }

@@ -59,6 +59,10 @@ public final class RedisURI {
    */
   private final boolean ssl;
   /**
+   * UNIX
+   */
+  private final boolean unix;
+  /**
    * Params
    */
   private final Map<String, String> params;
@@ -79,6 +83,7 @@ public final class RedisURI {
       switch (uri.getScheme()) {
         case "rediss":
           ssl = true;
+          unix = false;
           socketAddress = SocketAddress.inetSocketAddress(port, host);
           if (path.length() > 1) {
             // skip initial slash
@@ -91,6 +96,7 @@ public final class RedisURI {
           break;
         case "redis":
           ssl = false;
+          unix = false;
           socketAddress = SocketAddress.inetSocketAddress(port, host);
           if (path.length() > 1) {
             // skip initial slash
@@ -103,6 +109,7 @@ public final class RedisURI {
           break;
         case "unix":
           ssl = false;
+          unix = true;
           socketAddress = SocketAddress.domainSocketAddress(path);
           if (params.containsKey("db")) {
             select = Integer.parseInt(params.get("db"));
@@ -175,8 +182,36 @@ public final class RedisURI {
     return ssl;
   }
 
+  public boolean unix() {
+    return unix;
+  }
+
   public String param(String key) {
     return params.get(key);
+  }
+
+  public String userinfo() {
+    if (user == null && password == null) {
+      return "";
+    }
+
+    return
+      (user == null ? "" : user) +
+        ":" +
+        (password == null ? "" : password) +
+        "@";
+  }
+
+  public String protocol() {
+    if (unix) {
+      return "unix";
+    } else {
+      if (ssl) {
+        return "rediss";
+      } else {
+        return "redis";
+      }
+    }
   }
 
   @Override
