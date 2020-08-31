@@ -19,11 +19,11 @@ import java.util.concurrent.RejectedExecutionException;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 
-public class RedisConnectionImpl implements RedisConnection, ParserHandler {
+public class RedisStandaloneConnection implements RedisConnection, ParserHandler {
 
   private static final String BASE_ADDRESS = "io.vertx.redis";
 
-  private static final Logger LOG = LoggerFactory.getLogger(RedisConnectionImpl.class);
+  private static final Logger LOG = LoggerFactory.getLogger(RedisStandaloneConnection.class);
 
   private static final ErrorType CONNECTION_CLOSED = ErrorType.create("CONNECTION_CLOSED");
 
@@ -42,7 +42,7 @@ public class RedisConnectionImpl implements RedisConnection, ParserHandler {
   private Handler<Response> onMessage;
   private long expirationTimestamp;
 
-  public RedisConnectionImpl(Vertx vertx, ContextInternal context, ConnectionListener<RedisConnection> connectionListener, NetSocket netSocket, RedisOptions options) {
+  public RedisStandaloneConnection(Vertx vertx, ContextInternal context, ConnectionListener<RedisConnection> connectionListener, NetSocket netSocket, RedisOptions options) {
     this.listener = connectionListener;
     this.eventBus = vertx.eventBus();
     this.context = context;

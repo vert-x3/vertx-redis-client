@@ -83,7 +83,7 @@ class RedisConnectionManager {
 
     @Override
     public boolean isValid(RedisConnection conn) {
-      return ((RedisConnectionImpl) conn).isValid();
+      return ((RedisStandaloneConnection) conn).isValid();
     }
 
     @Override
@@ -122,7 +122,7 @@ class RedisConnectionManager {
 
         final Handler<Void> completeConnection = v -> {
           // the connection will inherit the user event loop context
-          final RedisConnectionImpl connection = new RedisConnectionImpl(vertx, ctx, connectionListener, netSocket, options);
+          final RedisStandaloneConnection connection = new RedisStandaloneConnection(vertx, ctx, connectionListener, netSocket, options);
 
           // parser utility
           netSocket
@@ -265,7 +265,7 @@ class RedisConnectionManager {
       connection.handler(null);
       connection.endHandler(null);
       connection.exceptionHandler(null);
-      ((RedisConnectionImpl) connection).forceClose();
+      ((RedisStandaloneConnection) connection).forceClose();
     }
   }
 
@@ -309,7 +309,7 @@ class RedisConnectionManager {
 
     @Override
     protected void close(RedisConnection conn) {
-      ((RedisConnectionImpl) conn).forceClose();
+      ((RedisStandaloneConnection) conn).forceClose();
     }
   }
 }
