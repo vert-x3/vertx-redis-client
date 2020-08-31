@@ -24,7 +24,7 @@ import io.vertx.ext.unit.TestContext;
 import io.vertx.ext.unit.junit.RunTestOnContext;
 import io.vertx.ext.unit.junit.VertxUnitRunner;
 import io.vertx.redis.client.*;
-import io.vertx.redis.client.impl.RedisConnectionImpl;
+import io.vertx.redis.client.impl.RedisStandaloneConnection;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;
@@ -134,7 +134,7 @@ public class RedisClientTest {
       // the socket, we are simulating what happens.
       RedisConnection conn = onConnect.result();
       try {
-        Field listenerField = getAccessibleField(RedisConnectionImpl.class, "listener");
+        Field listenerField = getAccessibleField(RedisStandaloneConnection.class, "listener");
         ConnectionListener<RedisConnection> originalListener = (ConnectionListener<RedisConnection>) listenerField.get(conn);
 
         listenerField.set(conn, new ConnectionListener<RedisConnection>() {
@@ -160,7 +160,7 @@ public class RedisClientTest {
       }
 
       try {
-        Field socketField = getAccessibleField(RedisConnectionImpl.class, "netSocket");
+        Field socketField = getAccessibleField(RedisStandaloneConnection.class, "netSocket");
         NetSocket socket = (NetSocket) socketField.get(conn);
         socket.close(); // this should cause the evict to occur
       } catch (NoSuchFieldException | IllegalAccessException e) {

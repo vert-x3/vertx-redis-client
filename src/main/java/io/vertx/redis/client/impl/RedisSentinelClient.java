@@ -97,7 +97,7 @@ public class RedisSentinelClient implements Redis {
               if ("MESSAGE".equalsIgnoreCase(msg.get(0).toString())) {
                 // we don't care about the payload
                 if (conn != null) {
-                  ((RedisConnectionImpl) conn).fail(ErrorType.create("SWITCH-MASTER Received +switch-master message from Redis Sentinel."));
+                  ((RedisStandaloneConnection) conn).fail(ErrorType.create("SWITCH-MASTER Received +switch-master message from Redis Sentinel."));
                 } else {
                   LOG.warn("Received +switch-master message from Redis Sentinel.");
                 }
@@ -107,15 +107,21 @@ public class RedisSentinelClient implements Redis {
 
         sentinel.send(cmd(SUBSCRIBE).arg("+switch-master"), send -> {
           if (send.failed()) {
-            LOG.error("Unable to subscribe to Sentinel PUBSUB", send.cause());
+            onCreate.handle(Future.failedFuture(send.cause()));
+          } else {
+            // both connections ready
+            onCreate.handle(Future.succeededFuture(new RedisSentinelConnection(conn, sentinel)));
           }
         });
 
-        sentinel.exceptionHandler(t -> LOG.error("Unhandled exception in Sentinel PUBSUB", t));
+        sentinel.exceptionHandler(t -> {
+          if (conn != null) {
+            ((RedisStandaloneConnection) conn).fail(t);
+          } else {
+            LOG.error("Unhandled exception in Sentinel PUBSUB", t);
+          }
+        });
       });
-
-      // no need to wait just return it
-      onCreate.handle(Future.succeededFuture(conn));
     });
 
     return this;
