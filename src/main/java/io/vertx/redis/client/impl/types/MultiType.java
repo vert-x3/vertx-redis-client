@@ -25,29 +25,36 @@ import java.util.*;
  */
 public final class MultiType implements Multi {
 
-  public static final MultiType EMPTY_MULTI = new MultiType(new Response[0], false);
-  public static final MultiType EMPTY_MAP = new MultiType(new Response[0], true);
+  public static final MultiType EMPTY_MULTI = new MultiType(0, false);
+  public static final MultiType EMPTY_MAP = new MultiType(0, true);
 
   public static MultiType create(long length, boolean asMap) {
     if (asMap) {
-      return new MultiType(new Response[(int) length * 2], true);
+      return new MultiType((int) length * 2, true);
     } else {
-      return new MultiType(new Response[(int) length], length % 2 == 0);
+      return new MultiType((int) length, false);
     }
   }
 
+  // only one of these will be not null
   private final Map<String, Response> map;
-  private final Response[] replies;
-  private final boolean asMap;
+  private final Response[] multi;
+  // the expected size
+  private final int size;
   // mutable temporary state
   private int count;
   private String key;
 
-  private MultiType(Response[] replies, boolean asMap) {
-    this.replies = replies;
+  private MultiType(int size, boolean asMap) {
+    if (asMap) {
+      this.multi = null;
+      this.map = new HashMap<>(size, 1.0f);
+    } else {
+      this.multi = new Response[size];
+      this.map = null;
+    }
+    this.size = size;
     this.count = 0;
-    this.asMap = asMap;
-    this.map = asMap ? new HashMap<>() : Collections.emptyMap();
   }
 
   @Override
@@ -55,8 +62,10 @@ public final class MultiType implements Multi {
     return ResponseType.MULTI;
   }
 
+  @Override
   public void add(Response reply) {
-    if (asMap) {
+    // if this Multi was created as a Map
+    if (map != null) {
       if (count % 2 == 0) {
         switch (reply.type()) {
           case BULK:
@@ -64,7 +73,7 @@ public final class MultiType implements Multi {
             key = reply.toString();
             break;
           default:
-            key = null;
+            throw new IllegalArgumentException("Map key is not BULK or SIMPLE");
         }
       } else {
         if (key != null) {
@@ -72,58 +81,141 @@ public final class MultiType implements Multi {
         }
       }
     }
-    this.replies[this.count++] = reply;
+    // if this Multi was created as a Collection
+    if (multi != null) {
+      this.multi[this.count] = reply;
+    }
+    // increment the counter
+    count++;
   }
 
   public boolean complete() {
-    return count == replies.length;
+    return count == size;
   }
 
   @Override
   public Response get(int index) {
-    return replies[index];
+    if (multi != null) {
+      return multi[index];
+    }
+    throw new RuntimeException("Multi is a Map");
   }
 
   @Override
   public Response get(String key) {
-    if (asMap) {
+    if (map != null) {
       return map.get(key);
     }
-    throw new RuntimeException("Number of key is not even");
+
+    if (multi != null) {
+      // fallback (emulate old behavior)
+      if (multi.length % 2 == 0) {
+        // if the size is even we assume we can handle it as Map
+        for (int i = 0; i < multi.length; i+=2) {
+          if (key.equals(multi[i].toString())) {
+            return multi[i+1];
+          }
+        }
+        // not found
+        return null;
+      }
+    }
+
+    throw new RuntimeException("Number of key is not even can't handle as Map");
+  }
+
+  @Override
+  public boolean containsKey(String key) {
+    if (map != null) {
+      return map.containsKey(key);
+    }
+
+    if (multi != null) {
+      // fallback (emulate old behavior)
+      if (multi.length % 2 == 0) {
+        // if the size is even we assume we can handle it as Map
+        for (int i = 0; i < multi.length; i+=2) {
+          if (key.equals(multi[i].toString())) {
+            return true;
+          }
+        }
+        // not found
+        return false;
+      }
+    }
+
+    throw new RuntimeException("Number of key is not even can't handle as Map");
   }
 
   @Override
   public Set<String> getKeys() {
-    if (asMap) {
+    if (map != null) {
       return map.keySet();
     }
-    throw new RuntimeException("Number of key is not even");
+
+    if (multi != null) {
+      // fallback (emulate old behavior)
+      if (multi.length % 2 == 0) {
+        final Set<String> keys = new HashSet<>();
+        // if the size is even we assume we can handle it as Map
+        for (int i = 0; i < multi.length; i+=2) {
+          switch (multi[i].type()) {
+            case BULK:
+            case SIMPLE:
+              keys.add(multi[i].toString());
+              break;
+          }
+        }
+
+        return keys;
+      }
+    }
+
+    throw new RuntimeException("Number of key is not even can't handle as Map");
   }
 
   @Override
   public int size() {
-    return replies.length;
+    return size;
   }
 
   @Override
   public String toString() {
     final StringBuilder sb = new StringBuilder();
 
-    sb.append('[');
-    boolean more = false;
-    for (Response r : replies) {
-      if (more) {
-        sb.append(", ");
-      }
+    if (multi != null) {
+      sb.append('[');
+      boolean more = false;
+      for (Response r : multi) {
+        if (more) {
+          sb.append(", ");
+        }
 
-      if (r == null) {
-        sb.append("null");
-      } else {
-        sb.append(r.toString());
+        if (r == null) {
+          sb.append("null");
+        } else {
+          sb.append(r.toString());
+        }
+        more = true;
       }
-      more = true;
+      sb.append(']');
     }
-    sb.append(']');
+
+    if (map != null) {
+      sb.append('{');
+      boolean more = false;
+      for (Map.Entry<String, Response> kv : map.entrySet()) {
+        if (more) {
+          sb.append(", ");
+        }
+
+        sb.append(kv.getKey());
+        sb.append(": ");
+        sb.append(kv.getValue().toString());
+        more = true;
+      }
+      sb.append('}');
+    }
 
     return sb.toString();
   }
@@ -135,20 +227,21 @@ public final class MultiType implements Multi {
 
       @Override
       public boolean hasNext() {
-        return idx < replies.length;
+        if (map != null) {
+          return false;
+        }
+        if (multi != null) {
+          return idx < size;
+        }
+        return false;
       }
 
       @Override
       public Response next() {
-        final Response value = replies[idx];
-
-        if (asMap) {
-          idx += 2;
-        } else {
-          idx++;
+        if (multi != null) {
+          return multi[idx++];
         }
-
-        return value;
+        throw new NoSuchElementException();
       }
     };
   }
