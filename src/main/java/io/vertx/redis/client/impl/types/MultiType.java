@@ -79,6 +79,8 @@ public final class MultiType implements Multi {
         if (key != null) {
           map.put(key, reply);
         }
+        // clear the key
+        key = null;
       }
     }
     // if this Multi was created as a Collection
