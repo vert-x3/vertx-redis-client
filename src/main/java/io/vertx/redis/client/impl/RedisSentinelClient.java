@@ -290,13 +290,12 @@ public class RedisSentinelClient implements Redis {
               int port = 6379;
               String ip = null;
 
-              for (int i = 0; i < slaveInfoArr.size(); i += 2) {
-                if ("port".equals(slaveInfoArr.get(i).toString())) {
-                  port = slaveInfoArr.get(i + 1).toInteger();
-                }
-                if ("ip".equals(slaveInfoArr.get(i).toString())) {
-                  ip = slaveInfoArr.get(i + 1).toString();
-                }
+              if (slaveInfoArr.containsKey("port")) {
+                port = slaveInfoArr.get("port").toInteger();
+              }
+
+              if (slaveInfoArr.containsKey("ip")) {
+                ip = slaveInfoArr.get("ip").toString();
               }
 
               if (ip == null) {

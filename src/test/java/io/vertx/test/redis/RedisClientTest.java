@@ -426,8 +426,8 @@ public class RedisClientTest {
       if (reply.succeeded()) {
         redis.config(toList("GET", "dbfilename"), reply2 -> {
           if (reply2.succeeded()) {
-            should.assertNotNull(reply2.result().get(0).toString());
-            should.assertTrue(reply2.result().get(1).toString().equals("redis.dump"));
+            should.assertNotNull(reply2.result().get("dbfilename"));
+            should.assertTrue(reply2.result().get("dbfilename").toString().equals("redis.dump"));
             test.complete();
           }
         });

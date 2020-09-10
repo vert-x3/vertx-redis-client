@@ -222,6 +222,16 @@ public interface Response extends Iterable<Response> {
   }
 
   /**
+   * Does this multi response contains a string key. Note that REDIS does not support strings as keys but by convention
+   * it encodes hashes in lists where index i is the key, and index i+1 is the value.
+   * @param key the required key.
+   * @return Response value.
+   */
+  default boolean containsKey(String key) {
+    throw new UnsupportedOperationException("This type doesn't hold a Map type");
+  }
+
+  /**
    * Get this multi response keys from a hash. Note that REDIS does not support strings as keys but by convention
    * it encodes hashes in lists where index i is the key, and index i+1 is the value.
    * @return the set of keys.
