@@ -24,12 +24,12 @@
   </parent>
 
   <artifactId>vertx-redis-client</artifactId>
-  <version>3.9.3</version>
+  <version>3.9.4-SNAPSHOT</version>
 
   <name>Vert.x Redis Client</name>
 
   <properties>
-    <stack.version>3.9.3</stack.version>
+    <stack.version>3.9.4-SNAPSHOT</stack.version>
   </properties>
 
   <!--
