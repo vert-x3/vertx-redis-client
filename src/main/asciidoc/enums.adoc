@@ -22,8 +22,31 @@ The client should work in sentinel mode. When this mode is active
 +++
 |[[CLUSTER]]`CLUSTER`|+++
 The client should work in cluster mode. When this mode is active
- use the link to define when slave nodes can be used
- for read only queries.
+ use the link to define when replica nodes can be
+ used for read only queries.
++++
+|===
+
+[[RedisReplicas]]
+== RedisReplicas
+
+++++
+ When should Redis replica nodes be used for queries.
+++++
+'''
+
+[cols=">25%,75%"]
+[frame="topbot"]
+|===
+^|Name | Description
+|[[NEVER]]`NEVER`|+++
+Never use REPLICA, queries are always run on a MASTER node.
++++
+|[[SHARE]]`SHARE`|+++
+Queries can be randomly run on both MASTER and REPLICA nodes.
++++
+|[[ALWAYS]]`ALWAYS`|+++
+Queries are always run on REPLICA nodes (never on MASTER node).
 +++
 |===
 
@@ -47,29 +70,6 @@ Use a SLAVE node connection.
 +++
 |[[SENTINEL]]`SENTINEL`|+++
 Use a SENTINEL node connection.
-+++
-|===
-
-[[RedisSlaves]]
-== RedisSlaves
-
-++++
- When should Redis Slave nodes be used for queries.
-++++
-'''
-
-[cols=">25%,75%"]
-[frame="topbot"]
-|===
-^|Name | Description
-|[[NEVER]]`NEVER`|+++
-Never use SLAVES, queries are always run on a MASTER node.
-+++
-|[[SHARE]]`SHARE`|+++
-Queries can be randomly run on both MASTER and SLAVE nodes.
-+++
-|[[ALWAYS]]`ALWAYS`|+++
-Queries are always run on SLAVE nodes (never on MASTER node).
 +++
 |===
 

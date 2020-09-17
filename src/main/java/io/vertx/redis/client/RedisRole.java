@@ -28,9 +28,15 @@ public enum RedisRole {
   MASTER,
 
   /**
-   * Use a SLAVE node connection.
+   * @deprecated use {@link #REPLICA} instead.
    */
+  @Deprecated
   SLAVE,
+
+  /**
+   * Use a REPLICA node connection.
+   */
+  REPLICA,
 
   /**
    * Use a SENTINEL node connection.

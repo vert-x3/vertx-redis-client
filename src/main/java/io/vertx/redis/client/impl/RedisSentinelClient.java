@@ -30,7 +30,7 @@ import static io.vertx.redis.client.Request.cmd;
 public class RedisSentinelClient implements Redis {
 
   // We don't need to be secure, we just want so simple
-  // randomization to avoid picking the same slave all the time
+  // randomization to avoid picking the same replica all the time
   private static final Random RANDOM = new Random();
 
   private static class Pair<L, R> {
@@ -152,8 +152,8 @@ public class RedisSentinelClient implements Redis {
         resolveClient(this::getMasterFromEndpoint, options, createAndConnect);
         break;
 
-      case SLAVE:
-        resolveClient(this::getSlaveFromEndpoint, options, createAndConnect);
+      case REPLICA:
+        resolveClient(this::getReplicaFromEndpoint, options, createAndConnect);
     }
   }
 
@@ -259,7 +259,7 @@ public class RedisSentinelClient implements Redis {
     });
   }
 
-  private void getSlaveFromEndpoint(String endpoint, RedisOptions options, Handler<AsyncResult<String>> handler) {
+  private void getReplicaFromEndpoint(String endpoint, RedisOptions options, Handler<AsyncResult<String>> handler) {
     // we can't use the endpoint as is, it should not contain a database selection,
     // but can contain authentication
     final RedisURI uri = new RedisURI(endpoint);
@@ -273,33 +273,33 @@ public class RedisSentinelClient implements Redis {
       final String masterName = options.getMasterName();
 
       // Send a command just to check we have a working node
-      conn.send(cmd(SENTINEL).arg("SLAVES").arg(masterName), sentinelSlaves -> {
-        if (sentinelSlaves.failed()) {
-          handler.handle(Future.failedFuture(sentinelSlaves.cause()));
+      conn.send(cmd(SENTINEL).arg("SLAVES").arg(masterName), sentinelReplicas -> {
+        if (sentinelReplicas.failed()) {
+          handler.handle(Future.failedFuture(sentinelReplicas.cause()));
         } else {
-          final Response response = sentinelSlaves.result();
+          final Response response = sentinelReplicas.result();
 
           // Test the response
           if (response.size() == 0) {
-            handler.handle(Future.failedFuture("No slaves linked to the master: " + masterName));
+            handler.handle(Future.failedFuture("No replicas linked to the master: " + masterName));
           } else {
-            Response slaveInfoArr = response.get(RANDOM.nextInt(response.size()));
-            if ((slaveInfoArr.size() % 2) > 0) {
+            Response replicaInfoArr = response.get(RANDOM.nextInt(response.size()));
+            if ((replicaInfoArr.size() % 2) > 0) {
               handler.handle(Future.failedFuture("Corrupted response from the sentinel"));
             } else {
               int port = 6379;
               String ip = null;
 
-              if (slaveInfoArr.containsKey("port")) {
-                port = slaveInfoArr.get("port").toInteger();
+              if (replicaInfoArr.containsKey("port")) {
+                port = replicaInfoArr.get("port").toInteger();
               }
 
-              if (slaveInfoArr.containsKey("ip")) {
-                ip = slaveInfoArr.get("ip").toString();
+              if (replicaInfoArr.containsKey("ip")) {
+                ip = replicaInfoArr.get("ip").toString();
               }
 
               if (ip == null) {
-                handler.handle(Future.failedFuture("No IP found for a SLAVE node!"));
+                handler.handle(Future.failedFuture("No IP found for a REPLICA node!"));
               } else {
                 final String host = ip.contains(":") ? "[" + ip + "]" : ip;
 
