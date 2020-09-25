@@ -43,7 +43,7 @@ class RedisConnectionManager {
     this.timerID = period > 0 ? vertx.setTimer(period, id -> checkExpired(period)) : -1;
   }
 
-  private synchronized void checkExpired(long period) {
+  private void checkExpired(long period) {
     pooledConnectionManager.forEach(e -> ((RedisEndpoint) e).pool.closeIdle());
     timerID = vertx.setTimer(period, id -> checkExpired(period));
   }
