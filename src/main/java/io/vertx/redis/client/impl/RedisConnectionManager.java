@@ -186,10 +186,11 @@ class RedisConnectionManager {
       String password = redisURI.password() != null ? redisURI.password() : options.getPassword();
 
       if (password != null) {
+        String user = redisURI.user();
         // will perform auth at hello level
         hello
           .arg("AUTH")
-          .arg(redisURI.user())
+          .arg(user == null ? "default" : user)
           .arg(password);
       }
 

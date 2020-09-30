@@ -128,15 +128,15 @@ public final class RedisURI {
           if (sep > 0) {
             user = userInfo.substring(0, sep);
           } else {
-            user = params.getOrDefault("user", "default");
+            user = params.getOrDefault("user", null);
           }
           password = userInfo.substring(sep + 1);
         } else {
-          user = params.getOrDefault("user", "default");
+          user = params.getOrDefault("user", null);
           password = params.getOrDefault("password", null);
         }
       } else {
-        user = params.getOrDefault("user", "default");
+        user = params.getOrDefault("user", null);
         password = params.getOrDefault("password", null);
       }
 

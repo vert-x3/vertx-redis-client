@@ -326,19 +326,7 @@ public class RedisSentinelClient implements Redis {
         sb.append('s');
       }
       sb.append("://");
-      boolean userinfo = false;
-      if (uri.user() != null) {
-        userinfo = true;
-        sb.append(uri.user());
-      }
-      if (uri.password() != null) {
-        userinfo = true;
-        sb.append(':');
-        sb.append(uri.password());
-      }
-      if (userinfo) {
-        sb.append('@');
-      }
+      sb.append(uri.userinfo());
       sb.append(uri.socketAddress().host());
       sb.append(':');
       sb.append(uri.socketAddress().port());
