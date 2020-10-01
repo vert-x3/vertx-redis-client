@@ -126,8 +126,10 @@ public class RedisClusterClientTest {
       client = Redis.createClient(
         rule.vertx(), new RedisOptions()
           .setType(RedisClientType.CLUSTER)
-          .setPassword(password)
-          .addConnectionString("redis://" + redis7000.getContainerIpAddress() + ":" + redis7000.getFirstMappedPort())
+          .addConnectionString(
+            password != null ?
+              "redis://:" + password + "@" + redis7000.getContainerIpAddress() + ":" + redis7000.getFirstMappedPort() :
+              "redis://" + redis7000.getContainerIpAddress() + ":" + redis7000.getFirstMappedPort())
       );
       before.complete();
     }).onFailure(should::fail);
