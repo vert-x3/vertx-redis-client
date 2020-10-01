@@ -58,7 +58,7 @@ public class RedisClusterClientTest {
     System.out.println(password);
 
     this.password = password;
-    String cmd = "redis-server --port 6379 --cluster-enabled yes --cluster-config-file nodes.conf --cluster-node-timeout 5000 --appendonly yes" + (password == null ? "" : "--requirepass " + password);
+    String cmd = "redis-server --port 6379 --cluster-enabled yes --cluster-config-file nodes.conf --cluster-node-timeout 5000 --appendonly yes" + (password == null ? "" : " --requirepass " + password);
 
     redis7000 = new GenericContainer<>(image)
       .withExposedPorts(6379)
