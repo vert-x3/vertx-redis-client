@@ -26,8 +26,12 @@ import java.util.List;
 public class RedisClusterClientTest {
 
   @Parameterized.Parameters
-  public static Iterable<String> redisVersions() {
-    return Arrays.asList("redis:5-alpine", "redis:6-alpine");
+  public static Iterable<String[]> data() {
+    return Arrays.asList(
+      new String[] {"redis:5-alpine", "abcd"},
+      new String[] {"redis:5-alpine", null},
+      new String[] {"redis:6-alpine", "abcd"},
+      new String[] {"redis:6-alpine", null});
   }
 
   public final Network network = Network.newNetwork();
@@ -46,39 +50,47 @@ public class RedisClusterClientTest {
   public final GenericContainer<?> redis7005;
 
   public GenericContainer<?> redisCli;
+  private final String password;
 
-  public RedisClusterClientTest(String redisVersion) {
-   redis7000 = new GenericContainer<>(redisVersion)
+  public RedisClusterClientTest(String image, String password) {
+
+    System.out.println(image);
+    System.out.println(password);
+
+    this.password = password;
+    String cmd = "redis-server --port 6379 --cluster-enabled yes --cluster-config-file nodes.conf --cluster-node-timeout 5000 --appendonly yes" + (password == null ? "" : "--requirepass " + password);
+
+    redis7000 = new GenericContainer<>(image)
       .withExposedPorts(6379)
       .withNetwork(network)
-      .withCommand("redis-server --port 6379 --cluster-enabled yes --cluster-config-file nodes.conf --cluster-node-timeout 5000 --appendonly yes");
+      .withCommand(cmd);
 
-    redis7001 = new GenericContainer<>(redisVersion)
+    redis7001 = new GenericContainer<>(image)
       .withExposedPorts(6379)
       .withNetwork(network)
-      .withCommand("redis-server --port 6379 --cluster-enabled yes --cluster-config-file nodes.conf --cluster-node-timeout 5000 --appendonly yes");
+      .withCommand(cmd);
 
-    redis7002 = new GenericContainer<>(redisVersion)
+    redis7002 = new GenericContainer<>(image)
       .withExposedPorts(6379)
       .withNetwork(network)
-      .withCommand("redis-server --port 6379 --cluster-enabled yes --cluster-config-file nodes.conf --cluster-node-timeout 5000 --appendonly yes");
+      .withCommand(cmd);
 
-    redis7003 = new GenericContainer<>(redisVersion)
+    redis7003 = new GenericContainer<>(image)
       .withExposedPorts(6379)
       .withNetwork(network)
-      .withCommand("redis-server --port 6379 --cluster-enabled yes --cluster-config-file nodes.conf --cluster-node-timeout 5000 --appendonly yes");
+      .withCommand(cmd);
 
-    redis7004 = new GenericContainer<>(redisVersion)
+    redis7004 = new GenericContainer<>(image)
       .withExposedPorts(6379)
       .withNetwork(network)
-      .withCommand("redis-server --port 6379 --cluster-enabled yes --cluster-config-file nodes.conf --cluster-node-timeout 5000 --appendonly yes");
+      .withCommand(cmd);
 
-    redis7005 = new GenericContainer<>(redisVersion)
+    redis7005 = new GenericContainer<>(image)
       .withExposedPorts(6379)
       .withNetwork(network)
-      .withCommand("redis-server --port 6379 --cluster-enabled yes --cluster-config-file nodes.conf --cluster-node-timeout 5000 --appendonly yes");
+      .withCommand(cmd);
 
-    redisCli = new GenericContainer<>(redisVersion)
+    redisCli = new GenericContainer<>(image)
       .withNetwork(network).waitingFor(
         Wait.forLogMessage(".*OK.*", 2)
       );
@@ -107,13 +119,14 @@ public class RedisClusterClientTest {
       }
 
       String connectionString = stringBuilder.substring(0, stringBuilder.length() - 1);
-      redisCli.setCommand(String.format("redis-cli --cluster create %s --cluster-replicas 1 --cluster-yes", connectionString));
+      redisCli.setCommand(String.format("redis-cli --cluster create %s --cluster-replicas 1 --cluster-yes%s", connectionString, password == null ? "" : " -a " + password));
       redisCli.start();
       handler.complete();
     }).onSuccess(handler -> {
       client = Redis.createClient(
         rule.vertx(), new RedisOptions()
           .setType(RedisClientType.CLUSTER)
+          .setPassword(password)
           .addConnectionString("redis://" + redis7000.getContainerIpAddress() + ":" + redis7000.getFirstMappedPort())
       );
       before.complete();
