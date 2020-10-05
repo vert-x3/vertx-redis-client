@@ -212,4 +212,26 @@ public class RedisTest {
         });
       });
   }
+
+  @Test
+  public void testZAdd(TestContext should) {
+    final Async test = should.async();
+
+    Redis.createClient(rule.vertx(), "redis://localhost:7006")
+      .connect(create -> {
+        should.assertTrue(create.succeeded());
+
+        final RedisConnection redis = create.result();
+        RedisAPI api = RedisAPI.api(redis);
+
+        api.zadd(Arrays.asList("anykey", "1598248800", "member1", "1598248700", "member2"), zadd -> {
+          should.assertTrue(zadd.succeeded());
+          api.zrange(Arrays.asList("anykey", "0", "-1", "WITHSCORES"), zrange -> {
+            should.assertTrue(zrange.succeeded());
+            System.out.println(zrange);
+            test.complete();
+          });
+        });
+      });
+  }
 }
