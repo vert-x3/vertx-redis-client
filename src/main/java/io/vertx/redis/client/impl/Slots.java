@@ -63,7 +63,7 @@ class Slots {
         // size
         s.size() - 2);
 
-      // array of all clients, clients[2] = master, others are slaves
+      // array of all clients, clients[2] = master, others are replicas
       for (int index = 2; index < s.size(); index++) {
         final Response c = s.get(index);
         final String host = c.get(0).toString().contains(":") ? "[" + c.get(0).toString() + "]" : c.get(0).toString();

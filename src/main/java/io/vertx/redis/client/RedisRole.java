@@ -28,9 +28,9 @@ public enum RedisRole {
   MASTER,
 
   /**
-   * Use a SLAVE node connection.
+   * Use a REPLICA node connection.
    */
-  SLAVE,
+  REPLICA,
 
   /**
    * Use a SENTINEL node connection.

@@ -72,7 +72,7 @@ public class RedisSentinelTest {
   }
 
   @Test
-  public void testGetClientToSlave(TestContext should) {
+  public void testGetClientToReplica(TestContext should) {
     final Async test = should.async();
 
     Redis.createClient(
@@ -83,11 +83,11 @@ public class RedisSentinelTest {
         .addConnectionString("redis://localhost:5001")
         .addConnectionString("redis://localhost:5002")
         .setMasterName("sentinel7000")
-        .setRole(RedisRole.SLAVE)
+        .setRole(RedisRole.REPLICA)
         .setMaxPoolSize(4)
         .setMaxPoolWaiting(16))
       .connect(onCreate -> {
-        // get a connection to the slave node
+        // get a connection to the replica node
         if (onCreate.failed()) {
           onCreate.cause().printStackTrace();
         }

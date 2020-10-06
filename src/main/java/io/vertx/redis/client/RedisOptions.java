@@ -43,7 +43,7 @@ public class RedisOptions {
   private int maxNestedArrays;
   private String masterName;
   private RedisRole role;
-  private RedisSlaves slaves;
+  private RedisReplicas useReplicas;
   private String password;
 
   // pool related options
@@ -62,7 +62,7 @@ public class RedisOptions {
     maxNestedArrays = 32;
     masterName = "mymaster";
     role = RedisRole.MASTER;
-    slaves = RedisSlaves.NEVER;
+    useReplicas = RedisReplicas.NEVER;
     type = RedisClientType.STANDALONE;
     poolCleanerInterval = -1;
     // thumb guess based on web browser defaults
@@ -91,7 +91,7 @@ public class RedisOptions {
     this.maxNestedArrays = other.maxNestedArrays;
     this.masterName = other.masterName;
     this.role = other.role;
-    this.slaves = other.slaves;
+    this.useReplicas = other.useReplicas;
     // pool related options
     this.poolCleanerInterval = other.poolCleanerInterval;
     this.maxPoolSize = other.maxPoolSize;
@@ -325,22 +325,22 @@ public class RedisOptions {
   }
 
   /**
-   * Get whether or not to use slave nodes (only considered in Cluster mode).
+   * Get whether or not to use replica nodes (only considered in Cluster mode).
    *
-   * @return the cluster slave mode.
+   * @return the cluster replica node use mode.
    */
-  public RedisSlaves getUseSlave() {
-    return slaves;
+  public RedisReplicas getUseReplicas() {
+    return useReplicas;
   }
 
   /**
-   * Set whether or not to use slave nodes (only considered in Cluster mode).
+   * Set whether or not to use replica nodes (only considered in Cluster mode).
    *
-   * @param slaves the cluster slave mode.
+   * @param useReplicas the cluster replica use mode.
    * @return fluent self.
    */
-  public RedisOptions setUseSlave(RedisSlaves slaves) {
-    this.slaves = slaves;
+  public RedisOptions setUseReplicas(RedisReplicas useReplicas) {
+    this.useReplicas = useReplicas;
     return this;
   }
 
