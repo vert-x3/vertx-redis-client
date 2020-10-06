@@ -60,7 +60,7 @@ Set the role name (only considered in HA mode).
 |[[type]]`@type`|`link:enums.html#RedisClientType[RedisClientType]`|+++
 Set the desired client type to be created.
 +++
-|[[useReplica]]`@useReplica`|`link:enums.html#RedisReplicas[RedisReplicas]`|+++
+|[[useReplicas]]`@useReplicas`|`link:enums.html#RedisReplicas[RedisReplicas]`|+++
 Set whether or not to use replica nodes (only considered in Cluster mode).
 +++
 |===

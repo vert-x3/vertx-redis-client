@@ -147,13 +147,12 @@ public class RedisSentinelClient implements Redis {
       case SENTINEL:
         resolveClient(this::isSentinelOk, options, createAndConnect);
         break;
-
       case MASTER:
         resolveClient(this::getMasterFromEndpoint, options, createAndConnect);
         break;
-
       case REPLICA:
         resolveClient(this::getReplicaFromEndpoint, options, createAndConnect);
+        break;
     }
   }
 
