@@ -139,7 +139,7 @@ public class RedisClusterClient implements Redis {
       return;
     }
 
-    connectionManager.getConnection(context, endpoints.get(index), RedisSlaves.NEVER != options.getUseSlave() ? cmd(READONLY) : null, getConnection -> {
+    connectionManager.getConnection(context, endpoints.get(index), RedisReplicas.NEVER != options.getUseReplicas() ? cmd(READONLY) : null, getConnection -> {
       if (getConnection.failed()) {
         // failed try with the next endpoint
         connect(endpoints, index + 1, onConnect);
@@ -174,7 +174,7 @@ public class RedisClusterClient implements Redis {
         }
 
         for (String endpoint : slots.endpoints()) {
-          connectionManager.getConnection(context, endpoint, RedisSlaves.NEVER != options.getUseSlave() ? cmd(READONLY) : null, getClusterConnection -> {
+          connectionManager.getConnection(context, endpoint, RedisReplicas.NEVER != options.getUseReplicas() ? cmd(READONLY) : null, getClusterConnection -> {
             if (getClusterConnection.failed()) {
               // failed try with the next endpoint
               failed.set(true);

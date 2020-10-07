@@ -99,9 +99,9 @@ public class RedisOptionsConverter {
             obj.setType(io.vertx.redis.client.RedisClientType.valueOf((String)member.getValue()));
           }
           break;
-        case "useSlave":
+        case "useReplicas":
           if (member.getValue() instanceof String) {
-            obj.setUseSlave(io.vertx.redis.client.RedisSlaves.valueOf((String)member.getValue()));
+            obj.setUseReplicas(io.vertx.redis.client.RedisReplicas.valueOf((String)member.getValue()));
           }
           break;
       }
@@ -142,8 +142,8 @@ public class RedisOptionsConverter {
     if (obj.getType() != null) {
       json.put("type", obj.getType().name());
     }
-    if (obj.getUseSlave() != null) {
-      json.put("useSlave", obj.getUseSlave().name());
+    if (obj.getUseReplicas() != null) {
+      json.put("useReplicas", obj.getUseReplicas().name());
     }
   }
 }

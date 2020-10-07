@@ -32,7 +32,7 @@ public class RedisClusterTest {
   // Server: https://github.com/Grokzen/docker-redis-cluster
   private final RedisOptions options = new RedisOptions()
     .setType(RedisClientType.CLUSTER)
-    .setUseSlave(RedisSlaves.SHARE)
+    .setUseReplicas(RedisReplicas.SHARE)
     // we will flood the redis server
     .setMaxWaitingHandlers(128 * 1024)
     .addConnectionString("redis://127.0.0.1:7000")

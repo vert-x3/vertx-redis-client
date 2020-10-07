@@ -62,7 +62,7 @@ initialized with the following values:
 * `endpoint`: default is `redis://localhost:6379`
 * `masterName`: default is `mymaster`
 * `role` default is `MASTER`
-* `slaves` default is `NEVER`
+* `useReplicas` default is `NEVER`
 
 In order to obtain a connection use the following code:
 

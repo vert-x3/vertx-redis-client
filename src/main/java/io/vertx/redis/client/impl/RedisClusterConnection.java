@@ -145,7 +145,7 @@ public class RedisClusterConnection implements RedisConnection {
       }
 
       String[] endpoints = slots.endpointsForKey(hashSlot);
-      send(selectMasterOrSlaveEndpoint(req.command().isReadOnly(), endpoints, forceMasterEndpoint), RETRIES, req, handler);
+      send(selectMasterOrReplicaEndpoint(req.command().isReadOnly(), endpoints, forceMasterEndpoint), RETRIES, req, handler);
       return this;
     }
 
@@ -157,7 +157,7 @@ public class RedisClusterConnection implements RedisConnection {
         String[] endpoints = slots.endpointsForSlot(i);
 
         final Promise<Response> p = Promise.promise();
-        send(selectMasterOrSlaveEndpoint(req.command().isReadOnly(), endpoints, forceMasterEndpoint), RETRIES, req, p);
+        send(selectMasterOrReplicaEndpoint(req.command().isReadOnly(), endpoints, forceMasterEndpoint), RETRIES, req, p);
         responses.add(p.future());
       }
       CompositeFuture.all(responses).onComplete(composite -> {
@@ -533,7 +533,7 @@ public class RedisClusterConnection implements RedisConnection {
    */
   private String selectEndpoint(int keySlot, boolean readOnly, boolean forceMasterEndpoint) {
     // this command doesn't have keys, return any connection
-    // NOTE: this means slaves may be used for no key commands regardless of slave config
+    // NOTE: this means replicas may be used for no key commands regardless of the config
     if (keySlot == -1) {
       return slots.randomEndPoint(forceMasterEndpoint);
     }
@@ -544,10 +544,10 @@ public class RedisClusterConnection implements RedisConnection {
     if (endpoints == null || endpoints.length == 0) {
       return options.getEndpoint();
     }
-    return selectMasterOrSlaveEndpoint(readOnly, endpoints, forceMasterEndpoint);
+    return selectMasterOrReplicaEndpoint(readOnly, endpoints, forceMasterEndpoint);
   }
 
-  private String selectMasterOrSlaveEndpoint(boolean readOnly, String[] endpoints, boolean forceMasterEndpoint) {
+  private String selectMasterOrReplicaEndpoint(boolean readOnly, String[] endpoints, boolean forceMasterEndpoint) {
     int index = 0;
 
     if (forceMasterEndpoint) {
@@ -555,15 +555,15 @@ public class RedisClusterConnection implements RedisConnection {
     }
 
     // always, never, share
-    RedisSlaves useSlaves = options.getUseSlave();
+    RedisReplicas useReplicas = options.getUseReplicas();
 
-    if (readOnly && useSlaves != RedisSlaves.NEVER && endpoints.length > 1) {
-      // always use a slave for read commands
-      if (useSlaves == RedisSlaves.ALWAYS) {
+    if (readOnly && useReplicas != RedisReplicas.NEVER && endpoints.length > 1) {
+      // always use a replica for read commands
+      if (useReplicas == RedisReplicas.ALWAYS) {
         index = RANDOM.nextInt(endpoints.length - 1) + 1;
       }
-      // share read commands across master + slaves
-      if (useSlaves == RedisSlaves.SHARE) {
+      // share read commands across master + replicas
+      if (useReplicas == RedisReplicas.SHARE) {
         index = RANDOM.nextInt(endpoints.length);
       }
     }
