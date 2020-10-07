@@ -240,3 +240,6 @@ reconnect with backoff timeout could be implemented as follows:
 In this example the client object will be replaced on reconnect and the application will retry up to 16 times with a
 backoff up to 1280ms. By discarding the client we ensure that all old inflight responses are lost and all new ones
 will be on the new connection.
+
+It is important to note that, the reconnect will create a new connection object, so these object references should not
+be cached and evaluated every time.

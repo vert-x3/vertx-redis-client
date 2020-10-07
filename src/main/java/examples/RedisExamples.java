@@ -138,7 +138,8 @@ public class RedisExamples {
           .onSuccess(conn -> {
             // make sure the client is reconnected on error
             conn.exceptionHandler(e -> {
-              // attempt to reconnect
+              // attempt to reconnect,
+              // if there is an unrecoverable error
               attemptReconnect(0);
             });
             // allow further processing
