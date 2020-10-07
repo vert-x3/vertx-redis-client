@@ -28,9 +28,9 @@ import io.vertx.redis.client.impl.CommandImpl;
 public interface Command {
 
 {{#each .}}
-  Command {{ enum }} = Command.create("{{ name }}", {{ arity }}, {{ firstKey }}, {{ lastKey }}, {{ interval }}, {{ readOnly }}, {{ movable }});
+  Command {{ enum }} = Command.create("{{ name }}", {{ arity }}, {{ firstKey }}, {{ lastKey }}, {{ interval }}, {{ write }}, {{ readOnly }}, {{ movable }}, {{ pubsub }});
 {{/each}}
-  Command SENTINEL = Command.create("sentinel", -1, 0, 0, 0, false, false);
+  Command SENTINEL = Command.create("sentinel");
 
   /**
    * Creates a Redis Command from METADATA. The metadata comes from the REDIS command "COMMAND"
@@ -50,12 +50,14 @@ public interface Command {
    * @param firstKey position of the first key
    * @param lastKey position of the last key
    * @param interval step count for locating repeating keys
+   * @param write write flag extracted from the nested Array reply of command flags
    * @param readOnly readOnly flag extracted from the nested Array reply of command flags
    * @param movable movable flag extracted from the nested Array reply of command flags
+   * @param pubsub flag extracted from the nested Array reply of command flags
    * @return a command instance
    */
-  static Command create(String command, int arity, int firstKey, int lastKey, int interval, boolean readOnly, boolean movable) {
-    return new CommandImpl(command, arity, firstKey, lastKey, interval, readOnly, movable);
+  static Command create(String command, int arity, int firstKey, int lastKey, int interval, boolean write, boolean readOnly, boolean movable, boolean pubsub) {
+    return new CommandImpl(command, arity, firstKey, lastKey, interval, write, readOnly, movable, pubsub);
   }
 
   /**
@@ -65,7 +67,7 @@ public interface Command {
    * @return the cachable immutable command instance
    */
   static Command create(String command) {
-    return new CommandImpl(command, -1, 0, 0, 0, false, false);
+    return new CommandImpl(command, -1, 0, 0, 0, false, false, false, false);
   }
 
   @GenIgnore(GenIgnore.PERMITTED_TYPE)
@@ -83,9 +85,13 @@ public interface Command {
 
   boolean isKeyless();
 
+  boolean isWrite();
+
   boolean isReadOnly();
 
   boolean isMovable();
 
   boolean isVoid();
+
+  boolean isPubSub();
 }

@@ -103,23 +103,28 @@ public interface Redis {
    */
   @Fluent
   default Redis send(Request command, Handler<AsyncResult<@Nullable Response>> onSend) {
-    connect(connect -> {
-      if (connect.failed()) {
-        onSend.handle(Future.failedFuture(connect.cause()));
-        return;
-      }
-
-      final RedisConnection conn = connect.result();
-
-      conn.send(command, send -> {
-        try {
-          onSend.handle(send);
-        } finally {
-          // regardless of the result, return the connection to the pool
-          conn.close();
+    if (command.command().isPubSub()) {
+      // mixing pubSub cannot be used on a one-shot operation
+      onSend.handle(Future.failedFuture("PubSub command in connection-less mode not allowed"));
+    } else {
+      connect(connect -> {
+        if (connect.failed()) {
+          onSend.handle(Future.failedFuture(connect.cause()));
+          return;
         }
+
+        final RedisConnection conn = connect.result();
+
+        conn.send(command, send -> {
+          try {
+            onSend.handle(send);
+          } finally {
+            // regardless of the result, return the connection to the pool
+            conn.close();
+          }
+        });
       });
-    });
+    }
 
     return this;
   }
@@ -145,6 +150,14 @@ public interface Redis {
    */
   @Fluent
   default Redis batch(List<Request> commands, Handler<AsyncResult<List<@Nullable Response>>> onSend) {
+    for (Request req : commands) {
+      if (req.command().isPubSub()) {
+        // mixing pubSub cannot be used on a one-shot operation
+        onSend.handle(Future.failedFuture("PubSub command in connection-less batch not allowed"));
+        return this;
+      }
+    }
+
     connect(connect -> {
       if (connect.failed()) {
         onSend.handle(Future.failedFuture(connect.cause()));

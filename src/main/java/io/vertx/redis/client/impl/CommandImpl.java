@@ -34,11 +34,13 @@ public class CommandImpl implements Command {
   private final int lastKey;
   private final int interval;
   private final boolean keyless;
+  private final boolean write;
   private final boolean readOnly;
   private final boolean movable;
+  private final boolean pubsub;
   private final boolean noreturn;
 
-  public CommandImpl(String command, int arity, int firstKey, int lastKey, int interval, boolean readOnly, boolean movable) {
+  public CommandImpl(String command, int arity, int firstKey, int lastKey, int interval, boolean write, boolean readOnly, boolean movable, boolean pubsub) {
     bytes = ("$" + command.length() + "\r\n" + command + "\r\n").getBytes(StandardCharsets.ISO_8859_1);
     this.arity = arity;
     this.firstKey = firstKey;
@@ -46,8 +48,10 @@ public class CommandImpl implements Command {
     this.interval = interval;
     this.multiKey = lastKey < 0;
     this.keyless = interval == 0 && !movable;
+    this.write = write;
     this.readOnly = readOnly;
     this.movable = movable;
+    this.pubsub = pubsub;
     // void commands are special and apply to pub/sub
     noreturn =
       "subscribe".equalsIgnoreCase(command)
@@ -92,6 +96,11 @@ public class CommandImpl implements Command {
   }
 
   @Override
+  public boolean isWrite() {
+    return write;
+  }
+
+  @Override
   public boolean isReadOnly() {
     return readOnly;
   }
@@ -104,5 +113,10 @@ public class CommandImpl implements Command {
   @Override
   public boolean isVoid() {
     return noreturn;
+  }
+
+  @Override
+  public boolean isPubSub() {
+    return pubsub;
   }
 }

@@ -58,8 +58,10 @@ redis.command(function (err, res) {
       multiKey: cmd[4] < 0,
       interval: cmd[5],
       keyless: cmd[5] === 0 && cmd[2].indexOf('movablekeys') === -1,
+      write: cmd[2].indexOf('write') !== -1,
       readOnly: cmd[2].indexOf('readonly') !== -1,
-      movable: cmd[2].indexOf('movablekeys') !== -1
+      movable: cmd[2].indexOf('movablekeys') !== -1,
+      pubsub: cmd[2].indexOf('pubsub') !== -1
     });
   });
 

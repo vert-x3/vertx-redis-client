@@ -74,20 +74,20 @@ public class RedisClientPubSubTest {
   @Test
   public void testPublishSubscribe(TestContext should) {
     final Async test = should.async();
-    redisSubscribe.send(Request.cmd(Command.SUBSCRIBE).arg("news"), reply -> {
+    pubConn.send(Request.cmd(Command.SUBSCRIBE).arg("news"), reply -> {
       should.assertTrue(reply.succeeded());
       rule.vertx().eventBus().consumer("io.vertx.redis.news", msg -> test.complete());
-      redisPublish.send(Request.cmd(Command.PUBLISH).arg("news").arg("foo"), preply -> should.assertTrue(preply.succeeded()));
+      pubConn.send(Request.cmd(Command.PUBLISH).arg("news").arg("foo"), preply -> should.assertTrue(preply.succeeded()));
     });
   }
 
   @Test
   public void testPublishPSubscribe(TestContext should) {
     final Async test = should.async();
-    redisSubscribe.send(Request.cmd(Command.PSUBSCRIBE).arg("new*"), reply -> {
+    subConn.send(Request.cmd(Command.PSUBSCRIBE).arg("new*"), reply -> {
       should.assertTrue(reply.succeeded());
       rule.vertx().eventBus().consumer("io.vertx.redis.new*", msg -> test.complete());
-      redisPublish.send(Request.cmd(Command.PUBLISH).arg("news").arg("foo"), preply -> should.assertTrue(preply.succeeded()));
+      pubConn.send(Request.cmd(Command.PUBLISH).arg("news").arg("foo"), preply -> should.assertTrue(preply.succeeded()));
     });
   }
 }
