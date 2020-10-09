@@ -6,6 +6,7 @@ import io.vertx.ext.unit.junit.RunTestOnContext;
 import io.vertx.ext.unit.junit.VertxUnitRunner;
 import io.vertx.redis.client.Redis;
 import io.vertx.redis.client.RedisOptions;
+import io.vertx.redis.client.Response;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;
@@ -15,8 +16,7 @@ import org.testcontainers.containers.GenericContainer;
 
 import java.util.UUID;
 
-import static io.vertx.redis.client.Command.GET;
-import static io.vertx.redis.client.Command.SET;
+import static io.vertx.redis.client.Command.*;
 import static io.vertx.redis.client.Request.cmd;
 
 @RunWith(VertxUnitRunner.class)
@@ -74,5 +74,56 @@ public class RedisClient6Test {
         });
       });
     });
+  }
+
+  @Test
+  public void testAssistedCaching2Connections(TestContext should) {
+    final Async test = should.async();
+
+    // get connection #1
+    client.connect()
+      .onFailure(should::fail)
+      .onSuccess(conn1 -> {
+        conn1.send(cmd(CLIENT).arg("ID"))
+          .onFailure(should::fail)
+          .onSuccess(id -> {
+            conn1
+              .handler(push -> {
+                if ("invalidate".equals(push.get(0).toString())) {
+                  for (Response invalidated : push.get(1)) {
+                    if ("foo".equals(invalidated.toString())) {
+                      test.complete();
+                    }
+                  }
+                }
+              })
+              .send(cmd(SUBSCRIBE).arg("__redis__:invalidate"))
+              .onFailure(should::fail)
+              .onSuccess(subscribe -> {
+                // get connection #2
+                client.connect()
+                  .onFailure(should::fail)
+                  .onSuccess(conn2 -> {
+                    conn2.send(cmd(CLIENT).arg("TRACKING").arg("on").arg("REDIRECT").arg(id.toInteger()))
+                      .onFailure(should::fail)
+                      .onSuccess(redirect -> {
+                        conn2.send(cmd(GET).arg("foo"))
+                          .onFailure(should::fail)
+                          .onSuccess(get0 -> {
+                            System.out.println(get0);
+                            // some other unrelated connection
+                            client.connect()
+                              .onFailure(should::fail)
+                              .onSuccess(conn3 -> {
+                                conn3.send(cmd(SET).arg("foo").arg("bar"))
+                                  .onFailure(should::fail)
+                                  .onSuccess(System.out::println);
+                              });
+                          });
+                      });
+                  });
+              });
+          });
+      });
   }
 }
