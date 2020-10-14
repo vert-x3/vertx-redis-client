@@ -119,7 +119,10 @@ public class RedisStandaloneConnection implements RedisConnection, ParserHandler
     // encode the message to a buffer
     final Buffer message = ((RequestImpl) request).encode();
     // wrap the handler into a promise
-    final Promise<Response> promise = context.promise(handler);
+    final Context current = Vertx.currentContext();
+    final Promise<Response> promise =
+      (current == null ? context : ((ContextInternal) current))
+        .promise(handler);
     // all update operations happen inside the context
     context.runOnContext(v -> {
       // offer the handler to the waiting queue if not void command
@@ -165,6 +168,7 @@ public class RedisStandaloneConnection implements RedisConnection, ParserHandler
 
     // encode the message to a single buffer
     final Buffer messages = Buffer.buffer();
+    final ContextInternal current = (Vertx.currentContext() == null ? context : ((ContextInternal) Vertx.currentContext()));
 
     for (int i = 0; i < commands.size(); i++) {
       final int index = i;
@@ -172,7 +176,7 @@ public class RedisStandaloneConnection implements RedisConnection, ParserHandler
       // encode to the single buffer
       req.encode(messages);
       // unwrap the handler into a single handler
-      callbacks.add(index, context.promise(command -> {
+      callbacks.add(index, current.promise(command -> {
         if (!failed.get()) {
           if (command.failed()) {
             failed.set(true);
