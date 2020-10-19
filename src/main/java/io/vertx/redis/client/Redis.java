@@ -77,18 +77,17 @@ public interface Redis {
    * @return a reference to this, so the API can be used fluently
    */
   @Fluent
-  Redis connect(Handler<AsyncResult<RedisConnection>> handler);
+  default Redis connect(Handler<AsyncResult<RedisConnection>> handler) {
+    connect().onComplete(handler);
+    return this;
+  }
 
   /**
    * Connects to the redis server.
    *
    * @return a future with the result of the operation
    */
-  default Future<RedisConnection> connect() {
-    final Promise<RedisConnection> promise = Promise.promise();
-    connect(promise);
-    return promise.future();
-  }
+  Future<RedisConnection> connect();
 
   /**
    * Closes the client and terminates any connection.
@@ -103,29 +102,7 @@ public interface Redis {
    */
   @Fluent
   default Redis send(Request command, Handler<AsyncResult<@Nullable Response>> onSend) {
-    if (command.command().isPubSub()) {
-      // mixing pubSub cannot be used on a one-shot operation
-      onSend.handle(Future.failedFuture("PubSub command in connection-less mode not allowed"));
-    } else {
-      connect(connect -> {
-        if (connect.failed()) {
-          onSend.handle(Future.failedFuture(connect.cause()));
-          return;
-        }
-
-        final RedisConnection conn = connect.result();
-
-        conn.send(command, send -> {
-          try {
-            onSend.handle(send);
-          } finally {
-            // regardless of the result, return the connection to the pool
-            conn.close();
-          }
-        });
-      });
-    }
-
+    send(command).onComplete(onSend);
     return this;
   }
 
@@ -134,11 +111,7 @@ public interface Redis {
    * @param command the command to send
    * @return a future with the result of the operation
    */
-  default Future<@Nullable Response> send(Request command) {
-    final Promise<@Nullable Response> promise = Promise.promise();
-    send(command, promise);
-    return promise.future();
-  }
+  Future<@Nullable Response> send(Request command);
 
   /**
    * Sends a list of commands in a single IO operation, this prevents any inter twinning to happen from other
@@ -150,31 +123,7 @@ public interface Redis {
    */
   @Fluent
   default Redis batch(List<Request> commands, Handler<AsyncResult<List<@Nullable Response>>> onSend) {
-    for (Request req : commands) {
-      if (req.command().isPubSub()) {
-        // mixing pubSub cannot be used on a one-shot operation
-        onSend.handle(Future.failedFuture("PubSub command in connection-less batch not allowed"));
-        return this;
-      }
-    }
-
-    connect(connect -> {
-      if (connect.failed()) {
-        onSend.handle(Future.failedFuture(connect.cause()));
-        return;
-      }
-
-      final RedisConnection conn = connect.result();
-      conn.batch(commands, batch -> {
-        try {
-          onSend.handle(batch);
-        } finally {
-          // regardless of the result, return the connection to the pool
-          conn.close();
-        }
-      });
-    });
-
+    batch(commands).onComplete(onSend);
     return this;
   }
 
@@ -185,9 +134,5 @@ public interface Redis {
    * @param commands list of command to send
    * @return a future with the result of the operation
    */
-  default Future<List<@Nullable Response>> batch(List<Request> commands) {
-    final Promise<List<@Nullable Response>> promise = Promise.promise();
-    batch(commands, promise);
-    return promise.future();
-  }
+  Future<List<@Nullable Response>> batch(List<Request> commands);
 }

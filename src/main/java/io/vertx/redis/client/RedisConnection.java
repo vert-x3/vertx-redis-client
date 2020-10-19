@@ -79,18 +79,17 @@ public interface RedisConnection extends ReadStream<Response> {
    * @return fluent self.
    */
   @Fluent
-  RedisConnection send(Request command, Handler<AsyncResult<@Nullable Response>> onSend);
+  default RedisConnection send(Request command, Handler<AsyncResult<@Nullable Response>> onSend) {
+    send(command).onComplete(onSend);
+    return this;
+  }
 
   /**
    * Send the given command to the redis server or cluster.
    * @param command the command to send
    * @return a future with the result of the operation
    */
-  default Future<@Nullable Response> send(Request command) {
-    final Promise<@Nullable Response> promise = Promise.promise();
-    send(command, promise);
-    return promise.future();
-  }
+  Future<@Nullable Response> send(Request command);
 
   /**
    * Sends a list of commands in a single IO operation, this prevents any inter twinning to happen from other
@@ -101,7 +100,10 @@ public interface RedisConnection extends ReadStream<Response> {
    * @return fluent self.
    */
   @Fluent
-  RedisConnection batch(List<Request> commands, Handler<AsyncResult<List<@Nullable Response>>> onSend);
+  default RedisConnection batch(List<Request> commands, Handler<AsyncResult<List<@Nullable Response>>> onSend) {
+    batch(commands).onComplete(onSend);
+    return this;
+  }
 
   /**
    * Sends a list of commands in a single IO operation, this prevents any inter twinning to happen from other
@@ -110,11 +112,7 @@ public interface RedisConnection extends ReadStream<Response> {
    * @param commands list of command to send
    * @return a future with the result of the operation
    */
-  default Future<List<@Nullable Response>> batch(List<Request> commands) {
-    final Promise<List<@Nullable Response>> promise = Promise.promise();
-    batch(commands, promise);
-    return promise.future();
-  }
+  Future<List<@Nullable Response>> batch(List<Request> commands);
 
   /**
    * Closes the connection or returns to the pool.

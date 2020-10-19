@@ -2,6 +2,7 @@ package io.vertx.redis.client.impl;
 
 import io.vertx.codegen.annotations.Nullable;
 import io.vertx.core.*;
+import io.vertx.core.impl.VertxInternal;
 import io.vertx.core.impl.logging.Logger;
 import io.vertx.core.impl.logging.LoggerFactory;
 import io.vertx.redis.client.*;
@@ -50,13 +51,13 @@ public class RedisClusterConnection implements RedisConnection {
     MASTER_ONLY_COMMANDS.add(command);
   }
 
-  private final Vertx vertx;
+  private final VertxInternal vertx;
   private final RedisOptions options;
   private final Slots slots;
   private final Map<String, RedisConnection> connections;
 
   RedisClusterConnection(Vertx vertx, RedisOptions options, Slots slots, Map<String, RedisConnection> connections) {
-    this.vertx = vertx;
+    this.vertx = (VertxInternal) vertx;
     this.options = options;
     this.slots = slots;
     this.connections = connections;
@@ -123,15 +124,17 @@ public class RedisClusterConnection implements RedisConnection {
   }
 
   @Override
-  public RedisConnection send(Request request, Handler<AsyncResult<Response>> handler) {
+  public Future<Response> send(Request request) {
+    final Promise<Response> promise = vertx.promise();
+
     // process commands for cluster mode
     final RequestImpl req = (RequestImpl) request;
     final Command cmd = req.command();
     final boolean forceMasterEndpoint = MASTER_ONLY_COMMANDS.contains(cmd);
 
     if (UNSUPPORTEDCOMMANDS.containsKey(cmd)) {
-      handler.handle(Future.failedFuture(UNSUPPORTEDCOMMANDS.get(cmd)));
-      return this;
+      promise.fail(UNSUPPORTEDCOMMANDS.get(cmd));
+      return promise.future();
     }
 
     if (cmd.isMovable()) {
@@ -140,13 +143,13 @@ public class RedisClusterConnection implements RedisConnection {
       int hashSlot = ZModem.generateMulti(keys);
       // -1 indicates that not all keys of the command targets the same hash slot, so Redis would not be able to execute it.
       if (hashSlot == -1) {
-        handler.handle(Future.failedFuture(buildCrossslotFailureMsg(req)));
-        return this;
+        promise.fail(buildCrossslotFailureMsg(req));
+        return promise.future();
       }
 
       String[] endpoints = slots.endpointsForKey(hashSlot);
-      send(selectMasterOrReplicaEndpoint(req.command().isReadOnly(), endpoints, forceMasterEndpoint), RETRIES, req, handler);
-      return this;
+      send(selectMasterOrReplicaEndpoint(req.command().isReadOnly(), endpoints, forceMasterEndpoint), RETRIES, req, promise);
+      return promise.future();
     }
 
     if (cmd.isKeyless() && REDUCERS.containsKey(cmd)) {
@@ -163,19 +166,19 @@ public class RedisClusterConnection implements RedisConnection {
       CompositeFuture.all(responses).onComplete(composite -> {
         if (composite.failed()) {
           // means if one of the operations failed, then we can fail the handler
-          handler.handle(Future.failedFuture(composite.cause()));
+          promise.fail(composite.cause());
         } else {
-          handler.handle(Future.succeededFuture(REDUCERS.get(cmd).apply(composite.result().list())));
+          promise.complete(REDUCERS.get(cmd).apply(composite.result().list()));
         }
       });
 
-      return this;
+      return promise.future();
     }
 
     if (cmd.isKeyless()) {
       // it doesn't matter which node to use
-      send(selectEndpoint(-1, cmd.isReadOnly(), forceMasterEndpoint), RETRIES, req, handler);
-      return this;
+      send(selectEndpoint(-1, cmd.isReadOnly(), forceMasterEndpoint), RETRIES, req, promise);
+      return promise.future();
     }
 
     final List<byte[]> args = req.getArgs();
@@ -204,8 +207,8 @@ public class RedisClusterConnection implements RedisConnection {
 
           if (!REDUCERS.containsKey(cmd)) {
             // we can't continue as we don't know how to reduce this
-            handler.handle(Future.failedFuture(buildCrossslotFailureMsg(req)));
-            return this;
+            promise.fail(buildCrossslotFailureMsg(req));
+            return promise.future();
           }
 
           final Map<Integer, Request> requests = splitRequest(cmd, args, start, end, step);
@@ -220,25 +223,25 @@ public class RedisClusterConnection implements RedisConnection {
           CompositeFuture.all(responses).onComplete(composite -> {
             if (composite.failed()) {
               // means if one of the operations failed, then we can fail the handler
-              handler.handle(Future.failedFuture(composite.cause()));
+              promise.fail(composite.cause());
             } else {
-              handler.handle(Future.succeededFuture(REDUCERS.get(cmd).apply(composite.result().list())));
+              promise.complete(REDUCERS.get(cmd).apply(composite.result().list()));
             }
           });
 
-          return this;
+          return promise.future();
         }
       }
 
       // all keys are on the same slot!
-      send(selectEndpoint(currentSlot, cmd.isReadOnly(), forceMasterEndpoint), RETRIES, req, handler);
-      return this;
+      send(selectEndpoint(currentSlot, cmd.isReadOnly(), forceMasterEndpoint), RETRIES, req, promise);
+      return promise.future();
     }
 
     // last option the command is single key
     int start = cmd.getFirstKey() - 1;
-    send(selectEndpoint(ZModem.generate(args.get(start)), cmd.isReadOnly(), forceMasterEndpoint), RETRIES, req, handler);
-    return this;
+    send(selectEndpoint(ZModem.generate(args.get(start)), cmd.isReadOnly(), forceMasterEndpoint), RETRIES, req, promise);
+    return promise.future();
   }
 
   private Map<Integer, Request> splitRequest(Command cmd, List<byte[]> args, int start, int end, int step) {
@@ -350,7 +353,9 @@ public class RedisClusterConnection implements RedisConnection {
   }
 
   @Override
-  public RedisConnection batch(List<Request> requests, Handler<AsyncResult<List<Response>>> handler) {
+  public Future<List<Response>> batch(List<Request> requests) {
+    final Promise<List<Response>> promise = vertx.promise();
+
     int currentSlot = -1;
     boolean readOnly = false;
     boolean forceMasterEndpoint = false;
@@ -362,8 +367,8 @@ public class RedisClusterConnection implements RedisConnection {
       final Command cmd = req.command();
 
       if (UNSUPPORTEDCOMMANDS.containsKey(cmd)) {
-        handler.handle(Future.failedFuture(UNSUPPORTEDCOMMANDS.get(cmd)));
-        return this;
+        promise.fail(UNSUPPORTEDCOMMANDS.get(cmd));
+        return promise.future();
       }
 
       readOnly |= cmd.isReadOnly();
@@ -379,8 +384,8 @@ public class RedisClusterConnection implements RedisConnection {
 
         int slot = ZModem.generateMulti(keys);
         if (slot == -1 || (currentSlot != -1 && currentSlot != slot)) {
-          handler.handle(Future.failedFuture(buildCrossslotFailureMsg(req)));
-          return this;
+          promise.fail(buildCrossslotFailureMsg(req));
+          return promise.future();
         }
         currentSlot = slot;
         continue;
@@ -408,8 +413,8 @@ public class RedisClusterConnection implements RedisConnection {
           }
           if (currentSlot != slot) {
             // in cluster mode we currently do not handle batching commands which keys are not on the same slot
-            handler.handle(Future.failedFuture(buildCrossslotFailureMsg(req)));
-            return this;
+            promise.fail(buildCrossslotFailureMsg(req));
+            return promise.future();
           }
         }
         // all keys are on the same slot!
@@ -426,13 +431,13 @@ public class RedisClusterConnection implements RedisConnection {
       }
       if (currentSlot != slot) {
         // in cluster mode we currently do not handle batching commands which keys are not on the same slot
-        handler.handle(Future.failedFuture(buildCrossslotFailureMsg(req)));
-        return this;
+        promise.fail(buildCrossslotFailureMsg(req));
+        return promise.future();
       }
     }
 
-    batch(selectEndpoint(currentSlot, readOnly, forceMasterEndpoint), RETRIES, requests, handler);
-    return this;
+    batch(selectEndpoint(currentSlot, readOnly, forceMasterEndpoint), RETRIES, requests, promise);
+    return promise.future();
   }
 
   private void batch(String endpoint, int retries, List<Request> commands, Handler<AsyncResult<List<Response>>> handler) {

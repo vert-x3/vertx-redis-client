@@ -16,6 +16,7 @@
 package io.vertx.redis.client.impl;
 
 import io.vertx.core.*;
+import io.vertx.core.impl.ContextInternal;
 import io.vertx.core.impl.logging.Logger;
 import io.vertx.core.impl.logging.LoggerFactory;
 import io.vertx.redis.client.*;
@@ -27,7 +28,7 @@ import java.util.Random;
 import static io.vertx.redis.client.Command.*;
 import static io.vertx.redis.client.Request.cmd;
 
-public class RedisSentinelClient implements Redis {
+public class RedisSentinelClient extends BaseRedisClient implements Redis {
 
   // We don't need to be secure, we just want so simple
   // randomization to avoid picking the same replica all the time
@@ -45,14 +46,11 @@ public class RedisSentinelClient implements Redis {
 
   private static final Logger LOG = LoggerFactory.getLogger(RedisSentinelClient.class);
 
-  private final Context context;
-  private final RedisConnectionManager connectionManager;
   private final RedisOptions options;
-
   private RedisConnection sentinel;
 
   public RedisSentinelClient(Vertx vertx, RedisOptions options) {
-    this.context = vertx.getOrCreateContext();
+    super(vertx, options);
     this.options = options;
     // validate options
     if (options.getMaxPoolSize() < 2) {
@@ -61,29 +59,23 @@ public class RedisSentinelClient implements Redis {
     if (options.getMaxPoolWaiting() < options.getMaxPoolSize()) {
       throw new IllegalStateException("Invalid options: maxPoolWaiting < maxPoolSize");
     }
-    // sentinel (HA) requires 2 connections, one to watch for sentinel events and the connection itself
-    this.connectionManager = new RedisConnectionManager(vertx, options);
-
-    this.connectionManager.start();
   }
 
   @Override
-  public void close() {
-    this.connectionManager.close();
-  }
+  public Future<RedisConnection> connect() {
+    final ContextInternal context = vertx.getOrCreateContext();
+    final Promise<RedisConnection> promise = vertx.promise();
 
-  @Override
-  public Redis connect(Handler<AsyncResult<RedisConnection>> onCreate) {
     // sentinel (HA) requires 2 connections, one to watch for sentinel events and the connection itself
-    createConnectionInternal(options, options.getRole(), createConnection -> {
+    createConnectionInternal(context, options, options.getRole(), createConnection -> {
       if (createConnection.failed()) {
-        onCreate.handle(Future.failedFuture(createConnection.cause()));
+        promise.fail(createConnection.cause());
         return;
       }
 
       final RedisConnection conn = createConnection.result();
 
-      createConnectionInternal(options, RedisRole.SENTINEL, create -> {
+      createConnectionInternal(context, options, RedisRole.SENTINEL, create -> {
         if (create.failed()) {
           LOG.error("Redis PUB/SUB wrap failed.", create.cause());
           return;
@@ -107,10 +99,10 @@ public class RedisSentinelClient implements Redis {
 
         sentinel.send(cmd(SUBSCRIBE).arg("+switch-master"), send -> {
           if (send.failed()) {
-            onCreate.handle(Future.failedFuture(send.cause()));
+            promise.fail(send.cause());
           } else {
             // both connections ready
-            onCreate.handle(Future.succeededFuture(new RedisSentinelConnection(conn, sentinel)));
+            promise.complete(new RedisSentinelConnection(conn, sentinel));
           }
         });
 
@@ -124,10 +116,10 @@ public class RedisSentinelClient implements Redis {
       });
     });
 
-    return this;
+    return promise.future();
   }
 
-  private void createConnectionInternal(RedisOptions options, RedisRole role, Handler<AsyncResult<RedisConnection>> onCreate) {
+  private void createConnectionInternal(Context context, RedisOptions options, RedisRole role, Handler<AsyncResult<RedisConnection>> onCreate) {
 
     final Handler<AsyncResult<String>> createAndConnect = resolve -> {
       if (resolve.failed()) {
@@ -145,13 +137,13 @@ public class RedisSentinelClient implements Redis {
 
     switch (role) {
       case SENTINEL:
-        resolveClient(this::isSentinelOk, options, createAndConnect);
+        resolveClient(this::isSentinelOk, context, options, createAndConnect);
         break;
       case MASTER:
-        resolveClient(this::getMasterFromEndpoint, options, createAndConnect);
+        resolveClient(this::getMasterFromEndpoint, context, options, createAndConnect);
         break;
       case REPLICA:
-        resolveClient(this::getReplicaFromEndpoint, options, createAndConnect);
+        resolveClient(this::getReplicaFromEndpoint, context, options, createAndConnect);
         break;
     }
   }
@@ -160,10 +152,10 @@ public class RedisSentinelClient implements Redis {
    * We use the algorithm from http://redis.io/topics/sentinel-clients
    * to get a sentinel client and then do 'stuff' with it
    */
-  private static void resolveClient(final Resolver checkEndpointFn, final RedisOptions options, final Handler<AsyncResult<String>> callback) {
+  private static void resolveClient(final Resolver checkEndpointFn, final Context context, final RedisOptions options, final Handler<AsyncResult<String>> callback) {
     // Because finding the master is going to be an async list we will terminate
     // when we find one then use promises...
-    iterate(0, checkEndpointFn, options, iterate -> {
+    iterate(0, checkEndpointFn, context, options, iterate -> {
       if (iterate.failed()) {
         callback.handle(Future.failedFuture(iterate.cause()));
       } else {
@@ -180,7 +172,7 @@ public class RedisSentinelClient implements Redis {
     });
   }
 
-  private static void iterate(final int idx, final Resolver checkEndpointFn, final RedisOptions argument, final Handler<AsyncResult<Pair<Integer, String>>> resultHandler) {
+  private static void iterate(final int idx, final Resolver checkEndpointFn, final Context context, final RedisOptions argument, final Handler<AsyncResult<Pair<Integer, String>>> resultHandler) {
     // stop condition
     final List<String> endpoints = argument.getEndpoints();
 
@@ -190,19 +182,19 @@ public class RedisSentinelClient implements Redis {
     }
 
     // attempt to perform operation
-    checkEndpointFn.resolve(endpoints.get(idx), argument, res -> {
+    checkEndpointFn.resolve(context, endpoints.get(idx), argument, res -> {
       if (res.succeeded()) {
         resultHandler.handle(Future.succeededFuture(new Pair<>(idx, res.result())));
       } else {
         // try again with next endpoint
-        iterate(idx + 1, checkEndpointFn, argument, resultHandler);
+        iterate(idx + 1, checkEndpointFn, context, argument, resultHandler);
       }
     });
   }
 
   // begin endpoint check methods
 
-  private void isSentinelOk(String endpoint, RedisOptions argument, Handler<AsyncResult<String>> handler) {
+  private void isSentinelOk(Context context, String endpoint, RedisOptions argument, Handler<AsyncResult<String>> handler) {
     // we can't use the endpoint as is, it should not contain a database selection,
     // but can contain authentication
     final RedisURI uri = new RedisURI(endpoint);
@@ -228,7 +220,7 @@ public class RedisSentinelClient implements Redis {
     });
   }
 
-  private void getMasterFromEndpoint(String endpoint, RedisOptions options, Handler<AsyncResult<String>> handler) {
+  private void getMasterFromEndpoint(Context context, String endpoint, RedisOptions options, Handler<AsyncResult<String>> handler) {
     // we can't use the endpoint as is, it should not contain a database selection,
     // but can contain authentication
     final RedisURI uri = new RedisURI(endpoint);
@@ -258,7 +250,7 @@ public class RedisSentinelClient implements Redis {
     });
   }
 
-  private void getReplicaFromEndpoint(String endpoint, RedisOptions options, Handler<AsyncResult<String>> handler) {
+  private void getReplicaFromEndpoint(Context context, String endpoint, RedisOptions options, Handler<AsyncResult<String>> handler) {
     // we can't use the endpoint as is, it should not contain a database selection,
     // but can contain authentication
     final RedisURI uri = new RedisURI(endpoint);

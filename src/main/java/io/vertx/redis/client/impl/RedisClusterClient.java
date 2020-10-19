@@ -32,7 +32,7 @@ import java.util.function.Function;
 import static io.vertx.redis.client.Command.*;
 import static io.vertx.redis.client.Request.cmd;
 
-public class RedisClusterClient implements Redis {
+public class RedisClusterClient extends BaseRedisClient implements Redis {
 
   public static void addReducer(Command command, Function<List<Response>, Response> fn) {
     RedisClusterConnection.addReducer(command, fn);
@@ -106,14 +106,10 @@ public class RedisClusterClient implements Redis {
     addMasterOnlyCommand(WAIT);
   }
 
-  private final Vertx vertx;
-  private final Context context;
-  private final RedisConnectionManager connectionManager;
   private final RedisOptions options;
 
   public RedisClusterClient(Vertx vertx, RedisOptions options) {
-    this.vertx = vertx;
-    this.context = vertx.getOrCreateContext();
+    super(vertx, options);
     this.options = options;
     // validate options
     if (options.getMaxPoolWaiting() < options.getMaxPoolSize()) {
@@ -121,18 +117,17 @@ public class RedisClusterClient implements Redis {
       // we can't validate the max pool size yet as we need to know the slots first
       // the remaining validation will happen at the connect time
     }
-    this.connectionManager = new RedisConnectionManager(vertx, options);
-    this.connectionManager.start();
   }
 
   @Override
-  public Redis connect(Handler<AsyncResult<RedisConnection>> onConnect) {
+  public Future<RedisConnection> connect() {
+    final Promise<RedisConnection> promise = vertx.promise();
     // attempt to load the slots from the first good endpoint
-    connect(options.getEndpoints(), 0, onConnect);
-    return this;
+    connect(vertx.getOrCreateContext(), options.getEndpoints(), 0, promise);
+    return promise.future();
   }
 
-  private void connect(List<String> endpoints, int index, Handler<AsyncResult<RedisConnection>> onConnect) {
+  private void connect(Context context, List<String> endpoints, int index, Handler<AsyncResult<RedisConnection>> onConnect) {
     if (index >= endpoints.size()) {
       // stop condition
       onConnect.handle(Future.failedFuture("Cannot connect to any of the provided endpoints"));
@@ -142,7 +137,7 @@ public class RedisClusterClient implements Redis {
     connectionManager.getConnection(context, endpoints.get(index), RedisReplicas.NEVER != options.getUseReplicas() ? cmd(READONLY) : null, getConnection -> {
       if (getConnection.failed()) {
         // failed try with the next endpoint
-        connect(endpoints, index + 1, onConnect);
+        connect(context, endpoints, index + 1, onConnect);
         return;
       }
 
@@ -154,7 +149,7 @@ public class RedisClusterClient implements Redis {
           // the slots command failed.
           conn.close();
           // try with the next one
-          connect(endpoints, index + 1, onConnect);
+          connect(context, endpoints, index + 1, onConnect);
           return;
         }
 
@@ -211,11 +206,6 @@ public class RedisClusterClient implements Redis {
         }
       });
     });
-  }
-
-  @Override
-  public void close() {
-    connectionManager.close();
   }
 
   private void getSlots(String endpoint, RedisConnection conn, Handler<AsyncResult<Slots>> onGetSlots) {
