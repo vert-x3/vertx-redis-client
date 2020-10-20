@@ -191,9 +191,9 @@ public class RedisTest {
 
         AtomicInteger cnt = new AtomicInteger();
         List<Future> futures = new ArrayList<>();
-        IntStream.range(0, 100).forEach(i ->{
+        IntStream.range(0, 100).forEach(i -> {
           Promise<Response> p = Promise.promise();
-          vertx.setTimer(1, timerid -> redisApi.set(Arrays.asList("foo","bar"), p));
+          vertx.setTimer(1, timerid -> redisApi.set(Arrays.asList("foo", "bar"), p));
           futures.add(p.future().map(res -> {
             System.out.println("SUCCESS " + cnt.incrementAndGet());
             return null;
@@ -205,11 +205,11 @@ public class RedisTest {
             should.assertEquals("Redis waiting Queue is full", f.getMessage());
             test.complete();
           })
-        .onSuccess(r -> {
-          if (cnt.get() == 100) {
-            should.fail("Should not succeed!");
-          }
-        });
+          .onSuccess(r -> {
+            if (cnt.get() == 100) {
+              should.fail("Should not succeed!");
+            }
+          });
       });
   }
 
@@ -248,6 +248,53 @@ public class RedisTest {
         redis.send(cmd(HMGET).arg("nonExistingKey").arg("nonExistingValue1").arg("nonExistingValue2"), send -> {
           should.assertTrue(send.succeeded());
           test.complete();
+        });
+      });
+  }
+
+  @Test
+  public void buggyIterator(TestContext should) {
+    final Async test = should.async();
+
+    Redis.createClient(rule.vertx(), "redis://localhost:7006")
+      .connect(create -> {
+        should.assertTrue(create.succeeded());
+
+        final RedisConnection redis = create.result();
+        final String key = UUID.randomUUID().toString();
+
+        redis.send(cmd(ZADD).arg(key).arg("1.0").arg("testValue1").arg("2.0").arg("testValue2"), zadd -> {
+          should.assertTrue(zadd.succeeded());
+          redis.send(cmd(ZRANGEBYSCORE).arg(key).arg("0.0").arg("3.0").arg("WITHSCORES"), zrangebyscore -> {
+            should.assertTrue(zrangebyscore.succeeded());
+
+            Response response = zrangebyscore.result();
+
+            should.assertEquals(ResponseType.MULTI, response.type());
+            //verify that keys are absent
+            should.assertEquals(0, response.getKeys().size());
+
+            //collect all the values (buggy)
+            List<String> buggyList = new ArrayList<>();
+            for (Response r : response) {
+              buggyList.add(r.toString());
+            }
+            //verify that first value is present
+            should.assertEquals("[testValue1, 1.0]", buggyList.get(0));
+            should.assertEquals("[testValue2, 2.0]", buggyList.get(1));
+            should.assertEquals(2, buggyList.size());
+
+            //collect all the values (correct)
+            List<String> correctList = new ArrayList<>();
+            for (int i = 0; i < response.size(); i++) {
+              correctList.add(response.get(i).toString());
+            }
+            //verify both values are present
+            should.assertEquals("[testValue1, 1.0]", correctList.get(0));
+            should.assertEquals("[testValue2, 2.0]", correctList.get(1));
+            should.assertEquals(2, correctList.size());
+            test.complete();
+          });
         });
       });
   }
