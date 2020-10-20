@@ -234,4 +234,21 @@ public class RedisTest {
         });
       });
   }
+
+  @Test
+  public void buggyHmget(TestContext should) {
+    final Async test = should.async();
+
+    Redis.createClient(rule.vertx(), "redis://localhost:7006")
+      .connect(create -> {
+        should.assertTrue(create.succeeded());
+
+        final RedisConnection redis = create.result();
+
+        redis.send(cmd(HMGET).arg("nonExistingKey").arg("nonExistingValue1").arg("nonExistingValue2"), send -> {
+          should.assertTrue(send.succeeded());
+          test.complete();
+        });
+      });
+  }
 }
