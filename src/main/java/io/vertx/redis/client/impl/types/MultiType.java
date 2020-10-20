@@ -57,6 +57,12 @@ public final class MultiType implements Multi {
     this.count = 0;
   }
 
+  private MultiType(String key, Response value) {
+    this.map = null;
+    this.multi = new Response[] { SimpleStringType.create(key), value };
+    this.size = 2;
+  }
+
   @Override
   public ResponseType type() {
     return ResponseType.MULTI;
@@ -67,6 +73,10 @@ public final class MultiType implements Multi {
     // if this Multi was created as a Map
     if (map != null) {
       if (count % 2 == 0) {
+        if (reply == null || reply.type() == null) {
+          throw new IllegalArgumentException("Map key is NULL or untyped");
+        }
+
         switch (reply.type()) {
           case BULK:
           case SIMPLE:
@@ -113,9 +123,9 @@ public final class MultiType implements Multi {
       // fallback (emulate old behavior)
       if (multi.length % 2 == 0) {
         // if the size is even we assume we can handle it as Map
-        for (int i = 0; i < multi.length; i+=2) {
+        for (int i = 0; i < multi.length; i += 2) {
           if (key.equals(multi[i].toString())) {
-            return multi[i+1];
+            return multi[i + 1];
           }
         }
         // not found
@@ -136,7 +146,7 @@ public final class MultiType implements Multi {
       // fallback (emulate old behavior)
       if (multi.length % 2 == 0) {
         // if the size is even we assume we can handle it as Map
-        for (int i = 0; i < multi.length; i+=2) {
+        for (int i = 0; i < multi.length; i += 2) {
           if (key.equals(multi[i].toString())) {
             return true;
           }
@@ -160,7 +170,7 @@ public final class MultiType implements Multi {
       if (multi.length % 2 == 0) {
         final Set<String> keys = new HashSet<>();
         // if the size is even we assume we can handle it as Map
-        for (int i = 0; i < multi.length; i+=2) {
+        for (int i = 0; i < multi.length; i += 2) {
           switch (multi[i].type()) {
             case BULK:
             case SIMPLE:
@@ -224,27 +234,40 @@ public final class MultiType implements Multi {
 
   @Override
   public Iterator<Response> iterator() {
-    return new Iterator<Response>() {
-      private int idx = 0;
+    if (multi != null) {
+      return new Iterator<Response>() {
+        private int idx = 0;
 
-      @Override
-      public boolean hasNext() {
-        if (map != null) {
-          return false;
-        }
-        if (multi != null) {
+        @Override
+        public boolean hasNext() {
           return idx < size;
         }
-        return false;
-      }
 
-      @Override
-      public Response next() {
-        if (multi != null) {
+        @Override
+        public Response next() {
           return multi[idx++];
         }
-        throw new NoSuchElementException();
-      }
-    };
+      };
+    }
+
+    if (map != null) {
+      return new Iterator<Response>() {
+        private final Iterator<Map.Entry<String, Response>> it = map.entrySet().iterator();
+
+        @Override
+        public boolean hasNext() {
+          return it.hasNext();
+        }
+
+        @Override
+        public Response next() {
+          // wrap the kv into a single multi response
+          final Map.Entry<String, Response> kv = it.next();
+          return new MultiType(kv.getKey(), kv.getValue());
+        }
+      };
+    }
+
+    throw new UnsupportedOperationException("Cannot iterator over NULL");
   }
 }

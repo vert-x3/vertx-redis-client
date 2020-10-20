@@ -1,7 +1,7 @@
 package io.vertx.redis.client.impl;
 
 import io.vertx.codegen.annotations.Nullable;
-import io.vertx.core.AsyncResult;
+import io.vertx.core.Future;
 import io.vertx.core.Handler;
 import io.vertx.redis.client.RedisConnection;
 import io.vertx.redis.client.Request;
@@ -56,15 +56,13 @@ public class RedisSentinelConnection implements RedisConnection {
   }
 
   @Override
-  public RedisConnection send(Request command, Handler<AsyncResult<@Nullable Response>> onSend) {
-    connection.send(command, onSend);
-    return this;
+  public Future<@Nullable Response> send(Request command) {
+    return connection.send(command);
   }
 
   @Override
-  public RedisConnection batch(List<Request> commands, Handler<AsyncResult<List<@Nullable Response>>> onBatch) {
-    connection.batch(commands, onBatch);
-    return this;
+  public Future<List<@Nullable Response>> batch(List<Request> commands) {
+    return connection.batch(commands);
   }
 
   @Override

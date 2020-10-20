@@ -757,7 +757,7 @@ public class RedisClusterTest {
       });
   }
 
-  @Test(timeout = 30_000)
+  @Test(timeout = 60_000)
   public void dbSize(TestContext should) {
     final Async test = should.async();
 
@@ -775,11 +775,16 @@ public class RedisClusterTest {
           cluster.send(cmd(SET).arg(id).arg(id), set -> {
             should.assertTrue(set.succeeded());
             if (counter.decrementAndGet() == 0) {
-              cluster.send(cmd(DBSIZE), dbSize -> {
-                should.assertTrue(dbSize.succeeded());
-                should.assertEquals(len, dbSize.result().toInteger());
-                test.complete();
-              });
+              // CI is slow, give it a few seconds to sync the cluster
+              System.out.println("Waiting 2sec so CI cluster can sync up");
+              rule.vertx()
+                .setTimer(2_000L, v -> {
+                  cluster.send(cmd(DBSIZE), dbSize -> {
+                    should.assertTrue(dbSize.succeeded());
+                    should.assertEquals(len, dbSize.result().toInteger());
+                    test.complete();
+                  });
+                });
             }
           });
         }
