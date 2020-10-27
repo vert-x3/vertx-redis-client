@@ -274,6 +274,12 @@ class RedisConnectionManager {
     pooledConnectionManager.getConnection((ContextInternal) userContext, new ConnectionKey(connectionString, setup), handler);
   }
 
+  public Future<RedisConnection> getConnection(Context userContext, String connectionString, Request setup) {
+    final Promise<RedisConnection> promise = ((ContextInternal) userContext).promise();
+    pooledConnectionManager.getConnection((ContextInternal) userContext, new ConnectionKey(connectionString, setup), promise);
+    return promise.future();
+  }
+
   public void close() {
     synchronized (this) {
       if (timerID >= 0) {

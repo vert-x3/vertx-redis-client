@@ -23,7 +23,7 @@ import io.vertx.redis.client.*;
 import io.vertx.redis.client.impl.types.ErrorType;
 
 import java.util.List;
-import java.util.Random;
+import java.util.SplittableRandom;
 
 import static io.vertx.redis.client.Command.*;
 import static io.vertx.redis.client.Request.cmd;
@@ -32,7 +32,7 @@ public class RedisSentinelClient extends BaseRedisClient implements Redis {
 
   // We don't need to be secure, we just want so simple
   // randomization to avoid picking the same replica all the time
-  private static final Random RANDOM = new Random();
+  private static final SplittableRandom RANDOM = new SplittableRandom();
 
   private static class Pair<L, R> {
     final L left;

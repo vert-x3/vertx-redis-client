@@ -21,10 +21,7 @@ import io.vertx.redis.client.impl.types.NumberType;
 import io.vertx.redis.client.impl.types.MultiType;
 import io.vertx.redis.client.impl.types.SimpleStringType;
 
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Function;
@@ -190,11 +187,11 @@ public class RedisClusterClient extends BaseRedisClient implements Redis {
                 // during an error we lock the map because we will change it
                 // probably this isn't an issue as no more write should happen anyway
                 synchronized (connections) {
-                  connections.forEach((key, value) -> {
+                  for (RedisConnection value : connections.values()) {
                     if (value != null) {
                       value.close();
                     }
-                  });
+                  }
                 }
                 // return
                 onConnect.handle(Future.failedFuture("Failed to connect to all nodes of the cluster"));

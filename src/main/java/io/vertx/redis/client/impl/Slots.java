@@ -23,7 +23,7 @@ class Slots {
 
   // we need some randomness, it doesn't need
   // to be secure or unpredictable
-  private static final Random RANDOM = new Random();
+  private static final SplittableRandom RANDOM = new SplittableRandom();
 
   static class Slot {
     private final int start;
@@ -37,6 +37,7 @@ class Slots {
     }
   }
 
+  private final long ts = System.currentTimeMillis();
   private final int size;
   private final Slot[] slots;
   private final String[] endpoints;
@@ -120,5 +121,9 @@ class Slots {
 
   String[] endpoints() {
     return endpoints;
+  }
+
+  long timestamp() {
+    return ts;
   }
 }

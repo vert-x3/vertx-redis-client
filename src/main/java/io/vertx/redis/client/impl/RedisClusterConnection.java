@@ -22,7 +22,7 @@ public class RedisClusterConnection implements RedisConnection {
 
   // we need some randomness, it doesn't need
   // to be secure or unpredictable
-  private static final Random RANDOM = new Random();
+  private static final SplittableRandom RANDOM = new SplittableRandom();
 
   // number of attempts/redirects when we get connection errors
   // or when we get MOVED/ASK responses
@@ -514,11 +514,11 @@ public class RedisClusterConnection implements RedisConnection {
 
   @Override
   public void close() {
-    connections.forEach((key, value) -> {
-      if (value != null) {
-        value.close();
+    for (RedisConnection conn : connections.values()) {
+      if (conn != null) {
+        conn.close();
       }
-    });
+    }
   }
 
   @Override
@@ -553,26 +553,27 @@ public class RedisClusterConnection implements RedisConnection {
   }
 
   private String selectMasterOrReplicaEndpoint(boolean readOnly, String[] endpoints, boolean forceMasterEndpoint) {
-    int index = 0;
-
     if (forceMasterEndpoint) {
-      return endpoints[index];
+      return endpoints[0];
     }
 
     // always, never, share
     RedisReplicas useReplicas = options.getUseReplicas();
 
     if (readOnly && useReplicas != RedisReplicas.NEVER && endpoints.length > 1) {
-      // always use a replica for read commands
-      if (useReplicas == RedisReplicas.ALWAYS) {
-        index = RANDOM.nextInt(endpoints.length - 1) + 1;
-      }
-      // share read commands across master + replicas
-      if (useReplicas == RedisReplicas.SHARE) {
-        index = RANDOM.nextInt(endpoints.length);
+      switch (useReplicas) {
+        // always use a replica for read commands
+        case ALWAYS:
+          // index must always be more than 1 as 0 denotes master
+          return endpoints[1 + RANDOM.nextInt(endpoints.length - 1)];
+        // share read commands across master + replicas
+        case SHARE:
+          return endpoints[RANDOM.nextInt(endpoints.length)];
       }
     }
-    return endpoints[index];
+
+    // fallback to master
+    return endpoints[0];
   }
 
   private String buildCrossslotFailureMsg(RequestImpl req) {

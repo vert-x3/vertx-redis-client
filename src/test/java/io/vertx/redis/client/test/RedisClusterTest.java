@@ -891,7 +891,7 @@ public class RedisClusterTest {
       should.asyncAssertSuccess(response -> {
         should.assertEquals("OK", response.toString());
         test.complete();
-    }))
+      }))
     ));
   }
 
@@ -907,10 +907,10 @@ public class RedisClusterTest {
     cmdList.add(req);
     cmdList.add(req);
     Redis.createClient(rule.vertx(), options).connect(should.asyncAssertSuccess(cluster -> cluster.batch(cmdList,
-        should.asyncAssertSuccess(response -> {
-          should.assertEquals(2, response.size());
-          response.forEach(r -> should.assertEquals("OK", r.toString()));
-          test.complete();
+      should.asyncAssertSuccess(response -> {
+        should.assertEquals(2, response.size());
+        response.forEach(r -> should.assertEquals("OK", r.toString()));
+        test.complete();
       }))
     ));
   }
@@ -931,7 +931,7 @@ public class RedisClusterTest {
         should.assertEquals(2, response.size());
         response.forEach(r -> should.assertEquals("OK", r.toString()));
         test.complete();
-    }))
+      }))
     ));
   }
 
@@ -947,7 +947,7 @@ public class RedisClusterTest {
     Redis.createClient(rule.vertx(), options).connect(should.asyncAssertSuccess(cluster -> cluster.send(cmd(EVAL).arg("local r1 = redis.call('SET', KEYS[1], ARGV[1]) \n" +
         "local r2 = redis.call('SET', KEYS[2], ARGV[2]) \n" +
         "return {r1, r2}").arg(2).arg(key1).arg(key2).arg(argv1).arg(argv2),
-      should.asyncAssertFailure(throwable ->  {
+      should.asyncAssertFailure(throwable -> {
         should.assertTrue(throwable.getMessage().startsWith("Keys of command or batch"));
         test.complete();
       }))
@@ -964,7 +964,7 @@ public class RedisClusterTest {
     cmdList.add(cmd(EVAL).arg("return redis.call('SET', KEYS[1], ARGV[1])").arg(1).arg("{hash_tag}.some-key").arg(argv));
     cmdList.add(cmd(EVAL).arg("return redis.call('SET', KEYS[1], ARGV[1])").arg(1).arg("{other_hash_tag}.some-key").arg(argv));
     Redis.createClient(rule.vertx(), options).connect(should.asyncAssertSuccess(cluster -> cluster.batch(cmdList,
-      should.asyncAssertFailure(throwable ->  {
+      should.asyncAssertFailure(throwable -> {
         should.assertTrue(throwable.getMessage().startsWith("Keys of command or batch"));
         test.complete();
       }))
