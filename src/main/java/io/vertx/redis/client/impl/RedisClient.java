@@ -15,34 +15,22 @@
  */
 package io.vertx.redis.client.impl;
 
-import io.vertx.core.AsyncResult;
-import io.vertx.core.Context;
-import io.vertx.core.Handler;
-import io.vertx.core.Vertx;
-import io.vertx.redis.client.Redis;
-import io.vertx.redis.client.RedisConnection;
-import io.vertx.redis.client.RedisOptions;
+import io.vertx.core.*;
+import io.vertx.redis.client.*;
 
-public class RedisClient implements Redis {
+public class RedisClient extends BaseRedisClient implements Redis {
 
-  private final Context context;
-  private final RedisConnectionManager connectionManager;
   private final String defaultAddress;
 
   public RedisClient(Vertx vertx, RedisOptions options) {
-    this.context = vertx.getOrCreateContext();
-    this.connectionManager = new RedisConnectionManager(vertx, options);
+    super(vertx, options);
     this.defaultAddress = options.getEndpoint();
   }
 
   @Override
-  public Redis connect(Handler<AsyncResult<RedisConnection>> onConnect) {
-    connectionManager.getConnection(context, defaultAddress, null, onConnect);
-    return this;
-  }
-
-  @Override
-  public void close() {
-    connectionManager.close();
+  public Future<RedisConnection> connect() {
+    final Promise<RedisConnection> promise = vertx.promise();
+    connectionManager.getConnection(vertx.getOrCreateContext(), defaultAddress, null, promise);
+    return promise.future();
   }
 }

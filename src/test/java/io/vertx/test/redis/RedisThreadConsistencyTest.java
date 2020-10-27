@@ -35,19 +35,20 @@ public class RedisThreadConsistencyTest {
         RedisAPI.api(
           Redis.createClient(
             rule.vertx(),
-            new RedisOptions().setConnectionString("redis://" + container.getContainerIpAddress() + ":" + container.getFirstMappedPort())))));
-
-
-    rule.vertx()
-      .createHttpClient()
-      .request(HttpMethod.GET, 8080, "localhost", "/")
+            new RedisOptions().setConnectionString("redis://" + container.getContainerIpAddress() + ":" + container.getFirstMappedPort())))))
       .onFailure(should::fail)
-      .onSuccess(req -> {
-        req.send()
+      .onSuccess(id -> {
+        rule.vertx()
+          .createHttpClient()
+          .request(HttpMethod.GET, 8080, "localhost", "/")
           .onFailure(should::fail)
-          .onSuccess(res -> {
-            should.assertEquals(res.getHeader("initialThread"), res.getHeader("threadAfterRedisExecution"));
-            test.complete();
+          .onSuccess(req -> {
+            req.send()
+              .onFailure(should::fail)
+              .onSuccess(res -> {
+                should.assertEquals(res.getHeader("initialThread"), res.getHeader("threadAfterRedisExecution"));
+                test.complete();
+              });
           });
       });
   }

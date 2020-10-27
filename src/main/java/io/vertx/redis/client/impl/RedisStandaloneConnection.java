@@ -1,9 +1,13 @@
 package io.vertx.redis.client.impl;
 
-import io.vertx.core.*;
+import io.vertx.core.Future;
+import io.vertx.core.Handler;
+import io.vertx.core.Promise;
+import io.vertx.core.Vertx;
 import io.vertx.core.buffer.Buffer;
 import io.vertx.core.eventbus.EventBus;
 import io.vertx.core.impl.ContextInternal;
+import io.vertx.core.impl.VertxInternal;
 import io.vertx.core.impl.logging.Logger;
 import io.vertx.core.impl.logging.LoggerFactory;
 import io.vertx.core.json.JsonObject;
@@ -28,6 +32,7 @@ public class RedisStandaloneConnection implements RedisConnection, ParserHandler
   private static final ErrorType CONNECTION_CLOSED = ErrorType.create("CONNECTION_CLOSED");
 
   private final ConnectionListener<RedisConnection> listener;
+  private final VertxInternal vertx;
   private final ContextInternal context;
   private final EventBus eventBus;
   private final NetSocket netSocket;
@@ -44,6 +49,7 @@ public class RedisStandaloneConnection implements RedisConnection, ParserHandler
 
   public RedisStandaloneConnection(Vertx vertx, ContextInternal context, ConnectionListener<RedisConnection> connectionListener, NetSocket netSocket, RedisOptions options) {
     this.listener = connectionListener;
+    this.vertx = (VertxInternal) vertx;
     this.eventBus = vertx.eventBus();
     this.context = context;
     this.netSocket = netSocket;
@@ -109,17 +115,17 @@ public class RedisStandaloneConnection implements RedisConnection, ParserHandler
   }
 
   @Override
-  public RedisConnection send(final Request request, Handler<AsyncResult<Response>> handler) {
+  public Future<Response> send(final Request request) {
+    final Promise<Response> promise = vertx.promise();
+
     final boolean voidCmd = request.command().isVoid();
     if (!voidCmd && waiting.isFull()) {
-      handler.handle(Future.failedFuture("Redis waiting Queue is full"));
-      return this;
+      promise.fail("Redis waiting Queue is full");
+      return promise.future();
     }
 
     // encode the message to a buffer
     final Buffer message = ((RequestImpl) request).encode();
-    // wrap the handler into a promise
-    final Promise<Response> promise = context.promise(handler);
     // all update operations happen inside the context
     context.runOnContext(v -> {
       // offer the handler to the waiting queue if not void command
@@ -127,7 +133,7 @@ public class RedisStandaloneConnection implements RedisConnection, ParserHandler
         // we might have switch thread/context
         // this means the check needs to be performed again
         if (waiting.isFull()) {
-          handler.handle(Future.failedFuture("Redis waiting Queue is full"));
+          promise.fail("Redis waiting Queue is full");
           return;
         }
         waiting.offer(promise);
@@ -147,14 +153,16 @@ public class RedisStandaloneConnection implements RedisConnection, ParserHandler
       });
     });
 
-    return this;
+    return promise.future();
   }
 
   @Override
-  public RedisConnection batch(List<Request> commands, Handler<AsyncResult<List<Response>>> handler) {
+  public Future<List<Response>> batch(List<Request> commands) {
+    final Promise<List<Response>> promise = vertx.promise();
+
     if (waiting.freeSlots() < commands.size()) {
-      handler.handle(Future.failedFuture("Redis waiting Queue is full"));
-      return this;
+      promise.fail("Redis waiting Queue is full");
+      return promise.future();
     }
 
     // will re-encode the handler into a list of promises
@@ -172,24 +180,20 @@ public class RedisStandaloneConnection implements RedisConnection, ParserHandler
       // encode to the single buffer
       req.encode(messages);
       // unwrap the handler into a single handler
-      callbacks.add(index, context.promise(command -> {
+      callbacks.add(index, vertx.promise(command -> {
         if (!failed.get()) {
           if (command.failed()) {
             failed.set(true);
-            if (handler != null) {
-              handler.handle(Future.failedFuture(command.cause()));
-            }
+            promise.fail(command.cause());
             return;
           }
-          // set the reply
-          replies.add(index, command.result());
+        }
+        // set the reply
+        replies.add(index, command.result());
 
-          if (count.decrementAndGet() == 0) {
-            // all results have arrived
-            if (handler != null) {
-              handler.handle(Future.succeededFuture(replies));
-            }
-          }
+        if (count.decrementAndGet() == 0) {
+          // all results have arrived
+          promise.complete(replies);
         }
       }));
     }
@@ -199,7 +203,7 @@ public class RedisStandaloneConnection implements RedisConnection, ParserHandler
       // we might have switch thread/context
       // this means the check needs to be performed again
       if (waiting.freeSlots() < callbacks.size()) {
-        handler.handle(Future.failedFuture("Redis waiting Queue is full"));
+        promise.fail("Redis waiting Queue is full");
         return;
       }
 
@@ -217,7 +221,7 @@ public class RedisStandaloneConnection implements RedisConnection, ParserHandler
       });
     });
 
-    return this;
+    return promise.future();
   }
 
   @Override
