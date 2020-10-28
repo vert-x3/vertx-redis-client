@@ -206,11 +206,13 @@ class RedisConnectionManager {
           return;
         }
 
-        if (onSend.cause().getMessage().startsWith("ERR unknown command")) {
+        final Throwable err = onSend.cause();
+
+        if (err != null && err.getMessage().startsWith("ERR unknown command")) {
           // chatting to an old server
           authenticate(connection, password, handler);
         } else {
-          handler.handle(Future.failedFuture(onSend.cause()));
+          handler.handle(Future.failedFuture(err));
         }
       });
     }
@@ -272,12 +274,6 @@ class RedisConnectionManager {
 
   public void getConnection(Context userContext, String connectionString, Request setup, Handler<AsyncResult<RedisConnection>> handler) {
     pooledConnectionManager.getConnection((ContextInternal) userContext, new ConnectionKey(connectionString, setup), handler);
-  }
-
-  public Future<RedisConnection> getConnection(Context userContext, String connectionString, Request setup) {
-    final Promise<RedisConnection> promise = ((ContextInternal) userContext).promise();
-    pooledConnectionManager.getConnection((ContextInternal) userContext, new ConnectionKey(connectionString, setup), promise);
-    return promise.future();
   }
 
   public void close() {
