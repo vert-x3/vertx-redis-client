@@ -2,6 +2,9 @@ package io.vertx.redis.client.impl;
 
 import io.vertx.core.*;
 import io.vertx.core.impl.ContextInternal;
+import io.vertx.core.impl.EventLoopContext;
+import io.vertx.core.impl.VertxInternal;
+import io.vertx.core.impl.future.PromiseInternal;
 import io.vertx.core.impl.logging.Logger;
 import io.vertx.core.impl.logging.LoggerFactory;
 import io.vertx.core.net.NetClient;
@@ -20,14 +23,14 @@ class RedisConnectionManager {
 
   private static final Handler<Throwable> DEFAULT_EXCEPTION_HANDLER = t -> LOG.error("Unhandled Error", t);
 
-  private final Vertx vertx;
+  private final VertxInternal vertx;
   private final NetClient netClient;
 
   private final RedisOptions options;
   private final ConnectionManager<ConnectionKey, RedisConnection> pooledConnectionManager;
   private long timerID;
 
-  RedisConnectionManager(Vertx vertx, RedisOptions options) {
+  RedisConnectionManager(VertxInternal vertx, RedisOptions options) {
     this.vertx = vertx;
     this.options = options;
     this.netClient = vertx.createNetClient(options.getNetClientOptions());
@@ -113,7 +116,7 @@ class RedisConnectionManager {
       netClient.connect(redisURI.socketAddress(), clientConnect -> {
         if (clientConnect.failed()) {
           // connection failed
-          ctx.runOnContext(v -> onConnect.handle(Future.failedFuture(clientConnect.cause())));
+          ctx.execute(Future.failedFuture(clientConnect.cause()), onConnect);
           return;
         }
 
@@ -133,21 +136,21 @@ class RedisConnectionManager {
           // initial handshake
           hello(connection, redisURI, hello -> {
             if (hello.failed()) {
-              ctx.runOnContext(v1 -> onConnect.handle(Future.failedFuture(hello.cause())));
+              ctx.execute(Future.failedFuture(hello.cause()), onConnect);
               return;
             }
 
             // perform select
             select(connection, redisURI.select(), select -> {
               if (select.failed()) {
-                ctx.runOnContext(v2 -> onConnect.handle(Future.failedFuture(select.cause())));
+                ctx.execute(Future.failedFuture(select.cause()), onConnect);
                 return;
               }
 
               // perform setup
               setup(connection, setup, setupResult -> {
                 if (setupResult.failed()) {
-                  ctx.runOnContext(v2 -> onConnect.handle(Future.failedFuture(setupResult.cause())));
+                  ctx.execute(Future.failedFuture(setupResult.cause()), onConnect);
                   return;
                 }
 
@@ -156,7 +159,7 @@ class RedisConnectionManager {
                 connection.endHandler(null);
                 connection.exceptionHandler(DEFAULT_EXCEPTION_HANDLER);
 
-                ctx.runOnContext(v2 -> onConnect.handle(Future.succeededFuture(new ConnectResult<>(connection, 1, 1))));
+                ctx.execute(Future.succeededFuture(new ConnectResult<>(connection, 1, 1)), onConnect);
               });
             });
           });
@@ -272,8 +275,18 @@ class RedisConnectionManager {
     }
   }
 
-  public void getConnection(Context userContext, String connectionString, Request setup, Handler<AsyncResult<RedisConnection>> handler) {
-    pooledConnectionManager.getConnection((ContextInternal) userContext, new ConnectionKey(connectionString, setup), handler);
+  public Future<RedisConnection> getConnection(String connectionString, Request setup) {
+    final PromiseInternal<RedisConnection> promise = vertx.promise();
+    final ContextInternal ctx = promise.context();
+    final EventLoopContext eventLoopContext;
+    if (ctx instanceof EventLoopContext) {
+      eventLoopContext = (EventLoopContext) ctx;
+    } else {
+      eventLoopContext = vertx.createEventLoopContext(ctx.nettyEventLoop(), ctx.workerPool(), ctx.classLoader());
+    }
+
+    pooledConnectionManager.getConnection(eventLoopContext, new ConnectionKey(connectionString, setup), promise);
+    return promise.future();
   }
 
   public void close() {

@@ -127,7 +127,7 @@ public class RedisStandaloneConnection implements RedisConnection, ParserHandler
     // encode the message to a buffer
     final Buffer message = ((RequestImpl) request).encode();
     // all update operations happen inside the context
-    context.runOnContext(v -> {
+    context.execute(v -> {
       // offer the handler to the waiting queue if not void command
       if (!voidCmd) {
         // we might have switch thread/context
@@ -199,7 +199,7 @@ public class RedisStandaloneConnection implements RedisConnection, ParserHandler
     }
 
     // all update operations happen inside the context
-    context.runOnContext(v -> {
+    context.execute(v -> {
       // we might have switch thread/context
       // this means the check needs to be performed again
       if (waiting.freeSlots() < callbacks.size()) {
@@ -229,7 +229,7 @@ public class RedisStandaloneConnection implements RedisConnection, ParserHandler
     // pub/sub mode
     if ((reply != null && reply.type() == ResponseType.PUSH) || waiting.isEmpty()) {
       if (onMessage != null) {
-        context.runOnContext(v -> onMessage.handle(reply));
+        context.execute(reply, onMessage);
       } else {
         // pub/sub messages are arrays
         if (reply instanceof Multi) {
@@ -267,7 +267,7 @@ public class RedisStandaloneConnection implements RedisConnection, ParserHandler
     }
 
     // all update operations happen inside the context
-    context.runOnContext(v -> {
+    context.execute(v -> {
       final Promise<Response> req = waiting.poll();
 
       if (req != null) {
@@ -310,7 +310,7 @@ public class RedisStandaloneConnection implements RedisConnection, ParserHandler
     evict();
     // call the forceClose handler if any
     if (onEnd != null) {
-      context.runOnContext(x -> onEnd.handle(v));
+      context.execute(v, onEnd);
     }
   }
 
@@ -320,7 +320,7 @@ public class RedisStandaloneConnection implements RedisConnection, ParserHandler
     evict();
     // call the exception handler if any
     if (onException != null) {
-      context.runOnContext(x -> onException.handle(t));
+      context.execute(t, onException);
     }
   }
 
@@ -334,7 +334,7 @@ public class RedisStandaloneConnection implements RedisConnection, ParserHandler
     evict();
     // call the exception handler if any
     if (onException != null) {
-      context.runOnContext(x -> onException.handle(t));
+      context.execute(t, onException);
     }
   }
 
@@ -345,14 +345,14 @@ public class RedisStandaloneConnection implements RedisConnection, ParserHandler
     } catch (RejectedExecutionException e) {
       // call the exception handler if any
       if (onException != null) {
-        context.runOnContext(x -> onException.handle(e));
+        context.execute(e, onException);
       }
     }
   }
 
   private void cleanupQueue(Throwable t) {
     // all update operations happen inside the context
-    context.runOnContext(v -> {
+    context.execute(v -> {
       Promise<Response> req;
 
       while ((req = waiting.poll()) != null) {
