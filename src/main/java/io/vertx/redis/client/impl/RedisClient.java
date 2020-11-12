@@ -29,8 +29,6 @@ public class RedisClient extends BaseRedisClient implements Redis {
 
   @Override
   public Future<RedisConnection> connect() {
-    final Promise<RedisConnection> promise = vertx.promise();
-    connectionManager.getConnection(vertx.getOrCreateContext(), defaultAddress, null, promise);
-    return promise.future();
+    return connectionManager.getConnection(defaultAddress, null);
   }
 }
