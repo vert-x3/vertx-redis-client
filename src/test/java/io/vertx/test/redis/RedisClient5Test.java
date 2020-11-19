@@ -5,10 +5,7 @@ import io.vertx.ext.unit.TestContext;
 import io.vertx.ext.unit.junit.RunTestOnContext;
 import io.vertx.ext.unit.junit.VertxUnitRunner;
 import io.vertx.redis.client.*;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.*;
 import org.junit.runner.RunWith;
 import org.testcontainers.containers.GenericContainer;
 
@@ -23,8 +20,8 @@ public class RedisClient5Test {
   @Rule
   public final RunTestOnContext rule = new RunTestOnContext();
 
-  @Rule
-  public final GenericContainer<?> redis = new GenericContainer<>("redis:5")
+  @ClassRule
+  public static final GenericContainer<?> redis = new GenericContainer<>("redis:5")
     .withExposedPorts(6379);
 
   private Redis client;
