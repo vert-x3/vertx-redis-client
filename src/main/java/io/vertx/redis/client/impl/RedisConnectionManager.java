@@ -310,9 +310,9 @@ class RedisConnectionManager {
       pool = new Pool<>(
         ctx,
         connectionProvider,
-        options.getMaxPoolSize(),
-        1,
         options.getMaxPoolWaiting(),
+        1,
+        options.getMaxPoolSize(),
         this::connectionAdded,
         this::connectionRemoved,
         false);
