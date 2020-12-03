@@ -211,7 +211,8 @@ class RedisConnectionManager {
 
         final Throwable err = onSend.cause();
 
-        if (err != null && err.getMessage().startsWith("ERR unknown command")) {
+        if (err != null && err.getMessage() != null && err.getMessage()
+          .startsWith("ERR unknown command")) {
           // chatting to an old server
           authenticate(connection, password, handler);
         } else {
