@@ -5,6 +5,7 @@ import io.vertx.ext.unit.TestContext;
 import io.vertx.ext.unit.junit.RunTestOnContext;
 import io.vertx.ext.unit.junit.VertxUnitRunner;
 import io.vertx.redis.client.Redis;
+import io.vertx.redis.client.RedisConnection;
 import io.vertx.redis.client.RedisOptions;
 import io.vertx.redis.client.Response;
 import org.junit.*;
@@ -120,6 +121,24 @@ public class RedisClient6Test {
                       });
                   });
               });
+          });
+      });
+  }
+
+  @Test
+  public void testBoolean(TestContext should) {
+    final Async test = should.async();
+    final String key = makeKey();
+
+    client.send(cmd(HSET).arg(key).arg("true").arg(true).arg("false").arg(false))
+      .onFailure(should::fail)
+      .onSuccess(ok -> {
+        client.send(cmd(HGETALL).arg(key))
+          .onFailure(should::fail)
+          .onSuccess(hgetall -> {
+            should.assertFalse(hgetall.get("false").toBoolean());
+            should.assertTrue(hgetall.get("true").toBoolean());
+            test.complete();
           });
       });
   }

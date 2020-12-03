@@ -132,10 +132,7 @@ public interface Request {
    * @return self
    */
   @Fluent
-  default Request arg(boolean arg) {
-    arg(arg ? 't' : 'f');
-    return this;
-  }
+  Request arg(boolean arg);
 
   /**
    * Adds a JsonObject argument, the encoding will serialize the json as key0, value0, key1, value1, ... keyN, valueN.

@@ -32,6 +32,8 @@ public final class RequestImpl implements Request {
   private static final byte[] EMPTY_BYTES = new byte[0];
   private static final byte[] NULL_BULK = "$-1\r\n".getBytes(StandardCharsets.ISO_8859_1);
   private static final byte[] EOL = "\r\n".getBytes(StandardCharsets.ISO_8859_1);
+  private static final byte[] TRUE = new byte[] { 't' };
+  private static final byte[] FALSE = new byte[] { 'f' };
 
   private final Command cmd;
   private final List<byte[]> args;
@@ -58,6 +60,13 @@ public final class RequestImpl implements Request {
   @Override
   public Request arg(long arg) {
     args.add(numToBytes(arg));
+    return this;
+  }
+
+  // boolean
+  @Override
+  public Request arg(boolean arg) {
+    arg(arg ? TRUE : FALSE);
     return this;
   }
 
