@@ -85,4 +85,9 @@ public final class NumberType implements Response {
   public String toString() {
     return value.toString();
   }
+
+  @Override
+  public Boolean toBoolean() {
+    return value.intValue() == 1;
+  }
 }
