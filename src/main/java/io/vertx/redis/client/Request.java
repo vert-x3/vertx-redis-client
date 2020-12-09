@@ -192,7 +192,7 @@ public interface Request {
   }
 
   /**
-   * Adds a NULL encoded string
+   * Adds a {@code null} encoded string
    * @return self
    */
   @Fluent
