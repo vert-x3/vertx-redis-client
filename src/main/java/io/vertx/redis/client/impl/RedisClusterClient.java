@@ -148,7 +148,7 @@ public class RedisClusterClient implements Redis {
       final RedisConnection conn = getConnection.result();
 
       // fetch slots from the cluster immediately to ensure slots are correct
-      getSlots(conn, getSlots -> {
+      getSlots(endpoints.get(index), conn, getSlots -> {
         if (getSlots.failed()) {
           // the slots command failed.
           conn.close();
@@ -217,7 +217,7 @@ public class RedisClusterClient implements Redis {
     connectionManager.close();
   }
 
-  private void getSlots(RedisConnection conn, Handler<AsyncResult<Slots>> onGetSlots) {
+  private void getSlots(String endpoint, RedisConnection conn, Handler<AsyncResult<Slots>> onGetSlots) {
 
     conn.send(cmd(CLUSTER).arg("SLOTS"), send -> {
       if (send.failed()) {
@@ -234,7 +234,7 @@ public class RedisClusterClient implements Redis {
         return;
       }
 
-      onGetSlots.handle(Future.succeededFuture(new Slots(reply)));
+      onGetSlots.handle(Future.succeededFuture(new Slots(endpoint, reply)));
     });
   }
 }

@@ -42,9 +42,11 @@ class Slots {
   private final String[] endpoints;
   private final String[] masterEndpoints;
 
-  Slots(Response reply) {
+  Slots(String connectionString, Response reply) {
     size = reply.size();
     slots = new Slot[size];
+
+    final RedisURI uri = new RedisURI(connectionString);
 
     Set<String> uniqueEndpoints = new HashSet<>();
     final List<String> masterEndpoints = new ArrayList<>();
@@ -64,7 +66,9 @@ class Slots {
       // array of all clients, clients[2] = master, others are slaves
       for (int index = 2; index < s.size(); index++) {
         Response c = s.get(index);
-        final String endpoint = "redis://" + c.get(0).toString() + ":" + c.get(1).toInteger();
+        final String host = c.get(0).toString().contains(":") ? "[" + c.get(0).toString() + "]" : c.get(0).toString();
+
+        final String endpoint = uri.protocol() + "://" + uri.userinfo() + host + ":" + c.get(1).toInteger();
         slots[i].endpoints[index - 2] = endpoint;
         uniqueEndpoints.add(endpoint);
         if (index == 2) {
