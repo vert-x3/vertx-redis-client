@@ -1,5 +1,6 @@
 package io.vertx.test.redis;
 
+import io.vertx.core.json.JsonObject;
 import io.vertx.ext.unit.Async;
 import io.vertx.ext.unit.TestContext;
 import io.vertx.ext.unit.junit.RunTestOnContext;
@@ -68,5 +69,21 @@ public class RedisClient5Test {
         });
       });
     });
+  }
+
+  @Test(timeout = 10_000L)
+  public void testJson(TestContext should) {
+    final Async test = should.async();
+    final String mykey = makeKey();
+
+    JsonObject json = new JsonObject()
+      .putNull("nullKey");
+
+    client.send(cmd(HSET).arg(mykey).arg(json))
+      .onSuccess(res -> {
+        System.out.println(res);
+        test.complete();
+      })
+      .onFailure(should::fail);
   }
 }

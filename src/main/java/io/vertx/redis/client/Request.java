@@ -138,6 +138,8 @@ public interface Request {
    * Adds a JsonObject argument, the encoding will serialize the json as key0, value0, key1, value1, ... keyN, valueN.
    * This is a non-optimized serialization and will just use the string encoding of the values for non buffers.
    *
+   * All {@code null} values will follow the encoding rules of {@link #nullArg()}.
+   *
    * @throws IllegalArgumentException when values are of type JsonArray or JsonObject
    * @return self
    */
@@ -168,6 +170,8 @@ public interface Request {
    * Adds a JsonArray argument, the encoding will serialize the json as value0, value1, ... valueN.
    * This is a non-optimized serialization and will just use the string encoding of the values for non buffers.
    *
+   * All {@code null} values will follow the encoding rules of {@link #nullArg()}.
+   *
    * @throws IllegalArgumentException when values are of type JsonArray or JsonObject
    * @return self
    */
@@ -192,7 +196,12 @@ public interface Request {
   }
 
   /**
-   * Adds a NULL encoded string
+   * Adds a {@code null} encoded string. Redis does not allow storing the {@code null} value by itself. This method
+   * will encode any null value as the four character long string {@code "null"}.
+   *
+   * As a recommendation, this method should not be used directly unless this is the intented behavior. It is present
+   * to handle special cases such as encoding of {@link JsonObject} and {@link JsonArray} which may contain null values.
+   *
    * @return self
    */
   @Fluent
