@@ -44,7 +44,7 @@ public class RedisOptions {
   private String masterName;
   private RedisRole role;
   private RedisReplicas useReplicas;
-  private String password;
+  private volatile String password;
 
   // pool related options
   private int poolCleanerInterval;
@@ -472,7 +472,7 @@ public class RedisOptions {
    * @param password the default password
    * @return fluent self
    */
-  public RedisOptions setPassword(String password) {
+  public synchronized RedisOptions setPassword(String password) {
     this.password = password;
     return this;
   }

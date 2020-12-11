@@ -128,6 +128,28 @@ public interface Request {
   }
 
   /**
+   * Adds a float encoded to string
+   * @return self
+   */
+  @Fluent
+  @GenIgnore(GenIgnore.PERMITTED_TYPE)
+  default Request arg(float arg) {
+    arg(Float.toString(arg));
+    return this;
+  }
+
+  /**
+   * Adds a double encoded to string
+   * @return self
+   */
+  @Fluent
+  @GenIgnore(GenIgnore.PERMITTED_TYPE)
+  default Request arg(double arg) {
+    arg(Double.toString(arg));
+    return this;
+  }
+
+  /**
    * Adds a boolean encoded to string
    * @return self
    */
