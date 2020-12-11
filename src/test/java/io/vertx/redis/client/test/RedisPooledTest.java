@@ -12,6 +12,7 @@ import org.junit.runner.RunWith;
 
 import java.util.Arrays;
 import java.util.UUID;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.IntStream;
 
@@ -139,10 +140,11 @@ public class RedisPooledTest {
       vertx,
       new RedisOptions()
         .addConnectionString("redis://localhost:7006")
-        .setMaxPoolSize(10)
+        .setMaxPoolSize(5)
         .setMaxPoolWaiting(10));
 
     final AtomicInteger counter = new AtomicInteger();
+    final AtomicBoolean done = new AtomicBoolean();
 
     // this test asserts that the pools behaves as expected it shall return 10 new connections
     // and will fail on the 21st call as the 10 waiting slots are taken
@@ -151,11 +153,13 @@ public class RedisPooledTest {
       counter.incrementAndGet();
       client.connect(event1 -> {
         if (event1.succeeded()) {
-          should.assertTrue(counter.get() <= 10);
+          should.assertTrue(counter.get() <= 5);
         } else {
-          should.assertTrue(counter.get() == 21);
+          should.assertTrue(counter.get() == 16);
           vertx.cancelTimer(event);
-          test.complete();
+          if (done.compareAndSet(false, true)) {
+            test.complete();
+          }
         }
       });
     });
