@@ -45,11 +45,27 @@ public final class RedisURI {
   /**
    * Password to the Redis instance
    */
+  private final String user;
+  /**
+   * Password to the Redis instance
+   */
   private final String password;
   /**
    * Database number. With a default Redis config it might be a number from 0 to 15. Not supported in clustered mode.
    */
   private final Integer select;
+  /**
+   * SSL
+   */
+  private final boolean ssl;
+  /**
+   * UNIX
+   */
+  private final boolean unix;
+  /**
+   * Params
+   */
+  private final Map<String, String> params;
 
   public RedisURI(String connectionString) {
     this.connectionString = connectionString;
@@ -63,24 +79,40 @@ public final class RedisURI {
       // According to https://www.iana.org/assignments/uri-schemes/prov/redis there is no specified order of decision
       // in case if db number or password are given in 2 different ways (e.g. in path and query).
       // Implementation uses the query values as a fallback if another one is missing.
-      Map<String, String> query = parseQuery(uri);
+      params = parseQuery(uri);
       switch (uri.getScheme()) {
         case "rediss":
-        case "redis":
+          ssl = true;
+          unix = false;
           socketAddress = SocketAddress.inetSocketAddress(port, host);
           if (path.length() > 1) {
             // skip initial slash
             select = Integer.parseInt(uri.getPath().substring(1));
-          } else if (query.containsKey("db")) {
-            select = Integer.parseInt(query.get("db"));
+          } else if (params.containsKey("db")) {
+            select = Integer.parseInt(params.get("db"));
+          } else {
+            select = null;
+          }
+          break;
+        case "redis":
+          ssl = false;
+          unix = false;
+          socketAddress = SocketAddress.inetSocketAddress(port, host);
+          if (path.length() > 1) {
+            // skip initial slash
+            select = Integer.parseInt(uri.getPath().substring(1));
+          } else if (params.containsKey("db")) {
+            select = Integer.parseInt(params.get("db"));
           } else {
             select = null;
           }
           break;
         case "unix":
+          ssl = false;
+          unix = true;
           socketAddress = SocketAddress.domainSocketAddress(path);
-          if (query.containsKey("db")) {
-            select = Integer.parseInt(query.get("db"));
+          if (params.containsKey("db")) {
+            select = Integer.parseInt(params.get("db"));
           } else {
             select = null;
           }
@@ -91,14 +123,21 @@ public final class RedisURI {
 
       String userInfo = uri.getUserInfo();
       if (userInfo != null) {
-        String[] userInfoArray = userInfo.split(":");
-        if (userInfoArray.length > 0) {
-          password = userInfoArray[userInfoArray.length - 1];
+        int sep = userInfo.lastIndexOf(':');
+        if (sep != -1) {
+          if (sep > 0) {
+            user = userInfo.substring(0, sep);
+          } else {
+            user = params.getOrDefault("user", null);
+          }
+          password = userInfo.substring(sep + 1);
         } else {
-          password = query.getOrDefault("password", null);
+          user = params.getOrDefault("user", null);
+          password = params.getOrDefault("password", null);
         }
       } else {
-        password = query.getOrDefault("password", null);
+        user = params.getOrDefault("user", null);
+        password = params.getOrDefault("password", null);
       }
 
     } catch (URISyntaxException e) {
@@ -127,6 +166,10 @@ public final class RedisURI {
     return socketAddress;
   }
 
+  public String user() {
+    return user;
+  }
+
   public String password() {
     return password;
   }
@@ -135,8 +178,40 @@ public final class RedisURI {
     return select;
   }
 
-  public String connectionString() {
-    return connectionString;
+  public boolean ssl() {
+    return ssl;
+  }
+
+  public boolean unix() {
+    return unix;
+  }
+
+  public String param(String key) {
+    return params.get(key);
+  }
+
+  public String userinfo() {
+    if (user == null && password == null) {
+      return "";
+    }
+
+    return
+      (user == null ? "" : user) +
+        ":" +
+        (password == null ? "" : password) +
+        "@";
+  }
+
+  public String protocol() {
+    if (unix) {
+      return "unix";
+    } else {
+      if (ssl) {
+        return "rediss";
+      } else {
+        return "redis";
+      }
+    }
   }
 
   @Override

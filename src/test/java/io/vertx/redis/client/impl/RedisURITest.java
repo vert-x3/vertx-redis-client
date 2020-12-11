@@ -17,7 +17,7 @@ public class RedisURITest {
 
   @Test
   public void testOnlyPasswordGiven() {
-    RedisURI redisURI = new RedisURI("redis://p%40ssw0rd@redis-1234.hosted.com:1234/0");
+    RedisURI redisURI = new RedisURI("redis://:p%40ssw0rd@redis-1234.hosted.com:1234/0");
     Assert.assertEquals("Password is not correct", "p@ssw0rd", redisURI.password());
   }
 
@@ -29,7 +29,7 @@ public class RedisURITest {
 
   @Test
   public void testTwoPasswordsAreGiven() {
-    RedisURI redisURI = new RedisURI("redis://pass@redis-1234.hosted.com:1234/0?password=p%40ssw0rd");
+    RedisURI redisURI = new RedisURI("redis://:pass@redis-1234.hosted.com:1234/0?password=p%40ssw0rd");
     Assert.assertEquals("Password is not correct", "pass", redisURI.password());
   }
 
@@ -75,5 +75,11 @@ public class RedisURITest {
   public void testRedundantQuery() {
     RedisURI redisURI = new RedisURI("unix:///some/file.sock?");
     Assert.assertEquals("UNIX file is not correct", "/some/file.sock", redisURI.socketAddress().path());
+  }
+
+  @Test
+  public void testIPV6() {
+    RedisURI redisURI = new RedisURI("redis://[::1]:1234/0");
+    Assert.assertEquals("[::1]:1234", redisURI.socketAddress().toString());
   }
 }
