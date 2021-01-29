@@ -4,6 +4,8 @@ var redis = require('redis').createClient(7006);
 var Handlebars = require('handlebars');
 require('handlebars-helpers')();
 
+const excludedPubSub = ['PUBSUB', 'PUBLISH'];
+
 redis.command(function (err, res) {
   redis.quit();
   if (err) {
@@ -61,7 +63,7 @@ redis.command(function (err, res) {
       write: cmd[2].indexOf('write') !== -1,
       readOnly: cmd[2].indexOf('readonly') !== -1,
       movable: cmd[2].indexOf('movablekeys') !== -1,
-      pubsub: cmd[2].indexOf('pubsub') !== -1
+      pubsub: cmd[2].indexOf('pubsub') !== -1 && !excludedPubSub.includes(cmd[0].replace('-', '_').replace(':', '').toUpperCase())
     });
   });
 
