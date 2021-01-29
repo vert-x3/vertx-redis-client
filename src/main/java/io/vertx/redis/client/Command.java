@@ -134,8 +134,8 @@ public interface Command {
   Command PSUBSCRIBE = Command.create("psubscribe", -2, 0, 0, 0, false, false, false, true);
   Command PSYNC = Command.create("psync", 3, 0, 0, 0, false, false, false, false);
   Command PTTL = Command.create("pttl", 2, 1, 1, 1, false, true, false, false);
-  Command PUBLISH = Command.create("publish", 3, 0, 0, 0, false, false, false, true);
-  Command PUBSUB = Command.create("pubsub", -2, 0, 0, 0, false, false, false, true);
+  Command PUBLISH = Command.create("publish", 3, 0, 0, 0, false, false, false, false);
+  Command PUBSUB = Command.create("pubsub", -2, 0, 0, 0, false, false, false, false);
   Command PUNSUBSCRIBE = Command.create("punsubscribe", -1, 0, 0, 0, false, false, false, true);
   Command RANDOMKEY = Command.create("randomkey", 1, 0, 0, 0, false, true, false, false);
   Command READONLY = Command.create("readonly", 1, 0, 0, 0, false, false, false, false);
