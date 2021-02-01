@@ -159,9 +159,10 @@ public class RedisClusterClient extends BaseRedisClient implements Redis {
           final Map<String, RedisConnection> connections = new HashMap<>();
 
           // validate if the pool config is valid
-          if (options.getMaxPoolSize() < slots.size()) {
+          final int totalUniqueEndpoints = slots.endpoints().length;
+          if (options.getMaxPoolSize() < totalUniqueEndpoints) {
             // this isn't a valid setup, the connection pool will not accommodate all the required connections
-            onConnect.handle(Future.failedFuture("RedisOptions maxPoolSize < Cluster size(" + slots.size() + "): The pool is not able to hold all required connections!"));
+            onConnect.handle(Future.failedFuture("RedisOptions maxPoolSize < Cluster size(" + totalUniqueEndpoints + "): The pool is not able to hold all required connections!"));
             return;
           }
 
