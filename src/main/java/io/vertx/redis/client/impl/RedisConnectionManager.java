@@ -216,14 +216,18 @@ class RedisConnectionManager {
         }
 
         final Throwable err = onSend.cause();
-
-        if (err != null && err.getMessage() != null && err.getMessage()
-          .startsWith("ERR unknown command")) {
-          // chatting to an old server
-          authenticate(connection, password, handler);
-        } else {
-          handler.handle(Future.failedFuture(err));
+        if (err != null) {
+          String msg = err.getMessage();
+          if (msg != null) {
+            if (msg.startsWith("ERR unknown command") || msg.startsWith("ERR unknown or unsupported command")) {
+              // chatting to an old server
+              authenticate(connection, password, handler);
+              return;
+            }
+          }
         }
+
+        handler.handle(Future.failedFuture(err));
       });
     }
 
