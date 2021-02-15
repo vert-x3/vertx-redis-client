@@ -28,10 +28,10 @@ public class RedisClusterClientTest {
   @Parameterized.Parameters
   public static Iterable<String[]> data() {
     return Arrays.asList(
-      new String[] {"redis:5-alpine", "abcd"},
-      new String[] {"redis:5-alpine", null},
-      new String[] {"redis:6-alpine", "abcd"},
-      new String[] {"redis:6-alpine", null});
+      new String[] {"redis:5", "abcd"},
+      new String[] {"redis:5", null},
+      new String[] {"redis:6", "abcd"},
+      new String[] {"redis:6", null});
   }
 
   public final Network network = Network.newNetwork();
