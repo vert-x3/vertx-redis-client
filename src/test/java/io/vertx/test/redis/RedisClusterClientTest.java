@@ -136,9 +136,15 @@ public class RedisClusterClientTest {
   }
 
   @After
-  public void after() {
-    client.close();
-    redisCli.close();
+  public void after(TestContext should) {
+    final Async after = should.async();
+    try {
+      client.close();
+    } catch (RuntimeException e) {}
+    try {
+      redisCli.close();
+    } catch (RuntimeException e) {}
+    after.complete();
   }
 
   @Test(timeout = 10_000L)
