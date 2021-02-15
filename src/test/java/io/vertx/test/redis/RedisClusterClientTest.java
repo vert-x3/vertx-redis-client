@@ -1,10 +1,6 @@
 package io.vertx.test.redis;
 
-import io.vertx.core.Context;
-import io.vertx.ext.unit.Async;
-import io.vertx.ext.unit.TestContext;
-import io.vertx.ext.unit.junit.RunTestOnContext;
-import io.vertx.ext.unit.junit.VertxUnitRunnerWithParametersFactory;
+import io.vertx.core.Vertx;
 import io.vertx.redis.client.Redis;
 import io.vertx.redis.client.RedisClientType;
 import io.vertx.redis.client.RedisOptions;
@@ -21,9 +17,12 @@ import org.testcontainers.containers.wait.strategy.Wait;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.concurrent.CountDownLatch;
+
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 @RunWith(Parameterized.class)
-@Parameterized.UseParametersRunnerFactory(VertxUnitRunnerWithParametersFactory.class)
 public class RedisClusterClientTest {
 
   @Parameterized.Parameters
@@ -97,17 +96,11 @@ public class RedisClusterClientTest {
       );
   }
 
-  @Rule
-  public final RunTestOnContext rule = new RunTestOnContext();
-
+  private Vertx vertx;
   private Redis client;
 
   @Before
-  public void before(TestContext should) {
-    final Async before = should.async();
-    final Context ctx = rule.vertx().getOrCreateContext();
-
-    new Thread(() -> {
+  public void before() {
       List<GenericContainer<?>> containerList = new ArrayList<>();
       containerList.add(redis7000);
       containerList.add(redis7001);
@@ -117,52 +110,61 @@ public class RedisClusterClientTest {
       containerList.add(redis7005);
       StringBuilder stringBuilder = new StringBuilder();
       for (GenericContainer<?> container : containerList) {
-        String ip = container.getContainerInfo().getNetworkSettings().getNetworks().values().stream().findFirst().get().getIpAddress();
-        stringBuilder.append(ip).append(":").append("6379").append(" ");
+        container
+          .getContainerInfo()
+          .getNetworkSettings()
+          .getNetworks()
+          .values()
+          .stream()
+          .findFirst()
+          .ifPresent(containerNetwork ->
+            stringBuilder.append(containerNetwork.getIpAddress()).append(":").append("6379").append(" "));
       }
 
       String connectionString = stringBuilder.substring(0, stringBuilder.length() - 1);
-      redisCli.setCommand(String.format("redis-cli --cluster create %s --cluster-replicas 1 --cluster-yes%s", connectionString, password == null ? "" : " -a " + password));
-      // don't block it!
+      String cmd = String.format("redis-cli --cluster create %s --cluster-replicas 1 --cluster-yes%s", connectionString, password == null ? "" : " -a " + password);
+      System.out.println(cmd);
+      redisCli.setCommand(cmd);
       redisCli.start();
 
-      ctx.runOnContext(v -> {
-        client = Redis.createClient(
-          rule.vertx(), new RedisOptions()
-            .setType(RedisClientType.CLUSTER)
-            .addConnectionString(
-              password != null ?
-                "redis://:" + password + "@" + redis7000.getContainerIpAddress() + ":" + redis7000.getFirstMappedPort() :
-                "redis://" + redis7000.getContainerIpAddress() + ":" + redis7000.getFirstMappedPort())
-        );
-        before.complete();
-      });
-
-    }).start();
+      vertx = Vertx.vertx();
+      client = Redis.createClient(
+        vertx, new RedisOptions()
+          .setType(RedisClientType.CLUSTER)
+          .addConnectionString(
+            password != null ?
+              "redis://:" + password + "@" + redis7000.getContainerIpAddress() + ":" + redis7000.getFirstMappedPort() :
+              "redis://" + redis7000.getContainerIpAddress() + ":" + redis7000.getFirstMappedPort())
+      );
   }
 
   @After
-  public void after(TestContext should) {
-    final Async after = should.async();
+  public void after() {
     try {
       client.close();
     } catch (RuntimeException e) {}
     try {
       redisCli.close();
     } catch (RuntimeException e) {}
-    after.complete();
+    try {
+      vertx.close();
+    } catch (RuntimeException e) {}
   }
 
   @Test(timeout = 10_000L)
-  public void testConnect(TestContext should) {
-    final Async test = should.async();
-
-    client.connect(onConnect -> {
-      if (onConnect.failed()) {
-        should.fail(onConnect.cause());
-      }
-      should.assertTrue(onConnect.succeeded());
-      test.complete();
+  public void testConnect() throws InterruptedException {
+    CountDownLatch test = new CountDownLatch(1);
+    vertx.runOnContext(v -> {
+      client.connect(onConnect -> {
+        if (onConnect.failed()) {
+          fail(onConnect.cause().getMessage());
+        } else {
+          assertTrue(onConnect.succeeded());
+          test.countDown();
+        }
+      });
     });
+
+    test.await();
   }
 }
