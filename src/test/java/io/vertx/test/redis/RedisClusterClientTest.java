@@ -120,7 +120,8 @@ public class RedisClusterClientTest {
 
       String connectionString = stringBuilder.substring(0, stringBuilder.length() - 1);
       redisCli.setCommand(String.format("redis-cli --cluster create %s --cluster-replicas 1 --cluster-yes%s", connectionString, password == null ? "" : " -a " + password));
-      redisCli.start();
+      // don't block it!
+      new Thread(() -> redisCli.start()).start();
       handler.complete();
     }).onSuccess(handler -> {
       client = Redis.createClient(
