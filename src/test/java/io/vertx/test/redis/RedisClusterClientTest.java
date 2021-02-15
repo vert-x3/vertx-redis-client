@@ -1,5 +1,6 @@
 package io.vertx.test.redis;
 
+import io.vertx.core.Context;
 import io.vertx.ext.unit.Async;
 import io.vertx.ext.unit.TestContext;
 import io.vertx.ext.unit.junit.RunTestOnContext;
@@ -104,7 +105,9 @@ public class RedisClusterClientTest {
   @Before
   public void before(TestContext should) {
     final Async before = should.async();
-    rule.vertx().executeBlocking(handler -> {
+    final Context ctx = rule.vertx().getOrCreateContext();
+
+    new Thread(() -> {
       List<GenericContainer<?>> containerList = new ArrayList<>();
       containerList.add(redis7000);
       containerList.add(redis7001);
@@ -121,19 +124,21 @@ public class RedisClusterClientTest {
       String connectionString = stringBuilder.substring(0, stringBuilder.length() - 1);
       redisCli.setCommand(String.format("redis-cli --cluster create %s --cluster-replicas 1 --cluster-yes%s", connectionString, password == null ? "" : " -a " + password));
       // don't block it!
-      new Thread(() -> redisCli.start()).start();
-      handler.complete();
-    }).onSuccess(handler -> {
-      client = Redis.createClient(
-        rule.vertx(), new RedisOptions()
-          .setType(RedisClientType.CLUSTER)
-          .addConnectionString(
-            password != null ?
-              "redis://:" + password + "@" + redis7000.getContainerIpAddress() + ":" + redis7000.getFirstMappedPort() :
-              "redis://" + redis7000.getContainerIpAddress() + ":" + redis7000.getFirstMappedPort())
-      );
-      before.complete();
-    }).onFailure(should::fail);
+      redisCli.start();
+
+      ctx.runOnContext(v -> {
+        client = Redis.createClient(
+          rule.vertx(), new RedisOptions()
+            .setType(RedisClientType.CLUSTER)
+            .addConnectionString(
+              password != null ?
+                "redis://:" + password + "@" + redis7000.getContainerIpAddress() + ":" + redis7000.getFirstMappedPort() :
+                "redis://" + redis7000.getContainerIpAddress() + ":" + redis7000.getFirstMappedPort())
+        );
+        before.complete();
+      });
+
+    }).start();
   }
 
   @After
