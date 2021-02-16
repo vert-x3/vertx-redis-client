@@ -23,7 +23,7 @@ import java.util.List;
 
 @RunWith(Parameterized.class)
 @Parameterized.UseParametersRunnerFactory(VertxUnitRunnerWithParametersFactory.class)
-public class RedisClusterClientTest {
+public class RedisClusterClientIT {
 
   @Parameterized.Parameters
   public static Iterable<String[]> data() {
@@ -52,7 +52,7 @@ public class RedisClusterClientTest {
   public GenericContainer<?> redisCli;
   private final String password;
 
-  public RedisClusterClientTest(String image, String password) {
+  public RedisClusterClientIT(String image, String password) {
 
     System.out.println(image);
     System.out.println(password);
@@ -136,9 +136,15 @@ public class RedisClusterClientTest {
   }
 
   @After
-  public void after() {
-    client.close();
-    redisCli.close();
+  public void after(TestContext should) {
+    final Async after = should.async();
+    try {
+      client.close();
+    } catch (RuntimeException e) {}
+    try {
+      redisCli.close();
+    } catch (RuntimeException e) {}
+    after.complete();
   }
 
   @Test(timeout = 10_000L)
