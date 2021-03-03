@@ -27,7 +27,7 @@ class RedisConnectionManager {
   private final NetClient netClient;
 
   private final RedisOptions options;
-  private final ConnectionManager<ConnectionKey, RedisConnection> pooledConnectionManager;
+  private final ConnectionManager<ConnectionKey, Lease<RedisConnection>> pooledConnectionManager;
   private long timerID;
 
   RedisConnectionManager(VertxInternal vertx, RedisOptions options) {
@@ -37,7 +37,7 @@ class RedisConnectionManager {
     this.pooledConnectionManager = new ConnectionManager<>(this::connectionEndpointProvider);
   }
 
-  private Endpoint<RedisConnection> connectionEndpointProvider(ConnectionKey key, ContextInternal ctx, Runnable dispose) {
+  private Endpoint<Lease<RedisConnection>> connectionEndpointProvider(ConnectionKey key, ContextInternal ctx, Runnable dispose) {
     return new RedisEndpoint(dispose, ctx, key);
   }
 
@@ -277,7 +277,7 @@ class RedisConnectionManager {
   }
 
   public Future<RedisConnection> getConnection(String connectionString, Request setup) {
-    final PromiseInternal<RedisConnection> promise = vertx.promise();
+    final PromiseInternal<Lease<RedisConnection>> promise = vertx.promise();
     final ContextInternal ctx = promise.context();
     final EventLoopContext eventLoopContext;
     if (ctx instanceof EventLoopContext) {
@@ -287,7 +287,7 @@ class RedisConnectionManager {
     }
 
     pooledConnectionManager.getConnection(eventLoopContext, new ConnectionKey(connectionString, setup), promise);
-    return promise.future();
+    return promise.future().map(PooledRedisConnection::new);
   }
 
   public void close() {
@@ -301,7 +301,7 @@ class RedisConnectionManager {
     netClient.close();
   }
 
-  private class RedisEndpoint extends Endpoint<RedisConnection> {
+  private class RedisEndpoint extends Endpoint<Lease<RedisConnection>> {
 
     final Pool<RedisConnection> pool;
 
@@ -314,19 +314,14 @@ class RedisConnectionManager {
         options.getMaxPoolWaiting(),
         1,
         options.getMaxPoolSize(),
-        this::connectionAdded,
-        this::connectionRemoved,
+        c -> {},
+        c -> {},
         false);
     }
 
     @Override
-    public void requestConnection(ContextInternal ctx, Handler<AsyncResult<RedisConnection>> handler) {
+    public void requestConnection(ContextInternal ctx, Handler<AsyncResult<Lease<RedisConnection>>> handler) {
       pool.getConnection(handler);
-    }
-
-    @Override
-    protected void close(RedisConnection conn) {
-      ((RedisStandaloneConnection) conn).forceClose();
     }
   }
 }

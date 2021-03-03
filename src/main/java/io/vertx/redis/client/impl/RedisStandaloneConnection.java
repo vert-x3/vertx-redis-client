@@ -68,9 +68,11 @@ public class RedisStandaloneConnection implements RedisConnection, ParserHandler
 
   @Override
   public void close() {
-    // recycle this connection from the pool
+    // Should not be called, unless we want (in the future) to have non pooled redis connections
+  }
+
+  private void recycle() {
     expirationTimestamp = recycleTimeout > 0 ? System.currentTimeMillis() + recycleTimeout : 0L;
-    listener.onRecycle();
   }
 
   @Override
