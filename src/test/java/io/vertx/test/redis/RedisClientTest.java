@@ -24,6 +24,7 @@ import io.vertx.ext.unit.TestContext;
 import io.vertx.ext.unit.junit.RunTestOnContext;
 import io.vertx.ext.unit.junit.VertxUnitRunner;
 import io.vertx.redis.client.*;
+import io.vertx.redis.client.impl.PooledRedisConnection;
 import io.vertx.redis.client.impl.RedisStandaloneConnection;
 import org.junit.*;
 import org.junit.runner.RunWith;
@@ -131,18 +132,17 @@ public class RedisClientTest {
       // the socket, we are simulating what happens.
       RedisConnection conn = onConnect.result();
       try {
+        // conn is a PooledRedisConnection object
+        Field connectionField = getAccessibleField(PooledRedisConnection.class, "connection");
+        RedisConnection internalConnection = (RedisConnection) connectionField.get(conn);
+        // internalConnection is a RedisStandaloneConnection object
         Field listenerField = getAccessibleField(RedisStandaloneConnection.class, "listener");
-        ConnectionListener<RedisConnection> originalListener = (ConnectionListener<RedisConnection>) listenerField.get(conn);
+        ConnectionListener<RedisConnection> originalListener = (ConnectionListener<RedisConnection>) listenerField.get(internalConnection);
 
-        listenerField.set(conn, new ConnectionListener<RedisConnection>() {
+        listenerField.set(internalConnection, new ConnectionListener<RedisConnection>() {
           @Override
           public void onConcurrencyChange(long concurrency) {
             originalListener.onConcurrencyChange(concurrency);
-          }
-
-          @Override
-          public void onRecycle() {
-            originalListener.onRecycle();
           }
 
           @Override
@@ -152,13 +152,9 @@ public class RedisClientTest {
             before.complete();
           }
         });
-      } catch (NoSuchFieldException | IllegalAccessException e) {
-        should.fail(e);
-      }
 
-      try {
         Field socketField = getAccessibleField(RedisStandaloneConnection.class, "netSocket");
-        NetSocket socket = (NetSocket) socketField.get(conn);
+        NetSocket socket = (NetSocket) socketField.get(internalConnection);
         socket.close(); // this should cause the evict to occur
       } catch (NoSuchFieldException | IllegalAccessException e) {
         should.fail(e);
