@@ -38,7 +38,7 @@ class RedisConnectionManager {
   }
 
   private Endpoint<Lease<RedisConnection>> connectionEndpointProvider(ConnectionKey key, ContextInternal ctx, Runnable dispose) {
-    return new RedisEndpoint(dispose, ctx, key);
+    return new RedisEndpoint(vertx, netClient, options, dispose, ctx, key);
   }
 
   synchronized void start() {
@@ -51,7 +51,7 @@ class RedisConnectionManager {
     timerID = vertx.setTimer(period, id -> checkExpired(period));
   }
 
-  private static class ConnectionKey {
+  static class ConnectionKey {
     private final String string;
     private final Request setup;
 
@@ -65,21 +65,27 @@ class RedisConnectionManager {
       if (this == o) return true;
       if (o == null || getClass() != o.getClass()) return false;
       ConnectionKey that = (ConnectionKey) o;
-      return Objects.equals(string, that.string);
+      return Objects.equals(string, that.string) && Objects.equals(setup, that.setup);
     }
 
     @Override
     public int hashCode() {
-      return Objects.hash(string);
+      return Objects.hash(string, setup);
     }
   }
 
-  class RedisConnectionProvider implements ConnectionProvider<RedisConnection> {
+  static class RedisConnectionProvider implements ConnectionProvider<RedisConnection> {
 
+    private final VertxInternal vertx;
+    private final NetClient netClient;
     private final RedisURI redisURI;
     private final Request setup;
+    private final RedisOptions options;
 
-    public RedisConnectionProvider(String connectionString, Request setup) {
+    public RedisConnectionProvider(VertxInternal vertx, NetClient netClient, RedisOptions options, String connectionString, Request setup) {
+      this.vertx = vertx;
+      this.netClient = netClient;
+      this.options = options;
       this.redisURI = new RedisURI(connectionString);
       this.setup = setup;
     }
@@ -96,7 +102,6 @@ class RedisConnectionManager {
 
     @Override
     public void connect(ConnectionListener<RedisConnection> connectionListener, ContextInternal ctx, Handler<AsyncResult<ConnectResult<RedisConnection>>> onConnect) {
-
       // verify if we can make this connection
       final boolean netClientSsl = options.getNetClientOptions().isSsl();
       final boolean connectionStringSsl = redisURI.ssl();
@@ -301,13 +306,14 @@ class RedisConnectionManager {
     netClient.close();
   }
 
-  private class RedisEndpoint extends Endpoint<Lease<RedisConnection>> {
+  static class RedisEndpoint extends Endpoint<Lease<RedisConnection>> {
 
     final Pool<RedisConnection> pool;
 
-    public RedisEndpoint(Runnable dispose, ContextInternal ctx, ConnectionKey key) {
+    public RedisEndpoint(VertxInternal vertx, NetClient netClient, RedisOptions options, Runnable dispose, ContextInternal ctx, ConnectionKey key) {
       super(dispose);
-      ConnectionProvider<RedisConnection> connectionProvider = new RedisConnectionProvider(key.string, key.setup);
+      System.out.println("NEW POOL for: " + key);
+      ConnectionProvider<RedisConnection> connectionProvider = new RedisConnectionProvider(vertx, netClient, options, key.string, key.setup);
       pool = new Pool<>(
         ctx,
         connectionProvider,
@@ -321,7 +327,7 @@ class RedisConnectionManager {
 
     @Override
     public void requestConnection(ContextInternal ctx, Handler<AsyncResult<Lease<RedisConnection>>> handler) {
-      pool.getConnection(handler);
+      ctx.execute(t -> pool.getConnection(handler));
     }
   }
 }
