@@ -16,6 +16,7 @@ import io.vertx.redis.client.RedisOptions;
 import io.vertx.redis.client.Request;
 
 import java.util.Objects;
+import java.util.function.Consumer;
 
 class RedisConnectionManager {
 
@@ -162,6 +163,7 @@ class RedisConnectionManager {
                 // initialization complete
                 connection.handler(null);
                 connection.endHandler(null);
+                connection.evictHandler(null);
                 connection.exceptionHandler(DEFAULT_EXCEPTION_HANDLER);
 
                 ctx.execute(Future.succeededFuture(new ConnectResult<>(connection, 1, 1)), onConnect);
@@ -308,11 +310,12 @@ class RedisConnectionManager {
 
   static class RedisEndpoint extends Endpoint<Lease<RedisConnection>> {
 
+    private static final Consumer<RedisConnection> NOOP = c -> {};
+
     final Pool<RedisConnection> pool;
 
     public RedisEndpoint(VertxInternal vertx, NetClient netClient, RedisOptions options, Runnable dispose, ContextInternal ctx, ConnectionKey key) {
       super(dispose);
-      System.out.println("NEW POOL for: " + key);
       ConnectionProvider<RedisConnection> connectionProvider = new RedisConnectionProvider(vertx, netClient, options, key.string, key.setup);
       pool = new Pool<>(
         ctx,
@@ -320,8 +323,8 @@ class RedisConnectionManager {
         options.getMaxPoolWaiting(),
         1,
         options.getMaxPoolSize(),
-        c -> {},
-        c -> {},
+        NOOP,
+        NOOP,
         false);
     }
 
@@ -329,19 +332,16 @@ class RedisConnectionManager {
     public void requestConnection(ContextInternal ctx, Handler<AsyncResult<Lease<RedisConnection>>> handler) {
       pool.getConnection(ar -> {
         if (ar.succeeded()) {
+          // increment the reference counter to avoid the pool to be closed too soon
+          // once there are no more connections the pool is collected, so this counter needs
+          // to be as up to date as possible.
           incRefCount();
-          Lease<RedisConnection> lease = ar.result();
-          RedisStandaloneConnection connection = (RedisStandaloneConnection) lease.get();
-
+          final RedisStandaloneConnection connection = (RedisStandaloneConnection) ar.result().get();
           // Integration between endpoint/pool and the standalone connection
-
-          connection.endpointEvictor = v -> {
-            decRefCount();
-          };
-          handler.handle(ar);
-        } else {
-          handler.handle(ar);
+          connection.evictHandler(this::decRefCount);
         }
+        // proceed to user
+        handler.handle(ar);
       });
     }
   }

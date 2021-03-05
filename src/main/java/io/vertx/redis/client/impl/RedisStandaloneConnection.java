@@ -45,8 +45,8 @@ public class RedisStandaloneConnection implements RedisConnection, ParserHandler
   private Handler<Throwable> onException;
   private Handler<Void> onEnd;
   private Handler<Response> onMessage;
+  private Runnable onEvict;
   private long expirationTimestamp;
-  Handler<Void> endpointEvictor;
 
   public RedisStandaloneConnection(Vertx vertx, ContextInternal context, ConnectionListener<RedisConnection> connectionListener, NetSocket netSocket, RedisOptions options) {
     this.listener = connectionListener;
@@ -60,6 +60,11 @@ public class RedisStandaloneConnection implements RedisConnection, ParserHandler
 
   void forceClose() {
     listener.onEvict();
+    if (onEvict != null) {
+      onEvict.run();
+      // reset to avoid double calls
+      onEvict = null;
+    }
     netSocket.close();
   }
 
@@ -90,6 +95,11 @@ public class RedisStandaloneConnection implements RedisConnection, ParserHandler
   @Override
   public RedisConnection endHandler(Handler<Void> handler) {
     this.onEnd = handler;
+    return this;
+  }
+
+  RedisConnection evictHandler(Runnable handler) {
+    this.onEvict = handler;
     return this;
   }
 
@@ -311,12 +321,9 @@ public class RedisStandaloneConnection implements RedisConnection, ParserHandler
     cleanupQueue(CONNECTION_CLOSED);
     // evict this connection from the pool
     evict();
-    // call the forceClose handler if any
+    // call the end handler if any
     if (onEnd != null) {
       context.execute(v, onEnd);
-    }
-    if (endpointEvictor != null) {
-      endpointEvictor.handle(null);
     }
   }
 
@@ -348,6 +355,11 @@ public class RedisStandaloneConnection implements RedisConnection, ParserHandler
     // evict this connection from the pool
     try {
       listener.onEvict();
+      if (onEvict != null) {
+        onEvict.run();
+        // reset to avoid double calls
+        onEvict = null;
+      }
     } catch (RejectedExecutionException e) {
       // call the exception handler if any
       if (onException != null) {
