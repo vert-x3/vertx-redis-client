@@ -163,7 +163,6 @@ class RedisConnectionManager {
                 // initialization complete
                 connection.handler(null);
                 connection.endHandler(null);
-                connection.evictHandler(null);
                 connection.exceptionHandler(DEFAULT_EXCEPTION_HANDLER);
 
                 ctx.execute(Future.succeededFuture(new ConnectResult<>(connection, 1, 1)), onConnect);
