@@ -23,6 +23,10 @@ public class PooledRedisConnection implements RedisConnection {
     this.connection = lease.get();
   }
 
+  public RedisConnection actual() {
+    return connection;
+  }
+
   @Override
   public RedisConnection exceptionHandler(Handler<Throwable> handler) {
     connection.exceptionHandler(handler);

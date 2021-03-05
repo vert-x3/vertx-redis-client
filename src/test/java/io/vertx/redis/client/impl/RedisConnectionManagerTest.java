@@ -60,7 +60,7 @@ public class RedisConnectionManagerTest {
       connectionManager.getConnection("redis://" + container.getContainerIpAddress() + ":" + container.getFirstMappedPort(), null)
         .onFailure(should::fail)
         .onSuccess(conn -> {
-          System.out.println(conn);
+          System.out.println(((PooledRedisConnection)conn).actual());
 
           conn.send(Request.cmd(Command.PING))
             .onFailure(should::fail)

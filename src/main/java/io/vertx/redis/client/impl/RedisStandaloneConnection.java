@@ -46,6 +46,7 @@ public class RedisStandaloneConnection implements RedisConnection, ParserHandler
   private Handler<Void> onEnd;
   private Handler<Response> onMessage;
   private long expirationTimestamp;
+  Handler<Void> endpointEvictor;
 
   public RedisStandaloneConnection(Vertx vertx, ContextInternal context, ConnectionListener<RedisConnection> connectionListener, NetSocket netSocket, RedisOptions options) {
     this.listener = connectionListener;
@@ -313,6 +314,9 @@ public class RedisStandaloneConnection implements RedisConnection, ParserHandler
     // call the forceClose handler if any
     if (onEnd != null) {
       context.execute(v, onEnd);
+    }
+    if (endpointEvictor != null) {
+      endpointEvictor.handle(null);
     }
   }
 

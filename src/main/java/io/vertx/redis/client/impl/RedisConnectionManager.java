@@ -327,7 +327,22 @@ class RedisConnectionManager {
 
     @Override
     public void requestConnection(ContextInternal ctx, Handler<AsyncResult<Lease<RedisConnection>>> handler) {
-      ctx.execute(t -> pool.getConnection(handler));
+      pool.getConnection(ar -> {
+        if (ar.succeeded()) {
+          incRefCount();
+          Lease<RedisConnection> lease = ar.result();
+          RedisStandaloneConnection connection = (RedisStandaloneConnection) lease.get();
+
+          // Integration between endpoint/pool and the standalone connection
+
+          connection.endpointEvictor = v -> {
+            decRefCount();
+          };
+          handler.handle(ar);
+        } else {
+          handler.handle(ar);
+        }
+      });
     }
   }
 }
