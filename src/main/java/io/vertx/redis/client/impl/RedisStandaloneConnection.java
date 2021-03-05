@@ -45,6 +45,7 @@ public class RedisStandaloneConnection implements RedisConnection, ParserHandler
   private Handler<Throwable> onException;
   private Handler<Void> onEnd;
   private Handler<Response> onMessage;
+  private Runnable onEvict;
   private long expirationTimestamp;
 
   public RedisStandaloneConnection(Vertx vertx, ContextInternal context, ConnectionListener<RedisConnection> connectionListener, NetSocket netSocket, RedisOptions options) {
@@ -59,6 +60,11 @@ public class RedisStandaloneConnection implements RedisConnection, ParserHandler
 
   void forceClose() {
     listener.onEvict();
+    if (onEvict != null) {
+      onEvict.run();
+      // reset to avoid double calls
+      onEvict = null;
+    }
     netSocket.close();
   }
 
@@ -68,9 +74,11 @@ public class RedisStandaloneConnection implements RedisConnection, ParserHandler
 
   @Override
   public void close() {
-    // recycle this connection from the pool
+    // Should not be called, unless we want (in the future) to have non pooled redis connections
+  }
+
+  private void recycle() {
     expirationTimestamp = recycleTimeout > 0 ? System.currentTimeMillis() + recycleTimeout : 0L;
-    listener.onRecycle();
   }
 
   @Override
@@ -87,6 +95,11 @@ public class RedisStandaloneConnection implements RedisConnection, ParserHandler
   @Override
   public RedisConnection endHandler(Handler<Void> handler) {
     this.onEnd = handler;
+    return this;
+  }
+
+  RedisConnection evictHandler(Runnable handler) {
+    this.onEvict = handler;
     return this;
   }
 
@@ -308,7 +321,7 @@ public class RedisStandaloneConnection implements RedisConnection, ParserHandler
     cleanupQueue(CONNECTION_CLOSED);
     // evict this connection from the pool
     evict();
-    // call the forceClose handler if any
+    // call the end handler if any
     if (onEnd != null) {
       context.execute(v, onEnd);
     }
@@ -342,6 +355,11 @@ public class RedisStandaloneConnection implements RedisConnection, ParserHandler
     // evict this connection from the pool
     try {
       listener.onEvict();
+      if (onEvict != null) {
+        onEvict.run();
+        // reset to avoid double calls
+        onEvict = null;
+      }
     } catch (RejectedExecutionException e) {
       // call the exception handler if any
       if (onException != null) {

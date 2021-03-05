@@ -16,6 +16,7 @@ import io.vertx.redis.client.RedisOptions;
 import io.vertx.redis.client.Request;
 
 import java.util.Objects;
+import java.util.function.Consumer;
 
 class RedisConnectionManager {
 
@@ -27,7 +28,7 @@ class RedisConnectionManager {
   private final NetClient netClient;
 
   private final RedisOptions options;
-  private final ConnectionManager<ConnectionKey, RedisConnection> pooledConnectionManager;
+  private final ConnectionManager<ConnectionKey, Lease<RedisConnection>> pooledConnectionManager;
   private long timerID;
 
   RedisConnectionManager(VertxInternal vertx, RedisOptions options) {
@@ -37,8 +38,8 @@ class RedisConnectionManager {
     this.pooledConnectionManager = new ConnectionManager<>(this::connectionEndpointProvider);
   }
 
-  private Endpoint<RedisConnection> connectionEndpointProvider(ConnectionKey key, ContextInternal ctx, Runnable dispose) {
-    return new RedisEndpoint(dispose, ctx, key);
+  private Endpoint<Lease<RedisConnection>> connectionEndpointProvider(ConnectionKey key, ContextInternal ctx, Runnable dispose) {
+    return new RedisEndpoint(vertx, netClient, options, dispose, ctx, key);
   }
 
   synchronized void start() {
@@ -51,7 +52,7 @@ class RedisConnectionManager {
     timerID = vertx.setTimer(period, id -> checkExpired(period));
   }
 
-  private static class ConnectionKey {
+  static class ConnectionKey {
     private final String string;
     private final Request setup;
 
@@ -65,21 +66,27 @@ class RedisConnectionManager {
       if (this == o) return true;
       if (o == null || getClass() != o.getClass()) return false;
       ConnectionKey that = (ConnectionKey) o;
-      return Objects.equals(string, that.string);
+      return Objects.equals(string, that.string) && Objects.equals(setup, that.setup);
     }
 
     @Override
     public int hashCode() {
-      return Objects.hash(string);
+      return Objects.hash(string, setup);
     }
   }
 
-  class RedisConnectionProvider implements ConnectionProvider<RedisConnection> {
+  static class RedisConnectionProvider implements ConnectionProvider<RedisConnection> {
 
+    private final VertxInternal vertx;
+    private final NetClient netClient;
     private final RedisURI redisURI;
     private final Request setup;
+    private final RedisOptions options;
 
-    public RedisConnectionProvider(String connectionString, Request setup) {
+    public RedisConnectionProvider(VertxInternal vertx, NetClient netClient, RedisOptions options, String connectionString, Request setup) {
+      this.vertx = vertx;
+      this.netClient = netClient;
+      this.options = options;
       this.redisURI = new RedisURI(connectionString);
       this.setup = setup;
     }
@@ -96,7 +103,6 @@ class RedisConnectionManager {
 
     @Override
     public void connect(ConnectionListener<RedisConnection> connectionListener, ContextInternal ctx, Handler<AsyncResult<ConnectResult<RedisConnection>>> onConnect) {
-
       // verify if we can make this connection
       final boolean netClientSsl = options.getNetClientOptions().isSsl();
       final boolean connectionStringSsl = redisURI.ssl();
@@ -277,7 +283,7 @@ class RedisConnectionManager {
   }
 
   public Future<RedisConnection> getConnection(String connectionString, Request setup) {
-    final PromiseInternal<RedisConnection> promise = vertx.promise();
+    final PromiseInternal<Lease<RedisConnection>> promise = vertx.promise();
     final ContextInternal ctx = promise.context();
     final EventLoopContext eventLoopContext;
     if (ctx instanceof EventLoopContext) {
@@ -287,7 +293,7 @@ class RedisConnectionManager {
     }
 
     pooledConnectionManager.getConnection(eventLoopContext, new ConnectionKey(connectionString, setup), promise);
-    return promise.future();
+    return promise.future().map(PooledRedisConnection::new);
   }
 
   public void close() {
@@ -301,32 +307,41 @@ class RedisConnectionManager {
     netClient.close();
   }
 
-  private class RedisEndpoint extends Endpoint<RedisConnection> {
+  static class RedisEndpoint extends Endpoint<Lease<RedisConnection>> {
+
+    private static final Consumer<RedisConnection> NOOP = c -> {};
 
     final Pool<RedisConnection> pool;
 
-    public RedisEndpoint(Runnable dispose, ContextInternal ctx, ConnectionKey key) {
+    public RedisEndpoint(VertxInternal vertx, NetClient netClient, RedisOptions options, Runnable dispose, ContextInternal ctx, ConnectionKey key) {
       super(dispose);
-      ConnectionProvider<RedisConnection> connectionProvider = new RedisConnectionProvider(key.string, key.setup);
+      ConnectionProvider<RedisConnection> connectionProvider = new RedisConnectionProvider(vertx, netClient, options, key.string, key.setup);
       pool = new Pool<>(
         ctx,
         connectionProvider,
         options.getMaxPoolWaiting(),
         1,
         options.getMaxPoolSize(),
-        this::connectionAdded,
-        this::connectionRemoved,
+        NOOP,
+        NOOP,
         false);
     }
 
     @Override
-    public void requestConnection(ContextInternal ctx, Handler<AsyncResult<RedisConnection>> handler) {
-      pool.getConnection(handler);
-    }
-
-    @Override
-    protected void close(RedisConnection conn) {
-      ((RedisStandaloneConnection) conn).forceClose();
+    public void requestConnection(ContextInternal ctx, Handler<AsyncResult<Lease<RedisConnection>>> handler) {
+      pool.getConnection(ar -> {
+        if (ar.succeeded()) {
+          // increment the reference counter to avoid the pool to be closed too soon
+          // once there are no more connections the pool is collected, so this counter needs
+          // to be as up to date as possible.
+          incRefCount();
+          final RedisStandaloneConnection connection = (RedisStandaloneConnection) ar.result().get();
+          // Integration between endpoint/pool and the standalone connection
+          connection.evictHandler(this::decRefCount);
+        }
+        // proceed to user
+        handler.handle(ar);
+      });
     }
   }
 }

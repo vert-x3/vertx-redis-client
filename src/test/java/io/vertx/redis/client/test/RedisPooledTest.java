@@ -6,9 +6,11 @@ import io.vertx.ext.unit.TestContext;
 import io.vertx.ext.unit.junit.RunTestOnContext;
 import io.vertx.ext.unit.junit.VertxUnitRunner;
 import io.vertx.redis.client.*;
+import org.junit.ClassRule;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.testcontainers.containers.GenericContainer;
 
 import java.util.Arrays;
 import java.util.UUID;
@@ -24,11 +26,15 @@ public class RedisPooledTest {
   @Rule
   public final RunTestOnContext rule = new RunTestOnContext();
 
+  @ClassRule
+  public static final GenericContainer<?> container = new GenericContainer<>("redis:6.0.6")
+    .withExposedPorts(6379);
+
   @Test
   public void simpleTest(TestContext should) {
     final Async test = should.async();
 
-    Redis.createClient(rule.vertx(), "redis://localhost:7006")
+    Redis.createClient(rule.vertx(), "redis://" + container.getContainerIpAddress() + ":" + container.getFirstMappedPort())
       .send(Request.cmd(Command.PING), send -> {
         should.assertTrue(send.succeeded());
         should.assertNotNull(send.result());
@@ -42,7 +48,7 @@ public class RedisPooledTest {
   public void emptyStringTest(TestContext should) {
     final Async test = should.async();
 
-    Redis.createClient(rule.vertx(), "redis://localhost:7006")
+    Redis.createClient(rule.vertx(), "redis://" + container.getContainerIpAddress() + ":" + container.getFirstMappedPort())
       .send(Request.cmd(Command.SET).arg(UUID.randomUUID().toString()).arg(""), send -> {
         should.assertTrue(send.succeeded());
         should.assertNotNull(send.result());
@@ -56,7 +62,7 @@ public class RedisPooledTest {
   public void simpleSelectTest(TestContext should) {
     final Async test = should.async();
 
-    Redis.createClient(rule.vertx(), "redis://localhost:7006/0")
+    Redis.createClient(rule.vertx(), "redis://" + container.getContainerIpAddress() + ":" + container.getFirstMappedPort() + "/0")
       .send(Request.cmd(Command.PING), send -> {
         should.assertTrue(send.succeeded());
         should.assertNotNull(send.result());
@@ -70,7 +76,7 @@ public class RedisPooledTest {
   public void batchTest(TestContext should) {
     final Async test = should.async();
 
-    Redis.createClient(rule.vertx(), "redis://localhost:7006")
+    Redis.createClient(rule.vertx(), "redis://" + container.getContainerIpAddress() + ":" + container.getFirstMappedPort())
       .batch(Arrays.asList(
         cmd(MULTI),
         cmd(SET).arg("a").arg(3),
@@ -86,7 +92,7 @@ public class RedisPooledTest {
   public void simpleTestAPI(TestContext should) {
     final Async test = should.async();
 
-    RedisAPI redis = RedisAPI.api(Redis.createClient(rule.vertx(), "redis://localhost:7006"));
+    RedisAPI redis = RedisAPI.api(Redis.createClient(rule.vertx(), "redis://" + container.getContainerIpAddress() + ":" + container.getFirstMappedPort()));
 
     redis.set(Arrays.asList("key1", "value1"), set -> {
       should.assertTrue(set.succeeded());
@@ -108,7 +114,7 @@ public class RedisPooledTest {
       rule.vertx(),
       new RedisOptions()
         .setMaxPoolWaiting(8)
-        .addConnectionString("redis://localhost:7006")));
+        .addConnectionString("redis://" + container.getContainerIpAddress() + ":" + container.getFirstMappedPort())));
 
     IntStream.range(0, 5).forEach(i -> vertx.setTimer(1, timerid -> {
       redis.set(Arrays.asList("foo", "bar"), res -> {
@@ -136,7 +142,7 @@ public class RedisPooledTest {
     Redis client = Redis.createClient(
       vertx,
       new RedisOptions()
-        .addConnectionString("redis://localhost:7006")
+        .addConnectionString("redis://" + container.getContainerIpAddress() + ":" + container.getFirstMappedPort())
         .setMaxPoolSize(10)
         .setMaxPoolWaiting(10));
 
