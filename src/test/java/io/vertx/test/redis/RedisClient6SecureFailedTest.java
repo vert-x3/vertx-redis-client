@@ -6,6 +6,7 @@ import io.vertx.ext.unit.junit.RunTestOnContext;
 import io.vertx.ext.unit.junit.VertxUnitRunner;
 import io.vertx.redis.client.Redis;
 import io.vertx.redis.client.RedisOptions;
+import io.vertx.redis.client.impl.types.ErrorType;
 import org.junit.*;
 import org.junit.runner.RunWith;
 import org.testcontainers.containers.GenericContainer;
@@ -23,7 +24,7 @@ public class RedisClient6SecureFailedTest {
   public final RunTestOnContext rule = new RunTestOnContext();
 
   @ClassRule
-  public static final GenericContainer<?> redis = new GenericContainer<>("redis:6")
+  public static final GenericContainer<?> redis = new GenericContainer<>("redis:6.2.1")
     .withExposedPorts(6379);
 
   private Redis client;
@@ -66,7 +67,7 @@ public class RedisClient6SecureFailedTest {
 
     client.send(cmd(GET).arg(nonexisting), reply0 -> {
       should.assertTrue(reply0.failed());
-      should.assertEquals("WRONGPASS invalid username-password pair", reply0.cause().getMessage());
+      should.assertTrue(((ErrorType) reply0.cause()).is("WRONGPASS"));
       test.complete();
     });
   }
