@@ -27,8 +27,6 @@ public class RedisClientTLSTest {
   public static final GenericContainer<?> redis = new GenericContainer<>("redis:6.2.1")
     .withExposedPorts(6379);
 
-  private volatile NetServer  server;
-
   @Before
   public void setUp(TestContext should) {
     final Async test = should.async();
@@ -59,7 +57,9 @@ public class RedisClientTLSTest {
       }).listen(0)
       .onFailure(should::fail)
       .onSuccess(server -> {
-        this.server = server;
+        rule.vertx()
+          .getOrCreateContext()
+          .putLocal("server", server);
         test.complete();
       });
   }
@@ -68,17 +68,22 @@ public class RedisClientTLSTest {
   public void tearDown(TestContext should) {
     final Async test = should.async();
 
+    NetServer server = rule.vertx()
+      .getOrCreateContext()
+      .getLocal("server");
+
     server.close()
       .onFailure(should::fail)
-      .onSuccess(v -> {
-        server = null;
-        test.complete();
-      });
+      .onSuccess(v -> test.complete());
   }
 
-  @Test
+  @Test(timeout = 30_000L)
   public void testConnectionStringUpgrade(TestContext should) {
     final Async test = should.async();
+
+    NetServer server = rule.vertx()
+      .getOrCreateContext()
+      .getLocal("server");
 
     Redis client = Redis.createClient(
       rule.vertx(),
@@ -90,18 +95,19 @@ public class RedisClientTLSTest {
     client.connect()
       .onFailure(should::fail)
       .onSuccess(conn -> {
-        conn.send(Request.cmd(Command.INFO))
+        conn.send(Request.cmd(Command.PING))
           .onFailure(should::fail)
-          .onSuccess(res -> {
-            System.out.println(res);
-            test.complete();
-          });
+          .onSuccess(res -> test.complete());
       });
   }
 
-  @Test
+  @Test(timeout = 30_000L)
   public void testConnectionOptions(TestContext should) {
     final Async test = should.async();
+
+    NetServer server = rule.vertx()
+      .getOrCreateContext()
+      .getLocal("server");
 
     Redis client = Redis.createClient(
       rule.vertx(),
@@ -113,7 +119,7 @@ public class RedisClientTLSTest {
     client.connect()
       .onFailure(should::fail)
       .onSuccess(conn -> {
-        conn.send(Request.cmd(Command.INFO))
+        conn.send(Request.cmd(Command.PING))
           .onFailure(should::fail)
           .onSuccess(res -> {
             System.out.println(res);
@@ -122,9 +128,13 @@ public class RedisClientTLSTest {
       });
   }
 
-  @Test
+  @Test(timeout = 30_000L)
   public void testInvalidOptions(TestContext should) {
     final Async test = should.async();
+
+    NetServer server = rule.vertx()
+      .getOrCreateContext()
+      .getLocal("server");
 
     Redis client = Redis.createClient(
       rule.vertx(),
