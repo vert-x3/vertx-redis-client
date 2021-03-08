@@ -5,7 +5,6 @@ import io.vertx.core.net.JksOptions;
 import io.vertx.core.net.NetClientOptions;
 import io.vertx.core.net.NetServer;
 import io.vertx.core.net.NetServerOptions;
-import io.vertx.core.streams.Pump;
 import io.vertx.ext.unit.Async;
 import io.vertx.ext.unit.TestContext;
 import io.vertx.ext.unit.junit.RunTestOnContext;
@@ -50,6 +49,8 @@ public class RedisClientTLSTest {
     proxyVertx
       .createNetServer(options)
       .connectHandler(sockA -> {
+        sockA.exceptionHandler(Throwable::printStackTrace);
+
         // client A is connected, open a socket to the redis server
         proxyVertx
           .createNetClient(new NetClientOptions()
@@ -62,9 +63,14 @@ public class RedisClientTLSTest {
             should.fail(err);
           })
           .onSuccess(sockB -> {
+            sockB.exceptionHandler(Throwable::printStackTrace);
+
             // pump
-            Pump.pump(sockA, sockB).start();
-            Pump.pump(sockB, sockA).start();
+            sockB.handler(sockA::write);
+            sockA.handler(sockB::write);
+
+            sockA.endHandler(v -> sockB.end());
+            sockB.endHandler(v -> sockA.end());
           });
       }).listen(0)
       .onFailure(should::fail)
