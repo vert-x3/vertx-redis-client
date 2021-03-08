@@ -80,9 +80,11 @@ public class RedisClientTLSTest {
     Redis client = Redis.createClient(
       rule.vertx(),
       new RedisOptions()
+        .setMaxPoolSize(20)
+        .setMaxPoolWaiting(0)
         // were using self signed certificates so we need to trust all
         .setNetClientOptions(new NetClientOptions().setTrustAll(true).setSsl(false))
-        .setConnectionString("rediss://localhost:" + port + "?test=upgrade"));
+        .setConnectionString("rediss://0.0.0.0:" + port + "?test=upgrade"));
 
     client.connect()
       .onFailure(err -> {
