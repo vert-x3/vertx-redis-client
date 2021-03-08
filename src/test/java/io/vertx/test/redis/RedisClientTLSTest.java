@@ -69,8 +69,6 @@ public class RedisClientTLSTest {
             should.fail(err);
           })
           .onSuccess(sockB -> {
-            // resume from pause
-            sockA.resume();
 
             sockB.exceptionHandler(Throwable::printStackTrace);
 
@@ -82,6 +80,9 @@ public class RedisClientTLSTest {
               sockB.write(buff)
                 .onFailure(should::fail);
             });
+
+            // resume from pause
+            sockA.resume();
 
             sockB.handler(buff -> {
               System.out.println("<- " + buff);
