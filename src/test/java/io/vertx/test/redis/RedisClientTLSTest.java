@@ -18,8 +18,6 @@ import org.junit.*;
 import org.junit.runner.RunWith;
 import org.testcontainers.containers.GenericContainer;
 
-import java.util.concurrent.atomic.AtomicBoolean;
-
 @RunWith(VertxUnitRunner.class)
 public class RedisClientTLSTest {
 
@@ -41,6 +39,8 @@ public class RedisClientTLSTest {
     // users are expected to serve it behind a TLS tunnel
     // this test fakes it by creating a tunnel to the final open redis server
     NetServerOptions options = new NetServerOptions()
+      .setTcpKeepAlive(true)
+      .setTcpNoDelay(true)
       .setSsl(true)
       .setKeyStoreOptions(
         new JksOptions()
@@ -50,55 +50,72 @@ public class RedisClientTLSTest {
     proxyVertx
       .createNetServer(options)
       .connectHandler(sockA -> {
+        // pause until the proxy client is ready
+        sockA.pause();
+
+        sockA.exceptionHandler(Throwable::printStackTrace);
+
         // client A is connected, open a socket to the redis server
         proxyVertx
-          .createNetClient()
+          .createNetClient(new NetClientOptions()
+            .setTcpKeepAlive(true)
+            .setTcpNoDelay(true))
           .connect(redis.getFirstMappedPort(), redis.getContainerIpAddress())
           .onFailure(err -> {
             System.out.println("PROXY CLIENT ERR: " + err);
             should.fail(err);
           })
           .onSuccess(sockB -> {
+
+            sockB.exceptionHandler(Throwable::printStackTrace);
+
             // pump
-            Pump.pump(sockA, sockB).start();
-            Pump.pump(sockB, sockA).start();
+            sockA.handler(buff -> {
+//              System.out.println("-> " + buff);
+              sockB.write(buff)
+                .onFailure(should::fail);
+            });
+
+            // resume from pause
+            sockA.resume();
+
+            sockB.handler(buff -> {
+//              System.out.println("<- " + buff);
+              sockA.write(buff)
+                .onFailure(should::fail);
+            });
+
+            sockA.endHandler(v -> sockB.end());
+            sockB.endHandler(v -> sockA.end());
           });
       }).listen(0)
       .onFailure(should::fail)
       .onSuccess(server -> {
         RedisClientTLSTest.server = server;
-        System.out.println("Proxy port: " + server.actualPort());
         test.complete();
       });
-  }
-
-  @AfterClass
-  public static void shutdown(TestContext should) {
-    final Async test = should.async();
-
-    proxyVertx.close()
-      .onFailure(should::fail)
-      .onSuccess(v -> test.complete());
   }
 
   @Test(timeout = 30_000L)
   public void testConnectionStringUpgrade(TestContext should) {
     final Async test = should.async();
-    final int port = server.actualPort();
 
-    System.out.println(port);
+    // begin test
+    final int port = server.actualPort();
 
     Redis client = Redis.createClient(
       rule.vertx(),
       new RedisOptions()
         // were using self signed certificates so we need to trust all
-        .setNetClientOptions(new NetClientOptions().setTrustAll(true))
-        .setConnectionString("rediss://localhost:" + port));
+        .setNetClientOptions(new NetClientOptions().setTrustAll(true)
+          // default values
+          .setTcpKeepAlive(true)
+          .setTcpNoDelay(true))
+        .setConnectionString("rediss://0.0.0.0:" + port + "?test=upgrade"));
 
     client.connect()
       .onFailure(err -> {
         System.out.println("REDIS CLIENT (CONNECT) ERR: " + err);
-        err.printStackTrace();
       })
       .onSuccess(conn -> {
         conn.send(Request.cmd(Command.PING))
@@ -119,7 +136,10 @@ public class RedisClientTLSTest {
       rule.vertx(),
       new RedisOptions()
         // were using self signed certificates so we need to trust all
-        .setNetClientOptions(new NetClientOptions().setSsl(true).setTrustAll(true))
+        .setNetClientOptions(new NetClientOptions().setSsl(true).setTrustAll(true)
+          // default values
+          .setTcpKeepAlive(true)
+          .setTcpNoDelay(true))
         .setConnectionString("rediss://localhost:" + server.actualPort()));
 
     client.connect()
@@ -139,7 +159,10 @@ public class RedisClientTLSTest {
       rule.vertx(),
       new RedisOptions()
         // were using self signed certificates so we need to trust all
-        .setNetClientOptions(new NetClientOptions().setSsl(true).setTrustAll(true))
+        .setNetClientOptions(new NetClientOptions().setSsl(true).setTrustAll(true)
+          // default values
+          .setTcpKeepAlive(true)
+          .setTcpNoDelay(true))
         // pool is SSL but connection string isn't
         .setConnectionString("redis://localhost:" + server.actualPort()));
 
