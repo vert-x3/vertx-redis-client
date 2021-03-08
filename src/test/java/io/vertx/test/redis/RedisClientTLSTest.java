@@ -5,6 +5,7 @@ import io.vertx.core.net.JksOptions;
 import io.vertx.core.net.NetClientOptions;
 import io.vertx.core.net.NetServer;
 import io.vertx.core.net.NetServerOptions;
+import io.vertx.core.streams.Pump;
 import io.vertx.ext.unit.Async;
 import io.vertx.ext.unit.TestContext;
 import io.vertx.ext.unit.junit.RunTestOnContext;
@@ -51,6 +52,9 @@ public class RedisClientTLSTest {
       .connectHandler(sockA -> {
         sockA.exceptionHandler(Throwable::printStackTrace);
 
+        System.out.println("Starting proxy client: " + System.currentTimeMillis());
+
+
         // client A is connected, open a socket to the redis server
         proxyVertx
           .createNetClient(new NetClientOptions()
@@ -65,9 +69,11 @@ public class RedisClientTLSTest {
           .onSuccess(sockB -> {
             sockB.exceptionHandler(Throwable::printStackTrace);
 
+            System.out.println("Connected proxy client: " + System.currentTimeMillis());
+
             // pump
-            sockB.handler(sockA::write);
-            sockA.handler(sockB::write);
+            Pump.pump(sockA, sockB).start();
+            Pump.pump(sockB, sockA).start();
 
             sockA.endHandler(v -> sockB.end());
             sockB.endHandler(v -> sockA.end());
@@ -83,6 +89,7 @@ public class RedisClientTLSTest {
   @Test(timeout = 30_000L)
   public void testConnectionStringUpgrade(TestContext should) {
     final Async test = should.async();
+    System.out.println("Starting test: " + System.currentTimeMillis());
 
     // begin test
     final int port = server.actualPort();
