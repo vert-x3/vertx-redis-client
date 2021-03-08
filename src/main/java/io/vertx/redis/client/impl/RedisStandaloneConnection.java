@@ -353,18 +353,9 @@ public class RedisStandaloneConnection implements RedisConnection, ParserHandler
 
   private void evict() {
     // evict this connection from the pool
-    try {
-      listener.onEvict();
-      if (onEvict != null) {
-        onEvict.run();
-        // reset to avoid double calls
-        onEvict = null;
-      }
-    } catch (RejectedExecutionException e) {
-      // call the exception handler if any
-      if (onException != null) {
-        context.execute(e, onException);
-      }
+    listener.onEvict();
+    if (onEvict != null) {
+      onEvict.run();
     }
   }
 

@@ -161,6 +161,7 @@ public class RedisPooledTest {
           System.out.println(counter.get());
           should.assertTrue(counter.get() == 21);
           vertx.cancelTimer(event);
+          client.close();
           vertx.runOnContext(v -> test.complete());
         }
       });

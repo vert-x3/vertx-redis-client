@@ -129,48 +129,6 @@ class RedisConnectionManager {
         // socket connection succeeded
         final NetSocket netSocket = clientConnect.result();
 
-        final Handler<Void> completeConnection = v -> {
-          // the connection will inherit the user event loop context
-          final RedisStandaloneConnection connection = new RedisStandaloneConnection(vertx, ctx, connectionListener, netSocket, options);
-
-          // parser utility
-          netSocket
-            .handler(new RESPParser(connection, options.getMaxNestedArrays()))
-            .closeHandler(connection::end)
-            .exceptionHandler(connection::fatal);
-
-          // initial handshake
-          hello(connection, redisURI, hello -> {
-            if (hello.failed()) {
-              ctx.execute(Future.failedFuture(hello.cause()), onConnect);
-              return;
-            }
-
-            // perform select
-            select(connection, redisURI.select(), select -> {
-              if (select.failed()) {
-                ctx.execute(Future.failedFuture(select.cause()), onConnect);
-                return;
-              }
-
-              // perform setup
-              setup(connection, setup, setupResult -> {
-                if (setupResult.failed()) {
-                  ctx.execute(Future.failedFuture(setupResult.cause()), onConnect);
-                  return;
-                }
-
-                // initialization complete
-                connection.handler(null);
-                connection.endHandler(null);
-                connection.exceptionHandler(DEFAULT_EXCEPTION_HANDLER);
-
-                ctx.execute(Future.succeededFuture(new ConnectResult<>(connection, 1, 1)), onConnect);
-              });
-            });
-          });
-        };
-
         // upgrade to ssl is only possible for inet sockets
         if (connectionStringInetSocket && !netClientSsl && connectionStringSsl) {
           // must upgrade protocol
@@ -179,13 +137,55 @@ class RedisConnectionManager {
               onConnect.handle(Future.failedFuture(upgradeToSsl.cause()));
             } else {
               // complete the connection
-              completeConnection.handle(null);
+              init(ctx, netSocket, connectionListener, onConnect);
             }
           });
         } else {
           // no need to upgrade
-          completeConnection.handle(null);
+          init(ctx, netSocket, connectionListener, onConnect);
         }
+      });
+    }
+
+    private void init(ContextInternal ctx, NetSocket netSocket, ConnectionListener<RedisConnection> connectionListener, Handler<AsyncResult<ConnectResult<RedisConnection>>> onConnect) {
+      // the connection will inherit the user event loop context
+      final RedisStandaloneConnection connection = new RedisStandaloneConnection(vertx, ctx, connectionListener, netSocket, options);
+
+      // parser utility
+      netSocket
+        .handler(new RESPParser(connection, options.getMaxNestedArrays()))
+        .closeHandler(connection::end)
+        .exceptionHandler(connection::fatal);
+
+      // initial handshake
+      hello(connection, redisURI, hello -> {
+        if (hello.failed()) {
+          ctx.execute(Future.failedFuture(hello.cause()), onConnect);
+          return;
+        }
+
+        // perform select
+        select(connection, redisURI.select(), select -> {
+          if (select.failed()) {
+            ctx.execute(Future.failedFuture(select.cause()), onConnect);
+            return;
+          }
+
+          // perform setup
+          setup(connection, setup, setupResult -> {
+            if (setupResult.failed()) {
+              ctx.execute(Future.failedFuture(setupResult.cause()), onConnect);
+              return;
+            }
+
+            // initialization complete
+            connection.handler(null);
+            connection.endHandler(null);
+            connection.exceptionHandler(DEFAULT_EXCEPTION_HANDLER);
+
+            ctx.execute(Future.succeededFuture(new ConnectResult<>(connection, 1, 1)), onConnect);
+          });
+        });
       });
     }
 
