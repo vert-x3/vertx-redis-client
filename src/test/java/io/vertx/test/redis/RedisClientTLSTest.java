@@ -39,6 +39,8 @@ public class RedisClientTLSTest {
     // users are expected to serve it behind a TLS tunnel
     // this test fakes it by creating a tunnel to the final open redis server
     NetServerOptions options = new NetServerOptions()
+      .setTcpKeepAlive(true)
+      .setTcpNoDelay(true)
       .setSsl(true)
       .setKeyStoreOptions(
         new JksOptions()
@@ -50,7 +52,9 @@ public class RedisClientTLSTest {
       .connectHandler(sockA -> {
         // client A is connected, open a socket to the redis server
         proxyVertx
-          .createNetClient()
+          .createNetClient(new NetClientOptions()
+            .setTcpKeepAlive(true)
+            .setTcpNoDelay(true))
           .connect(redis.getFirstMappedPort(), redis.getContainerIpAddress())
           .onFailure(err -> {
             System.out.println("PROXY CLIENT ERR: " + err);
@@ -112,7 +116,10 @@ public class RedisClientTLSTest {
           rule.vertx(),
           new RedisOptions()
             // were using self signed certificates so we need to trust all
-            .setNetClientOptions(new NetClientOptions().setTrustAll(true))
+            .setNetClientOptions(new NetClientOptions().setTrustAll(true)
+              // default values
+              .setTcpKeepAlive(true)
+              .setTcpNoDelay(true))
             .setConnectionString("rediss://0.0.0.0:" + port + "?test=upgrade"));
 
         client.connect()
@@ -144,7 +151,10 @@ public class RedisClientTLSTest {
       rule.vertx(),
       new RedisOptions()
         // were using self signed certificates so we need to trust all
-        .setNetClientOptions(new NetClientOptions().setSsl(true).setTrustAll(true))
+        .setNetClientOptions(new NetClientOptions().setSsl(true).setTrustAll(true)
+          // default values
+          .setTcpKeepAlive(true)
+          .setTcpNoDelay(true))
         .setConnectionString("rediss://localhost:" + server.actualPort()));
 
     client.connect()
@@ -164,7 +174,10 @@ public class RedisClientTLSTest {
       rule.vertx(),
       new RedisOptions()
         // were using self signed certificates so we need to trust all
-        .setNetClientOptions(new NetClientOptions().setSsl(true).setTrustAll(true))
+        .setNetClientOptions(new NetClientOptions().setSsl(true).setTrustAll(true)
+          // default values
+          .setTcpKeepAlive(true)
+          .setTcpNoDelay(true))
         // pool is SSL but connection string isn't
         .setConnectionString("redis://localhost:" + server.actualPort()));
 
