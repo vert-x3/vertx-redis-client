@@ -55,9 +55,6 @@ public class RedisClientTLSTest {
 
         sockA.exceptionHandler(Throwable::printStackTrace);
 
-        System.out.println("Starting proxy client: " + System.currentTimeMillis());
-
-
         // client A is connected, open a socket to the redis server
         proxyVertx
           .createNetClient(new NetClientOptions()
@@ -72,11 +69,9 @@ public class RedisClientTLSTest {
 
             sockB.exceptionHandler(Throwable::printStackTrace);
 
-            System.out.println("Connected proxy client: " + System.currentTimeMillis());
-
             // pump
             sockA.handler(buff -> {
-              System.out.println("-> " + buff);
+//              System.out.println("-> " + buff);
               sockB.write(buff)
                 .onFailure(should::fail);
             });
@@ -85,7 +80,7 @@ public class RedisClientTLSTest {
             sockA.resume();
 
             sockB.handler(buff -> {
-              System.out.println("<- " + buff);
+//              System.out.println("<- " + buff);
               sockA.write(buff)
                 .onFailure(should::fail);
             });
@@ -104,7 +99,6 @@ public class RedisClientTLSTest {
   @Test(timeout = 30_000L)
   public void testConnectionStringUpgrade(TestContext should) {
     final Async test = should.async();
-    System.out.println("Starting test: " + System.currentTimeMillis());
 
     // begin test
     final int port = server.actualPort();
