@@ -224,6 +224,7 @@ class RedisConnectionManager {
         }
 
         final Throwable err = onSend.cause();
+        System.out.println(err);
         if (err != null) {
           String msg = err.getMessage();
           if (msg != null) {
