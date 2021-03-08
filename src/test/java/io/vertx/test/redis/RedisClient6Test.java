@@ -25,7 +25,7 @@ public class RedisClient6Test {
   public final RunTestOnContext rule = new RunTestOnContext();
 
   @ClassRule
-  public static final GenericContainer<?> redis = new GenericContainer<>("redis:6")
+  public static final GenericContainer<?> redis = new GenericContainer<>("redis:6.2.1")
     .withExposedPorts(6379);
 
   private Redis client;

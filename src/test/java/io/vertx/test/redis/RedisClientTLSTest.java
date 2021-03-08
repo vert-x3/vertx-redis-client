@@ -18,6 +18,8 @@ import org.junit.*;
 import org.junit.runner.RunWith;
 import org.testcontainers.containers.GenericContainer;
 
+import java.util.concurrent.atomic.AtomicBoolean;
+
 @RunWith(VertxUnitRunner.class)
 public class RedisClientTLSTest {
 
@@ -89,17 +91,19 @@ public class RedisClientTLSTest {
         .setNetClientOptions(new NetClientOptions().setTrustAll(true))
         .setConnectionString("rediss://localhost:" + server.actualPort()));
 
+    final AtomicBoolean started = new AtomicBoolean(false);
+
     client.connect()
       .onFailure(err -> {
         System.out.println("REDIS CLIENT (CONNECT) ERR" + err);
-        should.fail(err);
+        if (!started.get()) {
+          should.fail(err);
+        }
       })
       .onSuccess(conn -> {
+        started.set(true);
         conn.send(Request.cmd(Command.PING))
-          .onFailure(err -> {
-            System.out.println("REDIS CLIENT (SEND) ERR" + err);
-            should.fail(err);
-          })
+          .onFailure(should::fail)
           .onSuccess(res -> {
             System.out.println("REDIS CLIENT SUCCESS");
             test.complete();
