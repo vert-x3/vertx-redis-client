@@ -72,8 +72,17 @@ public class RedisClientTLSTest {
             System.out.println("Connected proxy client: " + System.currentTimeMillis());
 
             // pump
-            Pump.pump(sockA, sockB).start();
-            Pump.pump(sockB, sockA).start();
+            sockA.handler(buff -> {
+              System.out.println("-> " + buff);
+              sockB.write(buff)
+                .onFailure(should::fail);
+            });
+
+            sockB.handler(buff -> {
+              System.out.println("<- " + buff);
+              sockA.write(buff)
+                .onFailure(should::fail);
+            });
 
             sockA.endHandler(v -> sockB.end());
             sockB.endHandler(v -> sockA.end());
