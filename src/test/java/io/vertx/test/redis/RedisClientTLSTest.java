@@ -52,7 +52,10 @@ public class RedisClientTLSTest {
         proxyVertx
           .createNetClient()
           .connect(redis.getFirstMappedPort(), redis.getContainerIpAddress())
-          .onFailure(should::fail)
+          .onFailure(err -> {
+            System.out.println("PROXY CLIENT ERR" + err);
+            should.fail(err);
+          })
           .onSuccess(sockB -> {
             // pump
             Pump.pump(sockA, sockB).start();
@@ -87,11 +90,20 @@ public class RedisClientTLSTest {
         .setConnectionString("rediss://localhost:" + server.actualPort()));
 
     client.connect()
-      .onFailure(should::fail)
+      .onFailure(err -> {
+        System.out.println("REDIS CLIENT (CONNECT) ERR" + err);
+        should.fail(err);
+      })
       .onSuccess(conn -> {
         conn.send(Request.cmd(Command.PING))
-          .onFailure(should::fail)
-          .onSuccess(res -> test.complete());
+          .onFailure(err -> {
+            System.out.println("REDIS CLIENT (SEND) ERR" + err);
+            should.fail(err);
+          })
+          .onSuccess(res -> {
+            System.out.println("REDIS CLIENT SUCCESS");
+            test.complete();
+          });
       });
   }
 
