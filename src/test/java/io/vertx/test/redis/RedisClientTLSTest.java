@@ -91,6 +91,7 @@ public class RedisClientTLSTest {
     rule.vertx()
       .createNetServer(options)
       .connectHandler(sockA -> {
+        sockA.exceptionHandler(Throwable::printStackTrace);
         // client A is connected, open a socket to the redis server
         rule.vertx()
           .createNetClient()
@@ -102,6 +103,9 @@ public class RedisClientTLSTest {
           })
           .onSuccess(sockB -> {
             // pump
+            sockB.exceptionHandler(Throwable::printStackTrace);
+            sockB.endHandler(v -> sockA.close());
+
             Pump.pump(sockA, sockB).start();
             Pump.pump(sockB, sockA).start();
           });
