@@ -50,6 +50,9 @@ public class RedisClientTLSTest {
     proxyVertx
       .createNetServer(options)
       .connectHandler(sockA -> {
+        // pause until the proxy client is ready
+        sockA.pause();
+
         sockA.exceptionHandler(Throwable::printStackTrace);
 
         System.out.println("Starting proxy client: " + System.currentTimeMillis());
@@ -62,11 +65,13 @@ public class RedisClientTLSTest {
             .setTcpNoDelay(true))
           .connect(redis.getFirstMappedPort(), redis.getContainerIpAddress())
           .onFailure(err -> {
-            sockA.close();
             System.out.println("PROXY CLIENT ERR: " + err);
             should.fail(err);
           })
           .onSuccess(sockB -> {
+            // resume from pause
+            sockA.resume();
+
             sockB.exceptionHandler(Throwable::printStackTrace);
 
             System.out.println("Connected proxy client: " + System.currentTimeMillis());
