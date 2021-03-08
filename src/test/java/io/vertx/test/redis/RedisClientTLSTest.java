@@ -1,5 +1,6 @@
 package io.vertx.test.redis;
 
+import io.vertx.core.Vertx;
 import io.vertx.core.net.JksOptions;
 import io.vertx.core.net.NetClientOptions;
 import io.vertx.core.net.NetServer;
@@ -27,8 +28,11 @@ public class RedisClientTLSTest {
   public static final GenericContainer<?> redis = new GenericContainer<>("redis:6.2.1")
     .withExposedPorts(6379);
 
-  @Before
-  public void setUp(TestContext should) {
+  private static final Vertx proxyVertx = Vertx.vertx();
+  private static NetServer server;
+
+  @BeforeClass
+  public static void beforeAll(TestContext should) {
     final Async test = should.async();
 
     // redis server (OSS) does not include TLS out of the box
@@ -41,11 +45,11 @@ public class RedisClientTLSTest {
           .setPath("server-keystore.jks")
           .setPassword("wibble"));
 
-    rule.vertx()
+    proxyVertx
       .createNetServer(options)
       .connectHandler(sockA -> {
         // client A is connected, open a socket to the redis server
-        rule.vertx()
+        proxyVertx
           .createNetClient()
           .connect(redis.getFirstMappedPort(), redis.getContainerIpAddress())
           .onFailure(should::fail)
@@ -57,20 +61,14 @@ public class RedisClientTLSTest {
       }).listen(0)
       .onFailure(should::fail)
       .onSuccess(server -> {
-        rule.vertx()
-          .getOrCreateContext()
-          .putLocal("server", server);
+        RedisClientTLSTest.server = server;
         test.complete();
       });
   }
 
-  @After
-  public void tearDown(TestContext should) {
+  @AfterClass
+  public static void shutdown(TestContext should) {
     final Async test = should.async();
-
-    NetServer server = rule.vertx()
-      .getOrCreateContext()
-      .getLocal("server");
 
     server.close()
       .onFailure(should::fail)
@@ -80,10 +78,6 @@ public class RedisClientTLSTest {
   @Test(timeout = 30_000L)
   public void testConnectionStringUpgrade(TestContext should) {
     final Async test = should.async();
-
-    NetServer server = rule.vertx()
-      .getOrCreateContext()
-      .getLocal("server");
 
     Redis client = Redis.createClient(
       rule.vertx(),
@@ -104,10 +98,6 @@ public class RedisClientTLSTest {
   @Test(timeout = 30_000L)
   public void testConnectionOptions(TestContext should) {
     final Async test = should.async();
-
-    NetServer server = rule.vertx()
-      .getOrCreateContext()
-      .getLocal("server");
 
     Redis client = Redis.createClient(
       rule.vertx(),
@@ -131,10 +121,6 @@ public class RedisClientTLSTest {
   @Test(timeout = 30_000L)
   public void testInvalidOptions(TestContext should) {
     final Async test = should.async();
-
-    NetServer server = rule.vertx()
-      .getOrCreateContext()
-      .getLocal("server");
 
     Redis client = Redis.createClient(
       rule.vertx(),
