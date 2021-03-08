@@ -55,7 +55,7 @@ public class RedisClientTLSTest {
           .createNetClient()
           .connect(redis.getFirstMappedPort(), redis.getContainerIpAddress())
           .onFailure(err -> {
-            System.out.println("PROXY CLIENT ERR" + err);
+            System.out.println("PROXY CLIENT ERR: " + err);
             should.fail(err);
           })
           .onSuccess(sockB -> {
@@ -67,6 +67,7 @@ public class RedisClientTLSTest {
       .onFailure(should::fail)
       .onSuccess(server -> {
         RedisClientTLSTest.server = server;
+        System.out.println("Proxy port: " + server.actualPort());
         test.complete();
       });
   }
@@ -75,7 +76,7 @@ public class RedisClientTLSTest {
   public static void shutdown(TestContext should) {
     final Async test = should.async();
 
-    server.close()
+    proxyVertx.close()
       .onFailure(should::fail)
       .onSuccess(v -> test.complete());
   }
@@ -83,21 +84,28 @@ public class RedisClientTLSTest {
   @Test(timeout = 30_000L)
   public void testConnectionStringUpgrade(TestContext should) {
     final Async test = should.async();
+    final int port = server.actualPort();
+
+    System.out.println(port);
 
     Redis client = Redis.createClient(
       rule.vertx(),
       new RedisOptions()
         // were using self signed certificates so we need to trust all
         .setNetClientOptions(new NetClientOptions().setTrustAll(true))
-        .setConnectionString("rediss://localhost:" + server.actualPort()));
+        .setConnectionString("rediss://localhost:" + port));
 
     client.connect()
-      .onFailure(err -> System.out.println("REDIS CLIENT (CONNECT) ERR" + err))
+      .onFailure(err -> {
+        System.out.println("REDIS CLIENT (CONNECT) ERR: " + err);
+        err.printStackTrace();
+      })
       .onSuccess(conn -> {
         conn.send(Request.cmd(Command.PING))
           .onFailure(should::fail)
           .onSuccess(res -> {
             System.out.println("REDIS CLIENT SUCCESS");
+            conn.close();
             test.complete();
           });
       });

@@ -297,7 +297,8 @@ class RedisConnectionManager {
     }
 
     pooledConnectionManager.getConnection(eventLoopContext, new ConnectionKey(connectionString, setup), promise);
-    return promise.future().map(PooledRedisConnection::new);
+    return promise.future()
+      .map(PooledRedisConnection::new);
   }
 
   public void close() {
