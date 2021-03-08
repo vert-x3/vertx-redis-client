@@ -88,6 +88,9 @@ public class RedisClientTLSTest {
 
     client.connect()
       .onFailure(err -> {
+        for (StackTraceElement el : Thread.currentThread().getStackTrace()) {
+          System.out.println(el);
+        }
         System.out.println("REDIS CLIENT (CONNECT) ERR: " + err);
         err.printStackTrace();
       })
