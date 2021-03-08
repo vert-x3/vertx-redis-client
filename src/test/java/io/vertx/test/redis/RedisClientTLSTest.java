@@ -67,17 +67,15 @@ public class RedisClientTLSTest {
       .onFailure(should::fail)
       .onSuccess(server -> {
         RedisClientTLSTest.server = server;
-        System.out.println("Proxy port: " + server.actualPort());
         test.complete();
       });
   }
 
-  @Test(timeout = 90_000L)
+  @Test(timeout = 30_000L)
   public void testConnectionStringUpgrade(TestContext should) {
     final Async test = should.async();
     final int port = server.actualPort();
-
-    System.out.println(port);
+    final long t0 = System.currentTimeMillis();
 
     Redis client = Redis.createClient(
       rule.vertx(),
@@ -88,6 +86,7 @@ public class RedisClientTLSTest {
 
     client.connect()
       .onFailure(err -> {
+        System.out.println("dt: " + (System.currentTimeMillis() - t0));
         for (StackTraceElement el : Thread.currentThread().getStackTrace()) {
           System.out.println(el);
         }
