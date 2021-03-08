@@ -78,73 +78,30 @@ public class RedisClientTLSTest {
   public void testConnectionStringUpgrade(TestContext should) {
     final Async test = should.async();
 
-    // redis server (OSS) does not include TLS out of the box
-    // users are expected to serve it behind a TLS tunnel
-    // this test fakes it by creating a tunnel to the final open redis server
-    NetServerOptions options = new NetServerOptions()
-      .setSsl(true)
-      .setKeyStoreOptions(
-        new JksOptions()
-          .setPath("server-keystore.jks")
-          .setPassword("wibble"));
+    // begin test
+    final int port = server.actualPort();
 
-    rule.vertx()
-      .createNetServer(options)
-      .connectHandler(sockA -> {
-        sockA.exceptionHandler(Throwable::printStackTrace);
-        // client A is connected, open a socket to the redis server
-        rule.vertx()
-          .createNetClient()
-          .connect(redis.getFirstMappedPort(), redis.getContainerIpAddress())
-          .onFailure(err -> {
-            sockA.close();
-            System.out.println("PROXY CLIENT ERR: " + err);
-            should.fail(err);
-          })
-          .onSuccess(sockB -> {
-            // pump
-            sockB.exceptionHandler(Throwable::printStackTrace);
-            sockB.endHandler(v -> sockA.close());
+    Redis client = Redis.createClient(
+      rule.vertx(),
+      new RedisOptions()
+        // were using self signed certificates so we need to trust all
+        .setNetClientOptions(new NetClientOptions().setTrustAll(true)
+          // default values
+          .setTcpKeepAlive(true)
+          .setTcpNoDelay(true))
+        .setConnectionString("rediss://0.0.0.0:" + port + "?test=upgrade"));
 
-            Pump.pump(sockA, sockB).start();
-            Pump.pump(sockB, sockA).start();
-          });
-      }).listen(0, "0.0.0.0")
-      .onFailure(should::fail)
-      .onSuccess(server -> {
-        // setup complete
-
-        // begin test
-        final int port = server.actualPort();
-        final long t0 = System.currentTimeMillis();
-
-        Redis client = Redis.createClient(
-          rule.vertx(),
-          new RedisOptions()
-            // were using self signed certificates so we need to trust all
-            .setNetClientOptions(new NetClientOptions().setTrustAll(true)
-              // default values
-              .setTcpKeepAlive(true)
-              .setTcpNoDelay(true))
-            .setConnectionString("rediss://0.0.0.0:" + port + "?test=upgrade"));
-
-        client.connect()
-          .onFailure(err -> {
-            System.out.println("dt: " + (System.currentTimeMillis() - t0));
-            for (StackTraceElement el : Thread.currentThread().getStackTrace()) {
-              System.out.println(el);
-            }
-            System.out.println("REDIS CLIENT (CONNECT) ERR: " + err);
-            err.printStackTrace();
-          })
-          .onSuccess(conn -> {
-            conn.send(Request.cmd(Command.PING))
-              .onFailure(should::fail)
-              .onSuccess(res -> {
-                System.out.println("REDIS CLIENT SUCCESS");
-                conn.close();
-                test.complete();
-              });
+    client.connect()
+      .onFailure(err -> {
+        System.out.println("REDIS CLIENT (CONNECT) ERR: " + err);
+      })
+      .onSuccess(conn -> {
+        conn.send(Request.cmd(Command.PING))
+          .onFailure(should::fail)
+          .onSuccess(res -> {
+            System.out.println("REDIS CLIENT SUCCESS");
+            conn.close();
+            test.complete();
           });
       });
   }

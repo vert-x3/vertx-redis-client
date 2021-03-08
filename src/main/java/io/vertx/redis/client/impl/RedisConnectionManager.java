@@ -119,7 +119,6 @@ class RedisConnectionManager {
       }
 
       // all calls the user handler will happen in the user context (ctx)
-      System.out.println("connect");
       netClient.connect(redisURI.socketAddress(), clientConnect -> {
         if (clientConnect.failed()) {
           // connection failed
@@ -133,7 +132,6 @@ class RedisConnectionManager {
         // upgrade to ssl is only possible for inet sockets
         if (connectionStringInetSocket && !netClientSsl && connectionStringSsl) {
           // must upgrade protocol
-          System.out.println("upgradeToSsl");
           netSocket.upgradeToSsl(upgradeToSsl -> {
             if (upgradeToSsl.failed()) {
               ctx.execute(Future.failedFuture(upgradeToSsl.cause()), onConnect);
@@ -152,8 +150,9 @@ class RedisConnectionManager {
     private void init(ContextInternal ctx, NetSocket netSocket, ConnectionListener<RedisConnection> connectionListener, Handler<AsyncResult<ConnectResult<RedisConnection>>> onConnect) {
       // the connection will inherit the user event loop context
       final RedisStandaloneConnection connection = new RedisStandaloneConnection(vertx, ctx, connectionListener, netSocket, options);
+      // initialization
+      connection.exceptionHandler(DEFAULT_EXCEPTION_HANDLER);
 
-      System.out.println("init");
       // parser utility
       netSocket
         .handler(new RESPParser(connection, options.getMaxNestedArrays()))
@@ -161,7 +160,6 @@ class RedisConnectionManager {
         .exceptionHandler(connection::fatal);
 
       // initial handshake
-      System.out.println("hello");
       hello(ctx, connection, redisURI, hello -> {
         if (hello.failed()) {
           ctx.execute(Future.failedFuture(hello.cause()), onConnect);
@@ -169,7 +167,6 @@ class RedisConnectionManager {
         }
 
         // perform select
-        System.out.println("select");
         select(ctx, connection, redisURI.select(), select -> {
           if (select.failed()) {
             ctx.execute(Future.failedFuture(select.cause()), onConnect);
@@ -177,19 +174,12 @@ class RedisConnectionManager {
           }
 
           // perform setup
-          System.out.println("setup");
           setup(ctx, connection, setup, setupResult -> {
             if (setupResult.failed()) {
               ctx.execute(Future.failedFuture(setupResult.cause()), onConnect);
               return;
             }
 
-            // initialization complete
-            connection.handler(null);
-            connection.endHandler(null);
-            connection.exceptionHandler(DEFAULT_EXCEPTION_HANDLER);
-
-            System.out.println("done");
             ctx.execute(Future.succeededFuture(new ConnectResult<>(connection, 1, 1)), onConnect);
           });
         });
@@ -215,7 +205,6 @@ class RedisConnectionManager {
         hello.arg("SETNAME").arg(client);
       }
 
-      System.out.println("hello::send");
       connection.send(hello, onSend -> {
         if (onSend.succeeded()) {
           LOG.debug(onSend.result());
@@ -224,7 +213,6 @@ class RedisConnectionManager {
         }
 
         final Throwable err = onSend.cause();
-        System.out.println(err);
         if (err != null) {
           String msg = err.getMessage();
           if (msg != null) {
@@ -241,13 +229,11 @@ class RedisConnectionManager {
     }
 
     private void authenticate(ContextInternal ctx, RedisConnection connection, String password, Handler<AsyncResult<Void>> handler) {
-      System.out.println("authenticate");
       if (password == null) {
         ctx.execute(Future.succeededFuture(), handler);
         return;
       }
       // perform authentication
-      System.out.println("authenticat::send");
       connection.send(Request.cmd(Command.AUTH).arg(password), auth -> {
         if (auth.failed()) {
           ctx.execute(Future.failedFuture(auth.cause()), handler);
@@ -263,7 +249,6 @@ class RedisConnectionManager {
         return;
       }
       // perform select
-      System.out.println("select::send");
       connection.send(Request.cmd(Command.SELECT).arg(select), auth -> {
         if (auth.failed()) {
           ctx.execute(Future.failedFuture(auth.cause()), handler);
@@ -279,7 +264,6 @@ class RedisConnectionManager {
         return;
       }
       // perform setup
-      System.out.println("setup::send");
       connection.send(setup, req -> {
         if (req.failed()) {
           ctx.execute(Future.failedFuture(req.cause()), handler);
