@@ -57,6 +57,7 @@ public class RedisClientTLSTest {
             .setTcpNoDelay(true))
           .connect(redis.getFirstMappedPort(), redis.getContainerIpAddress())
           .onFailure(err -> {
+            sockA.close();
             System.out.println("PROXY CLIENT ERR: " + err);
             should.fail(err);
           })
@@ -95,6 +96,7 @@ public class RedisClientTLSTest {
           .createNetClient()
           .connect(redis.getFirstMappedPort(), redis.getContainerIpAddress())
           .onFailure(err -> {
+            sockA.close();
             System.out.println("PROXY CLIENT ERR: " + err);
             should.fail(err);
           })
