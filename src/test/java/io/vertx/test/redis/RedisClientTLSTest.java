@@ -91,17 +91,9 @@ public class RedisClientTLSTest {
         .setNetClientOptions(new NetClientOptions().setTrustAll(true))
         .setConnectionString("rediss://localhost:" + server.actualPort()));
 
-    final AtomicBoolean started = new AtomicBoolean(false);
-
     client.connect()
-      .onFailure(err -> {
-        System.out.println("REDIS CLIENT (CONNECT) ERR" + err);
-        if (!started.get()) {
-          should.fail(err);
-        }
-      })
+      .onFailure(err -> System.out.println("REDIS CLIENT (CONNECT) ERR" + err))
       .onSuccess(conn -> {
-        started.set(true);
         conn.send(Request.cmd(Command.PING))
           .onFailure(should::fail)
           .onSuccess(res -> {
@@ -127,10 +119,7 @@ public class RedisClientTLSTest {
       .onSuccess(conn -> {
         conn.send(Request.cmd(Command.PING))
           .onFailure(should::fail)
-          .onSuccess(res -> {
-            System.out.println(res);
-            test.complete();
-          });
+          .onSuccess(res -> test.complete());
       });
   }
 
