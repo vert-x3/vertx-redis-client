@@ -72,16 +72,7 @@ public class RedisClientTLSTest {
       });
   }
 
-  @AfterClass
-  public static void shutdown(TestContext should) {
-    final Async test = should.async();
-
-    proxyVertx.close()
-      .onFailure(should::fail)
-      .onSuccess(v -> test.complete());
-  }
-
-  @Test(timeout = 30_000L)
+   @Test(timeout = 30_000L)
   public void testConnectionStringUpgrade(TestContext should) {
     final Async test = should.async();
     final int port = server.actualPort();
@@ -92,7 +83,7 @@ public class RedisClientTLSTest {
       rule.vertx(),
       new RedisOptions()
         // were using self signed certificates so we need to trust all
-        .setNetClientOptions(new NetClientOptions().setTrustAll(true))
+        .setNetClientOptions(new NetClientOptions().setTrustAll(true).setSsl(false))
         .setConnectionString("rediss://localhost:" + port));
 
     client.connect()

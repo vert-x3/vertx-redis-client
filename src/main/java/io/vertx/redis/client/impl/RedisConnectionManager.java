@@ -131,8 +131,10 @@ class RedisConnectionManager {
 
         // upgrade to ssl is only possible for inet sockets
         if (connectionStringInetSocket && !netClientSsl && connectionStringSsl) {
+          System.out.println("Upgrading to SSL...");
           // must upgrade protocol
           netSocket.upgradeToSsl(upgradeToSsl -> {
+            System.out.println("Upgrading to SSL done! " + upgradeToSsl.succeeded());
             if (upgradeToSsl.failed()) {
               onConnect.handle(Future.failedFuture(upgradeToSsl.cause()));
             } else {
