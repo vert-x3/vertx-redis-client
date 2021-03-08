@@ -99,7 +99,7 @@ public class RedisClientTLSTest {
             Pump.pump(sockA, sockB).start();
             Pump.pump(sockB, sockA).start();
           });
-      }).listen(0)
+      }).listen(0, "0.0.0.0")
       .onFailure(should::fail)
       .onSuccess(server -> {
         // setup complete
