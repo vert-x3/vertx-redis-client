@@ -72,7 +72,7 @@ public class RedisClientTLSTest {
       });
   }
 
-   @Test(timeout = 30_000L)
+  @Test(timeout = 90_000L)
   public void testConnectionStringUpgrade(TestContext should) {
     final Async test = should.async();
     final int port = server.actualPort();
@@ -84,7 +84,7 @@ public class RedisClientTLSTest {
       new RedisOptions()
         // were using self signed certificates so we need to trust all
         .setNetClientOptions(new NetClientOptions().setTrustAll(true).setSsl(false))
-        .setConnectionString("rediss://localhost:" + port));
+        .setConnectionString("rediss://localhost:" + port + "?test=upgrade"));
 
     client.connect()
       .onFailure(err -> {
