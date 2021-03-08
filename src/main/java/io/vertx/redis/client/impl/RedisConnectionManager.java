@@ -162,7 +162,7 @@ class RedisConnectionManager {
 
       // initial handshake
       System.out.println("hello");
-      hello(connection, redisURI, hello -> {
+      hello(ctx, connection, redisURI, hello -> {
         if (hello.failed()) {
           ctx.execute(Future.failedFuture(hello.cause()), onConnect);
           return;
@@ -170,7 +170,7 @@ class RedisConnectionManager {
 
         // perform select
         System.out.println("select");
-        select(connection, redisURI.select(), select -> {
+        select(ctx, connection, redisURI.select(), select -> {
           if (select.failed()) {
             ctx.execute(Future.failedFuture(select.cause()), onConnect);
             return;
@@ -178,7 +178,7 @@ class RedisConnectionManager {
 
           // perform setup
           System.out.println("setup");
-          setup(connection, setup, setupResult -> {
+          setup(ctx, connection, setup, setupResult -> {
             if (setupResult.failed()) {
               ctx.execute(Future.failedFuture(setupResult.cause()), onConnect);
               return;
@@ -196,7 +196,7 @@ class RedisConnectionManager {
       });
     }
 
-    private void hello(RedisConnection connection, RedisURI redisURI, Handler<AsyncResult<Void>> handler) {
+    private void hello(ContextInternal ctx, RedisConnection connection, RedisURI redisURI, Handler<AsyncResult<Void>> handler) {
       Request hello = Request.cmd(Command.HELLO).arg(RESPParser.VERSION);
 
       String password = redisURI.password() != null ? redisURI.password() : options.getPassword();
@@ -219,7 +219,7 @@ class RedisConnectionManager {
       connection.send(hello, onSend -> {
         if (onSend.succeeded()) {
           LOG.debug(onSend.result());
-          handler.handle(Future.succeededFuture());
+          ctx.execute(Future.succeededFuture(), handler);
           return;
         }
 
@@ -229,61 +229,61 @@ class RedisConnectionManager {
           if (msg != null) {
             if (msg.startsWith("ERR unknown command") || msg.startsWith("ERR unknown or unsupported command")) {
               // chatting to an old server
-              authenticate(connection, password, handler);
+              authenticate(ctx, connection, password, handler);
               return;
             }
           }
         }
 
-        handler.handle(Future.failedFuture(err));
+        ctx.execute(Future.failedFuture(err), handler);
       });
     }
 
-    private void authenticate(RedisConnection connection, String password, Handler<AsyncResult<Void>> handler) {
+    private void authenticate(ContextInternal ctx, RedisConnection connection, String password, Handler<AsyncResult<Void>> handler) {
       System.out.println("authenticate");
       if (password == null) {
-        handler.handle(Future.succeededFuture());
+        ctx.execute(Future.succeededFuture(), handler);
         return;
       }
       // perform authentication
       System.out.println("authenticat::send");
       connection.send(Request.cmd(Command.AUTH).arg(password), auth -> {
         if (auth.failed()) {
-          handler.handle(Future.failedFuture(auth.cause()));
+          ctx.execute(Future.failedFuture(auth.cause()), handler);
         } else {
-          handler.handle(Future.succeededFuture());
+          ctx.execute(Future.succeededFuture(), handler);
         }
       });
     }
 
-    private void select(RedisConnection connection, Integer select, Handler<AsyncResult<Void>> handler) {
+    private void select(ContextInternal ctx, RedisConnection connection, Integer select, Handler<AsyncResult<Void>> handler) {
       if (select == null) {
-        handler.handle(Future.succeededFuture());
+        ctx.execute(Future.succeededFuture(), handler);
         return;
       }
       // perform select
       System.out.println("select::send");
       connection.send(Request.cmd(Command.SELECT).arg(select), auth -> {
         if (auth.failed()) {
-          handler.handle(Future.failedFuture(auth.cause()));
+          ctx.execute(Future.failedFuture(auth.cause()), handler);
         } else {
-          handler.handle(Future.succeededFuture());
+          ctx.execute(Future.succeededFuture(), handler);
         }
       });
     }
 
-    private void setup(RedisConnection connection, Request setup, Handler<AsyncResult<Void>> handler) {
+    private void setup(ContextInternal ctx, RedisConnection connection, Request setup, Handler<AsyncResult<Void>> handler) {
       if (setup == null) {
-        handler.handle(Future.succeededFuture());
+        ctx.execute(Future.succeededFuture(), handler);
         return;
       }
       // perform setup
       System.out.println("setup::send");
       connection.send(setup, req -> {
         if (req.failed()) {
-          handler.handle(Future.failedFuture(req.cause()));
+          ctx.execute(Future.failedFuture(req.cause()), handler);
         } else {
-          handler.handle(Future.succeededFuture());
+          ctx.execute(Future.succeededFuture(), handler);
         }
       });
     }
