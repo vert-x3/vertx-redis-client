@@ -30,7 +30,7 @@ final class ReadableBuffer {
 
   // limit of integer parsing before overflowing
   private static final long MAX_INTEGER_DIV_10 = Long.MAX_VALUE / 10;
-  private static final int MARK_WATERMARK = 4 * 1024 * 1024;
+  private static final int MARK_WATERMARK = Integer.getInteger("io.vertx.redis.parser.watermark", 512 * 1024);
 
   private Buffer buffer;
   private int offset;

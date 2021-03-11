@@ -243,3 +243,16 @@ will be on the new connection.
 
 It is important to note that, the reconnect will create a new connection object, so these object references should not
 be cached and evaluated every time.
+
+== Protocol Parser
+
+This client supports both `RESP2` and `RESP3` protocols, at the connection handshake time the client will automatically
+detect which version is supported by the server and use it.
+
+The parser internally creates an "infinite" readable buffer from all the chunks received from the server, in order to
+avoid creating too much garbage in terms of memory collection, a tunnable watermark value is configurable at JVM startup
+time. The system property `io.vertx.redis.parser.watermark` defines how much data is keept in this readable buffer
+before it gets discarded. By default this value is 512Kb. This means that each connection to the server will use at
+least this amount of memory. As the client works in pipeline mode, keeping the number of connections low provides best
+results, which means `512Kb * nconn` memory will be used. If the application will require a large number of connections,
+then reducing the watermark value to a smaller value or even disable it entirely is advisable.
