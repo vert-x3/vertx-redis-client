@@ -5,14 +5,19 @@ import io.vertx.core.Future;
 import io.vertx.core.Promise;
 import io.vertx.core.Vertx;
 import io.vertx.core.impl.VertxInternal;
+import io.vertx.core.impl.logging.Logger;
+import io.vertx.core.impl.logging.LoggerFactory;
 import io.vertx.redis.client.Redis;
 import io.vertx.redis.client.RedisOptions;
 import io.vertx.redis.client.Request;
 import io.vertx.redis.client.Response;
 
+import java.util.Collections;
 import java.util.List;
 
 public abstract class BaseRedisClient implements Redis {
+
+  private static final Logger LOG = LoggerFactory.getLogger(BaseRedisClient.class);
 
   protected final VertxInternal vertx;
   protected final RedisConnectionManager connectionManager;
@@ -58,7 +63,8 @@ public abstract class BaseRedisClient implements Redis {
     final Promise<List<Response>> promise = vertx.promise();
 
     if (commands.isEmpty()) {
-      promise.complete();
+      LOG.debug("Empty batch");
+      promise.complete(Collections.emptyList());
     } else {
       for (Request req : commands) {
         if (req.command().isPubSub()) {

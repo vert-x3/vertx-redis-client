@@ -357,7 +357,8 @@ public class RedisClusterConnection implements RedisConnection {
     final Promise<List<Response>> promise = vertx.promise();
 
     if (requests.isEmpty()) {
-      promise.complete();
+      LOG.debug("Empty batch");
+      promise.complete(Collections.emptyList());
     } else {
       int currentSlot = -1;
       boolean readOnly = false;

@@ -18,6 +18,7 @@ import io.vertx.redis.client.impl.types.ErrorType;
 import io.vertx.redis.client.impl.types.Multi;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.RejectedExecutionException;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -174,7 +175,8 @@ public class RedisStandaloneConnection implements RedisConnection, ParserHandler
     final Promise<List<Response>> promise = vertx.promise();
 
     if (commands.isEmpty()) {
-      promise.complete();
+      LOG.debug("Empty batch");
+      promise.complete(Collections.emptyList());
     } else {
       if (waiting.freeSlots() < commands.size()) {
         promise.fail("Redis waiting Queue is full");

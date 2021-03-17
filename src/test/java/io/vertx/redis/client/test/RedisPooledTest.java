@@ -13,6 +13,7 @@ import org.junit.runner.RunWith;
 import org.testcontainers.containers.GenericContainer;
 
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.UUID;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.IntStream;
@@ -83,6 +84,17 @@ public class RedisPooledTest {
         cmd(LPOP).arg("a"),
         cmd(EXEC)
       ), batch -> {
+        should.assertTrue(batch.succeeded());
+        test.complete();
+      });
+  }
+
+  @Test
+  public void batchEmptyTest(TestContext should) {
+    final Async test = should.async();
+
+    Redis.createClient(rule.vertx(), "redis://" + container.getContainerIpAddress() + ":" + container.getFirstMappedPort())
+      .batch(Collections.emptyList(), batch -> {
         should.assertTrue(batch.succeeded());
         test.complete();
       });
