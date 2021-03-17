@@ -173,66 +173,70 @@ public class RedisStandaloneConnection implements RedisConnection, ParserHandler
   public Future<List<Response>> batch(List<Request> commands) {
     final Promise<List<Response>> promise = vertx.promise();
 
-    if (waiting.freeSlots() < commands.size()) {
-      promise.fail("Redis waiting Queue is full");
-      return promise.future();
-    }
-
-    // will re-encode the handler into a list of promises
-    final List<Promise<Response>> callbacks = new ArrayList<>(commands.size());
-    final List<Response> replies = new ArrayList<>(commands.size());
-    final AtomicInteger count = new AtomicInteger(commands.size());
-    final AtomicBoolean failed = new AtomicBoolean(false);
-
-    // encode the message to a single buffer
-    final Buffer messages = Buffer.buffer();
-
-    for (int i = 0; i < commands.size(); i++) {
-      final int index = i;
-      final RequestImpl req = (RequestImpl) commands.get(index);
-      // encode to the single buffer
-      req.encode(messages);
-      // unwrap the handler into a single handler
-      callbacks.add(index, vertx.promise(command -> {
-        if (!failed.get()) {
-          if (command.failed()) {
-            failed.set(true);
-            promise.fail(command.cause());
-            return;
-          }
-        }
-        // set the reply
-        replies.add(index, command.result());
-
-        if (count.decrementAndGet() == 0) {
-          // all results have arrived
-          promise.complete(replies);
-        }
-      }));
-    }
-
-    // all update operations happen inside the context
-    context.execute(v -> {
-      // we might have switch thread/context
-      // this means the check needs to be performed again
-      if (waiting.freeSlots() < callbacks.size()) {
+    if (commands.isEmpty()) {
+      promise.complete();
+    } else {
+      if (waiting.freeSlots() < commands.size()) {
         promise.fail("Redis waiting Queue is full");
-        return;
+        return promise.future();
       }
 
-      // offer all handlers to the waiting queue
-      for (Promise<Response> callback : callbacks) {
-        waiting.offer(callback);
+      // will re-encode the handler into a list of promises
+      final List<Promise<Response>> callbacks = new ArrayList<>(commands.size());
+      final List<Response> replies = new ArrayList<>(commands.size());
+      final AtomicInteger count = new AtomicInteger(commands.size());
+      final AtomicBoolean failed = new AtomicBoolean(false);
+
+      // encode the message to a single buffer
+      final Buffer messages = Buffer.buffer();
+
+      for (int i = 0; i < commands.size(); i++) {
+        final int index = i;
+        final RequestImpl req = (RequestImpl) commands.get(index);
+        // encode to the single buffer
+        req.encode(messages);
+        // unwrap the handler into a single handler
+        callbacks.add(index, vertx.promise(command -> {
+          if (!failed.get()) {
+            if (command.failed()) {
+              failed.set(true);
+              promise.fail(command.cause());
+              return;
+            }
+          }
+          // set the reply
+          replies.add(index, command.result());
+
+          if (count.decrementAndGet() == 0) {
+            // all results have arrived
+            promise.complete(replies);
+          }
+        }));
       }
-      // write to the socket
-      netSocket.write(messages, write -> {
-        if (write.failed()) {
-          // if the write fails, this connection enters a unknown state
-          // which means it should be terminated
-          fatal(write.cause());
+
+      // all update operations happen inside the context
+      context.execute(v -> {
+        // we might have switch thread/context
+        // this means the check needs to be performed again
+        if (waiting.freeSlots() < callbacks.size()) {
+          promise.fail("Redis waiting Queue is full");
+          return;
         }
+
+        // offer all handlers to the waiting queue
+        for (Promise<Response> callback : callbacks) {
+          waiting.offer(callback);
+        }
+        // write to the socket
+        netSocket.write(messages, write -> {
+          if (write.failed()) {
+            // if the write fails, this connection enters a unknown state
+            // which means it should be terminated
+            fatal(write.cause());
+          }
+        });
       });
-    });
+    }
 
     return promise.future();
   }

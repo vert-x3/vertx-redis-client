@@ -57,35 +57,39 @@ public abstract class BaseRedisClient implements Redis {
   public Future<List<@Nullable Response>> batch(List<Request> commands) {
     final Promise<List<Response>> promise = vertx.promise();
 
-    for (Request req : commands) {
-      if (req.command().isPubSub()) {
-        // mixing pubSub cannot be used on a one-shot operation
-        promise.fail("PubSub command in connection-less batch not allowed");
-        return promise.future();
+    if (commands.isEmpty()) {
+      promise.complete();
+    } else {
+      for (Request req : commands) {
+        if (req.command().isPubSub()) {
+          // mixing pubSub cannot be used on a one-shot operation
+          promise.fail("PubSub command in connection-less batch not allowed");
+          return promise.future();
+        }
       }
-    }
 
-    connect()
-      .onFailure(promise::fail)
-      .onSuccess(conn -> {
-        conn.batch(commands)
-          .onSuccess(responses -> {
-            try {
-              promise.complete(responses);
-            } finally {
-              // regardless of the result, return the connection to the pool
-              conn.close();
-            }
-          })
-          .onFailure(err -> {
-            try {
-              promise.fail(err);
-            } finally {
-              // regardless of the result, return the connection to the pool
-              conn.close();
-            }
-          });
-      });
+      connect()
+        .onFailure(promise::fail)
+        .onSuccess(conn -> {
+          conn.batch(commands)
+            .onSuccess(responses -> {
+              try {
+                promise.complete(responses);
+              } finally {
+                // regardless of the result, return the connection to the pool
+                conn.close();
+              }
+            })
+            .onFailure(err -> {
+              try {
+                promise.fail(err);
+              } finally {
+                // regardless of the result, return the connection to the pool
+                conn.close();
+              }
+            });
+        });
+    }
 
     return promise.future();
   }
