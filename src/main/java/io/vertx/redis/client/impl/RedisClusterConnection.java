@@ -356,87 +356,93 @@ public class RedisClusterConnection implements RedisConnection {
   public Future<List<Response>> batch(List<Request> requests) {
     final Promise<List<Response>> promise = vertx.promise();
 
-    int currentSlot = -1;
-    boolean readOnly = false;
-    boolean forceMasterEndpoint = false;
+    if (requests.isEmpty()) {
+      LOG.debug("Empty batch");
+      promise.complete(Collections.emptyList());
+    } else {
+      int currentSlot = -1;
+      boolean readOnly = false;
+      boolean forceMasterEndpoint = false;
 
-    // look up the base slot for the batch
-    for (Request request : requests) {
-      // process commands for cluster mode
-      final RequestImpl req = (RequestImpl) request;
-      final Command cmd = req.command();
+      // look up the base slot for the batch
+      for (Request request : requests) {
+        // process commands for cluster mode
+        final RequestImpl req = (RequestImpl) request;
+        final Command cmd = req.command();
 
-      if (UNSUPPORTEDCOMMANDS.containsKey(cmd)) {
-        promise.fail(UNSUPPORTEDCOMMANDS.get(cmd));
-        return promise.future();
-      }
-
-      readOnly |= cmd.isReadOnly();
-      forceMasterEndpoint |= MASTER_ONLY_COMMANDS.contains(cmd);
-
-      // this command can run anywhere
-      if (cmd.isKeyless()) {
-        continue;
-      }
-
-      if (cmd.isMovable()) {
-        final byte[][] keys = KeyExtractor.extractMovableKeys(req);
-
-        int slot = ZModem.generateMulti(keys);
-        if (slot == -1 || (currentSlot != -1 && currentSlot != slot)) {
-          promise.fail(buildCrossslotFailureMsg(req));
+        if (UNSUPPORTEDCOMMANDS.containsKey(cmd)) {
+          promise.fail(UNSUPPORTEDCOMMANDS.get(cmd));
           return promise.future();
         }
-        currentSlot = slot;
-        continue;
-      }
 
-      final List<byte[]> args = req.getArgs();
+        readOnly |= cmd.isReadOnly();
+        forceMasterEndpoint |= MASTER_ONLY_COMMANDS.contains(cmd);
 
-      if (cmd.isMultiKey()) {
-        // args exclude the command which is an arg in the commands response
-        int start = cmd.getFirstKey() - 1;
-        int end = cmd.getLastKey();
-        if (end > 0) {
-          end--;
+        // this command can run anywhere
+        if (cmd.isKeyless()) {
+          continue;
         }
-        if (end < 0) {
-          end = args.size() + (end + 1);
-        }
-        int step = cmd.getInterval();
 
-        for (int j = start; j < end; j += step) {
-          int slot = ZModem.generate(args.get(j));
-          if (currentSlot == -1) {
-            currentSlot = slot;
-            continue;
-          }
-          if (currentSlot != slot) {
-            // in cluster mode we currently do not handle batching commands which keys are not on the same slot
+        if (cmd.isMovable()) {
+          final byte[][] keys = KeyExtractor.extractMovableKeys(req);
+
+          int slot = ZModem.generateMulti(keys);
+          if (slot == -1 || (currentSlot != -1 && currentSlot != slot)) {
             promise.fail(buildCrossslotFailureMsg(req));
             return promise.future();
           }
+          currentSlot = slot;
+          continue;
         }
-        // all keys are on the same slot!
-        continue;
+
+        final List<byte[]> args = req.getArgs();
+
+        if (cmd.isMultiKey()) {
+          // args exclude the command which is an arg in the commands response
+          int start = cmd.getFirstKey() - 1;
+          int end = cmd.getLastKey();
+          if (end > 0) {
+            end--;
+          }
+          if (end < 0) {
+            end = args.size() + (end + 1);
+          }
+          int step = cmd.getInterval();
+
+          for (int j = start; j < end; j += step) {
+            int slot = ZModem.generate(args.get(j));
+            if (currentSlot == -1) {
+              currentSlot = slot;
+              continue;
+            }
+            if (currentSlot != slot) {
+              // in cluster mode we currently do not handle batching commands which keys are not on the same slot
+              promise.fail(buildCrossslotFailureMsg(req));
+              return promise.future();
+            }
+          }
+          // all keys are on the same slot!
+          continue;
+        }
+
+        // last option the command is single key
+        final int start = cmd.getFirstKey() - 1;
+        final int slot = ZModem.generate(args.get(start));
+        // we are checking the first request key
+        if (currentSlot == -1) {
+          currentSlot = slot;
+          continue;
+        }
+        if (currentSlot != slot) {
+          // in cluster mode we currently do not handle batching commands which keys are not on the same slot
+          promise.fail(buildCrossslotFailureMsg(req));
+          return promise.future();
+        }
       }
 
-      // last option the command is single key
-      final int start = cmd.getFirstKey() - 1;
-      final int slot = ZModem.generate(args.get(start));
-      // we are checking the first request key
-      if (currentSlot == -1) {
-        currentSlot = slot;
-        continue;
-      }
-      if (currentSlot != slot) {
-        // in cluster mode we currently do not handle batching commands which keys are not on the same slot
-        promise.fail(buildCrossslotFailureMsg(req));
-        return promise.future();
-      }
+      batch(selectEndpoint(currentSlot, readOnly, forceMasterEndpoint), RETRIES, requests, promise);
     }
 
-    batch(selectEndpoint(currentSlot, readOnly, forceMasterEndpoint), RETRIES, requests, promise);
     return promise.future();
   }
 

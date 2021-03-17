@@ -13,10 +13,7 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.IntStream;
 
@@ -115,6 +112,23 @@ public class RedisTest {
           cmd(LPOP).arg("a"),
           cmd(EXEC)
         ), batch -> {
+          should.assertTrue(batch.succeeded());
+          test.complete();
+        });
+      });
+  }
+
+  @Test
+  public void batchEmptyTest(TestContext should) {
+    final Async test = should.async();
+
+    Redis.createClient(rule.vertx(), "redis://localhost:7006")
+      .connect(create -> {
+        should.assertTrue(create.succeeded());
+
+        final RedisConnection redis = create.result();
+
+        redis.batch(Collections.emptyList(), batch -> {
           should.assertTrue(batch.succeeded());
           test.complete();
         });

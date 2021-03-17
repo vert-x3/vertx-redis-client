@@ -13,10 +13,7 @@ import io.vertx.redis.client.*;
 import org.junit.*;
 import org.junit.runner.RunWith;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Random;
-import java.util.UUID;
+import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import static io.vertx.redis.client.Command.*;
@@ -1016,6 +1013,20 @@ public class RedisClusterTest {
               test.countDown();
             }));
         }
+      }
+    ));
+  }
+
+  @Test(timeout = 30_000)
+  public void setAndWaitEmptyBatch(TestContext should) {
+    final Async test = should.async();
+
+    Redis.createClient(rule.vertx(), options).connect(should.asyncAssertSuccess(cluster -> {
+        cluster.batch(Collections.emptyList(),
+          should.asyncAssertSuccess(responses -> {
+            should.assertEquals(0, responses.size());
+            test.countDown();
+          }));
       }
     ));
   }
