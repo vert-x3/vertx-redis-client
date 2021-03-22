@@ -70,7 +70,7 @@ public class RedisStandaloneConnection implements RedisConnection, ParserHandler
   }
 
   public boolean isValid() {
-    return expirationTimestamp > 0 && System.currentTimeMillis() <= expirationTimestamp;
+    return expirationTimestamp == 0 || System.currentTimeMillis() <= expirationTimestamp;
   }
 
   @Override
