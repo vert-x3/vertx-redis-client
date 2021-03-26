@@ -45,7 +45,7 @@ public class RedisStandaloneConnection implements RedisConnection, ParserHandler
   private Handler<Void> onEnd;
   private Handler<Response> onMessage;
   private Runnable onEvict;
-  private Boolean isValid;
+  private boolean isValid;
 
   public RedisStandaloneConnection(Vertx vertx, ContextInternal context, ConnectionListener<RedisConnection> connectionListener, NetSocket netSocket, RedisOptions options) {
     this.listener = connectionListener;
