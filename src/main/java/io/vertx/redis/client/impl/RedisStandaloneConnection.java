@@ -20,7 +20,6 @@ import io.vertx.redis.client.impl.types.Multi;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.concurrent.RejectedExecutionException;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -40,14 +39,13 @@ public class RedisStandaloneConnection implements RedisConnection, ParserHandler
   // waiting: commands that have been sent but not answered
   // the queue is only accessed from the event loop
   private final ArrayQueue waiting;
-  private final int recycleTimeout;
 
   // state
   private Handler<Throwable> onException;
   private Handler<Void> onEnd;
   private Handler<Response> onMessage;
   private Runnable onEvict;
-  private long expirationTimestamp;
+  private Boolean isValid;
 
   public RedisStandaloneConnection(Vertx vertx, ContextInternal context, ConnectionListener<RedisConnection> connectionListener, NetSocket netSocket, RedisOptions options) {
     this.listener = connectionListener;
@@ -56,7 +54,7 @@ public class RedisStandaloneConnection implements RedisConnection, ParserHandler
     this.context = context;
     this.netSocket = netSocket;
     this.waiting = new ArrayQueue(options.getMaxWaitingHandlers());
-    this.recycleTimeout = options.getPoolRecycleTimeout();
+    this.isValid = true;
   }
 
   void forceClose() {
@@ -70,16 +68,12 @@ public class RedisStandaloneConnection implements RedisConnection, ParserHandler
   }
 
   public boolean isValid() {
-    return expirationTimestamp == 0 || System.currentTimeMillis() <= expirationTimestamp;
+    return isValid;
   }
 
   @Override
   public void close() {
     // Should not be called, unless we want (in the future) to have non pooled redis connections
-  }
-
-  private void recycle() {
-    expirationTimestamp = recycleTimeout > 0 ? System.currentTimeMillis() + recycleTimeout : 0L;
   }
 
   @Override
@@ -341,6 +335,8 @@ public class RedisStandaloneConnection implements RedisConnection, ParserHandler
     if (onException != null) {
       context.execute(t, onException);
     }
+    // mark this connection failed
+    isValid = false;
   }
 
   @Override
@@ -355,6 +351,8 @@ public class RedisStandaloneConnection implements RedisConnection, ParserHandler
     if (onException != null) {
       context.execute(t, onException);
     }
+    // mark this connection failed
+    isValid = false;
   }
 
   private void evict() {
