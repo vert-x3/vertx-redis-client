@@ -13,6 +13,7 @@ import io.vertx.core.impl.logging.LoggerFactory;
 import io.vertx.core.json.JsonObject;
 import io.vertx.core.net.NetSocket;
 import io.vertx.core.net.impl.clientconnection.ConnectionListener;
+import io.vertx.core.net.impl.pool.PoolConnector;
 import io.vertx.redis.client.*;
 import io.vertx.redis.client.impl.types.ErrorType;
 import io.vertx.redis.client.impl.types.Multi;
@@ -31,7 +32,7 @@ public class RedisStandaloneConnection implements RedisConnection, ParserHandler
 
   private static final ErrorType CONNECTION_CLOSED = ErrorType.create("CONNECTION_CLOSED");
 
-  private final ConnectionListener<RedisConnection> listener;
+  private final PoolConnector.Listener listener;
   private final VertxInternal vertx;
   private final ContextInternal context;
   private final EventBus eventBus;
@@ -47,7 +48,7 @@ public class RedisStandaloneConnection implements RedisConnection, ParserHandler
   private Runnable onEvict;
   private boolean isValid;
 
-  public RedisStandaloneConnection(Vertx vertx, ContextInternal context, ConnectionListener<RedisConnection> connectionListener, NetSocket netSocket, RedisOptions options) {
+  public RedisStandaloneConnection(Vertx vertx, ContextInternal context, PoolConnector.Listener connectionListener, NetSocket netSocket, RedisOptions options) {
     this.listener = connectionListener;
     this.vertx = (VertxInternal) vertx;
     this.eventBus = vertx.eventBus();
@@ -58,7 +59,7 @@ public class RedisStandaloneConnection implements RedisConnection, ParserHandler
   }
 
   void forceClose() {
-    listener.onEvict();
+    listener.onRemove();
     if (onEvict != null) {
       onEvict.run();
       // reset to avoid double calls
@@ -357,7 +358,7 @@ public class RedisStandaloneConnection implements RedisConnection, ParserHandler
 
   private void evict() {
     // evict this connection from the pool
-    listener.onEvict();
+    listener.onRemove();
     if (onEvict != null) {
       onEvict.run();
     }
