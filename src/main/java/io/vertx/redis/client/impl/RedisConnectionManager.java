@@ -330,7 +330,7 @@ class RedisConnectionManager {
     }
 
     @Override
-    public void requestConnection(ContextInternal ctx, Handler<AsyncResult<Lease<RedisConnection>>> handler) {
+    public void requestConnection(ContextInternal ctx, long timeout, Handler<AsyncResult<Lease<RedisConnection>>> handler) {
       pool.getConnection(ar -> {
         if (ar.succeeded()) {
           // increment the reference counter to avoid the pool to be closed too soon
