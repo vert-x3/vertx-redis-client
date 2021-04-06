@@ -18,7 +18,6 @@ package io.vertx.test.redis;
 import io.vertx.core.Context;
 import io.vertx.core.json.JsonArray;
 import io.vertx.core.net.NetSocket;
-import io.vertx.core.net.impl.clientconnection.ConnectionListener;
 import io.vertx.core.net.impl.pool.PoolConnector;
 import io.vertx.ext.unit.Async;
 import io.vertx.ext.unit.TestContext;
@@ -140,17 +139,17 @@ public class RedisClientTest {
         Field listenerField = getAccessibleField(RedisStandaloneConnection.class, "listener");
         PoolConnector.Listener originalListener = (PoolConnector.Listener) listenerField.get(internalConnection);
 
-        listenerField.set(internalConnection, new ConnectionListener<RedisConnection>() {
+        listenerField.set(internalConnection, new PoolConnector.Listener() {
           @Override
-          public void onConcurrencyChange(long concurrency) {
-            originalListener.onConcurrencyChange(concurrency);
-          }
-
-          @Override
-          public void onEvict() {
+          public void onRemove() {
             originalListener.onRemove();
             // When the socket is closed, evict should be call on the listener
             before.complete();
+          }
+
+          @Override
+          public void onConcurrencyChange(long concurrency) {
+            originalListener.onConcurrencyChange(concurrency);
           }
         });
 
