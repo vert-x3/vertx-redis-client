@@ -334,9 +334,9 @@ class RedisConnectionManager {
           // once there are no more connections the pool is collected, so this counter needs
           // to be as up to date as possible.
           incRefCount();
-          final RedisStandaloneConnection connection = (RedisStandaloneConnection) ar.result().get();
           // Integration between endpoint/pool and the standalone connection
-          connection.evictHandler(this::decRefCount);
+          ((RedisStandaloneConnection) ar.result().get())
+            .evictHandler(this::decRefCount);
         }
         // proceed to user
         handler.handle(ar);
