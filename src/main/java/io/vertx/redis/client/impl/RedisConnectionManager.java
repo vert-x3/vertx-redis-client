@@ -9,12 +9,18 @@ import io.vertx.core.impl.logging.Logger;
 import io.vertx.core.impl.logging.LoggerFactory;
 import io.vertx.core.net.NetClient;
 import io.vertx.core.net.NetSocket;
-import io.vertx.core.net.impl.clientconnection.*;
+import io.vertx.core.net.impl.clientconnection.ConnectResult;
+import io.vertx.core.net.impl.clientconnection.ConnectionManager;
+import io.vertx.core.net.impl.clientconnection.Endpoint;
+import io.vertx.core.net.impl.clientconnection.Lease;
+import io.vertx.core.net.impl.pool.ConnectionPool;
+import io.vertx.core.net.impl.pool.PoolConnector;
 import io.vertx.redis.client.Command;
 import io.vertx.redis.client.RedisConnection;
 import io.vertx.redis.client.RedisOptions;
 import io.vertx.redis.client.Request;
 
+import java.util.List;
 import java.util.Objects;
 import java.util.function.Consumer;
 
@@ -48,7 +54,20 @@ class RedisConnectionManager {
   }
 
   private void checkExpired(long period) {
-    pooledConnectionManager.forEach(e -> ((RedisEndpoint) e).pool.closeIdle());
+    pooledConnectionManager.forEach(e -> {
+      ((RedisEndpoint) e).pool.evict(conn -> !((RedisStandaloneConnection) conn).isValid(), ar -> {
+        if (ar.succeeded()) {
+          List<RedisConnection> result = ar.result();
+          for (RedisConnection conn : result) {
+            // on close we reset the default handlers
+            conn.handler(null);
+            conn.endHandler(null);
+            conn.exceptionHandler(null);
+            ((RedisStandaloneConnection) conn).forceClose();
+          }
+        }
+      });
+    });
     timerID = vertx.setTimer(period, id -> checkExpired(period));
   }
 
@@ -75,7 +94,7 @@ class RedisConnectionManager {
     }
   }
 
-  static class RedisConnectionProvider implements ConnectionProvider<RedisConnection> {
+  static class RedisConnectionProvider implements PoolConnector<RedisConnection> {
 
     private final VertxInternal vertx;
     private final NetClient netClient;
@@ -97,12 +116,7 @@ class RedisConnectionManager {
     }
 
     @Override
-    public void init(RedisConnection conn) {
-      // NO OP!
-    }
-
-    @Override
-    public void connect(ConnectionListener<RedisConnection> connectionListener, ContextInternal ctx, Handler<AsyncResult<ConnectResult<RedisConnection>>> onConnect) {
+    public void connect(EventLoopContext ctx, Listener listener, Handler<AsyncResult<ConnectResult<RedisConnection>>> onConnect) {
       // verify if we can make this connection
       final boolean netClientSsl = options.getNetClientOptions().isSsl();
       final boolean connectionStringSsl = redisURI.ssl();
@@ -137,17 +151,17 @@ class RedisConnectionManager {
               ctx.execute(Future.failedFuture(upgradeToSsl.cause()), onConnect);
             } else {
               // complete the connection
-              init(ctx, netSocket, connectionListener, onConnect);
+              init(ctx, netSocket, listener, onConnect);
             }
           });
         } else {
           // no need to upgrade
-          init(ctx, netSocket, connectionListener, onConnect);
+          init(ctx, netSocket, listener, onConnect);
         }
       });
     }
 
-    private void init(ContextInternal ctx, NetSocket netSocket, ConnectionListener<RedisConnection> connectionListener, Handler<AsyncResult<ConnectResult<RedisConnection>>> onConnect) {
+    private void init(ContextInternal ctx, NetSocket netSocket, PoolConnector.Listener connectionListener, Handler<AsyncResult<ConnectResult<RedisConnection>>> onConnect) {
       // the connection will inherit the user event loop context
       final RedisStandaloneConnection connection = new RedisStandaloneConnection(vertx, ctx, connectionListener, netSocket, options);
       // initialization
@@ -180,7 +194,7 @@ class RedisConnectionManager {
               return;
             }
 
-            ctx.execute(Future.succeededFuture(new ConnectResult<>(connection, 1, 1)), onConnect);
+            ctx.execute(Future.succeededFuture(new ConnectResult<>(connection, 1, 0)), onConnect);
           });
         });
       });
@@ -272,15 +286,6 @@ class RedisConnectionManager {
         }
       });
     }
-
-    @Override
-    public void close(RedisConnection connection) {
-      // on close we reset the default handlers
-      connection.handler(null);
-      connection.endHandler(null);
-      connection.exceptionHandler(null);
-      ((RedisStandaloneConnection) connection).forceClose();
-    }
   }
 
   public Future<RedisConnection> getConnection(String connectionString, Request setup) {
@@ -313,33 +318,25 @@ class RedisConnectionManager {
 
     private static final Consumer<RedisConnection> NOOP = c -> {};
 
-    final Pool<RedisConnection> pool;
+    final ConnectionPool<RedisConnection> pool;
 
     public RedisEndpoint(VertxInternal vertx, NetClient netClient, RedisOptions options, Runnable dispose, ContextInternal ctx, ConnectionKey key) {
       super(dispose);
-      ConnectionProvider<RedisConnection> connectionProvider = new RedisConnectionProvider(vertx, netClient, options, key.string, key.setup);
-      pool = new Pool<>(
-        ctx,
-        connectionProvider,
-        options.getMaxPoolWaiting(),
-        1,
-        options.getMaxPoolSize(),
-        NOOP,
-        NOOP,
-        false);
+      PoolConnector<RedisConnection> connector = new RedisConnectionProvider(vertx, netClient, options, key.string, key.setup);
+      pool = ConnectionPool.pool(connector, new int[]{options.getMaxPoolSize()}, options.getMaxPoolWaiting());
     }
 
     @Override
-    public void requestConnection(ContextInternal ctx, Handler<AsyncResult<Lease<RedisConnection>>> handler) {
-      pool.getConnection(ar -> {
+    public void requestConnection(ContextInternal ctx, long timeout, Handler<AsyncResult<Lease<RedisConnection>>> handler) {
+      pool.acquire((EventLoopContext) ctx, 0, ar -> {
         if (ar.succeeded()) {
           // increment the reference counter to avoid the pool to be closed too soon
           // once there are no more connections the pool is collected, so this counter needs
           // to be as up to date as possible.
           incRefCount();
-          final RedisStandaloneConnection connection = (RedisStandaloneConnection) ar.result().get();
           // Integration between endpoint/pool and the standalone connection
-          connection.evictHandler(this::decRefCount);
+          ((RedisStandaloneConnection) ar.result().get())
+            .evictHandler(this::decRefCount);
         }
         // proceed to user
         handler.handle(ar);

@@ -125,10 +125,11 @@ public class RedisPooledTest {
     RedisAPI redis = RedisAPI.api(Redis.createClient(
       rule.vertx(),
       new RedisOptions()
-        .setMaxPoolWaiting(8)
+        .setMaxPoolWaiting(10)
         .addConnectionString("redis://" + container.getContainerIpAddress() + ":" + container.getFirstMappedPort())));
 
     IntStream.range(0, 5).forEach(i -> vertx.setTimer(1, timerid -> {
+
       redis.set(Arrays.asList("foo", "bar"), res -> {
       });
 
