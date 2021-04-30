@@ -12,7 +12,6 @@ import io.vertx.core.impl.logging.Logger;
 import io.vertx.core.impl.logging.LoggerFactory;
 import io.vertx.core.json.JsonObject;
 import io.vertx.core.net.NetSocket;
-import io.vertx.core.net.impl.clientconnection.ConnectionListener;
 import io.vertx.core.net.impl.pool.PoolConnector;
 import io.vertx.redis.client.*;
 import io.vertx.redis.client.impl.types.ErrorType;
