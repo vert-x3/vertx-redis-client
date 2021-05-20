@@ -50,6 +50,7 @@ public class RedisOptions {
   private int poolCleanerInterval;
   private int maxPoolSize;
   private int maxPoolWaiting;
+  private int poolRecycleTimeout;
 
   private void init() {
     netClientOptions =
@@ -67,6 +68,7 @@ public class RedisOptions {
     // thumb guess based on web browser defaults
     maxPoolSize = 6;
     maxPoolWaiting = 24;
+    poolRecycleTimeout = 15_000;
   }
 
   /**
@@ -94,6 +96,7 @@ public class RedisOptions {
     this.poolCleanerInterval = other.poolCleanerInterval;
     this.maxPoolSize = other.maxPoolSize;
     this.maxPoolWaiting = other.maxPoolWaiting;
+    this.poolRecycleTimeout = other.poolRecycleTimeout;
     this.password = other.password;
   }
 
@@ -374,9 +377,6 @@ public class RedisOptions {
   /**
    * Tune how often in milliseconds should the connection pool cleaner execute.
    *
-   * For each connection in the pool, connections marked as invalid will be forcibly closed. A connection is marked
-   * invalid if it enters a exception or fatal state.
-   *
    * @param poolCleanerInterval the interval in milliseconds (-1 for never)
    * @return fluent self.
    */
@@ -423,6 +423,26 @@ public class RedisOptions {
    */
   public RedisOptions setMaxPoolWaiting(int maxPoolWaiting) {
     this.maxPoolWaiting = maxPoolWaiting;
+    return this;
+  }
+
+  /**
+   * Tune when a connection should be recycled in milliseconds.
+   *
+   * @return the timeout for recycling.
+   */
+  public int getPoolRecycleTimeout() {
+    return poolRecycleTimeout;
+  }
+
+  /**
+   * Tune when a connection should be recycled in milliseconds.
+   *
+   * @param poolRecycleTimeout the timeout for recycling.
+   * @return fluent self.
+   */
+  public RedisOptions setPoolRecycleTimeout(int poolRecycleTimeout) {
+    this.poolRecycleTimeout = poolRecycleTimeout;
     return this;
   }
 
