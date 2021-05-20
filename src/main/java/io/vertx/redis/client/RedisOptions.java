@@ -377,6 +377,9 @@ public class RedisOptions {
   /**
    * Tune how often in milliseconds should the connection pool cleaner execute.
    *
+   * For each connection in the pool, connections marked as invalid will be forcibly closed. A connection is marked
+   * invalid if it enters a exception or fatal state.
+   *
    * @param poolCleanerInterval the interval in milliseconds (-1 for never)
    * @return fluent self.
    */

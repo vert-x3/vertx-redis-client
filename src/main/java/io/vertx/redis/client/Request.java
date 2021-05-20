@@ -218,6 +218,9 @@ public interface Request {
   }
 
   /**
+   * @deprecated REDIS does not support {@code null} as a parameter, only as response. This was a deviation from the
+   * official protocol which should be avoided. Other clients explicitly do not allow this.
+   *
    * Adds a {@code null} encoded string. Redis does not allow storing the {@code null} value by itself. This method
    * will encode any null value as the four character long string {@code "null"}.
    *
@@ -227,6 +230,7 @@ public interface Request {
    * @return self
    */
   @Fluent
+  @Deprecated
   Request nullArg();
 
   /**
