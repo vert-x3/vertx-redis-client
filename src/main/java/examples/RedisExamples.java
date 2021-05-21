@@ -3,6 +3,8 @@ package examples;
 import io.vertx.core.*;
 import io.vertx.redis.client.*;
 
+import java.util.concurrent.atomic.AtomicBoolean;
+
 /**
  * These are the examples used in the documentation.
  *
@@ -117,6 +119,7 @@ public class RedisExamples {
 
       private final RedisOptions options = new RedisOptions();
       private RedisConnection client;
+      private final AtomicBoolean CONNECTING = new AtomicBoolean();
 
       @Override
       public void start() {
@@ -133,18 +136,30 @@ public class RedisExamples {
       private Future<RedisConnection> createRedisClient() {
         Promise<RedisConnection> promise = Promise.promise();
 
-        Redis.createClient(vertx, options)
-          .connect()
-          .onSuccess(conn -> {
-            // make sure the client is reconnected on error
-            conn.exceptionHandler(e -> {
-              // attempt to reconnect,
-              // if there is an unrecoverable error
-              attemptReconnect(0);
+        if (CONNECTING.compareAndSet(false, true)) {
+          Redis.createClient(vertx, options)
+            .connect()
+            .onSuccess(conn -> {
+
+              // make sure to invalidate old connection if present
+              if (client != null) {
+                client.close();
+              }
+
+              // make sure the client is reconnected on error
+              conn.exceptionHandler(e -> {
+                // attempt to reconnect,
+                // if there is an unrecoverable error
+                attemptReconnect(0);
+              });
+
+              // allow further processing
+              promise.complete(conn);
+              CONNECTING.set(false);
             });
-            // allow further processing
-            promise.complete(conn);
-          });
+        } else {
+          promise.complete();
+        }
 
         return promise.future();
       }
@@ -155,6 +170,7 @@ public class RedisExamples {
       private void attemptReconnect(int retry) {
         if (retry > MAX_RECONNECT_RETRIES) {
           // we should stop now, as there's nothing we can do.
+          CONNECTING.set(false);
         } else {
           // retry with backoff up to 10240 ms
           long backoff = (long) (Math.pow(2, Math.min(retry, 10)) * 10);
