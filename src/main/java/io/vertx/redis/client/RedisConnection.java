@@ -41,7 +41,7 @@ public interface RedisConnection extends ReadStream<Response> {
    */
   @Fluent
   @Override
-  RedisConnection handler(Handler<Response> handler);
+  RedisConnection handler(@Nullable Handler<Response> handler);
 
   /**
    * {@inheritDoc}
