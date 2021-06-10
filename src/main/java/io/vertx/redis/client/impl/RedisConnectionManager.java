@@ -15,6 +15,8 @@ import io.vertx.core.net.impl.pool.Endpoint;
 import io.vertx.core.net.impl.pool.Lease;
 import io.vertx.core.net.impl.pool.ConnectionPool;
 import io.vertx.core.net.impl.pool.PoolConnector;
+import io.vertx.core.spi.metrics.PoolMetrics;
+import io.vertx.core.spi.metrics.VertxMetrics;
 import io.vertx.redis.client.Command;
 import io.vertx.redis.client.RedisConnection;
 import io.vertx.redis.client.RedisOptions;
@@ -22,7 +24,6 @@ import io.vertx.redis.client.Request;
 
 import java.util.List;
 import java.util.Objects;
-import java.util.function.Consumer;
 
 class RedisConnectionManager {
 
@@ -32,6 +33,7 @@ class RedisConnectionManager {
 
   private final VertxInternal vertx;
   private final NetClient netClient;
+  private final PoolMetrics metrics;
 
   private final RedisOptions options;
   private final ConnectionManager<ConnectionKey, Lease<RedisConnection>> pooledConnectionManager;
@@ -40,12 +42,14 @@ class RedisConnectionManager {
   RedisConnectionManager(VertxInternal vertx, RedisOptions options) {
     this.vertx = vertx;
     this.options = options;
+    VertxMetrics metricsSPI = this.vertx.metricsSPI();
+    metrics = metricsSPI != null ? metricsSPI.createPoolMetrics("redis", options.getPoolName(), options.getMaxPoolSize()) : null;
     this.netClient = vertx.createNetClient(options.getNetClientOptions());
     this.pooledConnectionManager = new ConnectionManager<>(this::connectionEndpointProvider);
   }
 
   private Endpoint<Lease<RedisConnection>> connectionEndpointProvider(ConnectionKey key, ContextInternal ctx, Runnable dispose) {
-    return new RedisEndpoint(vertx, netClient, options, dispose, ctx, key);
+    return new RedisEndpoint(vertx, netClient, options, dispose, key);
   }
 
   synchronized void start() {
@@ -298,9 +302,17 @@ class RedisConnectionManager {
       eventLoopContext = vertx.createEventLoopContext(ctx.nettyEventLoop(), ctx.workerPool(), ctx.classLoader());
     }
 
+    final boolean metricsEnabled = metrics != null;
+    final Object queueMetric = metricsEnabled ? metrics.submitted() : null;
+
     pooledConnectionManager.getConnection(eventLoopContext, new ConnectionKey(connectionString, setup), promise);
     return promise.future()
-      .map(PooledRedisConnection::new);
+      .onFailure(err -> {
+        if (metricsEnabled) {
+          metrics.rejected(queueMetric);
+        }
+      })
+      .map(lease -> new PooledRedisConnection(lease, metrics, metricsEnabled ? metrics.begin(queueMetric) : null));
   }
 
   public void close() {
@@ -312,15 +324,16 @@ class RedisConnectionManager {
     }
     pooledConnectionManager.close();
     netClient.close();
+    if (metrics != null) {
+      metrics.close();
+    }
   }
 
   static class RedisEndpoint extends Endpoint<Lease<RedisConnection>> {
 
-    private static final Consumer<RedisConnection> NOOP = c -> {};
-
     final ConnectionPool<RedisConnection> pool;
 
-    public RedisEndpoint(VertxInternal vertx, NetClient netClient, RedisOptions options, Runnable dispose, ContextInternal ctx, ConnectionKey key) {
+    public RedisEndpoint(VertxInternal vertx, NetClient netClient, RedisOptions options, Runnable dispose, ConnectionKey key) {
       super(dispose);
       PoolConnector<RedisConnection> connector = new RedisConnectionProvider(vertx, netClient, options, key.string, key.setup);
       pool = ConnectionPool.pool(connector, new int[]{options.getMaxPoolSize()}, options.getMaxPoolWaiting());

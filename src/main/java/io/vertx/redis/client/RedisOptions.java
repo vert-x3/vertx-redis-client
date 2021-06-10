@@ -16,12 +16,14 @@
 package io.vertx.redis.client;
 
 import io.vertx.codegen.annotations.DataObject;
+import io.vertx.codegen.annotations.Fluent;
 import io.vertx.core.json.JsonObject;
 import io.vertx.core.net.NetClientOptions;
 import io.vertx.redis.client.impl.RedisURI;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 /**
  * Redis Client Configuration options.
@@ -47,6 +49,7 @@ public class RedisOptions {
   private volatile String password;
 
   // pool related options
+  private String poolName;
   private int poolCleanerInterval;
   private int maxPoolSize;
   private int maxPoolWaiting;
@@ -64,6 +67,7 @@ public class RedisOptions {
     role = RedisRole.MASTER;
     useReplicas = RedisReplicas.NEVER;
     type = RedisClientType.STANDALONE;
+    poolName = UUID.randomUUID().toString();
     poolCleanerInterval = -1;
     // thumb guess based on web browser defaults
     maxPoolSize = 6;
@@ -93,6 +97,7 @@ public class RedisOptions {
     this.role = other.role;
     this.useReplicas = other.useReplicas;
     // pool related options
+    this.poolName = other.poolName;
     this.poolCleanerInterval = other.poolCleanerInterval;
     this.maxPoolSize = other.maxPoolSize;
     this.maxPoolWaiting = other.maxPoolWaiting;
@@ -475,9 +480,27 @@ public class RedisOptions {
    * @param password the default password
    * @return fluent self
    */
-  public synchronized RedisOptions setPassword(String password) {
+  public RedisOptions setPassword(String password) {
     this.password = password;
     return this;
+  }
+
+  /**
+   * Set a user defined pool name (for metrics reporting).
+   * @param poolName the user desired pool name.
+   * @return fluent self
+   */
+  public RedisOptions setPoolName(String poolName) {
+    this.poolName = poolName;
+    return this;
+  }
+
+  /**
+   * Get the pool name to be used in this client. The default name is a random UUID.
+   * @return pool name.
+   */
+  public String getPoolName() {
+    return this.poolName;
   }
 
   /**
