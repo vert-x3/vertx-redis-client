@@ -74,6 +74,11 @@ public class RedisOptionsConverter {
             obj.setNetClientOptions(new io.vertx.core.net.NetClientOptions((io.vertx.core.json.JsonObject)member.getValue()));
           }
           break;
+        case "noHello":
+          if (member.getValue() instanceof Boolean) {
+            obj.setNoHello((Boolean)member.getValue());
+          }
+          break;
         case "password":
           if (member.getValue() instanceof String) {
             obj.setPassword((String)member.getValue());
@@ -131,6 +136,7 @@ public class RedisOptionsConverter {
     if (obj.getNetClientOptions() != null) {
       json.put("netClientOptions", obj.getNetClientOptions().toJson());
     }
+    json.put("noHello", obj.isNoHello());
     if (obj.getPassword() != null) {
       json.put("password", obj.getPassword());
     }

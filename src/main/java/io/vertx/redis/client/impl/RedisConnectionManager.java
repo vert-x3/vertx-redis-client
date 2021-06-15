@@ -21,6 +21,7 @@ import io.vertx.redis.client.Command;
 import io.vertx.redis.client.RedisConnection;
 import io.vertx.redis.client.RedisOptions;
 import io.vertx.redis.client.Request;
+import io.vertx.redis.client.impl.types.ErrorType;
 
 import java.util.List;
 import java.util.Objects;
@@ -205,25 +206,62 @@ class RedisConnectionManager {
     }
 
     private void hello(ContextInternal ctx, RedisConnection connection, RedisURI redisURI, Handler<AsyncResult<Void>> handler) {
-      Request hello = Request.cmd(Command.HELLO).arg(RESPParser.VERSION);
+      if (options.isNoHello()) {
+        ping(ctx, connection, handler);
+      } else {
+        Request hello = Request.cmd(Command.HELLO).arg(RESPParser.VERSION);
 
-      String password = redisURI.password() != null ? redisURI.password() : options.getPassword();
+        String password = redisURI.password() != null ? redisURI.password() : options.getPassword();
 
-      if (password != null) {
-        String user = redisURI.user();
-        // will perform auth at hello level
-        hello
-          .arg("AUTH")
-          .arg(user == null ? "default" : user)
-          .arg(password);
+        if (password != null) {
+          String user = redisURI.user();
+          // will perform auth at hello level
+          hello
+            .arg("AUTH")
+            .arg(user == null ? "default" : user)
+            .arg(password);
+        }
+
+        String client = redisURI.param("client");
+        if (client != null) {
+          hello.arg("SETNAME").arg(client);
+        }
+
+        connection.send(hello, onSend -> {
+          if (onSend.succeeded()) {
+            LOG.debug(onSend.result());
+            ctx.execute(Future.succeededFuture(), handler);
+            return;
+          }
+
+          final Throwable err = onSend.cause();
+          if (err != null) {
+            if (err instanceof ErrorType) {
+              final ErrorType redisErr = (ErrorType) err;
+              if (redisErr.is("NOAUTH")) {
+                authenticate(ctx, connection, password, handler);
+                return;
+              }
+              if (redisErr.is("ERR")) {
+                String msg = redisErr.getMessage();
+                if (msg.startsWith("ERR unknown command") || msg.startsWith("ERR unknown or unsupported command")) {
+                  // chatting to an old server
+                  ping(ctx, connection, handler);
+                }
+                return;
+              }
+            }
+          }
+
+          ctx.execute(Future.failedFuture(err), handler);
+        });
       }
+    }
 
-      String client = redisURI.param("client");
-      if (client != null) {
-        hello.arg("SETNAME").arg(client);
-      }
+    private void ping(ContextInternal ctx, RedisConnection connection, Handler<AsyncResult<Void>> handler) {
+      Request ping = Request.cmd(Command.PING);
 
-      connection.send(hello, onSend -> {
+      connection.send(ping, onSend -> {
         if (onSend.succeeded()) {
           LOG.debug(onSend.result());
           ctx.execute(Future.succeededFuture(), handler);
@@ -232,10 +270,10 @@ class RedisConnectionManager {
 
         final Throwable err = onSend.cause();
         if (err != null) {
-          String msg = err.getMessage();
-          if (msg != null) {
-            if (msg.startsWith("ERR unknown command") || msg.startsWith("ERR unknown or unsupported command")) {
-              // chatting to an old server
+          if (err instanceof ErrorType) {
+            if (((ErrorType) err).is("NOAUTH")) {
+              // old authentication required
+              String password = redisURI.password() != null ? redisURI.password() : options.getPassword();
               authenticate(ctx, connection, password, handler);
               return;
             }

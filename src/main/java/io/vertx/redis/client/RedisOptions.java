@@ -47,6 +47,7 @@ public class RedisOptions {
   private RedisRole role;
   private RedisReplicas useReplicas;
   private volatile String password;
+  private boolean noHello;
 
   // pool related options
   private String poolName;
@@ -482,6 +483,29 @@ public class RedisOptions {
    */
   public RedisOptions setPassword(String password) {
     this.password = password;
+    return this;
+  }
+
+  /**
+   * Read the flag to disable the HELLO command during connection handshake.
+   * @return true if HELLO is not to be used.
+   */
+  public boolean isNoHello() {
+    return noHello;
+  }
+
+  /**
+   * There are well know broken server implementations deployed on the cloud. Azure is one of these cases.
+   * These servers report the wrong number of keys to the hello response, rendering the client unusable.
+   *
+   * Disabling the hello command during the handshake will force the protocol to be downgraded and keep
+   * the client working.
+   *
+   * @param noHello true to disable hello (not recommended) unless reasons...
+   * @return fluent self
+   */
+  public RedisOptions setNoHello(boolean noHello) {
+    this.noHello = noHello;
     return this;
   }
 
