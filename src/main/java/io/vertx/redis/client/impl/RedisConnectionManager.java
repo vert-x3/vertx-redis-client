@@ -206,7 +206,7 @@ class RedisConnectionManager {
     }
 
     private void hello(ContextInternal ctx, RedisConnection connection, RedisURI redisURI, Handler<AsyncResult<Void>> handler) {
-      if (options.isNoHello()) {
+      if (!options.isHandshakeProtocolNegotiation()) {
         ping(ctx, connection, handler);
       } else {
         Request hello = Request.cmd(Command.HELLO).arg(RESPParser.VERSION);

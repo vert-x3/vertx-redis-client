@@ -44,6 +44,11 @@ public class RedisOptionsConverter {
             obj.setEndpoints(list);
           }
           break;
+        case "handshakeProtocolNegotiation":
+          if (member.getValue() instanceof Boolean) {
+            obj.setHandshakeProtocolNegotiation((Boolean)member.getValue());
+          }
+          break;
         case "masterName":
           if (member.getValue() instanceof String) {
             obj.setMasterName((String)member.getValue());
@@ -72,11 +77,6 @@ public class RedisOptionsConverter {
         case "netClientOptions":
           if (member.getValue() instanceof JsonObject) {
             obj.setNetClientOptions(new io.vertx.core.net.NetClientOptions((io.vertx.core.json.JsonObject)member.getValue()));
-          }
-          break;
-        case "noHello":
-          if (member.getValue() instanceof Boolean) {
-            obj.setNoHello((Boolean)member.getValue());
           }
           break;
         case "password":
@@ -126,6 +126,7 @@ public class RedisOptionsConverter {
       obj.getEndpoints().forEach(item -> array.add(item));
       json.put("endpoints", array);
     }
+    json.put("handshakeProtocolNegotiation", obj.isHandshakeProtocolNegotiation());
     if (obj.getMasterName() != null) {
       json.put("masterName", obj.getMasterName());
     }
@@ -136,7 +137,6 @@ public class RedisOptionsConverter {
     if (obj.getNetClientOptions() != null) {
       json.put("netClientOptions", obj.getNetClientOptions().toJson());
     }
-    json.put("noHello", obj.isNoHello());
     if (obj.getPassword() != null) {
       json.put("password", obj.getPassword());
     }

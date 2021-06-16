@@ -47,7 +47,7 @@ public class RedisOptions {
   private RedisRole role;
   private RedisReplicas useReplicas;
   private volatile String password;
-  private boolean noHello;
+  private boolean handshakeProtocolNegotiation;
 
   // pool related options
   private String poolName;
@@ -62,6 +62,7 @@ public class RedisOptions {
         .setTcpKeepAlive(true)
         .setTcpNoDelay(true);
 
+    handshakeProtocolNegotiation = true;
     maxWaitingHandlers = 2048;
     maxNestedArrays = 32;
     masterName = "mymaster";
@@ -104,6 +105,7 @@ public class RedisOptions {
     this.maxPoolWaiting = other.maxPoolWaiting;
     this.poolRecycleTimeout = other.poolRecycleTimeout;
     this.password = other.password;
+    this.handshakeProtocolNegotiation = other.handshakeProtocolNegotiation;
   }
 
   /**
@@ -487,25 +489,28 @@ public class RedisOptions {
   }
 
   /**
-   * Read the flag to disable the HELLO command during connection handshake.
-   * @return true if HELLO is not to be used.
+   * Should the client perform {@code REST} protocol negotiation during the connection acquire.
+   * By default this is {@code true}, but there are situations when using broken servers it may
+   * be useful to skip this and always fallback to {@code RESP2} without using the {@code HELLO}
+   * command.
+   *
+   * @return true to allow negotiation.
    */
-  public boolean isNoHello() {
-    return noHello;
+  public boolean isHandshakeProtocolNegotiation() {
+    return handshakeProtocolNegotiation;
   }
 
   /**
-   * There are well know broken server implementations deployed on the cloud. Azure is one of these cases.
-   * These servers report the wrong number of keys to the hello response, rendering the client unusable.
+   * Should the client perform {@code REST} protocol negotiation during the connection acquire.
+   * By default this is {@code true}, but there are situations when using broken servers it may
+   * be useful to skip this and always fallback to {@code RESP2} without using the {@code HELLO}
+   * command.
    *
-   * Disabling the hello command during the handshake will force the protocol to be downgraded and keep
-   * the client working.
-   *
-   * @param noHello true to disable hello (not recommended) unless reasons...
+   * @param handshakeProtocolNegotiation false to disable {@code HELLO} (not recommended) unless reasons...
    * @return fluent self
    */
-  public RedisOptions setNoHello(boolean noHello) {
-    this.noHello = noHello;
+  public RedisOptions setHandshakeProtocolNegotiation(boolean handshakeProtocolNegotiation) {
+    this.handshakeProtocolNegotiation = handshakeProtocolNegotiation;
     return this;
   }
 
