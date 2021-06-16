@@ -29,7 +29,7 @@ public class RedisClientIT {
     Redis client = Redis.createClient(
       rule.vertx(),
       new RedisOptions()
-        .setHandshakeProtocolNegotiation(false)
+        .setProtocolNegotiation(false)
         .setPassword(cachekey)
         .setConnectionString("redis://" + cacheHostname + ":6380"));
 

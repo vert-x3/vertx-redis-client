@@ -2,9 +2,6 @@ package io.vertx.redis.client;
 
 import io.vertx.core.json.JsonObject;
 import io.vertx.core.json.JsonArray;
-import io.vertx.core.json.impl.JsonUtil;
-import java.time.Instant;
-import java.time.format.DateTimeFormatter;
 
 /**
  * Converter and mapper for {@link io.vertx.redis.client.RedisOptions}.
@@ -46,7 +43,7 @@ public class RedisOptionsConverter {
           break;
         case "handshakeProtocolNegotiation":
           if (member.getValue() instanceof Boolean) {
-            obj.setHandshakeProtocolNegotiation((Boolean)member.getValue());
+            obj.setProtocolNegotiation((Boolean)member.getValue());
           }
           break;
         case "masterName":
@@ -126,7 +123,7 @@ public class RedisOptionsConverter {
       obj.getEndpoints().forEach(item -> array.add(item));
       json.put("endpoints", array);
     }
-    json.put("handshakeProtocolNegotiation", obj.isHandshakeProtocolNegotiation());
+    json.put("handshakeProtocolNegotiation", obj.isProtocolNegotiation());
     if (obj.getMasterName() != null) {
       json.put("masterName", obj.getMasterName());
     }
