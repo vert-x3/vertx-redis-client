@@ -47,6 +47,7 @@ public class RedisOptions {
   private RedisRole role;
   private RedisReplicas useReplicas;
   private volatile String password;
+  private boolean protocolNegotiation;
 
   // pool related options
   private String poolName;
@@ -61,6 +62,7 @@ public class RedisOptions {
         .setTcpKeepAlive(true)
         .setTcpNoDelay(true);
 
+    protocolNegotiation = true;
     maxWaitingHandlers = 2048;
     maxNestedArrays = 32;
     masterName = "mymaster";
@@ -103,6 +105,7 @@ public class RedisOptions {
     this.maxPoolWaiting = other.maxPoolWaiting;
     this.poolRecycleTimeout = other.poolRecycleTimeout;
     this.password = other.password;
+    this.protocolNegotiation = other.protocolNegotiation;
   }
 
   /**
@@ -482,6 +485,32 @@ public class RedisOptions {
    */
   public RedisOptions setPassword(String password) {
     this.password = password;
+    return this;
+  }
+
+  /**
+   * Should the client perform {@code RESP} protocol negotiation during the connection handshake.
+   * By default this is {@code true}, but there are situations when using broken servers it may
+   * be useful to skip this and always fallback to {@code RESP2} without using the {@code HELLO}
+   * command.
+   *
+   * @return true to perform negotiation.
+   */
+  public boolean isProtocolNegotiation() {
+    return protocolNegotiation;
+  }
+
+  /**
+   * Should the client perform {@code REST} protocol negotiation during the connection acquire.
+   * By default this is {@code true}, but there are situations when using broken servers it may
+   * be useful to skip this and always fallback to {@code RESP2} without using the {@code HELLO}
+   * command.
+   *
+   * @param protocolNegotiation false to disable {@code HELLO} (not recommended) unless reasons...
+   * @return fluent self
+   */
+  public RedisOptions setProtocolNegotiation(boolean protocolNegotiation) {
+    this.protocolNegotiation = protocolNegotiation;
     return this;
   }
 

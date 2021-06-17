@@ -84,9 +84,19 @@ public class RedisOptionsConverter {
             obj.setPoolCleanerInterval(((Number)member.getValue()).intValue());
           }
           break;
+        case "poolName":
+          if (member.getValue() instanceof String) {
+            obj.setPoolName((String)member.getValue());
+          }
+          break;
         case "poolRecycleTimeout":
           if (member.getValue() instanceof Number) {
             obj.setPoolRecycleTimeout(((Number)member.getValue()).intValue());
+          }
+          break;
+        case "protocolNegotiation":
+          if (member.getValue() instanceof Boolean) {
+            obj.setProtocolNegotiation((Boolean)member.getValue());
           }
           break;
         case "role":
@@ -135,7 +145,11 @@ public class RedisOptionsConverter {
       json.put("password", obj.getPassword());
     }
     json.put("poolCleanerInterval", obj.getPoolCleanerInterval());
+    if (obj.getPoolName() != null) {
+      json.put("poolName", obj.getPoolName());
+    }
     json.put("poolRecycleTimeout", obj.getPoolRecycleTimeout());
+    json.put("protocolNegotiation", obj.isProtocolNegotiation());
     if (obj.getRole() != null) {
       json.put("role", obj.getRole().name());
     }

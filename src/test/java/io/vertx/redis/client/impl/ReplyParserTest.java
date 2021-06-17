@@ -8,10 +8,12 @@ import io.vertx.ext.unit.junit.VertxUnitRunner;
 import io.vertx.redis.client.Response;
 import io.vertx.redis.client.impl.types.BulkType;
 import io.vertx.redis.client.impl.types.MultiType;
+import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
+import java.util.Base64;
 import java.util.concurrent.atomic.AtomicInteger;
 
 @RunWith(VertxUnitRunner.class)
@@ -427,29 +429,61 @@ public class ReplyParserTest {
 
     parser.handle(Buffer.buffer(
       "+OK\r\n" +
-      "+OK\r\n" +
-      "$1\r\n" +
-      "1\r\n" +
-      "+OK\r\n" +
-      "+OK\r\n" +
-      "+OK\r\n" +
-      "$5\r\n" +
-      "91600\r\n" +
-      "$6\r\n" +
-      "104099\r\n" +
-      "+OK\r\n" +
-      "$6\r\n" +
-      "104099\r\n" +
-      "$6\r\n" +
-      "104099\r\n" +
-      "+OK\r\n" +
-      "+OK\r\n" +
-      "+OK\r\n" +
-      "$5\r\n" +
-      "77347\r\n" +
-      "$5\r\n" +
-      "91600\r\n" +
-      "$5\r\n" +
-      "91600\r\n"));
+        "+OK\r\n" +
+        "$1\r\n" +
+        "1\r\n" +
+        "+OK\r\n" +
+        "+OK\r\n" +
+        "+OK\r\n" +
+        "$5\r\n" +
+        "91600\r\n" +
+        "$6\r\n" +
+        "104099\r\n" +
+        "+OK\r\n" +
+        "$6\r\n" +
+        "104099\r\n" +
+        "$6\r\n" +
+        "104099\r\n" +
+        "+OK\r\n" +
+        "+OK\r\n" +
+        "+OK\r\n" +
+        "$5\r\n" +
+        "77347\r\n" +
+        "$5\r\n" +
+        "91600\r\n" +
+        "$5\r\n" +
+        "91600\r\n"));
+  }
+
+  @Test
+  @Ignore("Broken Azure output")
+  public void parseAzureHello(TestContext should) {
+    final Async test = should.async();
+
+    final AtomicInteger counter = new AtomicInteger();
+
+    final RESPParser parser = new RESPParser(new ParserHandler() {
+      @Override
+      public void handle(Response response) {
+        System.out.println(response);
+        if (counter.incrementAndGet() == 17) {
+          test.complete();
+        }
+      }
+
+      @Override
+      public void fatal(Throwable t) {
+        should.fail(t);
+      }
+
+      @Override
+      public void fail(Throwable t) {
+        should.fail(t);
+      }
+    }, 16);
+
+    byte[] hello = Base64.getDecoder().decode("JTcNCiQ2DQpzZXJ2ZXINCiQ1DQpyZWRpcw0KJDcNCnZlcnNpb24NCiQ1DQo2LjAuMw0KJDUNCnByb3RvDQo6Mw0KJDINCmlkDQo6MzIxMDUNCiQ0DQptb2RlDQokMTANCnN0YW5kYWxvbmUNCiQ0DQpyb2xlDQokNg0KbWFzdGVyDQo=");
+
+    parser.handle(Buffer.buffer(hello));
   }
 }
