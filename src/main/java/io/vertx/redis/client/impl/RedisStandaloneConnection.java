@@ -48,10 +48,10 @@ public class RedisStandaloneConnection implements RedisConnection, ParserHandler
   private boolean isValid;
 
   public RedisStandaloneConnection(Vertx vertx, ContextInternal context, PoolConnector.Listener connectionListener, NetSocket netSocket, RedisOptions options) {
-    this.listener = connectionListener;
     this.vertx = (VertxInternal) vertx;
-    this.eventBus = vertx.eventBus();
     this.context = context;
+    this.listener = connectionListener;
+    this.eventBus = vertx.eventBus();
     this.netSocket = netSocket;
     this.waiting = new ArrayQueue(options.getMaxWaitingHandlers());
     this.isValid = true;

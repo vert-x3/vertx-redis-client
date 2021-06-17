@@ -4,6 +4,7 @@ import io.vertx.codegen.annotations.Nullable;
 import io.vertx.core.Future;
 import io.vertx.core.Handler;
 import io.vertx.core.net.impl.pool.Lease;
+import io.vertx.core.spi.metrics.PoolMetrics;
 import io.vertx.redis.client.RedisConnection;
 import io.vertx.redis.client.Request;
 import io.vertx.redis.client.Response;
@@ -17,10 +18,14 @@ public class PooledRedisConnection implements RedisConnection {
 
   private final Lease<RedisConnection> lease;
   private final RedisConnection connection;
+  private final PoolMetrics metrics;
+  private final Object metric;
 
-  public PooledRedisConnection(Lease<RedisConnection> lease) {
+  public PooledRedisConnection(Lease<RedisConnection> lease, PoolMetrics<?> poolMetrics, Object metric) {
     this.lease = lease;
     this.connection = lease.get();
+    this.metrics = poolMetrics;
+    this.metric = metric;
   }
 
   public RedisConnection actual() {
@@ -76,6 +81,9 @@ public class PooledRedisConnection implements RedisConnection {
   @Override
   public void close() {
     lease.recycle();
+    if (metrics != null) {
+      metrics.end(metric, true);
+    }
   }
 
   @Override
