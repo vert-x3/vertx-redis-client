@@ -2,6 +2,9 @@ package io.vertx.redis.client;
 
 import io.vertx.core.json.JsonObject;
 import io.vertx.core.json.JsonArray;
+import io.vertx.core.json.impl.JsonUtil;
+import java.time.Instant;
+import java.time.format.DateTimeFormatter;
 
 /**
  * Converter and mapper for {@link io.vertx.redis.client.RedisOptions}.
@@ -39,11 +42,6 @@ public class RedisOptionsConverter {
                 list.add((String)item);
             });
             obj.setEndpoints(list);
-          }
-          break;
-        case "handshakeProtocolNegotiation":
-          if (member.getValue() instanceof Boolean) {
-            obj.setProtocolNegotiation((Boolean)member.getValue());
           }
           break;
         case "masterName":
@@ -86,9 +84,19 @@ public class RedisOptionsConverter {
             obj.setPoolCleanerInterval(((Number)member.getValue()).intValue());
           }
           break;
+        case "poolName":
+          if (member.getValue() instanceof String) {
+            obj.setPoolName((String)member.getValue());
+          }
+          break;
         case "poolRecycleTimeout":
           if (member.getValue() instanceof Number) {
             obj.setPoolRecycleTimeout(((Number)member.getValue()).intValue());
+          }
+          break;
+        case "protocolNegotiation":
+          if (member.getValue() instanceof Boolean) {
+            obj.setProtocolNegotiation((Boolean)member.getValue());
           }
           break;
         case "role":
@@ -123,7 +131,6 @@ public class RedisOptionsConverter {
       obj.getEndpoints().forEach(item -> array.add(item));
       json.put("endpoints", array);
     }
-    json.put("handshakeProtocolNegotiation", obj.isProtocolNegotiation());
     if (obj.getMasterName() != null) {
       json.put("masterName", obj.getMasterName());
     }
@@ -138,7 +145,11 @@ public class RedisOptionsConverter {
       json.put("password", obj.getPassword());
     }
     json.put("poolCleanerInterval", obj.getPoolCleanerInterval());
+    if (obj.getPoolName() != null) {
+      json.put("poolName", obj.getPoolName());
+    }
     json.put("poolRecycleTimeout", obj.getPoolRecycleTimeout());
+    json.put("protocolNegotiation", obj.isProtocolNegotiation());
     if (obj.getRole() != null) {
       json.put("role", obj.getRole().name());
     }
