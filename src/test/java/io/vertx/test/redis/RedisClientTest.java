@@ -326,7 +326,7 @@ public class RedisClientTest {
     redis.brpoplpush("list1", "list2", "10000", result -> {
 
       if (result.succeeded()) {
-        redis.lpop("list2", result2 -> {
+        redis.lpop(toList("list2"), result2 -> {
           if (result2.succeeded()) {
             should.assertTrue("hello".equals(result2.result().toString()));
           }
@@ -1363,7 +1363,7 @@ public class RedisClientTest {
         redis.rpush(toList(mykey, "three"), reply2 -> {
           should.assertTrue(reply2.succeeded());
           should.assertEquals(3L, reply2.result().toLong());
-          redis.lpop(mykey, reply3 -> {
+          redis.lpop(toList(mykey), reply3 -> {
             should.assertTrue(reply3.succeeded());
             should.assertEquals("one", reply3.result().toString());
             test.complete();
