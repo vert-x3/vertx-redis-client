@@ -33,12 +33,6 @@
     <jar.manifest>${project.basedir}/src/main/resources/META-INF/MANIFEST.MF</jar.manifest>
   </properties>
 
-  <!--
-  Tests uses embedded Redis by default in the test framework, however it is possible to use
-  an existing Redis server by specifying the host and/or port system properties, for instance:
-  % mvn test -Dhost=.... -Dport=....
-  -->
-
   <dependencyManagement>
     <dependencies>
       <dependency>

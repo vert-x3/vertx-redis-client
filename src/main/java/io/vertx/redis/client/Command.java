@@ -21,6 +21,7 @@ import io.vertx.redis.client.impl.CommandImpl;
 
 /**
  * <b>Auto generated</b> API Commands to interact with REDIS.
+ * @version redis_version:6.2.4
  *
  * @author <a href="mailto:plopes@redhat.com">Paulo Lopes</a>
  */
@@ -38,6 +39,7 @@ public interface Command {
   Command BITFIELD_RO = Command.create("bitfield_ro", -2, 1, 1, 1, false, true, false, false);
   Command BITOP = Command.create("bitop", -4, 2, -1, 1, true, false, false, false);
   Command BITPOS = Command.create("bitpos", -3, 1, 1, 1, false, true, false, false);
+  Command BLMOVE = Command.create("blmove", 6, 1, 2, 1, true, false, false, false);
   Command BLPOP = Command.create("blpop", -3, 1, -2, 1, true, false, false, false);
   Command BRPOP = Command.create("brpop", -3, 1, -2, 1, true, false, false, false);
   Command BRPOPLPUSH = Command.create("brpoplpush", 4, 1, 2, 1, true, false, false, false);
@@ -47,6 +49,7 @@ public interface Command {
   Command CLUSTER = Command.create("cluster", -2, 0, 0, 0, false, false, false, false);
   Command COMMAND = Command.create("command", -1, 0, 0, 0, false, false, false, false);
   Command CONFIG = Command.create("config", -2, 0, 0, 0, false, false, false, false);
+  Command COPY = Command.create("copy", -3, 1, 2, 1, true, false, false, false);
   Command DBSIZE = Command.create("dbsize", 1, 0, 0, 0, false, true, false, false);
   Command DEBUG = Command.create("debug", -2, 0, 0, 0, false, false, false, false);
   Command DECR = Command.create("decr", 2, 1, 1, 1, true, false, false, false);
@@ -54,13 +57,14 @@ public interface Command {
   Command DEL = Command.create("del", -2, 1, -1, 1, true, false, false, false);
   Command DISCARD = Command.create("discard", 1, 0, 0, 0, false, false, false, false);
   Command DUMP = Command.create("dump", 2, 1, 1, 1, false, true, false, false);
-  Command ECHO = Command.create("echo", 2, 0, 0, 0, false, true, false, false);
+  Command ECHO = Command.create("echo", 2, 0, 0, 0, false, false, false, false);
   Command EVAL = Command.create("eval", -3, 0, 0, 0, false, false, true, false);
   Command EVALSHA = Command.create("evalsha", -3, 0, 0, 0, false, false, true, false);
   Command EXEC = Command.create("exec", 1, 0, 0, 0, false, false, false, false);
   Command EXISTS = Command.create("exists", -2, 1, -1, 1, false, true, false, false);
   Command EXPIRE = Command.create("expire", 3, 1, 1, 1, true, false, false, false);
   Command EXPIREAT = Command.create("expireat", 3, 1, 1, 1, true, false, false, false);
+  Command FAILOVER = Command.create("failover", -1, 0, 0, 0, false, false, false, false);
   Command FLUSHALL = Command.create("flushall", -1, 0, 0, 0, true, false, false, false);
   Command FLUSHDB = Command.create("flushdb", -1, 0, 0, 0, true, false, false, false);
   Command GEOADD = Command.create("geoadd", -5, 1, 1, 1, true, false, false, false);
@@ -68,15 +72,19 @@ public interface Command {
   Command GEOHASH = Command.create("geohash", -2, 1, 1, 1, false, true, false, false);
   Command GEOPOS = Command.create("geopos", -2, 1, 1, 1, false, true, false, false);
   Command GEORADIUS = Command.create("georadius", -6, 1, 1, 1, true, false, true, false);
-  Command GEORADIUS_RO = Command.create("georadius_ro", -6, 1, 1, 1, false, true, true, false);
+  Command GEORADIUS_RO = Command.create("georadius_ro", -6, 1, 1, 1, false, true, false, false);
   Command GEORADIUSBYMEMBER = Command.create("georadiusbymember", -5, 1, 1, 1, true, false, true, false);
-  Command GEORADIUSBYMEMBER_RO = Command.create("georadiusbymember_ro", -5, 1, 1, 1, false, true, true, false);
+  Command GEORADIUSBYMEMBER_RO = Command.create("georadiusbymember_ro", -5, 1, 1, 1, false, true, false, false);
+  Command GEOSEARCH = Command.create("geosearch", -7, 1, 1, 1, false, true, false, false);
+  Command GEOSEARCHSTORE = Command.create("geosearchstore", -8, 1, 2, 1, true, false, false, false);
   Command GET = Command.create("get", 2, 1, 1, 1, false, true, false, false);
   Command GETBIT = Command.create("getbit", 3, 1, 1, 1, false, true, false, false);
+  Command GETDEL = Command.create("getdel", 2, 1, 1, 1, true, false, false, false);
+  Command GETEX = Command.create("getex", -2, 1, 1, 1, true, false, false, false);
   Command GETRANGE = Command.create("getrange", 4, 1, 1, 1, false, true, false, false);
   Command GETSET = Command.create("getset", 3, 1, 1, 1, true, false, false, false);
   Command HDEL = Command.create("hdel", -3, 1, 1, 1, true, false, false, false);
-  Command HELLO = Command.create("hello", -2, 0, 0, 0, false, false, false, false);
+  Command HELLO = Command.create("hello", -1, 0, 0, 0, false, false, false, false);
   Command HEXISTS = Command.create("hexists", 3, 1, 1, 1, false, true, false, false);
   Command HGET = Command.create("hget", 3, 1, 1, 1, false, true, false, false);
   Command HGETALL = Command.create("hgetall", 2, 1, 1, 1, false, true, false, false);
@@ -87,6 +95,7 @@ public interface Command {
   Command HMGET = Command.create("hmget", -3, 1, 1, 1, false, true, false, false);
   Command HMSET = Command.create("hmset", -4, 1, 1, 1, true, false, false, false);
   Command HOST = Command.create("host:", -1, 0, 0, 0, false, true, false, false);
+  Command HRANDFIELD = Command.create("hrandfield", -2, 1, 1, 1, false, true, false, false);
   Command HSCAN = Command.create("hscan", -3, 1, 1, 1, false, true, false, false);
   Command HSET = Command.create("hset", -4, 1, 1, 1, true, false, false, false);
   Command HSETNX = Command.create("hsetnx", 4, 1, 1, 1, true, false, false, false);
@@ -97,13 +106,15 @@ public interface Command {
   Command INCRBYFLOAT = Command.create("incrbyfloat", 3, 1, 1, 1, true, false, false, false);
   Command INFO = Command.create("info", -1, 0, 0, 0, false, false, false, false);
   Command KEYS = Command.create("keys", 2, 0, 0, 0, false, true, false, false);
-  Command LASTSAVE = Command.create("lastsave", 1, 0, 0, 0, false, true, false, false);
+  Command LASTSAVE = Command.create("lastsave", 1, 0, 0, 0, false, false, false, false);
   Command LATENCY = Command.create("latency", -2, 0, 0, 0, false, false, false, false);
   Command LINDEX = Command.create("lindex", 3, 1, 1, 1, false, true, false, false);
   Command LINSERT = Command.create("linsert", 5, 1, 1, 1, true, false, false, false);
   Command LLEN = Command.create("llen", 2, 1, 1, 1, false, true, false, false);
+  Command LMOVE = Command.create("lmove", 5, 1, 2, 1, true, false, false, false);
   Command LOLWUT = Command.create("lolwut", -1, 0, 0, 0, false, true, false, false);
-  Command LPOP = Command.create("lpop", 2, 1, 1, 1, true, false, false, false);
+  Command LPOP = Command.create("lpop", -2, 1, 1, 1, true, false, false, false);
+  Command LPOS = Command.create("lpos", -3, 1, 1, 1, false, true, false, false);
   Command LPUSH = Command.create("lpush", -3, 1, 1, 1, true, false, false, false);
   Command LPUSHX = Command.create("lpushx", -3, 1, 1, 1, true, false, false, false);
   Command LRANGE = Command.create("lrange", 4, 1, 1, 1, false, true, false, false);
@@ -125,14 +136,14 @@ public interface Command {
   Command PEXPIREAT = Command.create("pexpireat", 3, 1, 1, 1, true, false, false, false);
   Command PFADD = Command.create("pfadd", -2, 1, 1, 1, true, false, false, false);
   Command PFCOUNT = Command.create("pfcount", -2, 1, -1, 1, false, true, false, false);
-  Command PFDEBUG = Command.create("pfdebug", -3, 0, 0, 0, true, false, false, false);
+  Command PFDEBUG = Command.create("pfdebug", -3, 2, 2, 1, true, false, false, false);
   Command PFMERGE = Command.create("pfmerge", -2, 1, -1, 1, true, false, false, false);
   Command PFSELFTEST = Command.create("pfselftest", 1, 0, 0, 0, false, false, false, false);
   Command PING = Command.create("ping", -1, 0, 0, 0, false, false, false, false);
   Command POST = Command.create("post", -1, 0, 0, 0, false, true, false, false);
   Command PSETEX = Command.create("psetex", 4, 1, 1, 1, true, false, false, false);
   Command PSUBSCRIBE = Command.create("psubscribe", -2, 0, 0, 0, false, false, false, true);
-  Command PSYNC = Command.create("psync", 3, 0, 0, 0, false, false, false, false);
+  Command PSYNC = Command.create("psync", -3, 0, 0, 0, false, false, false, false);
   Command PTTL = Command.create("pttl", 2, 1, 1, 1, false, true, false, false);
   Command PUBLISH = Command.create("publish", 3, 0, 0, 0, false, false, false, false);
   Command PUBSUB = Command.create("pubsub", -2, 0, 0, 0, false, false, false, false);
@@ -144,10 +155,11 @@ public interface Command {
   Command RENAMENX = Command.create("renamenx", 3, 1, 2, 1, true, false, false, false);
   Command REPLCONF = Command.create("replconf", -1, 0, 0, 0, false, false, false, false);
   Command REPLICAOF = Command.create("replicaof", 3, 0, 0, 0, false, false, false, false);
+  Command RESET = Command.create("reset", 1, 0, 0, 0, false, false, false, false);
   Command RESTORE = Command.create("restore", -4, 1, 1, 1, true, false, false, false);
   Command RESTORE_ASKING = Command.create("restore-asking", -4, 1, 1, 1, true, false, false, false);
-  Command ROLE = Command.create("role", 1, 0, 0, 0, false, true, false, false);
-  Command RPOP = Command.create("rpop", 2, 1, 1, 1, true, false, false, false);
+  Command ROLE = Command.create("role", 1, 0, 0, 0, false, false, false, false);
+  Command RPOP = Command.create("rpop", -2, 1, 1, 1, true, false, false, false);
   Command RPOPLPUSH = Command.create("rpoplpush", 3, 1, 2, 1, true, false, false, false);
   Command RPUSH = Command.create("rpush", -3, 1, 1, 1, true, false, false, false);
   Command RPUSHX = Command.create("rpushx", -3, 1, 1, 1, true, false, false, false);
@@ -171,6 +183,7 @@ public interface Command {
   Command SLAVEOF = Command.create("slaveof", 3, 0, 0, 0, false, false, false, false);
   Command SLOWLOG = Command.create("slowlog", -2, 0, 0, 0, false, false, false, false);
   Command SMEMBERS = Command.create("smembers", 2, 1, 1, 1, false, true, false, false);
+  Command SMISMEMBER = Command.create("smismember", -3, 1, 1, 1, false, true, false, false);
   Command SMOVE = Command.create("smove", 4, 1, 2, 1, true, false, false, false);
   Command SORT = Command.create("sort", -2, 1, 1, 1, true, false, true, false);
   Command SPOP = Command.create("spop", -2, 1, 1, 1, true, false, false, false);
@@ -185,7 +198,7 @@ public interface Command {
   Command SUNIONSTORE = Command.create("sunionstore", -3, 1, -1, 1, true, false, false, false);
   Command SWAPDB = Command.create("swapdb", 3, 0, 0, 0, true, false, false, false);
   Command SYNC = Command.create("sync", 1, 0, 0, 0, false, false, false, false);
-  Command TIME = Command.create("time", 1, 0, 0, 0, false, true, false, false);
+  Command TIME = Command.create("time", 1, 0, 0, 0, false, false, false, false);
   Command TOUCH = Command.create("touch", -2, 1, -1, 1, false, true, false, false);
   Command TTL = Command.create("ttl", 2, 1, 1, 1, false, true, false, false);
   Command TYPE = Command.create("type", 2, 1, 1, 1, false, true, false, false);
@@ -196,6 +209,7 @@ public interface Command {
   Command WATCH = Command.create("watch", -2, 1, -1, 1, false, false, false, false);
   Command XACK = Command.create("xack", -4, 1, 1, 1, true, false, false, false);
   Command XADD = Command.create("xadd", -5, 1, 1, 1, true, false, false, false);
+  Command XAUTOCLAIM = Command.create("xautoclaim", -6, 1, 1, 1, true, false, false, false);
   Command XCLAIM = Command.create("xclaim", -6, 1, 1, 1, true, false, false, false);
   Command XDEL = Command.create("xdel", -3, 1, 1, 1, true, false, false, false);
   Command XGROUP = Command.create("xgroup", -2, 2, 2, 1, true, false, false, false);
@@ -203,22 +217,28 @@ public interface Command {
   Command XLEN = Command.create("xlen", 2, 1, 1, 1, false, true, false, false);
   Command XPENDING = Command.create("xpending", -3, 1, 1, 1, false, true, false, false);
   Command XRANGE = Command.create("xrange", -4, 1, 1, 1, false, true, false, false);
-  Command XREAD = Command.create("xread", -4, 1, 1, 1, false, true, true, false);
-  Command XREADGROUP = Command.create("xreadgroup", -7, 1, 1, 1, true, false, true, false);
+  Command XREAD = Command.create("xread", -4, 0, 0, 0, false, true, true, false);
+  Command XREADGROUP = Command.create("xreadgroup", -7, 0, 0, 0, true, false, true, false);
   Command XREVRANGE = Command.create("xrevrange", -4, 1, 1, 1, false, true, false, false);
   Command XSETID = Command.create("xsetid", 3, 1, 1, 1, true, false, false, false);
-  Command XTRIM = Command.create("xtrim", -2, 1, 1, 1, true, false, false, false);
+  Command XTRIM = Command.create("xtrim", -4, 1, 1, 1, true, false, false, false);
   Command ZADD = Command.create("zadd", -4, 1, 1, 1, true, false, false, false);
   Command ZCARD = Command.create("zcard", 2, 1, 1, 1, false, true, false, false);
   Command ZCOUNT = Command.create("zcount", 4, 1, 1, 1, false, true, false, false);
+  Command ZDIFF = Command.create("zdiff", -3, 0, 0, 0, false, true, true, false);
+  Command ZDIFFSTORE = Command.create("zdiffstore", -4, 1, 1, 1, true, false, true, false);
   Command ZINCRBY = Command.create("zincrby", 4, 1, 1, 1, true, false, false, false);
-  Command ZINTERSTORE = Command.create("zinterstore", -4, 0, 0, 0, true, false, true, false);
+  Command ZINTER = Command.create("zinter", -3, 0, 0, 0, false, true, true, false);
+  Command ZINTERSTORE = Command.create("zinterstore", -4, 1, 1, 1, true, false, true, false);
   Command ZLEXCOUNT = Command.create("zlexcount", 4, 1, 1, 1, false, true, false, false);
+  Command ZMSCORE = Command.create("zmscore", -3, 1, 1, 1, false, true, false, false);
   Command ZPOPMAX = Command.create("zpopmax", -2, 1, 1, 1, true, false, false, false);
   Command ZPOPMIN = Command.create("zpopmin", -2, 1, 1, 1, true, false, false, false);
+  Command ZRANDMEMBER = Command.create("zrandmember", -2, 1, 1, 1, false, true, false, false);
   Command ZRANGE = Command.create("zrange", -4, 1, 1, 1, false, true, false, false);
   Command ZRANGEBYLEX = Command.create("zrangebylex", -4, 1, 1, 1, false, true, false, false);
   Command ZRANGEBYSCORE = Command.create("zrangebyscore", -4, 1, 1, 1, false, true, false, false);
+  Command ZRANGESTORE = Command.create("zrangestore", -5, 1, 2, 1, true, false, false, false);
   Command ZRANK = Command.create("zrank", 3, 1, 1, 1, false, true, false, false);
   Command ZREM = Command.create("zrem", -3, 1, 1, 1, true, false, false, false);
   Command ZREMRANGEBYLEX = Command.create("zremrangebylex", 4, 1, 1, 1, true, false, false, false);
@@ -230,7 +250,8 @@ public interface Command {
   Command ZREVRANK = Command.create("zrevrank", 3, 1, 1, 1, false, true, false, false);
   Command ZSCAN = Command.create("zscan", -3, 1, 1, 1, false, true, false, false);
   Command ZSCORE = Command.create("zscore", 3, 1, 1, 1, false, true, false, false);
-  Command ZUNIONSTORE = Command.create("zunionstore", -4, 0, 0, 0, true, false, true, false);
+  Command ZUNION = Command.create("zunion", -3, 0, 0, 0, false, true, true, false);
+  Command ZUNIONSTORE = Command.create("zunionstore", -4, 1, 1, 1, true, false, true, false);
   Command SENTINEL = Command.create("sentinel");
 
   /**
