@@ -33,6 +33,7 @@ public class RedisReplicationTest {
         onCreate.result()
           .send(Request.cmd(Command.INFO), info -> {
             should.assertTrue(info.succeeded());
+            System.out.println(info.result().toString());
             should.assertTrue(info.result().toString().contains("tcp_port:7000"));
             test.complete();
           });
