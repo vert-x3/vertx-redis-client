@@ -124,13 +124,20 @@ public class RedisSentinelClient extends BaseRedisClient implements Redis {
         onCreate.handle(Future.failedFuture(resolve.cause()));
         return;
       }
-      // wrap a new client
-      if (role == RedisRole.SENTINEL) {// sentinel cannot select
-        final RedisURI uri = resolve.result();
-        connectionManager.getConnection(getSentinelEndpoint(uri), null).onComplete(onCreate);
+
+      final RedisURI uri = resolve.result();
+      final String endpoint = getBaseEndpoint(uri);
+      final Request setup;
+
+      // SELECT is only allowed on non sentinel
+      if (role != RedisRole.SENTINEL && uri.select() != null) {
+        setup = cmd(SELECT).arg(uri.select());
       } else {
-        connectionManager.getConnection(resolve.result().toString(), null).onComplete(onCreate);
+        setup = null;
       }
+
+      // wrap a new client
+      connectionManager.getConnection(endpoint, setup).onComplete(onCreate);
     };
 
     switch (role) {
@@ -197,7 +204,7 @@ public class RedisSentinelClient extends BaseRedisClient implements Redis {
     // but can contain authentication
     final RedisURI uri = new RedisURI(endpoint);
 
-    connectionManager.getConnection(getSentinelEndpoint(uri), null)
+    connectionManager.getConnection(getBaseEndpoint(uri), null)
       .onFailure(err -> handler.handle(Future.failedFuture(err)))
       .onSuccess(conn -> {
         // Send a command just to check we have a working node
@@ -217,7 +224,7 @@ public class RedisSentinelClient extends BaseRedisClient implements Redis {
     // we can't use the endpoint as is, it should not contain a database selection,
     // but can contain authentication
     final RedisURI uri = new RedisURI(endpoint);
-    connectionManager.getConnection(getSentinelEndpoint(uri), null)
+    connectionManager.getConnection(getBaseEndpoint(uri), null)
       .onFailure(err -> handler.handle(Future.failedFuture(err)))
       .onSuccess(conn -> {
         final String masterName = options.getMasterName();
@@ -245,7 +252,7 @@ public class RedisSentinelClient extends BaseRedisClient implements Redis {
     // we can't use the endpoint as is, it should not contain a database selection,
     // but can contain authentication
     final RedisURI uri = new RedisURI(endpoint);
-    connectionManager.getConnection(getSentinelEndpoint(uri), null)
+    connectionManager.getConnection(getBaseEndpoint(uri), null)
       .onFailure(err -> handler.handle(Future.failedFuture(err)))
       .onSuccess(conn -> {
         final String masterName = options.getMasterName();
@@ -291,7 +298,7 @@ public class RedisSentinelClient extends BaseRedisClient implements Redis {
       });
   }
 
-  private String getSentinelEndpoint(RedisURI uri) {
+  private String getBaseEndpoint(RedisURI uri) {
     StringBuilder sb = new StringBuilder();
 
     if (uri.unix()) {
