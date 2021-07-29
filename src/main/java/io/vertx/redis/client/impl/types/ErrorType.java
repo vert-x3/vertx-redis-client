@@ -24,20 +24,8 @@ public final class ErrorType extends Throwable implements Response {
     return new ErrorType(message);
   }
 
-  private final String kind;
-
   private ErrorType(String message) {
     super(message, null, false, false);
-
-    if (message != null) {
-      for (int i = 0; i < message.length(); i++) {
-        if (message.charAt(i) == ' ') {
-          kind = message.substring(0, i);
-          return;
-        }
-      }
-    }
-    kind = null;
   }
 
   @Override
@@ -46,15 +34,18 @@ public final class ErrorType extends Throwable implements Response {
   }
 
   public boolean is(String kind) {
-    if (this.kind == null) {
+    String message = getMessage();
+    if (message == null) {
       return kind == null;
     } else {
-      return this.kind.equalsIgnoreCase(kind);
+      if (kind.equals("ERR")) {
+        return message.startsWith(kind);
+      } else {
+        // this is to address databases like PIKA which drift from the official
+        // protocol by always prefixing errors with ERR
+        return message.startsWith(kind) || message.startsWith("ERR " + kind);
+      }
     }
-  }
-
-  public String getKind() {
-    return kind;
   }
 
   @Override

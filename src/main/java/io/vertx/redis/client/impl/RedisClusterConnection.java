@@ -308,7 +308,7 @@ public class RedisClusterConnection implements RedisConnection {
             }
             // attempt to recover
             // REQUERY THE NEW ONE (we've got the correct details)
-            String addr = cause.slice(' ', 2);
+            String addr = cause.slice(' ', cause.is("ERR") ? 3 : 2);
 
             if (addr == null) {
               // bad message
@@ -473,7 +473,7 @@ public class RedisClusterConnection implements RedisConnection {
             }
             // attempt to recover
             // REQUERY THE NEW ONE (we've got the correct details)
-            String addr = cause.slice(' ', 2);
+            String addr = cause.slice(' ', cause.is("ERR") ? 3 : 2);
 
             if (addr == null) {
               // bad message
