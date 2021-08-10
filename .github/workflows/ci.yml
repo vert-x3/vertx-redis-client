@@ -34,7 +34,7 @@ jobs:
       - name: Run redis test cluster
         run: docker run -d -e 'IP=127.0.0.1' -e 'STANDALONE=true' -e 'SENTINEL=true' -p '7000-7007:7000-7007' -p '5000-5002:5000-5002' grokzen/redis-cluster:latest
       - name: Run tests
-        run: mvn -q clean verify -B
+        run: mvn -s .github/maven-ci-settings.xml -q clean verify -B
       - name: Publish Unit Test Results
         uses: scacap/action-surefire-report@v1
         if: ${{ always() }}
@@ -65,4 +65,4 @@ jobs:
         run: echo "PROJECT_VERSION=$(mvn org.apache.maven.plugins:maven-help-plugin:evaluate -Dexpression=project.version -B | grep -v '\[')" >> $GITHUB_ENV
       - name: Maven deploy
         if: ${{ endsWith(env.PROJECT_VERSION, '-SNAPSHOT') }}
-        run: mvn deploy -s .travis.maven.settings.xml -DskipTests -B
+        run: mvn deploy -s .github/maven-cd-settings.xml -DskipTests -B
