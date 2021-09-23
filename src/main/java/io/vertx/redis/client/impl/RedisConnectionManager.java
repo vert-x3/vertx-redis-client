@@ -1,3 +1,18 @@
+/*
+ * Copyright 2019 Red Hat, Inc.
+ * <p>
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * and Apache License v2.0 which accompanies this distribution.
+ * <p>
+ * The Eclipse Public License is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ * <p>
+ * The Apache License v2.0 is available at
+ * http://www.opensource.org/licenses/apache2.0.php
+ * <p>
+ * You may elect to redistribute this code under either of these licenses.
+ */
 package io.vertx.redis.client.impl;
 
 import io.vertx.core.*;
@@ -23,7 +38,6 @@ import io.vertx.redis.client.RedisOptions;
 import io.vertx.redis.client.Request;
 import io.vertx.redis.client.impl.types.ErrorType;
 
-import java.util.List;
 import java.util.Objects;
 
 class RedisConnectionManager {
@@ -37,7 +51,7 @@ class RedisConnectionManager {
   private final PoolMetrics metrics;
 
   private final RedisOptions options;
-  private final ConnectionManager<ConnectionKey, Lease<RedisConnection>> pooledConnectionManager;
+  private final ConnectionManager<ConnectionKey, Lease<RedisConnectionInternal>> pooledConnectionManager;
   private long timerID;
 
   RedisConnectionManager(VertxInternal vertx, RedisOptions options) {
@@ -49,7 +63,7 @@ class RedisConnectionManager {
     this.pooledConnectionManager = new ConnectionManager<>(this::connectionEndpointProvider);
   }
 
-  private Endpoint<Lease<RedisConnection>> connectionEndpointProvider(ConnectionKey key, ContextInternal ctx, Runnable dispose) {
+  private Endpoint<Lease<RedisConnectionInternal>> connectionEndpointProvider(ConnectionKey key, ContextInternal ctx, Runnable dispose) {
     return new RedisEndpoint(vertx, netClient, options, dispose, key);
   }
 
@@ -60,15 +74,14 @@ class RedisConnectionManager {
 
   private void checkExpired(long period) {
     pooledConnectionManager.forEach(e -> {
-      ((RedisEndpoint) e).pool.evict(conn -> !((RedisStandaloneConnection) conn).isValid(), ar -> {
+      ((RedisEndpoint) e).pool.evict(conn -> !conn.isValid(), ar -> {
         if (ar.succeeded()) {
-          List<RedisConnection> result = ar.result();
-          for (RedisConnection conn : result) {
+          for (RedisConnectionInternal conn : ar.result()) {
             // on close we reset the default handlers
             conn.handler(null);
             conn.endHandler(null);
             conn.exceptionHandler(null);
-            ((RedisStandaloneConnection) conn).forceClose();
+            conn.forceClose();
           }
         }
       });
@@ -99,7 +112,7 @@ class RedisConnectionManager {
     }
   }
 
-  static class RedisConnectionProvider implements PoolConnector<RedisConnection> {
+  static class RedisConnectionProvider implements PoolConnector<RedisConnectionInternal> {
 
     private final VertxInternal vertx;
     private final NetClient netClient;
@@ -116,12 +129,12 @@ class RedisConnectionManager {
     }
 
     @Override
-    public boolean isValid(RedisConnection conn) {
-      return ((RedisStandaloneConnection) conn).isValid();
+    public boolean isValid(RedisConnectionInternal conn) {
+      return conn.isValid();
     }
 
     @Override
-    public void connect(EventLoopContext ctx, Listener listener, Handler<AsyncResult<ConnectResult<RedisConnection>>> onConnect) {
+    public void connect(EventLoopContext ctx, Listener listener, Handler<AsyncResult<ConnectResult<RedisConnectionInternal>>> onConnect) {
       // verify if we can make this connection
       final boolean netClientSsl = options.getNetClientOptions().isSsl();
       final boolean connectionStringSsl = redisURI.ssl();
@@ -166,7 +179,7 @@ class RedisConnectionManager {
       });
     }
 
-    private void init(ContextInternal ctx, NetSocket netSocket, PoolConnector.Listener connectionListener, Handler<AsyncResult<ConnectResult<RedisConnection>>> onConnect) {
+    private void init(ContextInternal ctx, NetSocket netSocket, PoolConnector.Listener connectionListener, Handler<AsyncResult<ConnectResult<RedisConnectionInternal>>> onConnect) {
       // the connection will inherit the user event loop context
       final RedisStandaloneConnection connection = new RedisStandaloneConnection(vertx, ctx, connectionListener, netSocket, options);
       // initialization
@@ -331,7 +344,7 @@ class RedisConnectionManager {
   }
 
   public Future<RedisConnection> getConnection(String connectionString, Request setup) {
-    final PromiseInternal<Lease<RedisConnection>> promise = vertx.promise();
+    final PromiseInternal<Lease<RedisConnectionInternal>> promise = vertx.promise();
     final ContextInternal ctx = promise.context();
     final EventLoopContext eventLoopContext;
     if (ctx instanceof EventLoopContext) {
@@ -367,18 +380,18 @@ class RedisConnectionManager {
     }
   }
 
-  static class RedisEndpoint extends Endpoint<Lease<RedisConnection>> {
+  static class RedisEndpoint extends Endpoint<Lease<RedisConnectionInternal>> {
 
-    final ConnectionPool<RedisConnection> pool;
+    final ConnectionPool<RedisConnectionInternal> pool;
 
     public RedisEndpoint(VertxInternal vertx, NetClient netClient, RedisOptions options, Runnable dispose, ConnectionKey key) {
       super(dispose);
-      PoolConnector<RedisConnection> connector = new RedisConnectionProvider(vertx, netClient, options, key.string, key.setup);
+      PoolConnector<RedisConnectionInternal> connector = new RedisConnectionProvider(vertx, netClient, options, key.string, key.setup);
       pool = ConnectionPool.pool(connector, new int[]{options.getMaxPoolSize()}, options.getMaxPoolWaiting());
     }
 
     @Override
-    public void requestConnection(ContextInternal ctx, long timeout, Handler<AsyncResult<Lease<RedisConnection>>> handler) {
+    public void requestConnection(ContextInternal ctx, long timeout, Handler<AsyncResult<Lease<RedisConnectionInternal>>> handler) {
       pool.acquire((EventLoopContext) ctx, 0, ar -> {
         if (ar.succeeded()) {
           // increment the reference counter to avoid the pool to be closed too soon

@@ -16,12 +16,12 @@ import java.util.List;
  */
 public class PooledRedisConnection implements RedisConnection {
 
-  private final Lease<RedisConnection> lease;
-  private final RedisConnection connection;
+  private final Lease<RedisConnectionInternal> lease;
+  private final RedisConnectionInternal connection;
   private final PoolMetrics metrics;
   private final Object metric;
 
-  public PooledRedisConnection(Lease<RedisConnection> lease, PoolMetrics<?> poolMetrics, Object metric) {
+  public PooledRedisConnection(Lease<RedisConnectionInternal> lease, PoolMetrics<?> poolMetrics, Object metric) {
     this.lease = lease;
     this.connection = lease.get();
     this.metrics = poolMetrics;
@@ -80,7 +80,9 @@ public class PooledRedisConnection implements RedisConnection {
 
   @Override
   public void close() {
-    lease.recycle();
+    if (connection.reset()) {
+      lease.recycle();
+    }
     if (metrics != null) {
       metrics.end(metric, true);
     }

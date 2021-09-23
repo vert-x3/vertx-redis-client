@@ -23,7 +23,7 @@ import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 
-public class RedisStandaloneConnection implements RedisConnection, ParserHandler {
+public class RedisStandaloneConnection implements RedisConnectionInternal, ParserHandler {
 
   private static final String BASE_ADDRESS = "io.vertx.redis";
 
@@ -46,6 +46,7 @@ public class RedisStandaloneConnection implements RedisConnection, ParserHandler
   private Handler<Response> onMessage;
   private Runnable onEvict;
   private boolean isValid;
+  private boolean pubSub;
 
   public RedisStandaloneConnection(Vertx vertx, ContextInternal context, PoolConnector.Listener connectionListener, NetSocket netSocket, RedisOptions options) {
     this.vertx = (VertxInternal) vertx;
@@ -57,7 +58,8 @@ public class RedisStandaloneConnection implements RedisConnection, ParserHandler
     this.isValid = true;
   }
 
-  void forceClose() {
+  @Override
+  public void forceClose() {
     listener.onRemove();
     if (onEvict != null) {
       onEvict.run();
@@ -67,6 +69,7 @@ public class RedisStandaloneConnection implements RedisConnection, ParserHandler
     netSocket.close();
   }
 
+  @Override
   public boolean isValid() {
     return isValid;
   }
@@ -153,6 +156,8 @@ public class RedisStandaloneConnection implements RedisConnection, ParserHandler
           // which means it should be terminated
           fatal(write.cause());
         } else {
+          // tag this connection as pub sub
+          pubSub |= request.command().isPubSub();
           if (voidCmd) {
             // only on this case notify the promise
             promise.complete();
@@ -191,6 +196,8 @@ public class RedisStandaloneConnection implements RedisConnection, ParserHandler
         final RequestImpl req = (RequestImpl) commands.get(index);
         // encode to the single buffer
         req.encode(messages);
+        // tag this connection as pub sub
+        pubSub |= req.command().isPubSub();
         // unwrap the handler into a single handler
         callbacks.add(index, vertx.promise(command -> {
           if (!failed.get()) {
@@ -226,7 +233,7 @@ public class RedisStandaloneConnection implements RedisConnection, ParserHandler
         // write to the socket
         netSocket.write(messages, write -> {
           if (write.failed()) {
-            // if the write fails, this connection enters a unknown state
+            // if the write fails, this connection enters an unknown state
             // which means it should be terminated
             fatal(write.cause());
           }
@@ -353,6 +360,14 @@ public class RedisStandaloneConnection implements RedisConnection, ParserHandler
     }
     // mark this connection failed
     isValid = false;
+  }
+
+  @Override
+  public boolean reset() {
+    if (pubSub) {
+      evict();
+    }
+    return !pubSub;
   }
 
   private void evict() {

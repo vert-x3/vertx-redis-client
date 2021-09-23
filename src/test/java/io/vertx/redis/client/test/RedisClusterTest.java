@@ -82,6 +82,37 @@ public class RedisClusterTest {
   }
 
   @Test(timeout = 30_000)
+  public void testConnectTime(TestContext should) {
+    final Async test = should.async();
+
+    RedisOptions options = new RedisOptions()
+      .setType(RedisClientType.CLUSTER)
+      .setUseReplicas(RedisReplicas.SHARE)
+      // the first hosts are fake to simulate wrong setup
+      .addConnectionString("redis://127.0.0.1:9999")
+      .addConnectionString("redis://127.0.0.1:8888")
+      .addConnectionString("redis://127.0.0.1:7005")
+      .setMaxPoolSize(8)
+      .setMaxPoolWaiting(16);
+
+    long t0 = System.currentTimeMillis();
+    client = Redis.createClient(rule.vertx(), options);
+    long t1 = System.currentTimeMillis();
+
+    client
+      .connect(onCreate -> {
+        long t2 = System.currentTimeMillis();
+
+        should.assertTrue(onCreate.succeeded());
+
+        System.out.println(t1 - t0);
+        System.out.println(t2 - t1);
+        test.complete();
+      });
+  }
+
+
+  @Test(timeout = 30_000)
   public void runTheSlotScope(TestContext should) {
     final Async test = should.async();
 
