@@ -265,7 +265,7 @@ public class RedisSentinelClient extends BaseRedisClient implements Redis {
             final Response response = sentinelReplicas.result();
 
             // Test the response
-            if (response.size() == 0) {
+            if (response == null || response.size() == 0) {
               handler.handle(Future.failedFuture("No replicas linked to the master: " + masterName));
             } else {
               Response replicaInfoArr = response.get(RANDOM.nextInt(response.size()));

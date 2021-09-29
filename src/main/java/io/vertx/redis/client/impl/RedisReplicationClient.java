@@ -187,7 +187,7 @@ public class RedisReplicationClient extends BaseRedisClient implements Redis {
         return;
       }
 
-      final Map<String, String> reply = parseInfo(send.result().toString(StandardCharsets.ISO_8859_1));
+      final Map<String, String> reply = parseInfo(send.result());
 
       if (reply.size() == 0) {
         // no slots available we can't really proceed
@@ -233,12 +233,17 @@ public class RedisReplicationClient extends BaseRedisClient implements Redis {
     });
   }
 
-  private Map<String, String> parseInfo(String response) {
-    if (response == null || response.length() == 0) {
+  private Map<String, String> parseInfo(Response response) {
+    if (response == null) {
       return Collections.emptyMap();
     }
 
-    String[] lines = response.split("\r\n");
+    String text = response.toString(StandardCharsets.ISO_8859_1);
+    if (text == null || text.length() == 0) {
+      return Collections.emptyMap();
+    }
+
+    String[] lines = text.split("\r\n");
     Map<String, String> info = new HashMap<>();
     for (String line : lines) {
       int idx = line.indexOf(':');

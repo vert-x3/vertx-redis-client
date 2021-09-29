@@ -225,7 +225,7 @@ public class RedisClusterClient extends BaseRedisClient implements Redis {
 
       final Response reply = send.result();
 
-      if (reply.size() == 0) {
+      if (reply == null || reply.size() == 0) {
         // no slots available we can't really proceed
         onGetSlots.handle(Future.failedFuture("SLOTS No slots available in the cluster."));
         return;
