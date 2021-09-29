@@ -35,10 +35,6 @@ public final class RedisURI {
   private static final int DEFAULT_PORT = 6379;
 
   /**
-   * Original address string
-   */
-  private final String connectionString;
-  /**
    * Address, including host and port
    */
   private final SocketAddress socketAddress;
@@ -67,8 +63,18 @@ public final class RedisURI {
    */
   private final Map<String, String> params;
 
+  public RedisURI(RedisURI base, String host, int port) {
+    socketAddress = SocketAddress.inetSocketAddress(port, host);
+    unix = false;
+    // use the base data
+    user = base.user;
+    password = base.password;
+    select = base.select;
+    ssl = base.ssl;
+    params = base.params;
+  }
+
   public RedisURI(String connectionString) {
-    this.connectionString = connectionString;
     try {
       final URI uri = new URI(connectionString);
 
@@ -216,6 +222,6 @@ public final class RedisURI {
 
   @Override
   public String toString() {
-    return connectionString;
+    return protocol() + "://" + socketAddress() + "/" + (select == null ? "" : select);
   }
 }

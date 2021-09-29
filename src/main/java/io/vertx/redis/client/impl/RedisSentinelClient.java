@@ -119,18 +119,25 @@ public class RedisSentinelClient extends BaseRedisClient implements Redis {
 
   private void createConnectionInternal(RedisOptions options, RedisRole role, Handler<AsyncResult<RedisConnection>> onCreate) {
 
-    final Handler<AsyncResult<String>> createAndConnect = resolve -> {
+    final Handler<AsyncResult<RedisURI>> createAndConnect = resolve -> {
       if (resolve.failed()) {
         onCreate.handle(Future.failedFuture(resolve.cause()));
         return;
       }
-      // wrap a new client
-      if (role == RedisRole.SENTINEL) {// sentinel cannot select
-        final RedisURI uri = new RedisURI(resolve.result());
-        connectionManager.getConnection(getSentinelEndpoint(uri), null).onComplete(onCreate);
+
+      final RedisURI uri = resolve.result();
+      final String endpoint = getBaseEndpoint(uri);
+      final Request setup;
+
+      // SELECT is only allowed on non sentinel
+      if (role != RedisRole.SENTINEL && uri.select() != null) {
+        setup = cmd(SELECT).arg(uri.select());
       } else {
-        connectionManager.getConnection(resolve.result(), null).onComplete(onCreate);
+        setup = null;
       }
+
+      // wrap a new client
+      connectionManager.getConnection(endpoint, setup).onComplete(onCreate);
     };
 
     switch (role) {
@@ -150,14 +157,14 @@ public class RedisSentinelClient extends BaseRedisClient implements Redis {
    * We use the algorithm from http://redis.io/topics/sentinel-clients
    * to get a sentinel client and then do 'stuff' with it
    */
-  private static void resolveClient(final Resolver checkEndpointFn, final RedisOptions options, final Handler<AsyncResult<String>> callback) {
+  private static void resolveClient(final Resolver checkEndpointFn, final RedisOptions options, final Handler<AsyncResult<RedisURI>> callback) {
     // Because finding the master is going to be an async list we will terminate
     // when we find one then use promises...
     iterate(0, checkEndpointFn, options, iterate -> {
       if (iterate.failed()) {
         callback.handle(Future.failedFuture(iterate.cause()));
       } else {
-        final Pair<Integer, String> found = iterate.result();
+        final Pair<Integer, RedisURI> found = iterate.result();
         // This is the endpoint that has responded so stick it on the top of
         // the list
         final List<String> endpoints = options.getEndpoints();
@@ -170,7 +177,7 @@ public class RedisSentinelClient extends BaseRedisClient implements Redis {
     });
   }
 
-  private static void iterate(final int idx, final Resolver checkEndpointFn, final RedisOptions argument, final Handler<AsyncResult<Pair<Integer, String>>> resultHandler) {
+  private static void iterate(final int idx, final Resolver checkEndpointFn, final RedisOptions argument, final Handler<AsyncResult<Pair<Integer, RedisURI>>> resultHandler) {
     // stop condition
     final List<String> endpoints = argument.getEndpoints();
 
@@ -192,12 +199,12 @@ public class RedisSentinelClient extends BaseRedisClient implements Redis {
 
   // begin endpoint check methods
 
-  private void isSentinelOk(String endpoint, RedisOptions argument, Handler<AsyncResult<String>> handler) {
+  private void isSentinelOk(String endpoint, RedisOptions argument, Handler<AsyncResult<RedisURI>> handler) {
     // we can't use the endpoint as is, it should not contain a database selection,
     // but can contain authentication
     final RedisURI uri = new RedisURI(endpoint);
 
-    connectionManager.getConnection(getSentinelEndpoint(uri), null)
+    connectionManager.getConnection(getBaseEndpoint(uri), null)
       .onFailure(err -> handler.handle(Future.failedFuture(err)))
       .onSuccess(conn -> {
         // Send a command just to check we have a working node
@@ -205,7 +212,7 @@ public class RedisSentinelClient extends BaseRedisClient implements Redis {
           if (ping.failed()) {
             handler.handle(Future.failedFuture(ping.cause()));
           } else {
-            handler.handle(Future.succeededFuture(endpoint));
+            handler.handle(Future.succeededFuture(uri));
           }
           // connection is not needed anymore
           conn.close().onFailure(LOG::warn);
@@ -213,11 +220,11 @@ public class RedisSentinelClient extends BaseRedisClient implements Redis {
       });
   }
 
-  private void getMasterFromEndpoint(String endpoint, RedisOptions options, Handler<AsyncResult<String>> handler) {
+  private void getMasterFromEndpoint(String endpoint, RedisOptions options, Handler<AsyncResult<RedisURI>> handler) {
     // we can't use the endpoint as is, it should not contain a database selection,
     // but can contain authentication
     final RedisURI uri = new RedisURI(endpoint);
-    connectionManager.getConnection(getSentinelEndpoint(uri), null)
+    connectionManager.getConnection(getBaseEndpoint(uri), null)
       .onFailure(err -> handler.handle(Future.failedFuture(err)))
       .onSuccess(conn -> {
         final String masterName = options.getMasterName();
@@ -231,11 +238,9 @@ public class RedisSentinelClient extends BaseRedisClient implements Redis {
             if (response == null) {
               handler.handle(Future.failedFuture("Failed to GET-MASTER-ADDR-BY-NAME " + masterName));
             } else {
-              String rHost = response.get(0).toString();
-              Integer rPort = response.get(1).toInteger();
-
-              final String host = rHost.contains(":") ? "[" + rHost + "]" : rHost;
-              handler.handle(Future.succeededFuture(uri.protocol() + "://" + uri.userinfo() + host + ":" + rPort));
+              final String rHost = response.get(0).toString();
+              final Integer rPort = response.get(1).toInteger();
+              handler.handle(Future.succeededFuture(new RedisURI(uri, rHost.contains(":") ? "[" + rHost + "]" : rHost, rPort)));
             }
           }
           // we don't need this connection anymore
@@ -244,11 +249,11 @@ public class RedisSentinelClient extends BaseRedisClient implements Redis {
       });
   }
 
-  private void getReplicaFromEndpoint(String endpoint, RedisOptions options, Handler<AsyncResult<String>> handler) {
+  private void getReplicaFromEndpoint(String endpoint, RedisOptions options, Handler<AsyncResult<RedisURI>> handler) {
     // we can't use the endpoint as is, it should not contain a database selection,
     // but can contain authentication
     final RedisURI uri = new RedisURI(endpoint);
-    connectionManager.getConnection(getSentinelEndpoint(uri), null)
+    connectionManager.getConnection(getBaseEndpoint(uri), null)
       .onFailure(err -> handler.handle(Future.failedFuture(err)))
       .onSuccess(conn -> {
         final String masterName = options.getMasterName();
@@ -283,7 +288,7 @@ public class RedisSentinelClient extends BaseRedisClient implements Redis {
                 } else {
                   final String host = ip.contains(":") ? "[" + ip + "]" : ip;
 
-                  handler.handle(Future.succeededFuture(uri.protocol() + "://" + uri.userinfo() + host + ":" + port));
+                  handler.handle(Future.succeededFuture(new RedisURI(uri, host, port)));
                 }
               }
             }
@@ -294,7 +299,7 @@ public class RedisSentinelClient extends BaseRedisClient implements Redis {
       });
   }
 
-  private String getSentinelEndpoint(RedisURI uri) {
+  private String getBaseEndpoint(RedisURI uri) {
     StringBuilder sb = new StringBuilder();
 
     if (uri.unix()) {
