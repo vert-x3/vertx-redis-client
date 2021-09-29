@@ -72,7 +72,7 @@ public final class PushType implements Multi {
       if (r == null) {
         sb.append("null");
       } else {
-        sb.append(r.toString());
+        sb.append(r);
       }
       more = true;
     }

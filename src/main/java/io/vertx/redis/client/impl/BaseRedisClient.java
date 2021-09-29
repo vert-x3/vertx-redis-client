@@ -76,7 +76,7 @@ public abstract class BaseRedisClient implements Redis {
 
       connect()
         .onFailure(promise::fail)
-        .onSuccess(conn -> {
+        .onSuccess(conn ->
           conn.batch(commands)
             .onSuccess(responses -> {
               try {
@@ -93,8 +93,7 @@ public abstract class BaseRedisClient implements Redis {
                 // regardless of the result, return the connection to the pool
                 conn.close().onFailure(LOG::warn);
               }
-            });
-        });
+            }));
     }
 
     return promise.future();

@@ -16,7 +16,6 @@
 package io.vertx.redis.client;
 
 import io.vertx.codegen.annotations.DataObject;
-import io.vertx.codegen.annotations.Fluent;
 import io.vertx.core.json.JsonObject;
 import io.vertx.core.net.NetClientOptions;
 import io.vertx.redis.client.impl.RedisURI;

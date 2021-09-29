@@ -46,7 +46,7 @@ public class RedisStandaloneConnection implements RedisConnectionInternal, Parse
   private Handler<Response> onMessage;
   private Runnable onEvict;
   private boolean isValid;
-  private boolean pubSub;
+  private boolean tainted;
 
   public RedisStandaloneConnection(Vertx vertx, ContextInternal context, PoolConnector.Listener connectionListener, NetSocket netSocket, RedisOptions options) {
     this.vertx = (VertxInternal) vertx;
@@ -55,7 +55,11 @@ public class RedisStandaloneConnection implements RedisConnectionInternal, Parse
     this.eventBus = vertx.eventBus();
     this.netSocket = netSocket;
     this.waiting = new ArrayQueue(options.getMaxWaitingHandlers());
-    this.isValid = true;
+  }
+
+  void setValid() {
+    isValid = true;
+    tainted = false;
   }
 
   @Override
@@ -132,6 +136,21 @@ public class RedisStandaloneConnection implements RedisConnectionInternal, Parse
     return this;
   }
 
+  /**
+   * Checks if an executed command has tainted the connection. A connection is tainted if it changes the default state,
+   * for example, when a connection enters pub sub mode, or specific features are activated such as changing a database
+   * or different authentication is used.
+   *
+   * This is only relevant for pooled connections
+   */
+  private void taintCheck(Command cmd) {
+    if (listener != null && !tainted) {
+      if (cmd.isPubSub() || Command.SELECT.equals(cmd) || Command.AUTH.equals(cmd)) {
+        tainted = true;
+      }
+    }
+  }
+
   @Override
   public Future<Response> send(final Request request) {
     final Promise<Response> promise = vertx.promise();
@@ -163,8 +182,9 @@ public class RedisStandaloneConnection implements RedisConnectionInternal, Parse
           // which means it should be terminated
           fatal(write.cause());
         } else {
-          // tag this connection as pub sub
-          pubSub |= request.command().isPubSub();
+          // tag this connection as tainted if needed
+          taintCheck(request.command());
+
           if (voidCmd) {
             // only on this case notify the promise
             promise.complete();
@@ -203,8 +223,8 @@ public class RedisStandaloneConnection implements RedisConnectionInternal, Parse
         final RequestImpl req = (RequestImpl) commands.get(index);
         // encode to the single buffer
         req.encode(messages);
-        // tag this connection as pub sub
-        pubSub |= req.command().isPubSub();
+        // tag this connection as tainted if needed
+        taintCheck(req.command());
         // unwrap the handler into a single handler
         callbacks.add(index, vertx.promise(command -> {
           if (!failed.get()) {
@@ -371,10 +391,10 @@ public class RedisStandaloneConnection implements RedisConnectionInternal, Parse
 
   @Override
   public boolean reset() {
-    if (pubSub) {
+    if (tainted) {
       evict();
     }
-    return !pubSub;
+    return !tainted;
   }
 
   private void evict() {

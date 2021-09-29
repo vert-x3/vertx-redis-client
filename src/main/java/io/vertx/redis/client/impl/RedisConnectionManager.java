@@ -73,7 +73,7 @@ class RedisConnectionManager {
   }
 
   private void checkExpired(long period) {
-    pooledConnectionManager.forEach(e -> {
+    pooledConnectionManager.forEach(e ->
       ((RedisEndpoint) e).pool.evict(conn -> !conn.isValid(), ar -> {
         if (ar.succeeded()) {
           for (RedisConnectionInternal conn : ar.result()) {
@@ -84,8 +84,7 @@ class RedisConnectionManager {
             conn.forceClose();
           }
         }
-      });
-    });
+      }));
     timerID = vertx.setTimer(period, id -> checkExpired(period));
   }
 
@@ -211,6 +210,9 @@ class RedisConnectionManager {
               ctx.execute(Future.failedFuture(setupResult.cause()), onConnect);
               return;
             }
+
+            // connection is valid
+            connection.setValid();
 
             ctx.execute(Future.succeededFuture(new ConnectResult<>(connection, 1, 0)), onConnect);
           });
@@ -392,7 +394,7 @@ class RedisConnectionManager {
 
     @Override
     public void requestConnection(ContextInternal ctx, long timeout, Handler<AsyncResult<Lease<RedisConnectionInternal>>> handler) {
-      pool.acquire((EventLoopContext) ctx, 0, ar -> {
+      pool.acquire(ctx, 0, ar -> {
         if (ar.succeeded()) {
           // increment the reference counter to avoid the pool to be closed too soon
           // once there are no more connections the pool is collected, so this counter needs
