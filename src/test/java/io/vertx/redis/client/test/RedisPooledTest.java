@@ -224,4 +224,44 @@ public class RedisPooledTest {
           });
       });
   }
+
+  @Test
+  public void testReuse(TestContext should) {
+    final Async test = should.async();
+
+    final String connectionString = "redis://" + container.getContainerIpAddress() + ":" + container.getFirstMappedPort();
+    final Vertx vertx = rule.vertx();
+
+    Redis redis = Redis.createClient(
+      vertx,
+      new RedisOptions()
+        .addConnectionString(connectionString)
+        .setMaxPoolSize(1)
+        .setMaxPoolWaiting(1));
+
+    redis
+      .connect()
+      .onFailure(should::fail)
+      .onSuccess(conn -> {
+        conn
+          .send(Request.cmd(INFO))
+          .onFailure(should::fail)
+          .onSuccess(msg -> {
+            conn.close();
+            // escape the current ctx to avoid inlining
+            vertx.setTimer(5L, v -> {
+              redis
+                .connect()
+                .onFailure(should::fail)
+                .onSuccess(conn2 -> {
+                  should.assertEquals(((PooledRedisConnection) conn).actual(), ((PooledRedisConnection) conn2).actual());
+                  conn2
+                    .send(Request.cmd(GET).arg("foo"))
+                    .onFailure(should::fail)
+                    .onSuccess(msg2 -> test.complete());
+                });
+            });
+          });
+      });
+  }
 }

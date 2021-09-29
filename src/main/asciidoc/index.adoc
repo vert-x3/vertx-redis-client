@@ -48,11 +48,12 @@ compile 'io.vertx:vertx-redis-client:${maven.version}'
 
 == Connecting to Redis
 
-The Redis client can operate in 3 distinct modes:
+The Redis client can operate in 4 distinct modes:
 
 * Simple client (probably what most users need).
 * Sentinel (when working with Redis in High Availability mode).
 * Cluster (when working with Redis in Clustered mode).
+* Replication (single shard, one node write, multiple read).
 
 The connection mode is selected by the factory method on the Redis interface. Regardless of the mode the client can be
 configured using a {@link io.vertx.redis.client.RedisOptions} data object. By default, some configuration values are
@@ -148,6 +149,20 @@ recommended to read redis manual in order to understand how clustering works. Th
 a best effort to identify which slot is used by the executed command in order to execute it on the right node. There
 could be cases where this isn't possible to identify and in that case as a best effort the command will be run on a
 random node.
+
+== Replication Mode
+
+Working with replication is transparent to the client. Acquiring a connection is an expensive operation. The client will loop the provided endpoints until the master node is found. Once the master node is identified (this is the node where all write commands will be executed) a best effort is done to connect to all replica nodes (the read nodes).
+
+With all node knowledge the client will now filter operations that perform read or writes to the right node type. Note that the `useReplica` configuration affects this choice. Just like with clustering, when the configuration states that the use of replica nodes is `ALWAYS` then any  read operation will be performed on a replica node, `SHARED` will randomly share the read between master and replicas and finally `NEVER` means that replicas are never to be used.
+
+The recommended usage of this mode, given the connection acquisition cost, is to re-use the connection as long as the application may need it.
+
+[source,$lang]
+----
+{@link examples.RedisExamples#example13}
+----
+
 
 == Pub/Sub mode
 

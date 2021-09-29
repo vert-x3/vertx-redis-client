@@ -21,6 +21,7 @@ import io.vertx.codegen.annotations.VertxGen;
 import io.vertx.core.*;
 import io.vertx.redis.client.impl.RedisClient;
 import io.vertx.redis.client.impl.RedisClusterClient;
+import io.vertx.redis.client.impl.RedisReplicationClient;
 import io.vertx.redis.client.impl.RedisSentinelClient;
 
 import java.util.List;
@@ -65,6 +66,8 @@ public interface Redis {
         return new RedisSentinelClient(vertx, options);
       case CLUSTER:
         return new RedisClusterClient(vertx, options);
+      case REPLICATION:
+        return new RedisReplicationClient(vertx, options);
       default:
         throw new IllegalStateException("Unknown Redis Client type: " + options.getType());
     }
