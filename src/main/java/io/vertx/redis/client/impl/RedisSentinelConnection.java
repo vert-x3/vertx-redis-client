@@ -3,6 +3,7 @@ package io.vertx.redis.client.impl;
 import io.vertx.codegen.annotations.Nullable;
 import io.vertx.core.Future;
 import io.vertx.core.Handler;
+import io.vertx.core.Promise;
 import io.vertx.redis.client.RedisConnection;
 import io.vertx.redis.client.Request;
 import io.vertx.redis.client.Response;
@@ -66,9 +67,14 @@ public class RedisSentinelConnection implements RedisConnection {
   }
 
   @Override
-  public void close() {
-    sentinel.close();
-    connection.close();
+  public Future<Void> close() {
+    final Promise<Void> promise = Promise.promise();
+
+    sentinel.close()
+      .onSuccess(done -> connection.close(promise))
+      .onFailure(promise::fail);
+
+    return promise.future();
   }
 
   @Override

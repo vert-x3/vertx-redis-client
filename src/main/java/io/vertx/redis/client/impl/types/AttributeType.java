@@ -110,7 +110,7 @@ public final class AttributeType implements Multi {
       if (value == null) {
         sb.append("null");
       } else {
-        sb.append(value.toString());
+        sb.append(value);
       }
 
       more = true;

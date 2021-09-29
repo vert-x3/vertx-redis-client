@@ -519,12 +519,22 @@ public class RedisClusterConnection implements RedisConnection {
   }
 
   @Override
-  public void close() {
+  public Future<Void> close() {
+    List<Future> futures = new ArrayList<>();
     for (RedisConnection conn : connections.values()) {
       if (conn != null) {
-        conn.close();
+        futures.add(conn.close());
       }
     }
+
+    final Promise<Void> promise = Promise.promise();
+
+    CompositeFuture.all(futures)
+      .onSuccess(ignore -> promise.complete())
+      .onFailure(promise::fail);
+
+
+    return promise.future();
   }
 
   @Override

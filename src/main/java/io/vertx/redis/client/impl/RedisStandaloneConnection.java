@@ -23,7 +23,7 @@ import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 
-public class RedisStandaloneConnection implements RedisConnection, ParserHandler {
+public class RedisStandaloneConnection implements RedisConnectionInternal, ParserHandler {
 
   private static final String BASE_ADDRESS = "io.vertx.redis";
 
@@ -46,6 +46,7 @@ public class RedisStandaloneConnection implements RedisConnection, ParserHandler
   private Handler<Response> onMessage;
   private Runnable onEvict;
   private boolean isValid;
+  private boolean tainted;
 
   public RedisStandaloneConnection(Vertx vertx, ContextInternal context, PoolConnector.Listener connectionListener, NetSocket netSocket, RedisOptions options) {
     this.vertx = (VertxInternal) vertx;
@@ -54,11 +55,18 @@ public class RedisStandaloneConnection implements RedisConnection, ParserHandler
     this.eventBus = vertx.eventBus();
     this.netSocket = netSocket;
     this.waiting = new ArrayQueue(options.getMaxWaitingHandlers());
-    this.isValid = true;
   }
 
-  void forceClose() {
-    listener.onRemove();
+  void setValid() {
+    isValid = true;
+    tainted = false;
+  }
+
+  @Override
+  public void forceClose() {
+    if (listener != null) {
+      listener.onRemove();
+    }
     if (onEvict != null) {
       onEvict.run();
       // reset to avoid double calls
@@ -67,13 +75,19 @@ public class RedisStandaloneConnection implements RedisConnection, ParserHandler
     netSocket.close();
   }
 
+  @Override
   public boolean isValid() {
     return isValid;
   }
 
   @Override
-  public void close() {
-    // Should not be called, unless we want (in the future) to have non pooled redis connections
+  public Future<Void> close() {
+    if (listener == null) {
+      // no pool is being used
+      return netSocket.close();
+    } else {
+      return Future.succeededFuture();
+    }
   }
 
   @Override
@@ -122,6 +136,21 @@ public class RedisStandaloneConnection implements RedisConnection, ParserHandler
     return this;
   }
 
+  /**
+   * Checks if an executed command has tainted the connection. A connection is tainted if it changes the default state,
+   * for example, when a connection enters pub sub mode, or specific features are activated such as changing a database
+   * or different authentication is used.
+   *
+   * This is only relevant for pooled connections
+   */
+  private void taintCheck(Command cmd) {
+    if (listener != null && !tainted) {
+      if (cmd.isPubSub() || Command.SELECT.equals(cmd) || Command.AUTH.equals(cmd)) {
+        tainted = true;
+      }
+    }
+  }
+
   @Override
   public Future<Response> send(final Request request) {
     final Promise<Response> promise = vertx.promise();
@@ -153,6 +182,9 @@ public class RedisStandaloneConnection implements RedisConnection, ParserHandler
           // which means it should be terminated
           fatal(write.cause());
         } else {
+          // tag this connection as tainted if needed
+          taintCheck(request.command());
+
           if (voidCmd) {
             // only on this case notify the promise
             promise.complete();
@@ -191,6 +223,8 @@ public class RedisStandaloneConnection implements RedisConnection, ParserHandler
         final RequestImpl req = (RequestImpl) commands.get(index);
         // encode to the single buffer
         req.encode(messages);
+        // tag this connection as tainted if needed
+        taintCheck(req.command());
         // unwrap the handler into a single handler
         callbacks.add(index, vertx.promise(command -> {
           if (!failed.get()) {
@@ -226,7 +260,7 @@ public class RedisStandaloneConnection implements RedisConnection, ParserHandler
         // write to the socket
         netSocket.write(messages, write -> {
           if (write.failed()) {
-            // if the write fails, this connection enters a unknown state
+            // if the write fails, this connection enters an unknown state
             // which means it should be terminated
             fatal(write.cause());
           }
@@ -355,9 +389,19 @@ public class RedisStandaloneConnection implements RedisConnection, ParserHandler
     isValid = false;
   }
 
+  @Override
+  public boolean reset() {
+    if (tainted) {
+      evict();
+    }
+    return !tainted;
+  }
+
   private void evict() {
     // evict this connection from the pool
-    listener.onRemove();
+    if (listener != null) {
+      listener.onRemove();
+    }
     if (onEvict != null) {
       onEvict.run();
     }

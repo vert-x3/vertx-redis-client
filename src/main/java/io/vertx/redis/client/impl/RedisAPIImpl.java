@@ -17,9 +17,13 @@ package io.vertx.redis.client.impl;
 
 import io.vertx.core.Future;
 import io.vertx.core.Promise;
+import io.vertx.core.impl.logging.Logger;
+import io.vertx.core.impl.logging.LoggerFactory;
 import io.vertx.redis.client.*;
 
 public class RedisAPIImpl implements RedisAPI {
+
+  private static final Logger LOG = LoggerFactory.getLogger(RedisAPIImpl.class);
 
   private final Redis redis;
   private final RedisConnection connection;
@@ -66,7 +70,7 @@ public class RedisAPIImpl implements RedisAPI {
       redis.close();
     } else if (connection != null) {
       // operating on connection mode
-      connection.close();
+      connection.close().onFailure(LOG::warn);
     }
   }
 }

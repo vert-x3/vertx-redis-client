@@ -206,7 +206,7 @@ public final class MultiType implements Multi {
         if (r == null) {
           sb.append("null");
         } else {
-          sb.append(r.toString());
+          sb.append(r);
         }
         more = true;
       }
