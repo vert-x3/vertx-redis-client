@@ -141,14 +141,25 @@ public class RedisReplicationConnection implements RedisConnection {
   }
 
   @Override
-  public void close() {
-    master.close();
+  public Future<Void> close() {
+    List<Future> futures = new ArrayList<>();
+
+    futures.add(master.close());
 
     for (RedisConnection conn : replicas) {
       if (conn != null) {
-        conn.close();
+        futures.add(conn.close());
       }
     }
+
+    final Promise<Void> promise = Promise.promise();
+
+    CompositeFuture.all(futures)
+      .onSuccess(ignore -> promise.complete())
+      .onFailure(promise::fail);
+
+
+    return promise.future();
   }
 
   @Override
