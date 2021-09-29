@@ -16,6 +16,8 @@
 package io.vertx.redis.client.impl;
 
 import io.vertx.core.*;
+import io.vertx.core.impl.logging.Logger;
+import io.vertx.core.impl.logging.LoggerFactory;
 import io.vertx.redis.client.*;
 import io.vertx.redis.client.impl.types.MultiType;
 import io.vertx.redis.client.impl.types.NumberType;
@@ -33,6 +35,8 @@ import static io.vertx.redis.client.Command.*;
 import static io.vertx.redis.client.Request.cmd;
 
 public class RedisClusterClient extends BaseRedisClient implements Redis {
+
+  private static final Logger LOG = LoggerFactory.getLogger(RedisClusterClient.class);
 
   public static void addReducer(Command command, Function<List<Response>, Response> fn) {
     RedisClusterConnection.addReducer(command, fn);
@@ -144,14 +148,14 @@ public class RedisClusterClient extends BaseRedisClient implements Redis {
         getSlots(endpoints.get(index), conn, getSlots -> {
           if (getSlots.failed()) {
             // the slots command failed.
-            conn.close();
+            conn.close().onFailure(LOG::warn);
             // try with the next one
             connect(endpoints, index + 1, onConnect);
             return;
           }
 
           // slots are loaded (this connection isn't needed anymore)
-          conn.close();
+          conn.close().onFailure(LOG::warn);
           // create a cluster connection
           final Slots slots = getSlots.result();
           final AtomicBoolean failed = new AtomicBoolean(false);
@@ -198,7 +202,7 @@ public class RedisClusterClient extends BaseRedisClient implements Redis {
         synchronized (connections) {
           for (RedisConnection value : connections.values()) {
             if (value != null) {
-              value.close();
+              value.close().onFailure(LOG::warn);
             }
           }
         }

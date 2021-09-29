@@ -79,13 +79,15 @@ public class PooledRedisConnection implements RedisConnection {
   }
 
   @Override
-  public void close() {
+  public Future<Void> close() {
     if (connection.reset()) {
       lease.recycle();
     }
     if (metrics != null) {
       metrics.end(metric, true);
     }
+
+    return Future.succeededFuture();
   }
 
   @Override

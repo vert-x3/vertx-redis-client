@@ -117,7 +117,16 @@ public interface RedisConnection extends ReadStream<Response> {
   /**
    * Closes the connection or returns to the pool.
    */
-  void close();
+  Future<Void> close();
+
+  /**
+   * Closes the connection or returns to the pool.
+   */
+  @Fluent
+  default RedisConnection close(Handler<AsyncResult<Void>> onClose) {
+    close().onComplete(onClose);
+    return this;
+  }
 
   /**
    * Flag to notify if the pending message queue (commands in transit) is full.

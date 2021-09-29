@@ -51,7 +51,7 @@ public abstract class BaseRedisClient implements Redis {
             promise.handle(send);
           } finally {
             // regardless of the result, return the connection to the pool
-            conn.close();
+            conn.close().onFailure(LOG::warn);
           }
         }));
 
@@ -83,7 +83,7 @@ public abstract class BaseRedisClient implements Redis {
                 promise.complete(responses);
               } finally {
                 // regardless of the result, return the connection to the pool
-                conn.close();
+                conn.close().onFailure(LOG::warn);
               }
             })
             .onFailure(err -> {
@@ -91,7 +91,7 @@ public abstract class BaseRedisClient implements Redis {
                 promise.fail(err);
               } finally {
                 // regardless of the result, return the connection to the pool
-                conn.close();
+                conn.close().onFailure(LOG::warn);
               }
             });
         });

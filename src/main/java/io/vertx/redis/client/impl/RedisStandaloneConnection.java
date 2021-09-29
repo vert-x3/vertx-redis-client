@@ -60,7 +60,9 @@ public class RedisStandaloneConnection implements RedisConnectionInternal, Parse
 
   @Override
   public void forceClose() {
-    listener.onRemove();
+    if (listener != null) {
+      listener.onRemove();
+    }
     if (onEvict != null) {
       onEvict.run();
       // reset to avoid double calls
@@ -75,8 +77,13 @@ public class RedisStandaloneConnection implements RedisConnectionInternal, Parse
   }
 
   @Override
-  public void close() {
-    // Should not be called, unless we want (in the future) to have non pooled redis connections
+  public Future<Void> close() {
+    if (listener == null) {
+      // no pool is being used
+      return netSocket.close();
+    } else {
+      return Future.succeededFuture();
+    }
   }
 
   @Override
@@ -372,7 +379,9 @@ public class RedisStandaloneConnection implements RedisConnectionInternal, Parse
 
   private void evict() {
     // evict this connection from the pool
-    listener.onRemove();
+    if (listener != null) {
+      listener.onRemove();
+    }
     if (onEvict != null) {
       onEvict.run();
     }
