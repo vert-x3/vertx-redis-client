@@ -240,7 +240,8 @@ public class RedisSentinelClient extends BaseRedisClient implements Redis {
             } else {
               final String rHost = response.get(0).toString();
               final Integer rPort = response.get(1).toInteger();
-              handler.handle(Future.succeededFuture(new RedisURI(uri, rHost.contains(":") ? "[" + rHost + "]" : rHost, rPort)));            }
+              handler.handle(Future.succeededFuture(new RedisURI(uri, rHost.contains(":") ? "[" + rHost + "]" : rHost, rPort)));
+            }
           }
           // we don't need this connection anymore
           conn.close().onFailure(LOG::warn);
