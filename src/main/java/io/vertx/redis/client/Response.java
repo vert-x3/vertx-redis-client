@@ -16,6 +16,7 @@
 package io.vertx.redis.client;
 
 import io.vertx.codegen.annotations.GenIgnore;
+import io.vertx.codegen.annotations.Nullable;
 import io.vertx.codegen.annotations.VertxGen;
 import io.vertx.core.buffer.Buffer;
 
@@ -82,7 +83,7 @@ public interface Response extends Iterable<Response> {
    * Get this response as a Double.
    * @return double value.
    */
-  default Double toDouble() {
+  default @Nullable Double toDouble() {
     final String msg = toString();
     if (msg != null) {
       return Double.parseDouble(msg);
@@ -94,7 +95,7 @@ public interface Response extends Iterable<Response> {
    * Get this response as a Float.
    * @return double value.
    */
-  default Float toFloat() {
+  default @Nullable Float toFloat() {
     final String msg = toString();
     if (msg != null) {
       return Float.parseFloat(msg);
@@ -107,7 +108,7 @@ public interface Response extends Iterable<Response> {
    * @return long value.
    */
   @GenIgnore(GenIgnore.PERMITTED_TYPE)
-  default BigInteger toBigInteger() {
+  default @Nullable BigInteger toBigInteger() {
     final String msg = toString();
     if (msg != null) {
       return new BigInteger(msg);
@@ -119,7 +120,7 @@ public interface Response extends Iterable<Response> {
    * Get this response as a Long.
    * @return long value.
    */
-  default Long toLong() {
+  default @Nullable Long toLong() {
     final String msg = toString();
     if (msg != null) {
       return Long.parseLong(msg);
@@ -131,7 +132,7 @@ public interface Response extends Iterable<Response> {
    * Get this response as a Integer.
    * @return int value.
    */
-  default Integer toInteger() {
+  default @Nullable Integer toInteger() {
     final String msg = toString();
     if (msg != null) {
       return Integer.parseInt(msg);
@@ -143,7 +144,7 @@ public interface Response extends Iterable<Response> {
    * Get this response as a Short.
    * @return short value.
    */
-  default Short toShort() {
+  default @Nullable Short toShort() {
     final String msg = toString();
     if (msg != null) {
       return Short.parseShort(msg);
@@ -155,7 +156,7 @@ public interface Response extends Iterable<Response> {
    * Get this response as a Byte.
    * @return byte value.
    */
-  default Byte toByte() {
+  default @Nullable Byte toByte() {
     final String msg = toString();
     if (msg != null) {
       return Byte.parseByte(msg);
@@ -167,7 +168,7 @@ public interface Response extends Iterable<Response> {
    * Get this response as a Boolean.
    * @return boolean value.
    */
-  default Boolean toBoolean() {
+  default @Nullable Boolean toBoolean() {
     final String msg = toString();
     if (msg != null) {
       // the format used by redis RESP3 is 't' for true, 'f' for false.

@@ -15,6 +15,7 @@
  */
 package io.vertx.redis.client.impl;
 
+import io.vertx.codegen.annotations.Nullable;
 import io.vertx.redis.client.Response;
 
 import java.util.*;
@@ -103,7 +104,7 @@ class Slots {
     return slots[index].endpoints;
   }
 
-  String[] endpointsForKey(int key) {
+  @Nullable String[] endpointsForKey(int key) {
     for (Slot s : slots) {
       if (key >= s.start && key <= s.end) {
         return s.endpoints;

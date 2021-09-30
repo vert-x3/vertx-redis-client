@@ -15,6 +15,7 @@
  */
 package io.vertx.redis.client.impl.types;
 
+import io.vertx.codegen.annotations.Nullable;
 import io.vertx.redis.client.Response;
 import io.vertx.redis.client.ResponseType;
 
@@ -53,7 +54,7 @@ public final class ErrorType extends Throwable implements Response {
     return getMessage();
   }
 
-  public String slice(char sep, int index) {
+  public @Nullable String slice(char sep, int index) {
     String message = getMessage();
     if (message == null) {
       return null;

@@ -15,6 +15,8 @@
  */
 package io.vertx.redis.client.impl;
 
+import io.vertx.codegen.annotations.Nullable;
+
 import java.util.NoSuchElementException;
 
 final class ArrayQueue {
@@ -70,7 +72,7 @@ final class ArrayQueue {
    * @return element at front of the queue, null if empty.
    */
   @SuppressWarnings("unchecked")
-  <T> T peek() {
+  <T> @Nullable T peek() {
     if (isEmpty()) {
       return null;
     } else {

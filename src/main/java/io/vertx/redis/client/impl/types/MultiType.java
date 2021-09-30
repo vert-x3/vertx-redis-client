@@ -15,6 +15,7 @@
  */
 package io.vertx.redis.client.impl.types;
 
+import io.vertx.codegen.annotations.Nullable;
 import io.vertx.redis.client.Response;
 import io.vertx.redis.client.ResponseType;
 
@@ -114,7 +115,7 @@ public final class MultiType implements Multi {
   }
 
   @Override
-  public Response get(String key) {
+  public @Nullable Response get(String key) {
     if (map != null) {
       return map.get(key);
     }

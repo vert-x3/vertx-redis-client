@@ -15,6 +15,8 @@
  */
 package io.vertx.redis.client.impl;
 
+import io.vertx.codegen.annotations.Nullable;
+
 final class ArrayStack {
 
   private final Object[] stack;
@@ -41,7 +43,7 @@ final class ArrayStack {
   }
 
   @SuppressWarnings("unchecked")
-  <T> T peek() {
+  <T> @Nullable T peek() {
     if (pointer == -1) {
       return null;
     }

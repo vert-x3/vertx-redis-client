@@ -15,6 +15,7 @@
  */
 package io.vertx.redis.client.impl;
 
+import io.vertx.codegen.annotations.Nullable;
 import io.vertx.core.buffer.Buffer;
 
 import java.math.BigInteger;
@@ -128,7 +129,7 @@ final class ReadableBuffer {
     return number;
   }
 
-  String readLine(int end) {
+  @Nullable String readLine(int end) {
     byte[] bytes = null;
     if (end >= offset) {
       bytes = buffer.getBytes(offset, end - 1);

@@ -58,7 +58,15 @@ public class RedisClusterClient extends BaseRedisClient implements Redis {
       SimpleStringType.OK);
 
     addReducer(DEL, list ->
-      NumberType.create(list.stream().mapToLong(Response::toLong).sum()));
+      NumberType.create(list.stream()
+        .mapToLong(el -> {
+          Long l = el.toLong();
+          if (l == null) {
+            return 0L;
+          } else {
+            return l;
+          }
+        }).sum()));
 
     addReducer(MGET, list -> {
       int total = 0;
@@ -98,7 +106,15 @@ public class RedisClusterClient extends BaseRedisClient implements Redis {
 
     addReducer(DBSIZE, list ->
       // Sum of key numbers on all Key Slots
-      NumberType.create(list.stream().mapToLong(Response::toLong).sum()));
+      NumberType.create(list.stream()
+        .mapToLong(el -> {
+          Long l = el.toLong();
+          if (l == null) {
+            return 0L;
+          } else {
+            return l;
+          }
+        }).sum()));
 
     Arrays.asList(ASKING, AUTH, BGREWRITEAOF, BGSAVE, CLIENT, COMMAND, CONFIG,
       DEBUG, DISCARD, HOST, INFO, LASTSAVE, LATENCY, LOLWUT, MEMORY, MODULE, MONITOR, PFDEBUG, PFSELFTEST,
