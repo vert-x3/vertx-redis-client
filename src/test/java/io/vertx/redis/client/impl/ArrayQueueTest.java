@@ -4,6 +4,7 @@ import org.junit.Ignore;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 
 public class ArrayQueueTest {
 
@@ -26,5 +27,13 @@ public class ArrayQueueTest {
     arrayQueue.offer(1);
     //Overflow for int front
     assertEquals(1, (int) arrayQueue.poll());
+  }
+
+  @Test
+  public void testPollNSE() {
+    ArrayQueue arrayQueue = new ArrayQueue(10);
+    arrayQueue.poll();
+    arrayQueue.offer("a");
+    assertNotNull(arrayQueue.poll());
   }
 }

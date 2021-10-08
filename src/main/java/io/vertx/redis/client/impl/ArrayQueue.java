@@ -17,8 +17,6 @@ package io.vertx.redis.client.impl;
 
 import io.vertx.codegen.annotations.Nullable;
 
-import java.util.NoSuchElementException;
-
 final class ArrayQueue {
 
   private int
@@ -52,6 +50,7 @@ final class ArrayQueue {
    *
    * @param value the item to insert.
    * @throws IndexOutOfBoundsException if the queue is full.
+   * @throws NullPointerException if the value is {@code null}
    */
   <T> void offer(T value) {
     if (value == null) {
@@ -86,14 +85,13 @@ final class ArrayQueue {
   /**
    * Returns and removes the front element of the queue. It works with wraparound.
    *
-   * @return element at front of the queue
-   * @throws NoSuchElementException if the queue is empty.
+   * @return element at front of the queue or {@code null} if the queue is empty.
    */
-  <T> T poll() {
-    T e = peek();
-    if (e == null) {
-      return e;
+  <T> @Nullable T poll() {
+    if (isEmpty()) {
+      return null;
     }
+    T e = peek();
     queue[front % queue.length] = null; // for garbage collection
     front++;
     if (front == Integer.MAX_VALUE) {
