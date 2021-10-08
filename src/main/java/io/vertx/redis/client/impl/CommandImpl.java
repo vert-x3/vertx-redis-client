@@ -26,6 +26,7 @@ import java.nio.charset.StandardCharsets;
  */
 public class CommandImpl implements Command {
 
+  private final String command;
   private final byte[] bytes;
   private final int arity;
 
@@ -41,7 +42,8 @@ public class CommandImpl implements Command {
   private final boolean noreturn;
 
   public CommandImpl(String command, int arity, int firstKey, int lastKey, int interval, boolean write, boolean readOnly, boolean movable, boolean pubsub) {
-    bytes = ("$" + command.length() + "\r\n" + command + "\r\n").getBytes(StandardCharsets.ISO_8859_1);
+    this.command = command;
+    this.bytes = ("$" + command.length() + "\r\n" + command + "\r\n").getBytes(StandardCharsets.ISO_8859_1);
     this.arity = arity;
     this.firstKey = firstKey;
     this.lastKey = lastKey;
@@ -118,5 +120,10 @@ public class CommandImpl implements Command {
   @Override
   public boolean isPubSub() {
     return pubsub;
+  }
+
+  @Override
+  public String toString() {
+    return command;
   }
 }
