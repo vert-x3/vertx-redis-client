@@ -54,6 +54,9 @@ final class ArrayQueue {
    * @throws IndexOutOfBoundsException if the queue is full.
    */
   <T> void offer(T value) {
+    if (value == null) {
+      throw new NullPointerException();
+    }
     if (isFull()) {
       throw new IndexOutOfBoundsException();
     }
@@ -88,6 +91,9 @@ final class ArrayQueue {
    */
   <T> T poll() {
     T e = peek();
+    if (e == null) {
+      return e;
+    }
     queue[front % queue.length] = null; // for garbage collection
     front++;
     if (front == Integer.MAX_VALUE) {
