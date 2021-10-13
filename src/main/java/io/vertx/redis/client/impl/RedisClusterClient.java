@@ -124,6 +124,11 @@ public class RedisClusterClient extends BaseRedisClient implements Redis {
     addUnSupportedCommand(FLUSHALL, "RedisClusterClient does not handle command FLUSHALL, use FLUSHDB");
 
     addMasterOnlyCommand(WAIT);
+
+    addMasterOnlyCommand(SUBSCRIBE);
+    addMasterOnlyCommand(PSUBSCRIBE);
+    addReducer(UNSUBSCRIBE, list -> SimpleStringType.OK);
+    addReducer(PUNSUBSCRIBE, list -> SimpleStringType.OK);
   }
 
   private final RedisOptions options;

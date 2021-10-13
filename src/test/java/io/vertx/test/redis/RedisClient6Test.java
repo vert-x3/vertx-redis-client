@@ -9,6 +9,7 @@ import io.vertx.redis.client.Redis;
 import io.vertx.redis.client.RedisConnection;
 import io.vertx.redis.client.RedisOptions;
 import io.vertx.redis.client.Response;
+import io.vertx.redis.client.impl.types.ErrorType;
 import org.junit.*;
 import org.junit.runner.RunWith;
 import org.testcontainers.containers.GenericContainer;
@@ -160,4 +161,34 @@ public class RedisClient6Test {
       .onFailure(should::fail);
   }
 
+  @Test(timeout = 10_000L)
+  public void testACL(TestContext should) {
+    final Async test = should.async();
+
+    // create a alice user
+    client.send(cmd(ACL).arg("SETUSER").arg("alice").arg("on").arg(">p1pp0").arg("~cached:*").arg("+get"))
+      .onFailure(should::fail)
+      .onSuccess(ok -> {
+        // create a new client, this time using alice ACL
+        Redis alice = Redis.createClient(
+          rule.vertx(),
+          new RedisOptions().setConnectionString("redis://alice:p1pp0@" + redis.getContainerIpAddress() + ":" + redis.getFirstMappedPort() + "?client=tester"));
+
+        // connect should be fine
+        alice.connect()
+          .onFailure(should::fail)
+          .onSuccess(conn -> {
+            // there should not be allowed to GET
+            conn.send(cmd(GET).arg("foo"))
+              .onSuccess(res -> should.fail("This should fail with a NOPERM"))
+              .onFailure(err -> {
+                should.assertTrue(err instanceof ErrorType);
+                ErrorType error = (ErrorType) err;
+                should.assertTrue(error.is("NOPERM"));
+                test.complete();
+              });
+          });
+
+      });
+  }
 }
