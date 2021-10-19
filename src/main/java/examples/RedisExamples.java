@@ -144,6 +144,9 @@ public class RedisExamples {
             });
             // allow further processing
             promise.complete(conn);
+          })
+          .onFailure(t -> {
+            promise.fail(t);
           });
 
         return promise.future();
