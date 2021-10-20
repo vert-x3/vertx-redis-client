@@ -24,16 +24,29 @@ import java.nio.charset.StandardCharsets;
 
 public final class BulkType implements Response {
 
-  public static final BulkType EMPTY = new BulkType(Buffer.buffer(""));
+  public static final BulkType EMPTY = new BulkType(Buffer.buffer(""), false);
 
-  public static BulkType create(Buffer message) {
-    return new BulkType(message);
+  public static BulkType create(Buffer message, boolean verbatim) {
+    return new BulkType(message, verbatim);
   }
 
   private final Buffer message;
+  private final String format;
 
-  private BulkType(Buffer message) {
-    this.message = message;
+  private BulkType(Buffer message, boolean verbatim) {
+    if (verbatim) {
+      format = message.getString(0, 3);
+      assert message.getByte(3) == ':';
+      this.message = message.slice(4, message.length());
+    } else {
+      this.format = null;
+      this.message = message;
+    }
+  }
+
+  @Override
+  public String format() {
+    return format;
   }
 
   @Override

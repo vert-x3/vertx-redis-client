@@ -45,6 +45,7 @@ public final class RESPParser implements Handler<Buffer> {
   // parser state machine state
   private boolean eol = true;
   private int bytesNeeded = 0;
+  private boolean verbatim = false;
 
   @Override
   public void handle(Buffer chunk) {
@@ -89,9 +90,11 @@ public final class RESPParser implements Handler<Buffer> {
           case '(':
             handleNumber(type, eol);
             break;
-          case '$':
           case '=':
-            handleBulk(eol);
+            handleBulk(eol, true);
+            break;
+          case '$':
+            handleBulk(eol, false);
             break;
           case '*':
           case '%':
@@ -122,7 +125,9 @@ public final class RESPParser implements Handler<Buffer> {
           handleResponse(BulkType.EMPTY, false);
         } else {
           // fixed length parsing && read the required bytes
-          handleResponse(BulkType.create(buffer.readBytes(bytesNeeded)), false);
+          handleResponse(BulkType.create(buffer.readBytes(bytesNeeded), verbatim), false);
+          // clear the verbatim
+          verbatim = false;
         }
         // clean up the buffer, skip to the last \r\n
         if (buffer.skipEOL()) {
@@ -240,7 +245,7 @@ public final class RESPParser implements Handler<Buffer> {
     handleResponse(ErrorType.create(buffer.readLine(eol)), false);
   }
 
-  private void handleBulk(int eol) {
+  private void handleBulk(int eol, boolean verbatim) {
     long len = handleLength(eol);
     if (len >= 0L) {
       // redis strings cannot be longer than 512Mb
@@ -252,6 +257,7 @@ public final class RESPParser implements Handler<Buffer> {
       bytesNeeded = (int) len;
       // in this case we switch from eol parsing to fixed len parsing
       this.eol = false;
+      this.verbatim = verbatim;
     }
   }
 

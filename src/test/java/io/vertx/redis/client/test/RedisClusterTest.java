@@ -1061,4 +1061,19 @@ public class RedisClusterTest {
       }
     ));
   }
+
+  @Test(timeout = 30_000)
+  public void clusterInfoReturnsVerbatimString(TestContext should) {
+    final Async test = should.async();
+
+    Redis.createClient(rule.vertx(), options).connect(should.asyncAssertSuccess(cluster -> {
+        cluster.send(cmd(CLUSTER).arg("INFO"),
+          should.asyncAssertSuccess(response -> {
+            should.assertEquals("txt", response.format());
+            should.assertTrue(response.toString().startsWith("cluster_state:ok"));
+            test.complete();
+          }));
+      }
+    ));
+  }
 }

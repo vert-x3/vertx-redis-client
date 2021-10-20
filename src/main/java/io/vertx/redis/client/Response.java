@@ -70,6 +70,13 @@ public interface Response extends Iterable<Response> {
   String toString();
 
   /**
+   * RESP3 Verbatim Bulk message include a 3 character format.
+   */
+  default @Nullable String format() {
+    throw new UnsupportedOperationException("This type doesn't hold a Verbatim Bulk type");
+  }
+
+  /**
    * Get this response as a Number. In contrast to other numeric getters, this will not
    * perform any conversion if the underlying type is not numeric.
    * @return number value
