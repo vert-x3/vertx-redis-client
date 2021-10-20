@@ -59,8 +59,8 @@ public class RedisReconnectTest {
       .onFailure(should::fail)
       .onSuccess(list -> {
         String res = list.toString();
-        // this is a hack, and assumes we're on redis 6 (as the response is prefixed with 'txt:'
-        String id = res.substring(7, res.indexOf(' '));
+        // this is a hack
+        String id = res.substring(3, res.indexOf(' '));
 
         // kill the connection
         final RedisConnection orig = redis;
@@ -100,6 +100,4 @@ public class RedisReconnectTest {
         }));
     }
   }
-
-
 }
