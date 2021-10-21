@@ -36,6 +36,7 @@ public class RedisStandaloneConnection implements RedisConnectionInternal, Parse
   private final ContextInternal context;
   private final EventBus eventBus;
   private final NetSocket netSocket;
+  private final long expiresAt;
   // waiting: commands that have been sent but not answered
   // the queue is only accessed from the event loop
   private final ArrayQueue waiting;
@@ -55,6 +56,7 @@ public class RedisStandaloneConnection implements RedisConnectionInternal, Parse
     this.eventBus = vertx.eventBus();
     this.netSocket = netSocket;
     this.waiting = new ArrayQueue(options.getMaxWaitingHandlers());
+    this.expiresAt = options.getPoolRecycleTimeout() == -1 ? -1 : System.currentTimeMillis() + options.getPoolRecycleTimeout();
   }
 
   void setValid() {
@@ -77,7 +79,7 @@ public class RedisStandaloneConnection implements RedisConnectionInternal, Parse
 
   @Override
   public boolean isValid() {
-    return isValid;
+    return isValid && (expiresAt <= 0 || System.currentTimeMillis() < expiresAt);
   }
 
   @Override

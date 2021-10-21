@@ -69,11 +69,11 @@ public class RedisOptions {
     useReplicas = RedisReplicas.NEVER;
     type = RedisClientType.STANDALONE;
     poolName = UUID.randomUUID().toString();
-    poolCleanerInterval = -1;
     // thumb guess based on web browser defaults
+    poolCleanerInterval = 180_000;
     maxPoolSize = 6;
     maxPoolWaiting = 24;
-    poolRecycleTimeout = 15_000;
+    poolRecycleTimeout = 180_000;
   }
 
   /**

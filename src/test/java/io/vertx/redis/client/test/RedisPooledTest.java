@@ -264,4 +264,66 @@ public class RedisPooledTest {
           });
       });
   }
+
+  @Test
+  public void simpleTestRecycle(TestContext should) {
+    final Async test = should.async();
+
+    final Redis client = Redis.createClient(
+      rule.vertx(),
+      new RedisOptions()
+        .setConnectionString("redis://" + container.getContainerIpAddress() + ":" + container.getFirstMappedPort())
+        .setMaxPoolSize(1)
+        .setMaxPoolWaiting(1)
+        .setPoolCleanerInterval(1000)
+        .setPoolRecycleTimeout(1000));
+
+    client.connect()
+      .onSuccess(conn -> {
+        long conn1Id = ((PooledRedisConnection) conn).actual().hashCode();
+        conn.close();
+
+        rule.vertx()
+          .setTimer(2000L, t -> {
+            client.connect()
+              .onSuccess(conn2 -> {
+                long conn2Id = ((PooledRedisConnection) conn2).actual().hashCode();
+                should.assertNotEquals(conn1Id, conn2Id);
+                conn2.close();
+                test.complete();
+              });
+          });
+      });
+  }
+
+  @Test
+  public void simpleTestReuse(TestContext should) {
+    final Async test = should.async();
+
+    final Redis client = Redis.createClient(
+      rule.vertx(),
+      new RedisOptions()
+        .setConnectionString("redis://" + container.getContainerIpAddress() + ":" + container.getFirstMappedPort())
+        .setMaxPoolSize(1)
+        .setMaxPoolWaiting(1)
+        .setPoolCleanerInterval(1000)
+        .setPoolRecycleTimeout(1000));
+
+    client.connect()
+      .onSuccess(conn -> {
+        long conn1Id = ((PooledRedisConnection) conn).actual().hashCode();
+        conn.close();
+
+        rule.vertx()
+          .setTimer(100L, t -> {
+            client.connect()
+              .onSuccess(conn2 -> {
+                long conn2Id = ((PooledRedisConnection) conn2).actual().hashCode();
+                should.assertEquals(conn1Id, conn2Id);
+                conn2.close();
+                test.complete();
+              });
+          });
+      });
+  }
 }
