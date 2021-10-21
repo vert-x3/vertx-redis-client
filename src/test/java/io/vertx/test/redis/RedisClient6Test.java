@@ -1,5 +1,9 @@
 package io.vertx.test.redis;
 
+import io.vertx.core.AbstractVerticle;
+import io.vertx.core.DeploymentOptions;
+import io.vertx.core.Future;
+import io.vertx.core.Promise;
 import io.vertx.core.json.JsonObject;
 import io.vertx.ext.unit.Async;
 import io.vertx.ext.unit.TestContext;
@@ -9,12 +13,14 @@ import io.vertx.redis.client.Redis;
 import io.vertx.redis.client.RedisConnection;
 import io.vertx.redis.client.RedisOptions;
 import io.vertx.redis.client.Response;
+import io.vertx.redis.client.impl.RedisClient;
 import io.vertx.redis.client.impl.types.ErrorType;
 import org.junit.*;
 import org.junit.runner.RunWith;
 import org.testcontainers.containers.GenericContainer;
 
 import java.util.UUID;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import static io.vertx.redis.client.Command.*;
 import static io.vertx.redis.client.Request.cmd;
@@ -190,5 +196,53 @@ public class RedisClient6Test {
           });
 
       });
+  }
+
+  @Test
+  public void perfRegression(TestContext should) {
+    final Async test = should.async();
+
+    int iterations = 60000;
+    int instances = 100;
+    AtomicInteger count = new AtomicInteger();
+    AtomicInteger countOfErrors = new AtomicInteger();
+    rule.vertx()
+      .deployVerticle(() -> new AbstractVerticle() {
+        @Override
+        public void start(Promise<Void> onStart) {
+          Redis redisClient = Redis.createClient(rule.vertx(), new RedisOptions()
+            .setConnectionString("redis://" + redis.getContainerIpAddress() + ":" + redis.getFirstMappedPort() + "/0")
+            // given that we only use 1 connection and will be bombarded with requests we need to allow more handlers be waiting for a reply
+            .setMaxWaitingHandlers(iterations));
+          redisClient.connect()
+            .onFailure(should::fail)
+            .onSuccess(conn -> {
+              rule.vertx().eventBus()
+                .consumer("test.redis.load")
+                .handler(m -> {
+                  count.incrementAndGet();
+                  conn
+                    .send(cmd(SET).arg("foo").arg("bar"))
+                    .onFailure(err -> {
+                      err.printStackTrace();
+                      countOfErrors.incrementAndGet();
+                    });
+
+                  if (count.get() == iterations * instances) {
+                    System.out.println(countOfErrors.get());
+                    test.complete();
+                  }
+                });
+
+              onStart.complete();
+            });
+        }
+      }, new DeploymentOptions().setInstances(instances))
+      .onComplete(res -> {
+        for (int i = 0; i < iterations; i++) {
+          rule.vertx().eventBus().publish("test.redis.load", null);
+        }
+      });
+
   }
 }
