@@ -20,6 +20,7 @@ import org.junit.runner.RunWith;
 import org.testcontainers.containers.GenericContainer;
 
 import java.util.UUID;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import static io.vertx.redis.client.Command.*;
@@ -199,13 +200,14 @@ public class RedisClient6Test {
   }
 
   @Test
+  @Ignore
   public void perfRegression(TestContext should) {
     final Async test = should.async();
 
-    int iterations = 60000;
+    int iterations = 500;
     int instances = 100;
     AtomicInteger count = new AtomicInteger();
-    AtomicInteger countOfErrors = new AtomicInteger();
+    AtomicBoolean done = new AtomicBoolean();
     rule.vertx()
       .deployVerticle(() -> new AbstractVerticle() {
         @Override
@@ -213,29 +215,28 @@ public class RedisClient6Test {
           Redis redisClient = Redis.createClient(rule.vertx(), new RedisOptions()
             .setConnectionString("redis://" + redis.getContainerIpAddress() + ":" + redis.getFirstMappedPort() + "/0")
             // given that we only use 1 connection and will be bombarded with requests we need to allow more handlers be waiting for a reply
-            .setMaxWaitingHandlers(iterations));
-          redisClient.connect()
-            .onFailure(should::fail)
-            .onSuccess(conn -> {
-              rule.vertx().eventBus()
-                .consumer("test.redis.load")
-                .handler(m -> {
-                  count.incrementAndGet();
-                  conn
-                    .send(cmd(SET).arg("foo").arg("bar"))
-                    .onFailure(err -> {
-                      err.printStackTrace();
-                      countOfErrors.incrementAndGet();
-                    });
+            .setMaxWaitingHandlers(iterations)
+            .setMaxPoolSize(100)
+            .setMaxPoolWaiting(500));
 
-                  if (count.get() == iterations * instances) {
-                    System.out.println(countOfErrors.get());
-                    test.complete();
+          rule.vertx().eventBus()
+            .consumer("test.redis.load")
+            .handler(m -> {
+              redisClient
+                .send(cmd(SET).arg("foo").arg("bar"))
+                .onSuccess(res -> {
+                  if (count.incrementAndGet() == iterations * instances) {
+                    if (done.compareAndSet(false, true)) {
+                      rule.vertx()
+                        .setTimer(2000L, v -> test.complete());
+                    }
                   }
-                });
-
-              onStart.complete();
+                  System.out.println(count.get());
+                })
+                .onFailure(should::fail);
             });
+
+          onStart.complete();
         }
       }, new DeploymentOptions().setInstances(instances))
       .onComplete(res -> {
