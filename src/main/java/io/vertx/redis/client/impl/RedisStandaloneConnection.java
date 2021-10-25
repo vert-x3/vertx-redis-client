@@ -65,15 +65,8 @@ public class RedisStandaloneConnection implements RedisConnectionInternal, Parse
   }
 
   @Override
-  public void forceClose() {
-    if (listener != null) {
-      listener.onRemove();
-    }
-    if (onEvict != null) {
-      onEvict.run();
-      // reset to avoid double calls
-      onEvict = null;
-    }
+  public synchronized void forceClose() {
+    evict();
     netSocket.close();
   }
 
@@ -158,11 +151,6 @@ public class RedisStandaloneConnection implements RedisConnectionInternal, Parse
     final Promise<Response> promise = vertx.promise();
 
     final boolean voidCmd = request.command().isVoid();
-    if (!voidCmd && waiting.isFull()) {
-      promise.fail("Redis waiting Queue is full");
-      return promise.future();
-    }
-
     // encode the message to a buffer
     final Buffer message = ((RequestImpl) request).encode();
     // all update operations happen inside the context
@@ -206,11 +194,6 @@ public class RedisStandaloneConnection implements RedisConnectionInternal, Parse
       LOG.debug("Empty batch");
       promise.complete(Collections.emptyList());
     } else {
-      if (waiting.freeSlots() < commands.size()) {
-        promise.fail("Redis waiting Queue is full");
-        return promise.future();
-      }
-
       // will re-encode the handler into a list of promises
       final List<Promise<Response>> callbacks = new ArrayList<>(commands.size());
       final List<Response> replies = new ArrayList<>(commands.size());
@@ -353,46 +336,48 @@ public class RedisStandaloneConnection implements RedisConnectionInternal, Parse
   }
 
   public void end(Void v) {
+    // evict this connection from the pool
+    evict();
+
     // clean up the pending queue
-    cleanupQueue(CONNECTION_CLOSED);
-    // evict this connection from the pool
-    evict();
-    // call the end handler if any
-    if (onEnd != null) {
-      context.execute(v, onEnd);
-    }
+    cleanupQueue(CONNECTION_CLOSED)
+      .onComplete(v1 -> {
+        // call the end handler if any
+        if (onEnd != null) {
+          context.execute(v, onEnd);
+        }
+      });
   }
 
   @Override
-  public void fail(Throwable t) {
+  public synchronized void fail(Throwable t) {
     // evict this connection from the pool
     evict();
     // call the exception handler if any
     if (onException != null) {
       context.execute(t, onException);
     }
-    // mark this connection failed
-    isValid = false;
   }
 
   @Override
-  public void fatal(Throwable t) {
-    // if there are still on going requests
-    // the are all cancelled with the given
+  public synchronized void fatal(Throwable t) {
+    // evict this connection from the pool
+    evict();
+
+    // if there are still "on going" requests
+    // these are all cancelled with the given
     // throwable
-    cleanupQueue(t);
-    // evict this connection from the pool
-    evict();
-    // call the exception handler if any
-    if (onException != null) {
-      context.execute(t, onException);
-    }
-    // mark this connection failed
-    isValid = false;
+    cleanupQueue(t)
+      .onComplete(v -> {
+        // call the exception handler if any
+        if (onException != null) {
+          context.execute(t, onException);
+        }
+      });
   }
 
   @Override
-  public boolean reset() {
+  public synchronized boolean reset() {
     if (tainted) {
       evict();
     }
@@ -400,6 +385,7 @@ public class RedisStandaloneConnection implements RedisConnectionInternal, Parse
   }
 
   private void evict() {
+    isValid = false;
     // evict this connection from the pool
     if (listener != null) {
       listener.onRemove();
@@ -409,7 +395,8 @@ public class RedisStandaloneConnection implements RedisConnectionInternal, Parse
     }
   }
 
-  private void cleanupQueue(Throwable t) {
+  private Future<Void> cleanupQueue(Throwable t) {
+    final Promise<Void> cleanup = vertx.promise();
     // all update operations happen inside the context
     context.execute(v -> {
       Promise<Response> req;
@@ -423,6 +410,9 @@ public class RedisStandaloneConnection implements RedisConnectionInternal, Parse
           }
         }
       }
+      cleanup.complete();
     });
+
+    return cleanup.future();
   }
 }

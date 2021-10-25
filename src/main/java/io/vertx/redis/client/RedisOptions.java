@@ -70,7 +70,7 @@ public class RedisOptions {
     type = RedisClientType.STANDALONE;
     poolName = UUID.randomUUID().toString();
     // thumb guess based on web browser defaults
-    poolCleanerInterval = 180_000;
+    poolCleanerInterval = 30_000;
     maxPoolSize = 6;
     maxPoolWaiting = 24;
     poolRecycleTimeout = 180_000;

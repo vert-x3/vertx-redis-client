@@ -204,20 +204,18 @@ public class RedisClient6Test {
   public void perfRegression(TestContext should) {
     final Async test = should.async();
 
-    int iterations = 500;
+    int iterations = 1000;
     int instances = 100;
     AtomicInteger count = new AtomicInteger();
-    AtomicBoolean done = new AtomicBoolean();
+
     rule.vertx()
       .deployVerticle(() -> new AbstractVerticle() {
         @Override
         public void start(Promise<Void> onStart) {
           Redis redisClient = Redis.createClient(rule.vertx(), new RedisOptions()
             .setConnectionString("redis://" + redis.getContainerIpAddress() + ":" + redis.getFirstMappedPort() + "/0")
-            // given that we only use 1 connection and will be bombarded with requests we need to allow more handlers be waiting for a reply
-            .setMaxWaitingHandlers(iterations)
-            .setMaxPoolSize(100)
-            .setMaxPoolWaiting(500));
+            .setMaxPoolSize(10)
+            .setMaxPoolWaiting(10000));
 
           rule.vertx().eventBus()
             .consumer("test.redis.load")
@@ -226,22 +224,18 @@ public class RedisClient6Test {
                 .send(cmd(SET).arg("foo").arg("bar"))
                 .onSuccess(res -> {
                   if (count.incrementAndGet() == iterations * instances) {
-                    if (done.compareAndSet(false, true)) {
-                      rule.vertx()
-                        .setTimer(2000L, v -> test.complete());
-                    }
+                    test.complete();
                   }
-                  System.out.println(count.get());
                 })
                 .onFailure(should::fail);
             });
 
           onStart.complete();
         }
-      }, new DeploymentOptions().setInstances(instances))
+      }, new DeploymentOptions().setInstances(instances).setWorker(true))
       .onComplete(res -> {
         for (int i = 0; i < iterations; i++) {
-          rule.vertx().eventBus().publish("test.redis.load", null);
+          rule.vertx().eventBus().publish("test.redis.load", i);
         }
       });
 
