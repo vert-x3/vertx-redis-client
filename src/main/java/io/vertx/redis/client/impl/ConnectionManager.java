@@ -85,7 +85,7 @@ class ConnectionManager {
           .exceptionHandler(connection::fatal);
 
         // perform authentication
-        authenticate(connection, redisURI.password(), authenticate -> {
+        authenticate(connection, redisURI.user(), redisURI.password(), authenticate -> {
           if (authenticate.failed()) {
             ctx.runOnContext(v -> onConnect.handle(Future.failedFuture(authenticate.cause())));
             return;
@@ -117,13 +117,13 @@ class ConnectionManager {
       });
     }
 
-    private void authenticate(RedisConnection connection, String password, Handler<AsyncResult<Void>> handler) {
+    private void authenticate(RedisConnection connection, String user, String password, Handler<AsyncResult<Void>> handler) {
       if (password == null) {
         handler.handle(Future.succeededFuture());
         return;
       }
       // perform authentication
-      connection.send(Request.cmd(Command.AUTH).arg(password), auth -> {
+      connection.send(Request.cmd(Command.AUTH).arg(user == null ? "default" : user).arg(password), auth -> {
         if (auth.failed()) {
           handler.handle(Future.failedFuture(auth.cause()));
         } else {
