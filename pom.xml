@@ -29,13 +29,13 @@
       
     <artifactId>vertx-redis-client</artifactId>
       
-    <version>4.1.7-SNAPSHOT</version>
+    <version>4.1.7</version>
       
     <name>Vert.x Redis Client</name>
       
     <properties>
             
-        <stack.version>4.1.7-SNAPSHOT</stack.version>
+        <stack.version>4.1.7</stack.version>
             
         <jar.manifest>${project.basedir}/src/main/resources/META-INF/MANIFEST.MF</jar.manifest>
           
