@@ -212,4 +212,22 @@ public class RedisExamples {
         conn.send(Request.cmd(Command.GET).arg("key"));
       });
   }
+
+  public void example14(Vertx vertx) {
+    ;
+    Redis.createClient(
+        vertx,
+        // The client handles using credentials - user and password - with
+        // complex non-alphanumerical passwords, when .
+        // when you encode passwords and pass then as part of the connection string,
+        // redis clusters don't decode them back and returns a bad credentials
+        // error
+        new RedisOptions()
+          .addConnectionString("redis://localhost:6379/1?user=redundantName")
+          .setPassword("<password}{}!}}0001"))
+      .connect()
+      .onSuccess(conn -> {
+        // use the connection
+      });
+  }
 }
