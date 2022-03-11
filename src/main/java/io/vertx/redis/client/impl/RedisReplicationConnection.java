@@ -152,14 +152,9 @@ public class RedisReplicationConnection implements RedisConnection {
       }
     }
 
-    final Promise<Void> promise = Promise.promise();
-
-    CompositeFuture.all(futures)
-      .onSuccess(ignore -> promise.complete())
-      .onFailure(promise::fail);
-
-
-    return promise.future();
+    return CompositeFuture
+      .all(futures)
+      .mapEmpty();
   }
 
   @Override

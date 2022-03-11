@@ -159,7 +159,7 @@ public class RedisClusterConnection implements RedisConnection {
 
         String[] endpoints = slots.endpointsForSlot(i);
 
-        final Promise<Response> p = Promise.promise();
+        final Promise<Response> p = vertx.promise();
         send(selectMasterOrReplicaEndpoint(req.command().isReadOnly(), endpoints, forceMasterEndpoint), RETRIES, req, p);
         responses.add(p.future());
       }
@@ -215,7 +215,7 @@ public class RedisClusterConnection implements RedisConnection {
           final List<Future> responses = new ArrayList<>(requests.size());
 
           for (Map.Entry<Integer, Request> kv : requests.entrySet()) {
-            final Promise<Response> p = Promise.promise();
+            final Promise<Response> p = vertx.promise();
             send(selectEndpoint(kv.getKey(), cmd.isReadOnly(), forceMasterEndpoint), RETRIES, kv.getValue(), p);
             responses.add(p.future());
           }
@@ -527,14 +527,8 @@ public class RedisClusterConnection implements RedisConnection {
       }
     }
 
-    final Promise<Void> promise = Promise.promise();
-
-    CompositeFuture.all(futures)
-      .onSuccess(ignore -> promise.complete())
-      .onFailure(promise::fail);
-
-
-    return promise.future();
+    return CompositeFuture.all(futures)
+      .mapEmpty();
   }
 
   @Override

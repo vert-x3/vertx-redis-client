@@ -16,7 +16,6 @@
 package io.vertx.redis.client.impl;
 
 import io.vertx.core.Future;
-import io.vertx.core.Promise;
 import io.vertx.core.impl.logging.Logger;
 import io.vertx.core.impl.logging.LoggerFactory;
 import io.vertx.redis.client.*;
@@ -40,7 +39,6 @@ public class RedisAPIImpl implements RedisAPI {
 
   @Override
   public Future<Response> send(Command cmd, String... args) {
-    final Promise<Response> promise = Promise.promise();
     final Request req = Request.cmd(cmd);
 
     if (args != null) {
@@ -55,12 +53,13 @@ public class RedisAPIImpl implements RedisAPI {
 
     if (redis != null) {
       // operating in pooled mode
-      redis.send(req, promise);
+      return redis.send(req);
     } else if (connection != null) {
       // operating on connection mode
-      connection.send(req, promise);
+      return connection.send(req);
     }
-    return promise.future();
+
+    return Future.failedFuture(new IllegalStateException("Invalid state: no pool or connection available"));
   }
 
   @Override
