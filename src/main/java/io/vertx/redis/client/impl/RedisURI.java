@@ -15,10 +15,13 @@
  */
 package io.vertx.redis.client.impl;
 
+import io.vertx.core.http.impl.HttpUtils;
 import io.vertx.core.net.SocketAddress;
 
+import java.io.UnsupportedEncodingException;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.net.URLDecoder;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
@@ -127,16 +130,16 @@ public final class RedisURI {
           throw new IllegalArgumentException("Unsupported Redis connection string scheme [" + uri.getScheme() + "]");
       }
 
-      String userInfo = uri.getUserInfo();
+      String userInfo = uri.getRawUserInfo();
       if (userInfo != null) {
-        int sep = userInfo.lastIndexOf(':');
+        int sep = userInfo.indexOf(':');
         if (sep != -1) {
           if (sep > 0) {
-            user = userInfo.substring(0, sep);
+            user = urlDecode(userInfo.substring(0, sep));
           } else {
             user = params.getOrDefault("user", null);
           }
-          password = userInfo.substring(sep + 1);
+          password = urlDecode(userInfo.substring(sep + 1));
         } else {
           user = params.getOrDefault("user", null);
           password = params.getOrDefault("password", null);
@@ -148,6 +151,14 @@ public final class RedisURI {
 
     } catch (URISyntaxException e) {
       throw new IllegalArgumentException("Failed to parse the connection string", e);
+    }
+  }
+
+  private static String urlDecode(String raw) {
+    try {
+      return URLDecoder.decode(raw, "UTF-8");
+    } catch (UnsupportedEncodingException e) {
+      throw new RuntimeException(e);
     }
   }
 

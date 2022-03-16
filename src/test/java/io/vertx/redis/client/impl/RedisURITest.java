@@ -76,4 +76,10 @@ public class RedisURITest {
     RedisURI redisURI = new RedisURI("redis://[::1]:1234/0");
     Assert.assertEquals("[::1]:1234", redisURI.socketAddress().toString());
   }
+
+  @Test
+  public void testColon() {
+    RedisURI redisURI = new RedisURI("redis://:admin%3Aqwer@localhost:6379/1");
+    Assert.assertEquals("admin:qwer", redisURI.password());
+  }
 }
