@@ -15,7 +15,6 @@
  */
 package io.vertx.redis.client.impl;
 
-import io.vertx.core.http.impl.HttpUtils;
 import io.vertx.core.net.SocketAddress;
 
 import java.io.UnsupportedEncodingException;
