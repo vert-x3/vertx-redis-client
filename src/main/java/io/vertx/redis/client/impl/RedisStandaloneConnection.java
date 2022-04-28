@@ -7,7 +7,6 @@ import io.vertx.core.Vertx;
 import io.vertx.core.buffer.Buffer;
 import io.vertx.core.eventbus.EventBus;
 import io.vertx.core.impl.ContextInternal;
-import io.vertx.core.impl.VertxInternal;
 import io.vertx.core.impl.logging.Logger;
 import io.vertx.core.impl.logging.LoggerFactory;
 import io.vertx.core.json.JsonObject;
@@ -32,7 +31,6 @@ public class RedisStandaloneConnection implements RedisConnectionInternal, Parse
   private static final ErrorType CONNECTION_CLOSED = ErrorType.create("CONNECTION_CLOSED");
 
   private final PoolConnector.Listener listener;
-  private final VertxInternal vertx;
   private final ContextInternal context;
   private final EventBus eventBus;
   private final NetSocket netSocket;
@@ -46,11 +44,10 @@ public class RedisStandaloneConnection implements RedisConnectionInternal, Parse
   private Handler<Void> onEnd;
   private Handler<Response> onMessage;
   private Runnable onEvict;
-  private boolean isValid;
-  private boolean tainted;
+  private final AtomicBoolean isValid = new AtomicBoolean(false);
+  private final AtomicBoolean tainted = new AtomicBoolean(false);
 
   public RedisStandaloneConnection(Vertx vertx, ContextInternal context, PoolConnector.Listener connectionListener, NetSocket netSocket, RedisOptions options) {
-    this.vertx = (VertxInternal) vertx;
     this.context = context;
     this.listener = connectionListener;
     this.eventBus = vertx.eventBus();
@@ -60,19 +57,19 @@ public class RedisStandaloneConnection implements RedisConnectionInternal, Parse
   }
 
   synchronized void setValid() {
-    isValid = true;
-    tainted = false;
+    isValid.set(true);
+    tainted.set(false);
   }
 
   @Override
-  public synchronized void forceClose() {
+  public void forceClose() {
     evict();
     netSocket.close();
   }
 
   @Override
-  public synchronized boolean isValid() {
-    return isValid && (expiresAt <= 0 || System.currentTimeMillis() < expiresAt);
+  public boolean isValid() {
+    return isValid.get() && (expiresAt <= 0 || System.currentTimeMillis() < expiresAt);
   }
 
   @Override
@@ -87,7 +84,9 @@ public class RedisStandaloneConnection implements RedisConnectionInternal, Parse
 
   @Override
   public boolean pendingQueueFull() {
-    return waiting.isFull();
+    synchronized (waiting) {
+      return waiting.isFull();
+    }
   }
 
   @Override
@@ -139,57 +138,54 @@ public class RedisStandaloneConnection implements RedisConnectionInternal, Parse
    * This is only relevant for pooled connections
    */
   private void taintCheck(Command cmd) {
-    if (cmd.isPubSub() || Command.SELECT.equals(cmd) || Command.AUTH.equals(cmd)) {
-      // we're about to potentially modify the taint check, need to lock
-      synchronized (this) {
-        if (listener != null && !tainted) {
-          tainted = true;
-        }
+    if (listener != null) {
+      if (cmd.isPubSub() || Command.SELECT.equals(cmd) || Command.AUTH.equals(cmd)) {
+        tainted.compareAndSet(false, true);
       }
     }
   }
 
   @Override
   public Future<Response> send(final Request request) {
-    final Promise<Response> promise = vertx.promise();
+    final Promise<Response> promise;
 
     final boolean voidCmd = request.command().isVoid();
     // encode the message to a buffer
     final Buffer message = ((RequestImpl) request).encode();
-    // all update operations happen inside the context
-    context.execute(v -> {
-      // offer the handler to the waiting queue if not void command
-      if (!voidCmd) {
-        // we might have switch thread/context
-        // this means the check needs to be performed again
+    // offer the handler to the waiting queue if not void command
+    if (!voidCmd) {
+      // we might have switch thread/context
+      synchronized (waiting) {
         if (waiting.isFull()) {
-          promise.fail("Redis waiting Queue is full");
-          return;
+          return context.failedFuture("Redis waiting Queue is full");
         }
+        promise = context.promise();
         waiting.offer(promise);
       }
-      // write to the socket
-      netSocket.write(message)
-        // if the write fails, this connection enters a unknown state
-        // which means it should be terminated
-        .onFailure(this::fatal)
-        .onSuccess(ok -> {
-          // tag this connection as tainted if needed
-          taintCheck(request.command());
+    } else {
+      promise = context.promise();
+    }
+    // write to the socket
+    netSocket.write(message)
+      // if the write fails, this connection enters a unknown state
+      // which means it should be terminated
+      .onFailure(this::fatal)
+      .onSuccess(ok -> {
+        // tag this connection as tainted if needed
+        taintCheck(request.command());
 
-          if (voidCmd) {
-            // only on this case notify the promise
-            promise.complete();
-          }
-        });
-    });
+        if (voidCmd) {
+          // only on this case notify the promise
+          promise.complete();
+        }
+      });
 
     return promise.future();
   }
 
   @Override
   public Future<List<Response>> batch(List<Request> commands) {
-    final Promise<List<Response>> promise = vertx.promise();
+    final Promise<List<Response>> promise = context.promise();
 
     if (commands.isEmpty()) {
       LOG.debug("Empty batch");
@@ -212,7 +208,7 @@ public class RedisStandaloneConnection implements RedisConnectionInternal, Parse
         // tag this connection as tainted if needed
         taintCheck(req.command());
         // unwrap the handler into a single handler
-        callbacks.add(index, vertx.promise(command -> {
+        callbacks.add(index, context.promise(command -> {
           if (!failed.get()) {
             if (command.failed()) {
               failed.set(true);
@@ -230,25 +226,22 @@ public class RedisStandaloneConnection implements RedisConnectionInternal, Parse
         }));
       }
 
-      // all update operations happen inside the context
-      context.execute(v -> {
+      synchronized (waiting) {
         // we might have switch thread/context
         // this means the check needs to be performed again
         if (waiting.freeSlots() < callbacks.size()) {
-          promise.fail("Redis waiting Queue is full");
-          return;
+          return context.failedFuture("Redis waiting Queue is full");
         }
-
         // offer all handlers to the waiting queue
         for (Promise<Response> callback : callbacks) {
           waiting.offer(callback);
         }
-        // write to the socket
-        netSocket.write(messages)
-          // if the write fails, this connection enters an unknown state
-          // which means it should be terminated
-          .onFailure(this::fatal);
-      });
+      }
+      // write to the socket
+      netSocket.write(messages)
+        // if the write fails, this connection enters an unknown state
+        // which means it should be terminated
+        .onFailure(this::fatal);
     }
 
     return promise.future();
@@ -256,8 +249,20 @@ public class RedisStandaloneConnection implements RedisConnectionInternal, Parse
 
   @Override
   public void handle(Response reply) {
+    final boolean empty;
+    final Promise<Response> req;
+
+    synchronized (waiting) {
+      empty = waiting.isEmpty();
+      if (!empty) {
+        req = waiting.poll();
+      } else {
+        req = null;
+      }
+    }
+
     // pub/sub mode
-    if ((reply != null && reply.type() == ResponseType.PUSH) || waiting.isEmpty()) {
+    if ((reply != null && reply.type() == ResponseType.PUSH) || empty) {
       if (onMessage != null) {
         context.execute(reply, onMessage);
       } else {
@@ -296,59 +301,51 @@ public class RedisStandaloneConnection implements RedisConnectionInternal, Parse
       return;
     }
 
-    // all update operations happen inside the context
-    context.execute(v -> {
-      final Promise<Response> req = waiting.poll();
-
-      if (req != null) {
-        // special case (nulls are always a success)
-        // the reason is that nil is only a valid value for
-        // bulk or multi
-        if (reply == null) {
-          try {
-            req.complete();
-          } catch (RuntimeException e) {
-            fail(e);
-          }
-          return;
-        }
-        // errors
-        if (reply.type() == ResponseType.ERROR) {
-          try {
-            req.fail((ErrorType) reply);
-          } catch (RuntimeException e) {
-            fail(e);
-          }
-          return;
-        }
-        // everything else
+    if (req != null) {
+      // special case (nulls are always a success)
+      // the reason is that nil is only a valid value for
+      // bulk or multi
+      if (reply == null) {
         try {
-          req.complete(reply);
+          req.complete();
         } catch (RuntimeException e) {
           fail(e);
         }
-      } else {
-        LOG.error("No handler waiting for message: " + reply);
+        return;
       }
-    });
+      // errors
+      if (reply.type() == ResponseType.ERROR) {
+        try {
+          req.fail((ErrorType) reply);
+        } catch (RuntimeException e) {
+          fail(e);
+        }
+        return;
+      }
+      // everything else
+      try {
+        req.complete(reply);
+      } catch (RuntimeException e) {
+        fail(e);
+      }
+    } else {
+      LOG.error("No handler waiting for message: " + reply);
+    }
   }
 
   public void end(Void v) {
     // evict this connection from the pool
     evict();
-
     // clean up the pending queue
-    cleanupQueue(CONNECTION_CLOSED)
-      .onComplete(v1 -> {
-        // call the end handler if any
-        if (onEnd != null) {
-          context.execute(v, onEnd);
-        }
-      });
+    cleanupQueue(CONNECTION_CLOSED);
+    // call the end handler if any
+    if (onEnd != null) {
+      context.execute(v, onEnd);
+    }
   }
 
   @Override
-  public synchronized void fail(Throwable t) {
+  public void fail(Throwable t) {
     // evict this connection from the pool
     evict();
     // call the exception handler if any
@@ -358,32 +355,30 @@ public class RedisStandaloneConnection implements RedisConnectionInternal, Parse
   }
 
   @Override
-  public synchronized void fatal(Throwable t) {
+  public void fatal(Throwable t) {
     // evict this connection from the pool
     evict();
-
     // if there are still "on going" requests
     // these are all cancelled with the given
     // throwable
-    cleanupQueue(t)
-      .onComplete(v -> {
-        // call the exception handler if any
-        if (onException != null) {
-          context.execute(t, onException);
-        }
-      });
+    cleanupQueue(t);
+    // call the exception handler if any
+    if (onException != null) {
+      context.execute(t, onException);
+    }
   }
 
   @Override
-  public synchronized boolean reset() {
-    if (tainted) {
+  public boolean reset() {
+    if (tainted.get()) {
       evict();
+      return false;
     }
-    return !tainted;
+    return true;
   }
 
-  private synchronized void evict() {
-    isValid = false;
+  private void evict() {
+    isValid.set(false);
     // evict this connection from the pool
     if (listener != null) {
       listener.onRemove();
@@ -393,12 +388,9 @@ public class RedisStandaloneConnection implements RedisConnectionInternal, Parse
     }
   }
 
-  private Future<Void> cleanupQueue(Throwable t) {
-    final Promise<Void> cleanup = vertx.promise();
-    // all update operations happen inside the context
-    context.execute(v -> {
-      Promise<Response> req;
-
+  private void cleanupQueue(Throwable t) {
+    Promise<Response> req;
+    synchronized (waiting) {
       while ((req = waiting.poll()) != null) {
         if (t != null) {
           try {
@@ -408,9 +400,6 @@ public class RedisStandaloneConnection implements RedisConnectionInternal, Parse
           }
         }
       }
-      cleanup.complete();
-    });
-
-    return cleanup.future();
+    }
   }
 }
