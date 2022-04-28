@@ -378,13 +378,14 @@ public class RedisStandaloneConnection implements RedisConnectionInternal, Parse
   }
 
   private void evict() {
-    isValid.set(false);
-    // evict this connection from the pool
-    if (listener != null) {
-      listener.onRemove();
-    }
-    if (onEvict != null) {
-      onEvict.run();
+    if (isValid.compareAndSet(true, false)) {
+      // evict this connection from the pool
+      if (listener != null) {
+        listener.onRemove();
+      }
+      if (onEvict != null) {
+        onEvict.run();
+      }
     }
   }
 

@@ -24,7 +24,7 @@ public interface RedisConnectionInternal extends RedisConnection {
   void forceClose();
 
   /**
-   * Returns {@code true} is this connection can be resetted. This means that the connection didn't enter PubSub mode.
+   * Returns {@code true} is this connection can be reset. This means that the connection didn't enter PubSub mode.
    */
   boolean reset();
 }
