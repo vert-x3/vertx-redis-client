@@ -59,7 +59,7 @@ public class RedisStandaloneConnection implements RedisConnectionInternal, Parse
     this.expiresAt = options.getPoolRecycleTimeout() == -1 ? -1 : System.currentTimeMillis() + options.getPoolRecycleTimeout();
   }
 
-  void setValid() {
+  synchronized void setValid() {
     isValid = true;
     tainted = false;
   }
@@ -71,7 +71,7 @@ public class RedisStandaloneConnection implements RedisConnectionInternal, Parse
   }
 
   @Override
-  public boolean isValid() {
+  public synchronized boolean isValid() {
     return isValid && (expiresAt <= 0 || System.currentTimeMillis() < expiresAt);
   }
 
@@ -81,7 +81,7 @@ public class RedisStandaloneConnection implements RedisConnectionInternal, Parse
       // no pool is being used
       return netSocket.close();
     } else {
-      return Future.succeededFuture();
+      return context.succeededFuture();
     }
   }
 
@@ -135,13 +135,16 @@ public class RedisStandaloneConnection implements RedisConnectionInternal, Parse
    * Checks if an executed command has tainted the connection. A connection is tainted if it changes the default state,
    * for example, when a connection enters pub sub mode, or specific features are activated such as changing a database
    * or different authentication is used.
-   *
+   * <p>
    * This is only relevant for pooled connections
    */
   private void taintCheck(Command cmd) {
-    if (listener != null && !tainted) {
-      if (cmd.isPubSub() || Command.SELECT.equals(cmd) || Command.AUTH.equals(cmd)) {
-        tainted = true;
+    if (cmd.isPubSub() || Command.SELECT.equals(cmd) || Command.AUTH.equals(cmd)) {
+      // we're about to potentially modify the taint check, need to lock
+      synchronized (this) {
+        if (listener != null && !tainted) {
+          tainted = true;
+        }
       }
     }
   }
@@ -166,12 +169,11 @@ public class RedisStandaloneConnection implements RedisConnectionInternal, Parse
         waiting.offer(promise);
       }
       // write to the socket
-      netSocket.write(message, write -> {
-        if (write.failed()) {
-          // if the write fails, this connection enters a unknown state
-          // which means it should be terminated
-          fatal(write.cause());
-        } else {
+      netSocket.write(message)
+        // if the write fails, this connection enters a unknown state
+        // which means it should be terminated
+        .onFailure(this::fatal)
+        .onSuccess(ok -> {
           // tag this connection as tainted if needed
           taintCheck(request.command());
 
@@ -179,8 +181,7 @@ public class RedisStandaloneConnection implements RedisConnectionInternal, Parse
             // only on this case notify the promise
             promise.complete();
           }
-        }
-      });
+        });
     });
 
     return promise.future();
@@ -243,13 +244,10 @@ public class RedisStandaloneConnection implements RedisConnectionInternal, Parse
           waiting.offer(callback);
         }
         // write to the socket
-        netSocket.write(messages, write -> {
-          if (write.failed()) {
-            // if the write fails, this connection enters an unknown state
-            // which means it should be terminated
-            fatal(write.cause());
-          }
-        });
+        netSocket.write(messages)
+          // if the write fails, this connection enters an unknown state
+          // which means it should be terminated
+          .onFailure(this::fatal);
       });
     }
 
@@ -384,7 +382,7 @@ public class RedisStandaloneConnection implements RedisConnectionInternal, Parse
     return !tainted;
   }
 
-  private void evict() {
+  private synchronized void evict() {
     isValid = false;
     // evict this connection from the pool
     if (listener != null) {

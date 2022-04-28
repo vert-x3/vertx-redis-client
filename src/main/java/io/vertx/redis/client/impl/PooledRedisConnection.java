@@ -3,6 +3,7 @@ package io.vertx.redis.client.impl;
 import io.vertx.codegen.annotations.Nullable;
 import io.vertx.core.Future;
 import io.vertx.core.Handler;
+import io.vertx.core.impl.ContextInternal;
 import io.vertx.core.net.impl.pool.Lease;
 import io.vertx.core.spi.metrics.PoolMetrics;
 import io.vertx.redis.client.RedisConnection;
@@ -21,11 +22,14 @@ public class PooledRedisConnection implements RedisConnection {
   private final PoolMetrics metrics;
   private final Object metric;
 
-  public PooledRedisConnection(Lease<RedisConnectionInternal> lease, PoolMetrics<?> poolMetrics, Object metric) {
+  private final ContextInternal ctx;
+
+  public PooledRedisConnection(Lease<RedisConnectionInternal> lease, PoolMetrics<?> poolMetrics, Object metric, ContextInternal ctx) {
     this.lease = lease;
     this.connection = lease.get();
     this.metrics = poolMetrics;
     this.metric = metric;
+    this.ctx = ctx;
   }
 
   public RedisConnection actual() {
@@ -87,7 +91,7 @@ public class PooledRedisConnection implements RedisConnection {
       metrics.end(metric, true);
     }
 
-    return Future.succeededFuture();
+    return ctx.succeededFuture();
   }
 
   @Override
