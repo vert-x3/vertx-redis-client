@@ -45,7 +45,7 @@ public class RedisStandaloneConnection implements RedisConnectionInternal, Parse
   private Handler<Response> onMessage;
   private Runnable onEvict;
   private final AtomicBoolean isValid = new AtomicBoolean(false);
-  private final AtomicBoolean tainted = new AtomicBoolean(false);
+  private final AtomicBoolean tainted = new AtomicBoolean(true);
 
   public RedisStandaloneConnection(Vertx vertx, ContextInternal context, PoolConnector.Listener connectionListener, NetSocket netSocket, RedisOptions options) {
     this.context = context;
@@ -57,13 +57,20 @@ public class RedisStandaloneConnection implements RedisConnectionInternal, Parse
   }
 
   synchronized void setValid() {
+    assert !isValid.get();
+
     isValid.set(true);
+    // tainted will be reset, as a select during the handshake could have
+    // changed the state
     tainted.set(false);
   }
 
   @Override
   public void forceClose() {
     evict();
+    synchronized (this) {
+      tainted.set(true);
+    }
     netSocket.close();
   }
 
@@ -74,6 +81,10 @@ public class RedisStandaloneConnection implements RedisConnectionInternal, Parse
 
   @Override
   public Future<Void> close() {
+    synchronized (this) {
+      isValid.set(false);
+      tainted.set(true);
+    }
     if (listener == null) {
       // no pool is being used
       return netSocket.close();
@@ -149,6 +160,9 @@ public class RedisStandaloneConnection implements RedisConnectionInternal, Parse
   public Future<Response> send(final Request request) {
     final Promise<Response> promise;
 
+    // tag this connection as tainted if needed
+    taintCheck(request.command());
+
     final boolean voidCmd = request.command().isVoid();
     // encode the message to a buffer
     final Buffer message = ((RequestImpl) request).encode();
@@ -171,9 +185,6 @@ public class RedisStandaloneConnection implements RedisConnectionInternal, Parse
       // which means it should be terminated
       .onFailure(this::fatal)
       .onSuccess(ok -> {
-        // tag this connection as tainted if needed
-        taintCheck(request.command());
-
         if (voidCmd) {
           // only on this case notify the promise
           promise.complete();
@@ -395,7 +406,7 @@ public class RedisStandaloneConnection implements RedisConnectionInternal, Parse
       while ((req = waiting.poll()) != null) {
         if (t != null) {
           try {
-            req.fail(t);
+            req.tryFail(t);
           } catch (RuntimeException e) {
             LOG.warn("Exception during cleanup", e);
           }

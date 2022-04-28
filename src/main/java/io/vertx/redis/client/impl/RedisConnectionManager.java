@@ -19,7 +19,6 @@ import io.vertx.core.*;
 import io.vertx.core.impl.ContextInternal;
 import io.vertx.core.impl.EventLoopContext;
 import io.vertx.core.impl.VertxInternal;
-import io.vertx.core.impl.future.PromiseInternal;
 import io.vertx.core.impl.logging.Logger;
 import io.vertx.core.impl.logging.LoggerFactory;
 import io.vertx.core.net.NetClient;
@@ -47,6 +46,7 @@ class RedisConnectionManager {
   private static final Handler<Throwable> DEFAULT_EXCEPTION_HANDLER = t -> LOG.error("Unhandled Error", t);
 
   private final VertxInternal vertx;
+  private final ContextInternal context;
   private final NetClient netClient;
   private final PoolMetrics metrics;
 
@@ -56,6 +56,7 @@ class RedisConnectionManager {
 
   RedisConnectionManager(VertxInternal vertx, RedisOptions options) {
     this.vertx = vertx;
+    this.context = vertx.getContext();
     this.options = options;
     VertxMetrics metricsSPI = this.vertx.metricsSPI();
     metrics = metricsSPI != null ? metricsSPI.createPoolMetrics("redis", options.getPoolName(), options.getMaxPoolSize()) : null;
@@ -346,13 +347,12 @@ class RedisConnectionManager {
   }
 
   public Future<RedisConnection> getConnection(String connectionString, Request setup) {
-    final PromiseInternal<Lease<RedisConnectionInternal>> promise = vertx.promise();
-    final ContextInternal ctx = promise.context();
+    final Promise<Lease<RedisConnectionInternal>> promise = context.promise();
     final EventLoopContext eventLoopContext;
-    if (ctx instanceof EventLoopContext) {
-      eventLoopContext = (EventLoopContext) ctx;
+    if (context instanceof EventLoopContext) {
+      eventLoopContext = (EventLoopContext) context;
     } else {
-      eventLoopContext = vertx.createEventLoopContext(ctx.nettyEventLoop(), ctx.workerPool(), ctx.classLoader());
+      eventLoopContext = vertx.createEventLoopContext(context.nettyEventLoop(), context.workerPool(), context.classLoader());
     }
 
     final boolean metricsEnabled = metrics != null;
@@ -365,7 +365,7 @@ class RedisConnectionManager {
           metrics.rejected(queueMetric);
         }
       })
-      .map(lease -> new PooledRedisConnection(lease, metrics, metricsEnabled ? metrics.begin(queueMetric) : null, ctx));
+      .compose(lease -> context.succeededFuture(new PooledRedisConnection(lease, metrics, metricsEnabled ? metrics.begin(queueMetric) : null, context)));
   }
 
   public void close() {
