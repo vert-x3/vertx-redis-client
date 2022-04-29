@@ -151,32 +151,38 @@ class RedisConnectionManager {
       }
 
       // all calls the user handler will happen in the user context (ctx)
-      netClient.connect(redisURI.socketAddress(), clientConnect -> {
-        if (clientConnect.failed()) {
-          // connection failed
-          ctx.execute(ctx.failedFuture(clientConnect.cause()), onConnect);
-          return;
-        }
+      try {
+        netClient
+          .connect(redisURI.socketAddress(), clientConnect -> {
+            if (clientConnect.failed()) {
+              // connection failed
+              ctx.execute(ctx.failedFuture(clientConnect.cause()), onConnect);
+              return;
+            }
 
-        // socket connection succeeded
-        final NetSocket netSocket = clientConnect.result();
+            // socket connection succeeded
+            final NetSocket netSocket = clientConnect.result();
 
-        // upgrade to ssl is only possible for inet sockets
-        if (connectionStringInetSocket && !netClientSsl && connectionStringSsl) {
-          // must upgrade protocol
-          netSocket.upgradeToSsl(upgradeToSsl -> {
-            if (upgradeToSsl.failed()) {
-              ctx.execute(ctx.failedFuture(upgradeToSsl.cause()), onConnect);
+            // upgrade to ssl is only possible for inet sockets
+            if (connectionStringInetSocket && !netClientSsl && connectionStringSsl) {
+              // must upgrade protocol
+              netSocket.upgradeToSsl(upgradeToSsl -> {
+                if (upgradeToSsl.failed()) {
+                  ctx.execute(ctx.failedFuture(upgradeToSsl.cause()), onConnect);
+                } else {
+                  // complete the connection
+                  init(ctx, netSocket, listener, onConnect);
+                }
+              });
             } else {
-              // complete the connection
+              // no need to upgrade
               init(ctx, netSocket, listener, onConnect);
             }
           });
-        } else {
-          // no need to upgrade
-          init(ctx, netSocket, listener, onConnect);
-        }
-      });
+      } catch (IllegalStateException ise) {
+        // the netClient is in a closed state?
+        ctx.execute(ctx.failedFuture(ise), onConnect);
+      }
     }
 
     private void init(ContextInternal ctx, NetSocket netSocket, PoolConnector.Listener connectionListener, Handler<AsyncResult<ConnectResult<RedisConnectionInternal>>> onConnect) {
@@ -189,7 +195,7 @@ class RedisConnectionManager {
       netSocket
         .handler(new RESPParser(connection, options.getMaxNestedArrays()))
         .closeHandler(connection::end)
-        .exceptionHandler(connection::fatal);
+        .exceptionHandler(connection::fail);
 
       // initial handshake
       hello(ctx, connection, redisURI, hello -> {

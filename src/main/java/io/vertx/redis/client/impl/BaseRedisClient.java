@@ -65,6 +65,7 @@ public abstract class BaseRedisClient implements Redis {
     if (commands.isEmpty()) {
       LOG.debug("Empty batch");
       promise.complete(Collections.emptyList());
+      return promise.future();
     } else {
       for (Request req : commands) {
         if (req.command().isPubSub()) {
@@ -94,8 +95,8 @@ public abstract class BaseRedisClient implements Redis {
                 conn.close().onFailure(LOG::warn);
               }
             }));
-    }
 
-    return promise.future();
+      return promise.future();
+    }
   }
 }

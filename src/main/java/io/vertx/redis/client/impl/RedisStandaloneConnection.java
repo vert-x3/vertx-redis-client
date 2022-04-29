@@ -183,7 +183,7 @@ public class RedisStandaloneConnection implements RedisConnectionInternal, Parse
     netSocket.write(message)
       // if the write fails, this connection enters a unknown state
       // which means it should be terminated
-      .onFailure(this::fatal)
+      .onFailure(this::fail)
       .onSuccess(ok -> {
         if (voidCmd) {
           // only on this case notify the promise
@@ -252,7 +252,7 @@ public class RedisStandaloneConnection implements RedisConnectionInternal, Parse
       netSocket.write(messages)
         // if the write fails, this connection enters an unknown state
         // which means it should be terminated
-        .onFailure(this::fatal);
+        .onFailure(this::fail);
     }
 
     return promise.future();
@@ -313,32 +313,25 @@ public class RedisStandaloneConnection implements RedisConnectionInternal, Parse
     }
 
     if (req != null) {
-      // special case (nulls are always a success)
-      // the reason is that nil is only a valid value for
-      // bulk or multi
+      final boolean resolved;
       if (reply == null) {
-        try {
-          req.complete();
-        } catch (RuntimeException e) {
-          fail(e);
+        // special case (nulls are always a success)
+        // the reason is that nil is only a valid value for
+        // bulk or multi
+        resolved = req.tryComplete();
+      } else {
+        resolved = reply.type() == ResponseType.ERROR ?
+          req.tryFail((ErrorType) reply) :
+          req.tryComplete(reply);
+      }
+
+      if (!resolved) {
+        // call the exception handler if any
+        if (onException != null) {
+          context.execute(new IllegalStateException("Result is already complete: [" + req + "]"), onException);
         }
-        return;
       }
-      // errors
-      if (reply.type() == ResponseType.ERROR) {
-        try {
-          req.fail((ErrorType) reply);
-        } catch (RuntimeException e) {
-          fail(e);
-        }
-        return;
-      }
-      // everything else
-      try {
-        req.complete(reply);
-      } catch (RuntimeException e) {
-        fail(e);
-      }
+
     } else {
       LOG.error("No handler waiting for message: " + reply);
     }
@@ -357,16 +350,6 @@ public class RedisStandaloneConnection implements RedisConnectionInternal, Parse
 
   @Override
   public void fail(Throwable t) {
-    // evict this connection from the pool
-    evict();
-    // call the exception handler if any
-    if (onException != null) {
-      context.execute(t, onException);
-    }
-  }
-
-  @Override
-  public void fatal(Throwable t) {
     // evict this connection from the pool
     evict();
     // if there are still "on going" requests

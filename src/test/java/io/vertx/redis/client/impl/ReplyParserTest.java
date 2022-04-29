@@ -37,11 +37,6 @@ public class ReplyParserTest {
       }
 
       @Override
-      public void fatal(Throwable t) {
-        should.fail(t);
-      }
-
-      @Override
       public void fail(Throwable t) {
         should.fail(t);
       }
@@ -59,11 +54,6 @@ public class ReplyParserTest {
       public void handle(Response response) {
         System.out.println(response.toString());
         test.complete();
-      }
-
-      @Override
-      public void fatal(Throwable t) {
-        should.fail(t);
       }
 
       @Override
@@ -93,11 +83,6 @@ public class ReplyParserTest {
       }
 
       @Override
-      public void fatal(Throwable t) {
-        should.fail(t);
-      }
-
-      @Override
       public void fail(Throwable t) {
         should.fail(t);
       }
@@ -118,11 +103,6 @@ public class ReplyParserTest {
       }
 
       @Override
-      public void fatal(Throwable t) {
-        should.fail(t);
-      }
-
-      @Override
       public void fail(Throwable t) {
         should.fail(t);
       }
@@ -140,11 +120,6 @@ public class ReplyParserTest {
       public void handle(Response response) {
         should.assertEquals("foobar", response.toString());
         test.complete();
-      }
-
-      @Override
-      public void fatal(Throwable t) {
-        should.fail(t);
       }
 
       @Override
@@ -169,11 +144,6 @@ public class ReplyParserTest {
       }
 
       @Override
-      public void fatal(Throwable t) {
-        should.fail(t);
-      }
-
-      @Override
       public void fail(Throwable t) {
         should.fail(t);
       }
@@ -191,11 +161,6 @@ public class ReplyParserTest {
       public void handle(Response response) {
         should.assertTrue(response == null);
         test.complete();
-      }
-
-      @Override
-      public void fatal(Throwable t) {
-        should.fail(t);
       }
 
       @Override
@@ -220,11 +185,6 @@ public class ReplyParserTest {
       }
 
       @Override
-      public void fatal(Throwable t) {
-        should.fail(t);
-      }
-
-      @Override
       public void fail(Throwable t) {
         should.fail(t);
       }
@@ -242,11 +202,6 @@ public class ReplyParserTest {
       public void handle(Response response) {
         should.assertTrue(response == null);
         test.complete();
-      }
-
-      @Override
-      public void fatal(Throwable t) {
-        should.fail(t);
       }
 
       @Override
@@ -272,11 +227,6 @@ public class ReplyParserTest {
       }
 
       @Override
-      public void fatal(Throwable t) {
-        should.fail(t);
-      }
-
-      @Override
       public void fail(Throwable t) {
         should.fail(t);
       }
@@ -297,11 +247,6 @@ public class ReplyParserTest {
         should.assertEquals(2, response.get(1).toInteger());
         should.assertEquals(3, response.get(2).toInteger());
         test.complete();
-      }
-
-      @Override
-      public void fatal(Throwable t) {
-        should.fail(t);
       }
 
       @Override
@@ -330,11 +275,6 @@ public class ReplyParserTest {
       }
 
       @Override
-      public void fatal(Throwable t) {
-        should.fail(t);
-      }
-
-      @Override
       public void fail(Throwable t) {
         should.fail(t);
       }
@@ -357,11 +297,6 @@ public class ReplyParserTest {
         should.assertEquals("Foo", response.get(1).get(0).toString());
         should.assertEquals("Bar", response.get(1).get(1).toString());
         test.complete();
-      }
-
-      @Override
-      public void fatal(Throwable t) {
-        should.fail(t);
       }
 
       @Override
@@ -388,11 +323,6 @@ public class ReplyParserTest {
       }
 
       @Override
-      public void fatal(Throwable t) {
-        should.fail(t);
-      }
-
-      @Override
       public void fail(Throwable t) {
         should.fail(t);
       }
@@ -414,11 +344,6 @@ public class ReplyParserTest {
         if (counter.incrementAndGet() == 17) {
           test.complete();
         }
-      }
-
-      @Override
-      public void fatal(Throwable t) {
-        should.fail(t);
       }
 
       @Override
@@ -469,11 +394,6 @@ public class ReplyParserTest {
         if (counter.incrementAndGet() == 17) {
           test.complete();
         }
-      }
-
-      @Override
-      public void fatal(Throwable t) {
-        should.fail(t);
       }
 
       @Override
