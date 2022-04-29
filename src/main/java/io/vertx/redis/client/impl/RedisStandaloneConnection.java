@@ -56,7 +56,7 @@ public class RedisStandaloneConnection implements RedisConnectionInternal, Parse
     this.expiresAt = options.getPoolRecycleTimeout() == -1 ? -1 : System.currentTimeMillis() + options.getPoolRecycleTimeout();
   }
 
-  synchronized void setValid() {
+  void setValid() {
     assert !isValid.get();
 
     isValid.set(true);
@@ -81,10 +81,9 @@ public class RedisStandaloneConnection implements RedisConnectionInternal, Parse
 
   @Override
   public Future<Void> close() {
-    synchronized (this) {
-      isValid.set(false);
-      tainted.set(true);
-    }
+    isValid.set(false);
+    tainted.set(true);
+
     if (listener == null) {
       // no pool is being used
       return netSocket.close();
