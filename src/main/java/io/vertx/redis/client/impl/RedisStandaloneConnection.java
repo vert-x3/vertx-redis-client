@@ -3,10 +3,10 @@ package io.vertx.redis.client.impl;
 import io.vertx.core.Future;
 import io.vertx.core.Handler;
 import io.vertx.core.Promise;
-import io.vertx.core.Vertx;
 import io.vertx.core.buffer.Buffer;
 import io.vertx.core.eventbus.EventBus;
 import io.vertx.core.impl.ContextInternal;
+import io.vertx.core.impl.VertxInternal;
 import io.vertx.core.impl.logging.Logger;
 import io.vertx.core.impl.logging.LoggerFactory;
 import io.vertx.core.json.JsonObject;
@@ -31,6 +31,9 @@ public class RedisStandaloneConnection implements RedisConnectionInternal, Parse
   private static final ErrorType CONNECTION_CLOSED = ErrorType.create("CONNECTION_CLOSED");
 
   private final PoolConnector.Listener listener;
+  // to be used for callbacks
+  private final VertxInternal vertx;
+  // to be used for callbacks
   private final ContextInternal context;
   private final EventBus eventBus;
   private final NetSocket netSocket;
@@ -47,7 +50,8 @@ public class RedisStandaloneConnection implements RedisConnectionInternal, Parse
   private final AtomicBoolean isValid = new AtomicBoolean(false);
   private final AtomicBoolean tainted = new AtomicBoolean(true);
 
-  public RedisStandaloneConnection(Vertx vertx, ContextInternal context, PoolConnector.Listener connectionListener, NetSocket netSocket, RedisOptions options) {
+  public RedisStandaloneConnection(VertxInternal vertx, ContextInternal context, PoolConnector.Listener connectionListener, NetSocket netSocket, RedisOptions options) {
+    this.vertx = vertx;
     this.context = context;
     this.listener = connectionListener;
     this.eventBus = vertx.eventBus();
@@ -88,7 +92,7 @@ public class RedisStandaloneConnection implements RedisConnectionInternal, Parse
       // no pool is being used
       return netSocket.close();
     } else {
-      return context.succeededFuture();
+      return Future.succeededFuture();
     }
   }
 
@@ -170,13 +174,17 @@ public class RedisStandaloneConnection implements RedisConnectionInternal, Parse
       // we might have switch thread/context
       synchronized (waiting) {
         if (waiting.isFull()) {
-          return context.failedFuture("Redis waiting Queue is full");
+          return Future.failedFuture("Redis waiting Queue is full");
         }
-        promise = context.promise();
+        // create a new promise bound to the caller not
+        // the instance of this object (a.k.a. "context")
+        promise = vertx.promise();
         waiting.offer(promise);
       }
     } else {
-      promise = context.promise();
+      // create a new promise bound to the caller not
+      // the instance of this object (a.k.a. "context")
+      promise = vertx.promise();
     }
     // write to the socket
     netSocket.write(message)
@@ -186,7 +194,13 @@ public class RedisStandaloneConnection implements RedisConnectionInternal, Parse
       .onSuccess(ok -> {
         if (voidCmd) {
           // only on this case notify the promise
-          promise.complete();
+          if (!promise.tryComplete()) {
+            // if the promise fail (e.g.: an client error forced a cleanup)
+            // call the exception handler if any
+            if (onException != null) {
+              context.execute(new IllegalStateException("Result is already complete: [" + promise + "]"), onException);
+            }
+          }
         }
       });
 
@@ -195,7 +209,9 @@ public class RedisStandaloneConnection implements RedisConnectionInternal, Parse
 
   @Override
   public Future<List<Response>> batch(List<Request> commands) {
-    final Promise<List<Response>> promise = context.promise();
+    // create a new promise bound to the caller not
+    // the instance of this object (a.k.a. "context")
+    final Promise<List<Response>> promise = vertx.promise();
 
     if (commands.isEmpty()) {
       LOG.debug("Empty batch");
@@ -211,6 +227,7 @@ public class RedisStandaloneConnection implements RedisConnectionInternal, Parse
       final Buffer messages = Buffer.buffer();
 
       for (int i = 0; i < commands.size(); i++) {
+        // TODO: why don't we handle void cases here?
         final int index = i;
         final RequestImpl req = (RequestImpl) commands.get(index);
         // encode to the single buffer
@@ -218,11 +235,17 @@ public class RedisStandaloneConnection implements RedisConnectionInternal, Parse
         // tag this connection as tainted if needed
         taintCheck(req.command());
         // unwrap the handler into a single handler
-        callbacks.add(index, context.promise(command -> {
+        callbacks.add(index, vertx.promise(command -> {
           if (!failed.get()) {
             if (command.failed()) {
               failed.set(true);
-              promise.fail(command.cause());
+              if (!promise.tryFail(command.cause())) {
+                // if the promise fail (e.g.: an client error forced a cleanup)
+                // call the exception handler if any
+                if (onException != null) {
+                  context.execute(new IllegalStateException("Result is already complete: [" + promise + "]"), onException);
+                }
+              }
               return;
             }
           }
@@ -231,7 +254,13 @@ public class RedisStandaloneConnection implements RedisConnectionInternal, Parse
 
           if (count.decrementAndGet() == 0) {
             // all results have arrived
-            promise.complete(replies);
+            if (!promise.tryComplete(replies)) {
+              // if the promise fail (e.g.: an client error forced a cleanup)
+              // call the exception handler if any
+              if (onException != null) {
+                context.execute(new IllegalStateException("Result is already complete: [" + promise + "]"), onException);
+              }
+            }
           }
         }));
       }
@@ -240,7 +269,7 @@ public class RedisStandaloneConnection implements RedisConnectionInternal, Parse
         // we might have switch thread/context
         // this means the check needs to be performed again
         if (waiting.freeSlots() < callbacks.size()) {
-          return context.failedFuture("Redis waiting Queue is full");
+          return Future.failedFuture("Redis waiting Queue is full");
         }
         // offer all handlers to the waiting queue
         for (Promise<Response> callback : callbacks) {
@@ -387,11 +416,7 @@ public class RedisStandaloneConnection implements RedisConnectionInternal, Parse
     synchronized (waiting) {
       while ((req = waiting.poll()) != null) {
         if (t != null) {
-          try {
-            req.tryFail(t);
-          } catch (RuntimeException e) {
-            LOG.warn("Exception during cleanup", e);
-          }
+          req.tryFail(t);
         }
       }
     }

@@ -17,6 +17,8 @@ package io.vertx.redis.client.impl;
 
 import io.vertx.codegen.annotations.Nullable;
 
+import java.util.Objects;
+
 final class ArrayQueue {
 
   private int
@@ -53,9 +55,7 @@ final class ArrayQueue {
    * @throws NullPointerException if the value is {@code null}
    */
   <T> void offer(T value) {
-    if (value == null) {
-      throw new NullPointerException();
-    }
+    Objects.requireNonNull(value, "'value' cannot be null");
     if (isFull()) {
       throw new IndexOutOfBoundsException();
     }

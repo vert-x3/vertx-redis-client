@@ -353,7 +353,7 @@ class RedisConnectionManager {
   }
 
   public Future<RedisConnection> getConnection(String connectionString, Request setup) {
-    final Promise<Lease<RedisConnectionInternal>> promise = context.promise();
+    final Promise<Lease<RedisConnectionInternal>> promise = vertx.promise();
     final EventLoopContext eventLoopContext;
     if (context instanceof EventLoopContext) {
       eventLoopContext = (EventLoopContext) context;
@@ -371,7 +371,7 @@ class RedisConnectionManager {
           metrics.rejected(queueMetric);
         }
       })
-      .compose(lease -> context.succeededFuture(new PooledRedisConnection(lease, metrics, metricsEnabled ? metrics.begin(queueMetric) : null, context)));
+      .compose(lease -> Future.succeededFuture(new PooledRedisConnection(lease, metrics, metricsEnabled ? metrics.begin(queueMetric) : null, context)));
   }
 
   public void close() {
