@@ -22,14 +22,11 @@ public class PooledRedisConnection implements RedisConnection {
   private final PoolMetrics metrics;
   private final Object metric;
 
-  private final ContextInternal ctx;
-
-  public PooledRedisConnection(Lease<RedisConnectionInternal> lease, PoolMetrics<?> poolMetrics, Object metric, ContextInternal ctx) {
+  public PooledRedisConnection(Lease<RedisConnectionInternal> lease, PoolMetrics<?> poolMetrics, Object metric) {
     this.lease = lease;
     this.connection = lease.get();
     this.metrics = poolMetrics;
     this.metric = metric;
-    this.ctx = ctx;
   }
 
   public RedisConnection actual() {
@@ -91,7 +88,7 @@ public class PooledRedisConnection implements RedisConnection {
       metrics.end(metric, true);
     }
 
-    return ctx.succeededFuture();
+    return Future.succeededFuture();
   }
 
   @Override

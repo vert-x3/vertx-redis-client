@@ -230,6 +230,9 @@ public class RedisSentinelClient extends BaseRedisClient implements Redis {
         final String masterName = options.getMasterName();
         // Send a command just to check we have a working node
         conn.send(cmd(SENTINEL).arg("GET-MASTER-ADDR-BY-NAME").arg(masterName), getMasterAddrByName -> {
+          // we don't need this connection anymore
+          conn.close().onFailure(LOG::warn);
+
           if (getMasterAddrByName.failed()) {
             handler.handle(Future.failedFuture(getMasterAddrByName.cause()));
           } else {
@@ -243,8 +246,6 @@ public class RedisSentinelClient extends BaseRedisClient implements Redis {
               handler.handle(Future.succeededFuture(new RedisURI(uri, rHost.contains(":") ? "[" + rHost + "]" : rHost, rPort)));
             }
           }
-          // we don't need this connection anymore
-          conn.close().onFailure(LOG::warn);
         });
       });
   }
@@ -259,6 +260,9 @@ public class RedisSentinelClient extends BaseRedisClient implements Redis {
         final String masterName = options.getMasterName();
         // Send a command just to check we have a working node
         conn.send(cmd(SENTINEL).arg("SLAVES").arg(masterName), sentinelReplicas -> {
+          // connection is not needed anymore
+          conn.close().onFailure(LOG::warn);
+
           if (sentinelReplicas.failed()) {
             handler.handle(Future.failedFuture(sentinelReplicas.cause()));
           } else {
@@ -293,8 +297,6 @@ public class RedisSentinelClient extends BaseRedisClient implements Redis {
               }
             }
           }
-          // connection is not needed anymore
-          conn.close().onFailure(LOG::warn);
         });
       });
   }

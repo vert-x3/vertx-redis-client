@@ -371,7 +371,7 @@ class RedisConnectionManager {
           metrics.rejected(queueMetric);
         }
       })
-      .compose(lease -> Future.succeededFuture(new PooledRedisConnection(lease, metrics, metricsEnabled ? metrics.begin(queueMetric) : null, context)));
+      .compose(lease -> Future.succeededFuture(new PooledRedisConnection(lease, metrics, metricsEnabled ? metrics.begin(queueMetric) : null)));
   }
 
   public void close() {
