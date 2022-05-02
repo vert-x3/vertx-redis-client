@@ -74,7 +74,8 @@ public class RedisClientLoadTest {
           });
         }
       }, new DeploymentOptions().setInstances(instances))
-      .onComplete(res -> {
+      .onFailure(should::fail)
+      .onSuccess(deploymentId -> {
         for (int i = 0; i < iterations; i++) {
           rule.vertx().eventBus().publish("test.redis.load", true);
         }
