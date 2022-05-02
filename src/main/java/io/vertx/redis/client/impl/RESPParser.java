@@ -142,32 +142,24 @@ public final class RESPParser implements Handler<Buffer> {
   }
 
   private void handleNumber(byte type, int eol) {
-    try {
-      switch (type) {
-        case ':':
-          handleResponse(NumberType.create(buffer.readNumber(eol, ReadableBuffer.NumericType.INTEGER)), false);
-          break;
-        case ',':
-          handleResponse(NumberType.create(buffer.readNumber(eol, ReadableBuffer.NumericType.DECIMAL)), false);
-          break;
-        case '(':
-          handleResponse(NumberType.create(buffer.readNumber(eol, ReadableBuffer.NumericType.BIGINTEGER)), false);
-          break;
-      }
-    } catch (RuntimeException e) {
-      handler.fail(e);
+    switch (type) {
+      case ':':
+        handleResponse(NumberType.create(buffer.readNumber(eol, ReadableBuffer.NumericType.INTEGER)), false);
+        break;
+      case ',':
+        handleResponse(NumberType.create(buffer.readNumber(eol, ReadableBuffer.NumericType.DECIMAL)), false);
+        break;
+      case '(':
+        handleResponse(NumberType.create(buffer.readNumber(eol, ReadableBuffer.NumericType.BIGINTEGER)), false);
+        break;
+      default:
+        handler.fail(new NumberFormatException("Invalid REDIS format: [" + (char) type + "]"));
+        break;
     }
   }
 
   private long handleLength(int eol) {
-    final long integer;
-
-    try {
-      integer = buffer.readLong(eol);
-    } catch (RuntimeException e) {
-      handler.fail(e);
-      return -1;
-    }
+    final long integer = buffer.readLong(eol);
 
     // special cases
     // redis multi cannot have more than 2GB elements
@@ -211,7 +203,6 @@ public final class RESPParser implements Handler<Buffer> {
       } else {
         handleResponse(AttributeType.create(len), true);
       }
-
     }
   }
 

@@ -3,6 +3,7 @@ package io.vertx.test.redis;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import io.vertx.core.*;
+import io.vertx.core.impl.VertxInternal;
 import io.vertx.ext.unit.junit.Repeat;
 import org.junit.ClassRule;
 import org.junit.Rule;
@@ -50,7 +51,7 @@ public class RedisClientLoadTest {
     AtomicInteger countOfErrors = new AtomicInteger();
     AtomicInteger countOfSuccess = new AtomicInteger();
 
-    Promise<Void> donePromise = Promise.promise();
+    Promise<Void> donePromise = ((VertxInternal) rule.vertx()).promise();
 
     rule.vertx().deployVerticle(() -> new AbstractVerticle() {
         @Override
@@ -79,11 +80,14 @@ public class RedisClientLoadTest {
         }
       });
 
-    donePromise.future().onComplete(res -> {
-      if(countOfErrors.get() > 0) {
-        should.fail("count of errors:" + countOfErrors.get());
-      }
-      test.complete();
+    donePromise.future()
+      .onFailure(should::fail)
+      .onSuccess(ok -> {
+        // I'm suspecting that the issue is happening now here.
+        // when the test fails, an exception is thrown from the assert bellow
+        should.assertTrue(countOfErrors.get() == 0, "Count of errors: " + countOfErrors.get());
+        // then this triggers a re-run of the promise resolver which is not valid anymore
+        test.complete();
     });
   }
 
