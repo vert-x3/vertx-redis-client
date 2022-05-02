@@ -179,9 +179,9 @@ class RedisConnectionManager {
               init(ctx, netSocket, listener, onConnect);
             }
           });
-      } catch (IllegalStateException ise) {
+      } catch (RuntimeException err) {
         // the netClient is in a closed state?
-        ctx.execute(ctx.failedFuture(ise), onConnect);
+        ctx.execute(ctx.failedFuture(err), onConnect);
       }
     }
 

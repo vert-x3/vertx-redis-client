@@ -166,7 +166,7 @@ public class RedisStandaloneConnection implements RedisConnectionInternal, Parse
     // tag this connection as tainted if needed
     taintCheck(request.command());
 
-    final boolean voidCmd = request.command().isVoid();
+    final boolean voidCmd = request.command().isPubSub();
     // encode the message to a buffer
     final Buffer message = ((RequestImpl) request).encode();
     // offer the handler to the waiting queue if not void command
@@ -187,36 +187,42 @@ public class RedisStandaloneConnection implements RedisConnectionInternal, Parse
       promise = vertx.promise();
     }
     // write to the socket
-    netSocket.write(message)
-      // if the write fails, this connection enters a unknown state
-      // which means it should be terminated
-      .onFailure(this::fail)
-      .onSuccess(ok -> {
-        if (voidCmd) {
-          // only on this case notify the promise
-          if (!promise.tryComplete()) {
-            // if the promise fail (e.g.: an client error forced a cleanup)
-            // call the exception handler if any
-            if (onException != null) {
-              context.execute(new IllegalStateException("Result is already complete: [" + promise + "]"), onException);
+    try {
+      netSocket.write(message)
+        // if the write fails, this connection enters a unknown state
+        // which means it should be terminated
+        .onFailure(this::fail)
+        .onSuccess(ok -> {
+          if (voidCmd) {
+            // only on this case notify the promise
+            if (!promise.tryComplete()) {
+              // if the promise fail (e.g.: an client error forced a cleanup)
+              // call the exception handler if any
+              if (onException != null) {
+                context.execute(new IllegalStateException("Result is already complete: [" + promise + "]"), onException);
+              }
             }
           }
-        }
-      });
+        });
 
-    return promise.future();
+      return promise.future();
+    } catch (RuntimeException err) {
+      // is the socket in a broken state?
+      fail(err);
+      return Future.failedFuture(err);
+    }
   }
 
   @Override
   public Future<List<Response>> batch(List<Request> commands) {
-    // create a new promise bound to the caller not
-    // the instance of this object (a.k.a. "context")
-    final Promise<List<Response>> promise = vertx.promise();
-
     if (commands.isEmpty()) {
       LOG.debug("Empty batch");
-      promise.complete(Collections.emptyList());
+      return Future.succeededFuture(Collections.emptyList());
     } else {
+      // create a new promise bound to the caller not
+      // the instance of this object (a.k.a. "context")
+      final Promise<List<Response>> promise = vertx.promise();
+
       // will re-encode the handler into a list of promises
       final List<Promise<Response>> callbacks = new ArrayList<>(commands.size());
       final List<Response> replies = new ArrayList<>(commands.size());
@@ -227,9 +233,12 @@ public class RedisStandaloneConnection implements RedisConnectionInternal, Parse
       final Buffer messages = Buffer.buffer();
 
       for (int i = 0; i < commands.size(); i++) {
-        // TODO: why don't we handle void cases here?
         final int index = i;
         final RequestImpl req = (RequestImpl) commands.get(index);
+        if (req.command().isPubSub()) {
+          // mixing pubSub cannot be used on a one-shot operation
+          return Future.failedFuture("PubSub command in batch not allowed");
+        }
         // encode to the single buffer
         req.encode(messages);
         // tag this connection as tainted if needed
@@ -277,13 +286,19 @@ public class RedisStandaloneConnection implements RedisConnectionInternal, Parse
         }
       }
       // write to the socket
-      netSocket.write(messages)
-        // if the write fails, this connection enters an unknown state
-        // which means it should be terminated
-        .onFailure(this::fail);
-    }
+      try {
+        netSocket.write(messages)
+          // if the write fails, this connection enters an unknown state
+          // which means it should be terminated
+          .onFailure(this::fail);
 
-    return promise.future();
+        return promise.future();
+      } catch (RuntimeException err) {
+        // is the socket in a broken state?
+        fail(err);
+        return Future.failedFuture(err);
+      }
+    }
   }
 
   @Override
@@ -416,7 +431,11 @@ public class RedisStandaloneConnection implements RedisConnectionInternal, Parse
     synchronized (waiting) {
       while ((req = waiting.poll()) != null) {
         if (t != null) {
-          req.tryFail(t);
+          try {
+            req.tryFail(t);
+          } catch (RuntimeException err) {
+            LOG.warn("Exception while running cleanup", err);
+          }
         }
       }
     }
