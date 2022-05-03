@@ -7,6 +7,7 @@ import io.vertx.core.buffer.Buffer;
 import io.vertx.core.eventbus.EventBus;
 import io.vertx.core.impl.ContextInternal;
 import io.vertx.core.impl.VertxInternal;
+import io.vertx.core.impl.future.PromiseInternal;
 import io.vertx.core.impl.logging.Logger;
 import io.vertx.core.impl.logging.LoggerFactory;
 import io.vertx.core.json.JsonObject;
@@ -204,13 +205,13 @@ public class RedisStandaloneConnection implements RedisConnectionInternal, Parse
             }
           }
         });
-
-      return promise.future();
     } catch (RuntimeException err) {
       // is the socket in a broken state?
-      fail(err);
-      return Future.failedFuture(err);
+      context.execute(err, this::fail);
+      promise.fail(err);
     }
+
+    return promise.future();
   }
 
   @Override
@@ -291,13 +292,13 @@ public class RedisStandaloneConnection implements RedisConnectionInternal, Parse
           // if the write fails, this connection enters an unknown state
           // which means it should be terminated
           .onFailure(this::fail);
-
-        return promise.future();
       } catch (RuntimeException err) {
         // is the socket in a broken state?
-        fail(err);
-        return Future.failedFuture(err);
+        context.execute(err, this::fail);
+        promise.fail(err);
       }
+
+      return promise.future();
     }
   }
 
@@ -310,6 +311,15 @@ public class RedisStandaloneConnection implements RedisConnectionInternal, Parse
       empty = waiting.isEmpty();
       if (!empty) {
         req = waiting.poll();
+        // the client promises are generated internally and can be processed in 2 cases:
+        // 1. here when a message comes from the server
+        // 2. on a failure and the clean up task resolves all promises as a failure
+        if (req instanceof PromiseInternal) {
+          if (((PromiseInternal<?>) req).isComplete()) {
+            // this promise is already complete
+            return;
+          }
+        }
       } else {
         req = null;
       }
@@ -430,12 +440,16 @@ public class RedisStandaloneConnection implements RedisConnectionInternal, Parse
     Promise<Response> req;
     synchronized (waiting) {
       while ((req = waiting.poll()) != null) {
-        if (t != null) {
-          try {
-            req.tryFail(t);
-          } catch (RuntimeException err) {
-            LOG.warn("Exception while running cleanup", err);
+        if (req instanceof PromiseInternal) {
+          if (((PromiseInternal<?>) req).isComplete()) {
+            // skip if already resolved
+            continue;
           }
+        }
+        try {
+          req.tryFail(t);
+        } catch (RuntimeException err) {
+          LOG.warn("Exception while running cleanup", err);
         }
       }
     }
