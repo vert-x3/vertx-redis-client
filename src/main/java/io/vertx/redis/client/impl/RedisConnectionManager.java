@@ -43,7 +43,9 @@ class RedisConnectionManager {
 
   private static final Logger LOG = LoggerFactory.getLogger(RedisConnectionManager.class);
 
-  private static final Handler<Throwable> DEFAULT_EXCEPTION_HANDLER = t -> LOG.error("Unhandled Error", t);
+  private static final Handler<Throwable> DEFAULT_EXCEPTION_HANDLER = t -> {
+    LOG.error("Unhandled Error", t);
+  };
 
   private final VertxInternal vertx;
   private final ContextInternal context;

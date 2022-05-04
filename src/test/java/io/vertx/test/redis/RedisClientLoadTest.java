@@ -43,6 +43,46 @@ public class RedisClientLoadTest {
   public final RunTestOnContext rule = new RunTestOnContext();
 
   @Test
+  public void testStatePooled(TestContext should) {
+    final Async test = should.async();
+
+    Redis redis = Redis.createClient(rule.vertx(), new RedisOptions()
+      .setMaxPoolWaiting(1)
+      .setConnectionString("redis://" + redisServer.getContainerIpAddress() + ":" + redisServer.getFirstMappedPort()));
+    // acquire connection and close
+    redis.connect()
+      .onSuccess(conn -> {
+        conn.close()
+          .onFailure(should::fail)
+          .onSuccess(ok -> test.complete());
+      })
+      .onFailure(should::fail);
+
+  }
+
+  @Test
+  public void testStateExpired(TestContext should) {
+    final Async test = should.async();
+
+    Redis redis = Redis.createClient(rule.vertx(), new RedisOptions()
+      .setMaxPoolWaiting(1)
+      .setPoolRecycleTimeout(1)
+      .setConnectionString("redis://" + redisServer.getContainerIpAddress() + ":" + redisServer.getFirstMappedPort()));
+    // acquire connection and close
+    redis.connect()
+      .onSuccess(conn -> {
+        rule.vertx()
+            .setTimer(5L, v -> {
+              conn.close()
+                .onFailure(should::fail)
+                .onSuccess(ok -> test.complete());
+            });
+      })
+      .onFailure(should::fail);
+
+  }
+
+  @Test
   @Repeat(10)
   public void test1(TestContext should) {
     final Async test = should.async();
@@ -58,15 +98,15 @@ public class RedisClientLoadTest {
         public void start() throws Exception {
           Redis redis = Redis.createClient(rule.vertx(), REDIS_OPTIONS);
           this.vertx.eventBus().consumer("test.redis.load").handler(m -> {
-            redis.send(Request.cmd(Command.SET).arg("foo").arg("bar")).onComplete(res ->{
-              if(res.failed()) {
+            redis.send(Request.cmd(Command.SET).arg("foo").arg("bar")).onComplete(res -> {
+              if (res.failed()) {
                 //System.err.println(res.cause().getMessage());
                 countOfErrors.incrementAndGet();
               } else {
                 countOfSuccess.incrementAndGet();
               }
 
-              if(countOfErrors.get() + countOfSuccess.get() >= iterations * instances) {
+              if (countOfErrors.get() + countOfSuccess.get() >= iterations * instances) {
                 System.out.println("!!!DONE");
                 donePromise.complete();
               }
@@ -89,7 +129,7 @@ public class RedisClientLoadTest {
         should.assertTrue(countOfErrors.get() == 0, "Count of errors: " + countOfErrors.get());
         // then this triggers a re-run of the promise resolver which is not valid anymore
         test.complete();
-    });
+      });
   }
 
   @Test
@@ -109,15 +149,15 @@ public class RedisClientLoadTest {
           Redis redis = Redis.createClient(rule.vertx(), new RedisOptions().setMaxPoolWaiting(1000).setConnectionString("redis://" + redisServer.getContainerIpAddress() + ":" + redisServer.getFirstMappedPort()));
           this.vertx.eventBus().consumer("test.redis.load").handler(m -> {
             redis.connect().compose(r -> r.send(Request.cmd(Command.SET).arg("foo").arg("bar")).onComplete(res -> r.close()))
-              .onComplete(res ->{
-                if(res.failed()) {
+              .onComplete(res -> {
+                if (res.failed()) {
                   //System.err.println(res.cause().getMessage());
                   countOfErrors.incrementAndGet();
                 } else {
                   countOfSuccess.incrementAndGet();
                 }
 
-                if(countOfErrors.get() + countOfSuccess.get() >= iterations * instances) {
+                if (countOfErrors.get() + countOfSuccess.get() >= iterations * instances) {
                   System.out.println("!!!DONE");
                   donePromise.complete();
                 }
@@ -132,7 +172,7 @@ public class RedisClientLoadTest {
       });
 
     donePromise.future().onComplete(res -> {
-      if(countOfErrors.get() > 0) {
+      if (countOfErrors.get() > 0) {
         should.fail("count of errors:" + countOfErrors.get());
       }
       test.complete();
@@ -157,7 +197,7 @@ public class RedisClientLoadTest {
             connectionsInProcess.incrementAndGet();
             redis.connect()
               .compose(r -> {
-                if(r.pendingQueueFull()) {
+                if (r.pendingQueueFull()) {
                   System.out.println("!!! pendingQueueFull");
                 }
 
@@ -166,15 +206,15 @@ public class RedisClientLoadTest {
                 return Future.succeededFuture(r);
               })
               .compose(r -> r.send(Request.cmd(Command.SET).arg("foo").arg("bar")).onComplete(res -> r.close()))
-              .onComplete(res ->{
-                if(res.failed()) {
+              .onComplete(res -> {
+                if (res.failed()) {
                   //System.err.println(res.cause().getMessage());
                   countOfErrors.incrementAndGet();
                 } else {
                   countOfSuccess.incrementAndGet();
                 }
 
-                if(countOfErrors.get() + countOfSuccess.get() >= iterations * instances) {
+                if (countOfErrors.get() + countOfSuccess.get() >= iterations * instances) {
                   System.out.println("!!!DONE");
                   donePromise.complete();
                 }
@@ -190,7 +230,7 @@ public class RedisClientLoadTest {
 
     donePromise.future().onComplete(res -> {
 
-      if(countOfErrors.get() > 0) {
+      if (countOfErrors.get() > 0) {
         should.fail("count of errors:" + countOfErrors.get());
       }
       test.complete();

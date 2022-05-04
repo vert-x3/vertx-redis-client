@@ -48,10 +48,11 @@ public class RedisStandaloneConnection implements RedisConnectionInternal, Parse
   private Handler<Void> onEnd;
   private Handler<Response> onMessage;
   private Runnable onEvict;
-  private final AtomicBoolean isValid = new AtomicBoolean(false);
-  private final AtomicBoolean tainted = new AtomicBoolean(true);
+  private boolean closed = false;
+  private boolean tainted = false;
 
   public RedisStandaloneConnection(VertxInternal vertx, ContextInternal context, PoolConnector.Listener connectionListener, NetSocket netSocket, RedisOptions options) {
+    //System.out.println("<ctor>#" + this.hashCode());
     this.vertx = vertx;
     this.context = context;
     this.listener = connectionListener;
@@ -61,44 +62,45 @@ public class RedisStandaloneConnection implements RedisConnectionInternal, Parse
     this.expiresAt = options.getPoolRecycleTimeout() == -1 ? -1 : System.currentTimeMillis() + options.getPoolRecycleTimeout();
   }
 
-  void setValid() {
-    assert !isValid.get();
-
-    isValid.set(true);
+  synchronized void setValid() {
+    //System.out.println("setValid()#" + this.hashCode());
+    closed = false;
     // tainted will be reset, as a select during the handshake could have
     // changed the state
-    tainted.set(false);
+    tainted = false;
   }
 
   @Override
   public void forceClose() {
-    evict();
-    synchronized (this) {
-      tainted.set(true);
-    }
+    //System.out.println("forceClose()#" + this.hashCode());
+    // The socket will call the endHandler which in turn will flip the closed flag
     netSocket.close();
   }
 
   @Override
   public boolean isValid() {
-    return isValid.get() && (expiresAt <= 0 || System.currentTimeMillis() < expiresAt);
+    //System.out.println("isValid()#" + this.hashCode());
+    return !closed && (expiresAt <= 0 || System.currentTimeMillis() < expiresAt);
   }
 
   @Override
   public Future<Void> close() {
-    isValid.set(false);
-    tainted.set(true);
-
+    //System.out.println("close()#" + this.hashCode());
     if (listener == null) {
-      // no pool is being used
+      // no pool is being used. The socket will call the endHandler which in turn will flip the closed flag
       return netSocket.close();
     } else {
+      // Pooled mode, we don't really close the socket, just mark the connection as closed.
+      synchronized (this) {
+        closed = true;
+      }
       return Future.succeededFuture();
     }
   }
 
   @Override
   public boolean pendingQueueFull() {
+    //System.out.println("pendingQueueFull()#" + this.hashCode());
     synchronized (waiting) {
       return waiting.isFull();
     }
@@ -106,42 +108,49 @@ public class RedisStandaloneConnection implements RedisConnectionInternal, Parse
 
   @Override
   public RedisConnection exceptionHandler(Handler<Throwable> handler) {
+    //System.out.println("exceptionHandler()#" + this.hashCode());
     this.onException = handler;
     return this;
   }
 
   @Override
   public RedisConnection endHandler(Handler<Void> handler) {
+    //System.out.println("endHandler()#" + this.hashCode());
     this.onEnd = handler;
     return this;
   }
 
   RedisConnection evictHandler(Runnable handler) {
+    //System.out.println("evictHandler()#" + this.hashCode());
     this.onEvict = handler;
     return this;
   }
 
   @Override
   public RedisConnection handler(Handler<Response> handler) {
+    //System.out.println("handler()#" + this.hashCode());
     this.onMessage = handler;
     return this;
   }
 
   @Override
   public RedisConnection pause() {
+    //System.out.println("pause()#" + this.hashCode());
     netSocket.pause();
     return this;
   }
 
   @Override
   public RedisConnection resume() {
+    //System.out.println("resume()#" + this.hashCode());
     netSocket.resume();
     return this;
   }
 
   @Override
   public RedisConnection fetch(long size) {
-    // no-op
+    //System.out.println("fetch()#" + this.hashCode());
+    netSocket.fetch(size);
     return this;
   }
 
@@ -153,19 +162,25 @@ public class RedisStandaloneConnection implements RedisConnectionInternal, Parse
    * This is only relevant for pooled connections
    */
   private void taintCheck(Command cmd) {
+    //System.out.println("taintCheck()#" + this.hashCode());
     if (listener != null) {
       if (cmd.isPubSub() || Command.SELECT.equals(cmd) || Command.AUTH.equals(cmd)) {
-        tainted.compareAndSet(false, true);
+        tainted = true;
       }
     }
   }
 
   @Override
   public Future<Response> send(final Request request) {
+    //System.out.println("send()#" + this.hashCode());
     final Promise<Response> promise;
 
+    if (closed) {
+      throw new IllegalStateException("Connection is closed");
+    }
+
     // tag this connection as tainted if needed
-    taintCheck(request.command());
+    context.execute(request.command(), this::taintCheck);
 
     final boolean voidCmd = request.command().isPubSub();
     // encode the message to a buffer
@@ -216,6 +231,12 @@ public class RedisStandaloneConnection implements RedisConnectionInternal, Parse
 
   @Override
   public Future<List<Response>> batch(List<Request> commands) {
+    //System.out.println("batch()#" + this.hashCode());
+
+    if (closed) {
+      throw new IllegalStateException("Connection is closed");
+    }
+
     if (commands.isEmpty()) {
       LOG.debug("Empty batch");
       return Future.succeededFuture(Collections.emptyList());
@@ -304,6 +325,7 @@ public class RedisStandaloneConnection implements RedisConnectionInternal, Parse
 
   @Override
   public void handle(Response reply) {
+    //System.out.println("handle()#" + this.hashCode());
     final boolean empty;
     final Promise<Response> req;
 
@@ -311,15 +333,6 @@ public class RedisStandaloneConnection implements RedisConnectionInternal, Parse
       empty = waiting.isEmpty();
       if (!empty) {
         req = waiting.poll();
-        // the client promises are generated internally and can be processed in 2 cases:
-        // 1. here when a message comes from the server
-        // 2. on a failure and the clean up task resolves all promises as a failure
-        if (req instanceof PromiseInternal) {
-          if (((PromiseInternal<?>) req).isComplete()) {
-            // this promise is already complete
-            return;
-          }
-        }
       } else {
         req = null;
       }
@@ -390,7 +403,10 @@ public class RedisStandaloneConnection implements RedisConnectionInternal, Parse
     }
   }
 
-  public void end(Void v) {
+  public synchronized void end(Void v) {
+    //System.out.println("end()#" + this.hashCode());
+    assert !closed;
+    closed = true;
     // evict this connection from the pool
     evict();
     // clean up the pending queue
@@ -402,7 +418,10 @@ public class RedisStandaloneConnection implements RedisConnectionInternal, Parse
   }
 
   @Override
-  public void fail(Throwable t) {
+  public synchronized void fail(Throwable t) {
+    //System.out.println("fail()#" + this.hashCode());
+    assert !closed;
+    closed = true;
     // evict this connection from the pool
     evict();
     // if there are still "on going" requests
@@ -416,8 +435,14 @@ public class RedisStandaloneConnection implements RedisConnectionInternal, Parse
   }
 
   @Override
-  public boolean reset() {
-    if (tainted.get()) {
+  public synchronized boolean reset() {
+    //System.out.println("reset()#" + this.hashCode());
+    // cannot reset if connection is already closed
+    if (closed) {
+      return false;
+    }
+    // cannot reset if connection is tainted (custom DB/AUTH/PUBSUB)
+    if (tainted) {
       evict();
       return false;
     }
@@ -425,18 +450,18 @@ public class RedisStandaloneConnection implements RedisConnectionInternal, Parse
   }
 
   private void evict() {
-    if (isValid.compareAndSet(true, false)) {
-      // evict this connection from the pool
-      if (listener != null) {
-        listener.onRemove();
-      }
-      if (onEvict != null) {
-        onEvict.run();
-      }
+    //System.out.println("evict()#" + this.hashCode());
+    // evict this connection from the pool
+    if (listener != null) {
+      listener.onRemove();
+    }
+    if (onEvict != null) {
+      onEvict.run();
     }
   }
 
-  private void cleanupQueue(Throwable t) {
+  private synchronized void cleanupQueue(Throwable t) {
+    //System.out.println("cleanupQueue()#" + this.hashCode());
     Promise<Response> req;
     synchronized (waiting) {
       while ((req = waiting.poll()) != null) {
