@@ -30,7 +30,7 @@ import static io.vertx.codegen.annotations.GenIgnore.PERMITTED_TYPE;
 
 /**
  * <b>Auto generated</b> Redis API client wrapper.
- * @version redis_version:6.2.4
+ * @version redis_version:7.0.0
  */
 @VertxGen
 public interface RedisAPI {
@@ -252,6 +252,23 @@ public interface RedisAPI {
     return send(Command.BLMOVE, arg0, arg1, arg2, arg3, arg4);
   }
   /**
+   * Redis command <a href="https://redis.io/commands/blmpop">blmpop</a>.
+   * @return fluent self
+   */
+  @Fluent
+  default RedisAPI blmpop(List<String> args, Handler<AsyncResult<@Nullable Response>> handler) {
+    send(Command.BLMPOP, args.toArray(new String[0])).onComplete(handler);
+    return this;
+  }
+
+  /**
+   * Redis command <a href="https://redis.io/commands/blmpop">blmpop</a>.
+   * @return Future response.
+   */
+  default Future<@Nullable Response> blmpop(List<String> args) {
+    return send(Command.BLMPOP, args.toArray(new String[0]));
+  }
+  /**
    * Redis command <a href="https://redis.io/commands/blpop">blpop</a>.
    * @return fluent self
    */
@@ -301,6 +318,23 @@ public interface RedisAPI {
    */
   default Future<@Nullable Response> brpoplpush(String arg0, String arg1, String arg2) {
     return send(Command.BRPOPLPUSH, arg0, arg1, arg2);
+  }
+  /**
+   * Redis command <a href="https://redis.io/commands/bzmpop">bzmpop</a>.
+   * @return fluent self
+   */
+  @Fluent
+  default RedisAPI bzmpop(List<String> args, Handler<AsyncResult<@Nullable Response>> handler) {
+    send(Command.BZMPOP, args.toArray(new String[0])).onComplete(handler);
+    return this;
+  }
+
+  /**
+   * Redis command <a href="https://redis.io/commands/bzmpop">bzmpop</a>.
+   * @return Future response.
+   */
+  default Future<@Nullable Response> bzmpop(List<String> args) {
+    return send(Command.BZMPOP, args.toArray(new String[0]));
   }
   /**
    * Redis command <a href="https://redis.io/commands/bzpopmax">bzpopmax</a>.
@@ -575,6 +609,23 @@ public interface RedisAPI {
     return send(Command.EVAL, args.toArray(new String[0]));
   }
   /**
+   * Redis command <a href="https://redis.io/commands/eval_ro">evalRo</a>.
+   * @return fluent self
+   */
+  @Fluent
+  default RedisAPI evalRo(List<String> args, Handler<AsyncResult<@Nullable Response>> handler) {
+    send(Command.EVAL_RO, args.toArray(new String[0])).onComplete(handler);
+    return this;
+  }
+
+  /**
+   * Redis command <a href="https://redis.io/commands/eval_ro">evalRo</a>.
+   * @return Future response.
+   */
+  default Future<@Nullable Response> evalRo(List<String> args) {
+    return send(Command.EVAL_RO, args.toArray(new String[0]));
+  }
+  /**
    * Redis command <a href="https://redis.io/commands/evalsha">evalsha</a>.
    * @return fluent self
    */
@@ -590,6 +641,23 @@ public interface RedisAPI {
    */
   default Future<@Nullable Response> evalsha(List<String> args) {
     return send(Command.EVALSHA, args.toArray(new String[0]));
+  }
+  /**
+   * Redis command <a href="https://redis.io/commands/evalsha_ro">evalshaRo</a>.
+   * @return fluent self
+   */
+  @Fluent
+  default RedisAPI evalshaRo(List<String> args, Handler<AsyncResult<@Nullable Response>> handler) {
+    send(Command.EVALSHA_RO, args.toArray(new String[0])).onComplete(handler);
+    return this;
+  }
+
+  /**
+   * Redis command <a href="https://redis.io/commands/evalsha_ro">evalshaRo</a>.
+   * @return Future response.
+   */
+  default Future<@Nullable Response> evalshaRo(List<String> args) {
+    return send(Command.EVALSHA_RO, args.toArray(new String[0]));
   }
   /**
    * Redis command <a href="https://redis.io/commands/exec">exec</a>.
@@ -630,8 +698,8 @@ public interface RedisAPI {
    * @return fluent self
    */
   @Fluent
-  default RedisAPI expire(String arg0, String arg1, Handler<AsyncResult<@Nullable Response>> handler) {
-    send(Command.EXPIRE, arg0, arg1).onComplete(handler);
+  default RedisAPI expire(List<String> args, Handler<AsyncResult<@Nullable Response>> handler) {
+    send(Command.EXPIRE, args.toArray(new String[0])).onComplete(handler);
     return this;
   }
 
@@ -639,16 +707,16 @@ public interface RedisAPI {
    * Redis command <a href="https://redis.io/commands/expire">expire</a>.
    * @return Future response.
    */
-  default Future<@Nullable Response> expire(String arg0, String arg1) {
-    return send(Command.EXPIRE, arg0, arg1);
+  default Future<@Nullable Response> expire(List<String> args) {
+    return send(Command.EXPIRE, args.toArray(new String[0]));
   }
   /**
    * Redis command <a href="https://redis.io/commands/expireat">expireat</a>.
    * @return fluent self
    */
   @Fluent
-  default RedisAPI expireat(String arg0, String arg1, Handler<AsyncResult<@Nullable Response>> handler) {
-    send(Command.EXPIREAT, arg0, arg1).onComplete(handler);
+  default RedisAPI expireat(List<String> args, Handler<AsyncResult<@Nullable Response>> handler) {
+    send(Command.EXPIREAT, args.toArray(new String[0])).onComplete(handler);
     return this;
   }
 
@@ -656,8 +724,25 @@ public interface RedisAPI {
    * Redis command <a href="https://redis.io/commands/expireat">expireat</a>.
    * @return Future response.
    */
-  default Future<@Nullable Response> expireat(String arg0, String arg1) {
-    return send(Command.EXPIREAT, arg0, arg1);
+  default Future<@Nullable Response> expireat(List<String> args) {
+    return send(Command.EXPIREAT, args.toArray(new String[0]));
+  }
+  /**
+   * Redis command <a href="https://redis.io/commands/expiretime">expiretime</a>.
+   * @return fluent self
+   */
+  @Fluent
+  default RedisAPI expiretime(String arg0, Handler<AsyncResult<@Nullable Response>> handler) {
+    send(Command.EXPIRETIME, arg0).onComplete(handler);
+    return this;
+  }
+
+  /**
+   * Redis command <a href="https://redis.io/commands/expiretime">expiretime</a>.
+   * @return Future response.
+   */
+  default Future<@Nullable Response> expiretime(String arg0) {
+    return send(Command.EXPIRETIME, arg0);
   }
   /**
    * Redis command <a href="https://redis.io/commands/failover">failover</a>.
@@ -675,6 +760,40 @@ public interface RedisAPI {
    */
   default Future<@Nullable Response> failover(List<String> args) {
     return send(Command.FAILOVER, args.toArray(new String[0]));
+  }
+  /**
+   * Redis command <a href="https://redis.io/commands/fcall">fcall</a>.
+   * @return fluent self
+   */
+  @Fluent
+  default RedisAPI fcall(List<String> args, Handler<AsyncResult<@Nullable Response>> handler) {
+    send(Command.FCALL, args.toArray(new String[0])).onComplete(handler);
+    return this;
+  }
+
+  /**
+   * Redis command <a href="https://redis.io/commands/fcall">fcall</a>.
+   * @return Future response.
+   */
+  default Future<@Nullable Response> fcall(List<String> args) {
+    return send(Command.FCALL, args.toArray(new String[0]));
+  }
+  /**
+   * Redis command <a href="https://redis.io/commands/fcall_ro">fcallRo</a>.
+   * @return fluent self
+   */
+  @Fluent
+  default RedisAPI fcallRo(List<String> args, Handler<AsyncResult<@Nullable Response>> handler) {
+    send(Command.FCALL_RO, args.toArray(new String[0])).onComplete(handler);
+    return this;
+  }
+
+  /**
+   * Redis command <a href="https://redis.io/commands/fcall_ro">fcallRo</a>.
+   * @return Future response.
+   */
+  default Future<@Nullable Response> fcallRo(List<String> args) {
+    return send(Command.FCALL_RO, args.toArray(new String[0]));
   }
   /**
    * Redis command <a href="https://redis.io/commands/flushall">flushall</a>.
@@ -709,6 +828,23 @@ public interface RedisAPI {
    */
   default Future<@Nullable Response> flushdb(List<String> args) {
     return send(Command.FLUSHDB, args.toArray(new String[0]));
+  }
+  /**
+   * Redis command <a href="https://redis.io/commands/function">function</a>.
+   * @return fluent self
+   */
+  @Fluent
+  default RedisAPI function(List<String> args, Handler<AsyncResult<@Nullable Response>> handler) {
+    send(Command.FUNCTION, args.toArray(new String[0])).onComplete(handler);
+    return this;
+  }
+
+  /**
+   * Redis command <a href="https://redis.io/commands/function">function</a>.
+   * @return Future response.
+   */
+  default Future<@Nullable Response> function(List<String> args) {
+    return send(Command.FUNCTION, args.toArray(new String[0]));
   }
   /**
    * Redis command <a href="https://redis.io/commands/geoadd">geoadd</a>.
@@ -1170,23 +1306,6 @@ public interface RedisAPI {
     return send(Command.HMSET, args.toArray(new String[0]));
   }
   /**
-   * Redis command <a href="https://redis.io/commands/host:">host</a>.
-   * @return fluent self
-   */
-  @Fluent
-  default RedisAPI host(List<String> args, Handler<AsyncResult<@Nullable Response>> handler) {
-    send(Command.HOST, args.toArray(new String[0])).onComplete(handler);
-    return this;
-  }
-
-  /**
-   * Redis command <a href="https://redis.io/commands/host:">host</a>.
-   * @return Future response.
-   */
-  default Future<@Nullable Response> host(List<String> args) {
-    return send(Command.HOST, args.toArray(new String[0]));
-  }
-  /**
    * Redis command <a href="https://redis.io/commands/hrandfield">hrandfield</a>.
    * @return fluent self
    */
@@ -1408,6 +1527,23 @@ public interface RedisAPI {
     return send(Command.LATENCY, args.toArray(new String[0]));
   }
   /**
+   * Redis command <a href="https://redis.io/commands/lcs">lcs</a>.
+   * @return fluent self
+   */
+  @Fluent
+  default RedisAPI lcs(List<String> args, Handler<AsyncResult<@Nullable Response>> handler) {
+    send(Command.LCS, args.toArray(new String[0])).onComplete(handler);
+    return this;
+  }
+
+  /**
+   * Redis command <a href="https://redis.io/commands/lcs">lcs</a>.
+   * @return Future response.
+   */
+  default Future<@Nullable Response> lcs(List<String> args) {
+    return send(Command.LCS, args.toArray(new String[0]));
+  }
+  /**
    * Redis command <a href="https://redis.io/commands/lindex">lindex</a>.
    * @return fluent self
    */
@@ -1474,6 +1610,23 @@ public interface RedisAPI {
    */
   default Future<@Nullable Response> lmove(String arg0, String arg1, String arg2, String arg3) {
     return send(Command.LMOVE, arg0, arg1, arg2, arg3);
+  }
+  /**
+   * Redis command <a href="https://redis.io/commands/lmpop">lmpop</a>.
+   * @return fluent self
+   */
+  @Fluent
+  default RedisAPI lmpop(List<String> args, Handler<AsyncResult<@Nullable Response>> handler) {
+    send(Command.LMPOP, args.toArray(new String[0])).onComplete(handler);
+    return this;
+  }
+
+  /**
+   * Redis command <a href="https://redis.io/commands/lmpop">lmpop</a>.
+   * @return Future response.
+   */
+  default Future<@Nullable Response> lmpop(List<String> args) {
+    return send(Command.LMPOP, args.toArray(new String[0]));
   }
   /**
    * Redis command <a href="https://redis.io/commands/lolwut">lolwut</a>.
@@ -1820,8 +1973,8 @@ public interface RedisAPI {
    * @return fluent self
    */
   @Fluent
-  default RedisAPI pexpire(String arg0, String arg1, Handler<AsyncResult<@Nullable Response>> handler) {
-    send(Command.PEXPIRE, arg0, arg1).onComplete(handler);
+  default RedisAPI pexpire(List<String> args, Handler<AsyncResult<@Nullable Response>> handler) {
+    send(Command.PEXPIRE, args.toArray(new String[0])).onComplete(handler);
     return this;
   }
 
@@ -1829,16 +1982,16 @@ public interface RedisAPI {
    * Redis command <a href="https://redis.io/commands/pexpire">pexpire</a>.
    * @return Future response.
    */
-  default Future<@Nullable Response> pexpire(String arg0, String arg1) {
-    return send(Command.PEXPIRE, arg0, arg1);
+  default Future<@Nullable Response> pexpire(List<String> args) {
+    return send(Command.PEXPIRE, args.toArray(new String[0]));
   }
   /**
    * Redis command <a href="https://redis.io/commands/pexpireat">pexpireat</a>.
    * @return fluent self
    */
   @Fluent
-  default RedisAPI pexpireat(String arg0, String arg1, Handler<AsyncResult<@Nullable Response>> handler) {
-    send(Command.PEXPIREAT, arg0, arg1).onComplete(handler);
+  default RedisAPI pexpireat(List<String> args, Handler<AsyncResult<@Nullable Response>> handler) {
+    send(Command.PEXPIREAT, args.toArray(new String[0])).onComplete(handler);
     return this;
   }
 
@@ -1846,8 +1999,25 @@ public interface RedisAPI {
    * Redis command <a href="https://redis.io/commands/pexpireat">pexpireat</a>.
    * @return Future response.
    */
-  default Future<@Nullable Response> pexpireat(String arg0, String arg1) {
-    return send(Command.PEXPIREAT, arg0, arg1);
+  default Future<@Nullable Response> pexpireat(List<String> args) {
+    return send(Command.PEXPIREAT, args.toArray(new String[0]));
+  }
+  /**
+   * Redis command <a href="https://redis.io/commands/pexpiretime">pexpiretime</a>.
+   * @return fluent self
+   */
+  @Fluent
+  default RedisAPI pexpiretime(String arg0, Handler<AsyncResult<@Nullable Response>> handler) {
+    send(Command.PEXPIRETIME, arg0).onComplete(handler);
+    return this;
+  }
+
+  /**
+   * Redis command <a href="https://redis.io/commands/pexpiretime">pexpiretime</a>.
+   * @return Future response.
+   */
+  default Future<@Nullable Response> pexpiretime(String arg0) {
+    return send(Command.PEXPIRETIME, arg0);
   }
   /**
    * Redis command <a href="https://redis.io/commands/pfadd">pfadd</a>.
@@ -1950,23 +2120,6 @@ public interface RedisAPI {
    */
   default Future<@Nullable Response> ping(List<String> args) {
     return send(Command.PING, args.toArray(new String[0]));
-  }
-  /**
-   * Redis command <a href="https://redis.io/commands/post">post</a>.
-   * @return fluent self
-   */
-  @Fluent
-  default RedisAPI post(List<String> args, Handler<AsyncResult<@Nullable Response>> handler) {
-    send(Command.POST, args.toArray(new String[0])).onComplete(handler);
-    return this;
-  }
-
-  /**
-   * Redis command <a href="https://redis.io/commands/post">post</a>.
-   * @return Future response.
-   */
-  default Future<@Nullable Response> post(List<String> args) {
-    return send(Command.POST, args.toArray(new String[0]));
   }
   /**
    * Redis command <a href="https://redis.io/commands/psetex">psetex</a>.
@@ -2086,6 +2239,23 @@ public interface RedisAPI {
    */
   default Future<@Nullable Response> punsubscribe(List<String> args) {
     return send(Command.PUNSUBSCRIBE, args.toArray(new String[0]));
+  }
+  /**
+   * Redis command <a href="https://redis.io/commands/quit">quit</a>.
+   * @return fluent self
+   */
+  @Fluent
+  default RedisAPI quit(List<String> args, Handler<AsyncResult<@Nullable Response>> handler) {
+    send(Command.QUIT, args.toArray(new String[0])).onComplete(handler);
+    return this;
+  }
+
+  /**
+   * Redis command <a href="https://redis.io/commands/quit">quit</a>.
+   * @return Future response.
+   */
+  default Future<@Nullable Response> quit(List<String> args) {
+    return send(Command.QUIT, args.toArray(new String[0]));
   }
   /**
    * Redis command <a href="https://redis.io/commands/randomkey">randomkey</a>.
@@ -2598,6 +2768,23 @@ public interface RedisAPI {
     return send(Command.SINTER, args.toArray(new String[0]));
   }
   /**
+   * Redis command <a href="https://redis.io/commands/sintercard">sintercard</a>.
+   * @return fluent self
+   */
+  @Fluent
+  default RedisAPI sintercard(List<String> args, Handler<AsyncResult<@Nullable Response>> handler) {
+    send(Command.SINTERCARD, args.toArray(new String[0])).onComplete(handler);
+    return this;
+  }
+
+  /**
+   * Redis command <a href="https://redis.io/commands/sintercard">sintercard</a>.
+   * @return Future response.
+   */
+  default Future<@Nullable Response> sintercard(List<String> args) {
+    return send(Command.SINTERCARD, args.toArray(new String[0]));
+  }
+  /**
    * Redis command <a href="https://redis.io/commands/sinterstore">sinterstore</a>.
    * @return fluent self
    */
@@ -2734,6 +2921,23 @@ public interface RedisAPI {
     return send(Command.SORT, args.toArray(new String[0]));
   }
   /**
+   * Redis command <a href="https://redis.io/commands/sort_ro">sortRo</a>.
+   * @return fluent self
+   */
+  @Fluent
+  default RedisAPI sortRo(List<String> args, Handler<AsyncResult<@Nullable Response>> handler) {
+    send(Command.SORT_RO, args.toArray(new String[0])).onComplete(handler);
+    return this;
+  }
+
+  /**
+   * Redis command <a href="https://redis.io/commands/sort_ro">sortRo</a>.
+   * @return Future response.
+   */
+  default Future<@Nullable Response> sortRo(List<String> args) {
+    return send(Command.SORT_RO, args.toArray(new String[0]));
+  }
+  /**
    * Redis command <a href="https://redis.io/commands/spop">spop</a>.
    * @return fluent self
    */
@@ -2749,6 +2953,23 @@ public interface RedisAPI {
    */
   default Future<@Nullable Response> spop(List<String> args) {
     return send(Command.SPOP, args.toArray(new String[0]));
+  }
+  /**
+   * Redis command <a href="https://redis.io/commands/spublish">spublish</a>.
+   * @return fluent self
+   */
+  @Fluent
+  default RedisAPI spublish(String arg0, String arg1, Handler<AsyncResult<@Nullable Response>> handler) {
+    send(Command.SPUBLISH, arg0, arg1).onComplete(handler);
+    return this;
+  }
+
+  /**
+   * Redis command <a href="https://redis.io/commands/spublish">spublish</a>.
+   * @return Future response.
+   */
+  default Future<@Nullable Response> spublish(String arg0, String arg1) {
+    return send(Command.SPUBLISH, arg0, arg1);
   }
   /**
    * Redis command <a href="https://redis.io/commands/srandmember">srandmember</a>.
@@ -2802,21 +3023,21 @@ public interface RedisAPI {
     return send(Command.SSCAN, args.toArray(new String[0]));
   }
   /**
-   * Redis command <a href="https://redis.io/commands/stralgo">stralgo</a>.
+   * Redis command <a href="https://redis.io/commands/ssubscribe">ssubscribe</a>.
    * @return fluent self
    */
   @Fluent
-  default RedisAPI stralgo(List<String> args, Handler<AsyncResult<@Nullable Response>> handler) {
-    send(Command.STRALGO, args.toArray(new String[0])).onComplete(handler);
+  default RedisAPI ssubscribe(List<String> args, Handler<AsyncResult<@Nullable Response>> handler) {
+    send(Command.SSUBSCRIBE, args.toArray(new String[0])).onComplete(handler);
     return this;
   }
 
   /**
-   * Redis command <a href="https://redis.io/commands/stralgo">stralgo</a>.
+   * Redis command <a href="https://redis.io/commands/ssubscribe">ssubscribe</a>.
    * @return Future response.
    */
-  default Future<@Nullable Response> stralgo(List<String> args) {
-    return send(Command.STRALGO, args.toArray(new String[0]));
+  default Future<@Nullable Response> ssubscribe(List<String> args) {
+    return send(Command.SSUBSCRIBE, args.toArray(new String[0]));
   }
   /**
    * Redis command <a href="https://redis.io/commands/strlen">strlen</a>.
@@ -2902,6 +3123,23 @@ public interface RedisAPI {
    */
   default Future<@Nullable Response> sunionstore(List<String> args) {
     return send(Command.SUNIONSTORE, args.toArray(new String[0]));
+  }
+  /**
+   * Redis command <a href="https://redis.io/commands/sunsubscribe">sunsubscribe</a>.
+   * @return fluent self
+   */
+  @Fluent
+  default RedisAPI sunsubscribe(List<String> args, Handler<AsyncResult<@Nullable Response>> handler) {
+    send(Command.SUNSUBSCRIBE, args.toArray(new String[0])).onComplete(handler);
+    return this;
+  }
+
+  /**
+   * Redis command <a href="https://redis.io/commands/sunsubscribe">sunsubscribe</a>.
+   * @return Future response.
+   */
+  default Future<@Nullable Response> sunsubscribe(List<String> args) {
+    return send(Command.SUNSUBSCRIBE, args.toArray(new String[0]));
   }
   /**
    * Redis command <a href="https://redis.io/commands/swapdb">swapdb</a>.
@@ -3316,8 +3554,8 @@ public interface RedisAPI {
    * @return fluent self
    */
   @Fluent
-  default RedisAPI xsetid(String arg0, String arg1, Handler<AsyncResult<@Nullable Response>> handler) {
-    send(Command.XSETID, arg0, arg1).onComplete(handler);
+  default RedisAPI xsetid(List<String> args, Handler<AsyncResult<@Nullable Response>> handler) {
+    send(Command.XSETID, args.toArray(new String[0])).onComplete(handler);
     return this;
   }
 
@@ -3325,8 +3563,8 @@ public interface RedisAPI {
    * Redis command <a href="https://redis.io/commands/xsetid">xsetid</a>.
    * @return Future response.
    */
-  default Future<@Nullable Response> xsetid(String arg0, String arg1) {
-    return send(Command.XSETID, arg0, arg1);
+  default Future<@Nullable Response> xsetid(List<String> args) {
+    return send(Command.XSETID, args.toArray(new String[0]));
   }
   /**
    * Redis command <a href="https://redis.io/commands/xtrim">xtrim</a>.
@@ -3465,6 +3703,23 @@ public interface RedisAPI {
     return send(Command.ZINTER, args.toArray(new String[0]));
   }
   /**
+   * Redis command <a href="https://redis.io/commands/zintercard">zintercard</a>.
+   * @return fluent self
+   */
+  @Fluent
+  default RedisAPI zintercard(List<String> args, Handler<AsyncResult<@Nullable Response>> handler) {
+    send(Command.ZINTERCARD, args.toArray(new String[0])).onComplete(handler);
+    return this;
+  }
+
+  /**
+   * Redis command <a href="https://redis.io/commands/zintercard">zintercard</a>.
+   * @return Future response.
+   */
+  default Future<@Nullable Response> zintercard(List<String> args) {
+    return send(Command.ZINTERCARD, args.toArray(new String[0]));
+  }
+  /**
    * Redis command <a href="https://redis.io/commands/zinterstore">zinterstore</a>.
    * @return fluent self
    */
@@ -3497,6 +3752,23 @@ public interface RedisAPI {
    */
   default Future<@Nullable Response> zlexcount(String arg0, String arg1, String arg2) {
     return send(Command.ZLEXCOUNT, arg0, arg1, arg2);
+  }
+  /**
+   * Redis command <a href="https://redis.io/commands/zmpop">zmpop</a>.
+   * @return fluent self
+   */
+  @Fluent
+  default RedisAPI zmpop(List<String> args, Handler<AsyncResult<@Nullable Response>> handler) {
+    send(Command.ZMPOP, args.toArray(new String[0])).onComplete(handler);
+    return this;
+  }
+
+  /**
+   * Redis command <a href="https://redis.io/commands/zmpop">zmpop</a>.
+   * @return Future response.
+   */
+  default Future<@Nullable Response> zmpop(List<String> args) {
+    return send(Command.ZMPOP, args.toArray(new String[0]));
   }
   /**
    * Redis command <a href="https://redis.io/commands/zmscore">zmscore</a>.
