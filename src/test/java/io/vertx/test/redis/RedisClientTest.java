@@ -694,7 +694,7 @@ public class RedisClientTest {
 
     redis.set(toList(mykey, "Hello"), reply0 -> {
       should.assertTrue(reply0.succeeded());
-      redis.expire(mykey, "10", reply1 -> {
+      redis.expire(Arrays.asList(mykey, "10"), reply1 -> {
         should.assertTrue(reply1.succeeded());
         should.assertEquals(1L, reply1.result().toLong());
 
@@ -727,7 +727,7 @@ public class RedisClientTest {
         should.assertTrue(reply1.succeeded());
         should.assertEquals(1L, reply1.result().toLong());
 
-        redis.expireat(mykey, "1293840000", reply2 -> {
+        redis.expireat(Arrays.asList(mykey, "1293840000"), reply2 -> {
           should.assertTrue(reply2.succeeded());
           should.assertEquals(1L, reply2.result().toLong());
 
@@ -1720,7 +1720,7 @@ public class RedisClientTest {
     final String mykey = makeKey();
     redis.set(toList(mykey, "Hello"), reply0 -> {
       should.assertTrue(reply0.succeeded());
-      redis.expire(mykey, "10", reply1 -> {
+      redis.expire(Arrays.asList(mykey, "10"), reply1 -> {
         should.assertTrue(reply1.succeeded());
         should.assertEquals(1L, reply1.result().toLong());
         redis.ttl(mykey, reply2 -> {
@@ -1746,7 +1746,7 @@ public class RedisClientTest {
     final String mykey = makeKey();
     redis.set(toList(mykey, "Hello"), reply0 -> {
       should.assertTrue(reply0.succeeded());
-      redis.pexpire(mykey, "1000", reply1 -> {
+      redis.pexpire(Arrays.asList(mykey, "1000"), reply1 -> {
         should.assertTrue(reply1.succeeded());
         should.assertEquals(1L, reply1.result().toLong());
         redis.get(mykey, reply2 -> {
@@ -2727,7 +2727,7 @@ public class RedisClientTest {
     final String mykey = makeKey();
     redis.set(toList(mykey, "Hello"), reply0 -> {
       should.assertTrue(reply0.succeeded());
-      redis.expire(mykey, "10", reply1 -> {
+      redis.expire(Arrays.asList(mykey, "10"), reply1 -> {
         should.assertTrue(reply1.succeeded());
         should.assertEquals(1L, reply1.result().toLong());
         redis.ttl(mykey, reply2 -> {

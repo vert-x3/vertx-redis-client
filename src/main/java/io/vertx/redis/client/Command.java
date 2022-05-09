@@ -181,7 +181,7 @@ public interface Command {
   Command SDIFF = Command.create("sdiff", -2, 1, -1, 1, false, true, false, false);
   Command SDIFFSTORE = Command.create("sdiffstore", -3, 1, -1, 1, true, false, false, false);
   Command SELECT = Command.create("select", 2, 0, 0, 0, false, false, false, false);
-  Command SET = Command.create("set", -3, 1, 1, 1, true, false, true, false);
+  Command SET = Command.create("set", -3, 1, 1, 1, true, false, false, false);
   Command SETBIT = Command.create("setbit", 4, 1, 1, 1, true, false, false, false);
   Command SETEX = Command.create("setex", 4, 1, 1, 1, true, false, false, false);
   Command SETNX = Command.create("setnx", 3, 1, 1, 1, true, false, false, false);
