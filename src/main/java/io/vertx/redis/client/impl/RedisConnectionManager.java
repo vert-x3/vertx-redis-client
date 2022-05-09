@@ -19,7 +19,6 @@ import io.vertx.core.*;
 import io.vertx.core.impl.ContextInternal;
 import io.vertx.core.impl.EventLoopContext;
 import io.vertx.core.impl.VertxInternal;
-import io.vertx.core.impl.future.PromiseInternal;
 import io.vertx.core.impl.logging.Logger;
 import io.vertx.core.impl.logging.LoggerFactory;
 import io.vertx.core.net.NetClient;
@@ -44,9 +43,12 @@ class RedisConnectionManager {
 
   private static final Logger LOG = LoggerFactory.getLogger(RedisConnectionManager.class);
 
-  private static final Handler<Throwable> DEFAULT_EXCEPTION_HANDLER = t -> LOG.error("Unhandled Error", t);
+  private static final Handler<Throwable> DEFAULT_EXCEPTION_HANDLER = t -> {
+    LOG.error("Unhandled Error", t);
+  };
 
   private final VertxInternal vertx;
+  private final ContextInternal context;
   private final NetClient netClient;
   private final PoolMetrics metrics;
 
@@ -56,6 +58,7 @@ class RedisConnectionManager {
 
   RedisConnectionManager(VertxInternal vertx, RedisOptions options) {
     this.vertx = vertx;
+    this.context = vertx.getContext();
     this.options = options;
     VertxMetrics metricsSPI = this.vertx.metricsSPI();
     metrics = metricsSPI != null ? metricsSPI.createPoolMetrics("redis", options.getPoolName(), options.getMaxPoolSize()) : null;
@@ -144,38 +147,44 @@ class RedisConnectionManager {
       if (connectionStringInetSocket) {
         // net client is ssl and connection string is not ssl is not allowed
         if (netClientSsl && !connectionStringSsl) {
-          ctx.execute(Future.failedFuture("Pool initialized with SSL but connection requested plain socket"), onConnect);
+          ctx.execute(ctx.failedFuture("Pool initialized with SSL but connection requested plain socket"), onConnect);
           return;
         }
       }
 
       // all calls the user handler will happen in the user context (ctx)
-      netClient.connect(redisURI.socketAddress(), clientConnect -> {
-        if (clientConnect.failed()) {
-          // connection failed
-          ctx.execute(Future.failedFuture(clientConnect.cause()), onConnect);
-          return;
-        }
+      try {
+        netClient
+          .connect(redisURI.socketAddress(), clientConnect -> {
+            if (clientConnect.failed()) {
+              // connection failed
+              ctx.execute(ctx.failedFuture(clientConnect.cause()), onConnect);
+              return;
+            }
 
-        // socket connection succeeded
-        final NetSocket netSocket = clientConnect.result();
+            // socket connection succeeded
+            final NetSocket netSocket = clientConnect.result();
 
-        // upgrade to ssl is only possible for inet sockets
-        if (connectionStringInetSocket && !netClientSsl && connectionStringSsl) {
-          // must upgrade protocol
-          netSocket.upgradeToSsl(upgradeToSsl -> {
-            if (upgradeToSsl.failed()) {
-              ctx.execute(Future.failedFuture(upgradeToSsl.cause()), onConnect);
+            // upgrade to ssl is only possible for inet sockets
+            if (connectionStringInetSocket && !netClientSsl && connectionStringSsl) {
+              // must upgrade protocol
+              netSocket.upgradeToSsl(upgradeToSsl -> {
+                if (upgradeToSsl.failed()) {
+                  ctx.execute(ctx.failedFuture(upgradeToSsl.cause()), onConnect);
+                } else {
+                  // complete the connection
+                  init(ctx, netSocket, listener, onConnect);
+                }
+              });
             } else {
-              // complete the connection
+              // no need to upgrade
               init(ctx, netSocket, listener, onConnect);
             }
           });
-        } else {
-          // no need to upgrade
-          init(ctx, netSocket, listener, onConnect);
-        }
-      });
+      } catch (RuntimeException err) {
+        // the netClient is in a closed state?
+        ctx.execute(ctx.failedFuture(err), onConnect);
+      }
     }
 
     private void init(ContextInternal ctx, NetSocket netSocket, PoolConnector.Listener connectionListener, Handler<AsyncResult<ConnectResult<RedisConnectionInternal>>> onConnect) {
@@ -188,33 +197,33 @@ class RedisConnectionManager {
       netSocket
         .handler(new RESPParser(connection, options.getMaxNestedArrays()))
         .closeHandler(connection::end)
-        .exceptionHandler(connection::fatal);
+        .exceptionHandler(connection::fail);
 
       // initial handshake
       hello(ctx, connection, redisURI, hello -> {
         if (hello.failed()) {
-          ctx.execute(Future.failedFuture(hello.cause()), onConnect);
+          ctx.execute(ctx.failedFuture(hello.cause()), onConnect);
           return;
         }
 
         // perform select
         select(ctx, connection, redisURI.select(), select -> {
           if (select.failed()) {
-            ctx.execute(Future.failedFuture(select.cause()), onConnect);
+            ctx.execute(ctx.failedFuture(select.cause()), onConnect);
             return;
           }
 
           // perform setup
           setup(ctx, connection, setup, setupResult -> {
             if (setupResult.failed()) {
-              ctx.execute(Future.failedFuture(setupResult.cause()), onConnect);
+              ctx.execute(ctx.failedFuture(setupResult.cause()), onConnect);
               return;
             }
 
             // connection is valid
             connection.setValid();
 
-            ctx.execute(Future.succeededFuture(new ConnectResult<>(connection, 1, 0)), onConnect);
+            ctx.execute(ctx.succeededFuture(new ConnectResult<>(connection, 1, 0)), onConnect);
           });
         });
       });
@@ -245,7 +254,7 @@ class RedisConnectionManager {
         connection.send(hello, onSend -> {
           if (onSend.succeeded()) {
             LOG.debug(onSend.result());
-            ctx.execute(Future.succeededFuture(), handler);
+            ctx.execute(ctx.succeededFuture(), handler);
             return;
           }
 
@@ -268,7 +277,7 @@ class RedisConnectionManager {
             }
           }
 
-          ctx.execute(Future.failedFuture(err), handler);
+          ctx.execute(ctx.failedFuture(err), handler);
         });
       }
     }
@@ -279,7 +288,7 @@ class RedisConnectionManager {
       connection.send(ping, onSend -> {
         if (onSend.succeeded()) {
           LOG.debug(onSend.result());
-          ctx.execute(Future.succeededFuture(), handler);
+          ctx.execute(ctx.succeededFuture(), handler);
           return;
         }
 
@@ -295,64 +304,63 @@ class RedisConnectionManager {
           }
         }
 
-        ctx.execute(Future.failedFuture(err), handler);
+        ctx.execute(ctx.failedFuture(err), handler);
       });
     }
 
     private void authenticate(ContextInternal ctx, RedisConnection connection, String password, Handler<AsyncResult<Void>> handler) {
       if (password == null) {
-        ctx.execute(Future.succeededFuture(), handler);
+        ctx.execute(ctx.succeededFuture(), handler);
         return;
       }
       // perform authentication
       connection.send(Request.cmd(Command.AUTH).arg(password), auth -> {
         if (auth.failed()) {
-          ctx.execute(Future.failedFuture(auth.cause()), handler);
+          ctx.execute(ctx.failedFuture(auth.cause()), handler);
         } else {
-          ctx.execute(Future.succeededFuture(), handler);
+          ctx.execute(ctx.succeededFuture(), handler);
         }
       });
     }
 
     private void select(ContextInternal ctx, RedisConnection connection, Integer select, Handler<AsyncResult<Void>> handler) {
       if (select == null) {
-        ctx.execute(Future.succeededFuture(), handler);
+        ctx.execute(ctx.succeededFuture(), handler);
         return;
       }
       // perform select
       connection.send(Request.cmd(Command.SELECT).arg(select), auth -> {
         if (auth.failed()) {
-          ctx.execute(Future.failedFuture(auth.cause()), handler);
+          ctx.execute(ctx.failedFuture(auth.cause()), handler);
         } else {
-          ctx.execute(Future.succeededFuture(), handler);
+          ctx.execute(ctx.succeededFuture(), handler);
         }
       });
     }
 
     private void setup(ContextInternal ctx, RedisConnection connection, Request setup, Handler<AsyncResult<Void>> handler) {
       if (setup == null) {
-        ctx.execute(Future.succeededFuture(), handler);
+        ctx.execute(ctx.succeededFuture(), handler);
         return;
       }
       // perform setup
       connection.send(setup, req -> {
         if (req.failed()) {
-          ctx.execute(Future.failedFuture(req.cause()), handler);
+          ctx.execute(ctx.failedFuture(req.cause()), handler);
         } else {
-          ctx.execute(Future.succeededFuture(), handler);
+          ctx.execute(ctx.succeededFuture(), handler);
         }
       });
     }
   }
 
   public Future<RedisConnection> getConnection(String connectionString, Request setup) {
-    final PromiseInternal<Lease<RedisConnectionInternal>> promise = vertx.promise();
-    final ContextInternal ctx = promise.context();
+    final Promise<Lease<RedisConnectionInternal>> promise = vertx.promise();
     final EventLoopContext eventLoopContext;
-    if (ctx instanceof EventLoopContext) {
-      eventLoopContext = (EventLoopContext) ctx;
+    if (context instanceof EventLoopContext) {
+      eventLoopContext = (EventLoopContext) context;
     } else {
-      eventLoopContext = vertx.createEventLoopContext(ctx.nettyEventLoop(), ctx.workerPool(), ctx.classLoader());
+      eventLoopContext = vertx.createEventLoopContext(context.nettyEventLoop(), context.workerPool(), context.classLoader());
     }
 
     final boolean metricsEnabled = metrics != null;
@@ -365,7 +373,7 @@ class RedisConnectionManager {
           metrics.rejected(queueMetric);
         }
       })
-      .map(lease -> new PooledRedisConnection(lease, metrics, metricsEnabled ? metrics.begin(queueMetric) : null));
+      .compose(lease -> Future.succeededFuture(new PooledRedisConnection(lease, metrics, metricsEnabled ? metrics.begin(queueMetric) : null)));
   }
 
   public void close() {

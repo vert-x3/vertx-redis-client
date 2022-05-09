@@ -16,6 +16,7 @@ import org.testcontainers.containers.GenericContainer;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.UUID;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.IntStream;
 
@@ -161,22 +162,29 @@ public class RedisPooledTest {
         .setMaxPoolWaiting(10));
 
     final AtomicInteger counter = new AtomicInteger();
+    final AtomicBoolean closing = new AtomicBoolean(false);
+    final AtomicInteger pending = new AtomicInteger();
 
     // this test asserts that the pools behaves as expected it shall return 10 new connections
     // and will fail on the 21st call as the 10 waiting slots are taken
 
-    vertx.setPeriodic(500, event -> {
+    vertx.setPeriodic(250, event -> {
       counter.incrementAndGet();
       client.connect(event1 -> {
         if (event1.succeeded()) {
-          System.out.println(counter.get());
           should.assertTrue(counter.get() <= 10);
         } else {
-          System.out.println(counter.get());
           should.assertTrue(counter.get() == 21);
-          vertx.cancelTimer(event);
-          client.close();
-          vertx.runOnContext(v -> test.complete());
+          if (closing.compareAndSet(false, true)) {
+            vertx.cancelTimer(event);
+            client.close();
+          } else {
+            int _pending = pending.incrementAndGet();
+            should.assertTrue(_pending <= 10);
+            if (_pending == 10) {
+              test.complete();
+            }
+          }
         }
       });
     });

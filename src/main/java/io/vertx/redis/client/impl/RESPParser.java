@@ -115,7 +115,7 @@ public final class RESPParser implements Handler<Buffer> {
             break;
           default:
             // notify
-            handler.fatal(ErrorType.create("ILLEGAL_STATE Unknown RESP type " + (char) type));
+            handler.fail(ErrorType.create("ILLEGAL_STATE Unknown RESP type " + (char) type));
             return;
         }
       } else {
@@ -142,37 +142,29 @@ public final class RESPParser implements Handler<Buffer> {
   }
 
   private void handleNumber(byte type, int eol) {
-    try {
-      switch (type) {
-        case ':':
-          handleResponse(NumberType.create(buffer.readNumber(eol, ReadableBuffer.NumericType.INTEGER)), false);
-          break;
-        case ',':
-          handleResponse(NumberType.create(buffer.readNumber(eol, ReadableBuffer.NumericType.DECIMAL)), false);
-          break;
-        case '(':
-          handleResponse(NumberType.create(buffer.readNumber(eol, ReadableBuffer.NumericType.BIGINTEGER)), false);
-          break;
-      }
-    } catch (RuntimeException e) {
-      handler.fatal(e);
+    switch (type) {
+      case ':':
+        handleResponse(NumberType.create(buffer.readNumber(eol, ReadableBuffer.NumericType.INTEGER)), false);
+        break;
+      case ',':
+        handleResponse(NumberType.create(buffer.readNumber(eol, ReadableBuffer.NumericType.DECIMAL)), false);
+        break;
+      case '(':
+        handleResponse(NumberType.create(buffer.readNumber(eol, ReadableBuffer.NumericType.BIGINTEGER)), false);
+        break;
+      default:
+        handler.fail(new NumberFormatException("Invalid REDIS format: [" + (char) type + "]"));
+        break;
     }
   }
 
   private long handleLength(int eol) {
-    final long integer;
-
-    try {
-      integer = buffer.readLong(eol);
-    } catch (RuntimeException e) {
-      handler.fatal(e);
-      return -1;
-    }
+    final long integer = buffer.readLong(eol);
 
     // special cases
     // redis multi cannot have more than 2GB elements
     if (integer > Integer.MAX_VALUE) {
-      handler.fatal(ErrorType.create("ILLEGAL_STATE Redis Multi cannot be larger 2GB elements"));
+      handler.fail(ErrorType.create("ILLEGAL_STATE Redis Multi cannot be larger 2GB elements"));
       return -1;
     }
 
@@ -183,7 +175,7 @@ public final class RESPParser implements Handler<Buffer> {
         return -1;
       }
       // other negative values are not valid
-      handler.fatal(ErrorType.create("ILLEGAL_STATE Redis Multi cannot have negative length"));
+      handler.fail(ErrorType.create("ILLEGAL_STATE Redis Multi cannot have negative length"));
       return -1;
     }
 
@@ -195,7 +187,7 @@ public final class RESPParser implements Handler<Buffer> {
     if (len >= 0) {
       if (len == 0L) {
         // push always have 1 entry
-        handler.fatal(ErrorType.create("ILLEGAL_STATE Redis Push must have at least 1 element"));
+        handler.fail(ErrorType.create("ILLEGAL_STATE Redis Push must have at least 1 element"));
       } else {
         handleResponse(PushType.create(len), true);
       }
@@ -207,11 +199,10 @@ public final class RESPParser implements Handler<Buffer> {
     if (len >= 0L) {
       if (len == 0L) {
         // push always have 1 entry
-        handler.fatal(ErrorType.create("ILLEGAL_STATE Redis Push must have at least 1 element"));
+        handler.fail(ErrorType.create("ILLEGAL_STATE Redis Push must have at least 1 element"));
       } else {
         handleResponse(AttributeType.create(len), true);
       }
-
     }
   }
 
@@ -227,7 +218,7 @@ public final class RESPParser implements Handler<Buffer> {
         handleResponse(BooleanType.FALSE, false);
         break;
       default:
-        handler.fatal(ErrorType.create("Invalid boolean value: " + ((char) value)));
+        handler.fail(ErrorType.create("Invalid boolean value: " + ((char) value)));
     }
   }
 
@@ -250,7 +241,7 @@ public final class RESPParser implements Handler<Buffer> {
     if (len >= 0L) {
       // redis strings cannot be longer than 512Mb
       if (len > MAX_STRING_LENGTH) {
-        handler.fatal(ErrorType.create("ILLEGAL_STATE Redis Bulk cannot be larger than 512MB"));
+        handler.fail(ErrorType.create("ILLEGAL_STATE Redis Bulk cannot be larger than 512MB"));
         return;
       }
       // safe cast
@@ -310,7 +301,7 @@ public final class RESPParser implements Handler<Buffer> {
           m = stack.peek();
 
           if (m == null) {
-            handler.fatal(ErrorType.create("ILLEGAL_STATE Multi can't be null"));
+            handler.fail(ErrorType.create("ILLEGAL_STATE Multi can't be null"));
             return;
           }
         }

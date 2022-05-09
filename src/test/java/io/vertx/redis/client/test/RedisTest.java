@@ -207,11 +207,8 @@ public class RedisTest {
         List<Future> futures = new ArrayList<>();
         IntStream.range(0, 100).forEach(i -> {
           Promise<Response> p = Promise.promise();
-          vertx.setTimer(1, timerid -> redisApi.set(Arrays.asList("foo", "bar"), p));
-          futures.add(p.future().map(res -> {
-            System.out.println("SUCCESS " + cnt.incrementAndGet());
-            return null;
-          }));
+          vertx.setTimer(1, timerid -> redisApi.set(Arrays.asList("foo-" + i, "bar")).onComplete(p));
+          futures.add(p.future());
         });
 
         CompositeFuture.all(futures)

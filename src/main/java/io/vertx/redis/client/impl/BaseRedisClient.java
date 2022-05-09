@@ -2,7 +2,6 @@ package io.vertx.redis.client.impl;
 
 import io.vertx.codegen.annotations.Nullable;
 import io.vertx.core.Future;
-import io.vertx.core.Promise;
 import io.vertx.core.Vertx;
 import io.vertx.core.impl.VertxInternal;
 import io.vertx.core.impl.logging.Logger;
@@ -35,67 +34,39 @@ public abstract class BaseRedisClient implements Redis {
 
   @Override
   public Future<@Nullable Response> send(Request command) {
-    final Promise<Response> promise = vertx.promise();
-
     if (command.command().isPubSub()) {
       // mixing pubSub cannot be used on a one-shot operation
-      promise.fail("PubSub command in connection-less mode not allowed");
-      return promise.future();
+      return Future.failedFuture("PubSub command in connection-less mode not allowed");
     }
 
-    connect()
-      .onFailure(promise::fail)
-      .onSuccess(conn -> conn.send(command)
-        .onComplete(send -> {
-          try {
-            promise.handle(send);
-          } finally {
-            // regardless of the result, return the connection to the pool
-            conn.close().onFailure(LOG::warn);
-          }
-        }));
-
-    return promise.future();
+    return connect()
+      .compose(conn ->
+        conn.send(command)
+          // regardless of the result, return the connection to the pool
+          .eventually(e ->
+            conn.close()
+              .onFailure(LOG::warn)));
   }
 
   @Override
   public Future<List<@Nullable Response>> batch(List<Request> commands) {
-    final Promise<List<Response>> promise = vertx.promise();
-
     if (commands.isEmpty()) {
       LOG.debug("Empty batch");
-      promise.complete(Collections.emptyList());
+      return Future.succeededFuture(Collections.emptyList());
     } else {
       for (Request req : commands) {
         if (req.command().isPubSub()) {
           // mixing pubSub cannot be used on a one-shot operation
-          promise.fail("PubSub command in connection-less batch not allowed");
-          return promise.future();
+          return Future.failedFuture("PubSub command in connection-less batch not allowed");
         }
       }
 
-      connect()
-        .onFailure(promise::fail)
-        .onSuccess(conn ->
+      return connect()
+        .compose(conn ->
           conn.batch(commands)
-            .onSuccess(responses -> {
-              try {
-                promise.complete(responses);
-              } finally {
-                // regardless of the result, return the connection to the pool
-                conn.close().onFailure(LOG::warn);
-              }
-            })
-            .onFailure(err -> {
-              try {
-                promise.fail(err);
-              } finally {
-                // regardless of the result, return the connection to the pool
-                conn.close().onFailure(LOG::warn);
-              }
-            }));
+            // regardless of the result, return the connection to the pool
+            .eventually(e ->
+                conn.close().onFailure(LOG::warn)));
     }
-
-    return promise.future();
   }
 }

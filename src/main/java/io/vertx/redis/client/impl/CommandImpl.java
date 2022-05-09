@@ -39,7 +39,6 @@ public class CommandImpl implements Command {
   private final boolean readOnly;
   private final boolean movable;
   private final boolean pubsub;
-  private final boolean noreturn;
 
   public CommandImpl(String command, int arity, int firstKey, int lastKey, int interval, boolean write, boolean readOnly, boolean movable, boolean pubsub) {
     this.command = command;
@@ -54,12 +53,6 @@ public class CommandImpl implements Command {
     this.readOnly = readOnly;
     this.movable = movable;
     this.pubsub = pubsub;
-    // void commands are special and apply to pub/sub
-    noreturn =
-      "subscribe".equalsIgnoreCase(command)
-        || "unsubscribe".equalsIgnoreCase(command)
-        || "psubscribe".equalsIgnoreCase(command)
-        || "punsubscribe".equalsIgnoreCase(command);
   }
 
   @Override
@@ -110,11 +103,6 @@ public class CommandImpl implements Command {
   @Override
   public boolean isMovable() {
     return movable;
-  }
-
-  @Override
-  public boolean isVoid() {
-    return noreturn;
   }
 
   @Override

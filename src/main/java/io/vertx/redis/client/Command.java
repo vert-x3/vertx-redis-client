@@ -329,7 +329,13 @@ public interface Command {
 
   boolean isMovable();
 
-  boolean isVoid();
+  /**
+   * @deprecated use {@link #isPubSub()}
+   */
+  @Deprecated
+  default boolean isVoid() {
+    return isPubSub();
+  }
 
   boolean isPubSub();
 }

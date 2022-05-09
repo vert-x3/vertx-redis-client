@@ -198,46 +198,4 @@ public class RedisClient6Test {
 
       });
   }
-
-  @Test
-  @Ignore
-  public void perfRegression(TestContext should) {
-    final Async test = should.async();
-
-    int iterations = 1000;
-    int instances = 100;
-    AtomicInteger count = new AtomicInteger();
-
-    rule.vertx()
-      .deployVerticle(() -> new AbstractVerticle() {
-        @Override
-        public void start(Promise<Void> onStart) {
-          Redis redisClient = Redis.createClient(rule.vertx(), new RedisOptions()
-            .setConnectionString("redis://" + redis.getContainerIpAddress() + ":" + redis.getFirstMappedPort() + "/0")
-            .setMaxPoolSize(10)
-            .setMaxPoolWaiting(10000));
-
-          rule.vertx().eventBus()
-            .consumer("test.redis.load")
-            .handler(m -> {
-              redisClient
-                .send(cmd(SET).arg("foo").arg("bar"))
-                .onSuccess(res -> {
-                  if (count.incrementAndGet() == iterations * instances) {
-                    test.complete();
-                  }
-                })
-                .onFailure(should::fail);
-            });
-
-          onStart.complete();
-        }
-      }, new DeploymentOptions().setInstances(instances).setWorker(true))
-      .onComplete(res -> {
-        for (int i = 0; i < iterations; i++) {
-          rule.vertx().eventBus().publish("test.redis.load", i);
-        }
-      });
-
-  }
 }
