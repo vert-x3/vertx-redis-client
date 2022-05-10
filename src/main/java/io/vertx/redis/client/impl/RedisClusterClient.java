@@ -23,7 +23,6 @@ import io.vertx.redis.client.impl.types.MultiType;
 import io.vertx.redis.client.impl.types.NumberType;
 import io.vertx.redis.client.impl.types.SimpleStringType;
 
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -40,10 +39,6 @@ public class RedisClusterClient extends BaseRedisClient implements Redis {
 
   public static void addReducer(Command command, Function<List<Response>, Response> fn) {
     RedisClusterConnection.addReducer(command, fn);
-  }
-
-  public static void addUnSupportedCommand(Command command, String error) {
-    RedisClusterConnection.addUnSupportedCommand(command, error);
   }
 
   public static void addMasterOnlyCommand(Command command) {
@@ -115,13 +110,6 @@ public class RedisClusterClient extends BaseRedisClient implements Redis {
             return l;
           }
         }).sum()));
-
-    Arrays.asList(ASKING, AUTH, BGREWRITEAOF, BGSAVE, CLIENT, COMMAND, CONFIG,
-      DEBUG, DISCARD, INFO, LASTSAVE, LATENCY, LOLWUT, MEMORY, MODULE, MONITOR, PFDEBUG, PFSELFTEST,
-      PING, READONLY, READWRITE, REPLCONF, REPLICAOF, ROLE, SAVE, SCAN, SCRIPT, SELECT, SHUTDOWN, SLAVEOF, SLOWLOG, SWAPDB,
-      SYNC, SENTINEL).forEach(command -> addUnSupportedCommand(command, null));
-
-    addUnSupportedCommand(FLUSHALL, "RedisClusterClient does not handle command FLUSHALL, use FLUSHDB");
 
     addMasterOnlyCommand(WAIT);
 

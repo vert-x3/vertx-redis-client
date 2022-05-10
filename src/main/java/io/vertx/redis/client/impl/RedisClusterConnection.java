@@ -10,7 +10,6 @@ import io.vertx.redis.client.impl.keys.BeginSearch;
 import io.vertx.redis.client.impl.keys.FindKeys;
 import io.vertx.redis.client.impl.types.ErrorType;
 
-import java.nio.charset.StandardCharsets;
 import java.util.*;
 import java.util.function.Function;
 
@@ -30,7 +29,6 @@ public class RedisClusterConnection implements RedisConnection {
   // or when we get MOVED/ASK responses
   private static final int RETRIES = 16;
 
-  private static final Map<Command, String> UNSUPPORTEDCOMMANDS = new HashMap<>();
   // reduce from list fo responses to a single response
   private static final Map<Command, Function<List<Response>, Response>> REDUCERS = new HashMap<>();
   // List of commands they should run every time only against master nodes
@@ -38,18 +36,6 @@ public class RedisClusterConnection implements RedisConnection {
 
   public static void addReducer(Command command, Function<List<Response>, Response> fn) {
     REDUCERS.put(command, fn);
-  }
-
-  public static void addUnSupportedCommand(Command command, String error) {
-    if (error == null || error.isEmpty()) {
-      UNSUPPORTEDCOMMANDS.put(
-        command,
-        "RedisClusterClient does not handle command " +
-          new String(((CommandInternal) command).getBytes(), StandardCharsets.ISO_8859_1).split("\r\n")[1] +
-          ", use non cluster client on the right node.");
-    } else {
-      UNSUPPORTEDCOMMANDS.put(command, error);
-    }
   }
 
   public static void addMasterOnlyCommand(Command command) {
@@ -135,12 +121,6 @@ public class RedisClusterConnection implements RedisConnection {
     // process commands for cluster mode
     final RequestImpl req = (RequestImpl) request;
     final CommandInternal cmd = (CommandInternal) req.command();
-    final boolean forceMasterEndpoint = MASTER_ONLY_COMMANDS.contains(cmd);
-
-    if (UNSUPPORTEDCOMMANDS.containsKey(cmd)) {
-      promise.fail(UNSUPPORTEDCOMMANDS.get(cmd));
-      return promise.future();
-    }
 
     if (cmd.needsGetKeys()) {
       // it is required to resolve the keys at the server side as we cannot deduct where they are algorithmically
@@ -149,6 +129,7 @@ public class RedisClusterConnection implements RedisConnection {
       return promise.future();
     }
 
+    final boolean forceMasterEndpoint = MASTER_ONLY_COMMANDS.contains(cmd);
     final List<byte[]> keys = req.keys();
 
     switch (keys.size()) {
@@ -388,13 +369,7 @@ public class RedisClusterConnection implements RedisConnection {
         final RequestImpl req = (RequestImpl) request;
         final CommandInternal cmd = (CommandInternal) req.command();
 
-        if (UNSUPPORTEDCOMMANDS.containsKey(cmd)) {
-          promise.fail(UNSUPPORTEDCOMMANDS.get(cmd));
-          return promise.future();
-        }
-
         readOnly |= cmd.isReadOnly();
-        forceMasterEndpoint |= MASTER_ONLY_COMMANDS.contains(cmd);
 
         if (cmd.needsGetKeys()) {
           // it is required to resolve the keys at the server side as we cannot deduct where they are algorithmically
@@ -404,6 +379,7 @@ public class RedisClusterConnection implements RedisConnection {
         }
 
         final List<byte[]> keys = req.keys();
+        forceMasterEndpoint |= MASTER_ONLY_COMMANDS.contains(cmd);
         int slot;
 
         // process slots, need to verify if we can run this batch
