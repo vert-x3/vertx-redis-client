@@ -179,6 +179,10 @@ public class RedisStandaloneConnection implements RedisConnectionInternal, Parse
       throw new IllegalStateException("Connection is closed");
     }
 
+    if (!((RequestImpl) request).valid()) {
+      return Future.failedFuture("Redis command is not valid, check https://redis.io/commands");
+    }
+
     // tag this connection as tainted if needed
     context.execute(request.command(), this::taintCheck);
 
@@ -257,6 +261,11 @@ public class RedisStandaloneConnection implements RedisConnectionInternal, Parse
       for (int i = 0; i < commands.size(); i++) {
         final int index = i;
         final RequestImpl req = (RequestImpl) commands.get(index);
+
+        if (!req.valid()) {
+          return Future.failedFuture("Redis command is not valid, check https://redis.io/commands");
+        }
+
         if (req.command().isPubSub()) {
           // mixing pubSub cannot be used on a one-shot operation
           return Future.failedFuture("PubSub command in batch not allowed");

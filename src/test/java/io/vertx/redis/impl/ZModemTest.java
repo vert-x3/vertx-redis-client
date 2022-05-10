@@ -1,18 +1,11 @@
 package io.vertx.redis.impl;
 
-import io.vertx.redis.client.Request;
-import io.vertx.redis.client.impl.KeyExtractor;
-import io.vertx.redis.client.impl.RequestImpl;
 import io.vertx.redis.client.impl.ZModem;
 import org.junit.Test;
 
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
-import java.util.UUID;
-
-import static io.vertx.redis.client.Command.SET;
-import static io.vertx.redis.client.Request.cmd;
 import static org.junit.Assert.*;
 
 public class ZModemTest {

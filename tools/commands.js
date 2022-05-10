@@ -85,12 +85,6 @@ redis.info((err, info) => {
 
     commands.version = version;
 
-    var cmd_template = Handlebars.compile(fs.readFileSync('redis-command.hbs', 'utf8'));
-
-    fs.writeFileSync(
-      '../src/main/java/io/vertx/redis/client/Command.java',
-      cmd_template(commands));
-
     var api_template = Handlebars.compile(fs.readFileSync('redis-api.hbs', 'utf8'));
 
     fs.writeFileSync(

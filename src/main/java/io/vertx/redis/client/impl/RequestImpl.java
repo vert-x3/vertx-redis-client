@@ -18,6 +18,8 @@ package io.vertx.redis.client.impl;
 import io.vertx.core.buffer.Buffer;
 import io.vertx.redis.client.Command;
 import io.vertx.redis.client.Request;
+import io.vertx.redis.client.impl.keys.BeginSearch;
+import io.vertx.redis.client.impl.keys.FindKeys;
 
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
@@ -35,11 +37,11 @@ public final class RequestImpl implements Request {
   private static final byte[] TRUE = new byte[] { 't' };
   private static final byte[] FALSE = new byte[] { 'f' };
 
-  private final Command cmd;
+  private final CommandInternal cmd;
   private final List<byte[]> args;
 
   public RequestImpl(Command cmd) {
-    this.cmd = cmd;
+    this.cmd = (CommandInternal) cmd;
 
     if (cmd.getArity() != 0) {
       args = new ArrayList<>(Math.abs(cmd.getArity()));
@@ -144,8 +146,40 @@ public final class RequestImpl implements Request {
     return args;
   }
 
+  public List<byte[]> keys() {
+    BeginSearch beginSearch = cmd.beginSearch();
+    FindKeys findKeys = cmd.findKeys();
+    if (beginSearch == null || findKeys == null) {
+      return Collections.emptyList();
+    }
+
+    final List<byte[]> collector = new ArrayList<>();
+    final int arity = cmd.getArity();
+
+    findKeys.forEach(args, arity, beginSearch.begin(args, arity), (keyIdx, keyStep) -> {
+      collector.add(args.get(keyIdx));
+    });
+
+    return collector;
+  }
+
   @Override
   public String toString() {
     return encode().toString();
+  }
+
+  public boolean valid() {
+    int arity = cmd.getArity();
+    int arglen = args.size() + 1;
+    if (arity >= 0) {
+      if (arity != arglen) {
+        return false;
+      }
+    } else {
+      if (-arity > arglen) {
+        return false;
+      }
+    }
+    return true;
   }
 }

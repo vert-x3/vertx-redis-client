@@ -156,6 +156,9 @@ public class ZModem {
   public static int generateMulti(List<String> keys) {
     int i = 1;
     int len = keys.size();
+    if (len == 0) {
+      return -1;
+    }
     int base = generate(keys.get(0));
 
     while (i < len) {
@@ -174,13 +177,16 @@ public class ZModem {
    * @param keys array of keys
    * @return the overall hash
    */
-  public static int generateMulti(byte[]... keys) {
+  public static int generateMultiRaw(List<byte[]> keys) {
     int i = 1;
-    int len = keys.length;
-    int base = generate(keys[0]);
+    final int len = keys.size();
+    if (len == 0) {
+      return -1;
+    }
+    int base = generate(keys.get(0));
 
     while (i < len) {
-      if (generate(keys[i++]) != base) {
+      if (generate(keys.get(i++)) != base) {
         return -1;
       }
     }

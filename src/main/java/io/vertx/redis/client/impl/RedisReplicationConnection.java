@@ -112,7 +112,7 @@ public class RedisReplicationConnection implements RedisConnection {
     final Command cmd = req.command();
     final boolean forceMasterEndpoint = MASTER_ONLY_COMMANDS.contains(cmd);
 
-    return selectMasterOrReplicaEndpoint(!cmd.isWrite(), forceMasterEndpoint)
+    return selectMasterOrReplicaEndpoint(cmd.isReadOnly(), forceMasterEndpoint)
       .send(request);
   }
 
@@ -131,7 +131,7 @@ public class RedisReplicationConnection implements RedisConnection {
         final RequestImpl req = (RequestImpl) request;
         final Command cmd = req.command();
 
-        readOnly |= !cmd.isWrite();
+        readOnly |= cmd.isReadOnly();
         forceMasterEndpoint |= MASTER_ONLY_COMMANDS.contains(cmd);
       }
 

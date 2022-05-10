@@ -15,7 +15,8 @@
  */
 package io.vertx.redis.client.impl;
 
-import io.vertx.redis.client.Command;
+import io.vertx.redis.client.impl.keys.BeginSearch;
+import io.vertx.redis.client.impl.keys.FindKeys;
 
 import java.nio.charset.StandardCharsets;
 
@@ -24,34 +25,27 @@ import java.nio.charset.StandardCharsets;
  *
  * @author Paulo Lopes
  */
-public class CommandImpl implements Command {
+public class CommandImpl implements CommandInternal {
 
   private final String command;
   private final byte[] bytes;
   private final int arity;
 
-  private final boolean multiKey;
-  private final int firstKey;
-  private final int lastKey;
-  private final int interval;
-  private final boolean keyless;
-  private final boolean write;
+  private final BeginSearch beginSearch;
+  private final FindKeys findKeys;
+
+  private final boolean needGetKeys;
   private final boolean readOnly;
-  private final boolean movable;
   private final boolean pubsub;
 
-  public CommandImpl(String command, int arity, int firstKey, int lastKey, int interval, boolean write, boolean readOnly, boolean movable, boolean pubsub) {
+  public CommandImpl(String command, int arity, BeginSearch beginSearch, FindKeys findKeys, boolean needGetKeys, Boolean readOnly, boolean pubsub) {
     this.command = command;
     this.bytes = ("$" + command.length() + "\r\n" + command + "\r\n").getBytes(StandardCharsets.ISO_8859_1);
     this.arity = arity;
-    this.firstKey = firstKey;
-    this.lastKey = lastKey;
-    this.interval = interval;
-    this.multiKey = lastKey < 0;
-    this.keyless = interval == 0 && !movable;
-    this.write = write;
-    this.readOnly = readOnly;
-    this.movable = movable;
+    this.beginSearch = beginSearch;
+    this.findKeys = findKeys;
+    this.needGetKeys = needGetKeys;
+    this.readOnly = readOnly == null || readOnly;
     this.pubsub = pubsub;
   }
 
@@ -66,48 +60,28 @@ public class CommandImpl implements Command {
   }
 
   @Override
-  public boolean isMultiKey() {
-    return multiKey;
-  }
-
-  @Override
-  public int getFirstKey() {
-    return firstKey;
-  }
-
-  @Override
-  public int getLastKey() {
-    return lastKey;
-  }
-
-  @Override
-  public int getInterval() {
-    return interval;
-  }
-
-  @Override
-  public boolean isKeyless() {
-    return keyless;
-  }
-
-  @Override
-  public boolean isWrite() {
-    return write;
-  }
-
-  @Override
   public boolean isReadOnly() {
     return readOnly;
   }
 
   @Override
-  public boolean isMovable() {
-    return movable;
+  public boolean isPubSub() {
+    return pubsub;
   }
 
   @Override
-  public boolean isPubSub() {
-    return pubsub;
+  public BeginSearch beginSearch() {
+    return beginSearch;
+  }
+
+  @Override
+  public FindKeys findKeys() {
+    return findKeys;
+  }
+
+  @Override
+  public boolean needsGetKeys() {
+    return needGetKeys;
   }
 
   @Override
