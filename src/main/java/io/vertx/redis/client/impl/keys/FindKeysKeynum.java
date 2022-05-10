@@ -2,7 +2,6 @@ package io.vertx.redis.client.impl.keys;
 
 import java.nio.charset.StandardCharsets;
 import java.util.List;
-import java.util.function.BiConsumer;
 
 public class FindKeysKeynum implements FindKeys {
 
@@ -17,11 +16,11 @@ public class FindKeysKeynum implements FindKeys {
   }
 
   @Override
-  public int forEach(List<byte[]> args, int arity, int offset, BiConsumer<Integer, Integer> collector) {
+  public int forEach(List<byte[]> args, int arity, int offset, KeyConsumer collector) {
     int keys = Integer.parseInt(new String(args.get(offset + keyNumIdx), StandardCharsets.US_ASCII));
     int i, stop;
     for (i = offset + firstKey, stop = 0; ++stop <= keys; i += keyStep) {
-      collector.accept(i, keyStep);
+      collector.accept(offset, i, keyStep);
     }
     return i;
   }

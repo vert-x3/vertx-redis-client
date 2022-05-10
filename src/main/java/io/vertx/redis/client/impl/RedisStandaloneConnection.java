@@ -161,7 +161,7 @@ public class RedisStandaloneConnection implements RedisConnectionInternal, Parse
    * <p>
    * This is only relevant for pooled connections
    */
-  private void taintCheck(Command cmd) {
+  private void taintCheck(CommandImpl cmd) {
     //System.out.println("taintCheck()#" + this.hashCode());
     if (listener != null) {
       if (cmd.isPubSub() || Command.SELECT.equals(cmd) || Command.AUTH.equals(cmd)) {
@@ -183,10 +183,12 @@ public class RedisStandaloneConnection implements RedisConnectionInternal, Parse
       return Future.failedFuture("Redis command is not valid, check https://redis.io/commands");
     }
 
-    // tag this connection as tainted if needed
-    context.execute(request.command(), this::taintCheck);
+    final CommandImpl cmd = (CommandImpl) request.command();
 
-    final boolean voidCmd = request.command().isPubSub();
+    // tag this connection as tainted if needed
+    context.execute(cmd, this::taintCheck);
+
+    final boolean voidCmd = cmd.isPubSub();
     // encode the message to a buffer
     final Buffer message = ((RequestImpl) request).encode();
     // offer the handler to the waiting queue if not void command
@@ -261,19 +263,20 @@ public class RedisStandaloneConnection implements RedisConnectionInternal, Parse
       for (int i = 0; i < commands.size(); i++) {
         final int index = i;
         final RequestImpl req = (RequestImpl) commands.get(index);
+        final CommandImpl cmd = (CommandImpl) req.command();
 
         if (!req.valid()) {
           return Future.failedFuture("Redis command is not valid, check https://redis.io/commands");
         }
 
-        if (req.command().isPubSub()) {
+        if (cmd.isPubSub()) {
           // mixing pubSub cannot be used on a one-shot operation
           return Future.failedFuture("PubSub command in batch not allowed");
         }
         // encode to the single buffer
         req.encode(messages);
         // tag this connection as tainted if needed
-        taintCheck(req.command());
+        taintCheck(cmd);
         // unwrap the handler into a single handler
         callbacks.add(index, vertx.promise(command -> {
           if (!failed.get()) {

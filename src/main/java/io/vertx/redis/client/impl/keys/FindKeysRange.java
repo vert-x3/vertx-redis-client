@@ -1,7 +1,6 @@
 package io.vertx.redis.client.impl.keys;
 
 import java.util.List;
-import java.util.function.BiConsumer;
 
 public class FindKeysRange implements FindKeys {
 
@@ -16,7 +15,7 @@ public class FindKeysRange implements FindKeys {
   }
 
   @Override
-  public int forEach(List<byte[]> args, int arity, int offset, BiConsumer<Integer, Integer> collector) {
+  public int forEach(List<byte[]> args, int arity, int offset, KeyConsumer collector) {
     int stop;
 
     if (lastKey >= 0) {
@@ -35,7 +34,7 @@ public class FindKeysRange implements FindKeys {
 
     int i;
     for (i = offset; i <= stop; i += keyStep) {
-      collector.accept(i, keyStep);
+      collector.accept(offset, i, keyStep);
     }
 
     return i;

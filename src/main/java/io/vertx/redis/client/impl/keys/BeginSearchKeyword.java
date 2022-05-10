@@ -27,7 +27,8 @@ public class BeginSearchKeyword implements BeginSearch {
         return i + 1;
       }
     }
-    throw new IllegalArgumentException("Invalid command");
+    // not found
+    return -1;
   }
 
   /**

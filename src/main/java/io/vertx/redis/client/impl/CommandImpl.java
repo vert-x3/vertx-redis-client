@@ -15,73 +15,112 @@
  */
 package io.vertx.redis.client.impl;
 
-import io.vertx.redis.client.impl.keys.BeginSearch;
-import io.vertx.redis.client.impl.keys.FindKeys;
+import io.vertx.redis.client.Command;
+import io.vertx.redis.client.impl.keys.KeyConsumer;
 
 import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 
 /**
  * Implementation of the command metadata
  *
  * @author Paulo Lopes
  */
-public class CommandImpl implements CommandInternal {
+public class CommandImpl implements Command {
 
   private final String command;
   private final byte[] bytes;
   private final int arity;
 
-  private final BeginSearch beginSearch;
-  private final FindKeys findKeys;
-
+  private final KeyLocator[] keyLocators;
   private final boolean needGetKeys;
   private final boolean readOnly;
   private final boolean pubsub;
 
-  public CommandImpl(String command, int arity, BeginSearch beginSearch, FindKeys findKeys, boolean needGetKeys, Boolean readOnly, boolean pubsub) {
+  public CommandImpl(String command, int arity, Boolean readOnly, boolean pubsub, boolean needGetKeys, KeyLocator... keyLocators) {
     this.command = command;
     this.bytes = ("$" + command.length() + "\r\n" + command + "\r\n").getBytes(StandardCharsets.ISO_8859_1);
     this.arity = arity;
-    this.beginSearch = beginSearch;
-    this.findKeys = findKeys;
     this.needGetKeys = needGetKeys;
+    this.keyLocators = keyLocators;
     this.readOnly = readOnly == null || readOnly;
     this.pubsub = pubsub;
   }
 
-  @Override
   public byte[] getBytes() {
     return bytes;
   }
 
-  @Override
   public int getArity() {
     return arity;
   }
 
-  @Override
-  public boolean isReadOnly() {
+  public boolean isReadOnly(List<byte[]> args) {
+    if (keyLocators != null) {
+      for (int i = keyLocators.length - 1; i >= 0; i--) {
+        final KeyLocator keyLocator = keyLocators[i];
+        if (keyLocator.begin == null || keyLocator.find == null) {
+          continue;
+        }
+
+        final int offset = keyLocator.begin.begin(args, arity);
+        if (offset == -1) {
+          continue;
+        }
+        return keyLocator.ro;
+      }
+    }
     return readOnly;
   }
 
-  @Override
   public boolean isPubSub() {
     return pubsub;
   }
 
-  @Override
-  public BeginSearch beginSearch() {
-    return beginSearch;
-  }
-
-  @Override
-  public FindKeys findKeys() {
-    return findKeys;
-  }
-
-  @Override
   public boolean needsGetKeys() {
     return needGetKeys;
+  }
+
+  public List<byte[]> extractKeys(List<byte[]> args) {
+    if (keyLocators != null) {
+      for (int i = keyLocators.length - 1; i >= 0; i--) {
+        final KeyLocator keyLocator = keyLocators[i];
+        if (keyLocator.begin == null || keyLocator.find == null) {
+          continue;
+        }
+
+        final int offset = keyLocator.begin.begin(args, arity);
+        if (offset == -1) {
+          continue;
+        }
+
+        final List<byte[]> collector = new ArrayList<>();
+        keyLocator.find.forEach(args, arity, offset, (begin, keyIdx, keyStep) -> collector.add(args.get(keyIdx)));
+        return collector;
+      }
+    }
+    return Collections.emptyList();
+  }
+
+  public int iterateKeys(List<byte[]> args, KeyConsumer consumer) {
+    if (keyLocators != null) {
+      for (int i = keyLocators.length - 1; i >= 0; i--) {
+        final KeyLocator keyLocator = keyLocators[i];
+        if (keyLocator.begin == null || keyLocator.find == null) {
+          continue;
+        }
+
+        final int offset = keyLocator.begin.begin(args, arity);
+        if (offset == -1) {
+          continue;
+        }
+
+        return keyLocator.find.forEach(args, arity, offset, consumer);
+      }
+    }
+    return -1;
   }
 
   @Override

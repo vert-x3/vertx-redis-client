@@ -32,8 +32,8 @@ public class RedisClusterClientIT {
       new String[] {"redis:5-alpine", null},
       new String[] {"redis:6-alpine", "abcd"},
       new String[] {"redis:6-alpine", null},
-      new String[] {"redis:7.0-rc", "abcd"},
-      new String[] {"redis:7.0-rc", null});
+      new String[] {"redis:7-alpine", "abcd"},
+      new String[] {"redis:7-alpine", null});
   }
 
   public final Network network = Network.newNetwork();

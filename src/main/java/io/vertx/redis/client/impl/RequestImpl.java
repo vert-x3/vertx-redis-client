@@ -18,8 +18,6 @@ package io.vertx.redis.client.impl;
 import io.vertx.core.buffer.Buffer;
 import io.vertx.redis.client.Command;
 import io.vertx.redis.client.Request;
-import io.vertx.redis.client.impl.keys.BeginSearch;
-import io.vertx.redis.client.impl.keys.FindKeys;
 
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
@@ -37,14 +35,14 @@ public final class RequestImpl implements Request {
   private static final byte[] TRUE = new byte[] { 't' };
   private static final byte[] FALSE = new byte[] { 'f' };
 
-  private final CommandInternal cmd;
+  private final CommandImpl cmd;
   private final List<byte[]> args;
 
   public RequestImpl(Command cmd) {
-    this.cmd = (CommandInternal) cmd;
+    this.cmd = (CommandImpl) cmd;
 
-    if (cmd.getArity() != 0) {
-      args = new ArrayList<>(Math.abs(cmd.getArity()));
+    if (this.cmd.getArity() != 0) {
+      args = new ArrayList<>(Math.abs(this.cmd.getArity()));
     } else {
       args = Collections.emptyList();
     }
@@ -147,20 +145,7 @@ public final class RequestImpl implements Request {
   }
 
   public List<byte[]> keys() {
-    BeginSearch beginSearch = cmd.beginSearch();
-    FindKeys findKeys = cmd.findKeys();
-    if (beginSearch == null || findKeys == null) {
-      return Collections.emptyList();
-    }
-
-    final List<byte[]> collector = new ArrayList<>();
-    final int arity = cmd.getArity();
-
-    findKeys.forEach(args, arity, beginSearch.begin(args, arity), (keyIdx, keyStep) -> {
-      collector.add(args.get(keyIdx));
-    });
-
-    return collector;
+    return cmd.extractKeys(args);
   }
 
   @Override
@@ -172,14 +157,9 @@ public final class RequestImpl implements Request {
     int arity = cmd.getArity();
     int arglen = args.size() + 1;
     if (arity >= 0) {
-      if (arity != arglen) {
-        return false;
-      }
+      return arity == arglen;
     } else {
-      if (-arity > arglen) {
-        return false;
-      }
+      return -arity <= arglen;
     }
-    return true;
   }
 }

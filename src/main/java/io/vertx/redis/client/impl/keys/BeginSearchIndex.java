@@ -12,7 +12,10 @@ public class BeginSearchIndex implements BeginSearch {
 
   @Override
   public int begin(List<byte[]> args, int arity) {
-    // TODO: validation
-    return index - 1;
+    final int result = index - 1;
+    if (result >= args.size()) {
+      return -1;
+    }
+    return result;
   }
 }

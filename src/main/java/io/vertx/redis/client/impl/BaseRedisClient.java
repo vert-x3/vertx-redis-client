@@ -33,15 +33,16 @@ public abstract class BaseRedisClient implements Redis {
   }
 
   @Override
-  public Future<@Nullable Response> send(Request command) {
-    if (command.command().isPubSub()) {
+  public Future<@Nullable Response> send(Request request) {
+    final CommandImpl cmd = (CommandImpl) request.command();
+    if (cmd.isPubSub()) {
       // mixing pubSub cannot be used on a one-shot operation
       return Future.failedFuture("PubSub command in connection-less mode not allowed");
     }
 
     return connect()
       .compose(conn ->
-        conn.send(command)
+        conn.send(request)
           // regardless of the result, return the connection to the pool
           .eventually(e ->
             conn.close()
@@ -49,13 +50,14 @@ public abstract class BaseRedisClient implements Redis {
   }
 
   @Override
-  public Future<List<@Nullable Response>> batch(List<Request> commands) {
-    if (commands.isEmpty()) {
+  public Future<List<@Nullable Response>> batch(List<Request> requests) {
+    if (requests.isEmpty()) {
       LOG.debug("Empty batch");
       return Future.succeededFuture(Collections.emptyList());
     } else {
-      for (Request req : commands) {
-        if (req.command().isPubSub()) {
+      for (Request req : requests) {
+        final CommandImpl cmd = (CommandImpl) req.command();
+        if (cmd.isPubSub()) {
           // mixing pubSub cannot be used on a one-shot operation
           return Future.failedFuture("PubSub command in connection-less batch not allowed");
         }
@@ -63,7 +65,7 @@ public abstract class BaseRedisClient implements Redis {
 
       return connect()
         .compose(conn ->
-          conn.batch(commands)
+          conn.batch(requests)
             // regardless of the result, return the connection to the pool
             .eventually(e ->
                 conn.close().onFailure(LOG::warn)));

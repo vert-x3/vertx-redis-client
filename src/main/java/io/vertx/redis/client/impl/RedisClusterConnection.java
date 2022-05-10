@@ -6,8 +6,6 @@ import io.vertx.core.impl.VertxInternal;
 import io.vertx.core.impl.logging.Logger;
 import io.vertx.core.impl.logging.LoggerFactory;
 import io.vertx.redis.client.*;
-import io.vertx.redis.client.impl.keys.BeginSearch;
-import io.vertx.redis.client.impl.keys.FindKeys;
 import io.vertx.redis.client.impl.types.ErrorType;
 
 import java.util.*;
@@ -120,12 +118,13 @@ public class RedisClusterConnection implements RedisConnection {
 
     // process commands for cluster mode
     final RequestImpl req = (RequestImpl) request;
-    final CommandInternal cmd = (CommandInternal) req.command();
+    final CommandImpl cmd = (CommandImpl) req.command();
+    final List<byte[]> args = req.getArgs();
 
     if (cmd.needsGetKeys()) {
       // it is required to resolve the keys at the server side as we cannot deduct where they are algorithmically
       // we shall run this commands on the master node always
-      send(selectEndpoint(-1, cmd.isReadOnly(), true), RETRIES, req, promise);
+      send(selectEndpoint(-1, cmd.isReadOnly(args), true), RETRIES, req, promise);
       return promise.future();
     }
 
@@ -142,7 +141,7 @@ public class RedisClusterConnection implements RedisConnection {
             String[] endpoints = slots.endpointsForSlot(i);
 
             final Promise<Response> p = vertx.promise();
-            send(selectMasterOrReplicaEndpoint(req.command().isReadOnly(), endpoints, forceMasterEndpoint), RETRIES, req, p);
+            send(selectMasterOrReplicaEndpoint(cmd.isReadOnly(args), endpoints, forceMasterEndpoint), RETRIES, req, p);
             responses.add(p.future());
           }
 
@@ -154,25 +153,20 @@ public class RedisClusterConnection implements RedisConnection {
               promise.complete(REDUCERS.get(cmd).apply(composite.result().list()));
             }
           });
-
-          return promise.future();
         } else {
           // it doesn't matter which node to use
-          send(selectEndpoint(-1, cmd.isReadOnly(), forceMasterEndpoint), RETRIES, req, promise);
-          return promise.future();
+          send(selectEndpoint(-1, cmd.isReadOnly(args), forceMasterEndpoint), RETRIES, req, promise);
         }
+        return promise.future();
       case 1:
         // trivial option the command is single key
-        send(selectEndpoint(ZModem.generate(keys.get(0)), cmd.isReadOnly(), forceMasterEndpoint), RETRIES, req, promise);
+        send(selectEndpoint(ZModem.generate(keys.get(0)), cmd.isReadOnly(args), forceMasterEndpoint), RETRIES, req, promise);
         return promise.future();
       default:
         int hashSlot = ZModem.generateMultiRaw(keys);
         // -1 indicates that not all keys of the command targets the same hash slot, so Redis would not be able to execute it.
         // we try to perform a reduction if we know how
         if (hashSlot == -1) {
-
-          final List<byte[]> args = req.getArgs();
-
           int currentSlot = -1;
 
           for (byte[] key : keys) {
@@ -201,7 +195,7 @@ public class RedisClusterConnection implements RedisConnection {
 
               for (Map.Entry<Integer, Request> kv : requests.entrySet()) {
                 final Promise<Response> p = vertx.promise();
-                send(selectEndpoint(kv.getKey(), cmd.isReadOnly(), forceMasterEndpoint), RETRIES, kv.getValue(), p);
+                send(selectEndpoint(kv.getKey(), cmd.isReadOnly(args), forceMasterEndpoint), RETRIES, kv.getValue(), p);
                 responses.add(p.future());
               }
 
@@ -218,7 +212,7 @@ public class RedisClusterConnection implements RedisConnection {
             }
 
             // all keys are on the same slot!
-            send(selectEndpoint(currentSlot, cmd.isReadOnly(), forceMasterEndpoint), RETRIES, req, promise);
+            send(selectEndpoint(currentSlot, cmd.isReadOnly(args), forceMasterEndpoint), RETRIES, req, promise);
             return promise.future();
           }
 
@@ -227,27 +221,16 @@ public class RedisClusterConnection implements RedisConnection {
         }
 
         String[] endpoints = slots.endpointsForKey(hashSlot);
-        send(selectMasterOrReplicaEndpoint(req.command().isReadOnly(), endpoints, forceMasterEndpoint), RETRIES, req, promise);
+        send(selectMasterOrReplicaEndpoint(cmd.isReadOnly(args), endpoints, forceMasterEndpoint), RETRIES, req, promise);
         return promise.future();
     }
   }
 
-  private Map<Integer, Request> splitRequest(CommandInternal cmd, List<byte[]> args) {
-    BeginSearch beginSearch = cmd.beginSearch();
-    FindKeys findKeys = cmd.findKeys();
-    if (beginSearch == null || findKeys == null) {
-      // not possible to split the command
-      return Collections.emptyMap();
-    }
-
+  private Map<Integer, Request> splitRequest(CommandImpl cmd, List<byte[]> args) {
     // we will split the request across the slots
     final Map<Integer, Request> map = new IdentityHashMap<>();
 
-    final int arity = cmd.getArity();
-    final int begin = beginSearch.begin(args, arity);
-
-    int lastKey = findKeys
-      .forEach(args, arity, begin, (keyIdx, keyStep) -> {
+    int lastKey = cmd.iterateKeys(args, (begin, keyIdx, keyStep) -> {
         int slot = ZModem.generate(args.get(keyIdx));
         // get the client for the slot
         Request request = map.get(slot);
@@ -367,9 +350,11 @@ public class RedisClusterConnection implements RedisConnection {
       for (Request request : requests) {
         // process commands for cluster mode
         final RequestImpl req = (RequestImpl) request;
-        final CommandInternal cmd = (CommandInternal) req.command();
+        final CommandImpl cmd = (CommandImpl) req.command();
+        final List<byte[]> args = req.getArgs();
 
-        readOnly |= cmd.isReadOnly();
+
+        readOnly |= cmd.isReadOnly(args);
 
         if (cmd.needsGetKeys()) {
           // it is required to resolve the keys at the server side as we cannot deduct where they are algorithmically

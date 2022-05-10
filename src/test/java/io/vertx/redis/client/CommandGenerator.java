@@ -28,8 +28,6 @@ public class CommandGenerator extends AbstractVerticle {
         List<String> commands = new ArrayList<>();
 
         res.forEach(cmd -> {
-          String beginSearch = null;
-          String findKeys = null;
           Boolean ro = null;
           boolean getkeys = false;
 
@@ -42,55 +40,67 @@ public class CommandGenerator extends AbstractVerticle {
             }
           }
 
+          String keyLocator = null;
+
           if (cmd.get(8).size() > 0) {
-            if (cmd.get(8).size() > 1) {
-              getkeys = true;
-            } else {
-              Response hint = cmd.get(8).get(0);
+
+            for (Response hint : cmd.get(8)) {
+              String beginSearch = null;
+              String findKeys = null;
+              Boolean flagRO = null;
+
               if (hint.size() > 0) {
-                if (hint.size() > 0) {
-                  if (hint.containsKey("flags")) {
-                    for (Response flag : hint.get("flags")) {
-                      if ("RO".equalsIgnoreCase(flag.toString())) {
-                        ro = true;
-                        break;
-                      }
-                      if ("RW".equalsIgnoreCase(flag.toString()) || "OW".equalsIgnoreCase(flag.toString()) || "RM".equalsIgnoreCase(flag.toString())) {
-                        ro = false;
-                        break;
-                      }
+                if (hint.containsKey("flags")) {
+                  for (Response flag : hint.get("flags")) {
+                    if ("RO".equalsIgnoreCase(flag.toString())) {
+                      flagRO = true;
+                      break;
+                    }
+                    if ("RW".equalsIgnoreCase(flag.toString()) || "OW".equalsIgnoreCase(flag.toString()) || "RM".equalsIgnoreCase(flag.toString())) {
+                      flagRO = false;
+                      break;
                     }
                   }
-                  if (hint.containsKey("begin_search")) {
-                    String type = hint.get("begin_search").get("type").toString();
-                    Response spec = hint.get("begin_search").get("spec");
-                    switch (type) {
-                      case "index":
-                        beginSearch = "new BeginSearchIndex(" + spec.get("index").toInteger() + ")";
-                        break;
-                      case "keyword":
-                        beginSearch = "new BeginSearchKeyword(\"" + spec.get("keyword").toString() + "\", " + spec.get("startfrom").toInteger() + ")";
-                        break;
-                      case "unknown":
-                        System.err.println(cmd);
-                        break;
-                    }
+                }
+                if (hint.containsKey("begin_search")) {
+                  String type = hint.get("begin_search").get("type").toString();
+                  Response spec = hint.get("begin_search").get("spec");
+                  switch (type) {
+                    case "index":
+                      beginSearch = "new BeginSearchIndex(" + spec.get("index").toInteger() + ")";
+                      break;
+                    case "keyword":
+                      beginSearch = "new BeginSearchKeyword(\"" + spec.get("keyword").toString() + "\", " + spec.get("startfrom").toInteger() + ")";
+                      break;
+                    case "unknown":
+                      getkeys = true;
+                      System.err.println(cmd);
+                      break;
                   }
-                  if (hint.containsKey("find_keys")) {
-                    String type = hint.get("find_keys").get("type").toString();
-                    Response spec = hint.get("find_keys").get("spec");
-                    switch (type) {
-                      case "range":
-                        findKeys = "new FindKeysRange(" + spec.get("lastkey").toInteger() + ", " + spec.get("keystep").toInteger() + ", " + spec.get("limit").toInteger() + ")";
-                        break;
-                      case "keynum":
-                        findKeys = "new FindKeysKeynum(" + spec.get("keynumidx").toInteger() + ", " + spec.get("firstkey").toInteger() + ", " + spec.get("keystep").toInteger() + ")";
-                        break;
-                      case "unknown":
-                        System.err.println(cmd);
-                        break;
-                    }
+                }
+                if (hint.containsKey("find_keys")) {
+                  String type = hint.get("find_keys").get("type").toString();
+                  Response spec = hint.get("find_keys").get("spec");
+                  switch (type) {
+                    case "range":
+                      findKeys = "new FindKeysRange(" + spec.get("lastkey").toInteger() + ", " + spec.get("keystep").toInteger() + ", " + spec.get("limit").toInteger() + ")";
+                      break;
+                    case "keynum":
+                      findKeys = "new FindKeysKeynum(" + spec.get("keynumidx").toInteger() + ", " + spec.get("firstkey").toInteger() + ", " + spec.get("keystep").toInteger() + ")";
+                      break;
+                    case "unknown":
+                      getkeys = true;
+                      System.err.println(cmd);
+                      break;
                   }
+                }
+              }
+
+              if (beginSearch != null && findKeys != null) {
+                if (keyLocator == null) {
+                  keyLocator = "new KeyLocator(" + flagRO + ", " + beginSearch + ", " + findKeys + ")";
+                } else {
+                  keyLocator += ", new KeyLocator(" + flagRO + ", " + beginSearch + ", " + findKeys + ")";
                 }
               }
             }
@@ -113,11 +123,10 @@ public class CommandGenerator extends AbstractVerticle {
             generateCommand(
               cmd.get(0).toString(),
               cmd.get(1).toInteger(),
-              beginSearch,
-              findKeys,
-              getkeys,
               ro,
-              pubSub
+              pubSub,
+              getkeys,
+              keyLocator
             ));
         });
 
@@ -129,8 +138,8 @@ public class CommandGenerator extends AbstractVerticle {
       });
   }
 
-  private String generateCommand(String name, int arity, String beginSearch, String findKeys, boolean getkeys, Boolean ro, boolean pubSub) {
+  private String generateCommand(String name, int arity, Boolean ro, boolean pubSub, boolean getKeys, String keyLocator) {
     return
-      "Command " + name.replace('-', '_').toUpperCase() + " = Command.create(\"" + name + "\", " + arity + ", " + beginSearch + ", " + findKeys + ", " + getkeys + ", " + ro + ", " + pubSub + ");";
+      "Command " + name.replace('-', '_').toUpperCase() + " = new CommandImpl(\"" + name + "\", " + arity + ", " + ro + ", " + pubSub + ", " + getKeys  + (keyLocator == null ? "" : ", " + keyLocator) + ");";
   }
 }
