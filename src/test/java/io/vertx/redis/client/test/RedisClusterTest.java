@@ -1095,4 +1095,23 @@ public class RedisClusterTest {
         });
       });
   }
+
+  @Test
+  public void testCommandWithoutReadOrWrite(TestContext should) {
+    final Async test = should.async();
+
+    client
+      .connect(onCreate -> {
+        should.assertTrue(onCreate.succeeded());
+
+        final RedisConnection cluster = onCreate.result();
+        cluster.exceptionHandler(should::fail);
+
+        cluster.send(cmd(ACL, "users"), aclUsers -> {
+          should.assertTrue(aclUsers.succeeded());
+          should.assertEquals(1, aclUsers.result().size());
+          test.complete();
+        });
+      });
+  }
 }

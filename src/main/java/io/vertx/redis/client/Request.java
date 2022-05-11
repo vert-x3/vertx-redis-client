@@ -44,8 +44,28 @@ import java.util.Map;
 @VertxGen
 public interface Request {
 
+  /**
+   * Creates a new request command. Requests can be reused to avoid GC.
+   *
+   * @param command the command to use
+   * @return a new request instance
+   */
   static Request cmd(Command command) {
     return new RequestImpl(command);
+  }
+
+  /**
+   * Creates a new request command only with simple types: {@link Number}, {@link Boolean}, {@link String},
+   * {@code byte[]} or {@link Buffer}. This factory reduces the GC as it allocates the arguments array with
+   * the right size.
+   *
+   * @param command the command to use
+   * @param args the fixed list of arguments
+   * @return a new request instance
+   */
+  @GenIgnore(GenIgnore.PERMITTED_TYPE)
+  static Request cmd(Command command, Object... args) {
+    return new RequestImpl(command, args);
   }
 
   /**

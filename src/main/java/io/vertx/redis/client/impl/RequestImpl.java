@@ -16,11 +16,14 @@
 package io.vertx.redis.client.impl;
 
 import io.vertx.core.buffer.Buffer;
+import io.vertx.core.json.JsonArray;
+import io.vertx.core.json.JsonObject;
 import io.vertx.redis.client.Command;
 import io.vertx.redis.client.Request;
 
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
@@ -46,6 +49,43 @@ public final class RequestImpl implements Request {
     } else {
       args = Collections.emptyList();
     }
+  }
+
+  public RequestImpl(Command cmd, Object[] args) {
+    this.cmd = (CommandImpl) cmd;
+    if (args != null) {
+      final int len = args.length;
+      if (len > 0) {
+        for (int i = 0; i < args.length; i++) {
+          final Object o = args[i];
+          if (o != null) {
+            if (o instanceof Number) {
+              args[i] = o.toString().getBytes(StandardCharsets.US_ASCII);
+              continue;
+            }
+            if (o instanceof Boolean) {
+              args[i] = ((Boolean) o) ? TRUE : FALSE;
+              continue;
+            }
+            if (o instanceof String) {
+              args[i] = ((String) o).getBytes(StandardCharsets.UTF_8);
+              continue;
+            }
+            if (o instanceof byte[]) {
+              continue;
+            }
+            if (o instanceof Buffer) {
+              args[i] = ((Buffer) o).getBytes();
+              continue;
+            }
+            throw new IllegalArgumentException("Unsupported argument type: " + o.getClass());
+          }
+        }
+        this.args = (List) Arrays.asList(args);
+        return;
+      }
+    }
+    this.args = Collections.emptyList();
   }
 
   @Override

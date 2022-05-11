@@ -36,7 +36,7 @@ public class CommandImpl implements Command {
 
   private final KeyLocator[] keyLocators;
   private final boolean needGetKeys;
-  private final boolean readOnly;
+  private final Boolean readOnly;
   private final boolean pubsub;
 
   public CommandImpl(String command, int arity, Boolean readOnly, boolean pubsub, boolean needGetKeys, KeyLocator... keyLocators) {
@@ -45,7 +45,7 @@ public class CommandImpl implements Command {
     this.arity = arity;
     this.needGetKeys = needGetKeys;
     this.keyLocators = keyLocators;
-    this.readOnly = readOnly == null || readOnly;
+    this.readOnly = readOnly;
     this.pubsub = pubsub;
   }
 
@@ -69,10 +69,22 @@ public class CommandImpl implements Command {
         if (offset == -1) {
           continue;
         }
-        return keyLocator.ro;
+        if (keyLocator.ro == null) {
+          // when read only is undefined, we assume that the command has no side effects,
+          // so it can be execution on either a master or replica node
+          return true;
+        } else {
+          return keyLocator.ro;
+        }
       }
     }
-    return readOnly;
+    if (readOnly == null) {
+      // when read only is undefined, we assume that the command has no side effects,
+      // so it can be execution on either a master or replica node
+      return true;
+    } else {
+      return readOnly;
+    }
   }
 
   public boolean isPubSub() {

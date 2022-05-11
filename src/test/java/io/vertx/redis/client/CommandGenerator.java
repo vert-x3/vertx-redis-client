@@ -140,6 +140,6 @@ public class CommandGenerator extends AbstractVerticle {
 
   private String generateCommand(String name, int arity, Boolean ro, boolean pubSub, boolean getKeys, String keyLocator) {
     return
-      "Command " + name.replace('-', '_').toUpperCase() + " = new CommandImpl(\"" + name + "\", " + arity + ", " + ro + ", " + pubSub + ", " + getKeys  + (keyLocator == null ? "" : ", " + keyLocator) + ");";
+      "Command " + name.replace('.', '_').replace('-', '_').toUpperCase() + " = new CommandImpl(\"" + name + "\", " + arity + ", " + ro + ", " + pubSub + ", " + getKeys  + (keyLocator == null ? "" : ", " + keyLocator) + ");";
   }
 }
