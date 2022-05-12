@@ -58,7 +58,7 @@ class RedisConnectionManager {
 
   RedisConnectionManager(VertxInternal vertx, RedisOptions options) {
     this.vertx = vertx;
-    this.context = vertx.getContext();
+    this.context = vertx.getOrCreateContext();
     this.options = options;
     VertxMetrics metricsSPI = this.vertx.metricsSPI();
     metrics = metricsSPI != null ? metricsSPI.createPoolMetrics("redis", options.getPoolName(), options.getMaxPoolSize()) : null;
