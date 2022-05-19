@@ -1076,4 +1076,42 @@ public class RedisClusterTest {
       }
     ));
   }
+
+  @Test(timeout = 30_000)
+  public void testUnsupportedCommand(TestContext should) {
+    final Async test = should.async();
+
+    client
+      .connect(onCreate -> {
+        should.assertTrue(onCreate.succeeded());
+
+        final RedisConnection cluster = onCreate.result();
+        cluster.exceptionHandler(should::fail);
+
+        cluster.send(cmd(WAIT).arg(1).arg(0), hset1 -> {
+          should.assertTrue(hset1.succeeded());
+          System.out.println(hset1.result());
+          test.complete();
+        });
+      });
+  }
+
+  @Test
+  public void testCommandWithoutReadOrWrite(TestContext should) {
+    final Async test = should.async();
+
+    client
+      .connect(onCreate -> {
+        should.assertTrue(onCreate.succeeded());
+
+        final RedisConnection cluster = onCreate.result();
+        cluster.exceptionHandler(should::fail);
+
+        cluster.send(cmd(ACL, "users"), aclUsers -> {
+          should.assertTrue(aclUsers.succeeded());
+          should.assertEquals(1, aclUsers.result().size());
+          test.complete();
+        });
+      });
+  }
 }

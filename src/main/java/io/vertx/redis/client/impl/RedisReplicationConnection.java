@@ -109,10 +109,10 @@ public class RedisReplicationConnection implements RedisConnection {
   public Future<Response> send(Request request) {
     // process commands for cluster mode
     final RequestImpl req = (RequestImpl) request;
-    final Command cmd = req.command();
+    final CommandImpl cmd = (CommandImpl) req.command();
     final boolean forceMasterEndpoint = MASTER_ONLY_COMMANDS.contains(cmd);
 
-    return selectMasterOrReplicaEndpoint(!cmd.isWrite(), forceMasterEndpoint)
+    return selectMasterOrReplicaEndpoint(cmd.isReadOnly(req.getArgs()), forceMasterEndpoint)
       .send(request);
   }
 
@@ -129,9 +129,9 @@ public class RedisReplicationConnection implements RedisConnection {
       for (Request request : requests) {
         // process commands for cluster mode
         final RequestImpl req = (RequestImpl) request;
-        final Command cmd = req.command();
+        final CommandImpl cmd = (CommandImpl) req.command();
 
-        readOnly |= !cmd.isWrite();
+        readOnly |= cmd.isReadOnly(req.getArgs());
         forceMasterEndpoint |= MASTER_ONLY_COMMANDS.contains(cmd);
       }
 

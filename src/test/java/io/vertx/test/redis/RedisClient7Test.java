@@ -236,4 +236,22 @@ public class RedisClient7Test {
       });
 
   }
+
+  @Test
+  public void testBooleanVarArgs(TestContext should) {
+    final Async test = should.async();
+    final String key = makeKey();
+
+    client.send(cmd(HSET, key, "true", true, "false", false))
+      .onFailure(should::fail)
+      .onSuccess(ok -> {
+        client.send(cmd(HGETALL).arg(key))
+          .onFailure(should::fail)
+          .onSuccess(hgetall -> {
+            should.assertFalse(hgetall.get("false").toBoolean());
+            should.assertTrue(hgetall.get("true").toBoolean());
+            test.complete();
+          });
+      });
+  }
 }

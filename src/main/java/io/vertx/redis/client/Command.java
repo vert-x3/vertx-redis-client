@@ -15,327 +15,405 @@
  */
 package io.vertx.redis.client;
 
-import io.vertx.codegen.annotations.GenIgnore;
 import io.vertx.codegen.annotations.VertxGen;
 import io.vertx.redis.client.impl.CommandImpl;
+import io.vertx.redis.client.impl.KeyLocator;
+import io.vertx.redis.client.impl.keys.*;
 
 /**
  * <b>Auto generated</b> API Commands to interact with REDIS.
- * @version redis_version:7.0.0
  *
  * @author <a href="mailto:plopes@redhat.com">Paulo Lopes</a>
+ * @version redis_version:7.0.0
  */
 @VertxGen
 public interface Command {
 
-  Command ACL = Command.create("acl", -2, 0, 0, 0, false, false, false, false);
-  Command APPEND = Command.create("append", 3, 1, 1, 1, true, false, false, false);
-  Command ASKING = Command.create("asking", 1, 0, 0, 0, false, false, false, false);
-  Command AUTH = Command.create("auth", -2, 0, 0, 0, false, false, false, false);
-  Command BGREWRITEAOF = Command.create("bgrewriteaof", 1, 0, 0, 0, false, false, false, false);
-  Command BGSAVE = Command.create("bgsave", -1, 0, 0, 0, false, false, false, false);
-  Command BITCOUNT = Command.create("bitcount", -2, 1, 1, 1, false, true, false, false);
-  Command BITFIELD = Command.create("bitfield", -2, 1, 1, 1, true, false, true, false);
-  Command BITFIELD_RO = Command.create("bitfield_ro", -2, 1, 1, 1, false, true, false, false);
-  Command BITOP = Command.create("bitop", -4, 2, -1, 1, true, false, false, false);
-  Command BITPOS = Command.create("bitpos", -3, 1, 1, 1, false, true, false, false);
-  Command BLMOVE = Command.create("blmove", 6, 1, 2, 1, true, false, false, false);
-  Command BLMPOP = Command.create("blmpop", -5, 0, 0, 0, true, false, true, false);
-  Command BLPOP = Command.create("blpop", -3, 1, -2, 1, true, false, false, false);
-  Command BRPOP = Command.create("brpop", -3, 1, -2, 1, true, false, false, false);
-  Command BRPOPLPUSH = Command.create("brpoplpush", 4, 1, 2, 1, true, false, false, false);
-  Command BZMPOP = Command.create("bzmpop", -5, 0, 0, 0, true, false, true, false);
-  Command BZPOPMAX = Command.create("bzpopmax", -3, 1, -2, 1, true, false, false, false);
-  Command BZPOPMIN = Command.create("bzpopmin", -3, 1, -2, 1, true, false, false, false);
-  Command CLIENT = Command.create("client", -2, 0, 0, 0, false, false, false, false);
-  Command CLUSTER = Command.create("cluster", -2, 0, 0, 0, false, false, false, false);
-  Command COMMAND = Command.create("command", -1, 0, 0, 0, false, false, false, false);
-  Command CONFIG = Command.create("config", -2, 0, 0, 0, false, false, false, false);
-  Command COPY = Command.create("copy", -3, 1, 2, 1, true, false, false, false);
-  Command DBSIZE = Command.create("dbsize", 1, 0, 0, 0, false, true, false, false);
-  Command DEBUG = Command.create("debug", -2, 0, 0, 0, false, false, false, false);
-  Command DECR = Command.create("decr", 2, 1, 1, 1, true, false, false, false);
-  Command DECRBY = Command.create("decrby", 3, 1, 1, 1, true, false, false, false);
-  Command DEL = Command.create("del", -2, 1, -1, 1, true, false, false, false);
-  Command DISCARD = Command.create("discard", 1, 0, 0, 0, false, false, false, false);
-  Command DUMP = Command.create("dump", 2, 1, 1, 1, false, true, false, false);
-  Command ECHO = Command.create("echo", 2, 0, 0, 0, false, false, false, false);
-  Command EVAL = Command.create("eval", -3, 0, 0, 0, false, false, true, false);
-  Command EVAL_RO = Command.create("eval_ro", -3, 0, 0, 0, false, false, true, false);
-  Command EVALSHA = Command.create("evalsha", -3, 0, 0, 0, false, false, true, false);
-  Command EVALSHA_RO = Command.create("evalsha_ro", -3, 0, 0, 0, false, false, true, false);
-  Command EXEC = Command.create("exec", 1, 0, 0, 0, false, false, false, false);
-  Command EXISTS = Command.create("exists", -2, 1, -1, 1, false, true, false, false);
-  Command EXPIRE = Command.create("expire", -3, 1, 1, 1, true, false, false, false);
-  Command EXPIREAT = Command.create("expireat", -3, 1, 1, 1, true, false, false, false);
-  Command EXPIRETIME = Command.create("expiretime", 2, 1, 1, 1, false, true, false, false);
-  Command FAILOVER = Command.create("failover", -1, 0, 0, 0, false, false, false, false);
-  Command FCALL = Command.create("fcall", -3, 0, 0, 0, false, false, true, false);
-  Command FCALL_RO = Command.create("fcall_ro", -3, 0, 0, 0, false, false, true, false);
-  Command FLUSHALL = Command.create("flushall", -1, 0, 0, 0, true, false, false, false);
-  Command FLUSHDB = Command.create("flushdb", -1, 0, 0, 0, true, false, false, false);
-  Command FUNCTION = Command.create("function", -2, 0, 0, 0, false, false, false, false);
-  Command GEOADD = Command.create("geoadd", -5, 1, 1, 1, true, false, false, false);
-  Command GEODIST = Command.create("geodist", -4, 1, 1, 1, false, true, false, false);
-  Command GEOHASH = Command.create("geohash", -2, 1, 1, 1, false, true, false, false);
-  Command GEOPOS = Command.create("geopos", -2, 1, 1, 1, false, true, false, false);
-  Command GEORADIUS = Command.create("georadius", -6, 1, 1, 1, true, false, true, false);
-  Command GEORADIUS_RO = Command.create("georadius_ro", -6, 1, 1, 1, false, true, false, false);
-  Command GEORADIUSBYMEMBER = Command.create("georadiusbymember", -5, 1, 1, 1, true, false, true, false);
-  Command GEORADIUSBYMEMBER_RO = Command.create("georadiusbymember_ro", -5, 1, 1, 1, false, true, false, false);
-  Command GEOSEARCH = Command.create("geosearch", -7, 1, 1, 1, false, true, false, false);
-  Command GEOSEARCHSTORE = Command.create("geosearchstore", -8, 1, 2, 1, true, false, false, false);
-  Command GET = Command.create("get", 2, 1, 1, 1, false, true, false, false);
-  Command GETBIT = Command.create("getbit", 3, 1, 1, 1, false, true, false, false);
-  Command GETDEL = Command.create("getdel", 2, 1, 1, 1, true, false, false, false);
-  Command GETEX = Command.create("getex", -2, 1, 1, 1, true, false, false, false);
-  Command GETRANGE = Command.create("getrange", 4, 1, 1, 1, false, true, false, false);
-  Command GETSET = Command.create("getset", 3, 1, 1, 1, true, false, false, false);
-  Command HDEL = Command.create("hdel", -3, 1, 1, 1, true, false, false, false);
-  Command HELLO = Command.create("hello", -1, 0, 0, 0, false, false, false, false);
-  Command HEXISTS = Command.create("hexists", 3, 1, 1, 1, false, true, false, false);
-  Command HGET = Command.create("hget", 3, 1, 1, 1, false, true, false, false);
-  Command HGETALL = Command.create("hgetall", 2, 1, 1, 1, false, true, false, false);
-  Command HINCRBY = Command.create("hincrby", 4, 1, 1, 1, true, false, false, false);
-  Command HINCRBYFLOAT = Command.create("hincrbyfloat", 4, 1, 1, 1, true, false, false, false);
-  Command HKEYS = Command.create("hkeys", 2, 1, 1, 1, false, true, false, false);
-  Command HLEN = Command.create("hlen", 2, 1, 1, 1, false, true, false, false);
-  Command HMGET = Command.create("hmget", -3, 1, 1, 1, false, true, false, false);
-  Command HMSET = Command.create("hmset", -4, 1, 1, 1, true, false, false, false);
-  Command HRANDFIELD = Command.create("hrandfield", -2, 1, 1, 1, false, true, false, false);
-  Command HSCAN = Command.create("hscan", -3, 1, 1, 1, false, true, false, false);
-  Command HSET = Command.create("hset", -4, 1, 1, 1, true, false, false, false);
-  Command HSETNX = Command.create("hsetnx", 4, 1, 1, 1, true, false, false, false);
-  Command HSTRLEN = Command.create("hstrlen", 3, 1, 1, 1, false, true, false, false);
-  Command HVALS = Command.create("hvals", 2, 1, 1, 1, false, true, false, false);
-  Command INCR = Command.create("incr", 2, 1, 1, 1, true, false, false, false);
-  Command INCRBY = Command.create("incrby", 3, 1, 1, 1, true, false, false, false);
-  Command INCRBYFLOAT = Command.create("incrbyfloat", 3, 1, 1, 1, true, false, false, false);
-  Command INFO = Command.create("info", -1, 0, 0, 0, false, false, false, false);
-  Command KEYS = Command.create("keys", 2, 0, 0, 0, false, true, false, false);
-  Command LASTSAVE = Command.create("lastsave", 1, 0, 0, 0, false, false, false, false);
-  Command LATENCY = Command.create("latency", -2, 0, 0, 0, false, false, false, false);
-  Command LCS = Command.create("lcs", -3, 1, 2, 1, false, true, false, false);
-  Command LINDEX = Command.create("lindex", 3, 1, 1, 1, false, true, false, false);
-  Command LINSERT = Command.create("linsert", 5, 1, 1, 1, true, false, false, false);
-  Command LLEN = Command.create("llen", 2, 1, 1, 1, false, true, false, false);
-  Command LMOVE = Command.create("lmove", 5, 1, 2, 1, true, false, false, false);
-  Command LMPOP = Command.create("lmpop", -4, 0, 0, 0, true, false, true, false);
-  Command LOLWUT = Command.create("lolwut", -1, 0, 0, 0, false, true, false, false);
-  Command LPOP = Command.create("lpop", -2, 1, 1, 1, true, false, false, false);
-  Command LPOS = Command.create("lpos", -3, 1, 1, 1, false, true, false, false);
-  Command LPUSH = Command.create("lpush", -3, 1, 1, 1, true, false, false, false);
-  Command LPUSHX = Command.create("lpushx", -3, 1, 1, 1, true, false, false, false);
-  Command LRANGE = Command.create("lrange", 4, 1, 1, 1, false, true, false, false);
-  Command LREM = Command.create("lrem", 4, 1, 1, 1, true, false, false, false);
-  Command LSET = Command.create("lset", 4, 1, 1, 1, true, false, false, false);
-  Command LTRIM = Command.create("ltrim", 4, 1, 1, 1, true, false, false, false);
-  Command MEMORY = Command.create("memory", -2, 0, 0, 0, false, false, false, false);
-  Command MGET = Command.create("mget", -2, 1, -1, 1, false, true, false, false);
-  Command MIGRATE = Command.create("migrate", -6, 3, 3, 1, true, false, true, false);
-  Command MODULE = Command.create("module", -2, 0, 0, 0, false, false, false, false);
-  Command MONITOR = Command.create("monitor", 1, 0, 0, 0, false, false, false, false);
-  Command MOVE = Command.create("move", 3, 1, 1, 1, true, false, false, false);
-  Command MSET = Command.create("mset", -3, 1, -1, 2, true, false, false, false);
-  Command MSETNX = Command.create("msetnx", -3, 1, -1, 2, true, false, false, false);
-  Command MULTI = Command.create("multi", 1, 0, 0, 0, false, false, false, false);
-  Command OBJECT = Command.create("object", -2, 0, 0, 0, false, false, false, false);
-  Command PERSIST = Command.create("persist", 2, 1, 1, 1, true, false, false, false);
-  Command PEXPIRE = Command.create("pexpire", -3, 1, 1, 1, true, false, false, false);
-  Command PEXPIREAT = Command.create("pexpireat", -3, 1, 1, 1, true, false, false, false);
-  Command PEXPIRETIME = Command.create("pexpiretime", 2, 1, 1, 1, false, true, false, false);
-  Command PFADD = Command.create("pfadd", -2, 1, 1, 1, true, false, false, false);
-  Command PFCOUNT = Command.create("pfcount", -2, 1, -1, 1, false, true, false, false);
-  Command PFDEBUG = Command.create("pfdebug", -3, 2, 2, 1, true, false, false, false);
-  Command PFMERGE = Command.create("pfmerge", -2, 1, -1, 1, true, false, false, false);
-  Command PFSELFTEST = Command.create("pfselftest", 1, 0, 0, 0, false, false, false, false);
-  Command PING = Command.create("ping", -1, 0, 0, 0, false, false, false, false);
-  Command PSETEX = Command.create("psetex", 4, 1, 1, 1, true, false, false, false);
-  Command PSUBSCRIBE = Command.create("psubscribe", -2, 0, 0, 0, false, false, false, true);
-  Command PSYNC = Command.create("psync", -3, 0, 0, 0, false, false, false, false);
-  Command PTTL = Command.create("pttl", 2, 1, 1, 1, false, true, false, false);
-  Command PUBLISH = Command.create("publish", 3, 0, 0, 0, false, false, false, false);
-  Command PUBSUB = Command.create("pubsub", -2, 0, 0, 0, false, false, false, false);
-  Command PUNSUBSCRIBE = Command.create("punsubscribe", -1, 0, 0, 0, false, false, false, true);
-  Command QUIT = Command.create("quit", -1, 0, 0, 0, false, false, false, false);
-  Command RANDOMKEY = Command.create("randomkey", 1, 0, 0, 0, false, true, false, false);
-  Command READONLY = Command.create("readonly", 1, 0, 0, 0, false, false, false, false);
-  Command READWRITE = Command.create("readwrite", 1, 0, 0, 0, false, false, false, false);
-  Command RENAME = Command.create("rename", 3, 1, 2, 1, true, false, false, false);
-  Command RENAMENX = Command.create("renamenx", 3, 1, 2, 1, true, false, false, false);
-  Command REPLCONF = Command.create("replconf", -1, 0, 0, 0, false, false, false, false);
-  Command REPLICAOF = Command.create("replicaof", 3, 0, 0, 0, false, false, false, false);
-  Command RESET = Command.create("reset", 1, 0, 0, 0, false, false, false, false);
-  Command RESTORE = Command.create("restore", -4, 1, 1, 1, true, false, false, false);
-  Command RESTORE_ASKING = Command.create("restore-asking", -4, 1, 1, 1, true, false, false, false);
-  Command ROLE = Command.create("role", 1, 0, 0, 0, false, false, false, false);
-  Command RPOP = Command.create("rpop", -2, 1, 1, 1, true, false, false, false);
-  Command RPOPLPUSH = Command.create("rpoplpush", 3, 1, 2, 1, true, false, false, false);
-  Command RPUSH = Command.create("rpush", -3, 1, 1, 1, true, false, false, false);
-  Command RPUSHX = Command.create("rpushx", -3, 1, 1, 1, true, false, false, false);
-  Command SADD = Command.create("sadd", -3, 1, 1, 1, true, false, false, false);
-  Command SAVE = Command.create("save", 1, 0, 0, 0, false, false, false, false);
-  Command SCAN = Command.create("scan", -2, 0, 0, 0, false, true, false, false);
-  Command SCARD = Command.create("scard", 2, 1, 1, 1, false, true, false, false);
-  Command SCRIPT = Command.create("script", -2, 0, 0, 0, false, false, false, false);
-  Command SDIFF = Command.create("sdiff", -2, 1, -1, 1, false, true, false, false);
-  Command SDIFFSTORE = Command.create("sdiffstore", -3, 1, -1, 1, true, false, false, false);
-  Command SELECT = Command.create("select", 2, 0, 0, 0, false, false, false, false);
-  Command SET = Command.create("set", -3, 1, 1, 1, true, false, false, false);
-  Command SETBIT = Command.create("setbit", 4, 1, 1, 1, true, false, false, false);
-  Command SETEX = Command.create("setex", 4, 1, 1, 1, true, false, false, false);
-  Command SETNX = Command.create("setnx", 3, 1, 1, 1, true, false, false, false);
-  Command SETRANGE = Command.create("setrange", 4, 1, 1, 1, true, false, false, false);
-  Command SHUTDOWN = Command.create("shutdown", -1, 0, 0, 0, false, false, false, false);
-  Command SINTER = Command.create("sinter", -2, 1, -1, 1, false, true, false, false);
-  Command SINTERCARD = Command.create("sintercard", -3, 0, 0, 0, false, true, true, false);
-  Command SINTERSTORE = Command.create("sinterstore", -3, 1, -1, 1, true, false, false, false);
-  Command SISMEMBER = Command.create("sismember", 3, 1, 1, 1, false, true, false, false);
-  Command SLAVEOF = Command.create("slaveof", 3, 0, 0, 0, false, false, false, false);
-  Command SLOWLOG = Command.create("slowlog", -2, 0, 0, 0, false, false, false, false);
-  Command SMEMBERS = Command.create("smembers", 2, 1, 1, 1, false, true, false, false);
-  Command SMISMEMBER = Command.create("smismember", -3, 1, 1, 1, false, true, false, false);
-  Command SMOVE = Command.create("smove", 4, 1, 2, 1, true, false, false, false);
-  Command SORT = Command.create("sort", -2, 1, 1, 1, true, false, true, false);
-  Command SORT_RO = Command.create("sort_ro", -2, 1, 1, 1, false, true, true, false);
-  Command SPOP = Command.create("spop", -2, 1, 1, 1, true, false, false, false);
-  Command SPUBLISH = Command.create("spublish", 3, 1, 1, 1, false, false, false, true);
-  Command SRANDMEMBER = Command.create("srandmember", -2, 1, 1, 1, false, true, false, false);
-  Command SREM = Command.create("srem", -3, 1, 1, 1, true, false, false, false);
-  Command SSCAN = Command.create("sscan", -3, 1, 1, 1, false, true, false, false);
-  Command SSUBSCRIBE = Command.create("ssubscribe", -2, 1, -1, 1, false, false, false, true);
-  Command STRLEN = Command.create("strlen", 2, 1, 1, 1, false, true, false, false);
-  Command SUBSCRIBE = Command.create("subscribe", -2, 0, 0, 0, false, false, false, true);
-  Command SUBSTR = Command.create("substr", 4, 1, 1, 1, false, true, false, false);
-  Command SUNION = Command.create("sunion", -2, 1, -1, 1, false, true, false, false);
-  Command SUNIONSTORE = Command.create("sunionstore", -3, 1, -1, 1, true, false, false, false);
-  Command SUNSUBSCRIBE = Command.create("sunsubscribe", -1, 1, -1, 1, false, false, false, true);
-  Command SWAPDB = Command.create("swapdb", 3, 0, 0, 0, true, false, false, false);
-  Command SYNC = Command.create("sync", 1, 0, 0, 0, false, false, false, false);
-  Command TIME = Command.create("time", 1, 0, 0, 0, false, false, false, false);
-  Command TOUCH = Command.create("touch", -2, 1, -1, 1, false, true, false, false);
-  Command TTL = Command.create("ttl", 2, 1, 1, 1, false, true, false, false);
-  Command TYPE = Command.create("type", 2, 1, 1, 1, false, true, false, false);
-  Command UNLINK = Command.create("unlink", -2, 1, -1, 1, true, false, false, false);
-  Command UNSUBSCRIBE = Command.create("unsubscribe", -1, 0, 0, 0, false, false, false, true);
-  Command UNWATCH = Command.create("unwatch", 1, 0, 0, 0, false, false, false, false);
-  Command WAIT = Command.create("wait", 3, 0, 0, 0, false, false, false, false);
-  Command WATCH = Command.create("watch", -2, 1, -1, 1, false, false, false, false);
-  Command XACK = Command.create("xack", -4, 1, 1, 1, true, false, false, false);
-  Command XADD = Command.create("xadd", -5, 1, 1, 1, true, false, false, false);
-  Command XAUTOCLAIM = Command.create("xautoclaim", -6, 1, 1, 1, true, false, false, false);
-  Command XCLAIM = Command.create("xclaim", -6, 1, 1, 1, true, false, false, false);
-  Command XDEL = Command.create("xdel", -3, 1, 1, 1, true, false, false, false);
-  Command XGROUP = Command.create("xgroup", -2, 0, 0, 0, false, false, false, false);
-  Command XINFO = Command.create("xinfo", -2, 0, 0, 0, false, false, false, false);
-  Command XLEN = Command.create("xlen", 2, 1, 1, 1, false, true, false, false);
-  Command XPENDING = Command.create("xpending", -3, 1, 1, 1, false, true, false, false);
-  Command XRANGE = Command.create("xrange", -4, 1, 1, 1, false, true, false, false);
-  Command XREAD = Command.create("xread", -4, 0, 0, 0, false, true, true, false);
-  Command XREADGROUP = Command.create("xreadgroup", -7, 0, 0, 0, true, false, true, false);
-  Command XREVRANGE = Command.create("xrevrange", -4, 1, 1, 1, false, true, false, false);
-  Command XSETID = Command.create("xsetid", -3, 1, 1, 1, true, false, false, false);
-  Command XTRIM = Command.create("xtrim", -4, 1, 1, 1, true, false, false, false);
-  Command ZADD = Command.create("zadd", -4, 1, 1, 1, true, false, false, false);
-  Command ZCARD = Command.create("zcard", 2, 1, 1, 1, false, true, false, false);
-  Command ZCOUNT = Command.create("zcount", 4, 1, 1, 1, false, true, false, false);
-  Command ZDIFF = Command.create("zdiff", -3, 0, 0, 0, false, true, true, false);
-  Command ZDIFFSTORE = Command.create("zdiffstore", -4, 1, 1, 1, true, false, true, false);
-  Command ZINCRBY = Command.create("zincrby", 4, 1, 1, 1, true, false, false, false);
-  Command ZINTER = Command.create("zinter", -3, 0, 0, 0, false, true, true, false);
-  Command ZINTERCARD = Command.create("zintercard", -3, 0, 0, 0, false, true, true, false);
-  Command ZINTERSTORE = Command.create("zinterstore", -4, 1, 1, 1, true, false, true, false);
-  Command ZLEXCOUNT = Command.create("zlexcount", 4, 1, 1, 1, false, true, false, false);
-  Command ZMPOP = Command.create("zmpop", -4, 0, 0, 0, true, false, true, false);
-  Command ZMSCORE = Command.create("zmscore", -3, 1, 1, 1, false, true, false, false);
-  Command ZPOPMAX = Command.create("zpopmax", -2, 1, 1, 1, true, false, false, false);
-  Command ZPOPMIN = Command.create("zpopmin", -2, 1, 1, 1, true, false, false, false);
-  Command ZRANDMEMBER = Command.create("zrandmember", -2, 1, 1, 1, false, true, false, false);
-  Command ZRANGE = Command.create("zrange", -4, 1, 1, 1, false, true, false, false);
-  Command ZRANGEBYLEX = Command.create("zrangebylex", -4, 1, 1, 1, false, true, false, false);
-  Command ZRANGEBYSCORE = Command.create("zrangebyscore", -4, 1, 1, 1, false, true, false, false);
-  Command ZRANGESTORE = Command.create("zrangestore", -5, 1, 2, 1, true, false, false, false);
-  Command ZRANK = Command.create("zrank", 3, 1, 1, 1, false, true, false, false);
-  Command ZREM = Command.create("zrem", -3, 1, 1, 1, true, false, false, false);
-  Command ZREMRANGEBYLEX = Command.create("zremrangebylex", 4, 1, 1, 1, true, false, false, false);
-  Command ZREMRANGEBYRANK = Command.create("zremrangebyrank", 4, 1, 1, 1, true, false, false, false);
-  Command ZREMRANGEBYSCORE = Command.create("zremrangebyscore", 4, 1, 1, 1, true, false, false, false);
-  Command ZREVRANGE = Command.create("zrevrange", -4, 1, 1, 1, false, true, false, false);
-  Command ZREVRANGEBYLEX = Command.create("zrevrangebylex", -4, 1, 1, 1, false, true, false, false);
-  Command ZREVRANGEBYSCORE = Command.create("zrevrangebyscore", -4, 1, 1, 1, false, true, false, false);
-  Command ZREVRANK = Command.create("zrevrank", 3, 1, 1, 1, false, true, false, false);
-  Command ZSCAN = Command.create("zscan", -3, 1, 1, 1, false, true, false, false);
-  Command ZSCORE = Command.create("zscore", 3, 1, 1, 1, false, true, false, false);
-  Command ZUNION = Command.create("zunion", -3, 0, 0, 0, false, true, true, false);
-  Command ZUNIONSTORE = Command.create("zunionstore", -4, 1, 1, 1, true, false, true, false);
-  Command SENTINEL = Command.create("sentinel");
+  Command ACL = new CommandImpl("acl", -2, null, false, false);
+  Command APPEND = new CommandImpl("append", 3, false, false, false, new KeyLocator(false, new BeginSearchIndex(1), new FindKeysRange(0, 1, 0)));
+  Command ASKING = new CommandImpl("asking", 1, null, false, false);
+  Command AUTH = new CommandImpl("auth", -2, null, false, false);
+  Command BF_ADD = new CommandImpl("bf.add", -1, false, false, false, new KeyLocator(false, new BeginSearchIndex(1), new FindKeysRange(0, 1, 0)));
+  Command BF_DEBUG = new CommandImpl("bf.debug", -1, true, false, false, new KeyLocator(false, new BeginSearchIndex(1), new FindKeysRange(0, 1, 0)));
+  Command BF_EXISTS = new CommandImpl("bf.exists", -1, true, false, false, new KeyLocator(false, new BeginSearchIndex(1), new FindKeysRange(0, 1, 0)));
+  Command BF_INFO = new CommandImpl("bf.info", -1, true, false, false, new KeyLocator(false, new BeginSearchIndex(1), new FindKeysRange(0, 1, 0)));
+  Command BF_INSERT = new CommandImpl("bf.insert", -1, false, false, false, new KeyLocator(false, new BeginSearchIndex(1), new FindKeysRange(0, 1, 0)));
+  Command BF_LOADCHUNK = new CommandImpl("bf.loadchunk", -1, false, false, false, new KeyLocator(false, new BeginSearchIndex(1), new FindKeysRange(0, 1, 0)));
+  Command BF_MADD = new CommandImpl("bf.madd", -1, false, false, false, new KeyLocator(false, new BeginSearchIndex(1), new FindKeysRange(0, 1, 0)));
+  Command BF_MEXISTS = new CommandImpl("bf.mexists", -1, true, false, false, new KeyLocator(false, new BeginSearchIndex(1), new FindKeysRange(0, 1, 0)));
+  Command BF_RESERVE = new CommandImpl("bf.reserve", -1, false, false, false, new KeyLocator(false, new BeginSearchIndex(1), new FindKeysRange(0, 1, 0)));
+  Command BF_SCANDUMP = new CommandImpl("bf.scandump", -1, true, false, false, new KeyLocator(false, new BeginSearchIndex(1), new FindKeysRange(0, 1, 0)));
+  Command BGREWRITEAOF = new CommandImpl("bgrewriteaof", 1, null, false, false);
+  Command BGSAVE = new CommandImpl("bgsave", -1, null, false, false);
+  Command BITCOUNT = new CommandImpl("bitcount", -2, true, false, false, new KeyLocator(true, new BeginSearchIndex(1), new FindKeysRange(0, 1, 0)));
+  Command BITFIELD = new CommandImpl("bitfield", -2, false, false, false, new KeyLocator(false, new BeginSearchIndex(1), new FindKeysRange(0, 1, 0)));
+  Command BITFIELD_RO = new CommandImpl("bitfield_ro", -2, true, false, false, new KeyLocator(true, new BeginSearchIndex(1), new FindKeysRange(0, 1, 0)));
+  Command BITOP = new CommandImpl("bitop", -4, false, false, false, new KeyLocator(false, new BeginSearchIndex(2), new FindKeysRange(0, 1, 0)), new KeyLocator(true, new BeginSearchIndex(3), new FindKeysRange(-1, 1, 0)));
+  Command BITPOS = new CommandImpl("bitpos", -3, true, false, false, new KeyLocator(true, new BeginSearchIndex(1), new FindKeysRange(0, 1, 0)));
+  Command BLMOVE = new CommandImpl("blmove", 6, false, false, false, new KeyLocator(false, new BeginSearchIndex(1), new FindKeysRange(0, 1, 0)), new KeyLocator(false, new BeginSearchIndex(2), new FindKeysRange(0, 1, 0)));
+  Command BLMPOP = new CommandImpl("blmpop", -5, false, false, false, new KeyLocator(false, new BeginSearchIndex(2), new FindKeysKeynum(0, 1, 1)));
+  Command BLPOP = new CommandImpl("blpop", -3, false, false, false, new KeyLocator(false, new BeginSearchIndex(1), new FindKeysRange(-2, 1, 0)));
+  Command BRPOP = new CommandImpl("brpop", -3, false, false, false, new KeyLocator(false, new BeginSearchIndex(1), new FindKeysRange(-2, 1, 0)));
+  Command BRPOPLPUSH = new CommandImpl("brpoplpush", 4, false, false, false, new KeyLocator(false, new BeginSearchIndex(1), new FindKeysRange(0, 1, 0)), new KeyLocator(false, new BeginSearchIndex(2), new FindKeysRange(0, 1, 0)));
+  Command BZMPOP = new CommandImpl("bzmpop", -5, false, false, false, new KeyLocator(false, new BeginSearchIndex(2), new FindKeysKeynum(0, 1, 1)));
+  Command BZPOPMAX = new CommandImpl("bzpopmax", -3, false, false, false, new KeyLocator(false, new BeginSearchIndex(1), new FindKeysRange(-2, 1, 0)));
+  Command BZPOPMIN = new CommandImpl("bzpopmin", -3, false, false, false, new KeyLocator(false, new BeginSearchIndex(1), new FindKeysRange(-2, 1, 0)));
+  Command CF_ADD = new CommandImpl("cf.add", -1, false, false, false, new KeyLocator(false, new BeginSearchIndex(1), new FindKeysRange(0, 1, 0)));
+  Command CF_ADDNX = new CommandImpl("cf.addnx", -1, false, false, false, new KeyLocator(false, new BeginSearchIndex(1), new FindKeysRange(0, 1, 0)));
+  Command CF_COMPACT = new CommandImpl("cf.compact", -1, true, false, false, new KeyLocator(false, new BeginSearchIndex(1), new FindKeysRange(0, 1, 0)));
+  Command CF_COUNT = new CommandImpl("cf.count", -1, true, false, false, new KeyLocator(false, new BeginSearchIndex(1), new FindKeysRange(0, 1, 0)));
+  Command CF_DEBUG = new CommandImpl("cf.debug", -1, true, false, false, new KeyLocator(false, new BeginSearchIndex(1), new FindKeysRange(0, 1, 0)));
+  Command CF_DEL = new CommandImpl("cf.del", -1, false, false, false, new KeyLocator(false, new BeginSearchIndex(1), new FindKeysRange(0, 1, 0)));
+  Command CF_EXISTS = new CommandImpl("cf.exists", -1, true, false, false, new KeyLocator(false, new BeginSearchIndex(1), new FindKeysRange(0, 1, 0)));
+  Command CF_INFO = new CommandImpl("cf.info", -1, true, false, false, new KeyLocator(false, new BeginSearchIndex(1), new FindKeysRange(0, 1, 0)));
+  Command CF_INSERT = new CommandImpl("cf.insert", -1, false, false, false, new KeyLocator(false, new BeginSearchIndex(1), new FindKeysRange(0, 1, 0)));
+  Command CF_INSERTNX = new CommandImpl("cf.insertnx", -1, false, false, false, new KeyLocator(false, new BeginSearchIndex(1), new FindKeysRange(0, 1, 0)));
+  Command CF_LOADCHUNK = new CommandImpl("cf.loadchunk", -1, false, false, false, new KeyLocator(false, new BeginSearchIndex(1), new FindKeysRange(0, 1, 0)));
+  Command CF_MEXISTS = new CommandImpl("cf.mexists", -1, true, false, false, new KeyLocator(false, new BeginSearchIndex(1), new FindKeysRange(0, 1, 0)));
+  Command CF_RESERVE = new CommandImpl("cf.reserve", -1, false, false, false, new KeyLocator(false, new BeginSearchIndex(1), new FindKeysRange(0, 1, 0)));
+  Command CF_SCANDUMP = new CommandImpl("cf.scandump", -1, true, false, false, new KeyLocator(false, new BeginSearchIndex(1), new FindKeysRange(0, 1, 0)));
+  Command CLIENT = new CommandImpl("client", -2, null, false, false);
+  Command CLUSTER = new CommandImpl("cluster", -2, null, false, false);
+  Command CMS_INCRBY = new CommandImpl("cms.incrby", -1, false, false, false, new KeyLocator(false, new BeginSearchIndex(1), new FindKeysRange(0, 1, 0)));
+  Command CMS_INFO = new CommandImpl("cms.info", -1, true, false, false, new KeyLocator(false, new BeginSearchIndex(1), new FindKeysRange(0, 1, 0)));
+  Command CMS_INITBYDIM = new CommandImpl("cms.initbydim", -1, false, false, false, new KeyLocator(false, new BeginSearchIndex(1), new FindKeysRange(0, 1, 0)));
+  Command CMS_INITBYPROB = new CommandImpl("cms.initbyprob", -1, false, false, false, new KeyLocator(false, new BeginSearchIndex(1), new FindKeysRange(0, 1, 0)));
+  Command CMS_MERGE = new CommandImpl("cms.merge", -1, false, false, false, new KeyLocator(false, new BeginSearchIndex(1), new FindKeysRange(0, 1, 0)));
+  Command CMS_QUERY = new CommandImpl("cms.query", -1, true, false, false, new KeyLocator(false, new BeginSearchIndex(1), new FindKeysRange(0, 1, 0)));
+  Command COMMAND = new CommandImpl("command", -1, null, false, false);
+  Command CONFIG = new CommandImpl("config", -2, null, false, false);
+  Command COPY = new CommandImpl("copy", -3, false, false, false, new KeyLocator(true, new BeginSearchIndex(1), new FindKeysRange(0, 1, 0)), new KeyLocator(false, new BeginSearchIndex(2), new FindKeysRange(0, 1, 0)));
+  Command DBSIZE = new CommandImpl("dbsize", 1, true, false, false);
+  Command DEBUG = new CommandImpl("debug", -2, null, false, false);
+  Command DECR = new CommandImpl("decr", 2, false, false, false, new KeyLocator(false, new BeginSearchIndex(1), new FindKeysRange(0, 1, 0)));
+  Command DECRBY = new CommandImpl("decrby", 3, false, false, false, new KeyLocator(false, new BeginSearchIndex(1), new FindKeysRange(0, 1, 0)));
+  Command DEL = new CommandImpl("del", -2, false, false, false, new KeyLocator(false, new BeginSearchIndex(1), new FindKeysRange(-1, 1, 0)));
+  Command DISCARD = new CommandImpl("discard", 1, null, false, false);
+  Command DUMP = new CommandImpl("dump", 2, true, false, false, new KeyLocator(true, new BeginSearchIndex(1), new FindKeysRange(0, 1, 0)));
+  Command ECHO = new CommandImpl("echo", 2, null, false, false);
+  Command EVAL = new CommandImpl("eval", -3, null, false, false, new KeyLocator(false, new BeginSearchIndex(2), new FindKeysKeynum(0, 1, 1)));
+  Command EVALSHA = new CommandImpl("evalsha", -3, null, false, false, new KeyLocator(false, new BeginSearchIndex(2), new FindKeysKeynum(0, 1, 1)));
+  Command EVALSHA_RO = new CommandImpl("evalsha_ro", -3, null, false, false, new KeyLocator(true, new BeginSearchIndex(2), new FindKeysKeynum(0, 1, 1)));
+  Command EVAL_RO = new CommandImpl("eval_ro", -3, null, false, false, new KeyLocator(true, new BeginSearchIndex(2), new FindKeysKeynum(0, 1, 1)));
+  Command EXEC = new CommandImpl("exec", 1, null, false, false);
+  Command EXISTS = new CommandImpl("exists", -2, true, false, false, new KeyLocator(true, new BeginSearchIndex(1), new FindKeysRange(-1, 1, 0)));
+  Command EXPIRE = new CommandImpl("expire", -3, false, false, false, new KeyLocator(false, new BeginSearchIndex(1), new FindKeysRange(0, 1, 0)));
+  Command EXPIREAT = new CommandImpl("expireat", -3, false, false, false, new KeyLocator(false, new BeginSearchIndex(1), new FindKeysRange(0, 1, 0)));
+  Command EXPIRETIME = new CommandImpl("expiretime", 2, true, false, false, new KeyLocator(true, new BeginSearchIndex(1), new FindKeysRange(0, 1, 0)));
+  Command FAILOVER = new CommandImpl("failover", -1, null, false, false);
+  Command FCALL = new CommandImpl("fcall", -3, null, false, false, new KeyLocator(false, new BeginSearchIndex(2), new FindKeysKeynum(0, 1, 1)));
+  Command FCALL_RO = new CommandImpl("fcall_ro", -3, null, false, false, new KeyLocator(true, new BeginSearchIndex(2), new FindKeysKeynum(0, 1, 1)));
+  Command FLUSHALL = new CommandImpl("flushall", -1, false, false, false);
+  Command FLUSHDB = new CommandImpl("flushdb", -1, false, false, false);
+  Command FT_ADD = new CommandImpl("FT.ADD", -1, false, false, false, new KeyLocator(false, new BeginSearchIndex(1), new FindKeysRange(1, 1, 0)));
+  Command FT_AGGREGATE = new CommandImpl("FT.AGGREGATE", -1, true, false, false, new KeyLocator(false, new BeginSearchIndex(1), new FindKeysRange(0, 1, 0)));
+  Command FT_ALIASADD = new CommandImpl("FT.ALIASADD", -1, true, false, false, new KeyLocator(false, new BeginSearchIndex(1), new FindKeysRange(1, 1, 0)));
+  Command FT_ALIASDEL = new CommandImpl("FT.ALIASDEL", -1, true, false, false, new KeyLocator(false, new BeginSearchIndex(1), new FindKeysRange(0, 1, 0)));
+  Command FT_ALIASUPDATE = new CommandImpl("FT.ALIASUPDATE", -1, true, false, false, new KeyLocator(false, new BeginSearchIndex(1), new FindKeysRange(1, 1, 0)));
+  Command FT_ALTER = new CommandImpl("FT.ALTER", -1, false, false, false, new KeyLocator(false, new BeginSearchIndex(1), new FindKeysRange(0, 1, 0)));
+  Command FT_CONFIG = new CommandImpl("FT.CONFIG", -1, true, false, false);
+  Command FT_CREATE = new CommandImpl("FT.CREATE", -1, false, false, false, new KeyLocator(false, new BeginSearchIndex(1), new FindKeysRange(0, 1, 0)));
+  Command FT_CURSOR = new CommandImpl("FT.CURSOR", -1, true, false, false, new KeyLocator(false, new BeginSearchIndex(2), new FindKeysRange(0, 1, 0)));
+  Command FT_DEBUG = new CommandImpl("FT.DEBUG", -1, true, false, false);
+  Command FT_DEL = new CommandImpl("FT.DEL", -1, false, false, false, new KeyLocator(false, new BeginSearchIndex(1), new FindKeysRange(1, 1, 0)));
+  Command FT_DICTADD = new CommandImpl("FT.DICTADD", -1, true, false, false);
+  Command FT_DICTDEL = new CommandImpl("FT.DICTDEL", -1, true, false, false);
+  Command FT_DICTDUMP = new CommandImpl("FT.DICTDUMP", -1, true, false, false);
+  Command FT_DROP = new CommandImpl("FT.DROP", -1, false, false, false, new KeyLocator(false, new BeginSearchIndex(1), new FindKeysRange(0, 1, 0)));
+  Command FT_DROPINDEX = new CommandImpl("FT.DROPINDEX", -1, false, false, false, new KeyLocator(false, new BeginSearchIndex(1), new FindKeysRange(0, 1, 0)));
+  Command FT_EXPLAIN = new CommandImpl("FT.EXPLAIN", -1, true, false, false, new KeyLocator(false, new BeginSearchIndex(1), new FindKeysRange(0, 1, 0)));
+  Command FT_EXPLAINCLI = new CommandImpl("FT.EXPLAINCLI", -1, true, false, false, new KeyLocator(false, new BeginSearchIndex(1), new FindKeysRange(0, 1, 0)));
+  Command FT_GET = new CommandImpl("FT.GET", -1, true, false, false, new KeyLocator(false, new BeginSearchIndex(1), new FindKeysRange(1, 1, 0)));
+  Command FT_INFO = new CommandImpl("FT.INFO", -1, true, false, false, new KeyLocator(false, new BeginSearchIndex(1), new FindKeysRange(0, 1, 0)));
+  Command FT_MGET = new CommandImpl("FT.MGET", -1, true, false, false, new KeyLocator(false, new BeginSearchIndex(1), new FindKeysRange(-1, 1, 0)));
+  Command FT_PROFILE = new CommandImpl("FT.PROFILE", -1, true, false, false, new KeyLocator(false, new BeginSearchIndex(1), new FindKeysRange(0, 1, 0)));
+  Command FT_SAFEADD = new CommandImpl("FT.SAFEADD", -1, false, false, false, new KeyLocator(false, new BeginSearchIndex(1), new FindKeysRange(1, 1, 0)));
+  Command FT_SEARCH = new CommandImpl("FT.SEARCH", -1, true, false, false, new KeyLocator(false, new BeginSearchIndex(1), new FindKeysRange(0, 1, 0)));
+  Command FT_SPELLCHECK = new CommandImpl("FT.SPELLCHECK", -1, true, false, false, new KeyLocator(false, new BeginSearchIndex(1), new FindKeysRange(0, 1, 0)));
+  Command FT_SUGADD = new CommandImpl("FT.SUGADD", -1, false, false, false, new KeyLocator(false, new BeginSearchIndex(1), new FindKeysRange(0, 1, 0)));
+  Command FT_SUGDEL = new CommandImpl("FT.SUGDEL", -1, false, false, false, new KeyLocator(false, new BeginSearchIndex(1), new FindKeysRange(0, 1, 0)));
+  Command FT_SUGGET = new CommandImpl("FT.SUGGET", -1, true, false, false, new KeyLocator(false, new BeginSearchIndex(1), new FindKeysRange(0, 1, 0)));
+  Command FT_SUGLEN = new CommandImpl("FT.SUGLEN", -1, true, false, false, new KeyLocator(false, new BeginSearchIndex(1), new FindKeysRange(0, 1, 0)));
+  Command FT_SYNADD = new CommandImpl("FT.SYNADD", -1, false, false, false, new KeyLocator(false, new BeginSearchIndex(1), new FindKeysRange(0, 1, 0)));
+  Command FT_SYNDUMP = new CommandImpl("FT.SYNDUMP", -1, true, false, false, new KeyLocator(false, new BeginSearchIndex(1), new FindKeysRange(0, 1, 0)));
+  Command FT_SYNUPDATE = new CommandImpl("FT.SYNUPDATE", -1, false, false, false, new KeyLocator(false, new BeginSearchIndex(1), new FindKeysRange(0, 1, 0)));
+  Command FT_TAGVALS = new CommandImpl("FT.TAGVALS", -1, true, false, false, new KeyLocator(false, new BeginSearchIndex(1), new FindKeysRange(0, 1, 0)));
+  Command FT__ALIASADDIFNX = new CommandImpl("FT._ALIASADDIFNX", -1, true, false, false, new KeyLocator(false, new BeginSearchIndex(1), new FindKeysRange(1, 1, 0)));
+  Command FT__ALIASDELIFX = new CommandImpl("FT._ALIASDELIFX", -1, true, false, false, new KeyLocator(false, new BeginSearchIndex(1), new FindKeysRange(0, 1, 0)));
+  Command FT__ALTERIFNX = new CommandImpl("FT._ALTERIFNX", -1, false, false, false, new KeyLocator(false, new BeginSearchIndex(1), new FindKeysRange(0, 1, 0)));
+  Command FT__CREATEIFNX = new CommandImpl("FT._CREATEIFNX", -1, false, false, false, new KeyLocator(false, new BeginSearchIndex(1), new FindKeysRange(0, 1, 0)));
+  Command FT__DROPIFX = new CommandImpl("FT._DROPIFX", -1, false, false, false, new KeyLocator(false, new BeginSearchIndex(1), new FindKeysRange(0, 1, 0)));
+  Command FT__DROPINDEXIFX = new CommandImpl("FT._DROPINDEXIFX", -1, false, false, false, new KeyLocator(false, new BeginSearchIndex(1), new FindKeysRange(0, 1, 0)));
+  Command FT__LIST = new CommandImpl("FT._LIST", -1, true, false, false);
+  Command FUNCTION = new CommandImpl("function", -2, null, false, false);
+  Command GEOADD = new CommandImpl("geoadd", -5, false, false, false, new KeyLocator(false, new BeginSearchIndex(1), new FindKeysRange(0, 1, 0)));
+  Command GEODIST = new CommandImpl("geodist", -4, true, false, false, new KeyLocator(true, new BeginSearchIndex(1), new FindKeysRange(0, 1, 0)));
+  Command GEOHASH = new CommandImpl("geohash", -2, true, false, false, new KeyLocator(true, new BeginSearchIndex(1), new FindKeysRange(0, 1, 0)));
+  Command GEOPOS = new CommandImpl("geopos", -2, true, false, false, new KeyLocator(true, new BeginSearchIndex(1), new FindKeysRange(0, 1, 0)));
+  Command GEORADIUS = new CommandImpl("georadius", -6, false, false, false, new KeyLocator(true, new BeginSearchIndex(1), new FindKeysRange(0, 1, 0)), new KeyLocator(false, new BeginSearchKeyword("STORE", 6), new FindKeysRange(0, 1, 0)), new KeyLocator(false, new BeginSearchKeyword("STOREDIST", 6), new FindKeysRange(0, 1, 0)));
+  Command GEORADIUSBYMEMBER = new CommandImpl("georadiusbymember", -5, false, false, false, new KeyLocator(true, new BeginSearchIndex(1), new FindKeysRange(0, 1, 0)), new KeyLocator(false, new BeginSearchKeyword("STORE", 5), new FindKeysRange(0, 1, 0)), new KeyLocator(false, new BeginSearchKeyword("STOREDIST", 5), new FindKeysRange(0, 1, 0)));
+  Command GEORADIUSBYMEMBER_RO = new CommandImpl("georadiusbymember_ro", -5, true, false, false, new KeyLocator(true, new BeginSearchIndex(1), new FindKeysRange(0, 1, 0)));
+  Command GEORADIUS_RO = new CommandImpl("georadius_ro", -6, true, false, false, new KeyLocator(true, new BeginSearchIndex(1), new FindKeysRange(0, 1, 0)));
+  Command GEOSEARCH = new CommandImpl("geosearch", -7, true, false, false, new KeyLocator(true, new BeginSearchIndex(1), new FindKeysRange(0, 1, 0)));
+  Command GEOSEARCHSTORE = new CommandImpl("geosearchstore", -8, false, false, false, new KeyLocator(false, new BeginSearchIndex(1), new FindKeysRange(0, 1, 0)), new KeyLocator(true, new BeginSearchIndex(2), new FindKeysRange(0, 1, 0)));
+  Command GET = new CommandImpl("get", 2, true, false, false, new KeyLocator(true, new BeginSearchIndex(1), new FindKeysRange(0, 1, 0)));
+  Command GETBIT = new CommandImpl("getbit", 3, true, false, false, new KeyLocator(true, new BeginSearchIndex(1), new FindKeysRange(0, 1, 0)));
+  Command GETDEL = new CommandImpl("getdel", 2, false, false, false, new KeyLocator(false, new BeginSearchIndex(1), new FindKeysRange(0, 1, 0)));
+  Command GETEX = new CommandImpl("getex", -2, false, false, false, new KeyLocator(false, new BeginSearchIndex(1), new FindKeysRange(0, 1, 0)));
+  Command GETRANGE = new CommandImpl("getrange", 4, true, false, false, new KeyLocator(true, new BeginSearchIndex(1), new FindKeysRange(0, 1, 0)));
+  Command GETSET = new CommandImpl("getset", 3, false, false, false, new KeyLocator(false, new BeginSearchIndex(1), new FindKeysRange(0, 1, 0)));
+  Command GRAPH_BULK = new CommandImpl("graph.BULK", -1, false, false, false, new KeyLocator(false, new BeginSearchIndex(1), new FindKeysRange(0, 1, 0)));
+  Command GRAPH_CONFIG = new CommandImpl("graph.CONFIG", -1, true, false, false);
+  Command GRAPH_DEBUG = new CommandImpl("graph.DEBUG", -1, true, false, false);
+  Command GRAPH_DELETE = new CommandImpl("graph.DELETE", -1, false, false, false, new KeyLocator(false, new BeginSearchIndex(1), new FindKeysRange(0, 1, 0)));
+  Command GRAPH_EXPLAIN = new CommandImpl("graph.EXPLAIN", -1, false, false, false, new KeyLocator(false, new BeginSearchIndex(1), new FindKeysRange(0, 1, 0)));
+  Command GRAPH_LIST = new CommandImpl("graph.LIST", -1, true, false, false);
+  Command GRAPH_PROFILE = new CommandImpl("graph.PROFILE", -1, false, false, false, new KeyLocator(false, new BeginSearchIndex(1), new FindKeysRange(0, 1, 0)));
+  Command GRAPH_QUERY = new CommandImpl("graph.QUERY", -1, false, false, false, new KeyLocator(false, new BeginSearchIndex(1), new FindKeysRange(0, 1, 0)));
+  Command GRAPH_RO_QUERY = new CommandImpl("graph.RO_QUERY", -1, true, false, false, new KeyLocator(false, new BeginSearchIndex(1), new FindKeysRange(0, 1, 0)));
+  Command GRAPH_SLOWLOG = new CommandImpl("graph.SLOWLOG", -1, true, false, false, new KeyLocator(false, new BeginSearchIndex(1), new FindKeysRange(0, 1, 0)));
+  Command HDEL = new CommandImpl("hdel", -3, false, false, false, new KeyLocator(false, new BeginSearchIndex(1), new FindKeysRange(0, 1, 0)));
+  Command HELLO = new CommandImpl("hello", -1, null, false, false);
+  Command HEXISTS = new CommandImpl("hexists", 3, true, false, false, new KeyLocator(true, new BeginSearchIndex(1), new FindKeysRange(0, 1, 0)));
+  Command HGET = new CommandImpl("hget", 3, true, false, false, new KeyLocator(true, new BeginSearchIndex(1), new FindKeysRange(0, 1, 0)));
+  Command HGETALL = new CommandImpl("hgetall", 2, true, false, false, new KeyLocator(true, new BeginSearchIndex(1), new FindKeysRange(0, 1, 0)));
+  Command HINCRBY = new CommandImpl("hincrby", 4, false, false, false, new KeyLocator(false, new BeginSearchIndex(1), new FindKeysRange(0, 1, 0)));
+  Command HINCRBYFLOAT = new CommandImpl("hincrbyfloat", 4, false, false, false, new KeyLocator(false, new BeginSearchIndex(1), new FindKeysRange(0, 1, 0)));
+  Command HKEYS = new CommandImpl("hkeys", 2, true, false, false, new KeyLocator(true, new BeginSearchIndex(1), new FindKeysRange(0, 1, 0)));
+  Command HLEN = new CommandImpl("hlen", 2, true, false, false, new KeyLocator(true, new BeginSearchIndex(1), new FindKeysRange(0, 1, 0)));
+  Command HMGET = new CommandImpl("hmget", -3, true, false, false, new KeyLocator(true, new BeginSearchIndex(1), new FindKeysRange(0, 1, 0)));
+  Command HMSET = new CommandImpl("hmset", -4, false, false, false, new KeyLocator(false, new BeginSearchIndex(1), new FindKeysRange(0, 1, 0)));
+  Command HRANDFIELD = new CommandImpl("hrandfield", -2, true, false, false, new KeyLocator(true, new BeginSearchIndex(1), new FindKeysRange(0, 1, 0)));
+  Command HSCAN = new CommandImpl("hscan", -3, true, false, false, new KeyLocator(true, new BeginSearchIndex(1), new FindKeysRange(0, 1, 0)));
+  Command HSET = new CommandImpl("hset", -4, false, false, false, new KeyLocator(false, new BeginSearchIndex(1), new FindKeysRange(0, 1, 0)));
+  Command HSETNX = new CommandImpl("hsetnx", 4, false, false, false, new KeyLocator(false, new BeginSearchIndex(1), new FindKeysRange(0, 1, 0)));
+  Command HSTRLEN = new CommandImpl("hstrlen", 3, true, false, false, new KeyLocator(true, new BeginSearchIndex(1), new FindKeysRange(0, 1, 0)));
+  Command HVALS = new CommandImpl("hvals", 2, true, false, false, new KeyLocator(true, new BeginSearchIndex(1), new FindKeysRange(0, 1, 0)));
+  Command INCR = new CommandImpl("incr", 2, false, false, false, new KeyLocator(false, new BeginSearchIndex(1), new FindKeysRange(0, 1, 0)));
+  Command INCRBY = new CommandImpl("incrby", 3, false, false, false, new KeyLocator(false, new BeginSearchIndex(1), new FindKeysRange(0, 1, 0)));
+  Command INCRBYFLOAT = new CommandImpl("incrbyfloat", 3, false, false, false, new KeyLocator(false, new BeginSearchIndex(1), new FindKeysRange(0, 1, 0)));
+  Command INFO = new CommandImpl("info", -1, null, false, false);
+  Command JSON_ARRAPPEND = new CommandImpl("json.arrappend", -1, false, false, false, new KeyLocator(false, new BeginSearchIndex(1), new FindKeysRange(0, 1, 0)));
+  Command JSON_ARRINDEX = new CommandImpl("json.arrindex", -1, true, false, false, new KeyLocator(false, new BeginSearchIndex(1), new FindKeysRange(0, 1, 0)));
+  Command JSON_ARRINSERT = new CommandImpl("json.arrinsert", -1, false, false, false, new KeyLocator(false, new BeginSearchIndex(1), new FindKeysRange(0, 1, 0)));
+  Command JSON_ARRLEN = new CommandImpl("json.arrlen", -1, true, false, false, new KeyLocator(false, new BeginSearchIndex(1), new FindKeysRange(0, 1, 0)));
+  Command JSON_ARRPOP = new CommandImpl("json.arrpop", -1, false, false, false, new KeyLocator(false, new BeginSearchIndex(1), new FindKeysRange(0, 1, 0)));
+  Command JSON_ARRTRIM = new CommandImpl("json.arrtrim", -1, false, false, false, new KeyLocator(false, new BeginSearchIndex(1), new FindKeysRange(0, 1, 0)));
+  Command JSON_CLEAR = new CommandImpl("json.clear", -1, false, false, false, new KeyLocator(false, new BeginSearchIndex(1), new FindKeysRange(0, 1, 0)));
+  Command JSON_DEBUG = new CommandImpl("json.debug", -1, true, false, false, new KeyLocator(false, new BeginSearchIndex(2), new FindKeysRange(0, 1, 0)));
+  Command JSON_DEL = new CommandImpl("json.del", -1, false, false, false, new KeyLocator(false, new BeginSearchIndex(1), new FindKeysRange(0, 1, 0)));
+  Command JSON_FORGET = new CommandImpl("json.forget", -1, false, false, false, new KeyLocator(false, new BeginSearchIndex(1), new FindKeysRange(0, 1, 0)));
+  Command JSON_GET = new CommandImpl("json.get", -1, true, false, false, new KeyLocator(false, new BeginSearchIndex(1), new FindKeysRange(0, 1, 0)));
+  Command JSON_MGET = new CommandImpl("json.mget", -1, true, false, false, new KeyLocator(false, new BeginSearchIndex(1), new FindKeysRange(0, 1, 0)));
+  Command JSON_NUMINCRBY = new CommandImpl("json.numincrby", -1, false, false, false, new KeyLocator(false, new BeginSearchIndex(1), new FindKeysRange(0, 1, 0)));
+  Command JSON_NUMMULTBY = new CommandImpl("json.nummultby", -1, false, false, false, new KeyLocator(false, new BeginSearchIndex(1), new FindKeysRange(0, 1, 0)));
+  Command JSON_NUMPOWBY = new CommandImpl("json.numpowby", -1, false, false, false, new KeyLocator(false, new BeginSearchIndex(1), new FindKeysRange(0, 1, 0)));
+  Command JSON_OBJKEYS = new CommandImpl("json.objkeys", -1, true, false, false, new KeyLocator(false, new BeginSearchIndex(1), new FindKeysRange(0, 1, 0)));
+  Command JSON_OBJLEN = new CommandImpl("json.objlen", -1, true, false, false, new KeyLocator(false, new BeginSearchIndex(1), new FindKeysRange(0, 1, 0)));
+  Command JSON_RESP = new CommandImpl("json.resp", -1, true, false, false, new KeyLocator(false, new BeginSearchIndex(1), new FindKeysRange(0, 1, 0)));
+  Command JSON_SET = new CommandImpl("json.set", -1, false, false, false, new KeyLocator(false, new BeginSearchIndex(1), new FindKeysRange(0, 1, 0)));
+  Command JSON_STRAPPEND = new CommandImpl("json.strappend", -1, false, false, false, new KeyLocator(false, new BeginSearchIndex(1), new FindKeysRange(0, 1, 0)));
+  Command JSON_STRLEN = new CommandImpl("json.strlen", -1, true, false, false, new KeyLocator(false, new BeginSearchIndex(1), new FindKeysRange(0, 1, 0)));
+  Command JSON_TOGGLE = new CommandImpl("json.toggle", -1, false, false, false, new KeyLocator(false, new BeginSearchIndex(1), new FindKeysRange(0, 1, 0)));
+  Command JSON_TYPE = new CommandImpl("json.type", -1, true, false, false, new KeyLocator(false, new BeginSearchIndex(1), new FindKeysRange(0, 1, 0)));
+  Command KEYS = new CommandImpl("keys", 2, true, false, false);
+  Command LASTSAVE = new CommandImpl("lastsave", 1, null, false, false);
+  Command LATENCY = new CommandImpl("latency", -2, null, false, false);
+  Command LCS = new CommandImpl("lcs", -3, true, false, false, new KeyLocator(true, new BeginSearchIndex(1), new FindKeysRange(1, 1, 0)));
+  Command LINDEX = new CommandImpl("lindex", 3, true, false, false, new KeyLocator(true, new BeginSearchIndex(1), new FindKeysRange(0, 1, 0)));
+  Command LINSERT = new CommandImpl("linsert", 5, false, false, false, new KeyLocator(false, new BeginSearchIndex(1), new FindKeysRange(0, 1, 0)));
+  Command LLEN = new CommandImpl("llen", 2, true, false, false, new KeyLocator(true, new BeginSearchIndex(1), new FindKeysRange(0, 1, 0)));
+  Command LMOVE = new CommandImpl("lmove", 5, false, false, false, new KeyLocator(false, new BeginSearchIndex(1), new FindKeysRange(0, 1, 0)), new KeyLocator(false, new BeginSearchIndex(2), new FindKeysRange(0, 1, 0)));
+  Command LMPOP = new CommandImpl("lmpop", -4, false, false, false, new KeyLocator(false, new BeginSearchIndex(1), new FindKeysKeynum(0, 1, 1)));
+  Command LOLWUT = new CommandImpl("lolwut", -1, true, false, false);
+  Command LPOP = new CommandImpl("lpop", -2, false, false, false, new KeyLocator(false, new BeginSearchIndex(1), new FindKeysRange(0, 1, 0)));
+  Command LPOS = new CommandImpl("lpos", -3, true, false, false, new KeyLocator(true, new BeginSearchIndex(1), new FindKeysRange(0, 1, 0)));
+  Command LPUSH = new CommandImpl("lpush", -3, false, false, false, new KeyLocator(false, new BeginSearchIndex(1), new FindKeysRange(0, 1, 0)));
+  Command LPUSHX = new CommandImpl("lpushx", -3, false, false, false, new KeyLocator(false, new BeginSearchIndex(1), new FindKeysRange(0, 1, 0)));
+  Command LRANGE = new CommandImpl("lrange", 4, true, false, false, new KeyLocator(true, new BeginSearchIndex(1), new FindKeysRange(0, 1, 0)));
+  Command LREM = new CommandImpl("lrem", 4, false, false, false, new KeyLocator(false, new BeginSearchIndex(1), new FindKeysRange(0, 1, 0)));
+  Command LSET = new CommandImpl("lset", 4, false, false, false, new KeyLocator(false, new BeginSearchIndex(1), new FindKeysRange(0, 1, 0)));
+  Command LTRIM = new CommandImpl("ltrim", 4, false, false, false, new KeyLocator(false, new BeginSearchIndex(1), new FindKeysRange(0, 1, 0)));
+  Command MEMORY = new CommandImpl("memory", -2, null, false, false);
+  Command MGET = new CommandImpl("mget", -2, true, false, false, new KeyLocator(true, new BeginSearchIndex(1), new FindKeysRange(-1, 1, 0)));
+  Command MIGRATE = new CommandImpl("migrate", -6, false, false, false, new KeyLocator(false, new BeginSearchIndex(3), new FindKeysRange(0, 1, 0)), new KeyLocator(false, new BeginSearchKeyword("KEYS", -2), new FindKeysRange(-1, 1, 0)));
+  Command MODULE = new CommandImpl("module", -2, null, false, false);
+  Command MONITOR = new CommandImpl("monitor", 1, null, false, false);
+  Command MOVE = new CommandImpl("move", 3, false, false, false, new KeyLocator(false, new BeginSearchIndex(1), new FindKeysRange(0, 1, 0)));
+  Command MSET = new CommandImpl("mset", -3, false, false, false, new KeyLocator(false, new BeginSearchIndex(1), new FindKeysRange(-1, 2, 0)));
+  Command MSETNX = new CommandImpl("msetnx", -3, false, false, false, new KeyLocator(false, new BeginSearchIndex(1), new FindKeysRange(-1, 2, 0)));
+  Command MULTI = new CommandImpl("multi", 1, null, false, false);
+  Command OBJECT = new CommandImpl("object", -2, null, false, false);
+  Command PERSIST = new CommandImpl("persist", 2, false, false, false, new KeyLocator(false, new BeginSearchIndex(1), new FindKeysRange(0, 1, 0)));
+  Command PEXPIRE = new CommandImpl("pexpire", -3, false, false, false, new KeyLocator(false, new BeginSearchIndex(1), new FindKeysRange(0, 1, 0)));
+  Command PEXPIREAT = new CommandImpl("pexpireat", -3, false, false, false, new KeyLocator(false, new BeginSearchIndex(1), new FindKeysRange(0, 1, 0)));
+  Command PEXPIRETIME = new CommandImpl("pexpiretime", 2, true, false, false, new KeyLocator(true, new BeginSearchIndex(1), new FindKeysRange(0, 1, 0)));
+  Command PFADD = new CommandImpl("pfadd", -2, false, false, false, new KeyLocator(false, new BeginSearchIndex(1), new FindKeysRange(0, 1, 0)));
+  Command PFCOUNT = new CommandImpl("pfcount", -2, true, false, false, new KeyLocator(false, new BeginSearchIndex(1), new FindKeysRange(-1, 1, 0)));
+  Command PFDEBUG = new CommandImpl("pfdebug", -3, false, false, false, new KeyLocator(false, new BeginSearchIndex(2), new FindKeysRange(0, 1, 0)));
+  Command PFMERGE = new CommandImpl("pfmerge", -2, false, false, false, new KeyLocator(false, new BeginSearchIndex(1), new FindKeysRange(0, 1, 0)), new KeyLocator(true, new BeginSearchIndex(2), new FindKeysRange(-1, 1, 0)));
+  Command PFSELFTEST = new CommandImpl("pfselftest", 1, null, false, false);
+  Command PING = new CommandImpl("ping", -1, null, false, false);
+  Command PSETEX = new CommandImpl("psetex", 4, false, false, false, new KeyLocator(false, new BeginSearchIndex(1), new FindKeysRange(0, 1, 0)));
+  Command PSUBSCRIBE = new CommandImpl("psubscribe", -2, null, true, false);
+  Command PSYNC = new CommandImpl("psync", -3, null, false, false);
+  Command PTTL = new CommandImpl("pttl", 2, true, false, false, new KeyLocator(true, new BeginSearchIndex(1), new FindKeysRange(0, 1, 0)));
+  Command PUBLISH = new CommandImpl("publish", 3, null, false, false);
+  Command PUBSUB = new CommandImpl("pubsub", -2, null, false, false);
+  Command PUNSUBSCRIBE = new CommandImpl("punsubscribe", -1, null, true, false);
+  Command QUIT = new CommandImpl("quit", -1, null, false, false);
+  Command RANDOMKEY = new CommandImpl("randomkey", 1, true, false, false);
+  Command READONLY = new CommandImpl("readonly", 1, null, false, false);
+  Command READWRITE = new CommandImpl("readwrite", 1, null, false, false);
+  Command RENAME = new CommandImpl("rename", 3, false, false, false, new KeyLocator(false, new BeginSearchIndex(1), new FindKeysRange(0, 1, 0)), new KeyLocator(false, new BeginSearchIndex(2), new FindKeysRange(0, 1, 0)));
+  Command RENAMENX = new CommandImpl("renamenx", 3, false, false, false, new KeyLocator(false, new BeginSearchIndex(1), new FindKeysRange(0, 1, 0)), new KeyLocator(false, new BeginSearchIndex(2), new FindKeysRange(0, 1, 0)));
+  Command REPLCONF = new CommandImpl("replconf", -1, null, false, false);
+  Command REPLICAOF = new CommandImpl("replicaof", 3, null, false, false);
+  Command RESET = new CommandImpl("reset", 1, null, false, false);
+  Command RESTORE = new CommandImpl("restore", -4, false, false, false, new KeyLocator(false, new BeginSearchIndex(1), new FindKeysRange(0, 1, 0)));
+  Command RESTORE_ASKING = new CommandImpl("restore-asking", -4, false, false, false, new KeyLocator(false, new BeginSearchIndex(1), new FindKeysRange(0, 1, 0)));
+  Command ROLE = new CommandImpl("role", 1, null, false, false);
+  Command RPOP = new CommandImpl("rpop", -2, false, false, false, new KeyLocator(false, new BeginSearchIndex(1), new FindKeysRange(0, 1, 0)));
+  Command RPOPLPUSH = new CommandImpl("rpoplpush", 3, false, false, false, new KeyLocator(false, new BeginSearchIndex(1), new FindKeysRange(0, 1, 0)), new KeyLocator(false, new BeginSearchIndex(2), new FindKeysRange(0, 1, 0)));
+  Command RPUSH = new CommandImpl("rpush", -3, false, false, false, new KeyLocator(false, new BeginSearchIndex(1), new FindKeysRange(0, 1, 0)));
+  Command RPUSHX = new CommandImpl("rpushx", -3, false, false, false, new KeyLocator(false, new BeginSearchIndex(1), new FindKeysRange(0, 1, 0)));
+  Command SADD = new CommandImpl("sadd", -3, false, false, false, new KeyLocator(false, new BeginSearchIndex(1), new FindKeysRange(0, 1, 0)));
+  Command SAVE = new CommandImpl("save", 1, null, false, false);
+  Command SCAN = new CommandImpl("scan", -2, true, false, false);
+  Command SCARD = new CommandImpl("scard", 2, true, false, false, new KeyLocator(true, new BeginSearchIndex(1), new FindKeysRange(0, 1, 0)));
+  Command SCRIPT = new CommandImpl("script", -2, null, false, false);
+  Command SDIFF = new CommandImpl("sdiff", -2, true, false, false, new KeyLocator(true, new BeginSearchIndex(1), new FindKeysRange(-1, 1, 0)));
+  Command SDIFFSTORE = new CommandImpl("sdiffstore", -3, false, false, false, new KeyLocator(false, new BeginSearchIndex(1), new FindKeysRange(0, 1, 0)), new KeyLocator(true, new BeginSearchIndex(2), new FindKeysRange(-1, 1, 0)));
+  Command SELECT = new CommandImpl("select", 2, null, false, false);
+  Command SET = new CommandImpl("set", -3, false, false, false, new KeyLocator(false, new BeginSearchIndex(1), new FindKeysRange(0, 1, 0)));
+  Command SETBIT = new CommandImpl("setbit", 4, false, false, false, new KeyLocator(false, new BeginSearchIndex(1), new FindKeysRange(0, 1, 0)));
+  Command SETEX = new CommandImpl("setex", 4, false, false, false, new KeyLocator(false, new BeginSearchIndex(1), new FindKeysRange(0, 1, 0)));
+  Command SETNX = new CommandImpl("setnx", 3, false, false, false, new KeyLocator(false, new BeginSearchIndex(1), new FindKeysRange(0, 1, 0)));
+  Command SETRANGE = new CommandImpl("setrange", 4, false, false, false, new KeyLocator(false, new BeginSearchIndex(1), new FindKeysRange(0, 1, 0)));
+  Command SHUTDOWN = new CommandImpl("shutdown", -1, null, false, false);
+  Command SINTER = new CommandImpl("sinter", -2, true, false, false, new KeyLocator(true, new BeginSearchIndex(1), new FindKeysRange(-1, 1, 0)));
+  Command SINTERCARD = new CommandImpl("sintercard", -3, true, false, false, new KeyLocator(true, new BeginSearchIndex(1), new FindKeysKeynum(0, 1, 1)));
+  Command SINTERSTORE = new CommandImpl("sinterstore", -3, false, false, false, new KeyLocator(false, new BeginSearchIndex(1), new FindKeysRange(0, 1, 0)), new KeyLocator(true, new BeginSearchIndex(2), new FindKeysRange(-1, 1, 0)));
+  Command SISMEMBER = new CommandImpl("sismember", 3, true, false, false, new KeyLocator(true, new BeginSearchIndex(1), new FindKeysRange(0, 1, 0)));
+  Command SLAVEOF = new CommandImpl("slaveof", 3, null, false, false);
+  Command SLOWLOG = new CommandImpl("slowlog", -2, null, false, false);
+  Command SMEMBERS = new CommandImpl("smembers", 2, true, false, false, new KeyLocator(true, new BeginSearchIndex(1), new FindKeysRange(0, 1, 0)));
+  Command SMISMEMBER = new CommandImpl("smismember", -3, true, false, false, new KeyLocator(true, new BeginSearchIndex(1), new FindKeysRange(0, 1, 0)));
+  Command SMOVE = new CommandImpl("smove", 4, false, false, false, new KeyLocator(false, new BeginSearchIndex(1), new FindKeysRange(0, 1, 0)), new KeyLocator(false, new BeginSearchIndex(2), new FindKeysRange(0, 1, 0)));
+  Command SORT = new CommandImpl("sort", -2, false, false, true, new KeyLocator(true, new BeginSearchIndex(1), new FindKeysRange(0, 1, 0)));
+  Command SORT_RO = new CommandImpl("sort_ro", -2, true, false, true, new KeyLocator(true, new BeginSearchIndex(1), new FindKeysRange(0, 1, 0)));
+  Command SPOP = new CommandImpl("spop", -2, false, false, false, new KeyLocator(false, new BeginSearchIndex(1), new FindKeysRange(0, 1, 0)));
+  Command SPUBLISH = new CommandImpl("spublish", 3, null, true, false, new KeyLocator(null, new BeginSearchIndex(1), new FindKeysRange(0, 1, 0)));
+  Command SRANDMEMBER = new CommandImpl("srandmember", -2, true, false, false, new KeyLocator(true, new BeginSearchIndex(1), new FindKeysRange(0, 1, 0)));
+  Command SREM = new CommandImpl("srem", -3, false, false, false, new KeyLocator(false, new BeginSearchIndex(1), new FindKeysRange(0, 1, 0)));
+  Command SSCAN = new CommandImpl("sscan", -3, true, false, false, new KeyLocator(true, new BeginSearchIndex(1), new FindKeysRange(0, 1, 0)));
+  Command SSUBSCRIBE = new CommandImpl("ssubscribe", -2, null, true, false, new KeyLocator(null, new BeginSearchIndex(1), new FindKeysRange(-1, 1, 0)));
+  Command STRLEN = new CommandImpl("strlen", 2, true, false, false, new KeyLocator(true, new BeginSearchIndex(1), new FindKeysRange(0, 1, 0)));
+  Command SUBSCRIBE = new CommandImpl("subscribe", -2, null, true, false);
+  Command SUBSTR = new CommandImpl("substr", 4, true, false, false, new KeyLocator(true, new BeginSearchIndex(1), new FindKeysRange(0, 1, 0)));
+  Command SUNION = new CommandImpl("sunion", -2, true, false, false, new KeyLocator(true, new BeginSearchIndex(1), new FindKeysRange(-1, 1, 0)));
+  Command SUNIONSTORE = new CommandImpl("sunionstore", -3, false, false, false, new KeyLocator(false, new BeginSearchIndex(1), new FindKeysRange(0, 1, 0)), new KeyLocator(true, new BeginSearchIndex(2), new FindKeysRange(-1, 1, 0)));
+  Command SUNSUBSCRIBE = new CommandImpl("sunsubscribe", -1, null, true, false, new KeyLocator(null, new BeginSearchIndex(1), new FindKeysRange(-1, 1, 0)));
+  Command SWAPDB = new CommandImpl("swapdb", 3, false, false, false);
+  Command SYNC = new CommandImpl("sync", 1, null, false, false);
+  Command TIME = new CommandImpl("time", 1, null, false, false);
+  Command TIMESERIES_CLUSTERSET = new CommandImpl("timeseries.CLUSTERSET", -1, true, false, false);
+  Command TIMESERIES_CLUSTERSETFROMSHARD = new CommandImpl("timeseries.CLUSTERSETFROMSHARD", -1, true, false, false);
+  Command TIMESERIES_HELLO = new CommandImpl("timeseries.HELLO", -1, true, false, false);
+  Command TIMESERIES_INFOCLUSTER = new CommandImpl("timeseries.INFOCLUSTER", -1, true, false, false);
+  Command TIMESERIES_INNERCOMMUNICATION = new CommandImpl("timeseries.INNERCOMMUNICATION", -1, true, false, false);
+  Command TIMESERIES_NETWORKTEST = new CommandImpl("timeseries.NETWORKTEST", -1, true, false, false);
+  Command TIMESERIES_REFRESHCLUSTER = new CommandImpl("timeseries.REFRESHCLUSTER", -1, true, false, false);
+  Command TOPK_ADD = new CommandImpl("topk.add", -1, false, false, false, new KeyLocator(false, new BeginSearchIndex(1), new FindKeysRange(0, 1, 0)));
+  Command TOPK_COUNT = new CommandImpl("topk.count", -1, false, false, false, new KeyLocator(false, new BeginSearchIndex(1), new FindKeysRange(0, 1, 0)));
+  Command TOPK_INCRBY = new CommandImpl("topk.incrby", -1, false, false, false, new KeyLocator(false, new BeginSearchIndex(1), new FindKeysRange(0, 1, 0)));
+  Command TOPK_INFO = new CommandImpl("topk.info", -1, true, false, false, new KeyLocator(false, new BeginSearchIndex(1), new FindKeysRange(0, 1, 0)));
+  Command TOPK_LIST = new CommandImpl("topk.list", -1, true, false, false, new KeyLocator(false, new BeginSearchIndex(1), new FindKeysRange(0, 1, 0)));
+  Command TOPK_QUERY = new CommandImpl("topk.query", -1, true, false, false, new KeyLocator(false, new BeginSearchIndex(1), new FindKeysRange(0, 1, 0)));
+  Command TOPK_RESERVE = new CommandImpl("topk.reserve", -1, false, false, false, new KeyLocator(false, new BeginSearchIndex(1), new FindKeysRange(0, 1, 0)));
+  Command TOUCH = new CommandImpl("touch", -2, true, false, false, new KeyLocator(true, new BeginSearchIndex(1), new FindKeysRange(-1, 1, 0)));
+  Command TS_ADD = new CommandImpl("ts.add", -1, false, false, false, new KeyLocator(false, new BeginSearchIndex(1), new FindKeysRange(0, 1, 0)));
+  Command TS_ALTER = new CommandImpl("ts.alter", -1, false, false, false, new KeyLocator(false, new BeginSearchIndex(1), new FindKeysRange(0, 1, 0)));
+  Command TS_CREATE = new CommandImpl("ts.create", -1, false, false, false, new KeyLocator(false, new BeginSearchIndex(1), new FindKeysRange(0, 1, 0)));
+  Command TS_CREATERULE = new CommandImpl("ts.createrule", -1, false, false, false, new KeyLocator(false, new BeginSearchIndex(1), new FindKeysRange(0, 1, 0)));
+  Command TS_DECRBY = new CommandImpl("ts.decrby", -1, false, false, false, new KeyLocator(false, new BeginSearchIndex(1), new FindKeysRange(0, 1, 0)));
+  Command TS_DEL = new CommandImpl("ts.del", -1, false, false, false, new KeyLocator(false, new BeginSearchIndex(1), new FindKeysRange(0, 1, 0)));
+  Command TS_DELETERULE = new CommandImpl("ts.deleterule", -1, false, false, false, new KeyLocator(false, new BeginSearchIndex(1), new FindKeysRange(0, 1, 0)));
+  Command TS_GET = new CommandImpl("ts.get", -1, true, false, false, new KeyLocator(false, new BeginSearchIndex(1), new FindKeysRange(0, 1, 0)));
+  Command TS_INCRBY = new CommandImpl("ts.incrby", -1, false, false, false, new KeyLocator(false, new BeginSearchIndex(1), new FindKeysRange(0, 1, 0)));
+  Command TS_INFO = new CommandImpl("ts.info", -1, true, false, false, new KeyLocator(false, new BeginSearchIndex(1), new FindKeysRange(0, 1, 0)));
+  Command TS_MADD = new CommandImpl("ts.madd", -1, false, false, false, new KeyLocator(false, new BeginSearchIndex(1), new FindKeysRange(-1, 3, 0)));
+  Command TS_MGET = new CommandImpl("ts.mget", -1, true, false, false);
+  Command TS_MRANGE = new CommandImpl("ts.mrange", -1, true, false, false);
+  Command TS_MREVRANGE = new CommandImpl("ts.mrevrange", -1, true, false, false);
+  Command TS_QUERYINDEX = new CommandImpl("ts.queryindex", -1, true, false, false);
+  Command TS_RANGE = new CommandImpl("ts.range", -1, true, false, false, new KeyLocator(false, new BeginSearchIndex(1), new FindKeysRange(0, 1, 0)));
+  Command TS_REVRANGE = new CommandImpl("ts.revrange", -1, true, false, false, new KeyLocator(false, new BeginSearchIndex(1), new FindKeysRange(0, 1, 0)));
+  Command TTL = new CommandImpl("ttl", 2, true, false, false, new KeyLocator(true, new BeginSearchIndex(1), new FindKeysRange(0, 1, 0)));
+  Command TYPE = new CommandImpl("type", 2, true, false, false, new KeyLocator(true, new BeginSearchIndex(1), new FindKeysRange(0, 1, 0)));
+  Command UNLINK = new CommandImpl("unlink", -2, false, false, false, new KeyLocator(false, new BeginSearchIndex(1), new FindKeysRange(-1, 1, 0)));
+  Command UNSUBSCRIBE = new CommandImpl("unsubscribe", -1, null, true, false);
+  Command UNWATCH = new CommandImpl("unwatch", 1, null, false, false);
+  Command WAIT = new CommandImpl("wait", 3, null, false, false);
+  Command WATCH = new CommandImpl("watch", -2, null, false, false, new KeyLocator(null, new BeginSearchIndex(1), new FindKeysRange(-1, 1, 0)));
+  Command XACK = new CommandImpl("xack", -4, false, false, false, new KeyLocator(false, new BeginSearchIndex(1), new FindKeysRange(0, 1, 0)));
+  Command XADD = new CommandImpl("xadd", -5, false, false, false, new KeyLocator(false, new BeginSearchIndex(1), new FindKeysRange(0, 1, 0)));
+  Command XAUTOCLAIM = new CommandImpl("xautoclaim", -6, false, false, false, new KeyLocator(false, new BeginSearchIndex(1), new FindKeysRange(0, 1, 0)));
+  Command XCLAIM = new CommandImpl("xclaim", -6, false, false, false, new KeyLocator(false, new BeginSearchIndex(1), new FindKeysRange(0, 1, 0)));
+  Command XDEL = new CommandImpl("xdel", -3, false, false, false, new KeyLocator(false, new BeginSearchIndex(1), new FindKeysRange(0, 1, 0)));
+  Command XGROUP = new CommandImpl("xgroup", -2, null, false, false);
+  Command XINFO = new CommandImpl("xinfo", -2, null, false, false);
+  Command XLEN = new CommandImpl("xlen", 2, true, false, false, new KeyLocator(true, new BeginSearchIndex(1), new FindKeysRange(0, 1, 0)));
+  Command XPENDING = new CommandImpl("xpending", -3, true, false, false, new KeyLocator(true, new BeginSearchIndex(1), new FindKeysRange(0, 1, 0)));
+  Command XRANGE = new CommandImpl("xrange", -4, true, false, false, new KeyLocator(true, new BeginSearchIndex(1), new FindKeysRange(0, 1, 0)));
+  Command XREAD = new CommandImpl("xread", -4, true, false, false, new KeyLocator(true, new BeginSearchKeyword("STREAMS", 1), new FindKeysRange(-1, 1, 2)));
+  Command XREADGROUP = new CommandImpl("xreadgroup", -7, false, false, false, new KeyLocator(true, new BeginSearchKeyword("STREAMS", 4), new FindKeysRange(-1, 1, 2)));
+  Command XREVRANGE = new CommandImpl("xrevrange", -4, true, false, false, new KeyLocator(true, new BeginSearchIndex(1), new FindKeysRange(0, 1, 0)));
+  Command XSETID = new CommandImpl("xsetid", -3, false, false, false, new KeyLocator(false, new BeginSearchIndex(1), new FindKeysRange(0, 1, 0)));
+  Command XTRIM = new CommandImpl("xtrim", -4, false, false, false, new KeyLocator(false, new BeginSearchIndex(1), new FindKeysRange(0, 1, 0)));
+  Command ZADD = new CommandImpl("zadd", -4, false, false, false, new KeyLocator(false, new BeginSearchIndex(1), new FindKeysRange(0, 1, 0)));
+  Command ZCARD = new CommandImpl("zcard", 2, true, false, false, new KeyLocator(true, new BeginSearchIndex(1), new FindKeysRange(0, 1, 0)));
+  Command ZCOUNT = new CommandImpl("zcount", 4, true, false, false, new KeyLocator(true, new BeginSearchIndex(1), new FindKeysRange(0, 1, 0)));
+  Command ZDIFF = new CommandImpl("zdiff", -3, true, false, false, new KeyLocator(true, new BeginSearchIndex(1), new FindKeysKeynum(0, 1, 1)));
+  Command ZDIFFSTORE = new CommandImpl("zdiffstore", -4, false, false, false, new KeyLocator(false, new BeginSearchIndex(1), new FindKeysRange(0, 1, 0)), new KeyLocator(true, new BeginSearchIndex(2), new FindKeysKeynum(0, 1, 1)));
+  Command ZINCRBY = new CommandImpl("zincrby", 4, false, false, false, new KeyLocator(false, new BeginSearchIndex(1), new FindKeysRange(0, 1, 0)));
+  Command ZINTER = new CommandImpl("zinter", -3, true, false, false, new KeyLocator(true, new BeginSearchIndex(1), new FindKeysKeynum(0, 1, 1)));
+  Command ZINTERCARD = new CommandImpl("zintercard", -3, true, false, false, new KeyLocator(true, new BeginSearchIndex(1), new FindKeysKeynum(0, 1, 1)));
+  Command ZINTERSTORE = new CommandImpl("zinterstore", -4, false, false, false, new KeyLocator(false, new BeginSearchIndex(1), new FindKeysRange(0, 1, 0)), new KeyLocator(true, new BeginSearchIndex(2), new FindKeysKeynum(0, 1, 1)));
+  Command ZLEXCOUNT = new CommandImpl("zlexcount", 4, true, false, false, new KeyLocator(true, new BeginSearchIndex(1), new FindKeysRange(0, 1, 0)));
+  Command ZMPOP = new CommandImpl("zmpop", -4, false, false, false, new KeyLocator(false, new BeginSearchIndex(1), new FindKeysKeynum(0, 1, 1)));
+  Command ZMSCORE = new CommandImpl("zmscore", -3, true, false, false, new KeyLocator(true, new BeginSearchIndex(1), new FindKeysRange(0, 1, 0)));
+  Command ZPOPMAX = new CommandImpl("zpopmax", -2, false, false, false, new KeyLocator(false, new BeginSearchIndex(1), new FindKeysRange(0, 1, 0)));
+  Command ZPOPMIN = new CommandImpl("zpopmin", -2, false, false, false, new KeyLocator(false, new BeginSearchIndex(1), new FindKeysRange(0, 1, 0)));
+  Command ZRANDMEMBER = new CommandImpl("zrandmember", -2, true, false, false, new KeyLocator(true, new BeginSearchIndex(1), new FindKeysRange(0, 1, 0)));
+  Command ZRANGE = new CommandImpl("zrange", -4, true, false, false, new KeyLocator(true, new BeginSearchIndex(1), new FindKeysRange(0, 1, 0)));
+  Command ZRANGEBYLEX = new CommandImpl("zrangebylex", -4, true, false, false, new KeyLocator(true, new BeginSearchIndex(1), new FindKeysRange(0, 1, 0)));
+  Command ZRANGEBYSCORE = new CommandImpl("zrangebyscore", -4, true, false, false, new KeyLocator(true, new BeginSearchIndex(1), new FindKeysRange(0, 1, 0)));
+  Command ZRANGESTORE = new CommandImpl("zrangestore", -5, false, false, false, new KeyLocator(false, new BeginSearchIndex(1), new FindKeysRange(0, 1, 0)), new KeyLocator(true, new BeginSearchIndex(2), new FindKeysRange(0, 1, 0)));
+  Command ZRANK = new CommandImpl("zrank", 3, true, false, false, new KeyLocator(true, new BeginSearchIndex(1), new FindKeysRange(0, 1, 0)));
+  Command ZREM = new CommandImpl("zrem", -3, false, false, false, new KeyLocator(false, new BeginSearchIndex(1), new FindKeysRange(0, 1, 0)));
+  Command ZREMRANGEBYLEX = new CommandImpl("zremrangebylex", 4, false, false, false, new KeyLocator(false, new BeginSearchIndex(1), new FindKeysRange(0, 1, 0)));
+  Command ZREMRANGEBYRANK = new CommandImpl("zremrangebyrank", 4, false, false, false, new KeyLocator(false, new BeginSearchIndex(1), new FindKeysRange(0, 1, 0)));
+  Command ZREMRANGEBYSCORE = new CommandImpl("zremrangebyscore", 4, false, false, false, new KeyLocator(false, new BeginSearchIndex(1), new FindKeysRange(0, 1, 0)));
+  Command ZREVRANGE = new CommandImpl("zrevrange", -4, true, false, false, new KeyLocator(true, new BeginSearchIndex(1), new FindKeysRange(0, 1, 0)));
+  Command ZREVRANGEBYLEX = new CommandImpl("zrevrangebylex", -4, true, false, false, new KeyLocator(true, new BeginSearchIndex(1), new FindKeysRange(0, 1, 0)));
+  Command ZREVRANGEBYSCORE = new CommandImpl("zrevrangebyscore", -4, true, false, false, new KeyLocator(true, new BeginSearchIndex(1), new FindKeysRange(0, 1, 0)));
+  Command ZREVRANK = new CommandImpl("zrevrank", 3, true, false, false, new KeyLocator(true, new BeginSearchIndex(1), new FindKeysRange(0, 1, 0)));
+  Command ZSCAN = new CommandImpl("zscan", -3, true, false, false, new KeyLocator(true, new BeginSearchIndex(1), new FindKeysRange(0, 1, 0)));
+  Command ZSCORE = new CommandImpl("zscore", 3, true, false, false, new KeyLocator(true, new BeginSearchIndex(1), new FindKeysRange(0, 1, 0)));
+  Command ZUNION = new CommandImpl("zunion", -3, true, false, false, new KeyLocator(true, new BeginSearchIndex(1), new FindKeysKeynum(0, 1, 1)));
+  Command ZUNIONSTORE = new CommandImpl("zunionstore", -4, false, false, false, new KeyLocator(false, new BeginSearchIndex(1), new FindKeysRange(0, 1, 0)), new KeyLocator(true, new BeginSearchIndex(2), new FindKeysKeynum(0, 1, 1)));
 
-  /**
-   * Creates a Redis Command from METADATA. The metadata comes from the REDIS command "COMMAND"
-   * https://redis.io/commands/command
-   *
-   * Each top-level result contains six nested results. Each nested result is:
-   *
-   *     command name
-   *     command arity specification
-   *     nested Array reply of command flags
-   *     position of first key in argument list
-   *     position of last key in argument list
-   *     step count for locating repeating keys
-   *
-   * @param command command name
-   * @param arity arity
-   * @param firstKey position of the first key
-   * @param lastKey position of the last key
-   * @param interval step count for locating repeating keys
-   * @param write write flag extracted from the nested Array reply of command flags
-   * @param readOnly readOnly flag extracted from the nested Array reply of command flags
-   * @param movable movable flag extracted from the nested Array reply of command flags
-   * @param pubsub flag extracted from the nested Array reply of command flags
-   * @return a command instance
-   */
-  static Command create(String command, int arity, int firstKey, int lastKey, int interval, boolean write, boolean readOnly, boolean movable, boolean pubsub) {
-    return new CommandImpl(command, arity, firstKey, lastKey, interval, write, readOnly, movable, pubsub);
-  }
+  // synthetic
+  Command SENTINEL = create("sentinel");
 
   /**
    * Generic command generator for extensions.
    *
-   * @param command
-   * @return the cachable immutable command instance
+   * @param command command name
+   * @return the cacheable immutable command instance
    */
   static Command create(String command) {
-    return new CommandImpl(command, -1, 0, 0, 0, false, false, false, false);
+    return new CommandImpl(command, -1, null, false, true);
   }
-
-  @GenIgnore(GenIgnore.PERMITTED_TYPE)
-  byte[] getBytes();
-
-  int getArity();
-
-  boolean isMultiKey();
-
-  int getFirstKey();
-
-  int getLastKey();
-
-  int getInterval();
-
-  boolean isKeyless();
-
-  boolean isWrite();
-
-  boolean isReadOnly();
-
-  boolean isMovable();
-
-  /**
-   * @deprecated use {@link #isPubSub()}
-   */
-  @Deprecated
-  default boolean isVoid() {
-    return isPubSub();
-  }
-
-  boolean isPubSub();
 }

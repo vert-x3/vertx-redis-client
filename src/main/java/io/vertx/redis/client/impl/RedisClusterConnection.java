@@ -8,7 +8,6 @@ import io.vertx.core.impl.logging.LoggerFactory;
 import io.vertx.redis.client.*;
 import io.vertx.redis.client.impl.types.ErrorType;
 
-import java.nio.charset.StandardCharsets;
 import java.util.*;
 import java.util.function.Function;
 
@@ -28,7 +27,6 @@ public class RedisClusterConnection implements RedisConnection {
   // or when we get MOVED/ASK responses
   private static final int RETRIES = 16;
 
-  private static final Map<Command, String> UNSUPPORTEDCOMMANDS = new HashMap<>();
   // reduce from list fo responses to a single response
   private static final Map<Command, Function<List<Response>, Response>> REDUCERS = new HashMap<>();
   // List of commands they should run every time only against master nodes
@@ -36,15 +34,6 @@ public class RedisClusterConnection implements RedisConnection {
 
   public static void addReducer(Command command, Function<List<Response>, Response> fn) {
     REDUCERS.put(command, fn);
-  }
-
-  public static void addUnSupportedCommand(Command command, String error) {
-    if (error == null || error.isEmpty()) {
-      UNSUPPORTEDCOMMANDS.put(command, "RedisClusterClient does not handle command " +
-        new String(command.getBytes(), StandardCharsets.ISO_8859_1).split("\r\n")[1] + ", use non cluster client on the right node.");
-    } else {
-      UNSUPPORTEDCOMMANDS.put(command, error);
-    }
   }
 
   public static void addMasterOnlyCommand(Command command) {
@@ -129,94 +118,30 @@ public class RedisClusterConnection implements RedisConnection {
 
     // process commands for cluster mode
     final RequestImpl req = (RequestImpl) request;
-    final Command cmd = req.command();
-    final boolean forceMasterEndpoint = MASTER_ONLY_COMMANDS.contains(cmd);
-
-    if (UNSUPPORTEDCOMMANDS.containsKey(cmd)) {
-      promise.fail(UNSUPPORTEDCOMMANDS.get(cmd));
-      return promise.future();
-    }
-
-    if (cmd.isMovable()) {
-      final byte[][] keys = KeyExtractor.extractMovableKeys(req);
-
-      int hashSlot = ZModem.generateMulti(keys);
-      // -1 indicates that not all keys of the command targets the same hash slot, so Redis would not be able to execute it.
-      if (hashSlot == -1) {
-        promise.fail(buildCrossslotFailureMsg(req));
-        return promise.future();
-      }
-
-      String[] endpoints = slots.endpointsForKey(hashSlot);
-      send(selectMasterOrReplicaEndpoint(req.command().isReadOnly(), endpoints, forceMasterEndpoint), RETRIES, req, promise);
-      return promise.future();
-    }
-
-    if (cmd.isKeyless() && REDUCERS.containsKey(cmd)) {
-      final List<Future> responses = new ArrayList<>(slots.size());
-
-      for (int i = 0; i < slots.size(); i++) {
-
-        String[] endpoints = slots.endpointsForSlot(i);
-
-        final Promise<Response> p = vertx.promise();
-        send(selectMasterOrReplicaEndpoint(req.command().isReadOnly(), endpoints, forceMasterEndpoint), RETRIES, req, p);
-        responses.add(p.future());
-      }
-      CompositeFuture.all(responses).onComplete(composite -> {
-        if (composite.failed()) {
-          // means if one of the operations failed, then we can fail the handler
-          promise.fail(composite.cause());
-        } else {
-          promise.complete(REDUCERS.get(cmd).apply(composite.result().list()));
-        }
-      });
-
-      return promise.future();
-    }
-
-    if (cmd.isKeyless()) {
-      // it doesn't matter which node to use
-      send(selectEndpoint(-1, cmd.isReadOnly(), forceMasterEndpoint), RETRIES, req, promise);
-      return promise.future();
-    }
-
+    final CommandImpl cmd = (CommandImpl) req.command();
     final List<byte[]> args = req.getArgs();
 
-    if (cmd.isMultiKey()) {
-      int currentSlot = -1;
+    if (cmd.needsGetKeys()) {
+      // it is required to resolve the keys at the server side as we cannot deduct where they are algorithmically
+      // we shall run this commands on the master node always
+      send(selectEndpoint(-1, cmd.isReadOnly(args), true), RETRIES, req, promise);
+      return promise.future();
+    }
 
-      // args exclude the command which is an arg in the commands response
-      int start = cmd.getFirstKey() - 1;
-      int end = cmd.getLastKey();
-      if (end > 0) {
-        end--;
-      }
-      if (end < 0) {
-        end = args.size() + (end + 1);
-      }
-      int step = cmd.getInterval();
+    final boolean forceMasterEndpoint = MASTER_ONLY_COMMANDS.contains(cmd);
+    final List<byte[]> keys = req.keys();
 
-      for (int i = start; i < end; i += step) {
-        int slot = ZModem.generate(args.get(i));
-        if (currentSlot == -1) {
-          currentSlot = slot;
-          continue;
-        }
-        if (currentSlot != slot) {
+    switch (keys.size()) {
+      case 0:
+        // can run anywhere
+        if (REDUCERS.containsKey(cmd)) {
+          final List<Future> responses = new ArrayList<>(slots.size());
 
-          if (!REDUCERS.containsKey(cmd)) {
-            // we can't continue as we don't know how to reduce this
-            promise.fail(buildCrossslotFailureMsg(req));
-            return promise.future();
-          }
+          for (int i = 0; i < slots.size(); i++) {
+            String[] endpoints = slots.endpointsForSlot(i);
 
-          final Map<Integer, Request> requests = splitRequest(cmd, args, start, end, step);
-          final List<Future> responses = new ArrayList<>(requests.size());
-
-          for (Map.Entry<Integer, Request> kv : requests.entrySet()) {
             final Promise<Response> p = vertx.promise();
-            send(selectEndpoint(kv.getKey(), cmd.isReadOnly(), forceMasterEndpoint), RETRIES, kv.getValue(), p);
+            send(selectMasterOrReplicaEndpoint(cmd.isReadOnly(args), endpoints, forceMasterEndpoint), RETRIES, req, p);
             responses.add(p.future());
           }
 
@@ -228,52 +153,109 @@ public class RedisClusterConnection implements RedisConnection {
               promise.complete(REDUCERS.get(cmd).apply(composite.result().list()));
             }
           });
+        } else {
+          // it doesn't matter which node to use
+          send(selectEndpoint(-1, cmd.isReadOnly(args), forceMasterEndpoint), RETRIES, req, promise);
+        }
+        return promise.future();
+      case 1:
+        // trivial option the command is single key
+        send(selectEndpoint(ZModem.generate(keys.get(0)), cmd.isReadOnly(args), forceMasterEndpoint), RETRIES, req, promise);
+        return promise.future();
+      default:
+        int hashSlot = ZModem.generateMultiRaw(keys);
+        // -1 indicates that not all keys of the command targets the same hash slot, so Redis would not be able to execute it.
+        // we try to perform a reduction if we know how
+        if (hashSlot == -1) {
+          int currentSlot = -1;
 
+          for (byte[] key : keys) {
+            int slot = ZModem.generate(key);
+            if (currentSlot == -1) {
+              currentSlot = slot;
+              continue;
+            }
+            if (currentSlot != slot) {
+
+              if (!REDUCERS.containsKey(cmd)) {
+                // we can't continue as we don't know how to reduce this
+                promise.fail(buildCrossslotFailureMsg(req));
+                return promise.future();
+              }
+
+              final Map<Integer, Request> requests = splitRequest(cmd, args);
+
+              if (requests.isEmpty()) {
+                // we can't continue as we don't know how to split this command
+                promise.fail(buildCrossslotFailureMsg(req));
+                return promise.future();
+              }
+
+              final List<Future> responses = new ArrayList<>(requests.size());
+
+              for (Map.Entry<Integer, Request> kv : requests.entrySet()) {
+                final Promise<Response> p = vertx.promise();
+                send(selectEndpoint(kv.getKey(), cmd.isReadOnly(args), forceMasterEndpoint), RETRIES, kv.getValue(), p);
+                responses.add(p.future());
+              }
+
+              CompositeFuture.all(responses).onComplete(composite -> {
+                if (composite.failed()) {
+                  // means if one of the operations failed, then we can fail the handler
+                  promise.fail(composite.cause());
+                } else {
+                  promise.complete(REDUCERS.get(cmd).apply(composite.result().list()));
+                }
+              });
+
+              return promise.future();
+            }
+
+            // all keys are on the same slot!
+            send(selectEndpoint(currentSlot, cmd.isReadOnly(args), forceMasterEndpoint), RETRIES, req, promise);
+            return promise.future();
+          }
+
+          promise.fail(buildCrossslotFailureMsg(req));
           return promise.future();
         }
-      }
 
-      // all keys are on the same slot!
-      send(selectEndpoint(currentSlot, cmd.isReadOnly(), forceMasterEndpoint), RETRIES, req, promise);
-      return promise.future();
+        String[] endpoints = slots.endpointsForKey(hashSlot);
+        send(selectMasterOrReplicaEndpoint(cmd.isReadOnly(args), endpoints, forceMasterEndpoint), RETRIES, req, promise);
+        return promise.future();
     }
-
-    // last option the command is single key
-    int start = cmd.getFirstKey() - 1;
-    send(selectEndpoint(ZModem.generate(args.get(start)), cmd.isReadOnly(), forceMasterEndpoint), RETRIES, req, promise);
-    return promise.future();
   }
 
-  private Map<Integer, Request> splitRequest(Command cmd, List<byte[]> args, int start, int end, int step) {
+  private Map<Integer, Request> splitRequest(CommandImpl cmd, List<byte[]> args) {
     // we will split the request across the slots
     final Map<Integer, Request> map = new IdentityHashMap<>();
 
-    for (int i = start; i < end; i += step) {
-      int slot = ZModem.generate(args.get(i));
-      // get the client for the slot
-      Request request = map.get(slot);
-      if (request == null) {
-        // we need to create a new one
-        request = Request.cmd(cmd);
-        // all params before the key get added
-        for (int j = 0; j < start; j++) {
+    int lastKey = cmd.iterateKeys(args, (begin, keyIdx, keyStep) -> {
+        int slot = ZModem.generate(args.get(keyIdx));
+        // get the client for the slot
+        Request request = map.get(slot);
+        if (request == null) {
+          // we need to create a new one
+          request = Request.cmd(cmd);
+          // all params before the key get added
+          for (int j = 0; j < begin; j++) {
+            request.arg(args.get(j));
+          }
+          // add to the map
+          map.put(slot, request);
+        }
+        // request isn't null anymore
+        request.arg(args.get(keyIdx));
+        // all params before the next key get added
+        for (int j = keyIdx + 1; j < keyIdx + keyStep; j++) {
           request.arg(args.get(j));
         }
-        // add to the map
-        map.put(slot, request);
-      }
-      // request isn't null anymore
-      request.arg(args.get(i));
-      // all params before the next key get added
-      for (int j = i + 1; j < i + step; j++) {
-        request.arg(args.get(j));
-      }
-    }
+      });
 
     // if there are args after the end they must be added to all requests
     final Collection<Request> col = map.values();
     col.forEach(req -> {
-      for (int j = end; j < args.size(); j++) {
+      for (int j = lastKey; j < args.size(); j++) {
         req.arg(args.get(j));
       }
     });
@@ -368,78 +350,57 @@ public class RedisClusterConnection implements RedisConnection {
       for (Request request : requests) {
         // process commands for cluster mode
         final RequestImpl req = (RequestImpl) request;
-        final Command cmd = req.command();
-
-        if (UNSUPPORTEDCOMMANDS.containsKey(cmd)) {
-          promise.fail(UNSUPPORTEDCOMMANDS.get(cmd));
-          return promise.future();
-        }
-
-        readOnly |= cmd.isReadOnly();
-        forceMasterEndpoint |= MASTER_ONLY_COMMANDS.contains(cmd);
-
-        // this command can run anywhere
-        if (cmd.isKeyless()) {
-          continue;
-        }
-
-        if (cmd.isMovable()) {
-          final byte[][] keys = KeyExtractor.extractMovableKeys(req);
-
-          int slot = ZModem.generateMulti(keys);
-          if (slot == -1 || (currentSlot != -1 && currentSlot != slot)) {
-            promise.fail(buildCrossslotFailureMsg(req));
-            return promise.future();
-          }
-          currentSlot = slot;
-          continue;
-        }
-
+        final CommandImpl cmd = (CommandImpl) req.command();
         final List<byte[]> args = req.getArgs();
 
-        if (cmd.isMultiKey()) {
-          // args exclude the command which is an arg in the commands response
-          int start = cmd.getFirstKey() - 1;
-          int end = cmd.getLastKey();
-          if (end > 0) {
-            end--;
-          }
-          if (end < 0) {
-            end = args.size() + (end + 1);
-          }
-          int step = cmd.getInterval();
 
-          for (int j = start; j < end; j += step) {
-            int slot = ZModem.generate(args.get(j));
+        readOnly |= cmd.isReadOnly(args);
+
+        if (cmd.needsGetKeys()) {
+          // it is required to resolve the keys at the server side as we cannot deduct where they are algorithmically
+          // we shall run this commands on the master node always
+          forceMasterEndpoint = true;
+          continue;
+        }
+
+        final List<byte[]> keys = req.keys();
+        forceMasterEndpoint |= MASTER_ONLY_COMMANDS.contains(cmd);
+        int slot;
+
+        // process slots, need to verify if we can run this batch
+        switch (keys.size()) {
+          case 0:
+            // this command can run anywhere
+            break;
+          case 1:
+            // command is single key, as long as we're on the same slot, it's OK
+            slot = ZModem.generate(keys.get(0));
+            // we are checking the first request key
             if (currentSlot == -1) {
               currentSlot = slot;
-              continue;
-            }
-            if (currentSlot != slot) {
+            } else if (currentSlot != slot) {
               // in cluster mode we currently do not handle batching commands which keys are not on the same slot
               promise.fail(buildCrossslotFailureMsg(req));
               return promise.future();
             }
-          }
-          // all keys are on the same slot!
-          continue;
-        }
-
-        // last option the command is single key
-        final int start = cmd.getFirstKey() - 1;
-        final int slot = ZModem.generate(args.get(start));
-        // we are checking the first request key
-        if (currentSlot == -1) {
-          currentSlot = slot;
-          continue;
-        }
-        if (currentSlot != slot) {
-          // in cluster mode we currently do not handle batching commands which keys are not on the same slot
-          promise.fail(buildCrossslotFailureMsg(req));
-          return promise.future();
+            break;
+          default:
+            // multiple keys on the command
+            for (byte[] key : keys) {
+              slot = ZModem.generate(key);
+              if (currentSlot == -1) {
+                currentSlot = slot;
+              } else if (currentSlot != slot) {
+                // in cluster mode we currently do not handle batching commands which keys are not on the same slot
+                promise.fail(buildCrossslotFailureMsg(req));
+                return promise.future();
+              }
+              break;
+            }
         }
       }
 
+      // all keys are on the same slot!
       batch(selectEndpoint(currentSlot, readOnly, forceMasterEndpoint), RETRIES, requests, promise);
     }
 

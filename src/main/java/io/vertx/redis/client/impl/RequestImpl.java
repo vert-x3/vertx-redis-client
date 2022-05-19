@@ -16,11 +16,14 @@
 package io.vertx.redis.client.impl;
 
 import io.vertx.core.buffer.Buffer;
+import io.vertx.core.json.JsonArray;
+import io.vertx.core.json.JsonObject;
 import io.vertx.redis.client.Command;
 import io.vertx.redis.client.Request;
 
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
@@ -35,17 +38,54 @@ public final class RequestImpl implements Request {
   private static final byte[] TRUE = new byte[] { 't' };
   private static final byte[] FALSE = new byte[] { 'f' };
 
-  private final Command cmd;
+  private final CommandImpl cmd;
   private final List<byte[]> args;
 
   public RequestImpl(Command cmd) {
-    this.cmd = cmd;
+    this.cmd = (CommandImpl) cmd;
 
-    if (cmd.getArity() != 0) {
-      args = new ArrayList<>(Math.abs(cmd.getArity()));
+    if (this.cmd.getArity() != 0) {
+      args = new ArrayList<>(Math.abs(this.cmd.getArity()));
     } else {
       args = Collections.emptyList();
     }
+  }
+
+  public RequestImpl(Command cmd, Object[] args) {
+    this.cmd = (CommandImpl) cmd;
+    if (args != null) {
+      final int len = args.length;
+      if (len > 0) {
+        for (int i = 0; i < args.length; i++) {
+          final Object o = args[i];
+          if (o != null) {
+            if (o instanceof Number) {
+              args[i] = o.toString().getBytes(StandardCharsets.US_ASCII);
+              continue;
+            }
+            if (o instanceof Boolean) {
+              args[i] = ((Boolean) o) ? TRUE : FALSE;
+              continue;
+            }
+            if (o instanceof String) {
+              args[i] = ((String) o).getBytes(StandardCharsets.UTF_8);
+              continue;
+            }
+            if (o instanceof byte[]) {
+              continue;
+            }
+            if (o instanceof Buffer) {
+              args[i] = ((Buffer) o).getBytes();
+              continue;
+            }
+            throw new IllegalArgumentException("Unsupported argument type: " + o.getClass());
+          }
+        }
+        this.args = (List) Arrays.asList(args);
+        return;
+      }
+    }
+    this.args = Collections.emptyList();
   }
 
   @Override
@@ -144,8 +184,22 @@ public final class RequestImpl implements Request {
     return args;
   }
 
+  public List<byte[]> keys() {
+    return cmd.extractKeys(args);
+  }
+
   @Override
   public String toString() {
     return encode().toString();
+  }
+
+  public boolean valid() {
+    int arity = cmd.getArity();
+    int arglen = args.size() + 1;
+    if (arity >= 0) {
+      return arity == arglen;
+    } else {
+      return -arity <= arglen;
+    }
   }
 }

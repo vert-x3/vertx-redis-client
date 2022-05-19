@@ -16,8 +16,12 @@
 package io.vertx.redis.client.impl;
 
 import io.vertx.redis.client.Command;
+import io.vertx.redis.client.impl.keys.KeyConsumer;
 
 import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 
 /**
  * Implementation of the command metadata
@@ -30,84 +34,105 @@ public class CommandImpl implements Command {
   private final byte[] bytes;
   private final int arity;
 
-  private final boolean multiKey;
-  private final int firstKey;
-  private final int lastKey;
-  private final int interval;
-  private final boolean keyless;
-  private final boolean write;
-  private final boolean readOnly;
-  private final boolean movable;
+  private final KeyLocator[] keyLocators;
+  private final boolean needGetKeys;
+  private final Boolean readOnly;
   private final boolean pubsub;
 
-  public CommandImpl(String command, int arity, int firstKey, int lastKey, int interval, boolean write, boolean readOnly, boolean movable, boolean pubsub) {
+  public CommandImpl(String command, int arity, Boolean readOnly, boolean pubsub, boolean needGetKeys, KeyLocator... keyLocators) {
     this.command = command;
     this.bytes = ("$" + command.length() + "\r\n" + command + "\r\n").getBytes(StandardCharsets.ISO_8859_1);
     this.arity = arity;
-    this.firstKey = firstKey;
-    this.lastKey = lastKey;
-    this.interval = interval;
-    this.multiKey = lastKey < 0;
-    this.keyless = interval == 0 && !movable;
-    this.write = write;
+    this.needGetKeys = needGetKeys;
+    this.keyLocators = keyLocators;
     this.readOnly = readOnly;
-    this.movable = movable;
     this.pubsub = pubsub;
   }
 
-  @Override
   public byte[] getBytes() {
     return bytes;
   }
 
-  @Override
   public int getArity() {
     return arity;
   }
 
-  @Override
-  public boolean isMultiKey() {
-    return multiKey;
+  public boolean isReadOnly(List<byte[]> args) {
+    if (keyLocators != null) {
+      for (int i = keyLocators.length - 1; i >= 0; i--) {
+        final KeyLocator keyLocator = keyLocators[i];
+        if (keyLocator.begin == null || keyLocator.find == null) {
+          continue;
+        }
+
+        final int offset = keyLocator.begin.begin(args, arity);
+        if (offset == -1) {
+          continue;
+        }
+        if (keyLocator.ro == null) {
+          // when read only is undefined, we assume that the command has no side effects,
+          // so it can be execution on either a master or replica node
+          return true;
+        } else {
+          return keyLocator.ro;
+        }
+      }
+    }
+    if (readOnly == null) {
+      // when read only is undefined, we assume that the command has no side effects,
+      // so it can be execution on either a master or replica node
+      return true;
+    } else {
+      return readOnly;
+    }
   }
 
-  @Override
-  public int getFirstKey() {
-    return firstKey;
-  }
-
-  @Override
-  public int getLastKey() {
-    return lastKey;
-  }
-
-  @Override
-  public int getInterval() {
-    return interval;
-  }
-
-  @Override
-  public boolean isKeyless() {
-    return keyless;
-  }
-
-  @Override
-  public boolean isWrite() {
-    return write;
-  }
-
-  @Override
-  public boolean isReadOnly() {
-    return readOnly;
-  }
-
-  @Override
-  public boolean isMovable() {
-    return movable;
-  }
-
-  @Override
   public boolean isPubSub() {
     return pubsub;
+  }
+
+  public boolean needsGetKeys() {
+    return needGetKeys;
+  }
+
+  public List<byte[]> extractKeys(List<byte[]> args) {
+    if (keyLocators != null) {
+      for (int i = keyLocators.length - 1; i >= 0; i--) {
+        final KeyLocator keyLocator = keyLocators[i];
+        if (keyLocator.begin == null || keyLocator.find == null) {
+          continue;
+        }
+
+        final int offset = keyLocator.begin.begin(args, arity);
+        if (offset == -1) {
+          continue;
+        }
+
+        final List<byte[]> collector = new ArrayList<>();
+        keyLocator.find.forEach(args, arity, offset, (begin, keyIdx, keyStep) -> collector.add(args.get(keyIdx)));
+        return collector;
+      }
+    }
+    return Collections.emptyList();
+  }
+
+  public int iterateKeys(List<byte[]> args, KeyConsumer consumer) {
+    if (keyLocators != null) {
+      for (int i = keyLocators.length - 1; i >= 0; i--) {
+        final KeyLocator keyLocator = keyLocators[i];
+        if (keyLocator.begin == null || keyLocator.find == null) {
+          continue;
+        }
+
+        final int offset = keyLocator.begin.begin(args, arity);
+        if (offset == -1) {
+          continue;
+        }
+
+        return keyLocator.find.forEach(args, arity, offset, consumer);
+      }
+    }
+    return -1;
   }
 
   @Override
