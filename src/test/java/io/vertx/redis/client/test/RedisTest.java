@@ -314,10 +314,10 @@ public class RedisTest {
     RedisClient redis = (RedisClient) Redis.createClient(rule.vertx(), new RedisOptions().addConnectionString("redis://localhost:7006"));
 
     List<Request> requests = Arrays.asList(
-      Request.cmd(Command.SET).arg("foo"),
-      Request.cmd(Command.SET).arg("foo"),
-      Request.cmd(Command.SET).arg("foo"),
-      Request.cmd(Command.SET).arg("foo"));
+      Request.cmd(Command.create("OOPS")),
+      Request.cmd(Command.create("OOPS")),
+      Request.cmd(Command.create("OOPS")),
+      Request.cmd(Command.create("OOPS")));
 
     redis.batch(requests)
       .onFailure(err -> {
