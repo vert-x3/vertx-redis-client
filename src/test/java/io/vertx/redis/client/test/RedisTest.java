@@ -1,14 +1,12 @@
 package io.vertx.redis.client.test;
 
-import io.vertx.core.CompositeFuture;
-import io.vertx.core.Future;
-import io.vertx.core.Promise;
-import io.vertx.core.Vertx;
+import io.vertx.core.*;
 import io.vertx.ext.unit.Async;
 import io.vertx.ext.unit.TestContext;
 import io.vertx.ext.unit.junit.RunTestOnContext;
 import io.vertx.ext.unit.junit.VertxUnitRunner;
 import io.vertx.redis.client.*;
+import io.vertx.redis.client.impl.RedisClient;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -308,5 +306,27 @@ public class RedisTest {
           });
         });
       });
+  }
+
+  @Test
+  public void testBatch2(TestContext should) {
+    final Async test = should.async();
+    RedisClient redis = (RedisClient) Redis.createClient(rule.vertx(), new RedisOptions().addConnectionString("redis://localhost:7006"));
+
+    List<Request> requests = Arrays.asList(
+      Request.cmd(Command.SET).arg("foo"),
+      Request.cmd(Command.SET).arg("foo"),
+      Request.cmd(Command.SET).arg("foo"),
+      Request.cmd(Command.SET).arg("foo"));
+
+    redis.batch(requests)
+      .onFailure(err -> {
+        should.assertTrue(err.getMessage().contains("ERR [0]"));
+        should.assertTrue(err.getMessage().contains("ERR [1]"));
+        should.assertTrue(err.getMessage().contains("ERR [2]"));
+        should.assertTrue(err.getMessage().contains("ERR [3]"));
+        test.complete();
+      })
+      .onSuccess(responses -> should.fail("Commands are wrong"));
   }
 }

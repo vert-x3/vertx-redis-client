@@ -22,11 +22,15 @@ import io.vertx.redis.client.ResponseType;
 public final class ErrorType extends Throwable implements Response {
 
   public static ErrorType create(String message) {
-    return new ErrorType(message);
+    return new ErrorType(message, null);
   }
 
-  private ErrorType(String message) {
-    super(message, null, false, false);
+  public static ErrorType create(String message, Throwable cause) {
+    return new ErrorType(message, cause);
+  }
+
+  private ErrorType(String message, Throwable cause) {
+    super(message, cause, false, false);
   }
 
   @Override

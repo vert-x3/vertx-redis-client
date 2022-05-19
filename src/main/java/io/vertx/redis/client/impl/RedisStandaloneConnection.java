@@ -17,10 +17,7 @@ import io.vertx.redis.client.*;
 import io.vertx.redis.client.impl.types.ErrorType;
 import io.vertx.redis.client.impl.types.Multi;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
 
 public class RedisStandaloneConnection implements RedisConnectionInternal, ParserHandler {
@@ -247,9 +244,9 @@ public class RedisStandaloneConnection implements RedisConnectionInternal, Parse
 
       // will re-encode the handler into a list of promises
       final List<Promise<Response>> callbacks = new ArrayList<>(commands.size());
-      final List<Response> replies = new ArrayList<>(commands.size());
+      final Response[] replies = new Response[commands.size()];
       final AtomicInteger count = new AtomicInteger(commands.size());
-      final AtomicBoolean failed = new AtomicBoolean(false);
+      final StringBuilder errorMsg = new StringBuilder();
 
       // encode the message to a single buffer
       final Buffer messages = Buffer.buffer();
@@ -267,25 +264,34 @@ public class RedisStandaloneConnection implements RedisConnectionInternal, Parse
         taintCheck(req.command());
         // unwrap the handler into a single handler
         callbacks.add(index, vertx.promise(command -> {
-          if (!failed.get()) {
-            if (command.failed()) {
-              failed.set(true);
-              if (!promise.tryFail(command.cause())) {
-                // if the promise fail (e.g.: an client error forced a cleanup)
-                // call the exception handler if any
-                if (onException != null) {
-                  context.execute(new IllegalStateException("Result is already complete: [" + promise + "]"), onException);
+          if (command.failed()) {
+            if (errorMsg.length() > 0) {
+              errorMsg.append(System.lineSeparator());
+            }
+            String cause = null;
+            if (command.cause() != null) {
+              cause = command.cause().toString();
+              if (cause != null) {
+                if (cause.startsWith("ERR ")) {
+                  // strip the ERR prefix
+                  cause = cause.substring(4);
                 }
               }
-              return;
             }
+            // the message rewrite is just to comply to the redis error message contract
+            errorMsg.append("ERR [").append(index).append("] ").append(cause);
+          } else {
+            // set the reply
+            replies[index] = command.result();
           }
-          // set the reply
-          replies.add(index, command.result());
 
           if (count.decrementAndGet() == 0) {
             // all results have arrived
-            if (!promise.tryComplete(replies)) {
+            boolean resolved = errorMsg.length() > 0 ?
+              promise.tryFail(ErrorType.create(errorMsg.toString())) :
+              promise.tryComplete(Arrays.asList(replies));
+
+            if (!resolved) {
               // if the promise fail (e.g.: an client error forced a cleanup)
               // call the exception handler if any
               if (onException != null) {
