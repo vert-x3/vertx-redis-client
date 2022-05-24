@@ -145,40 +145,6 @@ public final class RequestImpl implements Request {
     return this;
   }
 
-  Buffer encode(String[] args) {
-    Buffer buffer = Buffer.buffer();
-
-    buffer
-      // array header
-      .appendByte((byte) '*')
-      .appendBytes(numToBytes(args.length + 1))
-      .appendBytes(EOL)
-      // command
-      .appendBytes(cmd.getBytes());
-
-    for (String arg : args) {
-      if (arg == null) {
-        buffer.appendBytes(NULL_BULK);
-        continue;
-      }
-
-      if (arg.length() == 0) {
-        buffer.appendBytes(EMPTY_BULK);
-        continue;
-      }
-
-      byte[] bytes = arg.getBytes(StandardCharsets.UTF_8);
-      buffer
-        .appendByte((byte) '$')
-        .appendBytes(numToBytes(bytes.length))
-        .appendBytes(EOL)
-        .appendBytes(bytes)
-        .appendBytes(EOL);
-    }
-
-    return buffer;
-  }
-
   Buffer encode() {
     return encode(Buffer.buffer());
   }
