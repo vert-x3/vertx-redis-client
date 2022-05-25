@@ -18,7 +18,7 @@ redis.info((err, info) => {
     .split("\r\n")
     .forEach(el => {
       if (el.startsWith('redis_version')) {
-        version = el;
+        version = el.substring(14);
       }
     });
 
@@ -46,7 +46,7 @@ redis.info((err, info) => {
             args += ', ';
             types += ', ';
           }
-          types += ("String arg" + i);
+          types += ("Object arg" + i);
           args += ("arg" + i);
         }
         // arg len includes the command name
@@ -57,13 +57,13 @@ redis.info((err, info) => {
       }
 
       if (cmd[1] < 0) {
-        types = "List<String> args";
+        types = "Object... args";
         args = "args";
         argLen = Math.abs(cmd[1]);
       }
 
       commands.push({
-        enum: cmd[0].replace('-', '_').replace(':', '').toUpperCase(),
+        enum: cmd[0].replace('-', '_').replace(':', '').replace('.', '_').toUpperCase(),
         name: cmd[0],
         safename: cmd[0].replace('-', ' ').replace(':', '').toUpperCase(),
         arity: cmd[1],
@@ -88,7 +88,7 @@ redis.info((err, info) => {
     var api_template = Handlebars.compile(fs.readFileSync('redis-api.hbs', 'utf8'));
 
     fs.writeFileSync(
-      '../src/main/java/io/vertx/redis/client/RedisAPI.java',
+      '../src/main/java/io/vertx/redis/client/RedisStack.java',
       api_template(commands));
 
     process.exit(0);

@@ -8,7 +8,7 @@
     "redis": "^2.8.0"
   },
   "scripts": {
-    "--prestart": "docker run --rm --net=host redis:latest",
+    "--prestart": "docker run --rm --net=host redis/redis-stack:7.0.0-RC4",
     "start": "node commands.js"
   }
 }
