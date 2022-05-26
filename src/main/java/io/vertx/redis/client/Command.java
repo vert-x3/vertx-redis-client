@@ -416,4 +416,8 @@ public interface Command {
   static Command create(String command) {
     return new CommandImpl(command, -1, null, false, true);
   }
+  
+  static Command create(String command, int arity, Boolean readOnly, boolean pubsub, boolean needGetKeys) {
+    return new CommandImpl(command, arity, readOnly, pubsub, needGetKeys);
+  }
 }
