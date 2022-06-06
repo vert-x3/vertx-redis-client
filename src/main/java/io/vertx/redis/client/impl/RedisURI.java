@@ -80,8 +80,17 @@ public final class RedisURI {
     try {
       final URI uri = new URI(connectionString);
 
-      final String host = uri.getHost() == null ? DEFAULT_HOST : uri.getHost();
-      final int port = uri.getPort() == -1 ? DEFAULT_PORT : uri.getPort();
+      boolean directRedisScheme = "rediss".equals(uri.getScheme()) || "redis".equals(uri.getScheme());
+      if (directRedisScheme && uri.getHost() == null) {
+        throw new IllegalArgumentException("Fail to parse connection string host");
+      }
+      final String host = uri.getHost();
+
+      if (directRedisScheme && uri.getPort() == -1) {
+        throw new IllegalArgumentException("Fail to parse connection string port");
+      }
+      final int port = uri.getPort();
+
       final String path = (uri.getPath() == null || uri.getPath().isEmpty()) ? "/" : uri.getPath();
 
       // According to https://www.iana.org/assignments/uri-schemes/prov/redis there is no specified order of decision
