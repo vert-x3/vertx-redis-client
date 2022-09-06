@@ -234,9 +234,9 @@ class RedisConnectionManager {
         Request hello = Request.cmd(Command.HELLO).arg(RESPParser.VERSION);
 
         String password = redisURI.password() != null ? redisURI.password() : options.getPassword();
+        String user = redisURI.user();
 
         if (password != null) {
-          String user = redisURI.user();
           // will perform auth at hello level
           hello
             .arg("AUTH")
@@ -261,7 +261,7 @@ class RedisConnectionManager {
             if (err instanceof ErrorType) {
               final ErrorType redisErr = (ErrorType) err;
               if (redisErr.is("NOAUTH")) {
-                authenticate(ctx, connection, password, handler);
+                authenticate(ctx, connection, user, password, handler);
                 return;
               }
               if (redisErr.is("ERR")) {
@@ -296,7 +296,7 @@ class RedisConnectionManager {
             if (((ErrorType) err).is("NOAUTH")) {
               // old authentication required
               String password = redisURI.password() != null ? redisURI.password() : options.getPassword();
-              authenticate(ctx, connection, password, handler);
+              authenticate(ctx, connection, redisURI.user(), password, handler);
               return;
             }
           }
@@ -306,13 +306,21 @@ class RedisConnectionManager {
       });
     }
 
-    private void authenticate(ContextInternal ctx, RedisConnection connection, String password, Handler<AsyncResult<Void>> handler) {
+    private void authenticate(ContextInternal ctx, RedisConnection connection, String user, String password, Handler<AsyncResult<Void>> handler) {
       if (password == null) {
         ctx.execute(ctx.succeededFuture(), handler);
         return;
       }
+
       // perform authentication
-      connection.send(Request.cmd(Command.AUTH).arg(password), auth -> {
+      final Request cmd = Request.cmd(Command.AUTH);
+      // when working with ACLs (Redis >= 6) we may use usernames
+      if (user != null) {
+        cmd.arg(user);
+      }
+      cmd.arg(password);
+
+      connection.send(cmd, auth -> {
         if (auth.failed()) {
           ctx.execute(ctx.failedFuture(auth.cause()), handler);
         } else {
