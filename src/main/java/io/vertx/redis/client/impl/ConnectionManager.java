@@ -122,8 +122,13 @@ class ConnectionManager {
         handler.handle(Future.succeededFuture());
         return;
       }
+      Request request = Request.cmd(Command.AUTH);
+      if (user != null) {
+        request.arg(user);
+      }
+      request.arg(password);
       // perform authentication
-      connection.send(Request.cmd(Command.AUTH).arg(user == null ? "default" : user).arg(password), auth -> {
+      connection.send(request, auth -> {
         if (auth.failed()) {
           handler.handle(Future.failedFuture(auth.cause()));
         } else {
