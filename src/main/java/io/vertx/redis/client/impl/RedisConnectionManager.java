@@ -61,11 +61,11 @@ class RedisConnectionManager {
     VertxMetrics metricsSPI = this.vertx.metricsSPI();
     metrics = metricsSPI != null ? metricsSPI.createPoolMetrics("redis", options.getPoolName(), options.getMaxPoolSize()) : null;
     this.netClient = vertx.createNetClient(options.getNetClientOptions());
-    this.pooledConnectionManager = new ConnectionManager<>(this::connectionEndpointProvider);
+    this.pooledConnectionManager = new ConnectionManager<>();
   }
 
-  private Endpoint<Lease<RedisConnectionInternal>> connectionEndpointProvider(ConnectionKey key, ContextInternal ctx, Runnable dispose) {
-    return new RedisEndpoint(vertx, netClient, options, dispose, key);
+  private Endpoint<Lease<RedisConnectionInternal>> connectionEndpointProvider(ContextInternal ctx, Runnable dispose, String connectionString, Request setup) {
+    return new RedisEndpoint(vertx, netClient, options, dispose, connectionString, setup);
   }
 
   synchronized void start() {
@@ -372,7 +372,7 @@ class RedisConnectionManager {
     final boolean metricsEnabled = metrics != null;
     final Object queueMetric = metricsEnabled ? metrics.submitted() : null;
 
-    pooledConnectionManager.getConnection(eventLoopContext, new ConnectionKey(connectionString, setup), promise);
+    pooledConnectionManager.getConnection(eventLoopContext, new ConnectionKey(connectionString, setup), (ctx, dispose) -> connectionEndpointProvider(ctx, dispose, connectionString, setup), promise);
     return promise.future()
       .onFailure(err -> {
         if (metricsEnabled) {
@@ -400,9 +400,9 @@ class RedisConnectionManager {
 
     final ConnectionPool<RedisConnectionInternal> pool;
 
-    public RedisEndpoint(VertxInternal vertx, NetClient netClient, RedisOptions options, Runnable dispose, ConnectionKey key) {
+    public RedisEndpoint(VertxInternal vertx, NetClient netClient, RedisOptions options, Runnable dispose, String connectionString, Request setup) {
       super(dispose);
-      PoolConnector<RedisConnectionInternal> connector = new RedisConnectionProvider(vertx, netClient, options, key.string, key.setup);
+      PoolConnector<RedisConnectionInternal> connector = new RedisConnectionProvider(vertx, netClient, options, connectionString, setup);
       pool = ConnectionPool.pool(connector, new int[]{options.getMaxPoolSize()}, options.getMaxPoolWaiting());
     }
 
