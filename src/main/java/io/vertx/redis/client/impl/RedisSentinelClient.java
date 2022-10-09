@@ -76,6 +76,7 @@ public class RedisSentinelClient extends BaseRedisClient implements Redis {
       createConnectionInternal(options, RedisRole.SENTINEL, create -> {
         if (create.failed()) {
           LOG.error("Redis PUB/SUB wrap failed.", create.cause());
+          promise.fail(create.cause());
           return;
         }
 
