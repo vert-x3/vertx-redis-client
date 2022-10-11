@@ -254,4 +254,17 @@ public class RedisClient7Test {
           });
       });
   }
+
+  @Test
+  public void testNaN(TestContext should) {
+    final Async test = should.async();
+    final String key = makeKey();
+
+    client.send(cmd(EVAL).arg("return tostring(0/0)").arg(0))
+      .onFailure(should::fail)
+      .onSuccess(ok -> {
+        should.assertTrue(Double.isNaN(ok.toDouble()));
+        test.complete();
+      });
+  }
 }

@@ -93,7 +93,17 @@ public interface Response extends Iterable<Response> {
   default @Nullable Double toDouble() {
     final String msg = toString();
     if (msg != null) {
-      return Double.parseDouble(msg);
+      switch (msg) {
+        case "-nan":
+        case "nan":
+          return Double.NaN;
+        case "inf":
+          return Double.POSITIVE_INFINITY;
+        case "-inf":
+          return Double.NEGATIVE_INFINITY;
+        default:
+          return Double.parseDouble(msg);
+      }
     }
     return null;
   }
