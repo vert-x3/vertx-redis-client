@@ -16,6 +16,7 @@
 package io.vertx.redis.client.impl;
 
 import io.vertx.core.*;
+import io.vertx.core.dns.DnsClient;
 import io.vertx.core.impl.logging.Logger;
 import io.vertx.core.impl.logging.LoggerFactory;
 import io.vertx.redis.client.*;
@@ -120,10 +121,14 @@ public class RedisClusterClient extends BaseRedisClient implements Redis {
   }
 
   private final RedisOptions options;
+  private final DnsClient dns;
 
   public RedisClusterClient(Vertx vertx, RedisOptions options) {
     super(vertx, options);
     this.options = options;
+    // TODO: allow DNS options
+    this.dns = vertx.createDnsClient();
+
     // validate options
     if (options.getMaxPoolWaiting() < options.getMaxPoolSize()) {
       throw new IllegalStateException("Invalid options: maxPoolWaiting < maxPoolSize");
@@ -136,7 +141,19 @@ public class RedisClusterClient extends BaseRedisClient implements Redis {
   public Future<RedisConnection> connect() {
     final Promise<RedisConnection> promise = vertx.promise();
     // attempt to load the slots from the first good endpoint
-    connect(options.getEndpoints(), 0, promise);
+    List<String> endpoints = options.getEndpoints();
+    if (endpoints.size() == 1) {
+      dns.resolveA(endpoints.get(0))
+        .onFailure(err -> {
+          // default to regular single node lookup
+          connect(options.getEndpoints(), 0, promise);
+        })
+        .onSuccess(resolvedEndpoints -> {
+          connect(resolvedEndpoints, 0, promise);
+        });
+    } else {
+      connect(options.getEndpoints(), 0, promise);
+    }
     return promise.future();
   }
 
