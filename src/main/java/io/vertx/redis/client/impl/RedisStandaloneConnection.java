@@ -462,6 +462,7 @@ public class RedisStandaloneConnection implements RedisConnectionInternal, Parse
     // cannot reset if connection is tainted (custom DB/AUTH/PUBSUB)
     if (tainted) {
       evict();
+      forceClose();
       return false;
     }
     return true;
