@@ -113,8 +113,12 @@ final class ReadableBuffer {
         case DECIMAL:
           if (bytes.length == 3 && bytes[0] == 'i' && bytes[1] == 'n' && bytes[2] == 'f') {
             number = Double.POSITIVE_INFINITY;
+          } else if (bytes.length == 3 && bytes[0] == 'n' && bytes[1] == 'a' && bytes[2] == 'n') {
+              number = Double.NaN;
           } else if (bytes.length == 4 && bytes[0] == '-' && bytes[1] == 'i' && bytes[2] == 'n' && bytes[3] == 'f') {
             number = Double.NEGATIVE_INFINITY;
+          } else if (bytes.length == 4 && bytes[0] == '-' && bytes[1] == 'n' && bytes[2] == 'a' && bytes[3] == 'n') {
+            number = Double.NaN;
           } else {
             number = Double.parseDouble(new String(bytes, StandardCharsets.US_ASCII));
           }
