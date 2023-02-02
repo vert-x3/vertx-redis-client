@@ -24,7 +24,7 @@ class Slots {
 
   // we need some randomness, it doesn't need
   // to be secure or unpredictable
-  private static final SplittableRandom RANDOM = new SplittableRandom();
+  private static final Random RANDOM = new Random();
 
   static class Slot {
     private final int start;

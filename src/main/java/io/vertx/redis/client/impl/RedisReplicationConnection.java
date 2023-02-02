@@ -14,7 +14,7 @@ public class RedisReplicationConnection implements RedisConnection {
 
   // we need some randomness, it doesn't need
   // to be secure or unpredictable
-  private static final SplittableRandom RANDOM = new SplittableRandom();
+  private static final Random RANDOM = new Random();
 
   // List of commands they should run every time only against master nodes
   private static final List<Command> MASTER_ONLY_COMMANDS = new ArrayList<>();
