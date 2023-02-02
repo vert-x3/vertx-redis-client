@@ -21,7 +21,7 @@ public class RedisClusterConnection implements RedisConnection {
 
   // we need some randomness, it doesn't need
   // to be secure or unpredictable
-  private static final SplittableRandom RANDOM = new SplittableRandom();
+  private static final Random RANDOM = new Random();
 
   // number of attempts/redirects when we get connection errors
   // or when we get MOVED/ASK responses
