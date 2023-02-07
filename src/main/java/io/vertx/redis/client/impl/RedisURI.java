@@ -21,6 +21,7 @@ import java.io.UnsupportedEncodingException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URLDecoder;
+import java.net.URLEncoder;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
@@ -33,7 +34,6 @@ import java.util.Map;
  */
 public final class RedisURI {
 
-  private static final String DEFAULT_HOST = "localhost";
   private static final int DEFAULT_PORT = 6379;
 
   /**
@@ -80,16 +80,15 @@ public final class RedisURI {
     try {
       final URI uri = new URI(connectionString);
 
-      boolean directRedisScheme = "rediss".equals(uri.getScheme()) || "redis".equals(uri.getScheme());
-      if (directRedisScheme && uri.getHost() == null) {
-        throw new IllegalArgumentException("Fail to parse connection string host");
-      }
       final String host = uri.getHost();
+      final int port = uri.getPort() == -1 ? DEFAULT_PORT : uri.getPort();
 
-      if (directRedisScheme && uri.getPort() == -1) {
-        throw new IllegalArgumentException("Fail to parse connection string port");
+      if (uri.getAuthority() != null) {
+        // if we have an authority, then we have a host and port or userinfo
+        if (uri.getRawUserInfo() == null && uri.getHost() == null && uri.getPort() == -1) {
+          throw new IllegalArgumentException("Fail to parse connection string authority");
+        }
       }
-      final int port = uri.getPort();
 
       final String path = (uri.getPath() == null || uri.getPath().isEmpty()) ? "/" : uri.getPath();
 
@@ -170,6 +169,14 @@ public final class RedisURI {
     }
   }
 
+  private static String urlEncode(String raw) {
+    try {
+      return URLEncoder.encode(raw, "UTF-8");
+    } catch (UnsupportedEncodingException e) {
+      throw new RuntimeException(e);
+    }
+  }
+
   private static Map<String, String> parseQuery(URI uri) {
     if (uri.getQuery() != null) {
       final Map<String, String> query = new HashMap<>();
@@ -223,7 +230,7 @@ public final class RedisURI {
     return
       (user == null ? "" : user) +
         ":" +
-        (password == null ? "" : password) +
+        (password == null ? "" : urlEncode(password)) +
         "@";
   }
 
