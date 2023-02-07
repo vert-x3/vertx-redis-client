@@ -1,17 +1,14 @@
 package io.vertx.redis.client.impl;
 
 import org.junit.Assert;
-import org.junit.Rule;
 import org.junit.Test;
-import org.junit.rules.ExpectedException;
+
+import static org.junit.Assert.assertThrows;
 
 /**
  * @author <a href="mailto:artursletter@gmail.com">Artur Badretdinov</a>
  */
 public class RedisURITest {
-
-  @Rule
-  public ExpectedException exceptionRule = ExpectedException.none();
 
   @Test
   public void testHostAndPort() {
@@ -97,8 +94,20 @@ public class RedisURITest {
 
   @Test
   public void testWrongSyntax() {
-    exceptionRule.expect(IllegalArgumentException.class);
-    exceptionRule.expectMessage("Fail to parse connection string host");
-    new RedisURI("redis://:your-redis-domain:6379");
+    assertThrows(IllegalArgumentException.class, () -> new RedisURI("redis://:your-redis-domain:6379"));
+  }
+
+  @Test
+  public void testDefaultPort() {
+    RedisURI redisURI = new RedisURI("redis://localhost");
+    Assert.assertEquals(6379, redisURI.socketAddress().port());
+  }
+
+  @Test
+  public void testDefaultPortWithPassword() {
+    RedisURI redisURI = new RedisURI("redis://:password@localhost");
+    Assert.assertEquals("password", redisURI.password());
+    Assert.assertEquals("localhost", redisURI.socketAddress().host());
+    Assert.assertEquals(6379, redisURI.socketAddress().port());
   }
 }
