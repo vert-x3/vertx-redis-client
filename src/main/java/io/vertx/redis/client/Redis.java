@@ -80,6 +80,7 @@ public interface Redis {
    * @return a reference to this, so the API can be used fluently
    */
   @Fluent
+  @Deprecated
   default Redis connect(Handler<AsyncResult<RedisConnection>> handler) {
     connect().onComplete(handler);
     return this;
@@ -104,6 +105,7 @@ public interface Redis {
    * @return fluent self.
    */
   @Fluent
+  @Deprecated
   default Redis send(Request command, Handler<AsyncResult<@Nullable Response>> onSend) {
     send(command).onComplete(onSend);
     return this;
@@ -125,6 +127,7 @@ public interface Redis {
    * @return fluent self.
    */
   @Fluent
+  @Deprecated
   default Redis batch(List<Request> commands, Handler<AsyncResult<List<@Nullable Response>>> onSend) {
     batch(commands).onComplete(onSend);
     return this;
