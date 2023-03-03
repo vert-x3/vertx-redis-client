@@ -125,6 +125,7 @@ public interface RedisConnection extends ReadStream<Response> {
    * Closes the connection or returns to the pool.
    */
   @Fluent
+  @Deprecated
   default RedisConnection close(Handler<AsyncResult<Void>> onClose) {
     close().onComplete(onClose);
     return this;
