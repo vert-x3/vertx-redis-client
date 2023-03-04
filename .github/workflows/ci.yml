@@ -19,19 +19,19 @@ jobs:
         jdk: [8, 17]
     runs-on: ${{ matrix.os }}
     steps:
-      - uses: actions/cache@v2
+      - uses: actions/cache@v3
         with:
           path: ~/.m2/repository
           key: maven-java-${{ matrix.jdk }}
       - name: Checkout
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
       - name: Install JDK
         uses: actions/setup-java@v2
         with:
           java-version: ${{ matrix.jdk }}
           distribution: temurin
       - name: Fetch container
-        run: docker pull grokzen/redis-cluster:latest
+        run: docker pull grokzen/redis-cluster:6.0.0
       - name: Run redis test cluster
         run: docker run -d -e 'IP=127.0.0.1' -e 'STANDALONE=true' -e 'SENTINEL=true' -p '7000-7007:7000-7007' -p '5000-5002:5000-5002' grokzen/redis-cluster:latest
       - name: Run tests
@@ -52,12 +52,12 @@ jobs:
       VERTX_NEXUS_USERNAME: ${{ secrets.VERTX_NEXUS_USERNAME }}
       VERTX_NEXUS_PASSWORD: ${{ secrets.VERTX_NEXUS_PASSWORD }}
     steps:
-      - uses: actions/cache@v2
+      - uses: actions/cache@v3
         with:
           path: ~/.m2/repository
           key: maven-java-${{ matrix.jdk }}
       - name: Checkout
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
       - name: Install JDK
         uses: actions/setup-java@v2
         with:
