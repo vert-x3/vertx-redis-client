@@ -79,6 +79,7 @@ public interface RedisConnection extends ReadStream<Response> {
    * @return fluent self.
    */
   @Fluent
+  @Deprecated
   default RedisConnection send(Request command, Handler<AsyncResult<@Nullable Response>> onSend) {
     send(command).onComplete(onSend);
     return this;
@@ -100,6 +101,7 @@ public interface RedisConnection extends ReadStream<Response> {
    * @return fluent self.
    */
   @Fluent
+  @Deprecated
   default RedisConnection batch(List<Request> commands, Handler<AsyncResult<List<@Nullable Response>>> onSend) {
     batch(commands).onComplete(onSend);
     return this;
@@ -123,6 +125,7 @@ public interface RedisConnection extends ReadStream<Response> {
    * Closes the connection or returns to the pool.
    */
   @Fluent
+  @Deprecated
   default RedisConnection close(Handler<AsyncResult<Void>> onClose) {
     close().onComplete(onClose);
     return this;

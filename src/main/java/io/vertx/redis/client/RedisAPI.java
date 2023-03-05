@@ -52,6 +52,7 @@ public interface RedisAPI {
    * @return fluent self
    */
   @Fluent
+  @Deprecated
   default RedisAPI ftAdd(List<String> args, Handler<AsyncResult<@Nullable Response>> handler) {
     send(Command.FT_ADD, args.toArray(new String[0])).onComplete(handler);
     return this;
@@ -69,6 +70,7 @@ public interface RedisAPI {
    * @return fluent self
    */
   @Fluent
+  @Deprecated
   default RedisAPI ftAggregate(List<String> args, Handler<AsyncResult<@Nullable Response>> handler) {
     send(Command.FT_AGGREGATE, args.toArray(new String[0])).onComplete(handler);
     return this;
@@ -86,6 +88,7 @@ public interface RedisAPI {
    * @return fluent self
    */
   @Fluent
+  @Deprecated
   default RedisAPI ftAliasadd(List<String> args, Handler<AsyncResult<@Nullable Response>> handler) {
     send(Command.FT_ALIASADD, args.toArray(new String[0])).onComplete(handler);
     return this;
@@ -103,6 +106,7 @@ public interface RedisAPI {
    * @return fluent self
    */
   @Fluent
+  @Deprecated
   default RedisAPI ftAliasdel(List<String> args, Handler<AsyncResult<@Nullable Response>> handler) {
     send(Command.FT_ALIASDEL, args.toArray(new String[0])).onComplete(handler);
     return this;
@@ -120,6 +124,7 @@ public interface RedisAPI {
    * @return fluent self
    */
   @Fluent
+  @Deprecated
   default RedisAPI ftAliasupdate(List<String> args, Handler<AsyncResult<@Nullable Response>> handler) {
     send(Command.FT_ALIASUPDATE, args.toArray(new String[0])).onComplete(handler);
     return this;
@@ -137,6 +142,7 @@ public interface RedisAPI {
    * @return fluent self
    */
   @Fluent
+  @Deprecated
   default RedisAPI ftAlter(List<String> args, Handler<AsyncResult<@Nullable Response>> handler) {
     send(Command.FT_ALTER, args.toArray(new String[0])).onComplete(handler);
     return this;
@@ -154,6 +160,7 @@ public interface RedisAPI {
    * @return fluent self
    */
   @Fluent
+  @Deprecated
   default RedisAPI ftConfig(List<String> args, Handler<AsyncResult<@Nullable Response>> handler) {
     send(Command.FT_CONFIG, args.toArray(new String[0])).onComplete(handler);
     return this;
@@ -171,6 +178,7 @@ public interface RedisAPI {
    * @return fluent self
    */
   @Fluent
+  @Deprecated
   default RedisAPI ftCreate(List<String> args, Handler<AsyncResult<@Nullable Response>> handler) {
     send(Command.FT_CREATE, args.toArray(new String[0])).onComplete(handler);
     return this;
@@ -188,6 +196,7 @@ public interface RedisAPI {
    * @return fluent self
    */
   @Fluent
+  @Deprecated
   default RedisAPI ftCursor(List<String> args, Handler<AsyncResult<@Nullable Response>> handler) {
     send(Command.FT_CURSOR, args.toArray(new String[0])).onComplete(handler);
     return this;
@@ -205,6 +214,7 @@ public interface RedisAPI {
    * @return fluent self
    */
   @Fluent
+  @Deprecated
   default RedisAPI ftDebug(List<String> args, Handler<AsyncResult<@Nullable Response>> handler) {
     send(Command.FT_DEBUG, args.toArray(new String[0])).onComplete(handler);
     return this;
@@ -222,6 +232,7 @@ public interface RedisAPI {
    * @return fluent self
    */
   @Fluent
+  @Deprecated
   default RedisAPI ftDel(List<String> args, Handler<AsyncResult<@Nullable Response>> handler) {
     send(Command.FT_DEL, args.toArray(new String[0])).onComplete(handler);
     return this;
@@ -239,6 +250,7 @@ public interface RedisAPI {
    * @return fluent self
    */
   @Fluent
+  @Deprecated
   default RedisAPI ftDictadd(List<String> args, Handler<AsyncResult<@Nullable Response>> handler) {
     send(Command.FT_DICTADD, args.toArray(new String[0])).onComplete(handler);
     return this;
@@ -256,6 +268,7 @@ public interface RedisAPI {
    * @return fluent self
    */
   @Fluent
+  @Deprecated
   default RedisAPI ftDictdel(List<String> args, Handler<AsyncResult<@Nullable Response>> handler) {
     send(Command.FT_DICTDEL, args.toArray(new String[0])).onComplete(handler);
     return this;
@@ -273,6 +286,7 @@ public interface RedisAPI {
    * @return fluent self
    */
   @Fluent
+  @Deprecated
   default RedisAPI ftDictdump(List<String> args, Handler<AsyncResult<@Nullable Response>> handler) {
     send(Command.FT_DICTDUMP, args.toArray(new String[0])).onComplete(handler);
     return this;
@@ -290,6 +304,7 @@ public interface RedisAPI {
    * @return fluent self
    */
   @Fluent
+  @Deprecated
   default RedisAPI ftDrop(List<String> args, Handler<AsyncResult<@Nullable Response>> handler) {
     send(Command.FT_DROP, args.toArray(new String[0])).onComplete(handler);
     return this;
@@ -307,6 +322,7 @@ public interface RedisAPI {
    * @return fluent self
    */
   @Fluent
+  @Deprecated
   default RedisAPI ftDropindex(List<String> args, Handler<AsyncResult<@Nullable Response>> handler) {
     send(Command.FT_DROPINDEX, args.toArray(new String[0])).onComplete(handler);
     return this;
@@ -324,6 +340,7 @@ public interface RedisAPI {
    * @return fluent self
    */
   @Fluent
+  @Deprecated
   default RedisAPI ftExplain(List<String> args, Handler<AsyncResult<@Nullable Response>> handler) {
     send(Command.FT_EXPLAIN, args.toArray(new String[0])).onComplete(handler);
     return this;
@@ -341,6 +358,7 @@ public interface RedisAPI {
    * @return fluent self
    */
   @Fluent
+  @Deprecated
   default RedisAPI ftExplaincli(List<String> args, Handler<AsyncResult<@Nullable Response>> handler) {
     send(Command.FT_EXPLAINCLI, args.toArray(new String[0])).onComplete(handler);
     return this;
@@ -358,6 +376,7 @@ public interface RedisAPI {
    * @return fluent self
    */
   @Fluent
+  @Deprecated
   default RedisAPI ftGet(List<String> args, Handler<AsyncResult<@Nullable Response>> handler) {
     send(Command.FT_GET, args.toArray(new String[0])).onComplete(handler);
     return this;
@@ -375,6 +394,7 @@ public interface RedisAPI {
    * @return fluent self
    */
   @Fluent
+  @Deprecated
   default RedisAPI ftInfo(List<String> args, Handler<AsyncResult<@Nullable Response>> handler) {
     send(Command.FT_INFO, args.toArray(new String[0])).onComplete(handler);
     return this;
@@ -392,6 +412,7 @@ public interface RedisAPI {
    * @return fluent self
    */
   @Fluent
+  @Deprecated
   default RedisAPI ftMget(List<String> args, Handler<AsyncResult<@Nullable Response>> handler) {
     send(Command.FT_MGET, args.toArray(new String[0])).onComplete(handler);
     return this;
@@ -409,6 +430,7 @@ public interface RedisAPI {
    * @return fluent self
    */
   @Fluent
+  @Deprecated
   default RedisAPI ftProfile(List<String> args, Handler<AsyncResult<@Nullable Response>> handler) {
     send(Command.FT_PROFILE, args.toArray(new String[0])).onComplete(handler);
     return this;
@@ -426,6 +448,7 @@ public interface RedisAPI {
    * @return fluent self
    */
   @Fluent
+  @Deprecated
   default RedisAPI ftSafeadd(List<String> args, Handler<AsyncResult<@Nullable Response>> handler) {
     send(Command.FT_SAFEADD, args.toArray(new String[0])).onComplete(handler);
     return this;
@@ -443,6 +466,7 @@ public interface RedisAPI {
    * @return fluent self
    */
   @Fluent
+  @Deprecated
   default RedisAPI ftSearch(List<String> args, Handler<AsyncResult<@Nullable Response>> handler) {
     send(Command.FT_SEARCH, args.toArray(new String[0])).onComplete(handler);
     return this;
@@ -460,6 +484,7 @@ public interface RedisAPI {
    * @return fluent self
    */
   @Fluent
+  @Deprecated
   default RedisAPI ftSpellcheck(List<String> args, Handler<AsyncResult<@Nullable Response>> handler) {
     send(Command.FT_SPELLCHECK, args.toArray(new String[0])).onComplete(handler);
     return this;
@@ -477,6 +502,7 @@ public interface RedisAPI {
    * @return fluent self
    */
   @Fluent
+  @Deprecated
   default RedisAPI ftSugadd(List<String> args, Handler<AsyncResult<@Nullable Response>> handler) {
     send(Command.FT_SUGADD, args.toArray(new String[0])).onComplete(handler);
     return this;
@@ -494,6 +520,7 @@ public interface RedisAPI {
    * @return fluent self
    */
   @Fluent
+  @Deprecated
   default RedisAPI ftSugdel(List<String> args, Handler<AsyncResult<@Nullable Response>> handler) {
     send(Command.FT_SUGDEL, args.toArray(new String[0])).onComplete(handler);
     return this;
@@ -511,6 +538,7 @@ public interface RedisAPI {
    * @return fluent self
    */
   @Fluent
+  @Deprecated
   default RedisAPI ftSugget(List<String> args, Handler<AsyncResult<@Nullable Response>> handler) {
     send(Command.FT_SUGGET, args.toArray(new String[0])).onComplete(handler);
     return this;
@@ -528,6 +556,7 @@ public interface RedisAPI {
    * @return fluent self
    */
   @Fluent
+  @Deprecated
   default RedisAPI ftSuglen(List<String> args, Handler<AsyncResult<@Nullable Response>> handler) {
     send(Command.FT_SUGLEN, args.toArray(new String[0])).onComplete(handler);
     return this;
@@ -545,6 +574,7 @@ public interface RedisAPI {
    * @return fluent self
    */
   @Fluent
+  @Deprecated
   default RedisAPI ftSynadd(List<String> args, Handler<AsyncResult<@Nullable Response>> handler) {
     send(Command.FT_SYNADD, args.toArray(new String[0])).onComplete(handler);
     return this;
@@ -562,6 +592,7 @@ public interface RedisAPI {
    * @return fluent self
    */
   @Fluent
+  @Deprecated
   default RedisAPI ftSyndump(List<String> args, Handler<AsyncResult<@Nullable Response>> handler) {
     send(Command.FT_SYNDUMP, args.toArray(new String[0])).onComplete(handler);
     return this;
@@ -579,6 +610,7 @@ public interface RedisAPI {
    * @return fluent self
    */
   @Fluent
+  @Deprecated
   default RedisAPI ftSynupdate(List<String> args, Handler<AsyncResult<@Nullable Response>> handler) {
     send(Command.FT_SYNUPDATE, args.toArray(new String[0])).onComplete(handler);
     return this;
@@ -596,6 +628,7 @@ public interface RedisAPI {
    * @return fluent self
    */
   @Fluent
+  @Deprecated
   default RedisAPI ftTagvals(List<String> args, Handler<AsyncResult<@Nullable Response>> handler) {
     send(Command.FT_TAGVALS, args.toArray(new String[0])).onComplete(handler);
     return this;
@@ -613,6 +646,7 @@ public interface RedisAPI {
    * @return fluent self
    */
   @Fluent
+  @Deprecated
   default RedisAPI ftAliasaddifnx(List<String> args, Handler<AsyncResult<@Nullable Response>> handler) {
     send(Command.FT__ALIASADDIFNX, args.toArray(new String[0])).onComplete(handler);
     return this;
@@ -630,6 +664,7 @@ public interface RedisAPI {
    * @return fluent self
    */
   @Fluent
+  @Deprecated
   default RedisAPI ftAliasdelifx(List<String> args, Handler<AsyncResult<@Nullable Response>> handler) {
     send(Command.FT__ALIASDELIFX, args.toArray(new String[0])).onComplete(handler);
     return this;
@@ -647,6 +682,7 @@ public interface RedisAPI {
    * @return fluent self
    */
   @Fluent
+  @Deprecated
   default RedisAPI ftAlterifnx(List<String> args, Handler<AsyncResult<@Nullable Response>> handler) {
     send(Command.FT__ALTERIFNX, args.toArray(new String[0])).onComplete(handler);
     return this;
@@ -664,6 +700,7 @@ public interface RedisAPI {
    * @return fluent self
    */
   @Fluent
+  @Deprecated
   default RedisAPI ftCreateifnx(List<String> args, Handler<AsyncResult<@Nullable Response>> handler) {
     send(Command.FT__CREATEIFNX, args.toArray(new String[0])).onComplete(handler);
     return this;
@@ -681,6 +718,7 @@ public interface RedisAPI {
    * @return fluent self
    */
   @Fluent
+  @Deprecated
   default RedisAPI ftDropifx(List<String> args, Handler<AsyncResult<@Nullable Response>> handler) {
     send(Command.FT__DROPIFX, args.toArray(new String[0])).onComplete(handler);
     return this;
@@ -698,6 +736,7 @@ public interface RedisAPI {
    * @return fluent self
    */
   @Fluent
+  @Deprecated
   default RedisAPI ftDropindexifx(List<String> args, Handler<AsyncResult<@Nullable Response>> handler) {
     send(Command.FT__DROPINDEXIFX, args.toArray(new String[0])).onComplete(handler);
     return this;
@@ -715,6 +754,7 @@ public interface RedisAPI {
    * @return fluent self
    */
   @Fluent
+  @Deprecated
   default RedisAPI ftList(List<String> args, Handler<AsyncResult<@Nullable Response>> handler) {
     send(Command.FT__LIST, args.toArray(new String[0])).onComplete(handler);
     return this;
@@ -732,6 +772,7 @@ public interface RedisAPI {
    * @return fluent self
    */
   @Fluent
+  @Deprecated
   default RedisAPI acl(List<String> args, Handler<AsyncResult<@Nullable Response>> handler) {
     send(Command.ACL, args.toArray(new String[0])).onComplete(handler);
     return this;
@@ -749,6 +790,7 @@ public interface RedisAPI {
    * @return fluent self
    */
   @Fluent
+  @Deprecated
   default RedisAPI append(String arg0, String arg1, Handler<AsyncResult<@Nullable Response>> handler) {
     send(Command.APPEND, arg0, arg1).onComplete(handler);
     return this;
@@ -766,6 +808,7 @@ public interface RedisAPI {
    * @return fluent self
    */
   @Fluent
+  @Deprecated
   default RedisAPI asking(Handler<AsyncResult<@Nullable Response>> handler) {
     send(Command.ASKING).onComplete(handler);
     return this;
@@ -783,6 +826,7 @@ public interface RedisAPI {
    * @return fluent self
    */
   @Fluent
+  @Deprecated
   default RedisAPI auth(List<String> args, Handler<AsyncResult<@Nullable Response>> handler) {
     send(Command.AUTH, args.toArray(new String[0])).onComplete(handler);
     return this;
@@ -800,6 +844,7 @@ public interface RedisAPI {
    * @return fluent self
    */
   @Fluent
+  @Deprecated
   default RedisAPI bfAdd(List<String> args, Handler<AsyncResult<@Nullable Response>> handler) {
     send(Command.BF_ADD, args.toArray(new String[0])).onComplete(handler);
     return this;
@@ -817,6 +862,7 @@ public interface RedisAPI {
    * @return fluent self
    */
   @Fluent
+  @Deprecated
   default RedisAPI bfDebug(List<String> args, Handler<AsyncResult<@Nullable Response>> handler) {
     send(Command.BF_DEBUG, args.toArray(new String[0])).onComplete(handler);
     return this;
@@ -834,6 +880,7 @@ public interface RedisAPI {
    * @return fluent self
    */
   @Fluent
+  @Deprecated
   default RedisAPI bfExists(List<String> args, Handler<AsyncResult<@Nullable Response>> handler) {
     send(Command.BF_EXISTS, args.toArray(new String[0])).onComplete(handler);
     return this;
@@ -851,6 +898,7 @@ public interface RedisAPI {
    * @return fluent self
    */
   @Fluent
+  @Deprecated
   default RedisAPI bfInfo(List<String> args, Handler<AsyncResult<@Nullable Response>> handler) {
     send(Command.BF_INFO, args.toArray(new String[0])).onComplete(handler);
     return this;
@@ -868,6 +916,7 @@ public interface RedisAPI {
    * @return fluent self
    */
   @Fluent
+  @Deprecated
   default RedisAPI bfInsert(List<String> args, Handler<AsyncResult<@Nullable Response>> handler) {
     send(Command.BF_INSERT, args.toArray(new String[0])).onComplete(handler);
     return this;
@@ -885,6 +934,7 @@ public interface RedisAPI {
    * @return fluent self
    */
   @Fluent
+  @Deprecated
   default RedisAPI bfLoadchunk(List<String> args, Handler<AsyncResult<@Nullable Response>> handler) {
     send(Command.BF_LOADCHUNK, args.toArray(new String[0])).onComplete(handler);
     return this;
@@ -902,6 +952,7 @@ public interface RedisAPI {
    * @return fluent self
    */
   @Fluent
+  @Deprecated
   default RedisAPI bfMadd(List<String> args, Handler<AsyncResult<@Nullable Response>> handler) {
     send(Command.BF_MADD, args.toArray(new String[0])).onComplete(handler);
     return this;
@@ -919,6 +970,7 @@ public interface RedisAPI {
    * @return fluent self
    */
   @Fluent
+  @Deprecated
   default RedisAPI bfMexists(List<String> args, Handler<AsyncResult<@Nullable Response>> handler) {
     send(Command.BF_MEXISTS, args.toArray(new String[0])).onComplete(handler);
     return this;
@@ -936,6 +988,7 @@ public interface RedisAPI {
    * @return fluent self
    */
   @Fluent
+  @Deprecated
   default RedisAPI bfReserve(List<String> args, Handler<AsyncResult<@Nullable Response>> handler) {
     send(Command.BF_RESERVE, args.toArray(new String[0])).onComplete(handler);
     return this;
@@ -953,6 +1006,7 @@ public interface RedisAPI {
    * @return fluent self
    */
   @Fluent
+  @Deprecated
   default RedisAPI bfScandump(List<String> args, Handler<AsyncResult<@Nullable Response>> handler) {
     send(Command.BF_SCANDUMP, args.toArray(new String[0])).onComplete(handler);
     return this;
@@ -970,6 +1024,7 @@ public interface RedisAPI {
    * @return fluent self
    */
   @Fluent
+  @Deprecated
   default RedisAPI bgrewriteaof(Handler<AsyncResult<@Nullable Response>> handler) {
     send(Command.BGREWRITEAOF).onComplete(handler);
     return this;
@@ -987,6 +1042,7 @@ public interface RedisAPI {
    * @return fluent self
    */
   @Fluent
+  @Deprecated
   default RedisAPI bgsave(List<String> args, Handler<AsyncResult<@Nullable Response>> handler) {
     send(Command.BGSAVE, args.toArray(new String[0])).onComplete(handler);
     return this;
@@ -1004,6 +1060,7 @@ public interface RedisAPI {
    * @return fluent self
    */
   @Fluent
+  @Deprecated
   default RedisAPI bitcount(List<String> args, Handler<AsyncResult<@Nullable Response>> handler) {
     send(Command.BITCOUNT, args.toArray(new String[0])).onComplete(handler);
     return this;
@@ -1021,6 +1078,7 @@ public interface RedisAPI {
    * @return fluent self
    */
   @Fluent
+  @Deprecated
   default RedisAPI bitfield(List<String> args, Handler<AsyncResult<@Nullable Response>> handler) {
     send(Command.BITFIELD, args.toArray(new String[0])).onComplete(handler);
     return this;
@@ -1038,6 +1096,7 @@ public interface RedisAPI {
    * @return fluent self
    */
   @Fluent
+  @Deprecated
   default RedisAPI bitfieldRo(List<String> args, Handler<AsyncResult<@Nullable Response>> handler) {
     send(Command.BITFIELD_RO, args.toArray(new String[0])).onComplete(handler);
     return this;
@@ -1055,6 +1114,7 @@ public interface RedisAPI {
    * @return fluent self
    */
   @Fluent
+  @Deprecated
   default RedisAPI bitop(List<String> args, Handler<AsyncResult<@Nullable Response>> handler) {
     send(Command.BITOP, args.toArray(new String[0])).onComplete(handler);
     return this;
@@ -1072,6 +1132,7 @@ public interface RedisAPI {
    * @return fluent self
    */
   @Fluent
+  @Deprecated
   default RedisAPI bitpos(List<String> args, Handler<AsyncResult<@Nullable Response>> handler) {
     send(Command.BITPOS, args.toArray(new String[0])).onComplete(handler);
     return this;
@@ -1089,6 +1150,7 @@ public interface RedisAPI {
    * @return fluent self
    */
   @Fluent
+  @Deprecated
   default RedisAPI blmove(String arg0, String arg1, String arg2, String arg3, String arg4, Handler<AsyncResult<@Nullable Response>> handler) {
     send(Command.BLMOVE, arg0, arg1, arg2, arg3, arg4).onComplete(handler);
     return this;
@@ -1106,6 +1168,7 @@ public interface RedisAPI {
    * @return fluent self
    */
   @Fluent
+  @Deprecated
   default RedisAPI blmpop(List<String> args, Handler<AsyncResult<@Nullable Response>> handler) {
     send(Command.BLMPOP, args.toArray(new String[0])).onComplete(handler);
     return this;
@@ -1123,6 +1186,7 @@ public interface RedisAPI {
    * @return fluent self
    */
   @Fluent
+  @Deprecated
   default RedisAPI blpop(List<String> args, Handler<AsyncResult<@Nullable Response>> handler) {
     send(Command.BLPOP, args.toArray(new String[0])).onComplete(handler);
     return this;
@@ -1140,6 +1204,7 @@ public interface RedisAPI {
    * @return fluent self
    */
   @Fluent
+  @Deprecated
   default RedisAPI brpop(List<String> args, Handler<AsyncResult<@Nullable Response>> handler) {
     send(Command.BRPOP, args.toArray(new String[0])).onComplete(handler);
     return this;
@@ -1157,6 +1222,7 @@ public interface RedisAPI {
    * @return fluent self
    */
   @Fluent
+  @Deprecated
   default RedisAPI brpoplpush(String arg0, String arg1, String arg2, Handler<AsyncResult<@Nullable Response>> handler) {
     send(Command.BRPOPLPUSH, arg0, arg1, arg2).onComplete(handler);
     return this;
@@ -1174,6 +1240,7 @@ public interface RedisAPI {
    * @return fluent self
    */
   @Fluent
+  @Deprecated
   default RedisAPI bzmpop(List<String> args, Handler<AsyncResult<@Nullable Response>> handler) {
     send(Command.BZMPOP, args.toArray(new String[0])).onComplete(handler);
     return this;
@@ -1191,6 +1258,7 @@ public interface RedisAPI {
    * @return fluent self
    */
   @Fluent
+  @Deprecated
   default RedisAPI bzpopmax(List<String> args, Handler<AsyncResult<@Nullable Response>> handler) {
     send(Command.BZPOPMAX, args.toArray(new String[0])).onComplete(handler);
     return this;
@@ -1208,6 +1276,7 @@ public interface RedisAPI {
    * @return fluent self
    */
   @Fluent
+  @Deprecated
   default RedisAPI bzpopmin(List<String> args, Handler<AsyncResult<@Nullable Response>> handler) {
     send(Command.BZPOPMIN, args.toArray(new String[0])).onComplete(handler);
     return this;
@@ -1225,6 +1294,7 @@ public interface RedisAPI {
    * @return fluent self
    */
   @Fluent
+  @Deprecated
   default RedisAPI cfAdd(List<String> args, Handler<AsyncResult<@Nullable Response>> handler) {
     send(Command.CF_ADD, args.toArray(new String[0])).onComplete(handler);
     return this;
@@ -1242,6 +1312,7 @@ public interface RedisAPI {
    * @return fluent self
    */
   @Fluent
+  @Deprecated
   default RedisAPI cfAddnx(List<String> args, Handler<AsyncResult<@Nullable Response>> handler) {
     send(Command.CF_ADDNX, args.toArray(new String[0])).onComplete(handler);
     return this;
@@ -1259,6 +1330,7 @@ public interface RedisAPI {
    * @return fluent self
    */
   @Fluent
+  @Deprecated
   default RedisAPI cfCompact(List<String> args, Handler<AsyncResult<@Nullable Response>> handler) {
     send(Command.CF_COMPACT, args.toArray(new String[0])).onComplete(handler);
     return this;
@@ -1276,6 +1348,7 @@ public interface RedisAPI {
    * @return fluent self
    */
   @Fluent
+  @Deprecated
   default RedisAPI cfCount(List<String> args, Handler<AsyncResult<@Nullable Response>> handler) {
     send(Command.CF_COUNT, args.toArray(new String[0])).onComplete(handler);
     return this;
@@ -1293,6 +1366,7 @@ public interface RedisAPI {
    * @return fluent self
    */
   @Fluent
+  @Deprecated
   default RedisAPI cfDebug(List<String> args, Handler<AsyncResult<@Nullable Response>> handler) {
     send(Command.CF_DEBUG, args.toArray(new String[0])).onComplete(handler);
     return this;
@@ -1310,6 +1384,7 @@ public interface RedisAPI {
    * @return fluent self
    */
   @Fluent
+  @Deprecated
   default RedisAPI cfDel(List<String> args, Handler<AsyncResult<@Nullable Response>> handler) {
     send(Command.CF_DEL, args.toArray(new String[0])).onComplete(handler);
     return this;
@@ -1327,6 +1402,7 @@ public interface RedisAPI {
    * @return fluent self
    */
   @Fluent
+  @Deprecated
   default RedisAPI cfExists(List<String> args, Handler<AsyncResult<@Nullable Response>> handler) {
     send(Command.CF_EXISTS, args.toArray(new String[0])).onComplete(handler);
     return this;
@@ -1344,6 +1420,7 @@ public interface RedisAPI {
    * @return fluent self
    */
   @Fluent
+  @Deprecated
   default RedisAPI cfInfo(List<String> args, Handler<AsyncResult<@Nullable Response>> handler) {
     send(Command.CF_INFO, args.toArray(new String[0])).onComplete(handler);
     return this;
@@ -1361,6 +1438,7 @@ public interface RedisAPI {
    * @return fluent self
    */
   @Fluent
+  @Deprecated
   default RedisAPI cfInsert(List<String> args, Handler<AsyncResult<@Nullable Response>> handler) {
     send(Command.CF_INSERT, args.toArray(new String[0])).onComplete(handler);
     return this;
@@ -1378,6 +1456,7 @@ public interface RedisAPI {
    * @return fluent self
    */
   @Fluent
+  @Deprecated
   default RedisAPI cfInsertnx(List<String> args, Handler<AsyncResult<@Nullable Response>> handler) {
     send(Command.CF_INSERTNX, args.toArray(new String[0])).onComplete(handler);
     return this;
@@ -1395,6 +1474,7 @@ public interface RedisAPI {
    * @return fluent self
    */
   @Fluent
+  @Deprecated
   default RedisAPI cfLoadchunk(List<String> args, Handler<AsyncResult<@Nullable Response>> handler) {
     send(Command.CF_LOADCHUNK, args.toArray(new String[0])).onComplete(handler);
     return this;
@@ -1412,6 +1492,7 @@ public interface RedisAPI {
    * @return fluent self
    */
   @Fluent
+  @Deprecated
   default RedisAPI cfMexists(List<String> args, Handler<AsyncResult<@Nullable Response>> handler) {
     send(Command.CF_MEXISTS, args.toArray(new String[0])).onComplete(handler);
     return this;
@@ -1429,6 +1510,7 @@ public interface RedisAPI {
    * @return fluent self
    */
   @Fluent
+  @Deprecated
   default RedisAPI cfReserve(List<String> args, Handler<AsyncResult<@Nullable Response>> handler) {
     send(Command.CF_RESERVE, args.toArray(new String[0])).onComplete(handler);
     return this;
@@ -1446,6 +1528,7 @@ public interface RedisAPI {
    * @return fluent self
    */
   @Fluent
+  @Deprecated
   default RedisAPI cfScandump(List<String> args, Handler<AsyncResult<@Nullable Response>> handler) {
     send(Command.CF_SCANDUMP, args.toArray(new String[0])).onComplete(handler);
     return this;
@@ -1463,6 +1546,7 @@ public interface RedisAPI {
    * @return fluent self
    */
   @Fluent
+  @Deprecated
   default RedisAPI client(List<String> args, Handler<AsyncResult<@Nullable Response>> handler) {
     send(Command.CLIENT, args.toArray(new String[0])).onComplete(handler);
     return this;
@@ -1480,6 +1564,7 @@ public interface RedisAPI {
    * @return fluent self
    */
   @Fluent
+  @Deprecated
   default RedisAPI cluster(List<String> args, Handler<AsyncResult<@Nullable Response>> handler) {
     send(Command.CLUSTER, args.toArray(new String[0])).onComplete(handler);
     return this;
@@ -1497,6 +1582,7 @@ public interface RedisAPI {
    * @return fluent self
    */
   @Fluent
+  @Deprecated
   default RedisAPI cmsIncrby(List<String> args, Handler<AsyncResult<@Nullable Response>> handler) {
     send(Command.CMS_INCRBY, args.toArray(new String[0])).onComplete(handler);
     return this;
@@ -1514,6 +1600,7 @@ public interface RedisAPI {
    * @return fluent self
    */
   @Fluent
+  @Deprecated
   default RedisAPI cmsInfo(List<String> args, Handler<AsyncResult<@Nullable Response>> handler) {
     send(Command.CMS_INFO, args.toArray(new String[0])).onComplete(handler);
     return this;
@@ -1531,6 +1618,7 @@ public interface RedisAPI {
    * @return fluent self
    */
   @Fluent
+  @Deprecated
   default RedisAPI cmsInitbydim(List<String> args, Handler<AsyncResult<@Nullable Response>> handler) {
     send(Command.CMS_INITBYDIM, args.toArray(new String[0])).onComplete(handler);
     return this;
@@ -1548,6 +1636,7 @@ public interface RedisAPI {
    * @return fluent self
    */
   @Fluent
+  @Deprecated
   default RedisAPI cmsInitbyprob(List<String> args, Handler<AsyncResult<@Nullable Response>> handler) {
     send(Command.CMS_INITBYPROB, args.toArray(new String[0])).onComplete(handler);
     return this;
@@ -1565,6 +1654,7 @@ public interface RedisAPI {
    * @return fluent self
    */
   @Fluent
+  @Deprecated
   default RedisAPI cmsMerge(List<String> args, Handler<AsyncResult<@Nullable Response>> handler) {
     send(Command.CMS_MERGE, args.toArray(new String[0])).onComplete(handler);
     return this;
@@ -1582,6 +1672,7 @@ public interface RedisAPI {
    * @return fluent self
    */
   @Fluent
+  @Deprecated
   default RedisAPI cmsQuery(List<String> args, Handler<AsyncResult<@Nullable Response>> handler) {
     send(Command.CMS_QUERY, args.toArray(new String[0])).onComplete(handler);
     return this;
@@ -1599,6 +1690,7 @@ public interface RedisAPI {
    * @return fluent self
    */
   @Fluent
+  @Deprecated
   default RedisAPI command(List<String> args, Handler<AsyncResult<@Nullable Response>> handler) {
     send(Command.COMMAND, args.toArray(new String[0])).onComplete(handler);
     return this;
@@ -1616,6 +1708,7 @@ public interface RedisAPI {
    * @return fluent self
    */
   @Fluent
+  @Deprecated
   default RedisAPI config(List<String> args, Handler<AsyncResult<@Nullable Response>> handler) {
     send(Command.CONFIG, args.toArray(new String[0])).onComplete(handler);
     return this;
@@ -1633,6 +1726,7 @@ public interface RedisAPI {
    * @return fluent self
    */
   @Fluent
+  @Deprecated
   default RedisAPI copy(List<String> args, Handler<AsyncResult<@Nullable Response>> handler) {
     send(Command.COPY, args.toArray(new String[0])).onComplete(handler);
     return this;
@@ -1650,6 +1744,7 @@ public interface RedisAPI {
    * @return fluent self
    */
   @Fluent
+  @Deprecated
   default RedisAPI dbsize(Handler<AsyncResult<@Nullable Response>> handler) {
     send(Command.DBSIZE).onComplete(handler);
     return this;
@@ -1667,6 +1762,7 @@ public interface RedisAPI {
    * @return fluent self
    */
   @Fluent
+  @Deprecated
   default RedisAPI debug(List<String> args, Handler<AsyncResult<@Nullable Response>> handler) {
     send(Command.DEBUG, args.toArray(new String[0])).onComplete(handler);
     return this;
@@ -1684,6 +1780,7 @@ public interface RedisAPI {
    * @return fluent self
    */
   @Fluent
+  @Deprecated
   default RedisAPI decr(String arg0, Handler<AsyncResult<@Nullable Response>> handler) {
     send(Command.DECR, arg0).onComplete(handler);
     return this;
@@ -1701,6 +1798,7 @@ public interface RedisAPI {
    * @return fluent self
    */
   @Fluent
+  @Deprecated
   default RedisAPI decrby(String arg0, String arg1, Handler<AsyncResult<@Nullable Response>> handler) {
     send(Command.DECRBY, arg0, arg1).onComplete(handler);
     return this;
@@ -1718,6 +1816,7 @@ public interface RedisAPI {
    * @return fluent self
    */
   @Fluent
+  @Deprecated
   default RedisAPI del(List<String> args, Handler<AsyncResult<@Nullable Response>> handler) {
     send(Command.DEL, args.toArray(new String[0])).onComplete(handler);
     return this;
@@ -1735,6 +1834,7 @@ public interface RedisAPI {
    * @return fluent self
    */
   @Fluent
+  @Deprecated
   default RedisAPI discard(Handler<AsyncResult<@Nullable Response>> handler) {
     send(Command.DISCARD).onComplete(handler);
     return this;
@@ -1752,6 +1852,7 @@ public interface RedisAPI {
    * @return fluent self
    */
   @Fluent
+  @Deprecated
   default RedisAPI dump(String arg0, Handler<AsyncResult<@Nullable Response>> handler) {
     send(Command.DUMP, arg0).onComplete(handler);
     return this;
@@ -1769,6 +1870,7 @@ public interface RedisAPI {
    * @return fluent self
    */
   @Fluent
+  @Deprecated
   default RedisAPI echo(String arg0, Handler<AsyncResult<@Nullable Response>> handler) {
     send(Command.ECHO, arg0).onComplete(handler);
     return this;
@@ -1786,6 +1888,7 @@ public interface RedisAPI {
    * @return fluent self
    */
   @Fluent
+  @Deprecated
   default RedisAPI eval(List<String> args, Handler<AsyncResult<@Nullable Response>> handler) {
     send(Command.EVAL, args.toArray(new String[0])).onComplete(handler);
     return this;
@@ -1803,6 +1906,7 @@ public interface RedisAPI {
    * @return fluent self
    */
   @Fluent
+  @Deprecated
   default RedisAPI evalRo(List<String> args, Handler<AsyncResult<@Nullable Response>> handler) {
     send(Command.EVAL_RO, args.toArray(new String[0])).onComplete(handler);
     return this;
@@ -1820,6 +1924,7 @@ public interface RedisAPI {
    * @return fluent self
    */
   @Fluent
+  @Deprecated
   default RedisAPI evalsha(List<String> args, Handler<AsyncResult<@Nullable Response>> handler) {
     send(Command.EVALSHA, args.toArray(new String[0])).onComplete(handler);
     return this;
@@ -1837,6 +1942,7 @@ public interface RedisAPI {
    * @return fluent self
    */
   @Fluent
+  @Deprecated
   default RedisAPI evalshaRo(List<String> args, Handler<AsyncResult<@Nullable Response>> handler) {
     send(Command.EVALSHA_RO, args.toArray(new String[0])).onComplete(handler);
     return this;
@@ -1854,6 +1960,7 @@ public interface RedisAPI {
    * @return fluent self
    */
   @Fluent
+  @Deprecated
   default RedisAPI exec(Handler<AsyncResult<@Nullable Response>> handler) {
     send(Command.EXEC).onComplete(handler);
     return this;
@@ -1871,6 +1978,7 @@ public interface RedisAPI {
    * @return fluent self
    */
   @Fluent
+  @Deprecated
   default RedisAPI exists(List<String> args, Handler<AsyncResult<@Nullable Response>> handler) {
     send(Command.EXISTS, args.toArray(new String[0])).onComplete(handler);
     return this;
@@ -1888,6 +1996,7 @@ public interface RedisAPI {
    * @return fluent self
    */
   @Fluent
+  @Deprecated
   default RedisAPI expire(List<String> args, Handler<AsyncResult<@Nullable Response>> handler) {
     send(Command.EXPIRE, args.toArray(new String[0])).onComplete(handler);
     return this;
@@ -1905,6 +2014,7 @@ public interface RedisAPI {
    * @return fluent self
    */
   @Fluent
+  @Deprecated
   default RedisAPI expireat(List<String> args, Handler<AsyncResult<@Nullable Response>> handler) {
     send(Command.EXPIREAT, args.toArray(new String[0])).onComplete(handler);
     return this;
@@ -1922,6 +2032,7 @@ public interface RedisAPI {
    * @return fluent self
    */
   @Fluent
+  @Deprecated
   default RedisAPI expiretime(String arg0, Handler<AsyncResult<@Nullable Response>> handler) {
     send(Command.EXPIRETIME, arg0).onComplete(handler);
     return this;
@@ -1939,6 +2050,7 @@ public interface RedisAPI {
    * @return fluent self
    */
   @Fluent
+  @Deprecated
   default RedisAPI failover(List<String> args, Handler<AsyncResult<@Nullable Response>> handler) {
     send(Command.FAILOVER, args.toArray(new String[0])).onComplete(handler);
     return this;
@@ -1956,6 +2068,7 @@ public interface RedisAPI {
    * @return fluent self
    */
   @Fluent
+  @Deprecated
   default RedisAPI fcall(List<String> args, Handler<AsyncResult<@Nullable Response>> handler) {
     send(Command.FCALL, args.toArray(new String[0])).onComplete(handler);
     return this;
@@ -1973,6 +2086,7 @@ public interface RedisAPI {
    * @return fluent self
    */
   @Fluent
+  @Deprecated
   default RedisAPI fcallRo(List<String> args, Handler<AsyncResult<@Nullable Response>> handler) {
     send(Command.FCALL_RO, args.toArray(new String[0])).onComplete(handler);
     return this;
@@ -1990,6 +2104,7 @@ public interface RedisAPI {
    * @return fluent self
    */
   @Fluent
+  @Deprecated
   default RedisAPI flushall(List<String> args, Handler<AsyncResult<@Nullable Response>> handler) {
     send(Command.FLUSHALL, args.toArray(new String[0])).onComplete(handler);
     return this;
@@ -2007,6 +2122,7 @@ public interface RedisAPI {
    * @return fluent self
    */
   @Fluent
+  @Deprecated
   default RedisAPI flushdb(List<String> args, Handler<AsyncResult<@Nullable Response>> handler) {
     send(Command.FLUSHDB, args.toArray(new String[0])).onComplete(handler);
     return this;
@@ -2024,6 +2140,7 @@ public interface RedisAPI {
    * @return fluent self
    */
   @Fluent
+  @Deprecated
   default RedisAPI function(List<String> args, Handler<AsyncResult<@Nullable Response>> handler) {
     send(Command.FUNCTION, args.toArray(new String[0])).onComplete(handler);
     return this;
@@ -2041,6 +2158,7 @@ public interface RedisAPI {
    * @return fluent self
    */
   @Fluent
+  @Deprecated
   default RedisAPI geoadd(List<String> args, Handler<AsyncResult<@Nullable Response>> handler) {
     send(Command.GEOADD, args.toArray(new String[0])).onComplete(handler);
     return this;
@@ -2058,6 +2176,7 @@ public interface RedisAPI {
    * @return fluent self
    */
   @Fluent
+  @Deprecated
   default RedisAPI geodist(List<String> args, Handler<AsyncResult<@Nullable Response>> handler) {
     send(Command.GEODIST, args.toArray(new String[0])).onComplete(handler);
     return this;
@@ -2075,6 +2194,7 @@ public interface RedisAPI {
    * @return fluent self
    */
   @Fluent
+  @Deprecated
   default RedisAPI geohash(List<String> args, Handler<AsyncResult<@Nullable Response>> handler) {
     send(Command.GEOHASH, args.toArray(new String[0])).onComplete(handler);
     return this;
@@ -2092,6 +2212,7 @@ public interface RedisAPI {
    * @return fluent self
    */
   @Fluent
+  @Deprecated
   default RedisAPI geopos(List<String> args, Handler<AsyncResult<@Nullable Response>> handler) {
     send(Command.GEOPOS, args.toArray(new String[0])).onComplete(handler);
     return this;
@@ -2109,6 +2230,7 @@ public interface RedisAPI {
    * @return fluent self
    */
   @Fluent
+  @Deprecated
   default RedisAPI georadius(List<String> args, Handler<AsyncResult<@Nullable Response>> handler) {
     send(Command.GEORADIUS, args.toArray(new String[0])).onComplete(handler);
     return this;
@@ -2126,6 +2248,7 @@ public interface RedisAPI {
    * @return fluent self
    */
   @Fluent
+  @Deprecated
   default RedisAPI georadiusRo(List<String> args, Handler<AsyncResult<@Nullable Response>> handler) {
     send(Command.GEORADIUS_RO, args.toArray(new String[0])).onComplete(handler);
     return this;
@@ -2143,6 +2266,7 @@ public interface RedisAPI {
    * @return fluent self
    */
   @Fluent
+  @Deprecated
   default RedisAPI georadiusbymember(List<String> args, Handler<AsyncResult<@Nullable Response>> handler) {
     send(Command.GEORADIUSBYMEMBER, args.toArray(new String[0])).onComplete(handler);
     return this;
@@ -2160,6 +2284,7 @@ public interface RedisAPI {
    * @return fluent self
    */
   @Fluent
+  @Deprecated
   default RedisAPI georadiusbymemberRo(List<String> args, Handler<AsyncResult<@Nullable Response>> handler) {
     send(Command.GEORADIUSBYMEMBER_RO, args.toArray(new String[0])).onComplete(handler);
     return this;
@@ -2177,6 +2302,7 @@ public interface RedisAPI {
    * @return fluent self
    */
   @Fluent
+  @Deprecated
   default RedisAPI geosearch(List<String> args, Handler<AsyncResult<@Nullable Response>> handler) {
     send(Command.GEOSEARCH, args.toArray(new String[0])).onComplete(handler);
     return this;
@@ -2194,6 +2320,7 @@ public interface RedisAPI {
    * @return fluent self
    */
   @Fluent
+  @Deprecated
   default RedisAPI geosearchstore(List<String> args, Handler<AsyncResult<@Nullable Response>> handler) {
     send(Command.GEOSEARCHSTORE, args.toArray(new String[0])).onComplete(handler);
     return this;
@@ -2211,6 +2338,7 @@ public interface RedisAPI {
    * @return fluent self
    */
   @Fluent
+  @Deprecated
   default RedisAPI get(String arg0, Handler<AsyncResult<@Nullable Response>> handler) {
     send(Command.GET, arg0).onComplete(handler);
     return this;
@@ -2228,6 +2356,7 @@ public interface RedisAPI {
    * @return fluent self
    */
   @Fluent
+  @Deprecated
   default RedisAPI getbit(String arg0, String arg1, Handler<AsyncResult<@Nullable Response>> handler) {
     send(Command.GETBIT, arg0, arg1).onComplete(handler);
     return this;
@@ -2245,6 +2374,7 @@ public interface RedisAPI {
    * @return fluent self
    */
   @Fluent
+  @Deprecated
   default RedisAPI getdel(String arg0, Handler<AsyncResult<@Nullable Response>> handler) {
     send(Command.GETDEL, arg0).onComplete(handler);
     return this;
@@ -2262,6 +2392,7 @@ public interface RedisAPI {
    * @return fluent self
    */
   @Fluent
+  @Deprecated
   default RedisAPI getex(List<String> args, Handler<AsyncResult<@Nullable Response>> handler) {
     send(Command.GETEX, args.toArray(new String[0])).onComplete(handler);
     return this;
@@ -2279,6 +2410,7 @@ public interface RedisAPI {
    * @return fluent self
    */
   @Fluent
+  @Deprecated
   default RedisAPI getrange(String arg0, String arg1, String arg2, Handler<AsyncResult<@Nullable Response>> handler) {
     send(Command.GETRANGE, arg0, arg1, arg2).onComplete(handler);
     return this;
@@ -2296,6 +2428,7 @@ public interface RedisAPI {
    * @return fluent self
    */
   @Fluent
+  @Deprecated
   default RedisAPI getset(String arg0, String arg1, Handler<AsyncResult<@Nullable Response>> handler) {
     send(Command.GETSET, arg0, arg1).onComplete(handler);
     return this;
@@ -2313,6 +2446,7 @@ public interface RedisAPI {
    * @return fluent self
    */
   @Fluent
+  @Deprecated
   default RedisAPI graphBulk(List<String> args, Handler<AsyncResult<@Nullable Response>> handler) {
     send(Command.GRAPH_BULK, args.toArray(new String[0])).onComplete(handler);
     return this;
@@ -2330,6 +2464,7 @@ public interface RedisAPI {
    * @return fluent self
    */
   @Fluent
+  @Deprecated
   default RedisAPI graphConfig(List<String> args, Handler<AsyncResult<@Nullable Response>> handler) {
     send(Command.GRAPH_CONFIG, args.toArray(new String[0])).onComplete(handler);
     return this;
@@ -2347,6 +2482,7 @@ public interface RedisAPI {
    * @return fluent self
    */
   @Fluent
+  @Deprecated
   default RedisAPI graphDebug(List<String> args, Handler<AsyncResult<@Nullable Response>> handler) {
     send(Command.GRAPH_DEBUG, args.toArray(new String[0])).onComplete(handler);
     return this;
@@ -2364,6 +2500,7 @@ public interface RedisAPI {
    * @return fluent self
    */
   @Fluent
+  @Deprecated
   default RedisAPI graphDelete(List<String> args, Handler<AsyncResult<@Nullable Response>> handler) {
     send(Command.GRAPH_DELETE, args.toArray(new String[0])).onComplete(handler);
     return this;
@@ -2381,6 +2518,7 @@ public interface RedisAPI {
    * @return fluent self
    */
   @Fluent
+  @Deprecated
   default RedisAPI graphExplain(List<String> args, Handler<AsyncResult<@Nullable Response>> handler) {
     send(Command.GRAPH_EXPLAIN, args.toArray(new String[0])).onComplete(handler);
     return this;
@@ -2398,6 +2536,7 @@ public interface RedisAPI {
    * @return fluent self
    */
   @Fluent
+  @Deprecated
   default RedisAPI graphList(List<String> args, Handler<AsyncResult<@Nullable Response>> handler) {
     send(Command.GRAPH_LIST, args.toArray(new String[0])).onComplete(handler);
     return this;
@@ -2415,6 +2554,7 @@ public interface RedisAPI {
    * @return fluent self
    */
   @Fluent
+  @Deprecated
   default RedisAPI graphProfile(List<String> args, Handler<AsyncResult<@Nullable Response>> handler) {
     send(Command.GRAPH_PROFILE, args.toArray(new String[0])).onComplete(handler);
     return this;
@@ -2432,6 +2572,7 @@ public interface RedisAPI {
    * @return fluent self
    */
   @Fluent
+  @Deprecated
   default RedisAPI graphQuery(List<String> args, Handler<AsyncResult<@Nullable Response>> handler) {
     send(Command.GRAPH_QUERY, args.toArray(new String[0])).onComplete(handler);
     return this;
@@ -2449,6 +2590,7 @@ public interface RedisAPI {
    * @return fluent self
    */
   @Fluent
+  @Deprecated
   default RedisAPI graphRoQuery(List<String> args, Handler<AsyncResult<@Nullable Response>> handler) {
     send(Command.GRAPH_RO_QUERY, args.toArray(new String[0])).onComplete(handler);
     return this;
@@ -2466,6 +2608,7 @@ public interface RedisAPI {
    * @return fluent self
    */
   @Fluent
+  @Deprecated
   default RedisAPI graphSlowlog(List<String> args, Handler<AsyncResult<@Nullable Response>> handler) {
     send(Command.GRAPH_SLOWLOG, args.toArray(new String[0])).onComplete(handler);
     return this;
@@ -2483,6 +2626,7 @@ public interface RedisAPI {
    * @return fluent self
    */
   @Fluent
+  @Deprecated
   default RedisAPI hdel(List<String> args, Handler<AsyncResult<@Nullable Response>> handler) {
     send(Command.HDEL, args.toArray(new String[0])).onComplete(handler);
     return this;
@@ -2500,6 +2644,7 @@ public interface RedisAPI {
    * @return fluent self
    */
   @Fluent
+  @Deprecated
   default RedisAPI hello(List<String> args, Handler<AsyncResult<@Nullable Response>> handler) {
     send(Command.HELLO, args.toArray(new String[0])).onComplete(handler);
     return this;
@@ -2517,6 +2662,7 @@ public interface RedisAPI {
    * @return fluent self
    */
   @Fluent
+  @Deprecated
   default RedisAPI hexists(String arg0, String arg1, Handler<AsyncResult<@Nullable Response>> handler) {
     send(Command.HEXISTS, arg0, arg1).onComplete(handler);
     return this;
@@ -2534,6 +2680,7 @@ public interface RedisAPI {
    * @return fluent self
    */
   @Fluent
+  @Deprecated
   default RedisAPI hget(String arg0, String arg1, Handler<AsyncResult<@Nullable Response>> handler) {
     send(Command.HGET, arg0, arg1).onComplete(handler);
     return this;
@@ -2551,6 +2698,7 @@ public interface RedisAPI {
    * @return fluent self
    */
   @Fluent
+  @Deprecated
   default RedisAPI hgetall(String arg0, Handler<AsyncResult<@Nullable Response>> handler) {
     send(Command.HGETALL, arg0).onComplete(handler);
     return this;
@@ -2568,6 +2716,7 @@ public interface RedisAPI {
    * @return fluent self
    */
   @Fluent
+  @Deprecated
   default RedisAPI hincrby(String arg0, String arg1, String arg2, Handler<AsyncResult<@Nullable Response>> handler) {
     send(Command.HINCRBY, arg0, arg1, arg2).onComplete(handler);
     return this;
@@ -2585,6 +2734,7 @@ public interface RedisAPI {
    * @return fluent self
    */
   @Fluent
+  @Deprecated
   default RedisAPI hincrbyfloat(String arg0, String arg1, String arg2, Handler<AsyncResult<@Nullable Response>> handler) {
     send(Command.HINCRBYFLOAT, arg0, arg1, arg2).onComplete(handler);
     return this;
@@ -2602,6 +2752,7 @@ public interface RedisAPI {
    * @return fluent self
    */
   @Fluent
+  @Deprecated
   default RedisAPI hkeys(String arg0, Handler<AsyncResult<@Nullable Response>> handler) {
     send(Command.HKEYS, arg0).onComplete(handler);
     return this;
@@ -2619,6 +2770,7 @@ public interface RedisAPI {
    * @return fluent self
    */
   @Fluent
+  @Deprecated
   default RedisAPI hlen(String arg0, Handler<AsyncResult<@Nullable Response>> handler) {
     send(Command.HLEN, arg0).onComplete(handler);
     return this;
@@ -2636,6 +2788,7 @@ public interface RedisAPI {
    * @return fluent self
    */
   @Fluent
+  @Deprecated
   default RedisAPI hmget(List<String> args, Handler<AsyncResult<@Nullable Response>> handler) {
     send(Command.HMGET, args.toArray(new String[0])).onComplete(handler);
     return this;
@@ -2653,6 +2806,7 @@ public interface RedisAPI {
    * @return fluent self
    */
   @Fluent
+  @Deprecated
   default RedisAPI hmset(List<String> args, Handler<AsyncResult<@Nullable Response>> handler) {
     send(Command.HMSET, args.toArray(new String[0])).onComplete(handler);
     return this;
@@ -2670,6 +2824,7 @@ public interface RedisAPI {
    * @return fluent self
    */
   @Fluent
+  @Deprecated
   default RedisAPI hrandfield(List<String> args, Handler<AsyncResult<@Nullable Response>> handler) {
     send(Command.HRANDFIELD, args.toArray(new String[0])).onComplete(handler);
     return this;
@@ -2687,6 +2842,7 @@ public interface RedisAPI {
    * @return fluent self
    */
   @Fluent
+  @Deprecated
   default RedisAPI hscan(List<String> args, Handler<AsyncResult<@Nullable Response>> handler) {
     send(Command.HSCAN, args.toArray(new String[0])).onComplete(handler);
     return this;
@@ -2704,6 +2860,7 @@ public interface RedisAPI {
    * @return fluent self
    */
   @Fluent
+  @Deprecated
   default RedisAPI hset(List<String> args, Handler<AsyncResult<@Nullable Response>> handler) {
     send(Command.HSET, args.toArray(new String[0])).onComplete(handler);
     return this;
@@ -2721,6 +2878,7 @@ public interface RedisAPI {
    * @return fluent self
    */
   @Fluent
+  @Deprecated
   default RedisAPI hsetnx(String arg0, String arg1, String arg2, Handler<AsyncResult<@Nullable Response>> handler) {
     send(Command.HSETNX, arg0, arg1, arg2).onComplete(handler);
     return this;
@@ -2738,6 +2896,7 @@ public interface RedisAPI {
    * @return fluent self
    */
   @Fluent
+  @Deprecated
   default RedisAPI hstrlen(String arg0, String arg1, Handler<AsyncResult<@Nullable Response>> handler) {
     send(Command.HSTRLEN, arg0, arg1).onComplete(handler);
     return this;
@@ -2755,6 +2914,7 @@ public interface RedisAPI {
    * @return fluent self
    */
   @Fluent
+  @Deprecated
   default RedisAPI hvals(String arg0, Handler<AsyncResult<@Nullable Response>> handler) {
     send(Command.HVALS, arg0).onComplete(handler);
     return this;
@@ -2772,6 +2932,7 @@ public interface RedisAPI {
    * @return fluent self
    */
   @Fluent
+  @Deprecated
   default RedisAPI incr(String arg0, Handler<AsyncResult<@Nullable Response>> handler) {
     send(Command.INCR, arg0).onComplete(handler);
     return this;
@@ -2789,6 +2950,7 @@ public interface RedisAPI {
    * @return fluent self
    */
   @Fluent
+  @Deprecated
   default RedisAPI incrby(String arg0, String arg1, Handler<AsyncResult<@Nullable Response>> handler) {
     send(Command.INCRBY, arg0, arg1).onComplete(handler);
     return this;
@@ -2806,6 +2968,7 @@ public interface RedisAPI {
    * @return fluent self
    */
   @Fluent
+  @Deprecated
   default RedisAPI incrbyfloat(String arg0, String arg1, Handler<AsyncResult<@Nullable Response>> handler) {
     send(Command.INCRBYFLOAT, arg0, arg1).onComplete(handler);
     return this;
@@ -2823,6 +2986,7 @@ public interface RedisAPI {
    * @return fluent self
    */
   @Fluent
+  @Deprecated
   default RedisAPI info(List<String> args, Handler<AsyncResult<@Nullable Response>> handler) {
     send(Command.INFO, args.toArray(new String[0])).onComplete(handler);
     return this;
@@ -2840,6 +3004,7 @@ public interface RedisAPI {
    * @return fluent self
    */
   @Fluent
+  @Deprecated
   default RedisAPI jsonArrappend(List<String> args, Handler<AsyncResult<@Nullable Response>> handler) {
     send(Command.JSON_ARRAPPEND, args.toArray(new String[0])).onComplete(handler);
     return this;
@@ -2857,6 +3022,7 @@ public interface RedisAPI {
    * @return fluent self
    */
   @Fluent
+  @Deprecated
   default RedisAPI jsonArrindex(List<String> args, Handler<AsyncResult<@Nullable Response>> handler) {
     send(Command.JSON_ARRINDEX, args.toArray(new String[0])).onComplete(handler);
     return this;
@@ -2874,6 +3040,7 @@ public interface RedisAPI {
    * @return fluent self
    */
   @Fluent
+  @Deprecated
   default RedisAPI jsonArrinsert(List<String> args, Handler<AsyncResult<@Nullable Response>> handler) {
     send(Command.JSON_ARRINSERT, args.toArray(new String[0])).onComplete(handler);
     return this;
@@ -2891,6 +3058,7 @@ public interface RedisAPI {
    * @return fluent self
    */
   @Fluent
+  @Deprecated
   default RedisAPI jsonArrlen(List<String> args, Handler<AsyncResult<@Nullable Response>> handler) {
     send(Command.JSON_ARRLEN, args.toArray(new String[0])).onComplete(handler);
     return this;
@@ -2908,6 +3076,7 @@ public interface RedisAPI {
    * @return fluent self
    */
   @Fluent
+  @Deprecated
   default RedisAPI jsonArrpop(List<String> args, Handler<AsyncResult<@Nullable Response>> handler) {
     send(Command.JSON_ARRPOP, args.toArray(new String[0])).onComplete(handler);
     return this;
@@ -2925,6 +3094,7 @@ public interface RedisAPI {
    * @return fluent self
    */
   @Fluent
+  @Deprecated
   default RedisAPI jsonArrtrim(List<String> args, Handler<AsyncResult<@Nullable Response>> handler) {
     send(Command.JSON_ARRTRIM, args.toArray(new String[0])).onComplete(handler);
     return this;
@@ -2942,6 +3112,7 @@ public interface RedisAPI {
    * @return fluent self
    */
   @Fluent
+  @Deprecated
   default RedisAPI jsonClear(List<String> args, Handler<AsyncResult<@Nullable Response>> handler) {
     send(Command.JSON_CLEAR, args.toArray(new String[0])).onComplete(handler);
     return this;
@@ -2959,6 +3130,7 @@ public interface RedisAPI {
    * @return fluent self
    */
   @Fluent
+  @Deprecated
   default RedisAPI jsonDebug(List<String> args, Handler<AsyncResult<@Nullable Response>> handler) {
     send(Command.JSON_DEBUG, args.toArray(new String[0])).onComplete(handler);
     return this;
@@ -2976,6 +3148,7 @@ public interface RedisAPI {
    * @return fluent self
    */
   @Fluent
+  @Deprecated
   default RedisAPI jsonDel(List<String> args, Handler<AsyncResult<@Nullable Response>> handler) {
     send(Command.JSON_DEL, args.toArray(new String[0])).onComplete(handler);
     return this;
@@ -2993,6 +3166,7 @@ public interface RedisAPI {
    * @return fluent self
    */
   @Fluent
+  @Deprecated
   default RedisAPI jsonForget(List<String> args, Handler<AsyncResult<@Nullable Response>> handler) {
     send(Command.JSON_FORGET, args.toArray(new String[0])).onComplete(handler);
     return this;
@@ -3010,6 +3184,7 @@ public interface RedisAPI {
    * @return fluent self
    */
   @Fluent
+  @Deprecated
   default RedisAPI jsonGet(List<String> args, Handler<AsyncResult<@Nullable Response>> handler) {
     send(Command.JSON_GET, args.toArray(new String[0])).onComplete(handler);
     return this;
@@ -3027,6 +3202,7 @@ public interface RedisAPI {
    * @return fluent self
    */
   @Fluent
+  @Deprecated
   default RedisAPI jsonMget(List<String> args, Handler<AsyncResult<@Nullable Response>> handler) {
     send(Command.JSON_MGET, args.toArray(new String[0])).onComplete(handler);
     return this;
@@ -3044,6 +3220,7 @@ public interface RedisAPI {
    * @return fluent self
    */
   @Fluent
+  @Deprecated
   default RedisAPI jsonNumincrby(List<String> args, Handler<AsyncResult<@Nullable Response>> handler) {
     send(Command.JSON_NUMINCRBY, args.toArray(new String[0])).onComplete(handler);
     return this;
@@ -3061,6 +3238,7 @@ public interface RedisAPI {
    * @return fluent self
    */
   @Fluent
+  @Deprecated
   default RedisAPI jsonNummultby(List<String> args, Handler<AsyncResult<@Nullable Response>> handler) {
     send(Command.JSON_NUMMULTBY, args.toArray(new String[0])).onComplete(handler);
     return this;
@@ -3078,6 +3256,7 @@ public interface RedisAPI {
    * @return fluent self
    */
   @Fluent
+  @Deprecated
   default RedisAPI jsonNumpowby(List<String> args, Handler<AsyncResult<@Nullable Response>> handler) {
     send(Command.JSON_NUMPOWBY, args.toArray(new String[0])).onComplete(handler);
     return this;
@@ -3095,6 +3274,7 @@ public interface RedisAPI {
    * @return fluent self
    */
   @Fluent
+  @Deprecated
   default RedisAPI jsonObjkeys(List<String> args, Handler<AsyncResult<@Nullable Response>> handler) {
     send(Command.JSON_OBJKEYS, args.toArray(new String[0])).onComplete(handler);
     return this;
@@ -3112,6 +3292,7 @@ public interface RedisAPI {
    * @return fluent self
    */
   @Fluent
+  @Deprecated
   default RedisAPI jsonObjlen(List<String> args, Handler<AsyncResult<@Nullable Response>> handler) {
     send(Command.JSON_OBJLEN, args.toArray(new String[0])).onComplete(handler);
     return this;
@@ -3129,6 +3310,7 @@ public interface RedisAPI {
    * @return fluent self
    */
   @Fluent
+  @Deprecated
   default RedisAPI jsonResp(List<String> args, Handler<AsyncResult<@Nullable Response>> handler) {
     send(Command.JSON_RESP, args.toArray(new String[0])).onComplete(handler);
     return this;
@@ -3146,6 +3328,7 @@ public interface RedisAPI {
    * @return fluent self
    */
   @Fluent
+  @Deprecated
   default RedisAPI jsonSet(List<String> args, Handler<AsyncResult<@Nullable Response>> handler) {
     send(Command.JSON_SET, args.toArray(new String[0])).onComplete(handler);
     return this;
@@ -3163,6 +3346,7 @@ public interface RedisAPI {
    * @return fluent self
    */
   @Fluent
+  @Deprecated
   default RedisAPI jsonStrappend(List<String> args, Handler<AsyncResult<@Nullable Response>> handler) {
     send(Command.JSON_STRAPPEND, args.toArray(new String[0])).onComplete(handler);
     return this;
@@ -3180,6 +3364,7 @@ public interface RedisAPI {
    * @return fluent self
    */
   @Fluent
+  @Deprecated
   default RedisAPI jsonStrlen(List<String> args, Handler<AsyncResult<@Nullable Response>> handler) {
     send(Command.JSON_STRLEN, args.toArray(new String[0])).onComplete(handler);
     return this;
@@ -3197,6 +3382,7 @@ public interface RedisAPI {
    * @return fluent self
    */
   @Fluent
+  @Deprecated
   default RedisAPI jsonToggle(List<String> args, Handler<AsyncResult<@Nullable Response>> handler) {
     send(Command.JSON_TOGGLE, args.toArray(new String[0])).onComplete(handler);
     return this;
@@ -3214,6 +3400,7 @@ public interface RedisAPI {
    * @return fluent self
    */
   @Fluent
+  @Deprecated
   default RedisAPI jsonType(List<String> args, Handler<AsyncResult<@Nullable Response>> handler) {
     send(Command.JSON_TYPE, args.toArray(new String[0])).onComplete(handler);
     return this;
@@ -3231,6 +3418,7 @@ public interface RedisAPI {
    * @return fluent self
    */
   @Fluent
+  @Deprecated
   default RedisAPI keys(String arg0, Handler<AsyncResult<@Nullable Response>> handler) {
     send(Command.KEYS, arg0).onComplete(handler);
     return this;
@@ -3248,6 +3436,7 @@ public interface RedisAPI {
    * @return fluent self
    */
   @Fluent
+  @Deprecated
   default RedisAPI lastsave(Handler<AsyncResult<@Nullable Response>> handler) {
     send(Command.LASTSAVE).onComplete(handler);
     return this;
@@ -3265,6 +3454,7 @@ public interface RedisAPI {
    * @return fluent self
    */
   @Fluent
+  @Deprecated
   default RedisAPI latency(List<String> args, Handler<AsyncResult<@Nullable Response>> handler) {
     send(Command.LATENCY, args.toArray(new String[0])).onComplete(handler);
     return this;
@@ -3282,6 +3472,7 @@ public interface RedisAPI {
    * @return fluent self
    */
   @Fluent
+  @Deprecated
   default RedisAPI lcs(List<String> args, Handler<AsyncResult<@Nullable Response>> handler) {
     send(Command.LCS, args.toArray(new String[0])).onComplete(handler);
     return this;
@@ -3299,6 +3490,7 @@ public interface RedisAPI {
    * @return fluent self
    */
   @Fluent
+  @Deprecated
   default RedisAPI lindex(String arg0, String arg1, Handler<AsyncResult<@Nullable Response>> handler) {
     send(Command.LINDEX, arg0, arg1).onComplete(handler);
     return this;
@@ -3316,6 +3508,7 @@ public interface RedisAPI {
    * @return fluent self
    */
   @Fluent
+  @Deprecated
   default RedisAPI linsert(String arg0, String arg1, String arg2, String arg3, Handler<AsyncResult<@Nullable Response>> handler) {
     send(Command.LINSERT, arg0, arg1, arg2, arg3).onComplete(handler);
     return this;
@@ -3333,6 +3526,7 @@ public interface RedisAPI {
    * @return fluent self
    */
   @Fluent
+  @Deprecated
   default RedisAPI llen(String arg0, Handler<AsyncResult<@Nullable Response>> handler) {
     send(Command.LLEN, arg0).onComplete(handler);
     return this;
@@ -3350,6 +3544,7 @@ public interface RedisAPI {
    * @return fluent self
    */
   @Fluent
+  @Deprecated
   default RedisAPI lmove(String arg0, String arg1, String arg2, String arg3, Handler<AsyncResult<@Nullable Response>> handler) {
     send(Command.LMOVE, arg0, arg1, arg2, arg3).onComplete(handler);
     return this;
@@ -3367,6 +3562,7 @@ public interface RedisAPI {
    * @return fluent self
    */
   @Fluent
+  @Deprecated
   default RedisAPI lmpop(List<String> args, Handler<AsyncResult<@Nullable Response>> handler) {
     send(Command.LMPOP, args.toArray(new String[0])).onComplete(handler);
     return this;
@@ -3384,6 +3580,7 @@ public interface RedisAPI {
    * @return fluent self
    */
   @Fluent
+  @Deprecated
   default RedisAPI lolwut(List<String> args, Handler<AsyncResult<@Nullable Response>> handler) {
     send(Command.LOLWUT, args.toArray(new String[0])).onComplete(handler);
     return this;
@@ -3401,6 +3598,7 @@ public interface RedisAPI {
    * @return fluent self
    */
   @Fluent
+  @Deprecated
   default RedisAPI lpop(List<String> args, Handler<AsyncResult<@Nullable Response>> handler) {
     send(Command.LPOP, args.toArray(new String[0])).onComplete(handler);
     return this;
@@ -3418,6 +3616,7 @@ public interface RedisAPI {
    * @return fluent self
    */
   @Fluent
+  @Deprecated
   default RedisAPI lpos(List<String> args, Handler<AsyncResult<@Nullable Response>> handler) {
     send(Command.LPOS, args.toArray(new String[0])).onComplete(handler);
     return this;
@@ -3435,6 +3634,7 @@ public interface RedisAPI {
    * @return fluent self
    */
   @Fluent
+  @Deprecated
   default RedisAPI lpush(List<String> args, Handler<AsyncResult<@Nullable Response>> handler) {
     send(Command.LPUSH, args.toArray(new String[0])).onComplete(handler);
     return this;
@@ -3452,6 +3652,7 @@ public interface RedisAPI {
    * @return fluent self
    */
   @Fluent
+  @Deprecated
   default RedisAPI lpushx(List<String> args, Handler<AsyncResult<@Nullable Response>> handler) {
     send(Command.LPUSHX, args.toArray(new String[0])).onComplete(handler);
     return this;
@@ -3469,6 +3670,7 @@ public interface RedisAPI {
    * @return fluent self
    */
   @Fluent
+  @Deprecated
   default RedisAPI lrange(String arg0, String arg1, String arg2, Handler<AsyncResult<@Nullable Response>> handler) {
     send(Command.LRANGE, arg0, arg1, arg2).onComplete(handler);
     return this;
@@ -3486,6 +3688,7 @@ public interface RedisAPI {
    * @return fluent self
    */
   @Fluent
+  @Deprecated
   default RedisAPI lrem(String arg0, String arg1, String arg2, Handler<AsyncResult<@Nullable Response>> handler) {
     send(Command.LREM, arg0, arg1, arg2).onComplete(handler);
     return this;
@@ -3503,6 +3706,7 @@ public interface RedisAPI {
    * @return fluent self
    */
   @Fluent
+  @Deprecated
   default RedisAPI lset(String arg0, String arg1, String arg2, Handler<AsyncResult<@Nullable Response>> handler) {
     send(Command.LSET, arg0, arg1, arg2).onComplete(handler);
     return this;
@@ -3520,6 +3724,7 @@ public interface RedisAPI {
    * @return fluent self
    */
   @Fluent
+  @Deprecated
   default RedisAPI ltrim(String arg0, String arg1, String arg2, Handler<AsyncResult<@Nullable Response>> handler) {
     send(Command.LTRIM, arg0, arg1, arg2).onComplete(handler);
     return this;
@@ -3537,6 +3742,7 @@ public interface RedisAPI {
    * @return fluent self
    */
   @Fluent
+  @Deprecated
   default RedisAPI memory(List<String> args, Handler<AsyncResult<@Nullable Response>> handler) {
     send(Command.MEMORY, args.toArray(new String[0])).onComplete(handler);
     return this;
@@ -3554,6 +3760,7 @@ public interface RedisAPI {
    * @return fluent self
    */
   @Fluent
+  @Deprecated
   default RedisAPI mget(List<String> args, Handler<AsyncResult<@Nullable Response>> handler) {
     send(Command.MGET, args.toArray(new String[0])).onComplete(handler);
     return this;
@@ -3571,6 +3778,7 @@ public interface RedisAPI {
    * @return fluent self
    */
   @Fluent
+  @Deprecated
   default RedisAPI migrate(List<String> args, Handler<AsyncResult<@Nullable Response>> handler) {
     send(Command.MIGRATE, args.toArray(new String[0])).onComplete(handler);
     return this;
@@ -3588,6 +3796,7 @@ public interface RedisAPI {
    * @return fluent self
    */
   @Fluent
+  @Deprecated
   default RedisAPI module(List<String> args, Handler<AsyncResult<@Nullable Response>> handler) {
     send(Command.MODULE, args.toArray(new String[0])).onComplete(handler);
     return this;
@@ -3605,6 +3814,7 @@ public interface RedisAPI {
    * @return fluent self
    */
   @Fluent
+  @Deprecated
   default RedisAPI monitor(Handler<AsyncResult<@Nullable Response>> handler) {
     send(Command.MONITOR).onComplete(handler);
     return this;
@@ -3622,6 +3832,7 @@ public interface RedisAPI {
    * @return fluent self
    */
   @Fluent
+  @Deprecated
   default RedisAPI move(String arg0, String arg1, Handler<AsyncResult<@Nullable Response>> handler) {
     send(Command.MOVE, arg0, arg1).onComplete(handler);
     return this;
@@ -3639,6 +3850,7 @@ public interface RedisAPI {
    * @return fluent self
    */
   @Fluent
+  @Deprecated
   default RedisAPI mset(List<String> args, Handler<AsyncResult<@Nullable Response>> handler) {
     send(Command.MSET, args.toArray(new String[0])).onComplete(handler);
     return this;
@@ -3656,6 +3868,7 @@ public interface RedisAPI {
    * @return fluent self
    */
   @Fluent
+  @Deprecated
   default RedisAPI msetnx(List<String> args, Handler<AsyncResult<@Nullable Response>> handler) {
     send(Command.MSETNX, args.toArray(new String[0])).onComplete(handler);
     return this;
@@ -3673,6 +3886,7 @@ public interface RedisAPI {
    * @return fluent self
    */
   @Fluent
+  @Deprecated
   default RedisAPI multi(Handler<AsyncResult<@Nullable Response>> handler) {
     send(Command.MULTI).onComplete(handler);
     return this;
@@ -3690,6 +3904,7 @@ public interface RedisAPI {
    * @return fluent self
    */
   @Fluent
+  @Deprecated
   default RedisAPI object(List<String> args, Handler<AsyncResult<@Nullable Response>> handler) {
     send(Command.OBJECT, args.toArray(new String[0])).onComplete(handler);
     return this;
@@ -3707,6 +3922,7 @@ public interface RedisAPI {
    * @return fluent self
    */
   @Fluent
+  @Deprecated
   default RedisAPI persist(String arg0, Handler<AsyncResult<@Nullable Response>> handler) {
     send(Command.PERSIST, arg0).onComplete(handler);
     return this;
@@ -3724,6 +3940,7 @@ public interface RedisAPI {
    * @return fluent self
    */
   @Fluent
+  @Deprecated
   default RedisAPI pexpire(List<String> args, Handler<AsyncResult<@Nullable Response>> handler) {
     send(Command.PEXPIRE, args.toArray(new String[0])).onComplete(handler);
     return this;
@@ -3741,6 +3958,7 @@ public interface RedisAPI {
    * @return fluent self
    */
   @Fluent
+  @Deprecated
   default RedisAPI pexpireat(List<String> args, Handler<AsyncResult<@Nullable Response>> handler) {
     send(Command.PEXPIREAT, args.toArray(new String[0])).onComplete(handler);
     return this;
@@ -3758,6 +3976,7 @@ public interface RedisAPI {
    * @return fluent self
    */
   @Fluent
+  @Deprecated
   default RedisAPI pexpiretime(String arg0, Handler<AsyncResult<@Nullable Response>> handler) {
     send(Command.PEXPIRETIME, arg0).onComplete(handler);
     return this;
@@ -3775,6 +3994,7 @@ public interface RedisAPI {
    * @return fluent self
    */
   @Fluent
+  @Deprecated
   default RedisAPI pfadd(List<String> args, Handler<AsyncResult<@Nullable Response>> handler) {
     send(Command.PFADD, args.toArray(new String[0])).onComplete(handler);
     return this;
@@ -3792,6 +4012,7 @@ public interface RedisAPI {
    * @return fluent self
    */
   @Fluent
+  @Deprecated
   default RedisAPI pfcount(List<String> args, Handler<AsyncResult<@Nullable Response>> handler) {
     send(Command.PFCOUNT, args.toArray(new String[0])).onComplete(handler);
     return this;
@@ -3809,6 +4030,7 @@ public interface RedisAPI {
    * @return fluent self
    */
   @Fluent
+  @Deprecated
   default RedisAPI pfdebug(List<String> args, Handler<AsyncResult<@Nullable Response>> handler) {
     send(Command.PFDEBUG, args.toArray(new String[0])).onComplete(handler);
     return this;
@@ -3826,6 +4048,7 @@ public interface RedisAPI {
    * @return fluent self
    */
   @Fluent
+  @Deprecated
   default RedisAPI pfmerge(List<String> args, Handler<AsyncResult<@Nullable Response>> handler) {
     send(Command.PFMERGE, args.toArray(new String[0])).onComplete(handler);
     return this;
@@ -3843,6 +4066,7 @@ public interface RedisAPI {
    * @return fluent self
    */
   @Fluent
+  @Deprecated
   default RedisAPI pfselftest(Handler<AsyncResult<@Nullable Response>> handler) {
     send(Command.PFSELFTEST).onComplete(handler);
     return this;
@@ -3860,6 +4084,7 @@ public interface RedisAPI {
    * @return fluent self
    */
   @Fluent
+  @Deprecated
   default RedisAPI ping(List<String> args, Handler<AsyncResult<@Nullable Response>> handler) {
     send(Command.PING, args.toArray(new String[0])).onComplete(handler);
     return this;
@@ -3877,6 +4102,7 @@ public interface RedisAPI {
    * @return fluent self
    */
   @Fluent
+  @Deprecated
   default RedisAPI psetex(String arg0, String arg1, String arg2, Handler<AsyncResult<@Nullable Response>> handler) {
     send(Command.PSETEX, arg0, arg1, arg2).onComplete(handler);
     return this;
@@ -3894,6 +4120,7 @@ public interface RedisAPI {
    * @return fluent self
    */
   @Fluent
+  @Deprecated
   default RedisAPI psubscribe(List<String> args, Handler<AsyncResult<@Nullable Response>> handler) {
     send(Command.PSUBSCRIBE, args.toArray(new String[0])).onComplete(handler);
     return this;
@@ -3911,6 +4138,7 @@ public interface RedisAPI {
    * @return fluent self
    */
   @Fluent
+  @Deprecated
   default RedisAPI psync(List<String> args, Handler<AsyncResult<@Nullable Response>> handler) {
     send(Command.PSYNC, args.toArray(new String[0])).onComplete(handler);
     return this;
@@ -3928,6 +4156,7 @@ public interface RedisAPI {
    * @return fluent self
    */
   @Fluent
+  @Deprecated
   default RedisAPI pttl(String arg0, Handler<AsyncResult<@Nullable Response>> handler) {
     send(Command.PTTL, arg0).onComplete(handler);
     return this;
@@ -3945,6 +4174,7 @@ public interface RedisAPI {
    * @return fluent self
    */
   @Fluent
+  @Deprecated
   default RedisAPI publish(String arg0, String arg1, Handler<AsyncResult<@Nullable Response>> handler) {
     send(Command.PUBLISH, arg0, arg1).onComplete(handler);
     return this;
@@ -3962,6 +4192,7 @@ public interface RedisAPI {
    * @return fluent self
    */
   @Fluent
+  @Deprecated
   default RedisAPI pubsub(List<String> args, Handler<AsyncResult<@Nullable Response>> handler) {
     send(Command.PUBSUB, args.toArray(new String[0])).onComplete(handler);
     return this;
@@ -3979,6 +4210,7 @@ public interface RedisAPI {
    * @return fluent self
    */
   @Fluent
+  @Deprecated
   default RedisAPI punsubscribe(List<String> args, Handler<AsyncResult<@Nullable Response>> handler) {
     send(Command.PUNSUBSCRIBE, args.toArray(new String[0])).onComplete(handler);
     return this;
@@ -3996,6 +4228,7 @@ public interface RedisAPI {
    * @return fluent self
    */
   @Fluent
+  @Deprecated
   default RedisAPI quit(List<String> args, Handler<AsyncResult<@Nullable Response>> handler) {
     send(Command.QUIT, args.toArray(new String[0])).onComplete(handler);
     return this;
@@ -4013,6 +4246,7 @@ public interface RedisAPI {
    * @return fluent self
    */
   @Fluent
+  @Deprecated
   default RedisAPI randomkey(Handler<AsyncResult<@Nullable Response>> handler) {
     send(Command.RANDOMKEY).onComplete(handler);
     return this;
@@ -4030,6 +4264,7 @@ public interface RedisAPI {
    * @return fluent self
    */
   @Fluent
+  @Deprecated
   default RedisAPI readonly(Handler<AsyncResult<@Nullable Response>> handler) {
     send(Command.READONLY).onComplete(handler);
     return this;
@@ -4047,6 +4282,7 @@ public interface RedisAPI {
    * @return fluent self
    */
   @Fluent
+  @Deprecated
   default RedisAPI readwrite(Handler<AsyncResult<@Nullable Response>> handler) {
     send(Command.READWRITE).onComplete(handler);
     return this;
@@ -4064,6 +4300,7 @@ public interface RedisAPI {
    * @return fluent self
    */
   @Fluent
+  @Deprecated
   default RedisAPI rename(String arg0, String arg1, Handler<AsyncResult<@Nullable Response>> handler) {
     send(Command.RENAME, arg0, arg1).onComplete(handler);
     return this;
@@ -4081,6 +4318,7 @@ public interface RedisAPI {
    * @return fluent self
    */
   @Fluent
+  @Deprecated
   default RedisAPI renamenx(String arg0, String arg1, Handler<AsyncResult<@Nullable Response>> handler) {
     send(Command.RENAMENX, arg0, arg1).onComplete(handler);
     return this;
@@ -4098,6 +4336,7 @@ public interface RedisAPI {
    * @return fluent self
    */
   @Fluent
+  @Deprecated
   default RedisAPI replconf(List<String> args, Handler<AsyncResult<@Nullable Response>> handler) {
     send(Command.REPLCONF, args.toArray(new String[0])).onComplete(handler);
     return this;
@@ -4115,6 +4354,7 @@ public interface RedisAPI {
    * @return fluent self
    */
   @Fluent
+  @Deprecated
   default RedisAPI replicaof(String arg0, String arg1, Handler<AsyncResult<@Nullable Response>> handler) {
     send(Command.REPLICAOF, arg0, arg1).onComplete(handler);
     return this;
@@ -4132,6 +4372,7 @@ public interface RedisAPI {
    * @return fluent self
    */
   @Fluent
+  @Deprecated
   default RedisAPI reset(Handler<AsyncResult<@Nullable Response>> handler) {
     send(Command.RESET).onComplete(handler);
     return this;
@@ -4149,6 +4390,7 @@ public interface RedisAPI {
    * @return fluent self
    */
   @Fluent
+  @Deprecated
   default RedisAPI restore(List<String> args, Handler<AsyncResult<@Nullable Response>> handler) {
     send(Command.RESTORE, args.toArray(new String[0])).onComplete(handler);
     return this;
@@ -4166,6 +4408,7 @@ public interface RedisAPI {
    * @return fluent self
    */
   @Fluent
+  @Deprecated
   default RedisAPI restoreAsking(List<String> args, Handler<AsyncResult<@Nullable Response>> handler) {
     send(Command.RESTORE_ASKING, args.toArray(new String[0])).onComplete(handler);
     return this;
@@ -4183,6 +4426,7 @@ public interface RedisAPI {
    * @return fluent self
    */
   @Fluent
+  @Deprecated
   default RedisAPI role(Handler<AsyncResult<@Nullable Response>> handler) {
     send(Command.ROLE).onComplete(handler);
     return this;
@@ -4200,6 +4444,7 @@ public interface RedisAPI {
    * @return fluent self
    */
   @Fluent
+  @Deprecated
   default RedisAPI rpop(List<String> args, Handler<AsyncResult<@Nullable Response>> handler) {
     send(Command.RPOP, args.toArray(new String[0])).onComplete(handler);
     return this;
@@ -4217,6 +4462,7 @@ public interface RedisAPI {
    * @return fluent self
    */
   @Fluent
+  @Deprecated
   default RedisAPI rpoplpush(String arg0, String arg1, Handler<AsyncResult<@Nullable Response>> handler) {
     send(Command.RPOPLPUSH, arg0, arg1).onComplete(handler);
     return this;
@@ -4234,6 +4480,7 @@ public interface RedisAPI {
    * @return fluent self
    */
   @Fluent
+  @Deprecated
   default RedisAPI rpush(List<String> args, Handler<AsyncResult<@Nullable Response>> handler) {
     send(Command.RPUSH, args.toArray(new String[0])).onComplete(handler);
     return this;
@@ -4251,6 +4498,7 @@ public interface RedisAPI {
    * @return fluent self
    */
   @Fluent
+  @Deprecated
   default RedisAPI rpushx(List<String> args, Handler<AsyncResult<@Nullable Response>> handler) {
     send(Command.RPUSHX, args.toArray(new String[0])).onComplete(handler);
     return this;
@@ -4268,6 +4516,7 @@ public interface RedisAPI {
    * @return fluent self
    */
   @Fluent
+  @Deprecated
   default RedisAPI sadd(List<String> args, Handler<AsyncResult<@Nullable Response>> handler) {
     send(Command.SADD, args.toArray(new String[0])).onComplete(handler);
     return this;
@@ -4285,6 +4534,7 @@ public interface RedisAPI {
    * @return fluent self
    */
   @Fluent
+  @Deprecated
   default RedisAPI save(Handler<AsyncResult<@Nullable Response>> handler) {
     send(Command.SAVE).onComplete(handler);
     return this;
@@ -4302,6 +4552,7 @@ public interface RedisAPI {
    * @return fluent self
    */
   @Fluent
+  @Deprecated
   default RedisAPI scan(List<String> args, Handler<AsyncResult<@Nullable Response>> handler) {
     send(Command.SCAN, args.toArray(new String[0])).onComplete(handler);
     return this;
@@ -4319,6 +4570,7 @@ public interface RedisAPI {
    * @return fluent self
    */
   @Fluent
+  @Deprecated
   default RedisAPI scard(String arg0, Handler<AsyncResult<@Nullable Response>> handler) {
     send(Command.SCARD, arg0).onComplete(handler);
     return this;
@@ -4336,6 +4588,7 @@ public interface RedisAPI {
    * @return fluent self
    */
   @Fluent
+  @Deprecated
   default RedisAPI script(List<String> args, Handler<AsyncResult<@Nullable Response>> handler) {
     send(Command.SCRIPT, args.toArray(new String[0])).onComplete(handler);
     return this;
@@ -4353,6 +4606,7 @@ public interface RedisAPI {
    * @return fluent self
    */
   @Fluent
+  @Deprecated
   default RedisAPI sdiff(List<String> args, Handler<AsyncResult<@Nullable Response>> handler) {
     send(Command.SDIFF, args.toArray(new String[0])).onComplete(handler);
     return this;
@@ -4370,6 +4624,7 @@ public interface RedisAPI {
    * @return fluent self
    */
   @Fluent
+  @Deprecated
   default RedisAPI sdiffstore(List<String> args, Handler<AsyncResult<@Nullable Response>> handler) {
     send(Command.SDIFFSTORE, args.toArray(new String[0])).onComplete(handler);
     return this;
@@ -4387,6 +4642,7 @@ public interface RedisAPI {
    * @return fluent self
    */
   @Fluent
+  @Deprecated
   default RedisAPI select(String arg0, Handler<AsyncResult<@Nullable Response>> handler) {
     send(Command.SELECT, arg0).onComplete(handler);
     return this;
@@ -4404,6 +4660,7 @@ public interface RedisAPI {
    * @return fluent self
    */
   @Fluent
+  @Deprecated
   default RedisAPI set(List<String> args, Handler<AsyncResult<@Nullable Response>> handler) {
     send(Command.SET, args.toArray(new String[0])).onComplete(handler);
     return this;
@@ -4421,6 +4678,7 @@ public interface RedisAPI {
    * @return fluent self
    */
   @Fluent
+  @Deprecated
   default RedisAPI setbit(String arg0, String arg1, String arg2, Handler<AsyncResult<@Nullable Response>> handler) {
     send(Command.SETBIT, arg0, arg1, arg2).onComplete(handler);
     return this;
@@ -4438,6 +4696,7 @@ public interface RedisAPI {
    * @return fluent self
    */
   @Fluent
+  @Deprecated
   default RedisAPI setex(String arg0, String arg1, String arg2, Handler<AsyncResult<@Nullable Response>> handler) {
     send(Command.SETEX, arg0, arg1, arg2).onComplete(handler);
     return this;
@@ -4455,6 +4714,7 @@ public interface RedisAPI {
    * @return fluent self
    */
   @Fluent
+  @Deprecated
   default RedisAPI setnx(String arg0, String arg1, Handler<AsyncResult<@Nullable Response>> handler) {
     send(Command.SETNX, arg0, arg1).onComplete(handler);
     return this;
@@ -4472,6 +4732,7 @@ public interface RedisAPI {
    * @return fluent self
    */
   @Fluent
+  @Deprecated
   default RedisAPI setrange(String arg0, String arg1, String arg2, Handler<AsyncResult<@Nullable Response>> handler) {
     send(Command.SETRANGE, arg0, arg1, arg2).onComplete(handler);
     return this;
@@ -4489,6 +4750,7 @@ public interface RedisAPI {
    * @return fluent self
    */
   @Fluent
+  @Deprecated
   default RedisAPI shutdown(List<String> args, Handler<AsyncResult<@Nullable Response>> handler) {
     send(Command.SHUTDOWN, args.toArray(new String[0])).onComplete(handler);
     return this;
@@ -4506,6 +4768,7 @@ public interface RedisAPI {
    * @return fluent self
    */
   @Fluent
+  @Deprecated
   default RedisAPI sinter(List<String> args, Handler<AsyncResult<@Nullable Response>> handler) {
     send(Command.SINTER, args.toArray(new String[0])).onComplete(handler);
     return this;
@@ -4523,6 +4786,7 @@ public interface RedisAPI {
    * @return fluent self
    */
   @Fluent
+  @Deprecated
   default RedisAPI sintercard(List<String> args, Handler<AsyncResult<@Nullable Response>> handler) {
     send(Command.SINTERCARD, args.toArray(new String[0])).onComplete(handler);
     return this;
@@ -4540,6 +4804,7 @@ public interface RedisAPI {
    * @return fluent self
    */
   @Fluent
+  @Deprecated
   default RedisAPI sinterstore(List<String> args, Handler<AsyncResult<@Nullable Response>> handler) {
     send(Command.SINTERSTORE, args.toArray(new String[0])).onComplete(handler);
     return this;
@@ -4557,6 +4822,7 @@ public interface RedisAPI {
    * @return fluent self
    */
   @Fluent
+  @Deprecated
   default RedisAPI sismember(String arg0, String arg1, Handler<AsyncResult<@Nullable Response>> handler) {
     send(Command.SISMEMBER, arg0, arg1).onComplete(handler);
     return this;
@@ -4574,6 +4840,7 @@ public interface RedisAPI {
    * @return fluent self
    */
   @Fluent
+  @Deprecated
   default RedisAPI slaveof(String arg0, String arg1, Handler<AsyncResult<@Nullable Response>> handler) {
     send(Command.SLAVEOF, arg0, arg1).onComplete(handler);
     return this;
@@ -4591,6 +4858,7 @@ public interface RedisAPI {
    * @return fluent self
    */
   @Fluent
+  @Deprecated
   default RedisAPI slowlog(List<String> args, Handler<AsyncResult<@Nullable Response>> handler) {
     send(Command.SLOWLOG, args.toArray(new String[0])).onComplete(handler);
     return this;
@@ -4608,6 +4876,7 @@ public interface RedisAPI {
    * @return fluent self
    */
   @Fluent
+  @Deprecated
   default RedisAPI smembers(String arg0, Handler<AsyncResult<@Nullable Response>> handler) {
     send(Command.SMEMBERS, arg0).onComplete(handler);
     return this;
@@ -4625,6 +4894,7 @@ public interface RedisAPI {
    * @return fluent self
    */
   @Fluent
+  @Deprecated
   default RedisAPI smismember(List<String> args, Handler<AsyncResult<@Nullable Response>> handler) {
     send(Command.SMISMEMBER, args.toArray(new String[0])).onComplete(handler);
     return this;
@@ -4642,6 +4912,7 @@ public interface RedisAPI {
    * @return fluent self
    */
   @Fluent
+  @Deprecated
   default RedisAPI smove(String arg0, String arg1, String arg2, Handler<AsyncResult<@Nullable Response>> handler) {
     send(Command.SMOVE, arg0, arg1, arg2).onComplete(handler);
     return this;
@@ -4659,6 +4930,7 @@ public interface RedisAPI {
    * @return fluent self
    */
   @Fluent
+  @Deprecated
   default RedisAPI sort(List<String> args, Handler<AsyncResult<@Nullable Response>> handler) {
     send(Command.SORT, args.toArray(new String[0])).onComplete(handler);
     return this;
@@ -4676,6 +4948,7 @@ public interface RedisAPI {
    * @return fluent self
    */
   @Fluent
+  @Deprecated
   default RedisAPI sortRo(List<String> args, Handler<AsyncResult<@Nullable Response>> handler) {
     send(Command.SORT_RO, args.toArray(new String[0])).onComplete(handler);
     return this;
@@ -4693,6 +4966,7 @@ public interface RedisAPI {
    * @return fluent self
    */
   @Fluent
+  @Deprecated
   default RedisAPI spop(List<String> args, Handler<AsyncResult<@Nullable Response>> handler) {
     send(Command.SPOP, args.toArray(new String[0])).onComplete(handler);
     return this;
@@ -4710,6 +4984,7 @@ public interface RedisAPI {
    * @return fluent self
    */
   @Fluent
+  @Deprecated
   default RedisAPI spublish(String arg0, String arg1, Handler<AsyncResult<@Nullable Response>> handler) {
     send(Command.SPUBLISH, arg0, arg1).onComplete(handler);
     return this;
@@ -4727,6 +5002,7 @@ public interface RedisAPI {
    * @return fluent self
    */
   @Fluent
+  @Deprecated
   default RedisAPI srandmember(List<String> args, Handler<AsyncResult<@Nullable Response>> handler) {
     send(Command.SRANDMEMBER, args.toArray(new String[0])).onComplete(handler);
     return this;
@@ -4744,6 +5020,7 @@ public interface RedisAPI {
    * @return fluent self
    */
   @Fluent
+  @Deprecated
   default RedisAPI srem(List<String> args, Handler<AsyncResult<@Nullable Response>> handler) {
     send(Command.SREM, args.toArray(new String[0])).onComplete(handler);
     return this;
@@ -4761,6 +5038,7 @@ public interface RedisAPI {
    * @return fluent self
    */
   @Fluent
+  @Deprecated
   default RedisAPI sscan(List<String> args, Handler<AsyncResult<@Nullable Response>> handler) {
     send(Command.SSCAN, args.toArray(new String[0])).onComplete(handler);
     return this;
@@ -4778,6 +5056,7 @@ public interface RedisAPI {
    * @return fluent self
    */
   @Fluent
+  @Deprecated
   default RedisAPI ssubscribe(List<String> args, Handler<AsyncResult<@Nullable Response>> handler) {
     send(Command.SSUBSCRIBE, args.toArray(new String[0])).onComplete(handler);
     return this;
@@ -4795,6 +5074,7 @@ public interface RedisAPI {
    * @return fluent self
    */
   @Fluent
+  @Deprecated
   default RedisAPI strlen(String arg0, Handler<AsyncResult<@Nullable Response>> handler) {
     send(Command.STRLEN, arg0).onComplete(handler);
     return this;
@@ -4812,6 +5092,7 @@ public interface RedisAPI {
    * @return fluent self
    */
   @Fluent
+  @Deprecated
   default RedisAPI subscribe(List<String> args, Handler<AsyncResult<@Nullable Response>> handler) {
     send(Command.SUBSCRIBE, args.toArray(new String[0])).onComplete(handler);
     return this;
@@ -4829,6 +5110,7 @@ public interface RedisAPI {
    * @return fluent self
    */
   @Fluent
+  @Deprecated
   default RedisAPI substr(String arg0, String arg1, String arg2, Handler<AsyncResult<@Nullable Response>> handler) {
     send(Command.SUBSTR, arg0, arg1, arg2).onComplete(handler);
     return this;
@@ -4846,6 +5128,7 @@ public interface RedisAPI {
    * @return fluent self
    */
   @Fluent
+  @Deprecated
   default RedisAPI sunion(List<String> args, Handler<AsyncResult<@Nullable Response>> handler) {
     send(Command.SUNION, args.toArray(new String[0])).onComplete(handler);
     return this;
@@ -4863,6 +5146,7 @@ public interface RedisAPI {
    * @return fluent self
    */
   @Fluent
+  @Deprecated
   default RedisAPI sunionstore(List<String> args, Handler<AsyncResult<@Nullable Response>> handler) {
     send(Command.SUNIONSTORE, args.toArray(new String[0])).onComplete(handler);
     return this;
@@ -4880,6 +5164,7 @@ public interface RedisAPI {
    * @return fluent self
    */
   @Fluent
+  @Deprecated
   default RedisAPI sunsubscribe(List<String> args, Handler<AsyncResult<@Nullable Response>> handler) {
     send(Command.SUNSUBSCRIBE, args.toArray(new String[0])).onComplete(handler);
     return this;
@@ -4897,6 +5182,7 @@ public interface RedisAPI {
    * @return fluent self
    */
   @Fluent
+  @Deprecated
   default RedisAPI swapdb(String arg0, String arg1, Handler<AsyncResult<@Nullable Response>> handler) {
     send(Command.SWAPDB, arg0, arg1).onComplete(handler);
     return this;
@@ -4914,6 +5200,7 @@ public interface RedisAPI {
    * @return fluent self
    */
   @Fluent
+  @Deprecated
   default RedisAPI sync(Handler<AsyncResult<@Nullable Response>> handler) {
     send(Command.SYNC).onComplete(handler);
     return this;
@@ -4931,6 +5218,7 @@ public interface RedisAPI {
    * @return fluent self
    */
   @Fluent
+  @Deprecated
   default RedisAPI time(Handler<AsyncResult<@Nullable Response>> handler) {
     send(Command.TIME).onComplete(handler);
     return this;
@@ -4948,6 +5236,7 @@ public interface RedisAPI {
    * @return fluent self
    */
   @Fluent
+  @Deprecated
   default RedisAPI timeseriesClusterset(List<String> args, Handler<AsyncResult<@Nullable Response>> handler) {
     send(Command.TIMESERIES_CLUSTERSET, args.toArray(new String[0])).onComplete(handler);
     return this;
@@ -4965,6 +5254,7 @@ public interface RedisAPI {
    * @return fluent self
    */
   @Fluent
+  @Deprecated
   default RedisAPI timeseriesClustersetfromshard(List<String> args, Handler<AsyncResult<@Nullable Response>> handler) {
     send(Command.TIMESERIES_CLUSTERSETFROMSHARD, args.toArray(new String[0])).onComplete(handler);
     return this;
@@ -4982,6 +5272,7 @@ public interface RedisAPI {
    * @return fluent self
    */
   @Fluent
+  @Deprecated
   default RedisAPI timeseriesHello(List<String> args, Handler<AsyncResult<@Nullable Response>> handler) {
     send(Command.TIMESERIES_HELLO, args.toArray(new String[0])).onComplete(handler);
     return this;
@@ -4999,6 +5290,7 @@ public interface RedisAPI {
    * @return fluent self
    */
   @Fluent
+  @Deprecated
   default RedisAPI timeseriesInfocluster(List<String> args, Handler<AsyncResult<@Nullable Response>> handler) {
     send(Command.TIMESERIES_INFOCLUSTER, args.toArray(new String[0])).onComplete(handler);
     return this;
@@ -5016,6 +5308,7 @@ public interface RedisAPI {
    * @return fluent self
    */
   @Fluent
+  @Deprecated
   default RedisAPI timeseriesInnercommunication(List<String> args, Handler<AsyncResult<@Nullable Response>> handler) {
     send(Command.TIMESERIES_INNERCOMMUNICATION, args.toArray(new String[0])).onComplete(handler);
     return this;
@@ -5033,6 +5326,7 @@ public interface RedisAPI {
    * @return fluent self
    */
   @Fluent
+  @Deprecated
   default RedisAPI timeseriesNetworktest(List<String> args, Handler<AsyncResult<@Nullable Response>> handler) {
     send(Command.TIMESERIES_NETWORKTEST, args.toArray(new String[0])).onComplete(handler);
     return this;
@@ -5050,6 +5344,7 @@ public interface RedisAPI {
    * @return fluent self
    */
   @Fluent
+  @Deprecated
   default RedisAPI timeseriesRefreshcluster(List<String> args, Handler<AsyncResult<@Nullable Response>> handler) {
     send(Command.TIMESERIES_REFRESHCLUSTER, args.toArray(new String[0])).onComplete(handler);
     return this;
@@ -5067,6 +5362,7 @@ public interface RedisAPI {
    * @return fluent self
    */
   @Fluent
+  @Deprecated
   default RedisAPI topkAdd(List<String> args, Handler<AsyncResult<@Nullable Response>> handler) {
     send(Command.TOPK_ADD, args.toArray(new String[0])).onComplete(handler);
     return this;
@@ -5084,6 +5380,7 @@ public interface RedisAPI {
    * @return fluent self
    */
   @Fluent
+  @Deprecated
   default RedisAPI topkCount(List<String> args, Handler<AsyncResult<@Nullable Response>> handler) {
     send(Command.TOPK_COUNT, args.toArray(new String[0])).onComplete(handler);
     return this;
@@ -5101,6 +5398,7 @@ public interface RedisAPI {
    * @return fluent self
    */
   @Fluent
+  @Deprecated
   default RedisAPI topkIncrby(List<String> args, Handler<AsyncResult<@Nullable Response>> handler) {
     send(Command.TOPK_INCRBY, args.toArray(new String[0])).onComplete(handler);
     return this;
@@ -5118,6 +5416,7 @@ public interface RedisAPI {
    * @return fluent self
    */
   @Fluent
+  @Deprecated
   default RedisAPI topkInfo(List<String> args, Handler<AsyncResult<@Nullable Response>> handler) {
     send(Command.TOPK_INFO, args.toArray(new String[0])).onComplete(handler);
     return this;
@@ -5135,6 +5434,7 @@ public interface RedisAPI {
    * @return fluent self
    */
   @Fluent
+  @Deprecated
   default RedisAPI topkList(List<String> args, Handler<AsyncResult<@Nullable Response>> handler) {
     send(Command.TOPK_LIST, args.toArray(new String[0])).onComplete(handler);
     return this;
@@ -5152,6 +5452,7 @@ public interface RedisAPI {
    * @return fluent self
    */
   @Fluent
+  @Deprecated
   default RedisAPI topkQuery(List<String> args, Handler<AsyncResult<@Nullable Response>> handler) {
     send(Command.TOPK_QUERY, args.toArray(new String[0])).onComplete(handler);
     return this;
@@ -5169,6 +5470,7 @@ public interface RedisAPI {
    * @return fluent self
    */
   @Fluent
+  @Deprecated
   default RedisAPI topkReserve(List<String> args, Handler<AsyncResult<@Nullable Response>> handler) {
     send(Command.TOPK_RESERVE, args.toArray(new String[0])).onComplete(handler);
     return this;
@@ -5186,6 +5488,7 @@ public interface RedisAPI {
    * @return fluent self
    */
   @Fluent
+  @Deprecated
   default RedisAPI touch(List<String> args, Handler<AsyncResult<@Nullable Response>> handler) {
     send(Command.TOUCH, args.toArray(new String[0])).onComplete(handler);
     return this;
@@ -5203,6 +5506,7 @@ public interface RedisAPI {
    * @return fluent self
    */
   @Fluent
+  @Deprecated
   default RedisAPI tsAdd(List<String> args, Handler<AsyncResult<@Nullable Response>> handler) {
     send(Command.TS_ADD, args.toArray(new String[0])).onComplete(handler);
     return this;
@@ -5220,6 +5524,7 @@ public interface RedisAPI {
    * @return fluent self
    */
   @Fluent
+  @Deprecated
   default RedisAPI tsAlter(List<String> args, Handler<AsyncResult<@Nullable Response>> handler) {
     send(Command.TS_ALTER, args.toArray(new String[0])).onComplete(handler);
     return this;
@@ -5237,6 +5542,7 @@ public interface RedisAPI {
    * @return fluent self
    */
   @Fluent
+  @Deprecated
   default RedisAPI tsCreate(List<String> args, Handler<AsyncResult<@Nullable Response>> handler) {
     send(Command.TS_CREATE, args.toArray(new String[0])).onComplete(handler);
     return this;
@@ -5254,6 +5560,7 @@ public interface RedisAPI {
    * @return fluent self
    */
   @Fluent
+  @Deprecated
   default RedisAPI tsCreaterule(List<String> args, Handler<AsyncResult<@Nullable Response>> handler) {
     send(Command.TS_CREATERULE, args.toArray(new String[0])).onComplete(handler);
     return this;
@@ -5271,6 +5578,7 @@ public interface RedisAPI {
    * @return fluent self
    */
   @Fluent
+  @Deprecated
   default RedisAPI tsDecrby(List<String> args, Handler<AsyncResult<@Nullable Response>> handler) {
     send(Command.TS_DECRBY, args.toArray(new String[0])).onComplete(handler);
     return this;
@@ -5288,6 +5596,7 @@ public interface RedisAPI {
    * @return fluent self
    */
   @Fluent
+  @Deprecated
   default RedisAPI tsDel(List<String> args, Handler<AsyncResult<@Nullable Response>> handler) {
     send(Command.TS_DEL, args.toArray(new String[0])).onComplete(handler);
     return this;
@@ -5305,6 +5614,7 @@ public interface RedisAPI {
    * @return fluent self
    */
   @Fluent
+  @Deprecated
   default RedisAPI tsDeleterule(List<String> args, Handler<AsyncResult<@Nullable Response>> handler) {
     send(Command.TS_DELETERULE, args.toArray(new String[0])).onComplete(handler);
     return this;
@@ -5322,6 +5632,7 @@ public interface RedisAPI {
    * @return fluent self
    */
   @Fluent
+  @Deprecated
   default RedisAPI tsGet(List<String> args, Handler<AsyncResult<@Nullable Response>> handler) {
     send(Command.TS_GET, args.toArray(new String[0])).onComplete(handler);
     return this;
@@ -5339,6 +5650,7 @@ public interface RedisAPI {
    * @return fluent self
    */
   @Fluent
+  @Deprecated
   default RedisAPI tsIncrby(List<String> args, Handler<AsyncResult<@Nullable Response>> handler) {
     send(Command.TS_INCRBY, args.toArray(new String[0])).onComplete(handler);
     return this;
@@ -5356,6 +5668,7 @@ public interface RedisAPI {
    * @return fluent self
    */
   @Fluent
+  @Deprecated
   default RedisAPI tsInfo(List<String> args, Handler<AsyncResult<@Nullable Response>> handler) {
     send(Command.TS_INFO, args.toArray(new String[0])).onComplete(handler);
     return this;
@@ -5373,6 +5686,7 @@ public interface RedisAPI {
    * @return fluent self
    */
   @Fluent
+  @Deprecated
   default RedisAPI tsMadd(List<String> args, Handler<AsyncResult<@Nullable Response>> handler) {
     send(Command.TS_MADD, args.toArray(new String[0])).onComplete(handler);
     return this;
@@ -5390,6 +5704,7 @@ public interface RedisAPI {
    * @return fluent self
    */
   @Fluent
+  @Deprecated
   default RedisAPI tsMget(List<String> args, Handler<AsyncResult<@Nullable Response>> handler) {
     send(Command.TS_MGET, args.toArray(new String[0])).onComplete(handler);
     return this;
@@ -5407,6 +5722,7 @@ public interface RedisAPI {
    * @return fluent self
    */
   @Fluent
+  @Deprecated
   default RedisAPI tsMrange(List<String> args, Handler<AsyncResult<@Nullable Response>> handler) {
     send(Command.TS_MRANGE, args.toArray(new String[0])).onComplete(handler);
     return this;
@@ -5424,6 +5740,7 @@ public interface RedisAPI {
    * @return fluent self
    */
   @Fluent
+  @Deprecated
   default RedisAPI tsMrevrange(List<String> args, Handler<AsyncResult<@Nullable Response>> handler) {
     send(Command.TS_MREVRANGE, args.toArray(new String[0])).onComplete(handler);
     return this;
@@ -5441,6 +5758,7 @@ public interface RedisAPI {
    * @return fluent self
    */
   @Fluent
+  @Deprecated
   default RedisAPI tsQueryindex(List<String> args, Handler<AsyncResult<@Nullable Response>> handler) {
     send(Command.TS_QUERYINDEX, args.toArray(new String[0])).onComplete(handler);
     return this;
@@ -5458,6 +5776,7 @@ public interface RedisAPI {
    * @return fluent self
    */
   @Fluent
+  @Deprecated
   default RedisAPI tsRange(List<String> args, Handler<AsyncResult<@Nullable Response>> handler) {
     send(Command.TS_RANGE, args.toArray(new String[0])).onComplete(handler);
     return this;
@@ -5475,6 +5794,7 @@ public interface RedisAPI {
    * @return fluent self
    */
   @Fluent
+  @Deprecated
   default RedisAPI tsRevrange(List<String> args, Handler<AsyncResult<@Nullable Response>> handler) {
     send(Command.TS_REVRANGE, args.toArray(new String[0])).onComplete(handler);
     return this;
@@ -5492,6 +5812,7 @@ public interface RedisAPI {
    * @return fluent self
    */
   @Fluent
+  @Deprecated
   default RedisAPI ttl(String arg0, Handler<AsyncResult<@Nullable Response>> handler) {
     send(Command.TTL, arg0).onComplete(handler);
     return this;
@@ -5509,6 +5830,7 @@ public interface RedisAPI {
    * @return fluent self
    */
   @Fluent
+  @Deprecated
   default RedisAPI type(String arg0, Handler<AsyncResult<@Nullable Response>> handler) {
     send(Command.TYPE, arg0).onComplete(handler);
     return this;
@@ -5526,6 +5848,7 @@ public interface RedisAPI {
    * @return fluent self
    */
   @Fluent
+  @Deprecated
   default RedisAPI unlink(List<String> args, Handler<AsyncResult<@Nullable Response>> handler) {
     send(Command.UNLINK, args.toArray(new String[0])).onComplete(handler);
     return this;
@@ -5543,6 +5866,7 @@ public interface RedisAPI {
    * @return fluent self
    */
   @Fluent
+  @Deprecated
   default RedisAPI unsubscribe(List<String> args, Handler<AsyncResult<@Nullable Response>> handler) {
     send(Command.UNSUBSCRIBE, args.toArray(new String[0])).onComplete(handler);
     return this;
@@ -5560,6 +5884,7 @@ public interface RedisAPI {
    * @return fluent self
    */
   @Fluent
+  @Deprecated
   default RedisAPI unwatch(Handler<AsyncResult<@Nullable Response>> handler) {
     send(Command.UNWATCH).onComplete(handler);
     return this;
@@ -5577,6 +5902,7 @@ public interface RedisAPI {
    * @return fluent self
    */
   @Fluent
+  @Deprecated
   default RedisAPI wait(String arg0, String arg1, Handler<AsyncResult<@Nullable Response>> handler) {
     send(Command.WAIT, arg0, arg1).onComplete(handler);
     return this;
@@ -5594,6 +5920,7 @@ public interface RedisAPI {
    * @return fluent self
    */
   @Fluent
+  @Deprecated
   default RedisAPI watch(List<String> args, Handler<AsyncResult<@Nullable Response>> handler) {
     send(Command.WATCH, args.toArray(new String[0])).onComplete(handler);
     return this;
@@ -5611,6 +5938,7 @@ public interface RedisAPI {
    * @return fluent self
    */
   @Fluent
+  @Deprecated
   default RedisAPI xack(List<String> args, Handler<AsyncResult<@Nullable Response>> handler) {
     send(Command.XACK, args.toArray(new String[0])).onComplete(handler);
     return this;
@@ -5628,6 +5956,7 @@ public interface RedisAPI {
    * @return fluent self
    */
   @Fluent
+  @Deprecated
   default RedisAPI xadd(List<String> args, Handler<AsyncResult<@Nullable Response>> handler) {
     send(Command.XADD, args.toArray(new String[0])).onComplete(handler);
     return this;
@@ -5645,6 +5974,7 @@ public interface RedisAPI {
    * @return fluent self
    */
   @Fluent
+  @Deprecated
   default RedisAPI xautoclaim(List<String> args, Handler<AsyncResult<@Nullable Response>> handler) {
     send(Command.XAUTOCLAIM, args.toArray(new String[0])).onComplete(handler);
     return this;
@@ -5662,6 +5992,7 @@ public interface RedisAPI {
    * @return fluent self
    */
   @Fluent
+  @Deprecated
   default RedisAPI xclaim(List<String> args, Handler<AsyncResult<@Nullable Response>> handler) {
     send(Command.XCLAIM, args.toArray(new String[0])).onComplete(handler);
     return this;
@@ -5679,6 +6010,7 @@ public interface RedisAPI {
    * @return fluent self
    */
   @Fluent
+  @Deprecated
   default RedisAPI xdel(List<String> args, Handler<AsyncResult<@Nullable Response>> handler) {
     send(Command.XDEL, args.toArray(new String[0])).onComplete(handler);
     return this;
@@ -5696,6 +6028,7 @@ public interface RedisAPI {
    * @return fluent self
    */
   @Fluent
+  @Deprecated
   default RedisAPI xgroup(List<String> args, Handler<AsyncResult<@Nullable Response>> handler) {
     send(Command.XGROUP, args.toArray(new String[0])).onComplete(handler);
     return this;
@@ -5713,6 +6046,7 @@ public interface RedisAPI {
    * @return fluent self
    */
   @Fluent
+  @Deprecated
   default RedisAPI xinfo(List<String> args, Handler<AsyncResult<@Nullable Response>> handler) {
     send(Command.XINFO, args.toArray(new String[0])).onComplete(handler);
     return this;
@@ -5730,6 +6064,7 @@ public interface RedisAPI {
    * @return fluent self
    */
   @Fluent
+  @Deprecated
   default RedisAPI xlen(String arg0, Handler<AsyncResult<@Nullable Response>> handler) {
     send(Command.XLEN, arg0).onComplete(handler);
     return this;
@@ -5747,6 +6082,7 @@ public interface RedisAPI {
    * @return fluent self
    */
   @Fluent
+  @Deprecated
   default RedisAPI xpending(List<String> args, Handler<AsyncResult<@Nullable Response>> handler) {
     send(Command.XPENDING, args.toArray(new String[0])).onComplete(handler);
     return this;
@@ -5764,6 +6100,7 @@ public interface RedisAPI {
    * @return fluent self
    */
   @Fluent
+  @Deprecated
   default RedisAPI xrange(List<String> args, Handler<AsyncResult<@Nullable Response>> handler) {
     send(Command.XRANGE, args.toArray(new String[0])).onComplete(handler);
     return this;
@@ -5781,6 +6118,7 @@ public interface RedisAPI {
    * @return fluent self
    */
   @Fluent
+  @Deprecated
   default RedisAPI xread(List<String> args, Handler<AsyncResult<@Nullable Response>> handler) {
     send(Command.XREAD, args.toArray(new String[0])).onComplete(handler);
     return this;
@@ -5798,6 +6136,7 @@ public interface RedisAPI {
    * @return fluent self
    */
   @Fluent
+  @Deprecated
   default RedisAPI xreadgroup(List<String> args, Handler<AsyncResult<@Nullable Response>> handler) {
     send(Command.XREADGROUP, args.toArray(new String[0])).onComplete(handler);
     return this;
@@ -5815,6 +6154,7 @@ public interface RedisAPI {
    * @return fluent self
    */
   @Fluent
+  @Deprecated
   default RedisAPI xrevrange(List<String> args, Handler<AsyncResult<@Nullable Response>> handler) {
     send(Command.XREVRANGE, args.toArray(new String[0])).onComplete(handler);
     return this;
@@ -5832,6 +6172,7 @@ public interface RedisAPI {
    * @return fluent self
    */
   @Fluent
+  @Deprecated
   default RedisAPI xsetid(List<String> args, Handler<AsyncResult<@Nullable Response>> handler) {
     send(Command.XSETID, args.toArray(new String[0])).onComplete(handler);
     return this;
@@ -5849,6 +6190,7 @@ public interface RedisAPI {
    * @return fluent self
    */
   @Fluent
+  @Deprecated
   default RedisAPI xtrim(List<String> args, Handler<AsyncResult<@Nullable Response>> handler) {
     send(Command.XTRIM, args.toArray(new String[0])).onComplete(handler);
     return this;
@@ -5866,6 +6208,7 @@ public interface RedisAPI {
    * @return fluent self
    */
   @Fluent
+  @Deprecated
   default RedisAPI zadd(List<String> args, Handler<AsyncResult<@Nullable Response>> handler) {
     send(Command.ZADD, args.toArray(new String[0])).onComplete(handler);
     return this;
@@ -5883,6 +6226,7 @@ public interface RedisAPI {
    * @return fluent self
    */
   @Fluent
+  @Deprecated
   default RedisAPI zcard(String arg0, Handler<AsyncResult<@Nullable Response>> handler) {
     send(Command.ZCARD, arg0).onComplete(handler);
     return this;
@@ -5900,6 +6244,7 @@ public interface RedisAPI {
    * @return fluent self
    */
   @Fluent
+  @Deprecated
   default RedisAPI zcount(String arg0, String arg1, String arg2, Handler<AsyncResult<@Nullable Response>> handler) {
     send(Command.ZCOUNT, arg0, arg1, arg2).onComplete(handler);
     return this;
@@ -5917,6 +6262,7 @@ public interface RedisAPI {
    * @return fluent self
    */
   @Fluent
+  @Deprecated
   default RedisAPI zdiff(List<String> args, Handler<AsyncResult<@Nullable Response>> handler) {
     send(Command.ZDIFF, args.toArray(new String[0])).onComplete(handler);
     return this;
@@ -5934,6 +6280,7 @@ public interface RedisAPI {
    * @return fluent self
    */
   @Fluent
+  @Deprecated
   default RedisAPI zdiffstore(List<String> args, Handler<AsyncResult<@Nullable Response>> handler) {
     send(Command.ZDIFFSTORE, args.toArray(new String[0])).onComplete(handler);
     return this;
@@ -5951,6 +6298,7 @@ public interface RedisAPI {
    * @return fluent self
    */
   @Fluent
+  @Deprecated
   default RedisAPI zincrby(String arg0, String arg1, String arg2, Handler<AsyncResult<@Nullable Response>> handler) {
     send(Command.ZINCRBY, arg0, arg1, arg2).onComplete(handler);
     return this;
@@ -5968,6 +6316,7 @@ public interface RedisAPI {
    * @return fluent self
    */
   @Fluent
+  @Deprecated
   default RedisAPI zinter(List<String> args, Handler<AsyncResult<@Nullable Response>> handler) {
     send(Command.ZINTER, args.toArray(new String[0])).onComplete(handler);
     return this;
@@ -5985,6 +6334,7 @@ public interface RedisAPI {
    * @return fluent self
    */
   @Fluent
+  @Deprecated
   default RedisAPI zintercard(List<String> args, Handler<AsyncResult<@Nullable Response>> handler) {
     send(Command.ZINTERCARD, args.toArray(new String[0])).onComplete(handler);
     return this;
@@ -6002,6 +6352,7 @@ public interface RedisAPI {
    * @return fluent self
    */
   @Fluent
+  @Deprecated
   default RedisAPI zinterstore(List<String> args, Handler<AsyncResult<@Nullable Response>> handler) {
     send(Command.ZINTERSTORE, args.toArray(new String[0])).onComplete(handler);
     return this;
@@ -6019,6 +6370,7 @@ public interface RedisAPI {
    * @return fluent self
    */
   @Fluent
+  @Deprecated
   default RedisAPI zlexcount(String arg0, String arg1, String arg2, Handler<AsyncResult<@Nullable Response>> handler) {
     send(Command.ZLEXCOUNT, arg0, arg1, arg2).onComplete(handler);
     return this;
@@ -6036,6 +6388,7 @@ public interface RedisAPI {
    * @return fluent self
    */
   @Fluent
+  @Deprecated
   default RedisAPI zmpop(List<String> args, Handler<AsyncResult<@Nullable Response>> handler) {
     send(Command.ZMPOP, args.toArray(new String[0])).onComplete(handler);
     return this;
@@ -6053,6 +6406,7 @@ public interface RedisAPI {
    * @return fluent self
    */
   @Fluent
+  @Deprecated
   default RedisAPI zmscore(List<String> args, Handler<AsyncResult<@Nullable Response>> handler) {
     send(Command.ZMSCORE, args.toArray(new String[0])).onComplete(handler);
     return this;
@@ -6070,6 +6424,7 @@ public interface RedisAPI {
    * @return fluent self
    */
   @Fluent
+  @Deprecated
   default RedisAPI zpopmax(List<String> args, Handler<AsyncResult<@Nullable Response>> handler) {
     send(Command.ZPOPMAX, args.toArray(new String[0])).onComplete(handler);
     return this;
@@ -6087,6 +6442,7 @@ public interface RedisAPI {
    * @return fluent self
    */
   @Fluent
+  @Deprecated
   default RedisAPI zpopmin(List<String> args, Handler<AsyncResult<@Nullable Response>> handler) {
     send(Command.ZPOPMIN, args.toArray(new String[0])).onComplete(handler);
     return this;
@@ -6104,6 +6460,7 @@ public interface RedisAPI {
    * @return fluent self
    */
   @Fluent
+  @Deprecated
   default RedisAPI zrandmember(List<String> args, Handler<AsyncResult<@Nullable Response>> handler) {
     send(Command.ZRANDMEMBER, args.toArray(new String[0])).onComplete(handler);
     return this;
@@ -6121,6 +6478,7 @@ public interface RedisAPI {
    * @return fluent self
    */
   @Fluent
+  @Deprecated
   default RedisAPI zrange(List<String> args, Handler<AsyncResult<@Nullable Response>> handler) {
     send(Command.ZRANGE, args.toArray(new String[0])).onComplete(handler);
     return this;
@@ -6138,6 +6496,7 @@ public interface RedisAPI {
    * @return fluent self
    */
   @Fluent
+  @Deprecated
   default RedisAPI zrangebylex(List<String> args, Handler<AsyncResult<@Nullable Response>> handler) {
     send(Command.ZRANGEBYLEX, args.toArray(new String[0])).onComplete(handler);
     return this;
@@ -6155,6 +6514,7 @@ public interface RedisAPI {
    * @return fluent self
    */
   @Fluent
+  @Deprecated
   default RedisAPI zrangebyscore(List<String> args, Handler<AsyncResult<@Nullable Response>> handler) {
     send(Command.ZRANGEBYSCORE, args.toArray(new String[0])).onComplete(handler);
     return this;
@@ -6172,6 +6532,7 @@ public interface RedisAPI {
    * @return fluent self
    */
   @Fluent
+  @Deprecated
   default RedisAPI zrangestore(List<String> args, Handler<AsyncResult<@Nullable Response>> handler) {
     send(Command.ZRANGESTORE, args.toArray(new String[0])).onComplete(handler);
     return this;
@@ -6189,6 +6550,7 @@ public interface RedisAPI {
    * @return fluent self
    */
   @Fluent
+  @Deprecated
   default RedisAPI zrank(String arg0, String arg1, Handler<AsyncResult<@Nullable Response>> handler) {
     send(Command.ZRANK, arg0, arg1).onComplete(handler);
     return this;
@@ -6206,6 +6568,7 @@ public interface RedisAPI {
    * @return fluent self
    */
   @Fluent
+  @Deprecated
   default RedisAPI zrem(List<String> args, Handler<AsyncResult<@Nullable Response>> handler) {
     send(Command.ZREM, args.toArray(new String[0])).onComplete(handler);
     return this;
@@ -6223,6 +6586,7 @@ public interface RedisAPI {
    * @return fluent self
    */
   @Fluent
+  @Deprecated
   default RedisAPI zremrangebylex(String arg0, String arg1, String arg2, Handler<AsyncResult<@Nullable Response>> handler) {
     send(Command.ZREMRANGEBYLEX, arg0, arg1, arg2).onComplete(handler);
     return this;
@@ -6240,6 +6604,7 @@ public interface RedisAPI {
    * @return fluent self
    */
   @Fluent
+  @Deprecated
   default RedisAPI zremrangebyrank(String arg0, String arg1, String arg2, Handler<AsyncResult<@Nullable Response>> handler) {
     send(Command.ZREMRANGEBYRANK, arg0, arg1, arg2).onComplete(handler);
     return this;
@@ -6257,6 +6622,7 @@ public interface RedisAPI {
    * @return fluent self
    */
   @Fluent
+  @Deprecated
   default RedisAPI zremrangebyscore(String arg0, String arg1, String arg2, Handler<AsyncResult<@Nullable Response>> handler) {
     send(Command.ZREMRANGEBYSCORE, arg0, arg1, arg2).onComplete(handler);
     return this;
@@ -6274,6 +6640,7 @@ public interface RedisAPI {
    * @return fluent self
    */
   @Fluent
+  @Deprecated
   default RedisAPI zrevrange(List<String> args, Handler<AsyncResult<@Nullable Response>> handler) {
     send(Command.ZREVRANGE, args.toArray(new String[0])).onComplete(handler);
     return this;
@@ -6291,6 +6658,7 @@ public interface RedisAPI {
    * @return fluent self
    */
   @Fluent
+  @Deprecated
   default RedisAPI zrevrangebylex(List<String> args, Handler<AsyncResult<@Nullable Response>> handler) {
     send(Command.ZREVRANGEBYLEX, args.toArray(new String[0])).onComplete(handler);
     return this;
@@ -6308,6 +6676,7 @@ public interface RedisAPI {
    * @return fluent self
    */
   @Fluent
+  @Deprecated
   default RedisAPI zrevrangebyscore(List<String> args, Handler<AsyncResult<@Nullable Response>> handler) {
     send(Command.ZREVRANGEBYSCORE, args.toArray(new String[0])).onComplete(handler);
     return this;
@@ -6325,6 +6694,7 @@ public interface RedisAPI {
    * @return fluent self
    */
   @Fluent
+  @Deprecated
   default RedisAPI zrevrank(String arg0, String arg1, Handler<AsyncResult<@Nullable Response>> handler) {
     send(Command.ZREVRANK, arg0, arg1).onComplete(handler);
     return this;
@@ -6342,6 +6712,7 @@ public interface RedisAPI {
    * @return fluent self
    */
   @Fluent
+  @Deprecated
   default RedisAPI zscan(List<String> args, Handler<AsyncResult<@Nullable Response>> handler) {
     send(Command.ZSCAN, args.toArray(new String[0])).onComplete(handler);
     return this;
@@ -6359,6 +6730,7 @@ public interface RedisAPI {
    * @return fluent self
    */
   @Fluent
+  @Deprecated
   default RedisAPI zscore(String arg0, String arg1, Handler<AsyncResult<@Nullable Response>> handler) {
     send(Command.ZSCORE, arg0, arg1).onComplete(handler);
     return this;
@@ -6376,6 +6748,7 @@ public interface RedisAPI {
    * @return fluent self
    */
   @Fluent
+  @Deprecated
   default RedisAPI zunion(List<String> args, Handler<AsyncResult<@Nullable Response>> handler) {
     send(Command.ZUNION, args.toArray(new String[0])).onComplete(handler);
     return this;
@@ -6393,6 +6766,7 @@ public interface RedisAPI {
    * @return fluent self
    */
   @Fluent
+  @Deprecated
   default RedisAPI zunionstore(List<String> args, Handler<AsyncResult<@Nullable Response>> handler) {
     send(Command.ZUNIONSTORE, args.toArray(new String[0])).onComplete(handler);
     return this;
