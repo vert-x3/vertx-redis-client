@@ -29,7 +29,7 @@ public class RedisClient7Test {
   public final RunTestOnContext rule = new RunTestOnContext();
 
   @ClassRule
-  public static final GenericContainer<?> redis = new GenericContainer<>("redis:7.0-rc")
+  public static final GenericContainer<?> redis = new GenericContainer<>("redis:7.0")
     .withExposedPorts(6379);
 
   private Redis client;
