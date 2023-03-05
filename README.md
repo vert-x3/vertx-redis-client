@@ -16,7 +16,7 @@ docker run -d \
   -e 'SENTINEL=true' \
   -p '7000-7007:7000-7007' \
   -p '5000-5002:5000-5002' \
-  grokzen/redis-cluster:latest
+  grokzen/redis-cluster:6.2.0
 ```
 
 ## Documentation:
