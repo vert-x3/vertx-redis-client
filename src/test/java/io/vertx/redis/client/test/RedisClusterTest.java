@@ -1114,4 +1114,53 @@ public class RedisClusterTest {
         });
       });
   }
+
+  @Test(timeout = 30_000)
+  public void autoFindNodesByName(TestContext should) {
+    final Async test = should.async();
+
+    final RedisOptions options = new RedisOptions()
+      .setType(RedisClientType.CLUSTER)
+      .setConnectionString("redis://localhost:7000")
+      // we will flood the redis server
+      .setMaxWaitingHandlers(128 * 1024)
+      .setMaxPoolSize(8)
+      .setMaxPoolWaiting(16);
+
+    // we only provide 1 node
+
+    final Redis client2 = Redis.createClient(rule.vertx(), options);
+
+    client2
+      .connect(onCreate -> {
+        should.assertTrue(onCreate.succeeded());
+
+        final RedisConnection cluster = onCreate.result();
+        cluster.exceptionHandler(should::fail);
+
+        final int len = (int) Math.pow(2, 17);
+        final AtomicInteger counter = new AtomicInteger();
+
+        for (int i = 0; i < len; i++) {
+          final String id = Integer.toString(i);
+          cluster.send(cmd(SET).arg(id).arg(id), set -> {
+            should.assertTrue(set.succeeded());
+            cluster.send(cmd(GET).arg(id), get -> {
+              should.assertTrue(get.succeeded());
+              should.assertEquals(id, get.result().toString());
+
+              final int cnt = counter.incrementAndGet();
+              if (cnt % 1024 == 0) {
+                System.out.print('.');
+              }
+
+              if (cnt == len) {
+                client2.close();
+                test.complete();
+              }
+            });
+          });
+        }
+      });
+  }
 }

@@ -42,7 +42,7 @@ public interface Redis {
   }
 
   /**
-   * Create a new redis client using the default client options. Does not support rediss (redis over ssl scheme) for now.
+   * Create a new redis client using the default client options.
    * @param connectionString a string URI following the scheme: redis://[username:password@][host][:port][/database]
    * @param vertx the vertx instance
    * @return the client
