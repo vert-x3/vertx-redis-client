@@ -231,26 +231,26 @@ public class RedisClusterConnection implements RedisConnection {
     final Map<Integer, Request> map = new IdentityHashMap<>();
 
     int lastKey = cmd.iterateKeys(args, (begin, keyIdx, keyStep) -> {
-        int slot = ZModem.generate(args.get(keyIdx));
-        // get the client for the slot
-        Request request = map.get(slot);
-        if (request == null) {
-          // we need to create a new one
-          request = Request.cmd(cmd);
-          // all params before the key get added
-          for (int j = 0; j < begin; j++) {
-            request.arg(args.get(j));
-          }
-          // add to the map
-          map.put(slot, request);
-        }
-        // request isn't null anymore
-        request.arg(args.get(keyIdx));
-        // all params before the next key get added
-        for (int j = keyIdx + 1; j < keyIdx + keyStep; j++) {
+      int slot = ZModem.generate(args.get(keyIdx));
+      // get the client for the slot
+      Request request = map.get(slot);
+      if (request == null) {
+        // we need to create a new one
+        request = Request.cmd(cmd);
+        // all params before the key get added
+        for (int j = 0; j < begin; j++) {
           request.arg(args.get(j));
         }
-      });
+        // add to the map
+        map.put(slot, request);
+      }
+      // request isn't null anymore
+      request.arg(args.get(keyIdx));
+      // all params before the next key get added
+      for (int j = keyIdx + 1; j < keyIdx + keyStep; j++) {
+        request.arg(args.get(j));
+      }
+    });
 
     // if there are args after the end they must be added to all requests
     final Collection<Request> col = map.values();
@@ -272,66 +272,66 @@ public class RedisClusterConnection implements RedisConnection {
       return;
     }
 
-    connection.send(command, send -> {
-      if (send.failed() && send.cause() instanceof ErrorType && retries >= 0) {
-        final ErrorType cause = (ErrorType) send.cause();
+    connection
+      .send(command)
+      .onComplete(send -> {
+        if (send.failed() && send.cause() instanceof ErrorType && retries >= 0) {
+          final ErrorType cause = (ErrorType) send.cause();
 
-        if (cause.is("MOVED")) {
-          // cluster is unbalanced, need to reconnect
-          handler.handle(Future.failedFuture(cause));
-          return;
+          if (cause.is("MOVED")) {
+            // cluster is unbalanced, need to reconnect
+            handler.handle(Future.failedFuture(cause));
+            return;
+          }
+
+          if (cause.is("ASK")) {
+            connection
+              .send(cmd(ASKING))
+              .onFailure(err -> handler.handle(Future.failedFuture(err)))
+              .onSuccess(asking -> {
+                // attempt to recover
+                // REQUERY THE NEW ONE (we've got the correct details)
+                String addr = cause.slice(' ', cause.is("ERR") ? 3 : 2);
+
+                if (addr == null) {
+                  // bad message
+                  handler.handle(Future.failedFuture(cause));
+                  return;
+                }
+                // inherit protocol config from the current connection
+                final RedisURI uri = new RedisURI(endpoint);
+                // re-run on the new endpoint
+                send(uri.protocol() + "://" + uri.userinfo() + addr, retries - 1, command, handler);
+              });
+            return;
+          }
+
+          if (cause.is("TRYAGAIN") || cause.is("CLUSTERDOWN")) {
+            // TRYAGAIN response or cluster down, retry with backoff up to 1280ms
+            long backoff = (long) (Math.pow(2, 16 - Math.max(retries, 9)) * 10);
+            vertx.setTimer(backoff, t -> send(endpoint, retries - 1, command, handler));
+            return;
+          }
+
+          if (cause.is("NOAUTH") && options.getPassword() != null) {
+            // NOAUTH will try to authenticate
+            connection
+              .send(cmd(AUTH).arg(options.getPassword()))
+              .onFailure(err -> handler.handle(Future.failedFuture(err)))
+              .onSuccess(auth -> {
+                // again
+                send(endpoint, retries - 1, command, handler);
+              });
+            return;
+          }
         }
 
-        if (cause.is("ASK")) {
-          connection.send(cmd(ASKING), asking -> {
-            if (asking.failed()) {
-              handler.handle(Future.failedFuture(asking.cause()));
-              return;
-            }
-            // attempt to recover
-            // REQUERY THE NEW ONE (we've got the correct details)
-            String addr = cause.slice(' ', cause.is("ERR") ? 3 : 2);
-
-            if (addr == null) {
-              // bad message
-              handler.handle(Future.failedFuture(cause));
-              return;
-            }
-            // inherit protocol config from the current connection
-            final RedisURI uri = new RedisURI(endpoint);
-            // re-run on the new endpoint
-            send(uri.protocol() + "://" + uri.userinfo() + addr, retries - 1, command, handler);
-          });
-          return;
+        try {
+          handler.handle(send);
+        } catch (RuntimeException e) {
+          LOG.error("Handler failure", e);
         }
-
-        if (cause.is("TRYAGAIN") || cause.is("CLUSTERDOWN")) {
-          // TRYAGAIN response or cluster down, retry with backoff up to 1280ms
-          long backoff = (long) (Math.pow(2, 16 - Math.max(retries, 9)) * 10);
-          vertx.setTimer(backoff, t -> send(endpoint, retries - 1, command, handler));
-          return;
-        }
-
-        if (cause.is("NOAUTH") && options.getPassword() != null) {
-          // NOAUTH will try to authenticate
-          connection.send(cmd(AUTH).arg(options.getPassword()), auth -> {
-            if (auth.failed()) {
-              handler.handle(Future.failedFuture(auth.cause()));
-              return;
-            }
-            // again
-            send(endpoint, retries - 1, command, handler);
-          });
-          return;
-        }
-      }
-
-      try {
-        handler.handle(send);
-      } catch (RuntimeException e) {
-        LOG.error("Handler failure", e);
-      }
-    });
+      });
   }
 
   @Override
@@ -416,67 +416,67 @@ public class RedisClusterConnection implements RedisConnection {
       return;
     }
 
-    connection.batch(commands, send -> {
-      if (send.failed() && send.cause() instanceof ErrorType && retries >= 0) {
-        final ErrorType cause = (ErrorType) send.cause();
+    connection
+      .batch(commands)
+      .onComplete(send -> {
+        if (send.failed() && send.cause() instanceof ErrorType && retries >= 0) {
+          final ErrorType cause = (ErrorType) send.cause();
 
-        if (cause.is("MOVED")) {
-          // cluster is unbalanced, need to reconnect
-          handler.handle(Future.failedFuture(cause));
-          return;
+          if (cause.is("MOVED")) {
+            // cluster is unbalanced, need to reconnect
+            handler.handle(Future.failedFuture(cause));
+            return;
+          }
+
+          if (cause.is("ASK")) {
+            connection
+              .send(cmd(ASKING))
+              .onFailure(err -> handler.handle(Future.failedFuture(err)))
+              .onSuccess(asking -> {
+                // attempt to recover
+                // REQUERY THE NEW ONE (we've got the correct details)
+                String addr = cause.slice(' ', cause.is("ERR") ? 3 : 2);
+
+                if (addr == null) {
+                  // bad message
+                  handler.handle(Future.failedFuture(cause));
+                  return;
+                }
+
+                // inherit protocol config from the current connection
+                final RedisURI uri = new RedisURI(endpoint);
+                // re-run on the new endpoint
+                batch(uri.protocol() + "://" + uri.userinfo() + addr, retries - 1, commands, handler);
+              });
+            return;
+          }
+
+          if (cause.is("TRYAGAIN") || cause.is("CLUSTERDOWN")) {
+            // TRYAGAIN response or cluster down, retry with backoff up to 1280ms
+            long backoff = (long) (Math.pow(2, 16 - Math.max(retries, 9)) * 10);
+            vertx.setTimer(backoff, t -> batch(endpoint, retries - 1, commands, handler));
+            return;
+          }
+
+          if (cause.is("NOAUTH") && options.getPassword() != null) {
+            // try to authenticate
+            connection
+              .send(cmd(AUTH).arg(options.getPassword()))
+              .onFailure(err -> handler.handle(Future.failedFuture(err)))
+              .onSuccess(auth -> {
+                // again
+                batch(endpoint, retries - 1, commands, handler);
+              });
+            return;
+          }
         }
 
-        if (cause.is("ASK")) {
-          connection.send(cmd(ASKING), asking -> {
-            if (asking.failed()) {
-              handler.handle(Future.failedFuture(asking.cause()));
-              return;
-            }
-            // attempt to recover
-            // REQUERY THE NEW ONE (we've got the correct details)
-            String addr = cause.slice(' ', cause.is("ERR") ? 3 : 2);
-
-            if (addr == null) {
-              // bad message
-              handler.handle(Future.failedFuture(cause));
-              return;
-            }
-
-            // inherit protocol config from the current connection
-            final RedisURI uri = new RedisURI(endpoint);
-            // re-run on the new endpoint
-            batch(uri.protocol() + "://" + uri.userinfo() + addr, retries - 1, commands, handler);
-          });
-          return;
+        try {
+          handler.handle(send);
+        } catch (RuntimeException e) {
+          LOG.error("Handler failure", e);
         }
-
-        if (cause.is("TRYAGAIN") || cause.is("CLUSTERDOWN")) {
-          // TRYAGAIN response or cluster down, retry with backoff up to 1280ms
-          long backoff = (long) (Math.pow(2, 16 - Math.max(retries, 9)) * 10);
-          vertx.setTimer(backoff, t -> batch(endpoint, retries - 1, commands, handler));
-          return;
-        }
-
-        if (cause.is("NOAUTH") && options.getPassword() != null) {
-          // try to authenticate
-          connection.send(cmd(AUTH).arg(options.getPassword()), auth -> {
-            if (auth.failed()) {
-              handler.handle(Future.failedFuture(auth.cause()));
-              return;
-            }
-            // again
-            batch(endpoint, retries - 1, commands, handler);
-          });
-          return;
-        }
-      }
-
-      try {
-        handler.handle(send);
-      } catch (RuntimeException e) {
-        LOG.error("Handler failure", e);
-      }
-    });
+      });
   }
 
   @Override

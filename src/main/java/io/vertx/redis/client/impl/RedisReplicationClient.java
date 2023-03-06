@@ -180,14 +180,11 @@ public class RedisReplicationClient extends BaseRedisClient implements Redis {
 
   private void getNodes(RedisConnection conn, List<String> endpoints, int index, Handler<AsyncResult<List<Node>>> onGetSlots) {
 
-    conn.send(cmd(INFO).arg("REPLICATION"), send -> {
-      if (send.failed()) {
-        // failed to load the slots from this connection
-        onGetSlots.handle(Future.failedFuture(send.cause()));
-        return;
-      }
+    conn.send(cmd(INFO).arg("REPLICATION"))
+      .onFailure(err -> onGetSlots.handle(Future.failedFuture(err)))
+      .onSuccess(info -> {
 
-      final Map<String, String> reply = parseInfo(send.result());
+      final Map<String, String> reply = parseInfo(info);
 
       if (reply.size() == 0) {
         // no slots available we can't really proceed

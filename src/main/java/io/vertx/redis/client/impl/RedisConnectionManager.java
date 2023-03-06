@@ -153,27 +153,18 @@ class RedisConnectionManager {
       // all calls the user handler will happen in the user context (ctx)
       try {
         netClient
-          .connect(redisURI.socketAddress(), clientConnect -> {
-            if (clientConnect.failed()) {
-              // connection failed
-              ctx.execute(ctx.failedFuture(clientConnect.cause()), onConnect);
-              return;
-            }
-
-            // socket connection succeeded
-            final NetSocket netSocket = clientConnect.result();
-
+          .connect(redisURI.socketAddress())
+          .onFailure(err -> {
+            // connection failed
+            ctx.execute(ctx.failedFuture(err), onConnect);
+          })
+          .onSuccess(netSocket -> {
             // upgrade to ssl is only possible for inet sockets
             if (connectionStringInetSocket && !netClientSsl && connectionStringSsl) {
               // must upgrade protocol
-              netSocket.upgradeToSsl(upgradeToSsl -> {
-                if (upgradeToSsl.failed()) {
-                  ctx.execute(ctx.failedFuture(upgradeToSsl.cause()), onConnect);
-                } else {
-                  // complete the connection
-                  init(ctx, netSocket, listener, onConnect);
-                }
-              });
+              netSocket.upgradeToSsl()
+                .onFailure(err -> ctx.execute(ctx.failedFuture(err), onConnect))
+                .onSuccess(v -> init(ctx, netSocket, listener, onConnect));
             } else {
               // no need to upgrade
               init(ctx, netSocket, listener, onConnect);
@@ -249,27 +240,50 @@ class RedisConnectionManager {
           hello.arg("SETNAME").arg(client);
         }
 
-        connection.send(hello, onSend -> {
-          if (onSend.succeeded()) {
-            LOG.debug(onSend.result());
+        connection.send(hello)
+          .onSuccess(ok -> {
+            LOG.debug(ok);
             ctx.execute(ctx.succeededFuture(), handler);
-            return;
-          }
+          })
+          .onFailure(err -> {
+            if (err != null) {
+              if (err instanceof ErrorType) {
+                final ErrorType redisErr = (ErrorType) err;
+                if (redisErr.is("NOAUTH")) {
+                  authenticate(ctx, connection, user, password, handler);
+                  return;
+                }
+                if (redisErr.is("ERR")) {
+                  String msg = redisErr.getMessage();
+                  if (msg.startsWith("ERR unknown command") || msg.startsWith("ERR unknown or unsupported command")) {
+                    // chatting to an old server
+                    ping(ctx, connection, handler);
+                  }
+                  return;
+                }
+              }
+            }
 
-          final Throwable err = onSend.cause();
+            ctx.execute(ctx.failedFuture(err), handler);
+          });
+      }
+    }
+
+    private void ping(ContextInternal ctx, RedisConnection connection, Handler<AsyncResult<Void>> handler) {
+      Request ping = Request.cmd(Command.PING);
+
+      connection.send(ping)
+        .onSuccess(ok -> {
+          LOG.debug(ok);
+          ctx.execute(ctx.succeededFuture(), handler);
+        })
+        .onFailure(err -> {
           if (err != null) {
             if (err instanceof ErrorType) {
-              final ErrorType redisErr = (ErrorType) err;
-              if (redisErr.is("NOAUTH")) {
-                authenticate(ctx, connection, user, password, handler);
-                return;
-              }
-              if (redisErr.is("ERR")) {
-                String msg = redisErr.getMessage();
-                if (msg.startsWith("ERR unknown command") || msg.startsWith("ERR unknown or unsupported command")) {
-                  // chatting to an old server
-                  ping(ctx, connection, handler);
-                }
+              if (((ErrorType) err).is("NOAUTH")) {
+                // old authentication required
+                String password = redisURI.password() != null ? redisURI.password() : options.getPassword();
+                authenticate(ctx, connection, redisURI.user(), password, handler);
                 return;
               }
             }
@@ -277,33 +291,6 @@ class RedisConnectionManager {
 
           ctx.execute(ctx.failedFuture(err), handler);
         });
-      }
-    }
-
-    private void ping(ContextInternal ctx, RedisConnection connection, Handler<AsyncResult<Void>> handler) {
-      Request ping = Request.cmd(Command.PING);
-
-      connection.send(ping, onSend -> {
-        if (onSend.succeeded()) {
-          LOG.debug(onSend.result());
-          ctx.execute(ctx.succeededFuture(), handler);
-          return;
-        }
-
-        final Throwable err = onSend.cause();
-        if (err != null) {
-          if (err instanceof ErrorType) {
-            if (((ErrorType) err).is("NOAUTH")) {
-              // old authentication required
-              String password = redisURI.password() != null ? redisURI.password() : options.getPassword();
-              authenticate(ctx, connection, redisURI.user(), password, handler);
-              return;
-            }
-          }
-        }
-
-        ctx.execute(ctx.failedFuture(err), handler);
-      });
     }
 
     private void authenticate(ContextInternal ctx, RedisConnection connection, String user, String password, Handler<AsyncResult<Void>> handler) {
@@ -320,13 +307,9 @@ class RedisConnectionManager {
       }
       cmd.arg(password);
 
-      connection.send(cmd, auth -> {
-        if (auth.failed()) {
-          ctx.execute(ctx.failedFuture(auth.cause()), handler);
-        } else {
-          ctx.execute(ctx.succeededFuture(), handler);
-        }
-      });
+      connection.send(cmd)
+        .onFailure(err -> ctx.execute(ctx.failedFuture(err), handler))
+        .onSuccess(ok -> ctx.execute(ctx.succeededFuture(), handler));
     }
 
     private void select(ContextInternal ctx, RedisConnection connection, Integer select, Handler<AsyncResult<Void>> handler) {
@@ -335,13 +318,9 @@ class RedisConnectionManager {
         return;
       }
       // perform select
-      connection.send(Request.cmd(Command.SELECT).arg(select), auth -> {
-        if (auth.failed()) {
-          ctx.execute(ctx.failedFuture(auth.cause()), handler);
-        } else {
-          ctx.execute(ctx.succeededFuture(), handler);
-        }
-      });
+      connection.send(Request.cmd(Command.SELECT).arg(select))
+        .onFailure(err -> ctx.execute(ctx.failedFuture(err), handler))
+        .onSuccess(ok -> ctx.execute(ctx.succeededFuture(), handler));
     }
 
     private void setup(ContextInternal ctx, RedisConnection connection, Request setup, Handler<AsyncResult<Void>> handler) {
@@ -350,13 +329,9 @@ class RedisConnectionManager {
         return;
       }
       // perform setup
-      connection.send(setup, req -> {
-        if (req.failed()) {
-          ctx.execute(ctx.failedFuture(req.cause()), handler);
-        } else {
-          ctx.execute(ctx.succeededFuture(), handler);
-        }
-      });
+      connection.send(setup)
+        .onFailure(err -> ctx.execute(ctx.failedFuture(err), handler))
+        .onSuccess(ok -> ctx.execute(ctx.succeededFuture(), handler));
     }
   }
 

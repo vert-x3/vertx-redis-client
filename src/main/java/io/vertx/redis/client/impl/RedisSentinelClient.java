@@ -23,7 +23,6 @@ import io.vertx.redis.client.impl.types.ErrorType;
 
 import java.util.List;
 import java.util.Random;
-import java.util.SplittableRandom;
 
 import static io.vertx.redis.client.Command.*;
 import static io.vertx.redis.client.Request.cmd;
@@ -97,14 +96,10 @@ public class RedisSentinelClient extends BaseRedisClient implements Redis {
             }
           });
 
-        sentinel.send(cmd(SUBSCRIBE).arg("+switch-master"), send -> {
-          if (send.failed()) {
-            promise.fail(send.cause());
-          } else {
-            // both connections ready
-            promise.complete(new RedisSentinelConnection(conn, sentinel));
-          }
-        });
+        sentinel
+          .send(cmd(SUBSCRIBE).arg("+switch-master"))
+          .onFailure(promise::fail)
+          .onSuccess(ok -> promise.complete(new RedisSentinelConnection(conn, sentinel)));
 
         sentinel.exceptionHandler(t -> {
           if (conn != null) {
@@ -210,15 +205,11 @@ public class RedisSentinelClient extends BaseRedisClient implements Redis {
       .onFailure(err -> handler.handle(Future.failedFuture(err)))
       .onSuccess(conn -> {
         // Send a command just to check we have a working node
-        conn.send(cmd(PING), ping -> {
-          if (ping.failed()) {
-            handler.handle(Future.failedFuture(ping.cause()));
-          } else {
-            handler.handle(Future.succeededFuture(uri));
-          }
-          // connection is not needed anymore
-          conn.close().onFailure(LOG::warn);
-        });
+        conn
+          .send(cmd(PING))
+          .onFailure(err -> handler.handle(Future.failedFuture(err)))
+          .onSuccess(ok -> handler.handle(Future.succeededFuture(uri)))
+          .eventually(v -> conn.close().onFailure(LOG::warn));
       });
   }
 
@@ -231,15 +222,10 @@ public class RedisSentinelClient extends BaseRedisClient implements Redis {
       .onSuccess(conn -> {
         final String masterName = options.getMasterName();
         // Send a command just to check we have a working node
-        conn.send(cmd(SENTINEL).arg("GET-MASTER-ADDR-BY-NAME").arg(masterName), getMasterAddrByName -> {
-          // we don't need this connection anymore
-          conn.close().onFailure(LOG::warn);
-
-          if (getMasterAddrByName.failed()) {
-            handler.handle(Future.failedFuture(getMasterAddrByName.cause()));
-          } else {
-            // Test the response
-            final Response response = getMasterAddrByName.result();
+        conn
+          .send(cmd(SENTINEL).arg("GET-MASTER-ADDR-BY-NAME").arg(masterName))
+          .onFailure(err -> handler.handle(Future.failedFuture(err)))
+          .onSuccess(response -> {
             if (response == null) {
               handler.handle(Future.failedFuture("Failed to GET-MASTER-ADDR-BY-NAME " + masterName));
             } else {
@@ -247,8 +233,8 @@ public class RedisSentinelClient extends BaseRedisClient implements Redis {
               final Integer rPort = response.get(1).toInteger();
               handler.handle(Future.succeededFuture(new RedisURI(uri, rHost.contains(":") ? "[" + rHost + "]" : rHost, rPort)));
             }
-          }
-        });
+          })
+          .eventually(v -> conn.close().onFailure(LOG::warn));
       });
   }
 
@@ -261,15 +247,10 @@ public class RedisSentinelClient extends BaseRedisClient implements Redis {
       .onSuccess(conn -> {
         final String masterName = options.getMasterName();
         // Send a command just to check we have a working node
-        conn.send(cmd(SENTINEL).arg("SLAVES").arg(masterName), sentinelReplicas -> {
-          // connection is not needed anymore
-          conn.close().onFailure(LOG::warn);
-
-          if (sentinelReplicas.failed()) {
-            handler.handle(Future.failedFuture(sentinelReplicas.cause()));
-          } else {
-            final Response response = sentinelReplicas.result();
-
+        conn
+          .send(cmd(SENTINEL).arg("SLAVES").arg(masterName))
+          .onFailure(err -> handler.handle(Future.failedFuture(err)))
+          .onSuccess(response -> {
             // Test the response
             if (response == null || response.size() == 0) {
               handler.handle(Future.failedFuture("No replicas linked to the master: " + masterName));
@@ -298,8 +279,8 @@ public class RedisSentinelClient extends BaseRedisClient implements Redis {
                 }
               }
             }
-          }
-        });
+          })
+          .eventually(v -> conn.close().onFailure(LOG::warn));
       });
   }
 
