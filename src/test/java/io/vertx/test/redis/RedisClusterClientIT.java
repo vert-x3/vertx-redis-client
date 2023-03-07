@@ -28,12 +28,12 @@ public class RedisClusterClientIT {
   @Parameterized.Parameters
   public static Iterable<String[]> data() {
     return Arrays.asList(
-      new String[] {"redis:5-alpine", "abcd"},
-      new String[] {"redis:5-alpine", null},
-      new String[] {"redis:6-alpine", "abcd"},
-      new String[] {"redis:6-alpine", null},
-      new String[] {"redis:7-alpine", "abcd"},
-      new String[] {"redis:7-alpine", null});
+      new String[]{"redis:5-alpine", "abcd"},
+      new String[]{"redis:5-alpine", null},
+      new String[]{"redis:6-alpine", "abcd"},
+      new String[]{"redis:6-alpine", null},
+      new String[]{"redis:7-alpine", "abcd"},
+      new String[]{"redis:7-alpine", null});
   }
 
   public final Network network = Network.newNetwork();
@@ -130,8 +130,8 @@ public class RedisClusterClientIT {
           .setType(RedisClientType.CLUSTER)
           .addConnectionString(
             password != null ?
-              "redis://:" + password + "@" + redis7000.getContainerIpAddress() + ":" + redis7000.getFirstMappedPort() :
-              "redis://" + redis7000.getContainerIpAddress() + ":" + redis7000.getFirstMappedPort())
+              "redis://:" + password + "@" + redis7000.getHost() + ":" + redis7000.getFirstMappedPort() :
+              "redis://" + redis7000.getHost() + ":" + redis7000.getFirstMappedPort())
       );
       before.complete();
     }).onFailure(should::fail);
@@ -142,10 +142,12 @@ public class RedisClusterClientIT {
     final Async after = should.async();
     try {
       client.close();
-    } catch (RuntimeException e) {}
+    } catch (RuntimeException e) {
+    }
     try {
       redisCli.close();
-    } catch (RuntimeException e) {}
+    } catch (RuntimeException e) {
+    }
     after.complete();
   }
 
@@ -153,7 +155,7 @@ public class RedisClusterClientIT {
   public void testConnect(TestContext should) {
     final Async test = should.async();
 
-    client.connect(onConnect -> {
+    client.connect().onComplete(onConnect -> {
       if (onConnect.failed()) {
         should.fail(onConnect.cause());
       }

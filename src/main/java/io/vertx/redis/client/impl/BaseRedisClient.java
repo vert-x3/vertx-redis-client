@@ -68,7 +68,7 @@ public abstract class BaseRedisClient implements Redis {
           conn.batch(requests)
             // regardless of the result, return the connection to the pool
             .eventually(e ->
-                conn.close().onFailure(LOG::warn)));
+              conn.close().onFailure(LOG::warn)));
     }
   }
 }

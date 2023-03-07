@@ -3,7 +3,9 @@ package io.vertx.redis.client;
 import io.vertx.core.AbstractVerticle;
 import io.vertx.core.Vertx;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.List;
 
 import static io.vertx.redis.client.Command.COMMAND;
 import static io.vertx.redis.client.Request.cmd;
@@ -140,6 +142,6 @@ public class CommandGenerator extends AbstractVerticle {
 
   private String generateCommand(String name, int arity, Boolean ro, boolean pubSub, boolean getKeys, String keyLocator) {
     return
-      "Command " + name.replace('.', '_').replace('-', '_').toUpperCase() + " = new CommandImpl(\"" + name + "\", " + arity + ", " + ro + ", " + pubSub + ", " + getKeys  + (keyLocator == null ? "" : ", " + keyLocator) + ");";
+      "Command " + name.replace('.', '_').replace('-', '_').toUpperCase() + " = new CommandImpl(\"" + name + "\", " + arity + ", " + ro + ", " + pubSub + ", " + getKeys + (keyLocator == null ? "" : ", " + keyLocator) + ");";
   }
 }

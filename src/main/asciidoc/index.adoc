@@ -3,9 +3,10 @@
 
 Vert.x-redis is redis client to be used with Vert.x.
 
-This module allows data to be saved, retrieved, searched for, and deleted in a Redis. Redis is an open source, advanced
-key-value store. It is often referred to as a data structure server since keys can contain  strings, hashes, lists, sets
-and sorted sets. To use this module you must have a Redis server instance running on your network.
+This module allows data to be saved, retrieved, searched for, and deleted in a Redis.
+Redis is an open source, advanced key-value store.
+It is often referred to as a data structure server since keys can contain strings, hashes, lists, sets and sorted sets.
+To use this module you must have a Redis server instance running on your network.
 
 Redis has a rich API and it can be organized in the following groups:
 
@@ -55,9 +56,9 @@ The Redis client can operate in 4 distinct modes:
 * Cluster (when working with Redis in Clustered mode).
 * Replication (single shard, one node write, multiple read).
 
-The connection mode is selected by the factory method on the Redis interface. Regardless of the mode the client can be
-configured using a {@link io.vertx.redis.client.RedisOptions} data object. By default, some configuration values are
-initialized with the following values:
+The connection mode is selected by the factory method on the Redis interface.
+Regardless of the mode the client can be configured using a {@link io.vertx.redis.client.RedisOptions} data object.
+By default, some configuration values are initialized with the following values:
 
 * `netClientOptions`: default is `TcpKeepAlive: true`, `TcpNoDelay: true`
 * `endpoint`: default is `redis://localhost:6379`
@@ -72,8 +73,7 @@ In order to obtain a connection use the following code:
 {@link examples.RedisExamples#example1}
 ----
 
-In the configuration contains a `password` and/or a `select` database, these 2 commands will be executed automatically
-once a successful connection is established to the server.
+In the configuration contains a `password` and/or a `select` database, these 2 commands will be executed automatically once a successful connection is established to the server.
 
 [source,$lang]
 ----
@@ -96,21 +96,18 @@ unix://[:password@]/domain/docker.sock[?select=db-number]
 
 When specifying a password or a database those commands are always executed on connection start.
 
-
 == Running commands
 
 Given that the redis client is connected to the server, all commands are now possible to execute using this module.
-The module offers a clean API for executing commands without the need to hand write the command itself, for example
-if one wants to get a value of a key it can be done as:
+The module offers a clean API for executing commands without the need to hand write the command itself, for example if one wants to get a value of a key it can be done as:
 
 [source,$lang]
 ----
 {@link examples.RedisExamples#example3}
 ----
 
-The response object is a generic type that allow converting from the basic redis types to your language types. For
-example, if your response is of type `INTEGER` then you can get the value as any numeric primitive type `int`, `long`,
-etc...
+The response object is a generic type that allow converting from the basic redis types to your language types.
+For example, if your response is of type `INTEGER` then you can get the value as any numeric primitive type `int`, `long`, etc...
 
 Or you can perform more complex tasks such as handling responses as iterators:
 
@@ -128,9 +125,8 @@ To work with high availability mode the connection creation is quite similar:
 {@link examples.RedisExamples#example5}
 ----
 
-What is important to notice is that in this mode, an extra connection is established to the server(s) and behind the
-scenes the client will listen for events from the sentinel. When the sentinel notifies that we switched masters, then
-an exception is send to the client and you can decide what to do next.
+What is important to notice is that in this mode, an extra connection is established to the server(s) and behind the scenes the client will listen for events from the sentinel.
+When the sentinel notifies that we switched masters, then an exception is send to the client and you can decide what to do next.
 
 == Cluster mode
 
@@ -141,20 +137,24 @@ To work with cluster the connection creation is quite similar:
 {@link examples.RedisExamples#example6}
 ----
 
-In this case the configuration requires one of more members of the cluster to be known. This list will be used to ask
-the cluster for the current configuration, which means if any of the listed members is not available it will be skipped.
+In this case the configuration requires one of more members of the cluster to be known.
+This list will be used to ask the cluster for the current configuration, which means if any of the listed members is not available it will be skipped.
 
-In cluster mode a connection is established to each node and special care is needed when executing commands. It is
-recommended to read redis manual in order to understand how clustering works. The client operating in this mode will do
-a best effort to identify which slot is used by the executed command in order to execute it on the right node. There
-could be cases where this isn't possible to identify and in that case as a best effort the command will be run on a
-random node.
+In cluster mode a connection is established to each node and special care is needed when executing commands.
+It is recommended to read redis manual in order to understand how clustering works.
+The client operating in this mode will do a best effort to identify which slot is used by the executed command in order to execute it on the right node.
+There could be cases where this isn't possible to identify and in that case as a best effort the command will be run on a random node.
 
 == Replication Mode
 
-Working with replication is transparent to the client. Acquiring a connection is an expensive operation. The client will loop the provided endpoints until the master node is found. Once the master node is identified (this is the node where all write commands will be executed) a best effort is done to connect to all replica nodes (the read nodes).
+Working with replication is transparent to the client.
+Acquiring a connection is an expensive operation.
+The client will loop the provided endpoints until the master node is found.
+Once the master node is identified (this is the node where all write commands will be executed) a best effort is done to connect to all replica nodes (the read nodes).
 
-With all node knowledge the client will now filter operations that perform read or writes to the right node type. Note that the `useReplica` configuration affects this choice. Just like with clustering, when the configuration states that the use of replica nodes is `ALWAYS` then any  read operation will be performed on a replica node, `SHARED` will randomly share the read between master and replicas and finally `NEVER` means that replicas are never to be used.
+With all node knowledge the client will now filter operations that perform read or writes to the right node type.
+Note that the `useReplica` configuration affects this choice.
+Just like with clustering, when the configuration states that the use of replica nodes is `ALWAYS` then any read operation will be performed on a replica node, `SHARED` will randomly share the read between master and replicas and finally `NEVER` means that replicas are never to be used.
 
 The recommended usage of this mode, given the connection acquisition cost, is to re-use the connection as long as the application may need it.
 
@@ -163,11 +163,9 @@ The recommended usage of this mode, given the connection acquisition cost, is to
 {@link examples.RedisExamples#example13}
 ----
 
-
 == Pub/Sub mode
 
-Redis supports queues and pub/sub mode, when operated in this mode once a connection invokes a subscriber mode then
-it cannot be used for running other commands than the command to leave that mode.
+Redis supports queues and pub/sub mode, when operated in this mode once a connection invokes a subscriber mode then it cannot be used for running other commands than the command to leave that mode.
 
 To start a subscriber one would do:
 
@@ -184,26 +182,27 @@ And from another place in the code publish messages to the queue:
 ----
 
 NOTE: It is important to remember that the commands `SUBSCRIBE`, `UNSUBSCRIBE`, `PSUBSCRIBE` and `PUNSUBSCRIBE` are `void`.
-This means that the result in case of success is `null` not a instance of response. All messages are then routed through
-the handler on the client.
+This means that the result in case of success is `null` not a instance of response.
+All messages are then routed through the handler on the client.
 
 == Domain Sockets
 
-Most of the examples shown connecting to a TCP sockets, however it is also possible to use Redis connecting to a UNIX
-domain docket:
+Most of the examples shown connecting to a TCP sockets, however it is also possible to use Redis connecting to a UNIX domain docket:
 
 [source,$lang]
 ----
 {@link examples.RedisExamples#example9}
 ----
 
-Be aware that HA and cluster modes report server addresses always on TCP addresses not domain sockets. So the
-combination is not possible. Not because of this client but how Redis works.
+Be aware that HA and cluster modes report server addresses always on TCP addresses not domain sockets.
+So the combination is not possible.
+Not because of this client but how Redis works.
 
 == Connection Pooling
 
-All client variations are backed by a connection pool. By default the configuration sets the pool size to 1, which means
-that it operates just like a single connection. There are 4 tunnables for the pool:
+All client variations are backed by a connection pool.
+By default the configuration sets the pool size to 1, which means that it operates just like a single connection.
+There are 4 tunnables for the pool:
 
 * `maxPoolSize` the max number of connections on the pool (default `6`)
 * `maxPoolWaiting` the max waiting handlers to get a connection on a queue (default `24`)
@@ -217,26 +216,24 @@ Pooling is quite useful to avoid custom connection management, for example you c
 {@link examples.RedisExamples#example11}
 ----
 
-It is important to observe that no connection was acquired or returned, it's all handled by the pool. However there might
-be some scalability issues when more than 1 concurrent request attempts to get a connection from the pool, in order to
-overcome this we need to tune the pool. A common configuration is to set the maximum size of the pool to the number of
-available CPU cores and allow requests to get a connection from the pool to queue:
+It is important to observe that no connection was acquired or returned, it's all handled by the pool.
+However there might be some scalability issues when more than 1 concurrent request attempts to get a connection from the pool, in order to overcome this we need to tune the pool.
+A common configuration is to set the maximum size of the pool to the number of available CPU cores and allow requests to get a connection from the pool to queue:
 
 [source,$lang]
 ----
 {@link examples.RedisExamples#example12}
 ----
 
-NOTE: Pooling is not compatible with `SUBSCRIBE`, `UNSUBSCRIBE`, `PSUBSCRIBE` or `PUNSUBSCRIBE` because these commands
-will modify the way the connection operates and the connection cannot be reused.
+NOTE: Pooling is not compatible with `SUBSCRIBE`, `UNSUBSCRIBE`, `PSUBSCRIBE` or `PUNSUBSCRIBE` because these commands will modify the way the connection operates and the connection cannot be reused.
 
 == Implementing Reconnect on Error
 
-While the connection pool is quite useful, for performance, a connection should not be auto managed but controlled by
-you. In this case you will need to handle connection recovery, error handling and reconnect.
+While the connection pool is quite useful, for performance, a connection should not be auto managed but controlled by you.
+In this case you will need to handle connection recovery, error handling and reconnect.
 
-A typical scenario is that a user will want to reconnect to the server whenever an error occurs. The automatic reconnect
-is not part of the redis client as it will force a behaviour that might not match the user expectations, for example:
+A typical scenario is that a user will want to reconnect to the server whenever an error occurs.
+The automatic reconnect is not part of the redis client as it will force a behaviour that might not match the user expectations, for example:
 
 1. What should happen to current in-flight requests?
 2. Should the exception handler be invoked or not?
@@ -244,30 +241,26 @@ is not part of the redis client as it will force a behaviour that might not matc
 4. Should the previous state (db, authentication, subscriptions) be restored?
 5. Etc...
 
-In order to give the user full flexibility, this decision should not be performed by the client. However a simple
-reconnect with backoff timeout could be implemented as follows:
+In order to give the user full flexibility, this decision should not be performed by the client.
+However a simple reconnect with backoff timeout could be implemented as follows:
 
 [source,$lang]
 ----
 {@link examples.RedisExamples#example10}
 ----
 
-In this example the client object will be replaced on reconnect and the application will retry up to 16 times with a
-backoff up to 1280ms. By discarding the client we ensure that all old inflight responses are lost and all new ones
-will be on the new connection.
+In this example the client object will be replaced on reconnect and the application will retry up to 16 times with a backoff up to 1280ms.
+By discarding the client we ensure that all old inflight responses are lost and all new ones will be on the new connection.
 
-It is important to note that, the reconnect will create a new connection object, so these object references should not
-be cached and evaluated every time.
+It is important to note that, the reconnect will create a new connection object, so these object references should not be cached and evaluated every time.
 
 == Protocol Parser
 
-This client supports both `RESP2` and `RESP3` protocols, at the connection handshake time the client will automatically
-detect which version is supported by the server and use it.
+This client supports both `RESP2` and `RESP3` protocols, at the connection handshake time the client will automatically detect which version is supported by the server and use it.
 
-The parser internally creates an "infinite" readable buffer from all the chunks received from the server, in order to
-avoid creating too much garbage in terms of memory collection, a tunnable watermark value is configurable at JVM startup
-time. The system property `io.vertx.redis.parser.watermark` defines how much data is keept in this readable buffer
-before it gets discarded. By default this value is 512Kb. This means that each connection to the server will use at
-least this amount of memory. As the client works in pipeline mode, keeping the number of connections low provides best
-results, which means `512Kb * nconn` memory will be used. If the application will require a large number of connections,
-then reducing the watermark value to a smaller value or even disable it entirely is advisable.
+The parser internally creates an "infinite" readable buffer from all the chunks received from the server, in order to avoid creating too much garbage in terms of memory collection, a tunnable watermark value is configurable at JVM startup time.
+The system property `io.vertx.redis.parser.watermark` defines how much data is keept in this readable buffer before it gets discarded.
+By default this value is 512Kb.
+This means that each connection to the server will use at least this amount of memory.
+As the client works in pipeline mode, keeping the number of connections low provides best results, which means `512Kb * nconn` memory will be used.
+If the application will require a large number of connections, then reducing the watermark value to a smaller value or even disable it entirely is advisable.

@@ -20,8 +20,11 @@ import io.vertx.ext.unit.Async;
 import io.vertx.ext.unit.TestContext;
 import io.vertx.ext.unit.junit.RunTestOnContext;
 import io.vertx.ext.unit.junit.VertxUnitRunner;
-import io.vertx.redis.client.*;
-import org.junit.*;
+import io.vertx.redis.client.Command;
+import io.vertx.redis.client.Redis;
+import org.junit.ClassRule;
+import org.junit.Rule;
+import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.testcontainers.containers.GenericContainer;
 
@@ -46,7 +49,7 @@ public class RedisClientREJSONTest {
 
     final Redis client = Redis.createClient(
       rule.vertx(),
-      "redis://" + container.getContainerIpAddress() + ":" + container.getFirstMappedPort());
+      "redis://" + container.getHost() + ":" + container.getFirstMappedPort());
 
     client
       .send(cmd(Command.create("JSON.SET")).arg("foo").arg(".").arg("\"bar\""))

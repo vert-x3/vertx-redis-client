@@ -31,8 +31,8 @@ public class RedisReconnectTest {
     final Async before = should.async();
 
     Context context = rule.vertx().getOrCreateContext();
-    client = Redis.createClient(rule.vertx(), new RedisOptions().setConnectionString("redis://" + container.getContainerIpAddress() + ":" + container.getFirstMappedPort()));
-    client.connect(onConnect -> {
+    client = Redis.createClient(rule.vertx(), new RedisOptions().setConnectionString("redis://" + container.getHost() + ":" + container.getFirstMappedPort()));
+    client.connect().onComplete(onConnect -> {
       should.assertTrue(onConnect.succeeded());
       should.assertEquals(context, rule.vertx().getOrCreateContext());
       redis = onConnect.result();
@@ -72,7 +72,7 @@ public class RedisReconnectTest {
             should.assertEquals(1, kill.toInteger());
             // wait until the connection is updated
             rule.vertx()
-              .setPeriodic(500, t ->{
+              .setPeriodic(500, t -> {
                 if (orig != redis) {
                   // when the 2 references change
                   // it means the connection has been replaced
@@ -91,7 +91,7 @@ public class RedisReconnectTest {
 
       rule
         .vertx()
-        .setTimer(backoff, timer -> client.connect(onReconnect -> {
+        .setTimer(backoff, timer -> client.connect().onComplete(onReconnect -> {
           if (onReconnect.failed()) {
             reconnect(retry + 1);
           } else {

@@ -1,8 +1,6 @@
 package io.vertx.test.redis;
 
 import io.vertx.core.VertxOptions;
-import io.vertx.core.eventbus.MessageConsumer;
-import io.vertx.core.json.JsonObject;
 import io.vertx.ext.unit.Async;
 import io.vertx.ext.unit.TestContext;
 import io.vertx.ext.unit.junit.RunTestOnContext;
@@ -32,14 +30,16 @@ public class RedisPubSubTest {
     RedisOptions options = new RedisOptions()
       .setConnectionString("redis://localhost:7001")
       .setType(RedisClientType.CLUSTER);
-    redisPublish = Redis.createClient(rule.vertx(), options)
-      .connect(connectPub -> {
+    redisPublish = Redis.createClient(rule.vertx(), options);
+    redisPublish
+      .connect().onComplete(connectPub -> {
         should.assertTrue(connectPub.succeeded());
 
         pubConn = connectPub.result();
 
-        redisSubscribe = Redis.createClient(rule.vertx(), options)
-          .connect(connectSub -> {
+        redisSubscribe = Redis.createClient(rule.vertx(), options);
+        redisSubscribe
+          .connect().onComplete(connectSub -> {
             should.assertTrue(connectSub.succeeded());
 
             subConn = connectSub.result();
@@ -55,9 +55,9 @@ public class RedisPubSubTest {
   }
 
   @Test
-  public void testSubscribeMultipleTimes(TestContext should){
+  public void testSubscribeMultipleTimes(TestContext should) {
     int N = 10;
-    String CHAN="chan1";
+    String CHAN = "chan1";
     final Async test = should.async(N);
     for (int i = 0; i < N; i++)
       rule.vertx().eventBus().consumer(CHAN, msg -> {
@@ -69,12 +69,12 @@ public class RedisPubSubTest {
     });
     subUnsub(CHAN, N, should.async(N));
     rule.vertx().setTimer(1000, id ->
-      pubConn.send(Request.cmd(Command.PUBLISH).arg(CHAN).arg("hello"), preply -> should.assertTrue(preply.succeeded())));
+      pubConn.send(Request.cmd(Command.PUBLISH).arg(CHAN).arg("hello")).onComplete(preply -> should.assertTrue(preply.succeeded())));
   }
 
-  private void subUnsub(String channel, int attempts, Async testSub){
-    subConn.send(Request.cmd(Command.UNSUBSCRIBE).arg(channel), unreply -> {
-      subConn.send(Request.cmd(Command.SUBSCRIBE).arg(channel), reply -> {
+  private void subUnsub(String channel, int attempts, Async testSub) {
+    subConn.send(Request.cmd(Command.UNSUBSCRIBE).arg(channel)).onComplete(unreply -> {
+      subConn.send(Request.cmd(Command.SUBSCRIBE).arg(channel)).onComplete(reply -> {
         testSub.countDown();
         if (attempts > 1) {
           subUnsub(channel, attempts - 1, testSub);

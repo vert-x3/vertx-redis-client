@@ -20,22 +20,22 @@ public class RedisSentinelTest {
     final Async test = should.async();
 
     Redis.createClient(
-      rule.vertx(),
-      new RedisOptions()
-        .setType(RedisClientType.SENTINEL)
-        .addConnectionString("redis://localhost:5000")
-        .addConnectionString("redis://localhost:5001")
-        .addConnectionString("redis://localhost:5002")
-        .setMasterName("sentinel7000")
-        .setRole(RedisRole.MASTER)
-        .setMaxPoolSize(4)
-        .setMaxPoolWaiting(16))
-      .connect(onCreate -> {
+        rule.vertx(),
+        new RedisOptions()
+          .setType(RedisClientType.SENTINEL)
+          .addConnectionString("redis://localhost:5000")
+          .addConnectionString("redis://localhost:5001")
+          .addConnectionString("redis://localhost:5002")
+          .setMasterName("sentinel7000")
+          .setRole(RedisRole.MASTER)
+          .setMaxPoolSize(4)
+          .setMaxPoolWaiting(16))
+      .connect().onComplete(onCreate -> {
         // get a connection to the master node
         should.assertTrue(onCreate.succeeded());
         // query the info
         onCreate.result()
-          .send(Request.cmd(Command.INFO), info -> {
+          .send(Request.cmd(Command.INFO)).onComplete(info -> {
             should.assertTrue(info.succeeded());
             should.assertTrue(info.result().toString().contains("tcp_port:7000"));
             test.complete();
@@ -48,22 +48,22 @@ public class RedisSentinelTest {
     final Async test = should.async();
 
     Redis.createClient(
-      rule.vertx(),
-      new RedisOptions()
-        .setType(RedisClientType.SENTINEL)
-        .addConnectionString("redis://localhost:5000/0")
-        .addConnectionString("redis://localhost:5001/0")
-        .addConnectionString("redis://localhost:5002/0")
-        .setMasterName("sentinel7000")
-        .setRole(RedisRole.MASTER)
-        .setMaxPoolSize(4)
-        .setMaxPoolWaiting(16))
-      .connect(onCreate -> {
+        rule.vertx(),
+        new RedisOptions()
+          .setType(RedisClientType.SENTINEL)
+          .addConnectionString("redis://localhost:5000/0")
+          .addConnectionString("redis://localhost:5001/0")
+          .addConnectionString("redis://localhost:5002/0")
+          .setMasterName("sentinel7000")
+          .setRole(RedisRole.MASTER)
+          .setMaxPoolSize(4)
+          .setMaxPoolWaiting(16))
+      .connect().onComplete(onCreate -> {
         // get a connection to the master node
         should.assertTrue(onCreate.succeeded());
         // query the info
         onCreate.result()
-          .send(Request.cmd(Command.INFO), info -> {
+          .send(Request.cmd(Command.INFO)).onComplete(info -> {
             should.assertTrue(info.succeeded());
             should.assertTrue(info.result().toString().contains("tcp_port:7000"));
             test.complete();
@@ -76,17 +76,17 @@ public class RedisSentinelTest {
     final Async test = should.async();
 
     Redis.createClient(
-      rule.vertx(),
-      new RedisOptions()
-        .setType(RedisClientType.SENTINEL)
-        .addConnectionString("redis://localhost:5000")
-        .addConnectionString("redis://localhost:5001")
-        .addConnectionString("redis://localhost:5002")
-        .setMasterName("sentinel7000")
-        .setRole(RedisRole.REPLICA)
-        .setMaxPoolSize(4)
-        .setMaxPoolWaiting(16))
-      .connect(onCreate -> {
+        rule.vertx(),
+        new RedisOptions()
+          .setType(RedisClientType.SENTINEL)
+          .addConnectionString("redis://localhost:5000")
+          .addConnectionString("redis://localhost:5001")
+          .addConnectionString("redis://localhost:5002")
+          .setMasterName("sentinel7000")
+          .setRole(RedisRole.REPLICA)
+          .setMaxPoolSize(4)
+          .setMaxPoolWaiting(16))
+      .connect().onComplete(onCreate -> {
         // get a connection to the replica node
         if (onCreate.failed()) {
           onCreate.cause().printStackTrace();
@@ -94,7 +94,7 @@ public class RedisSentinelTest {
         should.assertTrue(onCreate.succeeded());
         // query the info
         onCreate.result()
-          .send(Request.cmd(Command.INFO), info -> {
+          .send(Request.cmd(Command.INFO)).onComplete(info -> {
             should.assertTrue(info.succeeded());
             should.assertTrue(info.result().toString().contains("tcp_port:700"));
             test.complete();
@@ -107,22 +107,22 @@ public class RedisSentinelTest {
     final Async test = should.async();
 
     Redis.createClient(
-      rule.vertx(),
-      new RedisOptions()
-        .setType(RedisClientType.SENTINEL)
-        .addConnectionString("redis://localhost:5000")
-        .addConnectionString("redis://localhost:5001")
-        .addConnectionString("redis://localhost:5002")
-        .setMasterName("sentinel7000")
-        .setRole(RedisRole.SENTINEL)
-        .setMaxPoolSize(4)
-        .setMaxPoolWaiting(16))
-      .connect(onCreate -> {
+        rule.vertx(),
+        new RedisOptions()
+          .setType(RedisClientType.SENTINEL)
+          .addConnectionString("redis://localhost:5000")
+          .addConnectionString("redis://localhost:5001")
+          .addConnectionString("redis://localhost:5002")
+          .setMasterName("sentinel7000")
+          .setRole(RedisRole.SENTINEL)
+          .setMaxPoolSize(4)
+          .setMaxPoolWaiting(16))
+      .connect().onComplete(onCreate -> {
         // get a connection to the master node
         should.assertTrue(onCreate.succeeded());
         // query the info
         onCreate.result()
-          .send(Request.cmd(Command.INFO), info -> {
+          .send(Request.cmd(Command.INFO)).onComplete(info -> {
             should.assertTrue(info.succeeded());
             String res = info.result().toString();
             System.out.println(res);

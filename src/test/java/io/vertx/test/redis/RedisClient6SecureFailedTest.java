@@ -35,17 +35,17 @@ public class RedisClient6SecureFailedTest {
 
     Redis setupClient = Redis.createClient(
       rule.vertx(),
-      new RedisOptions().setConnectionString("redis://" + redis.getContainerIpAddress() + ":" + redis.getFirstMappedPort()));
+      new RedisOptions().setConnectionString("redis://" + redis.getHost() + ":" + redis.getFirstMappedPort()));
 
     setupClient
-      .send(cmd(CONFIG).arg("SET").arg("requirepass").arg("foobar"), onConfigSet -> {
+      .send(cmd(CONFIG).arg("SET").arg("requirepass").arg("foobar")).onComplete(onConfigSet -> {
         should.assertTrue(onConfigSet.succeeded());
         // disconnect this client and create a new one
         setupClient.close();
 
         client = Redis.createClient(
           rule.vertx(),
-          new RedisOptions().setConnectionString("redis://:foobared@" + redis.getContainerIpAddress() + ":" + redis.getFirstMappedPort()));
+          new RedisOptions().setConnectionString("redis://:foobared@" + redis.getHost() + ":" + redis.getFirstMappedPort()));
 
         before.complete();
       });
@@ -65,7 +65,7 @@ public class RedisClient6SecureFailedTest {
     final Async test = should.async();
     final String nonexisting = makeKey();
 
-    client.send(cmd(GET).arg(nonexisting), reply0 -> {
+    client.send(cmd(GET).arg(nonexisting)).onComplete(reply0 -> {
       should.assertTrue(reply0.failed());
       should.assertTrue(((ErrorType) reply0.cause()).is("WRONGPASS"));
       test.complete();

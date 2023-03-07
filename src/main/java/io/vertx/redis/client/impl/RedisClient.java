@@ -15,8 +15,11 @@
  */
 package io.vertx.redis.client.impl;
 
-import io.vertx.core.*;
-import io.vertx.redis.client.*;
+import io.vertx.core.Future;
+import io.vertx.core.Vertx;
+import io.vertx.redis.client.Redis;
+import io.vertx.redis.client.RedisConnection;
+import io.vertx.redis.client.RedisOptions;
 
 public class RedisClient extends BaseRedisClient implements Redis {
 

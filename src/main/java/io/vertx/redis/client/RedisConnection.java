@@ -18,7 +18,9 @@ package io.vertx.redis.client;
 import io.vertx.codegen.annotations.Fluent;
 import io.vertx.codegen.annotations.Nullable;
 import io.vertx.codegen.annotations.VertxGen;
-import io.vertx.core.*;
+import io.vertx.core.AsyncResult;
+import io.vertx.core.Future;
+import io.vertx.core.Handler;
 import io.vertx.core.streams.ReadStream;
 
 import java.util.List;
@@ -74,8 +76,9 @@ public interface RedisConnection extends ReadStream<Response> {
 
   /**
    * Send the given command to the redis server or cluster.
+   *
    * @param command the command to send
-   * @param onSend the asynchronous result handler.
+   * @param onSend  the asynchronous result handler.
    * @return fluent self.
    */
   @Fluent
@@ -87,6 +90,7 @@ public interface RedisConnection extends ReadStream<Response> {
 
   /**
    * Send the given command to the redis server or cluster.
+   *
    * @param command the command to send
    * @return a future with the result of the operation
    */
@@ -97,7 +101,7 @@ public interface RedisConnection extends ReadStream<Response> {
    * client users.
    *
    * @param commands list of command to send
-   * @param onSend the asynchronous result handler.
+   * @param onSend   the asynchronous result handler.
    * @return fluent self.
    */
   @Fluent
@@ -133,7 +137,7 @@ public interface RedisConnection extends ReadStream<Response> {
 
   /**
    * Flag to notify if the pending message queue (commands in transit) is full.
-   *
+   * <p>
    * When the pending message queue is full and a new send command is issued it will result in a exception to be thrown.
    * Checking this flag before sending can allow the application to wait before sending the next message.
    *

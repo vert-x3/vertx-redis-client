@@ -6,6 +6,7 @@ public interface Multi extends Response {
 
   /**
    * Adds a reply to the current response as it gets parsed from the wire.
+   *
    * @param reply the reply to add
    */
   void add(Response reply);

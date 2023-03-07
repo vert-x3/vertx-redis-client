@@ -239,7 +239,6 @@ public class RedisOptions {
    *
    * @param connectionString a string URI following the scheme: redis://[username:password@][host][:port][/database]
    * @return fluent self.
-   *
    * @see <a href="https://www.iana.org/assignments/uri-schemes/prov/redis">Redis scheme on iana.org</a>
    */
   public RedisOptions addConnectionString(String connectionString) {
@@ -383,7 +382,7 @@ public class RedisOptions {
 
   /**
    * Tune how often in milliseconds should the connection pool cleaner execute.
-   *
+   * <p>
    * For each connection in the pool, connections marked as invalid will be forcibly closed. A connection is marked
    * invalid if it enters a exception or fatal state.
    *
@@ -515,6 +514,7 @@ public class RedisOptions {
 
   /**
    * Set a user defined pool name (for metrics reporting).
+   *
    * @param poolName the user desired pool name.
    * @return fluent self
    */
@@ -525,6 +525,7 @@ public class RedisOptions {
 
   /**
    * Get the pool name to be used in this client. The default name is a random UUID.
+   *
    * @return pool name.
    */
   public String getPoolName() {

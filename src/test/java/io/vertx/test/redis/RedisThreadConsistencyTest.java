@@ -36,7 +36,7 @@ public class RedisThreadConsistencyTest {
         RedisAPI.api(
           Redis.createClient(
             rule.vertx(),
-            new RedisOptions().setConnectionString("redis://" + container.getContainerIpAddress() + ":" + container.getFirstMappedPort())))))
+            new RedisOptions().setConnectionString("redis://" + container.getHost() + ":" + container.getFirstMappedPort())))))
       .onFailure(should::fail)
       .onSuccess(id -> {
         rule.vertx()

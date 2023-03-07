@@ -40,9 +40,9 @@ public class RedisClient7Test {
 
     client = Redis.createClient(
       rule.vertx(),
-      new RedisOptions().setConnectionString("redis://" + redis.getContainerIpAddress() + ":" + redis.getFirstMappedPort() + "?client=tester"));
+      new RedisOptions().setConnectionString("redis://" + redis.getHost() + ":" + redis.getFirstMappedPort() + "?client=tester"));
 
-    client.connect(onConnect -> {
+    client.connect().onComplete(onConnect -> {
       should.assertTrue(onConnect.succeeded());
       onConnect.result().close();
       before.complete();
@@ -64,13 +64,13 @@ public class RedisClient7Test {
     final String nonexisting = makeKey();
     final String mykey = makeKey();
 
-    client.send(cmd(GET).arg(nonexisting), reply0 -> {
+    client.send(cmd(GET).arg(nonexisting)).onComplete(reply0 -> {
       should.assertTrue(reply0.succeeded());
       should.assertNull(reply0.result());
 
-      client.send(cmd(SET).arg(mykey).arg("Hello"), reply1 -> {
+      client.send(cmd(SET).arg(mykey).arg("Hello")).onComplete(reply1 -> {
         should.assertTrue(reply1.succeeded());
-        client.send(cmd(GET).arg(mykey), reply2 -> {
+        client.send(cmd(GET).arg(mykey)).onComplete(reply2 -> {
           should.assertTrue(reply2.succeeded());
           should.assertEquals("Hello", reply2.result().toString());
           test.complete();
@@ -175,7 +175,7 @@ public class RedisClient7Test {
         // create a new client, this time using alice ACL
         Redis alice = Redis.createClient(
           rule.vertx(),
-          new RedisOptions().setConnectionString("redis://alice:p1pp0@" + redis.getContainerIpAddress() + ":" + redis.getFirstMappedPort() + "?client=tester"));
+          new RedisOptions().setConnectionString("redis://alice:p1pp0@" + redis.getHost() + ":" + redis.getFirstMappedPort() + "?client=tester"));
 
         // connect should be fine
         alice.connect()
@@ -209,7 +209,7 @@ public class RedisClient7Test {
         @Override
         public void start(Promise<Void> onStart) {
           Redis redisClient = Redis.createClient(rule.vertx(), new RedisOptions()
-            .setConnectionString("redis://" + redis.getContainerIpAddress() + ":" + redis.getFirstMappedPort() + "/0")
+            .setConnectionString("redis://" + redis.getHost() + ":" + redis.getFirstMappedPort() + "/0")
             .setMaxPoolSize(10)
             .setMaxPoolWaiting(10000));
 

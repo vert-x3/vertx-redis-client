@@ -56,8 +56,8 @@ public class RedisClientTest {
     final Async before = should.async();
 
     Context context = rule.vertx().getOrCreateContext();
-    client = Redis.createClient(rule.vertx(), new RedisOptions().setConnectionString("redis://" + container.getContainerIpAddress() + ":" + container.getFirstMappedPort()));
-    client.connect(onConnect -> {
+    client = Redis.createClient(rule.vertx(), new RedisOptions().setConnectionString("redis://" + container.getHost() + ":" + container.getFirstMappedPort()));
+    client.connect().onComplete(onConnect -> {
       should.assertTrue(onConnect.succeeded());
       should.assertEquals(context, rule.vertx().getOrCreateContext());
       redis = RedisAPI.api(onConnect.result());
@@ -124,7 +124,7 @@ public class RedisClientTest {
     final Async before = should.async();
 
     Context context = rule.vertx().getOrCreateContext();
-    client.connect(onConnect -> {
+    client.connect().onComplete(onConnect -> {
       should.assertTrue(onConnect.succeeded());
       should.assertEquals(context, rule.vertx().getOrCreateContext());
 
@@ -282,7 +282,7 @@ public class RedisClientTest {
     redis.del(toList(list1, list2), reply0 -> {
       should.assertTrue(reply0.succeeded());
 
-      redis.rpush(toList(list1,"a", "b", "c"), reply1 -> {
+      redis.rpush(toList(list1, "a", "b", "c"), reply1 -> {
         should.assertTrue(reply1.succeeded());
         should.assertEquals(3, reply1.result().toInteger());
 
@@ -338,9 +338,9 @@ public class RedisClientTest {
       }
     });
 
-    Redis redis2 = Redis.createClient(rule.vertx(), new RedisOptions().setConnectionString("redis://" + container.getContainerIpAddress() + ":" + container.getFirstMappedPort()));
+    Redis redis2 = Redis.createClient(rule.vertx(), new RedisOptions().setConnectionString("redis://" + container.getHost() + ":" + container.getFirstMappedPort()));
 
-    redis2.send(Request.cmd(Command.LPUSH).arg("list1").arg("hello"), result -> {
+    redis2.send(Request.cmd(Command.LPUSH).arg("list1").arg("hello")).onComplete(result -> {
     });
   }
 

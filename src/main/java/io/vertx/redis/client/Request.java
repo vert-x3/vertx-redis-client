@@ -30,13 +30,13 @@ import java.util.Map;
 /**
  * Builder for REDIS requests that will be encoded according to the RESP protocol was introduced in Redis 1.2.
  * Which became the standard way for talking with the Redis server in Redis 2.0.
- *
+ * <p>
  * Redis <a href="https://redis.io/topics/protocol">protocol documentation</a> states:
  *
  * <blockquote>
- *     Clients send commands to a Redis server as a RESP Array of Bulk Strings.
+ * Clients send commands to a Redis server as a RESP Array of Bulk Strings.
  * </blockquote>
- *
+ * <p>
  * So all non String/Bulk types will be encoded to Bulk for convenience.
  *
  * @author Paulo Lopes
@@ -60,7 +60,7 @@ public interface Request {
    * the right size.
    *
    * @param command the command to use
-   * @param args the fixed list of arguments
+   * @param args    the fixed list of arguments
    * @return a new request instance
    */
   @GenIgnore(GenIgnore.PERMITTED_TYPE)
@@ -70,6 +70,7 @@ public interface Request {
 
   /**
    * Adds a byte array
+   *
    * @return self
    */
   @Fluent
@@ -78,6 +79,7 @@ public interface Request {
 
   /**
    * Adds a String argument using UTF8 character encoding
+   *
    * @return self
    */
   @Fluent
@@ -90,6 +92,7 @@ public interface Request {
 
   /**
    * Adds a String using a specific character encoding argument
+   *
    * @return self
    */
   @Fluent
@@ -102,6 +105,7 @@ public interface Request {
 
   /**
    * Adds a String key argument
+   *
    * @return self
    */
   @Fluent
@@ -109,6 +113,7 @@ public interface Request {
 
   /**
    * Adds a long encoded to string
+   *
    * @return self
    */
   @Fluent
@@ -116,6 +121,7 @@ public interface Request {
 
   /**
    * Adds a int encoded to string
+   *
    * @return self
    */
   @Fluent
@@ -127,6 +133,7 @@ public interface Request {
 
   /**
    * Adds a short encoded to string
+   *
    * @return self
    */
   @Fluent
@@ -138,6 +145,7 @@ public interface Request {
 
   /**
    * Adds a byte encoded to string
+   *
    * @return self
    */
   @Fluent
@@ -149,6 +157,7 @@ public interface Request {
 
   /**
    * Adds a float encoded to string
+   *
    * @return self
    */
   @Fluent
@@ -160,6 +169,7 @@ public interface Request {
 
   /**
    * Adds a double encoded to string
+   *
    * @return self
    */
   @Fluent
@@ -171,6 +181,7 @@ public interface Request {
 
   /**
    * Adds a boolean encoded to string
+   *
    * @return self
    */
   @Fluent
@@ -179,11 +190,11 @@ public interface Request {
   /**
    * Adds a JsonObject argument, the encoding will serialize the json as key0, value0, key1, value1, ... keyN, valueN.
    * This is a non-optimized serialization and will just use the string encoding of the values for non buffers.
-   *
+   * <p>
    * All {@code null} values will follow the encoding rules of {@link #nullArg()}.
    *
-   * @throws IllegalArgumentException when values are of type JsonArray or JsonObject
    * @return self
+   * @throws IllegalArgumentException when values are of type JsonArray or JsonObject
    */
   @Fluent
   default Request arg(JsonObject arg) {
@@ -211,11 +222,11 @@ public interface Request {
   /**
    * Adds a JsonArray argument, the encoding will serialize the json as value0, value1, ... valueN.
    * This is a non-optimized serialization and will just use the string encoding of the values for non buffers.
-   *
+   * <p>
    * All {@code null} values will follow the encoding rules of {@link #nullArg()}.
    *
-   * @throws IllegalArgumentException when values are of type JsonArray or JsonObject
    * @return self
+   * @throws IllegalArgumentException when values are of type JsonArray or JsonObject
    */
   @Fluent
   default Request arg(JsonArray arg) {
@@ -238,16 +249,15 @@ public interface Request {
   }
 
   /**
+   * @return self
    * @deprecated REDIS does not support {@code null} as a parameter, only as response. This was a deviation from the
    * official protocol which should be avoided. Other clients explicitly do not allow this.
-   *
+   * <p>
    * Adds a {@code null} encoded string. Redis does not allow storing the {@code null} value by itself. This method
    * will encode any null value as the four character long string {@code "null"}.
-   *
+   * <p>
    * As a recommendation, this method should not be used directly unless this is the intented behavior. It is present
    * to handle special cases such as encoding of {@link JsonObject} and {@link JsonArray} which may contain null values.
-   *
-   * @return self
    */
   @Fluent
   @Deprecated
@@ -255,6 +265,7 @@ public interface Request {
 
   /**
    * Get the Command that is to be used by this request.
+   *
    * @return the command.
    */
   Command command();

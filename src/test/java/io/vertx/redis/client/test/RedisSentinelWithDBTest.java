@@ -20,22 +20,22 @@ public class RedisSentinelWithDBTest {
     final Async test = should.async();
 
     Redis.createClient(
-      rule.vertx(),
-      new RedisOptions()
-        .setType(RedisClientType.SENTINEL)
-        .addConnectionString("redis://localhost:5000/0")
-        .addConnectionString("redis://localhost:5001/0")
-        .addConnectionString("redis://localhost:5002/0")
-        .setMasterName("sentinel7000")
-        .setRole(RedisRole.MASTER)
-        .setMaxPoolSize(4)
-        .setMaxPoolWaiting(16))
-      .connect(onCreate -> {
+        rule.vertx(),
+        new RedisOptions()
+          .setType(RedisClientType.SENTINEL)
+          .addConnectionString("redis://localhost:5000/0")
+          .addConnectionString("redis://localhost:5001/0")
+          .addConnectionString("redis://localhost:5002/0")
+          .setMasterName("sentinel7000")
+          .setRole(RedisRole.MASTER)
+          .setMaxPoolSize(4)
+          .setMaxPoolWaiting(16))
+      .connect().onComplete(onCreate -> {
         // get a connection to the master node
         should.assertTrue(onCreate.succeeded());
         // query the info
         onCreate.result()
-          .send(Request.cmd(Command.CLIENT).arg("LIST"), info -> {
+          .send(Request.cmd(Command.CLIENT).arg("LIST")).onComplete(info -> {
             should.assertTrue(info.succeeded());
             System.out.println(info.result());
             test.complete();

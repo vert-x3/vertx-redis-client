@@ -7,7 +7,8 @@ import io.vertx.ext.unit.junit.RunTestOnContext;
 import io.vertx.ext.unit.junit.VertxUnitRunner;
 import io.vertx.redis.client.Redis;
 import io.vertx.redis.client.RedisOptions;
-import org.junit.*;
+import org.junit.Rule;
+import org.junit.Test;
 import org.junit.runner.RunWith;
 
 @RunWith(VertxUnitRunner.class)
@@ -29,7 +30,7 @@ public class RedisClientHelloTest {
       rule.vertx(),
       new RedisOptions().setConnectionString("redis://localhost:9876"));
 
-    client.connect(onConnect -> {
+    client.connect().onComplete(onConnect -> {
       should.assertFalse(onConnect.succeeded());
       before.complete();
     });

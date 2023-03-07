@@ -15,7 +15,10 @@
  */
 package io.vertx.redis.client.impl;
 
-import io.vertx.core.*;
+import io.vertx.core.AsyncResult;
+import io.vertx.core.Future;
+import io.vertx.core.Handler;
+import io.vertx.core.Promise;
 import io.vertx.core.impl.ContextInternal;
 import io.vertx.core.impl.EventLoopContext;
 import io.vertx.core.impl.VertxInternal;
@@ -23,12 +26,7 @@ import io.vertx.core.impl.logging.Logger;
 import io.vertx.core.impl.logging.LoggerFactory;
 import io.vertx.core.net.NetClient;
 import io.vertx.core.net.NetSocket;
-import io.vertx.core.net.impl.pool.ConnectResult;
-import io.vertx.core.net.impl.pool.ConnectionManager;
-import io.vertx.core.net.impl.pool.Endpoint;
-import io.vertx.core.net.impl.pool.Lease;
-import io.vertx.core.net.impl.pool.ConnectionPool;
-import io.vertx.core.net.impl.pool.PoolConnector;
+import io.vertx.core.net.impl.pool.*;
 import io.vertx.core.spi.metrics.PoolMetrics;
 import io.vertx.core.spi.metrics.VertxMetrics;
 import io.vertx.redis.client.Command;

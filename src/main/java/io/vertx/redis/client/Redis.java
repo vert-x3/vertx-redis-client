@@ -18,7 +18,10 @@ package io.vertx.redis.client;
 import io.vertx.codegen.annotations.Fluent;
 import io.vertx.codegen.annotations.Nullable;
 import io.vertx.codegen.annotations.VertxGen;
-import io.vertx.core.*;
+import io.vertx.core.AsyncResult;
+import io.vertx.core.Future;
+import io.vertx.core.Handler;
+import io.vertx.core.Vertx;
 import io.vertx.redis.client.impl.RedisClient;
 import io.vertx.redis.client.impl.RedisClusterClient;
 import io.vertx.redis.client.impl.RedisReplicationClient;
@@ -34,6 +37,7 @@ public interface Redis {
 
   /**
    * Create a new redis client using the default client options.
+   *
    * @param vertx the vertx instance
    * @return the client
    */
@@ -43,8 +47,9 @@ public interface Redis {
 
   /**
    * Create a new redis client using the default client options. Does not support rediss (redis over ssl scheme) for now.
+   *
    * @param connectionString a string URI following the scheme: redis://[username:password@][host][:port][/database]
-   * @param vertx the vertx instance
+   * @param vertx            the vertx instance
    * @return the client
    * @see <a href="https://www.iana.org/assignments/uri-schemes/prov/redis">Redis scheme on iana.org</a>
    */
@@ -54,7 +59,8 @@ public interface Redis {
 
   /**
    * Create a new redis client using the given client options.
-   * @param vertx the vertx instance
+   *
+   * @param vertx   the vertx instance
    * @param options the user provided options
    * @return the client
    */
@@ -76,7 +82,7 @@ public interface Redis {
   /**
    * Connects to the redis server.
    *
-   * @param handler  the async result handler
+   * @param handler the async result handler
    * @return a reference to this, so the API can be used fluently
    */
   @Fluent
@@ -100,8 +106,9 @@ public interface Redis {
 
   /**
    * Send the given command to the redis server or cluster.
+   *
    * @param command the command to send
-   * @param onSend the asynchronous result handler.
+   * @param onSend  the asynchronous result handler.
    * @return fluent self.
    */
   @Fluent
@@ -113,6 +120,7 @@ public interface Redis {
 
   /**
    * Send the given command to the redis server or cluster.
+   *
    * @param command the command to send
    * @return a future with the result of the operation
    */
@@ -123,7 +131,7 @@ public interface Redis {
    * client users.
    *
    * @param commands list of command to send
-   * @param onSend the asynchronous result handler.
+   * @param onSend   the asynchronous result handler.
    * @return fluent self.
    */
   @Fluent

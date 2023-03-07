@@ -1,6 +1,9 @@
 package io.vertx.redis.client.test;
 
-import io.vertx.core.*;
+import io.vertx.core.CompositeFuture;
+import io.vertx.core.Future;
+import io.vertx.core.Promise;
+import io.vertx.core.Vertx;
 import io.vertx.ext.unit.Async;
 import io.vertx.ext.unit.TestContext;
 import io.vertx.ext.unit.junit.RunTestOnContext;
@@ -29,7 +32,7 @@ public class RedisTest {
     final Async test = should.async();
 
     Redis.createClient(rule.vertx(), "redis://localhost:7006")
-      .connect(create -> {
+      .connect().onComplete(create -> {
         should.assertTrue(create.succeeded());
 
         final RedisConnection redis = create.result();
@@ -38,7 +41,7 @@ public class RedisTest {
 
         });
 
-        redis.send(Request.cmd(Command.PING), send -> {
+        redis.send(Request.cmd(Command.PING)).onComplete(send -> {
           should.assertTrue(send.succeeded());
           should.assertNotNull(send.result());
 
@@ -53,14 +56,14 @@ public class RedisTest {
     final Async test = should.async();
 
     Redis.createClient(rule.vertx(), "redis://localhost:7006")
-      .connect(create -> {
+      .connect().onComplete(create -> {
         should.assertTrue(create.succeeded());
 
         final RedisConnection redis = create.result();
 
         redis.exceptionHandler(should::fail);
 
-        redis.send(Request.cmd(Command.SET).arg(UUID.randomUUID().toString()).arg(""), send -> {
+        redis.send(Request.cmd(Command.SET).arg(UUID.randomUUID().toString()).arg("")).onComplete(send -> {
           should.assertTrue(send.succeeded());
           should.assertNotNull(send.result());
 
@@ -75,7 +78,7 @@ public class RedisTest {
     final Async test = should.async();
 
     Redis.createClient(rule.vertx(), new RedisOptions().addConnectionString("redis://localhost:7006/0"))
-      .connect(create -> {
+      .connect().onComplete(create -> {
         should.assertTrue(create.succeeded());
 
         final RedisConnection redis = create.result();
@@ -84,7 +87,7 @@ public class RedisTest {
 
         });
 
-        redis.send(Request.cmd(Command.PING), send -> {
+        redis.send(Request.cmd(Command.PING)).onComplete(send -> {
           should.assertTrue(send.succeeded());
           should.assertNotNull(send.result());
 
@@ -99,7 +102,7 @@ public class RedisTest {
     final Async test = should.async();
 
     Redis.createClient(rule.vertx(), "redis://localhost:7006")
-      .connect(create -> {
+      .connect().onComplete(create -> {
         should.assertTrue(create.succeeded());
 
         final RedisConnection redis = create.result();
@@ -109,7 +112,7 @@ public class RedisTest {
           cmd(SET).arg("a").arg(3),
           cmd(LPOP).arg("a"),
           cmd(EXEC)
-        ), batch -> {
+        )).onComplete(batch -> {
           should.assertTrue(batch.succeeded());
           test.complete();
         });
@@ -121,12 +124,12 @@ public class RedisTest {
     final Async test = should.async();
 
     Redis.createClient(rule.vertx(), "redis://localhost:7006")
-      .connect(create -> {
+      .connect().onComplete(create -> {
         should.assertTrue(create.succeeded());
 
         final RedisConnection redis = create.result();
 
-        redis.batch(Collections.emptyList(), batch -> {
+        redis.batch(Collections.emptyList()).onComplete(batch -> {
           should.assertTrue(batch.succeeded());
           test.complete();
         });
@@ -138,7 +141,7 @@ public class RedisTest {
     final Async test = should.async();
 
     Redis.createClient(rule.vertx(), "redis://localhost:7006")
-      .connect(create -> {
+      .connect().onComplete(create -> {
         should.assertTrue(create.succeeded());
 
         RedisAPI redis = RedisAPI.api(create.result());
@@ -161,7 +164,7 @@ public class RedisTest {
     final Vertx vertx = rule.vertx();
 
     Redis.createClient(vertx, "redis://localhost:7006")
-      .connect(create -> {
+      .connect().onComplete(create -> {
         should.assertTrue(create.succeeded());
 
         RedisAPI redis = RedisAPI.api(create.result());
@@ -195,7 +198,7 @@ public class RedisTest {
       .addConnectionString("redis://localhost:7006");
 
     Redis.createClient(rule.vertx(), options)
-      .connect(create -> {
+      .connect().onComplete(create -> {
         should.assertTrue(create.succeeded());
 
         final RedisConnection redis = create.result();
@@ -227,7 +230,7 @@ public class RedisTest {
     final Async test = should.async();
 
     Redis.createClient(rule.vertx(), "redis://localhost:7006")
-      .connect(create -> {
+      .connect().onComplete(create -> {
         should.assertTrue(create.succeeded());
 
         final RedisConnection redis = create.result();
@@ -249,12 +252,12 @@ public class RedisTest {
     final Async test = should.async();
 
     Redis.createClient(rule.vertx(), "redis://localhost:7006")
-      .connect(create -> {
+      .connect().onComplete(create -> {
         should.assertTrue(create.succeeded());
 
         final RedisConnection redis = create.result();
 
-        redis.send(cmd(HMGET).arg("nonExistingKey").arg("nonExistingValue1").arg("nonExistingValue2"), send -> {
+        redis.send(cmd(HMGET).arg("nonExistingKey").arg("nonExistingValue1").arg("nonExistingValue2")).onComplete(send -> {
           should.assertTrue(send.succeeded());
           test.complete();
         });
@@ -266,15 +269,15 @@ public class RedisTest {
     final Async test = should.async();
 
     Redis.createClient(rule.vertx(), "redis://localhost:7006")
-      .connect(create -> {
+      .connect().onComplete(create -> {
         should.assertTrue(create.succeeded());
 
         final RedisConnection redis = create.result();
         final String key = UUID.randomUUID().toString();
 
-        redis.send(cmd(ZADD).arg(key).arg("1.0").arg("testValue1").arg("2.0").arg("testValue2"), zadd -> {
+        redis.send(cmd(ZADD).arg(key).arg("1.0").arg("testValue1").arg("2.0").arg("testValue2")).onComplete(zadd -> {
           should.assertTrue(zadd.succeeded());
-          redis.send(cmd(ZRANGEBYSCORE).arg(key).arg("0.0").arg("3.0").arg("WITHSCORES"), zrangebyscore -> {
+          redis.send(cmd(ZRANGEBYSCORE).arg(key).arg("0.0").arg("3.0").arg("WITHSCORES")).onComplete(zrangebyscore -> {
             should.assertTrue(zrangebyscore.succeeded());
 
             Response response = zrangebyscore.result();
