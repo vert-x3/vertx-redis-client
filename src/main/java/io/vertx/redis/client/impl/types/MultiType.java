@@ -60,7 +60,7 @@ public final class MultiType implements Multi {
 
   private MultiType(String key, Response value) {
     this.map = null;
-    this.multi = new Response[] { SimpleStringType.create(key), value };
+    this.multi = new Response[]{SimpleStringType.create(key), value};
     this.size = 2;
   }
 

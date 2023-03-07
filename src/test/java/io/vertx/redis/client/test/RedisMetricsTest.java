@@ -1,6 +1,6 @@
 package io.vertx.redis.client.test;
 
-import io.vertx.core.*;
+import io.vertx.core.VertxOptions;
 import io.vertx.core.metrics.MetricsOptions;
 import io.vertx.core.metrics.impl.DummyVertxMetrics;
 import io.vertx.core.spi.VertxMetricsFactory;
@@ -10,16 +10,18 @@ import io.vertx.ext.unit.Async;
 import io.vertx.ext.unit.TestContext;
 import io.vertx.ext.unit.junit.RunTestOnContext;
 import io.vertx.ext.unit.junit.VertxUnitRunner;
-import io.vertx.redis.client.*;
+import io.vertx.redis.client.Command;
+import io.vertx.redis.client.Redis;
+import io.vertx.redis.client.RedisConnection;
+import io.vertx.redis.client.Request;
 import io.vertx.test.fakemetrics.FakePoolMetrics;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
-import java.util.*;
+import java.util.Collections;
+import java.util.Map;
 import java.util.concurrent.atomic.AtomicReference;
-
-import static org.junit.Assert.assertEquals;
 
 @RunWith(VertxUnitRunner.class)
 public class RedisMetricsTest {
@@ -61,7 +63,7 @@ public class RedisMetricsTest {
     Redis client = Redis.createClient(rule.vertx(), "redis://localhost:7006");
 
     client
-      .connect(create -> {
+      .connect().onComplete(create -> {
         should.assertTrue(create.succeeded());
 
         should.assertEquals(0, getMetrics().numberOfWaitingTasks());
@@ -73,7 +75,7 @@ public class RedisMetricsTest {
 
         });
 
-        redis.send(Request.cmd(Command.PING), send -> {
+        redis.send(Request.cmd(Command.PING)).onComplete(send -> {
           should.assertTrue(send.succeeded());
           should.assertNotNull(send.result());
 

@@ -6,10 +6,12 @@ import io.vertx.ext.unit.junit.RunTestOnContext;
 import io.vertx.ext.unit.junit.VertxUnitRunner;
 import io.vertx.redis.client.Redis;
 import io.vertx.redis.client.RedisOptions;
-import org.junit.*;
+import org.junit.Ignore;
+import org.junit.Rule;
+import org.junit.Test;
 import org.junit.runner.RunWith;
 
-import static io.vertx.redis.client.Command.*;
+import static io.vertx.redis.client.Command.KEYS;
 import static io.vertx.redis.client.Request.cmd;
 
 @RunWith(VertxUnitRunner.class)
@@ -33,7 +35,7 @@ public class RedisClientIT {
         .setPassword(cachekey)
         .setConnectionString("redis://" + cacheHostname + ":6380"));
 
-    client.connect(onConnect -> {
+    client.connect().onComplete(onConnect -> {
       should.assertTrue(onConnect.succeeded());
       onConnect.result()
         .send(cmd(KEYS).arg("*"))

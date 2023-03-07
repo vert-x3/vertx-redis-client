@@ -52,7 +52,7 @@ final class ArrayQueue {
    *
    * @param value the item to insert.
    * @throws IndexOutOfBoundsException if the queue is full.
-   * @throws NullPointerException if the value is {@code null}
+   * @throws NullPointerException      if the value is {@code null}
    */
   <T> void offer(T value) {
     Objects.requireNonNull(value, "'value' cannot be null");

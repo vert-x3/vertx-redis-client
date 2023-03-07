@@ -1,25 +1,27 @@
 package io.vertx.test.redis;
 
-import java.util.concurrent.atomic.AtomicInteger;
-
-import io.vertx.core.*;
+import io.vertx.core.AbstractVerticle;
+import io.vertx.core.DeploymentOptions;
+import io.vertx.core.Future;
+import io.vertx.core.Promise;
 import io.vertx.core.impl.VertxInternal;
-import io.vertx.ext.unit.junit.Repeat;
-import org.junit.ClassRule;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.testcontainers.containers.GenericContainer;
-
 import io.vertx.core.net.NetClientOptions;
 import io.vertx.ext.unit.Async;
 import io.vertx.ext.unit.TestContext;
+import io.vertx.ext.unit.junit.Repeat;
 import io.vertx.ext.unit.junit.RunTestOnContext;
 import io.vertx.ext.unit.junit.VertxUnitRunner;
 import io.vertx.redis.client.Command;
 import io.vertx.redis.client.Redis;
 import io.vertx.redis.client.RedisOptions;
 import io.vertx.redis.client.Request;
+import org.junit.ClassRule;
+import org.junit.Rule;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.testcontainers.containers.GenericContainer;
+
+import java.util.concurrent.atomic.AtomicInteger;
 
 @RunWith(VertxUnitRunner.class)
 public class RedisClientLoadTest {
@@ -30,7 +32,7 @@ public class RedisClientLoadTest {
 
   private final RedisOptions REDIS_OPTIONS = new RedisOptions()
     .setMaxPoolWaiting(1000)
-    .setConnectionString("redis://" + redisServer.getContainerIpAddress() + ":" + redisServer.getFirstMappedPort())
+    .setConnectionString("redis://" + redisServer.getHost() + ":" + redisServer.getFirstMappedPort())
     .setNetClientOptions(new NetClientOptions()
       .setConnectTimeout(100)
       .setReuseAddress(true)
@@ -48,7 +50,7 @@ public class RedisClientLoadTest {
 
     Redis redis = Redis.createClient(rule.vertx(), new RedisOptions()
       .setMaxPoolWaiting(1)
-      .setConnectionString("redis://" + redisServer.getContainerIpAddress() + ":" + redisServer.getFirstMappedPort()));
+      .setConnectionString("redis://" + redisServer.getHost() + ":" + redisServer.getFirstMappedPort()));
     // acquire connection and close
     redis.connect()
       .onSuccess(conn -> {
@@ -67,16 +69,16 @@ public class RedisClientLoadTest {
     Redis redis = Redis.createClient(rule.vertx(), new RedisOptions()
       .setMaxPoolWaiting(1)
       .setPoolRecycleTimeout(1)
-      .setConnectionString("redis://" + redisServer.getContainerIpAddress() + ":" + redisServer.getFirstMappedPort()));
+      .setConnectionString("redis://" + redisServer.getHost() + ":" + redisServer.getFirstMappedPort()));
     // acquire connection and close
     redis.connect()
       .onSuccess(conn -> {
         rule.vertx()
-            .setTimer(5L, v -> {
-              conn.close()
-                .onFailure(should::fail)
-                .onSuccess(ok -> test.complete());
-            });
+          .setTimer(5L, v -> {
+            conn.close()
+              .onFailure(should::fail)
+              .onSuccess(ok -> test.complete());
+          });
       })
       .onFailure(should::fail);
 
@@ -146,7 +148,7 @@ public class RedisClientLoadTest {
     rule.vertx().deployVerticle(() -> new AbstractVerticle() {
         @Override
         public void start() throws Exception {
-          Redis redis = Redis.createClient(rule.vertx(), new RedisOptions().setMaxPoolWaiting(1000).setConnectionString("redis://" + redisServer.getContainerIpAddress() + ":" + redisServer.getFirstMappedPort()));
+          Redis redis = Redis.createClient(rule.vertx(), new RedisOptions().setMaxPoolWaiting(1000).setConnectionString("redis://" + redisServer.getHost() + ":" + redisServer.getFirstMappedPort()));
           this.vertx.eventBus().consumer("test.redis.load").handler(m -> {
             redis.connect().compose(r -> r.send(Request.cmd(Command.SET).arg("foo").arg("bar")).onComplete(res -> r.close()))
               .onComplete(res -> {
@@ -192,7 +194,7 @@ public class RedisClientLoadTest {
     rule.vertx().deployVerticle(() -> new AbstractVerticle() {
         @Override
         public void start() throws Exception {
-          Redis redis = Redis.createClient(rule.vertx(), new RedisOptions().setMaxPoolWaiting(1000).setConnectionString("redis://" + redisServer.getContainerIpAddress() + ":" + redisServer.getFirstMappedPort()));
+          Redis redis = Redis.createClient(rule.vertx(), new RedisOptions().setMaxPoolWaiting(1000).setConnectionString("redis://" + redisServer.getHost() + ":" + redisServer.getFirstMappedPort()));
           this.vertx.eventBus().consumer("test.redis.load").handler(m -> {
             connectionsInProcess.incrementAndGet();
             redis.connect()

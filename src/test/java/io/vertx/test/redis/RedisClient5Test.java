@@ -5,15 +5,16 @@ import io.vertx.ext.unit.Async;
 import io.vertx.ext.unit.TestContext;
 import io.vertx.ext.unit.junit.RunTestOnContext;
 import io.vertx.ext.unit.junit.VertxUnitRunner;
-import io.vertx.redis.client.*;
+import io.vertx.redis.client.Redis;
+import io.vertx.redis.client.RedisOptions;
 import org.junit.*;
 import org.junit.runner.RunWith;
 import org.testcontainers.containers.GenericContainer;
 
 import java.util.UUID;
 
-import static io.vertx.redis.client.Request.cmd;
 import static io.vertx.redis.client.Command.*;
+import static io.vertx.redis.client.Request.cmd;
 
 @RunWith(VertxUnitRunner.class)
 public class RedisClient5Test {
@@ -33,9 +34,9 @@ public class RedisClient5Test {
 
     client = Redis.createClient(
       rule.vertx(),
-      new RedisOptions().setConnectionString("redis://" + redis.getContainerIpAddress() + ":" + redis.getFirstMappedPort()));
+      new RedisOptions().setConnectionString("redis://" + redis.getHost() + ":" + redis.getFirstMappedPort()));
 
-    client.connect(onConnect -> {
+    client.connect().onComplete(onConnect -> {
       should.assertTrue(onConnect.succeeded());
       before.complete();
     });
@@ -56,13 +57,13 @@ public class RedisClient5Test {
     final String nonexisting = makeKey();
     final String mykey = makeKey();
 
-    client.send(cmd(GET).arg(nonexisting), reply0 -> {
+    client.send(cmd(GET).arg(nonexisting)).onComplete(reply0 -> {
       should.assertTrue(reply0.succeeded());
       should.assertNull(reply0.result());
 
-      client.send(cmd(SET).arg(mykey).arg("Hello"), reply1 -> {
+      client.send(cmd(SET).arg(mykey).arg("Hello")).onComplete(reply1 -> {
         should.assertTrue(reply1.succeeded());
-        client.send(cmd(GET).arg(mykey), reply2 -> {
+        client.send(cmd(GET).arg(mykey)).onComplete(reply2 -> {
           should.assertTrue(reply2.succeeded());
           should.assertEquals("Hello", reply2.result().toString());
           test.complete();

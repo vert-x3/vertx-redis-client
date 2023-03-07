@@ -38,7 +38,7 @@ import java.util.stream.StreamSupport;
  *     <li>bulk - byte array</li>
  *     <li>multi - list</li>
  * </ul>
- *
+ * <p>
  * Due to the dynamic nature the response object will try to cast the received response to the desired type. A special
  * case should be noted that multi responses are also handled by the response object as it implements the iterable
  * interface. So in this case constructs like for loops on the response will give you access to the underlying elements.
@@ -50,12 +50,14 @@ public interface Response extends Iterable<Response> {
 
   /**
    * The response return type.
+   *
    * @return the type.
    */
   ResponseType type();
 
   /**
    * RESP3 responses may include attributes
+   *
    * @return the a key value map of attributes to this response.
    */
   default Map<String, Response> attributes() {
@@ -64,6 +66,7 @@ public interface Response extends Iterable<Response> {
 
   /**
    * Get this response as a String.
+   *
    * @return string value
    */
   @Override
@@ -79,6 +82,7 @@ public interface Response extends Iterable<Response> {
   /**
    * Get this response as a Number. In contrast to other numeric getters, this will not
    * perform any conversion if the underlying type is not numeric.
+   *
    * @return number value
    */
   @GenIgnore(GenIgnore.PERMITTED_TYPE)
@@ -88,6 +92,7 @@ public interface Response extends Iterable<Response> {
 
   /**
    * Get this response as a Double.
+   *
    * @return double value.
    */
   default @Nullable Double toDouble() {
@@ -110,6 +115,7 @@ public interface Response extends Iterable<Response> {
 
   /**
    * Get this response as a Float.
+   *
    * @return double value.
    */
   default @Nullable Float toFloat() {
@@ -122,6 +128,7 @@ public interface Response extends Iterable<Response> {
 
   /**
    * Get this response as a BigInteger.
+   *
    * @return long value.
    */
   @GenIgnore(GenIgnore.PERMITTED_TYPE)
@@ -135,6 +142,7 @@ public interface Response extends Iterable<Response> {
 
   /**
    * Get this response as a Long.
+   *
    * @return long value.
    */
   default @Nullable Long toLong() {
@@ -147,6 +155,7 @@ public interface Response extends Iterable<Response> {
 
   /**
    * Get this response as a Integer.
+   *
    * @return int value.
    */
   default @Nullable Integer toInteger() {
@@ -159,6 +168,7 @@ public interface Response extends Iterable<Response> {
 
   /**
    * Get this response as a Short.
+   *
    * @return short value.
    */
   default @Nullable Short toShort() {
@@ -171,6 +181,7 @@ public interface Response extends Iterable<Response> {
 
   /**
    * Get this response as a Byte.
+   *
    * @return byte value.
    */
   default @Nullable Byte toByte() {
@@ -183,6 +194,7 @@ public interface Response extends Iterable<Response> {
 
   /**
    * Get this response as a Boolean.
+   *
    * @return boolean value.
    */
   default @Nullable Boolean toBoolean() {
@@ -196,6 +208,7 @@ public interface Response extends Iterable<Response> {
 
   /**
    * Get this response as a String encoded with the given charset.
+   *
    * @return String value.
    */
   @GenIgnore(GenIgnore.PERMITTED_TYPE)
@@ -205,6 +218,7 @@ public interface Response extends Iterable<Response> {
 
   /**
    * Get this response as Buffer.
+   *
    * @return buffer value.
    */
   default Buffer toBuffer() {
@@ -213,6 +227,7 @@ public interface Response extends Iterable<Response> {
 
   /**
    * Get this response as a byte[].
+   *
    * @return byte[] value.
    */
   @GenIgnore(GenIgnore.PERMITTED_TYPE)
@@ -222,6 +237,7 @@ public interface Response extends Iterable<Response> {
 
   /**
    * Get this multi response value at a numerical index.
+   *
    * @param index the required index.
    * @return Response value.
    */
@@ -232,6 +248,7 @@ public interface Response extends Iterable<Response> {
   /**
    * Get this multi response value at a string key. Note that REDIS does not support strings as keys but by convention
    * it encodes hashes in lists where index i is the key, and index i+1 is the value.
+   *
    * @param key the required key.
    * @return Response value.
    */
@@ -242,6 +259,7 @@ public interface Response extends Iterable<Response> {
   /**
    * Does this multi response contains a string key. Note that REDIS does not support strings as keys but by convention
    * it encodes hashes in lists where index i is the key, and index i+1 is the value.
+   *
    * @param key the required key.
    * @return Response value.
    */
@@ -252,6 +270,7 @@ public interface Response extends Iterable<Response> {
   /**
    * Get this multi response keys from a hash. Note that REDIS does not support strings as keys but by convention
    * it encodes hashes in lists where index i is the key, and index i+1 is the value.
+   *
    * @return the set of keys.
    */
   default Set<String> getKeys() {
@@ -260,6 +279,7 @@ public interface Response extends Iterable<Response> {
 
   /**
    * Get this size of this multi response.
+   *
    * @return the size of the multi.
    */
   default int size() {
@@ -268,6 +288,7 @@ public interface Response extends Iterable<Response> {
 
   /**
    * Return an iterator so it can be iterated using the foreach construct.
+   *
    * @return response iterator.
    */
   @Override
@@ -278,6 +299,7 @@ public interface Response extends Iterable<Response> {
 
   /**
    * Return a stream of responses based on the iterable of this object.
+   *
    * @return a stream of response
    */
   @GenIgnore

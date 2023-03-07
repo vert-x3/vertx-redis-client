@@ -1,6 +1,9 @@
 package examples;
 
-import io.vertx.core.*;
+import io.vertx.core.AbstractVerticle;
+import io.vertx.core.Future;
+import io.vertx.core.Promise;
+import io.vertx.core.Vertx;
 import io.vertx.redis.client.*;
 
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -22,11 +25,11 @@ public class RedisExamples {
 
   public void example2(Vertx vertx) {
     Redis.createClient(
-      vertx,
-      // The client handles REDIS URLs. The select database as per spec is the
-      // numerical path of the URL and the password is the password field of
-      // the URL authority
-      "redis://:abracadabra@localhost:6379/1")
+        vertx,
+        // The client handles REDIS URLs. The select database as per spec is the
+        // numerical path of the URL and the password is the password field of
+        // the URL authority
+        "redis://:abracadabra@localhost:6379/1")
       .connect()
       .onSuccess(conn -> {
         // use the connection
@@ -56,14 +59,14 @@ public class RedisExamples {
 
   public void example5(Vertx vertx) {
     Redis.createClient(
-      vertx,
-      new RedisOptions()
-        .setType(RedisClientType.SENTINEL)
-        .addConnectionString("redis://127.0.0.1:5000")
-        .addConnectionString("redis://127.0.0.1:5001")
-        .addConnectionString("redis://127.0.0.1:5002")
-        .setMasterName("sentinel7000")
-        .setRole(RedisRole.MASTER))
+        vertx,
+        new RedisOptions()
+          .setType(RedisClientType.SENTINEL)
+          .addConnectionString("redis://127.0.0.1:5000")
+          .addConnectionString("redis://127.0.0.1:5001")
+          .addConnectionString("redis://127.0.0.1:5002")
+          .setMasterName("sentinel7000")
+          .setRole(RedisRole.MASTER))
       .connect()
       .onSuccess(conn -> {
         conn.send(Request.cmd(Command.INFO))
@@ -197,14 +200,14 @@ public class RedisExamples {
 
   public void example12(Vertx vertx) {
     Redis.createClient(
-      vertx,
-      new RedisOptions()
-        .setConnectionString("redis://localhost:7006")
-        // allow at max 8 connections to redis
-        .setMaxPoolSize(8)
-        // allow 32 connection requests to queue waiting
-        // for a connection to be available.
-        .setMaxWaitingHandlers(32))
+        vertx,
+        new RedisOptions()
+          .setConnectionString("redis://localhost:7006")
+          // allow at max 8 connections to redis
+          .setMaxPoolSize(8)
+          // allow 32 connection requests to queue waiting
+          // for a connection to be available.
+          .setMaxWaitingHandlers(32))
       .send(Request.cmd(Command.PING))
       .onSuccess(res -> {
         // Should have received a pong...
@@ -213,12 +216,12 @@ public class RedisExamples {
 
   public void example13(Vertx vertx) {
     Redis.createClient(
-      vertx,
-      new RedisOptions()
-        .setType(RedisClientType.REPLICATION)
-        .addConnectionString("redis://localhost:7000")
-        .setMaxPoolSize(4)
-        .setMaxPoolWaiting(16))
+        vertx,
+        new RedisOptions()
+          .setType(RedisClientType.REPLICATION)
+          .addConnectionString("redis://localhost:7000")
+          .setMaxPoolSize(4)
+          .setMaxPoolWaiting(16))
       .connect()
       .onSuccess(conn -> {
         // this is a replication client.

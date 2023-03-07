@@ -36,9 +36,9 @@ public class RedisClientPikaSecureTest {
 
     client = Redis.createClient(
       rule.vertx(),
-      new RedisOptions().setConnectionString("redis://:userpass@" + redis.getContainerIpAddress() + ":" + redis.getFirstMappedPort()));
+      new RedisOptions().setConnectionString("redis://:userpass@" + redis.getHost() + ":" + redis.getFirstMappedPort()));
 
-    client.connect(onConnect -> {
+    client.connect().onComplete(onConnect -> {
       should.assertTrue(onConnect.succeeded());
       before.complete();
     });
@@ -59,13 +59,13 @@ public class RedisClientPikaSecureTest {
     final String nonexisting = makeKey();
     final String mykey = makeKey();
 
-    client.send(cmd(GET).arg(nonexisting), reply0 -> {
+    client.send(cmd(GET).arg(nonexisting)).onComplete(reply0 -> {
       should.assertTrue(reply0.succeeded());
       should.assertNull(reply0.result());
 
-      client.send(cmd(SET).arg(mykey).arg("Hello"), reply1 -> {
+      client.send(cmd(SET).arg(mykey).arg("Hello")).onComplete(reply1 -> {
         should.assertTrue(reply1.succeeded());
-        client.send(cmd(GET).arg(mykey), reply2 -> {
+        client.send(cmd(GET).arg(mykey)).onComplete(reply2 -> {
           should.assertTrue(reply2.succeeded());
           should.assertEquals("Hello", reply2.result().toString());
           test.complete();

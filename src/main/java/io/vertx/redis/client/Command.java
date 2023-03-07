@@ -18,7 +18,10 @@ package io.vertx.redis.client;
 import io.vertx.codegen.annotations.VertxGen;
 import io.vertx.redis.client.impl.CommandImpl;
 import io.vertx.redis.client.impl.KeyLocator;
-import io.vertx.redis.client.impl.keys.*;
+import io.vertx.redis.client.impl.keys.BeginSearchIndex;
+import io.vertx.redis.client.impl.keys.BeginSearchKeyword;
+import io.vertx.redis.client.impl.keys.FindKeysKeynum;
+import io.vertx.redis.client.impl.keys.FindKeysRange;
 
 /**
  * <b>Auto generated</b> API Commands to interact with REDIS.

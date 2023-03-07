@@ -3,7 +3,6 @@ package io.vertx.redis.client.test;
 import io.vertx.core.CompositeFuture;
 import io.vertx.core.Context;
 import io.vertx.core.Future;
-import io.vertx.core.Promise;
 import io.vertx.core.buffer.Buffer;
 import io.vertx.ext.unit.Async;
 import io.vertx.ext.unit.TestContext;
@@ -60,10 +59,10 @@ public class RedisClusterTest {
   public void cleanRedis(TestContext should) {
     final Async test = should.async();
 
-    client.connect(onCreate -> {
+    client.connect().onComplete(onCreate -> {
       should.assertTrue(onCreate.succeeded());
       final RedisConnection cluster = onCreate.result();
-      cluster.send(cmd(FLUSHDB), flushDB -> {
+      cluster.send(cmd(FLUSHDB)).onComplete(flushDB -> {
         should.assertTrue(flushDB.succeeded());
         client.close();
         test.complete();
@@ -75,7 +74,7 @@ public class RedisClusterTest {
   public void testContextReturn(TestContext should) {
     final Async test = should.async();
     Context context = rule.vertx().getOrCreateContext();
-    client.connect(onCreate -> {
+    client.connect().onComplete(onCreate -> {
       should.assertEquals(context, rule.vertx().getOrCreateContext());
       test.complete();
     });
@@ -100,7 +99,7 @@ public class RedisClusterTest {
     long t1 = System.currentTimeMillis();
 
     client
-      .connect(onCreate -> {
+      .connect().onComplete(onCreate -> {
         long t2 = System.currentTimeMillis();
 
         should.assertTrue(onCreate.succeeded());
@@ -117,7 +116,7 @@ public class RedisClusterTest {
     final Async test = should.async();
 
     client
-      .connect(onCreate -> {
+      .connect().onComplete(onCreate -> {
         should.assertTrue(onCreate.succeeded());
 
         final RedisConnection cluster = onCreate.result();
@@ -128,9 +127,9 @@ public class RedisClusterTest {
 
         for (int i = 0; i < len; i++) {
           final String id = Integer.toString(i);
-          cluster.send(cmd(SET).arg(id).arg(id), set -> {
+          cluster.send(cmd(SET).arg(id).arg(id)).onComplete(set -> {
             should.assertTrue(set.succeeded());
-            cluster.send(cmd(GET).arg(id), get -> {
+            cluster.send(cmd(GET).arg(id)).onComplete(get -> {
               if (get.failed()) {
                 get.cause().printStackTrace();
               }
@@ -170,7 +169,7 @@ public class RedisClusterTest {
     final Redis client2 = Redis.createClient(rule.vertx(), options);
 
     client2
-      .connect(onCreate -> {
+      .connect().onComplete(onCreate -> {
         should.assertTrue(onCreate.succeeded());
 
         final RedisConnection cluster = onCreate.result();
@@ -181,9 +180,9 @@ public class RedisClusterTest {
 
         for (int i = 0; i < len; i++) {
           final String id = Integer.toString(i);
-          cluster.send(cmd(SET).arg(id).arg(id), set -> {
+          cluster.send(cmd(SET).arg(id).arg(id)).onComplete(set -> {
             should.assertTrue(set.succeeded());
-            cluster.send(cmd(GET).arg(id), get -> {
+            cluster.send(cmd(GET).arg(id)).onComplete(get -> {
               should.assertTrue(get.succeeded());
               should.assertEquals(id, get.result().toString());
 
@@ -219,7 +218,7 @@ public class RedisClusterTest {
     final Redis client2 = Redis.createClient(rule.vertx(), options);
 
     client2
-      .connect(onCreate -> {
+      .connect().onComplete(onCreate -> {
         should.assertTrue(onCreate.succeeded());
 
         final RedisConnection cluster = onCreate.result();
@@ -230,9 +229,9 @@ public class RedisClusterTest {
 
         for (int i = 0; i < len; i++) {
           final String id = Integer.toString(i);
-          cluster.send(cmd(SET).arg(id).arg(id), set -> {
+          cluster.send(cmd(SET).arg(id).arg(id)).onComplete(set -> {
             should.assertTrue(set.succeeded());
-            cluster.send(cmd(GET).arg(id), get -> {
+            cluster.send(cmd(GET).arg(id)).onComplete(get -> {
               should.assertTrue(get.succeeded());
               should.assertEquals(id, get.result().toString());
 
@@ -266,9 +265,7 @@ public class RedisClusterTest {
     List<Future> futures = new ArrayList<>(24);
 
     for (int i = 0; i < 24; i++) {
-      Promise p = Promise.promise();
-      Redis.createClient(rule.vertx(), options).connect(p);
-      futures.add(p.future());
+      futures.add(Redis.createClient(rule.vertx(), options).connect());
     }
 
 
@@ -288,10 +285,10 @@ public class RedisClusterTest {
       for (int i = 0; i < len; i++) {
         final String id = Integer.toString(i);
         clients.get(rnd.nextInt(clients.size()))
-          .send(cmd(SET).arg(id).arg(id), set -> {
+          .send(cmd(SET).arg(id).arg(id)).onComplete(set -> {
             should.assertTrue(set.succeeded());
             clients.get(rnd.nextInt(clients.size()))
-              .send(cmd(GET).arg(id), get -> {
+              .send(cmd(GET).arg(id)).onComplete(get -> {
                 should.assertTrue(get.succeeded());
                 should.assertEquals(id, get.result().toString());
 
@@ -315,17 +312,17 @@ public class RedisClusterTest {
     final Async test = should.async();
 
     client
-      .connect(onCreate -> {
+      .connect().onComplete(onCreate -> {
         should.assertTrue(onCreate.succeeded());
 
         final RedisConnection cluster = onCreate.result();
         cluster.exceptionHandler(should::fail);
 
-        cluster.send(cmd(HSET).arg("testKey").arg("field1").arg("Hello"), hset1 -> {
+        cluster.send(cmd(HSET).arg("testKey").arg("field1").arg("Hello")).onComplete(hset1 -> {
           should.assertTrue(hset1.succeeded());
-          cluster.send(cmd(HSET).arg("testKey").arg("field2").arg("World"), hset2 -> {
+          cluster.send(cmd(HSET).arg("testKey").arg("field2").arg("World")).onComplete(hset2 -> {
             should.assertTrue(hset2.succeeded());
-            cluster.send(cmd(HGETALL).arg("testKey"), hGetAll -> {
+            cluster.send(cmd(HGETALL).arg("testKey")).onComplete(hGetAll -> {
               should.assertTrue(hGetAll.succeeded());
               try {
                 Response obj = hGetAll.result();
@@ -347,24 +344,24 @@ public class RedisClusterTest {
     final String key = makeKey();
 
     client
-      .connect(onCreate -> {
+      .connect().onComplete(onCreate -> {
         should.assertTrue(onCreate.succeeded());
 
         final RedisConnection cluster = onCreate.result();
         cluster.exceptionHandler(should::fail);
 
-        cluster.send(cmd(DEL).arg(key), del -> {
+        cluster.send(cmd(DEL).arg(key)).onComplete(del -> {
           should.assertTrue(del.succeeded());
 
-          cluster.send(cmd(APPEND).arg(key).arg("Hello"), append1 -> {
+          cluster.send(cmd(APPEND).arg(key).arg("Hello")).onComplete(append1 -> {
             should.assertTrue(append1.succeeded());
             should.assertEquals(5L, append1.result().toLong());
 
-            cluster.send(cmd(APPEND).arg(key).arg(" World"), append2 -> {
+            cluster.send(cmd(APPEND).arg(key).arg(" World")).onComplete(append2 -> {
               should.assertTrue(append2.succeeded());
               should.assertEquals(11L, append2.result().toLong());
 
-              cluster.send(cmd(GET).arg(key), get -> {
+              cluster.send(cmd(GET).arg(key)).onComplete(get -> {
                 should.assertTrue(get.succeeded());
                 should.assertEquals("Hello World", get.result().toString());
                 test.complete();
@@ -381,24 +378,24 @@ public class RedisClusterTest {
     final String key = makeKey();
 
     client
-      .connect(onCreate -> {
+      .connect().onComplete(onCreate -> {
         should.assertTrue(onCreate.succeeded());
 
         final RedisConnection cluster = onCreate.result();
         cluster.exceptionHandler(should::fail);
 
-        cluster.send(cmd(SET).arg(key).arg("foobar"), set -> {
+        cluster.send(cmd(SET).arg(key).arg("foobar")).onComplete(set -> {
           should.assertTrue(set.succeeded());
 
-          cluster.send(cmd(BITCOUNT).arg(key), bitCount1 -> {
+          cluster.send(cmd(BITCOUNT).arg(key)).onComplete(bitCount1 -> {
             should.assertTrue(bitCount1.succeeded());
             should.assertEquals(26L, bitCount1.result().toLong());
 
-            cluster.send(cmd(BITCOUNT).arg(key).arg(0).arg(0), bitCount2 -> {
+            cluster.send(cmd(BITCOUNT).arg(key).arg(0).arg(0)).onComplete(bitCount2 -> {
               should.assertTrue(bitCount2.succeeded());
               should.assertEquals(4L, bitCount2.result().toLong());
 
-              cluster.send(cmd(BITCOUNT).arg(key).arg(1).arg(1), bitCount3 -> {
+              cluster.send(cmd(BITCOUNT).arg(key).arg(1).arg(1)).onComplete(bitCount3 -> {
                 should.assertTrue(bitCount3.succeeded());
                 should.assertEquals(6L, bitCount3.result().toLong());
                 test.complete();
@@ -418,21 +415,21 @@ public class RedisClusterTest {
     final String destkey = makeKey();
 
     client
-      .connect(onCreate -> {
+      .connect().onComplete(onCreate -> {
         should.assertTrue(onCreate.succeeded());
 
         final RedisConnection cluster = onCreate.result();
         cluster.exceptionHandler(should::fail);
 
-        cluster.send(cmd(SET).arg(key1).arg("foobar"), set1 -> {
+        cluster.send(cmd(SET).arg(key1).arg("foobar")).onComplete(set1 -> {
           should.assertTrue(set1.succeeded());
 
-          cluster.send(cmd(SET).arg(key1).arg("abcdef"), set2 -> {
+          cluster.send(cmd(SET).arg(key1).arg("abcdef")).onComplete(set2 -> {
             should.assertTrue(set2.succeeded());
 
-            cluster.send(cmd(BITOP).arg("AND").arg(destkey).arg(key1).arg(key2), bitTop -> {
+            cluster.send(cmd(BITOP).arg("AND").arg(destkey).arg(key1).arg(key2)).onComplete(bitTop -> {
               should.assertTrue(bitTop.succeeded());
-              cluster.send(cmd(GET).arg(destkey), get -> {
+              cluster.send(cmd(GET).arg(destkey)).onComplete(get -> {
                 should.assertTrue(get.succeeded());
                 test.complete();
               });
@@ -449,22 +446,22 @@ public class RedisClusterTest {
     final String list2 = makeKey();
 
     client
-      .connect(onCreate -> {
+      .connect().onComplete(onCreate -> {
         should.assertTrue(onCreate.succeeded());
 
         final RedisConnection cluster = onCreate.result();
         cluster.exceptionHandler(should::fail);
 
-        cluster.send(cmd(DEL).arg(list1), del1 -> {
+        cluster.send(cmd(DEL).arg(list1)).onComplete(del1 -> {
           should.assertTrue(del1.succeeded());
 
-          cluster.send(cmd(DEL).arg(list2), del2 -> {
+          cluster.send(cmd(DEL).arg(list2)).onComplete(del2 -> {
             should.assertTrue(del2.succeeded());
 
-            cluster.send(cmd(RPUSH).arg(list1).arg("a").arg("b").arg("c"), rPush -> {
+            cluster.send(cmd(RPUSH).arg(list1).arg("a").arg("b").arg("c")).onComplete(rPush -> {
               should.assertTrue(rPush.succeeded());
 
-              cluster.send(cmd(BLPOP).arg(list1).arg(0), blPop -> {
+              cluster.send(cmd(BLPOP).arg(list1).arg(0)).onComplete(blPop -> {
                 should.assertTrue(blPop.succeeded());
                 should.assertEquals(list1, blPop.result().get(0).toString());
                 should.assertEquals("a", blPop.result().get(1).toString());
@@ -486,23 +483,23 @@ public class RedisClusterTest {
     final byte[] value2 = new byte[]{0, 0, 0};
 
     client
-      .connect(onCreate -> {
+      .connect().onComplete(onCreate -> {
         should.assertTrue(onCreate.succeeded());
 
         final RedisConnection cluster = onCreate.result();
         cluster.exceptionHandler(should::fail);
 
-        cluster.send(cmd(SET).arg(key).arg(Buffer.buffer(value1)), set1 -> {
+        cluster.send(cmd(SET).arg(key).arg(Buffer.buffer(value1))).onComplete(set1 -> {
           should.assertTrue(set1.succeeded());
 
-          cluster.send(cmd(BITPOS).arg(key).arg(0), bitPos1 -> {
+          cluster.send(cmd(BITPOS).arg(key).arg(0)).onComplete(bitPos1 -> {
             should.assertTrue(bitPos1.succeeded());
             should.assertEquals(12L, bitPos1.result().toLong());
 
-            cluster.send(cmd(SET).arg(key).arg(Buffer.buffer(value2)), set2 -> {
+            cluster.send(cmd(SET).arg(key).arg(Buffer.buffer(value2))).onComplete(set2 -> {
               should.assertTrue(set2.succeeded());
 
-              cluster.send(cmd(BITPOS).arg(key).arg(1), bitPos2 -> {
+              cluster.send(cmd(BITPOS).arg(key).arg(1)).onComplete(bitPos2 -> {
                 should.assertTrue(bitPos2.succeeded());
                 should.assertEquals(-1L, bitPos2.result().toLong());
                 test.complete();
@@ -521,22 +518,22 @@ public class RedisClusterTest {
     final String list2 = makeKey();
 
     client
-      .connect(onCreate -> {
+      .connect().onComplete(onCreate -> {
         should.assertTrue(onCreate.succeeded());
 
         final RedisConnection cluster = onCreate.result();
         cluster.exceptionHandler(should::fail);
 
-        cluster.send(cmd(DEL).arg(list1), del1 -> {
+        cluster.send(cmd(DEL).arg(list1)).onComplete(del1 -> {
           should.assertTrue(del1.succeeded());
 
-          cluster.send(cmd(DEL).arg(list2), del2 -> {
+          cluster.send(cmd(DEL).arg(list2)).onComplete(del2 -> {
             should.assertTrue(del2.succeeded());
 
-            cluster.send(cmd(RPUSH).arg(list1).arg("a").arg("b").arg("c"), rPush -> {
+            cluster.send(cmd(RPUSH).arg(list1).arg("a").arg("b").arg("c")).onComplete(rPush -> {
               should.assertTrue(rPush.succeeded());
 
-              cluster.send(cmd(BRPOP).arg(list1).arg(list2).arg(0), brPop -> {
+              cluster.send(cmd(BRPOP).arg(list1).arg(list2).arg(0)).onComplete(brPop -> {
                 should.assertTrue(brPop.succeeded());
                 should.assertEquals(String.join(",", toStringArray(list1, "a")), brPop.result().toString());
                 test.complete();
@@ -553,16 +550,16 @@ public class RedisClusterTest {
     final String key = makeKey();
 
     client
-      .connect(onCreate -> {
+      .connect().onComplete(onCreate -> {
         should.assertTrue(onCreate.succeeded());
 
         final RedisConnection cluster = onCreate.result();
         cluster.exceptionHandler(should::fail);
 
-        cluster.send(cmd(SET).arg(key).arg(10), set -> {
+        cluster.send(cmd(SET).arg(key).arg(10)).onComplete(set -> {
           should.assertTrue(set.succeeded());
 
-          cluster.send(cmd(DECR).arg(key), decr -> {
+          cluster.send(cmd(DECR).arg(key)).onComplete(decr -> {
             should.assertTrue(decr.succeeded());
             should.assertEquals(9L, decr.result().toLong());
             test.complete();
@@ -577,16 +574,16 @@ public class RedisClusterTest {
     final String key = makeKey();
 
     client
-      .connect(onCreate -> {
+      .connect().onComplete(onCreate -> {
         should.assertTrue(onCreate.succeeded());
 
         final RedisConnection cluster = onCreate.result();
         cluster.exceptionHandler(should::fail);
 
-        cluster.send(cmd(SET).arg(key).arg(10), set -> {
+        cluster.send(cmd(SET).arg(key).arg(10)).onComplete(set -> {
           should.assertTrue(set.succeeded());
 
-          cluster.send(cmd(DECRBY).arg(key).arg(5), decrBy -> {
+          cluster.send(cmd(DECRBY).arg(key).arg(5)).onComplete(decrBy -> {
             should.assertTrue(decrBy.succeeded());
             should.assertEquals(5L, decrBy.result().toLong());
             test.complete();
@@ -601,19 +598,19 @@ public class RedisClusterTest {
     final String key1 = makeKey();
     final String key2 = makeKey();
 
-    client.connect(onCreate -> {
+    client.connect().onComplete(onCreate -> {
       should.assertTrue(onCreate.succeeded());
 
       final RedisConnection cluster = onCreate.result();
       cluster.exceptionHandler(should::fail);
 
-      cluster.send(cmd(SET).arg(key1).arg("Hello"), set1 -> {
+      cluster.send(cmd(SET).arg(key1).arg("Hello")).onComplete(set1 -> {
         should.assertTrue(set1.succeeded());
 
-        cluster.send(cmd(SET).arg(key2).arg("Hello"), set2 -> {
+        cluster.send(cmd(SET).arg(key2).arg("Hello")).onComplete(set2 -> {
           should.assertTrue(set2.succeeded());
 
-          cluster.send(cmd(DEL).arg(key1).arg(key2), del -> {
+          cluster.send(cmd(DEL).arg(key1).arg(key2)).onComplete(del -> {
             should.assertTrue(del.succeeded());
             should.assertEquals(2, del.result().toInteger());
             test.complete();
@@ -628,13 +625,13 @@ public class RedisClusterTest {
     final Async test = should.async();
 
     client
-      .connect(onCreate -> {
+      .connect().onComplete(onCreate -> {
         should.assertTrue(onCreate.succeeded());
 
         final RedisConnection cluster = onCreate.result();
         cluster.exceptionHandler(should::fail);
 
-        cluster.send(cmd(ECHO).arg("Hello Wordl"), echo -> {
+        cluster.send(cmd(ECHO).arg("Hello Wordl")).onComplete(echo -> {
           should.assertTrue(echo.succeeded());
           should.assertEquals("Hello Wordl", echo.result().toString());
           test.complete();
@@ -651,16 +648,16 @@ public class RedisClusterTest {
     final AtomicInteger counter = new AtomicInteger();
 
     client
-      .connect(onCreate -> {
+      .connect().onComplete(onCreate -> {
         should.assertTrue(onCreate.succeeded());
 
         final RedisConnection cluster = onCreate.result();
         cluster.exceptionHandler(should::fail);
 
-        cluster.send(cmd(SET).arg(key1).arg("Hello"), set -> {
+        cluster.send(cmd(SET).arg(key1).arg("Hello")).onComplete(set -> {
           should.assertTrue(set.succeeded());
 
-          cluster.send(cmd(EXISTS).arg(key1), exists -> {
+          cluster.send(cmd(EXISTS).arg(key1)).onComplete(exists -> {
             should.assertTrue(exists.succeeded());
             should.assertEquals(1L, exists.result().toLong());
             if (counter.incrementAndGet() == 2) {
@@ -669,7 +666,7 @@ public class RedisClusterTest {
           });
         });
 
-        cluster.send(cmd(EXISTS).arg(key2), exists -> {
+        cluster.send(cmd(EXISTS).arg(key2)).onComplete(exists -> {
           should.assertTrue(exists.succeeded());
           should.assertEquals(0L, exists.result().toLong());
           if (counter.incrementAndGet() == 2) {
@@ -685,28 +682,28 @@ public class RedisClusterTest {
     final String key = makeKey();
 
     client
-      .connect(onCreate -> {
+      .connect().onComplete(onCreate -> {
         should.assertTrue(onCreate.succeeded());
 
         final RedisConnection cluster = onCreate.result();
         cluster.exceptionHandler(should::fail);
 
-        cluster.send(cmd(SET).arg(key).arg("Hello"), set1 -> {
+        cluster.send(cmd(SET).arg(key).arg("Hello")).onComplete(set1 -> {
           should.assertTrue(set1.succeeded());
 
-          cluster.send(cmd(EXPIRE).arg(key).arg(10), expire -> {
+          cluster.send(cmd(EXPIRE).arg(key).arg(10)).onComplete(expire -> {
             should.assertTrue(expire.succeeded());
             should.assertEquals(1L, expire.result().toLong());
 
-            cluster.send(cmd(TTL).arg(key), ttl1 -> {
+            cluster.send(cmd(TTL).arg(key)).onComplete(ttl1 -> {
               should.assertTrue(ttl1.succeeded());
               should.assertEquals(10L, ttl1.result().toLong());
 
 
-              cluster.send(cmd(SET).arg(key).arg("Hello World"), set2 -> {
+              cluster.send(cmd(SET).arg(key).arg("Hello World")).onComplete(set2 -> {
                 should.assertTrue(set2.succeeded());
 
-                cluster.send(cmd(TTL).arg(key), ttl2 -> {
+                cluster.send(cmd(TTL).arg(key)).onComplete(ttl2 -> {
                   should.assertTrue(ttl2.succeeded());
                   should.assertEquals(-1L, ttl2.result().toLong());
                   test.complete();
@@ -724,25 +721,25 @@ public class RedisClusterTest {
     final String key = makeKey();
 
     client
-      .connect(onCreate -> {
+      .connect().onComplete(onCreate -> {
         should.assertTrue(onCreate.succeeded());
 
         final RedisConnection cluster = onCreate.result();
         cluster.exceptionHandler(should::fail);
 
-        cluster.send(cmd(SET).arg(key).arg("Hello"), set1 -> {
+        cluster.send(cmd(SET).arg(key).arg("Hello")).onComplete(set1 -> {
           should.assertTrue(set1.succeeded());
 
-          cluster.send(cmd(EXISTS).arg(key), exists1 -> {
+          cluster.send(cmd(EXISTS).arg(key)).onComplete(exists1 -> {
             should.assertTrue(exists1.succeeded());
             should.assertEquals(1L, exists1.result().toLong());
 
-            cluster.send(cmd(EXPIREAT).arg(key).arg(1293840000), expireAt -> {
+            cluster.send(cmd(EXPIREAT).arg(key).arg(1293840000)).onComplete(expireAt -> {
               should.assertTrue(expireAt.succeeded());
               should.assertEquals(1L, expireAt.result().toLong());
 
 
-              cluster.send(cmd(EXISTS).arg(key), exists2 -> {
+              cluster.send(cmd(EXISTS).arg(key)).onComplete(exists2 -> {
                 should.assertTrue(exists2.succeeded());
                 should.assertEquals(0L, exists2.result().toLong());
                 test.complete();
@@ -761,21 +758,21 @@ public class RedisClusterTest {
 
 
     client
-      .connect(onCreate -> {
+      .connect().onComplete(onCreate -> {
         should.assertTrue(onCreate.succeeded());
 
         final RedisConnection cluster = onCreate.result();
 
         cluster.exceptionHandler(should::fail);
 
-        cluster.send(cmd(GET).arg(nonExistentKey), get1 -> {
+        cluster.send(cmd(GET).arg(nonExistentKey)).onComplete(get1 -> {
           should.assertTrue(get1.succeeded());
           should.assertNull(get1.result());
 
-          cluster.send(cmd(SET).arg(key).arg("Hello"), set -> {
+          cluster.send(cmd(SET).arg(key).arg("Hello")).onComplete(set -> {
             should.assertTrue(set.succeeded());
 
-            cluster.send(cmd(GET).arg(key), get2 -> {
+            cluster.send(cmd(GET).arg(key)).onComplete(get2 -> {
               should.assertTrue(get2.succeeded());
               should.assertEquals("Hello", get2.result().toString());
               test.complete();
@@ -790,7 +787,7 @@ public class RedisClusterTest {
     final Async test = should.async();
 
     client
-      .connect(onCreate -> {
+      .connect().onComplete(onCreate -> {
         should.assertTrue(onCreate.succeeded());
 
         final RedisConnection cluster = onCreate.result();
@@ -800,14 +797,14 @@ public class RedisClusterTest {
         final AtomicInteger counter = new AtomicInteger(len);
         for (int i = 0; i < len; i++) {
           final String id = Integer.toString(i);
-          cluster.send(cmd(SET).arg(id).arg(id), set -> {
+          cluster.send(cmd(SET).arg(id).arg(id)).onComplete(set -> {
             should.assertTrue(set.succeeded());
             if (counter.decrementAndGet() == 0) {
               // CI is slow, give it a few seconds to sync the cluster
               System.out.println("Waiting 2sec so CI cluster can sync up");
               rule.vertx()
                 .setTimer(2_000L, v -> {
-                  cluster.send(cmd(DBSIZE), dbSize -> {
+                  cluster.send(cmd(DBSIZE)).onComplete(dbSize -> {
                     should.assertTrue(dbSize.succeeded());
                     should.assertEquals(len, dbSize.result().toInteger());
                     test.complete();
@@ -824,7 +821,7 @@ public class RedisClusterTest {
     final Async test = should.async();
 
     client
-      .connect(onCreate -> {
+      .connect().onComplete(onCreate -> {
         should.assertTrue(onCreate.succeeded());
 
         final RedisConnection cluster = onCreate.result();
@@ -834,13 +831,13 @@ public class RedisClusterTest {
         final AtomicInteger counter = new AtomicInteger();
         for (int i = 0; i < len; i++) {
           final String id = Integer.toString(i);
-          cluster.send(cmd(SET).arg(id).arg(id), set -> should.assertTrue(set.succeeded()));
+          cluster.send(cmd(SET).arg(id).arg(id)).onComplete(set -> should.assertTrue(set.succeeded()));
         }
 
-        cluster.send(cmd(FLUSHDB), flushDb -> {
+        cluster.send(cmd(FLUSHDB)).onComplete(flushDb -> {
           should.assertTrue(flushDb.succeeded());
 
-          cluster.send(cmd(DBSIZE), dbSize -> {
+          cluster.send(cmd(DBSIZE)).onComplete(dbSize -> {
             should.assertTrue(dbSize.succeeded());
             should.assertEquals(0L, dbSize.result().toLong());
             test.complete();
@@ -855,15 +852,15 @@ public class RedisClusterTest {
     final Async test = should.async();
 
     client
-      .connect(onCreate -> {
+      .connect().onComplete(onCreate -> {
         should.assertTrue(onCreate.succeeded());
 
         final RedisConnection cluster = onCreate.result();
         cluster.exceptionHandler(should::fail);
 
-        cluster.send(cmd(MSET).arg("1").arg("1").arg("2").arg("2").arg("3").arg("3").arg("key").arg("value"), mset -> {
+        cluster.send(cmd(MSET).arg("1").arg("1").arg("2").arg("2").arg("3").arg("3").arg("key").arg("value")).onComplete(mset -> {
           should.assertTrue(mset.succeeded());
-          cluster.send(cmd(KEYS).arg("[0-9]"), keys -> {
+          cluster.send(cmd(KEYS).arg("[0-9]")).onComplete(keys -> {
             should.assertTrue(keys.succeeded());
             should.assertEquals(3, keys.result().size());
             test.complete();
@@ -877,17 +874,17 @@ public class RedisClusterTest {
     final Async test = should.async();
 
     client
-      .connect(onCreate -> {
+      .connect().onComplete(onCreate -> {
         should.assertTrue(onCreate.succeeded());
 
         final RedisConnection cluster = onCreate.result();
         cluster.exceptionHandler(should::fail);
 
-        cluster.send(cmd(SET).arg("key1").arg("Hello"), set1 -> {
+        cluster.send(cmd(SET).arg("key1").arg("Hello")).onComplete(set1 -> {
           should.assertTrue(set1.succeeded());
-          cluster.send(cmd(SET).arg("key2").arg("World"), set2 -> {
+          cluster.send(cmd(SET).arg("key2").arg("World")).onComplete(set2 -> {
             should.assertTrue(set2.succeeded());
-            cluster.send(cmd(MGET).arg("key1").arg("key2").arg("nonexisting"), mget -> {
+            cluster.send(cmd(MGET).arg("key1").arg("key2").arg("nonexisting")).onComplete(mget -> {
               should.assertTrue(mget.succeeded());
               should.assertEquals(3, mget.result().size());
               List<String> values = new ArrayList<>();
@@ -915,12 +912,13 @@ public class RedisClusterTest {
     final String key = "{hash_tag}.some-key";
     final String argv = "some-value";
 
-    Redis.createClient(rule.vertx(), options).connect(should.asyncAssertSuccess(cluster -> cluster.send(cmd(EVAL).arg("return redis.call('SET', KEYS[1], ARGV[1])").arg(1).arg(key).arg(argv),
-      should.asyncAssertSuccess(response -> {
-        should.assertEquals("OK", response.toString());
-        test.complete();
-      }))
-    ));
+    Redis.createClient(rule.vertx(), options).connect()
+      .onComplete(should.asyncAssertSuccess(cluster -> cluster.send(cmd(EVAL).arg("return redis.call('SET', KEYS[1], ARGV[1])").arg(1).arg(key).arg(argv))
+        .onComplete(should.asyncAssertSuccess(response -> {
+          should.assertEquals("OK", response.toString());
+          test.complete();
+        }))
+      ));
   }
 
   @Test(timeout = 30_000)
@@ -934,8 +932,7 @@ public class RedisClusterTest {
     final List<Request> cmdList = new ArrayList<>();
     cmdList.add(req);
     cmdList.add(req);
-    Redis.createClient(rule.vertx(), options).connect(should.asyncAssertSuccess(cluster -> cluster.batch(cmdList,
-      should.asyncAssertSuccess(response -> {
+    Redis.createClient(rule.vertx(), options).connect().onComplete(should.asyncAssertSuccess(cluster -> cluster.batch(cmdList).onComplete(should.asyncAssertSuccess(response -> {
         should.assertEquals(2, response.size());
         response.forEach(r -> should.assertEquals("OK", r.toString()));
         test.complete();
@@ -952,10 +949,9 @@ public class RedisClusterTest {
     final String key2 = "{hash_tag}.other-key";
     final String argv2 = "other-value";
 
-    Redis.createClient(rule.vertx(), options).connect(should.asyncAssertSuccess(cluster -> cluster.send(cmd(EVAL).arg("local r1 = redis.call('SET', KEYS[1], ARGV[1]) \n" +
+    Redis.createClient(rule.vertx(), options).connect().onComplete(should.asyncAssertSuccess(cluster -> cluster.send(cmd(EVAL).arg("local r1 = redis.call('SET', KEYS[1], ARGV[1]) \n" +
         "local r2 = redis.call('SET', KEYS[2], ARGV[2]) \n" +
-        "return {r1, r2}").arg(2).arg(key1).arg(key2).arg(argv1).arg(argv2),
-      should.asyncAssertSuccess(response -> {
+        "return {r1, r2}").arg(2).arg(key1).arg(key2).arg(argv1).arg(argv2)).onComplete(should.asyncAssertSuccess(response -> {
         should.assertEquals(2, response.size());
         response.forEach(r -> should.assertEquals("OK", r.toString()));
         test.complete();
@@ -972,10 +968,9 @@ public class RedisClusterTest {
     final String key2 = "{other_hash_tag}.other-key";
     final String argv2 = "other-value";
 
-    Redis.createClient(rule.vertx(), options).connect(should.asyncAssertSuccess(cluster -> cluster.send(cmd(EVAL).arg("local r1 = redis.call('SET', KEYS[1], ARGV[1]) \n" +
+    Redis.createClient(rule.vertx(), options).connect().onComplete(should.asyncAssertSuccess(cluster -> cluster.send(cmd(EVAL).arg("local r1 = redis.call('SET', KEYS[1], ARGV[1]) \n" +
         "local r2 = redis.call('SET', KEYS[2], ARGV[2]) \n" +
-        "return {r1, r2}").arg(2).arg(key1).arg(key2).arg(argv1).arg(argv2),
-      should.asyncAssertFailure(throwable -> {
+        "return {r1, r2}").arg(2).arg(key1).arg(key2).arg(argv1).arg(argv2)).onComplete(should.asyncAssertFailure(throwable -> {
         should.assertTrue(throwable.getMessage().startsWith("Keys of command or batch"));
         test.complete();
       }))
@@ -991,8 +986,7 @@ public class RedisClusterTest {
     final List<Request> cmdList = new ArrayList<>();
     cmdList.add(cmd(EVAL).arg("return redis.call('SET', KEYS[1], ARGV[1])").arg(1).arg("{hash_tag}.some-key").arg(argv));
     cmdList.add(cmd(EVAL).arg("return redis.call('SET', KEYS[1], ARGV[1])").arg(1).arg("{other_hash_tag}.some-key").arg(argv));
-    Redis.createClient(rule.vertx(), options).connect(should.asyncAssertSuccess(cluster -> cluster.batch(cmdList,
-      should.asyncAssertFailure(throwable -> {
+    Redis.createClient(rule.vertx(), options).connect().onComplete(should.asyncAssertSuccess(cluster -> cluster.batch(cmdList).onComplete(should.asyncAssertFailure(throwable -> {
         should.assertTrue(throwable.getMessage().startsWith("Keys of command or batch"));
         test.complete();
       }))
@@ -1007,17 +1001,16 @@ public class RedisClusterTest {
     final int runs = 10;
     final Async test = should.async(runs);
 
-    Redis.createClient(rule.vertx(), options).connect(should.asyncAssertSuccess(cluster -> {
+    Redis.createClient(rule.vertx(), options).connect().onComplete(should.asyncAssertSuccess(cluster -> {
         for (int i = 0; i < runs; i++) {
-          cluster.send(cmd(SET).arg("key").arg("value"),
-            should.asyncAssertSuccess(setResponse -> {
-              should.assertEquals("OK", setResponse.toString().toUpperCase());
+          cluster.send(cmd(SET).arg("key").arg("value")).onComplete(should.asyncAssertSuccess(setResponse -> {
+            should.assertEquals("OK", setResponse.toString().toUpperCase());
 
-              cluster.send(cmd(WAIT).arg(1).arg(2000), should.asyncAssertSuccess(waitResponse -> {
-                should.assertEquals(1, waitResponse.toInteger());
-                test.countDown();
-              }));
+            cluster.send(cmd(WAIT).arg(1).arg(2000)).onComplete(should.asyncAssertSuccess(waitResponse -> {
+              should.assertEquals(1, waitResponse.toInteger());
+              test.countDown();
             }));
+          }));
         }
       }
     ));
@@ -1031,18 +1024,17 @@ public class RedisClusterTest {
     final List<Request> cmdList = new ArrayList<>();
     cmdList.add(cmd(SET).arg("key").arg("value"));
     cmdList.add(cmd(WAIT).arg(1).arg(2000));
-    Redis.createClient(rule.vertx(), options).connect(should.asyncAssertSuccess(cluster -> {
+    Redis.createClient(rule.vertx(), options).connect().onComplete(should.asyncAssertSuccess(cluster -> {
         for (int i = 0; i < runs; i++) {
-          cluster.batch(cmdList,
-            should.asyncAssertSuccess(responses -> {
-              should.assertEquals(2, responses.size());
-              Response setResponse = responses.get(0);
-              should.assertEquals("OK", setResponse.toString().toUpperCase());
-              Response waitResponse = responses.get(1);
-              should.assertEquals(1, waitResponse.toInteger());
+          cluster.batch(cmdList).onComplete(should.asyncAssertSuccess(responses -> {
+            should.assertEquals(2, responses.size());
+            Response setResponse = responses.get(0);
+            should.assertEquals("OK", setResponse.toString().toUpperCase());
+            Response waitResponse = responses.get(1);
+            should.assertEquals(1, waitResponse.toInteger());
 
-              test.countDown();
-            }));
+            test.countDown();
+          }));
         }
       }
     ));
@@ -1052,12 +1044,11 @@ public class RedisClusterTest {
   public void setAndWaitEmptyBatch(TestContext should) {
     final Async test = should.async();
 
-    Redis.createClient(rule.vertx(), options).connect(should.asyncAssertSuccess(cluster -> {
-        cluster.batch(Collections.emptyList(),
-          should.asyncAssertSuccess(responses -> {
-            should.assertEquals(0, responses.size());
-            test.countDown();
-          }));
+    Redis.createClient(rule.vertx(), options).connect().onComplete(should.asyncAssertSuccess(cluster -> {
+        cluster.batch(Collections.emptyList()).onComplete(should.asyncAssertSuccess(responses -> {
+          should.assertEquals(0, responses.size());
+          test.countDown();
+        }));
       }
     ));
   }
@@ -1066,13 +1057,12 @@ public class RedisClusterTest {
   public void clusterInfoReturnsVerbatimString(TestContext should) {
     final Async test = should.async();
 
-    Redis.createClient(rule.vertx(), options).connect(should.asyncAssertSuccess(cluster -> {
-        cluster.send(cmd(CLUSTER).arg("INFO"),
-          should.asyncAssertSuccess(response -> {
-            should.assertEquals("txt", response.format());
-            should.assertTrue(response.toString().startsWith("cluster_state:ok"));
-            test.complete();
-          }));
+    Redis.createClient(rule.vertx(), options).connect().onComplete(should.asyncAssertSuccess(cluster -> {
+        cluster.send(cmd(CLUSTER).arg("INFO")).onComplete(should.asyncAssertSuccess(response -> {
+          should.assertEquals("txt", response.format());
+          should.assertTrue(response.toString().startsWith("cluster_state:ok"));
+          test.complete();
+        }));
       }
     ));
   }
@@ -1082,13 +1072,13 @@ public class RedisClusterTest {
     final Async test = should.async();
 
     client
-      .connect(onCreate -> {
+      .connect().onComplete(onCreate -> {
         should.assertTrue(onCreate.succeeded());
 
         final RedisConnection cluster = onCreate.result();
         cluster.exceptionHandler(should::fail);
 
-        cluster.send(cmd(WAIT).arg(1).arg(0), hset1 -> {
+        cluster.send(cmd(WAIT).arg(1).arg(0)).onComplete(hset1 -> {
           should.assertTrue(hset1.succeeded());
           System.out.println(hset1.result());
           test.complete();
@@ -1101,13 +1091,13 @@ public class RedisClusterTest {
     final Async test = should.async();
 
     client
-      .connect(onCreate -> {
+      .connect().onComplete(onCreate -> {
         should.assertTrue(onCreate.succeeded());
 
         final RedisConnection cluster = onCreate.result();
         cluster.exceptionHandler(should::fail);
 
-        cluster.send(cmd(ACL, "users"), aclUsers -> {
+        cluster.send(cmd(ACL, "users")).onComplete(aclUsers -> {
           should.assertTrue(aclUsers.succeeded());
           should.assertEquals(1, aclUsers.result().size());
           test.complete();

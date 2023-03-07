@@ -19,11 +19,17 @@ import io.vertx.ext.unit.Async;
 import io.vertx.ext.unit.TestContext;
 import io.vertx.ext.unit.junit.RunTestOnContext;
 import io.vertx.ext.unit.junit.VertxUnitRunner;
-import io.vertx.redis.client.*;
-import org.junit.*;
+import io.vertx.redis.client.Command;
+import io.vertx.redis.client.Redis;
+import io.vertx.redis.client.RedisConnection;
+import io.vertx.redis.client.Request;
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Rule;
+import org.junit.Test;
 import org.junit.runner.RunWith;
 
-import java.util.*;
+import java.util.UUID;
 
 /**
  * This test relies on a Redis server, by default it will start and stop a Redis server unless
@@ -45,14 +51,16 @@ public class RedisClientPubSubTest {
   @Before
   public void before(TestContext should) {
     Async test = should.async();
-    redisPublish = Redis.createClient(rule.vertx(), "redis://localhost:7006")
-      .connect(connectPub -> {
+    redisPublish = Redis.createClient(rule.vertx(), "redis://localhost:7006");
+    redisPublish
+      .connect().onComplete(connectPub -> {
         should.assertTrue(connectPub.succeeded());
 
         pubConn = connectPub.result();
 
-        redisSubscribe = Redis.createClient(rule.vertx(), "redis://localhost:7006")
-          .connect(connectSub -> {
+        redisSubscribe = Redis.createClient(rule.vertx(), "redis://localhost:7006");
+        redisSubscribe
+          .connect().onComplete(connectSub -> {
             should.assertTrue(connectSub.succeeded());
 
             subConn = connectSub.result();
@@ -74,20 +82,20 @@ public class RedisClientPubSubTest {
   @Test
   public void testPublishSubscribe(TestContext should) {
     final Async test = should.async();
-    pubConn.send(Request.cmd(Command.SUBSCRIBE).arg("news"), reply -> {
+    pubConn.send(Request.cmd(Command.SUBSCRIBE).arg("news")).onComplete(reply -> {
       should.assertTrue(reply.succeeded());
       rule.vertx().eventBus().consumer("io.vertx.redis.news", msg -> test.complete());
-      pubConn.send(Request.cmd(Command.PUBLISH).arg("news").arg("foo"), preply -> should.assertTrue(preply.succeeded()));
+      pubConn.send(Request.cmd(Command.PUBLISH).arg("news").arg("foo")).onComplete(preply -> should.assertTrue(preply.succeeded()));
     });
   }
 
   @Test
   public void testPublishPSubscribe(TestContext should) {
     final Async test = should.async();
-    subConn.send(Request.cmd(Command.PSUBSCRIBE).arg("new*"), reply -> {
+    subConn.send(Request.cmd(Command.PSUBSCRIBE).arg("new*")).onComplete(reply -> {
       should.assertTrue(reply.succeeded());
       rule.vertx().eventBus().consumer("io.vertx.redis.new*", msg -> test.complete());
-      pubConn.send(Request.cmd(Command.PUBLISH).arg("news").arg("foo"), preply -> should.assertTrue(preply.succeeded()));
+      pubConn.send(Request.cmd(Command.PUBLISH).arg("news").arg("foo")).onComplete(preply -> should.assertTrue(preply.succeeded()));
     });
   }
 }

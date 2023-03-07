@@ -12,18 +12,21 @@
 [frame="topbot"]
 |===
 ^|Name | Description
-|[[STANDALONE]]`STANDALONE`|+++
+|
+[[STANDALONE]]`STANDALONE`|+++
 The client should work in single server mode (the default).
 +++
-|[[SENTINEL]]`SENTINEL`|+++
+|
+[[SENTINEL]]`SENTINEL`|+++
 The client should work in sentinel mode. When this mode is active
- use the link to define which role to get the client
- connection to.
+use the link to define which role to get the client
+connection to.
 +++
-|[[CLUSTER]]`CLUSTER`|+++
+|
+[[CLUSTER]]`CLUSTER`|+++
 The client should work in cluster mode. When this mode is active
- use the link to define when replica nodes can be
- used for read only queries.
+use the link to define when replica nodes can be
+used for read only queries.
 +++
 |===
 
@@ -39,13 +42,16 @@ The client should work in cluster mode. When this mode is active
 [frame="topbot"]
 |===
 ^|Name | Description
-|[[NEVER]]`NEVER`|+++
+|
+[[NEVER]]`NEVER`|+++
 Never use REPLICA, queries are always run on a MASTER node.
 +++
-|[[SHARE]]`SHARE`|+++
+|
+[[SHARE]]`SHARE`|+++
 Queries can be randomly run on both MASTER and REPLICA nodes.
 +++
-|[[ALWAYS]]`ALWAYS`|+++
+|
+[[ALWAYS]]`ALWAYS`|+++
 Queries are always run on REPLICA nodes (never on MASTER node).
 +++
 |===
@@ -62,13 +68,16 @@ Queries are always run on REPLICA nodes (never on MASTER node).
 [frame="topbot"]
 |===
 ^|Name | Description
-|[[MASTER]]`MASTER`|+++
+|
+[[MASTER]]`MASTER`|+++
 Use a MASTER node connection.
 +++
-|[[REPLICA]]`REPLICA`|+++
+|
+[[REPLICA]]`REPLICA`|+++
 Use a REPLICA node connection.
 +++
-|[[SENTINEL]]`SENTINEL`|+++
+|
+[[SENTINEL]]`SENTINEL`|+++
 Use a SENTINEL node connection.
 +++
 |===
@@ -85,28 +94,36 @@ Use a SENTINEL node connection.
 [frame="topbot"]
 |===
 ^|Name | Description
-|[[SIMPLE]]`SIMPLE`|+++
+|
+[[SIMPLE]]`SIMPLE`|+++
 C String simple String.
 +++
-|[[ERROR]]`ERROR`|+++
+|
+[[ERROR]]`ERROR`|+++
 C String simple String representing an error.
 +++
-|[[BOOLEAN]]`BOOLEAN`|+++
+|
+[[BOOLEAN]]`BOOLEAN`|+++
 boolean value.
 +++
-|[[NUMBER]]`NUMBER`|+++
+|
+[[NUMBER]]`NUMBER`|+++
 numeric value.
 +++
-|[[BULK]]`BULK`|+++
+|
+[[BULK]]`BULK`|+++
 byte array value.
 +++
-|[[PUSH]]`PUSH`|+++
+|
+[[PUSH]]`PUSH`|+++
 Push message
 +++
-|[[ATTRIBUTE]]`ATTRIBUTE`|+++
+|
+[[ATTRIBUTE]]`ATTRIBUTE`|+++
 Attribute message
 +++
-|[[MULTI]]`MULTI`|+++
+|
+[[MULTI]]`MULTI`|+++
 List of multiple bulk responses (List, Set, Map).
 +++
 |===

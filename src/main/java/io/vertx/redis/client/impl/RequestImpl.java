@@ -16,8 +16,6 @@
 package io.vertx.redis.client.impl;
 
 import io.vertx.core.buffer.Buffer;
-import io.vertx.core.json.JsonArray;
-import io.vertx.core.json.JsonObject;
 import io.vertx.redis.client.Command;
 import io.vertx.redis.client.Request;
 
@@ -35,8 +33,8 @@ public final class RequestImpl implements Request {
   private static final byte[] EMPTY_BYTES = new byte[0];
   private static final byte[] NULL_BULK = "$4\r\nnull\r\n".getBytes(StandardCharsets.ISO_8859_1);
   private static final byte[] EOL = "\r\n".getBytes(StandardCharsets.ISO_8859_1);
-  private static final byte[] TRUE = new byte[] { 't' };
-  private static final byte[] FALSE = new byte[] { 'f' };
+  private static final byte[] TRUE = new byte[]{'t'};
+  private static final byte[] FALSE = new byte[]{'f'};
 
   private final CommandImpl cmd;
   private final List<byte[]> args;

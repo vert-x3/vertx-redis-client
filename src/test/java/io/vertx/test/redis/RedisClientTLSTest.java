@@ -5,7 +5,6 @@ import io.vertx.core.net.JksOptions;
 import io.vertx.core.net.NetClientOptions;
 import io.vertx.core.net.NetServer;
 import io.vertx.core.net.NetServerOptions;
-import io.vertx.core.streams.Pump;
 import io.vertx.ext.unit.Async;
 import io.vertx.ext.unit.TestContext;
 import io.vertx.ext.unit.junit.RunTestOnContext;
@@ -14,7 +13,10 @@ import io.vertx.redis.client.Command;
 import io.vertx.redis.client.Redis;
 import io.vertx.redis.client.RedisOptions;
 import io.vertx.redis.client.Request;
-import org.junit.*;
+import org.junit.BeforeClass;
+import org.junit.ClassRule;
+import org.junit.Rule;
+import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.testcontainers.containers.GenericContainer;
 
@@ -60,7 +62,7 @@ public class RedisClientTLSTest {
           .createNetClient(new NetClientOptions()
             .setTcpKeepAlive(true)
             .setTcpNoDelay(true))
-          .connect(redis.getFirstMappedPort(), redis.getContainerIpAddress())
+          .connect(redis.getFirstMappedPort(), redis.getHost())
           .onFailure(err -> {
             System.out.println("PROXY CLIENT ERR: " + err);
             should.fail(err);

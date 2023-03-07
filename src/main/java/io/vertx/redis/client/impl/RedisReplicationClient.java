@@ -184,50 +184,50 @@ public class RedisReplicationClient extends BaseRedisClient implements Redis {
       .onFailure(err -> onGetSlots.handle(Future.failedFuture(err)))
       .onSuccess(info -> {
 
-      final Map<String, String> reply = parseInfo(info);
+        final Map<String, String> reply = parseInfo(info);
 
-      if (reply.size() == 0) {
-        // no slots available we can't really proceed
-        onGetSlots.handle(Future.failedFuture("INFO REPLICATION No config available in the node."));
-        return;
-      }
+        if (reply.size() == 0) {
+          // no slots available we can't really proceed
+          onGetSlots.handle(Future.failedFuture("INFO REPLICATION No config available in the node."));
+          return;
+        }
 
-      // inherit protocol config from the current connection
-      final RedisURI uri = new RedisURI(endpoints.get(index));
+        // inherit protocol config from the current connection
+        final RedisURI uri = new RedisURI(endpoints.get(index));
 
-      switch (reply.get("role")) {
-        case "master":
-          try {
-            List<Node> nodes = new ArrayList<>();
-            int totalNodes = Integer.parseInt(reply.get("connected_slaves"));
-            for (int i = 0; i < totalNodes; i++) {
-              nodes.add(new Node(uri, reply.get("slave" + i)));
+        switch (reply.get("role")) {
+          case "master":
+            try {
+              List<Node> nodes = new ArrayList<>();
+              int totalNodes = Integer.parseInt(reply.get("connected_slaves"));
+              for (int i = 0; i < totalNodes; i++) {
+                nodes.add(new Node(uri, reply.get("slave" + i)));
+              }
+              onGetSlots.handle(Future.succeededFuture(nodes));
+              return;
+            } catch (RuntimeException e) {
+              onGetSlots.handle(Future.failedFuture(e));
+              return;
             }
-            onGetSlots.handle(Future.succeededFuture(nodes));
-            return;
-          } catch (RuntimeException e) {
-            onGetSlots.handle(Future.failedFuture(e));
-            return;
-          }
-        case "slave":
-          // extract the master info and if present add it to the current endpoints
-          try {
-            String masterHost = reply.get("master_host");
-            String masterPort = reply.get("master_port");
-            // push it to the list
-            endpoints.add(index + 1, uri.protocol() + "://" + uri.userinfo() + masterHost + ":" + masterPort);
-            // so it will be run on the next try
-            onGetSlots.handle(Future.failedFuture("Connected to replica, retrying with master"));
-            return;
-          } catch (RuntimeException e) {
-            onGetSlots.handle(Future.failedFuture(e));
-            return;
-          }
-        default:
-          onGetSlots.handle(Future.failedFuture("INFO REPLICATION invalid role: " + reply.get("role")));
-          break;
-      }
-    });
+          case "slave":
+            // extract the master info and if present add it to the current endpoints
+            try {
+              String masterHost = reply.get("master_host");
+              String masterPort = reply.get("master_port");
+              // push it to the list
+              endpoints.add(index + 1, uri.protocol() + "://" + uri.userinfo() + masterHost + ":" + masterPort);
+              // so it will be run on the next try
+              onGetSlots.handle(Future.failedFuture("Connected to replica, retrying with master"));
+              return;
+            } catch (RuntimeException e) {
+              onGetSlots.handle(Future.failedFuture(e));
+              return;
+            }
+          default:
+            onGetSlots.handle(Future.failedFuture("INFO REPLICATION invalid role: " + reply.get("role")));
+            break;
+        }
+      });
   }
 
   private Map<String, String> parseInfo(Response response) {

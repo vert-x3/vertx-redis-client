@@ -4,7 +4,9 @@ import io.vertx.ext.unit.Async;
 import io.vertx.ext.unit.TestContext;
 import io.vertx.ext.unit.junit.RunTestOnContext;
 import io.vertx.ext.unit.junit.VertxUnitRunner;
-import io.vertx.redis.client.*;
+import io.vertx.redis.client.Redis;
+import io.vertx.redis.client.RedisConnection;
+import io.vertx.redis.client.Request;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;
@@ -14,8 +16,8 @@ import org.junit.runner.RunWith;
 import java.util.HashSet;
 import java.util.concurrent.atomic.AtomicInteger;
 
-import static io.vertx.redis.client.Request.cmd;
 import static io.vertx.redis.client.Command.*;
+import static io.vertx.redis.client.Request.cmd;
 
 @RunWith(VertxUnitRunner.class)
 public class RedisPubSubTest {
@@ -31,13 +33,13 @@ public class RedisPubSubTest {
     final Async setUp = should.async();
 
     Redis.createClient(rule.vertx(), "redis://127.0.0.1:7006")
-      .connect(onCreate -> {
+      .connect().onComplete(onCreate -> {
         should.assertTrue(onCreate.succeeded());
         pub = onCreate.result();
         pub.exceptionHandler(should::fail);
 
         Redis.createClient(rule.vertx(), "redis://127.0.0.1:7006")
-          .connect(onCreate2 -> {
+          .connect().onComplete(onCreate2 -> {
             should.assertTrue(onCreate2.succeeded());
             sub = onCreate2.result();
             sub.exceptionHandler(should::fail);
@@ -82,10 +84,10 @@ public class RedisPubSubTest {
       }
     });
 
-    sub.send(cmd(SUBSCRIBE).arg("mychannel"), subscribe -> {
+    sub.send(cmd(SUBSCRIBE).arg("mychannel")).onComplete(subscribe -> {
       should.assertTrue(subscribe.succeeded());
 
-      rule.vertx().setTimer(100L, t -> pub.send(cmd(PUBLISH).arg("mychannel").arg(123456), publish -> {
+      rule.vertx().setTimer(100L, t -> pub.send(cmd(PUBLISH).arg("mychannel").arg(123456)).onComplete(publish -> {
         should.assertTrue(publish.succeeded());
         should.assertNotNull(publish.result());
       }));
@@ -136,13 +138,13 @@ public class RedisPubSubTest {
     // Add all patterns to subscribe to
     patterns.forEach(psub_request::arg);
 
-    sub.send(psub_request, subscribe -> {
+    sub.send(psub_request).onComplete(subscribe -> {
       should.assertTrue(subscribe.succeeded());
 
-      rule.vertx().setTimer(100L, t -> patterns.forEach(p -> pub.send(cmd(PUBLISH).arg(p).arg(System.nanoTime()), publish -> {
-          should.assertTrue(publish.succeeded());
-          should.assertNotNull(publish.result());
-        })));
+      rule.vertx().setTimer(100L, t -> patterns.forEach(p -> pub.send(cmd(PUBLISH).arg(p).arg(System.nanoTime())).onComplete(publish -> {
+        should.assertTrue(publish.succeeded());
+        should.assertNotNull(publish.result());
+      })));
     });
   }
 }
