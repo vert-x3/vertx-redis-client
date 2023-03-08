@@ -1,6 +1,7 @@
 # Vert.x Redis Client
 
-[![Build Status](https://github.com/vert-x3/vertx-redis-client/workflows/CI/badge.svg?branch=master)](https://github.com/vert-x3/vertx-redis-client/actions?query=workflow%3ACI)
+[![Build Status (5.x)](https://github.com/vert-x3/vertx-redis-client/actions/workflows/ci-5.x.yml/badge.svg)](https://github.com/vert-x3/vertx-redis-client/actions/workflows/ci-5.x.yml)
+[![Build Status (4.x)](https://github.com/vert-x3/vertx-redis-client/actions/workflows/ci-4.x.yml/badge.svg)](https://github.com/vert-x3/vertx-redis-client/actions/workflows/ci-4.x.yml)
 
 The Vert.x Redis client provides an asynchronous API to interact with a [Redis](http://redis.io) data-structure server.
 
