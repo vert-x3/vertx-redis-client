@@ -12,6 +12,7 @@ import static io.vertx.redis.client.Request.cmd;
 
 public class CommandGenerator extends AbstractVerticle {
 
+  // redis/redis-stack:7.0.0-RC4
   public static void main(String[] args) {
     Vertx.vertx().deployVerticle(new CommandGenerator());
   }

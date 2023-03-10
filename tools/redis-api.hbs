@@ -1,5 +1,5 @@
 /*
- * Copyright 2018 Red Hat, Inc.
+ * Copyright 2022 Red Hat, Inc.
  *
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
@@ -15,65 +15,49 @@
  */
 package io.vertx.redis.client;
 
-import io.vertx.codegen.annotations.Fluent;
 import io.vertx.codegen.annotations.GenIgnore;
 import io.vertx.codegen.annotations.Nullable;
 import io.vertx.codegen.annotations.VertxGen;
-import io.vertx.core.AsyncResult;
 import io.vertx.core.Future;
-import io.vertx.core.Handler;
-import io.vertx.redis.client.impl.RedisAPIImpl;
-
-import java.util.List;
+import io.vertx.redis.client.impl.RedisStackImpl;
 
 import static io.vertx.codegen.annotations.GenIgnore.PERMITTED_TYPE;
+import static io.vertx.redis.client.Request.cmd;
 
 /**
- * <b>Auto generated</b> Redis API client wrapper.
+ * <b>Auto generated</b> Redis Stack API client wrapper.
  * @version {{ version }}
  */
 @VertxGen
-public interface RedisAPI {
+public interface RedisStack {
 
   @GenIgnore(PERMITTED_TYPE)
-  static RedisAPI api(Redis client) {
-    return new RedisAPIImpl(client);
+  static RedisStack api(Redis client) {
+    return new RedisStackImpl(client);
   }
 
   @GenIgnore(PERMITTED_TYPE)
-  static RedisAPI api(RedisConnection connection) {
-    return new RedisAPIImpl(connection);
+  static RedisStack api(RedisConnection connection) {
+    return new RedisStackImpl(connection);
   }
 
-  void close();
-
+  Future<Void> close();
 {{#each .}}
-  /**
-   * Redis command <a href="https://redis.io/commands/{{ name }}">{{ camelcase safename }}</a>.
-   * @return fluent self
-   */
-  @Fluent
-  default RedisAPI {{ camelcase safename }}({{{ types }}}{{#if argLen}}, {{/if}}Handler<AsyncResult<@Nullable Response>> handler) {
-    send(Command.{{ enum }}{{#if argLen}}, {{{ args }}}{{#if variable}}.toArray(new String[0]){{/if}}{{/if}}).onComplete(handler);
-    return this;
-  }
 
   /**
-   * Redis command <a href="https://redis.io/commands/{{ name }}">{{ camelcase safename }}</a>.
-   * @return Future response.
+   * Redis command <a href="https://redis.io/commands/{{ name }}">{{ name }}</a>.
+   * @return Future asynchronous result with {@link Response} or {@code null}.
    */
+  @GenIgnore(GenIgnore.PERMITTED_TYPE)
   default Future<@Nullable Response> {{ camelcase safename }}({{{ types }}}) {
-    return send(Command.{{ enum }}{{#if argLen}}, {{{ args }}}{{#if variable}}.toArray(new String[0]){{/if}}{{/if}});
+    return send(cmd(Command.{{ enum }}{{#if argLen}}, {{{ args }}}{{#if variable}}{{/if}}{{/if}}));
   }
 {{/each}}
 
   /**
-   * Send untyped command to redis.
-   *
-   * @param cmd the command
-   * @param args var args
+   * @param req the request to fulfill
    * @return Future response.
    */
   @GenIgnore
-  Future<@Nullable Response> send(Command cmd, String... args);
+  Future<@Nullable Response> send(Request req);
 }
