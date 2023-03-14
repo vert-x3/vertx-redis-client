@@ -67,7 +67,7 @@ public class RedisThreadConsistencyTest {
       vertx.createHttpServer()
         .requestHandler(req -> {
           String threadBeforeRedisCommandExecution = Thread.currentThread().getName();
-          redisAPI.info(Collections.emptyList(), result -> {
+          redisAPI.info(Collections.emptyList()).onComplete(result -> {
             String threadAfterRedisCommandExecution = Thread.currentThread().getName();
             req.response().putHeader("initialThread", threadBeforeRedisCommandExecution)
               .putHeader("threadAfterRedisExecution", threadAfterRedisCommandExecution)

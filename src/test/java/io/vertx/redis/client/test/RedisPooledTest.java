@@ -108,13 +108,11 @@ public class RedisPooledTest {
 
     RedisAPI redis = RedisAPI.api(Redis.createClient(rule.vertx(), "redis://" + container.getHost() + ":" + container.getFirstMappedPort()));
 
-    redis.set(Arrays.asList("key1", "value1"), set -> {
-      should.assertTrue(set.succeeded());
-      should.assertNotNull(set.result());
-
-      should.assertEquals("OK", set.result().toString());
+    redis.set(Arrays.asList("key1", "value1")).onComplete(should.asyncAssertSuccess(set -> {
+      should.assertNotNull(set);
+      should.assertEquals("OK", set.toString());
       test.complete();
-    });
+    }));
   }
 
   @Test
@@ -132,11 +130,10 @@ public class RedisPooledTest {
 
     IntStream.range(0, 5).forEach(i -> vertx.setTimer(1, timerid -> {
 
-      redis.set(Arrays.asList("foo", "bar"), res -> {
-      });
+      redis.set(Arrays.asList("foo", "bar"));
 
       // EXPECTED NULL
-      redis.get("redis_test", res -> {
+      redis.get("redis_test").onComplete(res -> {
         if (res.failed()) {
           should.fail(res.cause());
         } else {
