@@ -146,13 +146,11 @@ public class RedisTest {
 
         RedisAPI redis = RedisAPI.api(create.result());
 
-        redis.set(Arrays.asList("key1", "value1"), set -> {
-          should.assertTrue(set.succeeded());
-          should.assertNotNull(set.result());
-
-          should.assertEquals("OK", set.result().toString());
+        redis.set(Arrays.asList("key1", "value1")).onComplete(should.asyncAssertSuccess(set -> {
+          should.assertNotNull(set);
+          should.assertEquals("OK", set.toString());
           test.complete();
-        });
+        }));
       });
   }
 
@@ -170,11 +168,10 @@ public class RedisTest {
         RedisAPI redis = RedisAPI.api(create.result());
 
         IntStream.range(0, 100).forEach(i -> vertx.setTimer(1, timerid -> {
-          redis.set(Arrays.asList("foo", "bar"), res -> {
-          });
+          redis.set(Arrays.asList("foo", "bar"));
 
           // EXPECTED NULL
-          redis.get("redis_test", res -> {
+          redis.get("redis_test").onComplete(res -> {
             if (res.failed()) {
               should.fail(res.cause());
             } else {
@@ -236,14 +233,14 @@ public class RedisTest {
         final RedisConnection redis = create.result();
         RedisAPI api = RedisAPI.api(redis);
 
-        api.zadd(Arrays.asList("anykey", "1598248800", "member1", "1598248700", "member2"), zadd -> {
-          should.assertTrue(zadd.succeeded());
-          api.zrange(Arrays.asList("anykey", "0", "-1", "WITHSCORES"), zrange -> {
-            should.assertTrue(zrange.succeeded());
-            System.out.println(zrange);
-            test.complete();
-          });
-        });
+        api
+          .zadd(Arrays.asList("anykey", "1598248800", "member1", "1598248700", "member2"))
+          .onComplete(should.asyncAssertSuccess(zadd -> {
+            api.zrange(Arrays.asList("anykey", "0", "-1", "WITHSCORES")).onComplete(should.asyncAssertSuccess(zrange -> {
+              System.out.println(zrange);
+              test.complete();
+            }));
+          }));
       });
   }
 
