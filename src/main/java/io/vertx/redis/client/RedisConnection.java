@@ -18,7 +18,6 @@ package io.vertx.redis.client;
 import io.vertx.codegen.annotations.Fluent;
 import io.vertx.codegen.annotations.Nullable;
 import io.vertx.codegen.annotations.VertxGen;
-import io.vertx.core.AsyncResult;
 import io.vertx.core.Future;
 import io.vertx.core.Handler;
 import io.vertx.core.streams.ReadStream;
@@ -73,21 +72,6 @@ public interface RedisConnection extends ReadStream<Response> {
   @Override
   RedisConnection endHandler(@Nullable Handler<Void> endHandler);
 
-
-  /**
-   * Send the given command to the redis server or cluster.
-   *
-   * @param command the command to send
-   * @param onSend  the asynchronous result handler.
-   * @return fluent self.
-   */
-  @Fluent
-  @Deprecated
-  default RedisConnection send(Request command, Handler<AsyncResult<@Nullable Response>> onSend) {
-    send(command).onComplete(onSend);
-    return this;
-  }
-
   /**
    * Send the given command to the redis server or cluster.
    *
@@ -95,21 +79,6 @@ public interface RedisConnection extends ReadStream<Response> {
    * @return a future with the result of the operation
    */
   Future<@Nullable Response> send(Request command);
-
-  /**
-   * Sends a list of commands in a single IO operation, this prevents any inter twinning to happen from other
-   * client users.
-   *
-   * @param commands list of command to send
-   * @param onSend   the asynchronous result handler.
-   * @return fluent self.
-   */
-  @Fluent
-  @Deprecated
-  default RedisConnection batch(List<Request> commands, Handler<AsyncResult<List<@Nullable Response>>> onSend) {
-    batch(commands).onComplete(onSend);
-    return this;
-  }
 
   /**
    * Sends a list of commands in a single IO operation, this prevents any inter twinning to happen from other
@@ -124,16 +93,6 @@ public interface RedisConnection extends ReadStream<Response> {
    * Closes the connection or returns to the pool.
    */
   Future<Void> close();
-
-  /**
-   * Closes the connection or returns to the pool.
-   */
-  @Fluent
-  @Deprecated
-  default RedisConnection close(Handler<AsyncResult<Void>> onClose) {
-    close().onComplete(onClose);
-    return this;
-  }
 
   /**
    * Flag to notify if the pending message queue (commands in transit) is full.

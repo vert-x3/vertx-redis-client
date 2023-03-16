@@ -15,12 +15,9 @@
  */
 package io.vertx.redis.client;
 
-import io.vertx.codegen.annotations.Fluent;
 import io.vertx.codegen.annotations.Nullable;
 import io.vertx.codegen.annotations.VertxGen;
-import io.vertx.core.AsyncResult;
 import io.vertx.core.Future;
-import io.vertx.core.Handler;
 import io.vertx.core.Vertx;
 import io.vertx.redis.client.impl.RedisClient;
 import io.vertx.redis.client.impl.RedisClusterClient;
@@ -82,19 +79,6 @@ public interface Redis {
   /**
    * Connects to the redis server.
    *
-   * @param handler the async result handler
-   * @return a reference to this, so the API can be used fluently
-   */
-  @Fluent
-  @Deprecated
-  default Redis connect(Handler<AsyncResult<RedisConnection>> handler) {
-    connect().onComplete(handler);
-    return this;
-  }
-
-  /**
-   * Connects to the redis server.
-   *
    * @return a future with the result of the operation
    */
   Future<RedisConnection> connect();
@@ -108,38 +92,9 @@ public interface Redis {
    * Send the given command to the redis server or cluster.
    *
    * @param command the command to send
-   * @param onSend  the asynchronous result handler.
-   * @return fluent self.
-   */
-  @Fluent
-  @Deprecated
-  default Redis send(Request command, Handler<AsyncResult<@Nullable Response>> onSend) {
-    send(command).onComplete(onSend);
-    return this;
-  }
-
-  /**
-   * Send the given command to the redis server or cluster.
-   *
-   * @param command the command to send
    * @return a future with the result of the operation
    */
   Future<@Nullable Response> send(Request command);
-
-  /**
-   * Sends a list of commands in a single IO operation, this prevents any inter twinning to happen from other
-   * client users.
-   *
-   * @param commands list of command to send
-   * @param onSend   the asynchronous result handler.
-   * @return fluent self.
-   */
-  @Fluent
-  @Deprecated
-  default Redis batch(List<Request> commands, Handler<AsyncResult<List<@Nullable Response>>> onSend) {
-    batch(commands).onComplete(onSend);
-    return this;
-  }
 
   /**
    * Sends a list of commands in a single IO operation, this prevents any inter twinning to happen from other

@@ -19,7 +19,6 @@ import io.vertx.codegen.annotations.Fluent;
 import io.vertx.codegen.annotations.GenIgnore;
 import io.vertx.codegen.annotations.Nullable;
 import io.vertx.codegen.annotations.VertxGen;
-import io.vertx.core.AsyncResult;
 import io.vertx.core.Future;
 import io.vertx.core.Handler;
 import io.vertx.redis.client.impl.RedisAPIImpl;
@@ -51,34 +50,10 @@ public interface RedisAPI {
   /**
    * Redis command <a href="https://redis.io/commands/FT.ADD">ftAdd</a>.
    *
-   * @return fluent self
-   */
-  @Fluent
-  @Deprecated
-  default RedisAPI ftAdd(List<String> args, Handler<AsyncResult<@Nullable Response>> handler) {
-    send(Command.FT_ADD, args.toArray(new String[0])).onComplete(handler);
-    return this;
-  }
-
-  /**
-   * Redis command <a href="https://redis.io/commands/FT.ADD">ftAdd</a>.
-   *
    * @return Future response.
    */
   default Future<@Nullable Response> ftAdd(List<String> args) {
     return send(Command.FT_ADD, args.toArray(new String[0]));
-  }
-
-  /**
-   * Redis command <a href="https://redis.io/commands/FT.AGGREGATE">ftAggregate</a>.
-   *
-   * @return fluent self
-   */
-  @Fluent
-  @Deprecated
-  default RedisAPI ftAggregate(List<String> args, Handler<AsyncResult<@Nullable Response>> handler) {
-    send(Command.FT_AGGREGATE, args.toArray(new String[0])).onComplete(handler);
-    return this;
   }
 
   /**
@@ -93,34 +68,10 @@ public interface RedisAPI {
   /**
    * Redis command <a href="https://redis.io/commands/FT.ALIASADD">ftAliasadd</a>.
    *
-   * @return fluent self
-   */
-  @Fluent
-  @Deprecated
-  default RedisAPI ftAliasadd(List<String> args, Handler<AsyncResult<@Nullable Response>> handler) {
-    send(Command.FT_ALIASADD, args.toArray(new String[0])).onComplete(handler);
-    return this;
-  }
-
-  /**
-   * Redis command <a href="https://redis.io/commands/FT.ALIASADD">ftAliasadd</a>.
-   *
    * @return Future response.
    */
   default Future<@Nullable Response> ftAliasadd(List<String> args) {
     return send(Command.FT_ALIASADD, args.toArray(new String[0]));
-  }
-
-  /**
-   * Redis command <a href="https://redis.io/commands/FT.ALIASDEL">ftAliasdel</a>.
-   *
-   * @return fluent self
-   */
-  @Fluent
-  @Deprecated
-  default RedisAPI ftAliasdel(List<String> args, Handler<AsyncResult<@Nullable Response>> handler) {
-    send(Command.FT_ALIASDEL, args.toArray(new String[0])).onComplete(handler);
-    return this;
   }
 
   /**
@@ -135,34 +86,10 @@ public interface RedisAPI {
   /**
    * Redis command <a href="https://redis.io/commands/FT.ALIASUPDATE">ftAliasupdate</a>.
    *
-   * @return fluent self
-   */
-  @Fluent
-  @Deprecated
-  default RedisAPI ftAliasupdate(List<String> args, Handler<AsyncResult<@Nullable Response>> handler) {
-    send(Command.FT_ALIASUPDATE, args.toArray(new String[0])).onComplete(handler);
-    return this;
-  }
-
-  /**
-   * Redis command <a href="https://redis.io/commands/FT.ALIASUPDATE">ftAliasupdate</a>.
-   *
    * @return Future response.
    */
   default Future<@Nullable Response> ftAliasupdate(List<String> args) {
     return send(Command.FT_ALIASUPDATE, args.toArray(new String[0]));
-  }
-
-  /**
-   * Redis command <a href="https://redis.io/commands/FT.ALTER">ftAlter</a>.
-   *
-   * @return fluent self
-   */
-  @Fluent
-  @Deprecated
-  default RedisAPI ftAlter(List<String> args, Handler<AsyncResult<@Nullable Response>> handler) {
-    send(Command.FT_ALTER, args.toArray(new String[0])).onComplete(handler);
-    return this;
   }
 
   /**
@@ -177,34 +104,10 @@ public interface RedisAPI {
   /**
    * Redis command <a href="https://redis.io/commands/FT.CONFIG">ftConfig</a>.
    *
-   * @return fluent self
-   */
-  @Fluent
-  @Deprecated
-  default RedisAPI ftConfig(List<String> args, Handler<AsyncResult<@Nullable Response>> handler) {
-    send(Command.FT_CONFIG, args.toArray(new String[0])).onComplete(handler);
-    return this;
-  }
-
-  /**
-   * Redis command <a href="https://redis.io/commands/FT.CONFIG">ftConfig</a>.
-   *
    * @return Future response.
    */
   default Future<@Nullable Response> ftConfig(List<String> args) {
     return send(Command.FT_CONFIG, args.toArray(new String[0]));
-  }
-
-  /**
-   * Redis command <a href="https://redis.io/commands/FT.CREATE">ftCreate</a>.
-   *
-   * @return fluent self
-   */
-  @Fluent
-  @Deprecated
-  default RedisAPI ftCreate(List<String> args, Handler<AsyncResult<@Nullable Response>> handler) {
-    send(Command.FT_CREATE, args.toArray(new String[0])).onComplete(handler);
-    return this;
   }
 
   /**
@@ -219,34 +122,10 @@ public interface RedisAPI {
   /**
    * Redis command <a href="https://redis.io/commands/FT.CURSOR">ftCursor</a>.
    *
-   * @return fluent self
-   */
-  @Fluent
-  @Deprecated
-  default RedisAPI ftCursor(List<String> args, Handler<AsyncResult<@Nullable Response>> handler) {
-    send(Command.FT_CURSOR, args.toArray(new String[0])).onComplete(handler);
-    return this;
-  }
-
-  /**
-   * Redis command <a href="https://redis.io/commands/FT.CURSOR">ftCursor</a>.
-   *
    * @return Future response.
    */
   default Future<@Nullable Response> ftCursor(List<String> args) {
     return send(Command.FT_CURSOR, args.toArray(new String[0]));
-  }
-
-  /**
-   * Redis command <a href="https://redis.io/commands/FT.DEBUG">ftDebug</a>.
-   *
-   * @return fluent self
-   */
-  @Fluent
-  @Deprecated
-  default RedisAPI ftDebug(List<String> args, Handler<AsyncResult<@Nullable Response>> handler) {
-    send(Command.FT_DEBUG, args.toArray(new String[0])).onComplete(handler);
-    return this;
   }
 
   /**
@@ -261,34 +140,10 @@ public interface RedisAPI {
   /**
    * Redis command <a href="https://redis.io/commands/FT.DEL">ftDel</a>.
    *
-   * @return fluent self
-   */
-  @Fluent
-  @Deprecated
-  default RedisAPI ftDel(List<String> args, Handler<AsyncResult<@Nullable Response>> handler) {
-    send(Command.FT_DEL, args.toArray(new String[0])).onComplete(handler);
-    return this;
-  }
-
-  /**
-   * Redis command <a href="https://redis.io/commands/FT.DEL">ftDel</a>.
-   *
    * @return Future response.
    */
   default Future<@Nullable Response> ftDel(List<String> args) {
     return send(Command.FT_DEL, args.toArray(new String[0]));
-  }
-
-  /**
-   * Redis command <a href="https://redis.io/commands/FT.DICTADD">ftDictadd</a>.
-   *
-   * @return fluent self
-   */
-  @Fluent
-  @Deprecated
-  default RedisAPI ftDictadd(List<String> args, Handler<AsyncResult<@Nullable Response>> handler) {
-    send(Command.FT_DICTADD, args.toArray(new String[0])).onComplete(handler);
-    return this;
   }
 
   /**
@@ -303,34 +158,10 @@ public interface RedisAPI {
   /**
    * Redis command <a href="https://redis.io/commands/FT.DICTDEL">ftDictdel</a>.
    *
-   * @return fluent self
-   */
-  @Fluent
-  @Deprecated
-  default RedisAPI ftDictdel(List<String> args, Handler<AsyncResult<@Nullable Response>> handler) {
-    send(Command.FT_DICTDEL, args.toArray(new String[0])).onComplete(handler);
-    return this;
-  }
-
-  /**
-   * Redis command <a href="https://redis.io/commands/FT.DICTDEL">ftDictdel</a>.
-   *
    * @return Future response.
    */
   default Future<@Nullable Response> ftDictdel(List<String> args) {
     return send(Command.FT_DICTDEL, args.toArray(new String[0]));
-  }
-
-  /**
-   * Redis command <a href="https://redis.io/commands/FT.DICTDUMP">ftDictdump</a>.
-   *
-   * @return fluent self
-   */
-  @Fluent
-  @Deprecated
-  default RedisAPI ftDictdump(List<String> args, Handler<AsyncResult<@Nullable Response>> handler) {
-    send(Command.FT_DICTDUMP, args.toArray(new String[0])).onComplete(handler);
-    return this;
   }
 
   /**
@@ -345,34 +176,10 @@ public interface RedisAPI {
   /**
    * Redis command <a href="https://redis.io/commands/FT.DROP">ftDrop</a>.
    *
-   * @return fluent self
-   */
-  @Fluent
-  @Deprecated
-  default RedisAPI ftDrop(List<String> args, Handler<AsyncResult<@Nullable Response>> handler) {
-    send(Command.FT_DROP, args.toArray(new String[0])).onComplete(handler);
-    return this;
-  }
-
-  /**
-   * Redis command <a href="https://redis.io/commands/FT.DROP">ftDrop</a>.
-   *
    * @return Future response.
    */
   default Future<@Nullable Response> ftDrop(List<String> args) {
     return send(Command.FT_DROP, args.toArray(new String[0]));
-  }
-
-  /**
-   * Redis command <a href="https://redis.io/commands/FT.DROPINDEX">ftDropindex</a>.
-   *
-   * @return fluent self
-   */
-  @Fluent
-  @Deprecated
-  default RedisAPI ftDropindex(List<String> args, Handler<AsyncResult<@Nullable Response>> handler) {
-    send(Command.FT_DROPINDEX, args.toArray(new String[0])).onComplete(handler);
-    return this;
   }
 
   /**
@@ -384,17 +191,6 @@ public interface RedisAPI {
     return send(Command.FT_DROPINDEX, args.toArray(new String[0]));
   }
 
-  /**
-   * Redis command <a href="https://redis.io/commands/FT.EXPLAIN">ftExplain</a>.
-   *
-   * @return fluent self
-   */
-  @Fluent
-  @Deprecated
-  default RedisAPI ftExplain(List<String> args, Handler<AsyncResult<@Nullable Response>> handler) {
-    send(Command.FT_EXPLAIN, args.toArray(new String[0])).onComplete(handler);
-    return this;
-  }
 
   /**
    * Redis command <a href="https://redis.io/commands/FT.EXPLAIN">ftExplain</a>.
@@ -403,18 +199,6 @@ public interface RedisAPI {
    */
   default Future<@Nullable Response> ftExplain(List<String> args) {
     return send(Command.FT_EXPLAIN, args.toArray(new String[0]));
-  }
-
-  /**
-   * Redis command <a href="https://redis.io/commands/FT.EXPLAINCLI">ftExplaincli</a>.
-   *
-   * @return fluent self
-   */
-  @Fluent
-  @Deprecated
-  default RedisAPI ftExplaincli(List<String> args, Handler<AsyncResult<@Nullable Response>> handler) {
-    send(Command.FT_EXPLAINCLI, args.toArray(new String[0])).onComplete(handler);
-    return this;
   }
 
   /**
@@ -429,34 +213,10 @@ public interface RedisAPI {
   /**
    * Redis command <a href="https://redis.io/commands/FT.GET">ftGet</a>.
    *
-   * @return fluent self
-   */
-  @Fluent
-  @Deprecated
-  default RedisAPI ftGet(List<String> args, Handler<AsyncResult<@Nullable Response>> handler) {
-    send(Command.FT_GET, args.toArray(new String[0])).onComplete(handler);
-    return this;
-  }
-
-  /**
-   * Redis command <a href="https://redis.io/commands/FT.GET">ftGet</a>.
-   *
    * @return Future response.
    */
   default Future<@Nullable Response> ftGet(List<String> args) {
     return send(Command.FT_GET, args.toArray(new String[0]));
-  }
-
-  /**
-   * Redis command <a href="https://redis.io/commands/FT.INFO">ftInfo</a>.
-   *
-   * @return fluent self
-   */
-  @Fluent
-  @Deprecated
-  default RedisAPI ftInfo(List<String> args, Handler<AsyncResult<@Nullable Response>> handler) {
-    send(Command.FT_INFO, args.toArray(new String[0])).onComplete(handler);
-    return this;
   }
 
   /**
@@ -471,34 +231,10 @@ public interface RedisAPI {
   /**
    * Redis command <a href="https://redis.io/commands/FT.MGET">ftMget</a>.
    *
-   * @return fluent self
-   */
-  @Fluent
-  @Deprecated
-  default RedisAPI ftMget(List<String> args, Handler<AsyncResult<@Nullable Response>> handler) {
-    send(Command.FT_MGET, args.toArray(new String[0])).onComplete(handler);
-    return this;
-  }
-
-  /**
-   * Redis command <a href="https://redis.io/commands/FT.MGET">ftMget</a>.
-   *
    * @return Future response.
    */
   default Future<@Nullable Response> ftMget(List<String> args) {
     return send(Command.FT_MGET, args.toArray(new String[0]));
-  }
-
-  /**
-   * Redis command <a href="https://redis.io/commands/FT.PROFILE">ftProfile</a>.
-   *
-   * @return fluent self
-   */
-  @Fluent
-  @Deprecated
-  default RedisAPI ftProfile(List<String> args, Handler<AsyncResult<@Nullable Response>> handler) {
-    send(Command.FT_PROFILE, args.toArray(new String[0])).onComplete(handler);
-    return this;
   }
 
   /**
@@ -513,34 +249,10 @@ public interface RedisAPI {
   /**
    * Redis command <a href="https://redis.io/commands/FT.SAFEADD">ftSafeadd</a>.
    *
-   * @return fluent self
-   */
-  @Fluent
-  @Deprecated
-  default RedisAPI ftSafeadd(List<String> args, Handler<AsyncResult<@Nullable Response>> handler) {
-    send(Command.FT_SAFEADD, args.toArray(new String[0])).onComplete(handler);
-    return this;
-  }
-
-  /**
-   * Redis command <a href="https://redis.io/commands/FT.SAFEADD">ftSafeadd</a>.
-   *
    * @return Future response.
    */
   default Future<@Nullable Response> ftSafeadd(List<String> args) {
     return send(Command.FT_SAFEADD, args.toArray(new String[0]));
-  }
-
-  /**
-   * Redis command <a href="https://redis.io/commands/FT.SEARCH">ftSearch</a>.
-   *
-   * @return fluent self
-   */
-  @Fluent
-  @Deprecated
-  default RedisAPI ftSearch(List<String> args, Handler<AsyncResult<@Nullable Response>> handler) {
-    send(Command.FT_SEARCH, args.toArray(new String[0])).onComplete(handler);
-    return this;
   }
 
   /**
@@ -555,34 +267,10 @@ public interface RedisAPI {
   /**
    * Redis command <a href="https://redis.io/commands/FT.SPELLCHECK">ftSpellcheck</a>.
    *
-   * @return fluent self
-   */
-  @Fluent
-  @Deprecated
-  default RedisAPI ftSpellcheck(List<String> args, Handler<AsyncResult<@Nullable Response>> handler) {
-    send(Command.FT_SPELLCHECK, args.toArray(new String[0])).onComplete(handler);
-    return this;
-  }
-
-  /**
-   * Redis command <a href="https://redis.io/commands/FT.SPELLCHECK">ftSpellcheck</a>.
-   *
    * @return Future response.
    */
   default Future<@Nullable Response> ftSpellcheck(List<String> args) {
     return send(Command.FT_SPELLCHECK, args.toArray(new String[0]));
-  }
-
-  /**
-   * Redis command <a href="https://redis.io/commands/FT.SUGADD">ftSugadd</a>.
-   *
-   * @return fluent self
-   */
-  @Fluent
-  @Deprecated
-  default RedisAPI ftSugadd(List<String> args, Handler<AsyncResult<@Nullable Response>> handler) {
-    send(Command.FT_SUGADD, args.toArray(new String[0])).onComplete(handler);
-    return this;
   }
 
   /**
@@ -597,34 +285,10 @@ public interface RedisAPI {
   /**
    * Redis command <a href="https://redis.io/commands/FT.SUGDEL">ftSugdel</a>.
    *
-   * @return fluent self
-   */
-  @Fluent
-  @Deprecated
-  default RedisAPI ftSugdel(List<String> args, Handler<AsyncResult<@Nullable Response>> handler) {
-    send(Command.FT_SUGDEL, args.toArray(new String[0])).onComplete(handler);
-    return this;
-  }
-
-  /**
-   * Redis command <a href="https://redis.io/commands/FT.SUGDEL">ftSugdel</a>.
-   *
    * @return Future response.
    */
   default Future<@Nullable Response> ftSugdel(List<String> args) {
     return send(Command.FT_SUGDEL, args.toArray(new String[0]));
-  }
-
-  /**
-   * Redis command <a href="https://redis.io/commands/FT.SUGGET">ftSugget</a>.
-   *
-   * @return fluent self
-   */
-  @Fluent
-  @Deprecated
-  default RedisAPI ftSugget(List<String> args, Handler<AsyncResult<@Nullable Response>> handler) {
-    send(Command.FT_SUGGET, args.toArray(new String[0])).onComplete(handler);
-    return this;
   }
 
   /**
@@ -639,34 +303,10 @@ public interface RedisAPI {
   /**
    * Redis command <a href="https://redis.io/commands/FT.SUGLEN">ftSuglen</a>.
    *
-   * @return fluent self
-   */
-  @Fluent
-  @Deprecated
-  default RedisAPI ftSuglen(List<String> args, Handler<AsyncResult<@Nullable Response>> handler) {
-    send(Command.FT_SUGLEN, args.toArray(new String[0])).onComplete(handler);
-    return this;
-  }
-
-  /**
-   * Redis command <a href="https://redis.io/commands/FT.SUGLEN">ftSuglen</a>.
-   *
    * @return Future response.
    */
   default Future<@Nullable Response> ftSuglen(List<String> args) {
     return send(Command.FT_SUGLEN, args.toArray(new String[0]));
-  }
-
-  /**
-   * Redis command <a href="https://redis.io/commands/FT.SYNADD">ftSynadd</a>.
-   *
-   * @return fluent self
-   */
-  @Fluent
-  @Deprecated
-  default RedisAPI ftSynadd(List<String> args, Handler<AsyncResult<@Nullable Response>> handler) {
-    send(Command.FT_SYNADD, args.toArray(new String[0])).onComplete(handler);
-    return this;
   }
 
   /**
@@ -681,34 +321,10 @@ public interface RedisAPI {
   /**
    * Redis command <a href="https://redis.io/commands/FT.SYNDUMP">ftSyndump</a>.
    *
-   * @return fluent self
-   */
-  @Fluent
-  @Deprecated
-  default RedisAPI ftSyndump(List<String> args, Handler<AsyncResult<@Nullable Response>> handler) {
-    send(Command.FT_SYNDUMP, args.toArray(new String[0])).onComplete(handler);
-    return this;
-  }
-
-  /**
-   * Redis command <a href="https://redis.io/commands/FT.SYNDUMP">ftSyndump</a>.
-   *
    * @return Future response.
    */
   default Future<@Nullable Response> ftSyndump(List<String> args) {
     return send(Command.FT_SYNDUMP, args.toArray(new String[0]));
-  }
-
-  /**
-   * Redis command <a href="https://redis.io/commands/FT.SYNUPDATE">ftSynupdate</a>.
-   *
-   * @return fluent self
-   */
-  @Fluent
-  @Deprecated
-  default RedisAPI ftSynupdate(List<String> args, Handler<AsyncResult<@Nullable Response>> handler) {
-    send(Command.FT_SYNUPDATE, args.toArray(new String[0])).onComplete(handler);
-    return this;
   }
 
   /**
@@ -723,34 +339,10 @@ public interface RedisAPI {
   /**
    * Redis command <a href="https://redis.io/commands/FT.TAGVALS">ftTagvals</a>.
    *
-   * @return fluent self
-   */
-  @Fluent
-  @Deprecated
-  default RedisAPI ftTagvals(List<String> args, Handler<AsyncResult<@Nullable Response>> handler) {
-    send(Command.FT_TAGVALS, args.toArray(new String[0])).onComplete(handler);
-    return this;
-  }
-
-  /**
-   * Redis command <a href="https://redis.io/commands/FT.TAGVALS">ftTagvals</a>.
-   *
    * @return Future response.
    */
   default Future<@Nullable Response> ftTagvals(List<String> args) {
     return send(Command.FT_TAGVALS, args.toArray(new String[0]));
-  }
-
-  /**
-   * Redis command <a href="https://redis.io/commands/FT._ALIASADDIFNX">ftAliasaddifnx</a>.
-   *
-   * @return fluent self
-   */
-  @Fluent
-  @Deprecated
-  default RedisAPI ftAliasaddifnx(List<String> args, Handler<AsyncResult<@Nullable Response>> handler) {
-    send(Command.FT__ALIASADDIFNX, args.toArray(new String[0])).onComplete(handler);
-    return this;
   }
 
   /**
@@ -765,34 +357,10 @@ public interface RedisAPI {
   /**
    * Redis command <a href="https://redis.io/commands/FT._ALIASDELIFX">ftAliasdelifx</a>.
    *
-   * @return fluent self
-   */
-  @Fluent
-  @Deprecated
-  default RedisAPI ftAliasdelifx(List<String> args, Handler<AsyncResult<@Nullable Response>> handler) {
-    send(Command.FT__ALIASDELIFX, args.toArray(new String[0])).onComplete(handler);
-    return this;
-  }
-
-  /**
-   * Redis command <a href="https://redis.io/commands/FT._ALIASDELIFX">ftAliasdelifx</a>.
-   *
    * @return Future response.
    */
   default Future<@Nullable Response> ftAliasdelifx(List<String> args) {
     return send(Command.FT__ALIASDELIFX, args.toArray(new String[0]));
-  }
-
-  /**
-   * Redis command <a href="https://redis.io/commands/FT._ALTERIFNX">ftAlterifnx</a>.
-   *
-   * @return fluent self
-   */
-  @Fluent
-  @Deprecated
-  default RedisAPI ftAlterifnx(List<String> args, Handler<AsyncResult<@Nullable Response>> handler) {
-    send(Command.FT__ALTERIFNX, args.toArray(new String[0])).onComplete(handler);
-    return this;
   }
 
   /**
@@ -807,34 +375,10 @@ public interface RedisAPI {
   /**
    * Redis command <a href="https://redis.io/commands/FT._CREATEIFNX">ftCreateifnx</a>.
    *
-   * @return fluent self
-   */
-  @Fluent
-  @Deprecated
-  default RedisAPI ftCreateifnx(List<String> args, Handler<AsyncResult<@Nullable Response>> handler) {
-    send(Command.FT__CREATEIFNX, args.toArray(new String[0])).onComplete(handler);
-    return this;
-  }
-
-  /**
-   * Redis command <a href="https://redis.io/commands/FT._CREATEIFNX">ftCreateifnx</a>.
-   *
    * @return Future response.
    */
   default Future<@Nullable Response> ftCreateifnx(List<String> args) {
     return send(Command.FT__CREATEIFNX, args.toArray(new String[0]));
-  }
-
-  /**
-   * Redis command <a href="https://redis.io/commands/FT._DROPIFX">ftDropifx</a>.
-   *
-   * @return fluent self
-   */
-  @Fluent
-  @Deprecated
-  default RedisAPI ftDropifx(List<String> args, Handler<AsyncResult<@Nullable Response>> handler) {
-    send(Command.FT__DROPIFX, args.toArray(new String[0])).onComplete(handler);
-    return this;
   }
 
   /**
@@ -849,34 +393,10 @@ public interface RedisAPI {
   /**
    * Redis command <a href="https://redis.io/commands/FT._DROPINDEXIFX">ftDropindexifx</a>.
    *
-   * @return fluent self
-   */
-  @Fluent
-  @Deprecated
-  default RedisAPI ftDropindexifx(List<String> args, Handler<AsyncResult<@Nullable Response>> handler) {
-    send(Command.FT__DROPINDEXIFX, args.toArray(new String[0])).onComplete(handler);
-    return this;
-  }
-
-  /**
-   * Redis command <a href="https://redis.io/commands/FT._DROPINDEXIFX">ftDropindexifx</a>.
-   *
    * @return Future response.
    */
   default Future<@Nullable Response> ftDropindexifx(List<String> args) {
     return send(Command.FT__DROPINDEXIFX, args.toArray(new String[0]));
-  }
-
-  /**
-   * Redis command <a href="https://redis.io/commands/FT._LIST">ftList</a>.
-   *
-   * @return fluent self
-   */
-  @Fluent
-  @Deprecated
-  default RedisAPI ftList(List<String> args, Handler<AsyncResult<@Nullable Response>> handler) {
-    send(Command.FT__LIST, args.toArray(new String[0])).onComplete(handler);
-    return this;
   }
 
   /**
@@ -891,34 +411,10 @@ public interface RedisAPI {
   /**
    * Redis command <a href="https://redis.io/commands/acl">acl</a>.
    *
-   * @return fluent self
-   */
-  @Fluent
-  @Deprecated
-  default RedisAPI acl(List<String> args, Handler<AsyncResult<@Nullable Response>> handler) {
-    send(Command.ACL, args.toArray(new String[0])).onComplete(handler);
-    return this;
-  }
-
-  /**
-   * Redis command <a href="https://redis.io/commands/acl">acl</a>.
-   *
    * @return Future response.
    */
   default Future<@Nullable Response> acl(List<String> args) {
     return send(Command.ACL, args.toArray(new String[0]));
-  }
-
-  /**
-   * Redis command <a href="https://redis.io/commands/append">append</a>.
-   *
-   * @return fluent self
-   */
-  @Fluent
-  @Deprecated
-  default RedisAPI append(String arg0, String arg1, Handler<AsyncResult<@Nullable Response>> handler) {
-    send(Command.APPEND, arg0, arg1).onComplete(handler);
-    return this;
   }
 
   /**
@@ -933,34 +429,10 @@ public interface RedisAPI {
   /**
    * Redis command <a href="https://redis.io/commands/asking">asking</a>.
    *
-   * @return fluent self
-   */
-  @Fluent
-  @Deprecated
-  default RedisAPI asking(Handler<AsyncResult<@Nullable Response>> handler) {
-    send(Command.ASKING).onComplete(handler);
-    return this;
-  }
-
-  /**
-   * Redis command <a href="https://redis.io/commands/asking">asking</a>.
-   *
    * @return Future response.
    */
   default Future<@Nullable Response> asking() {
     return send(Command.ASKING);
-  }
-
-  /**
-   * Redis command <a href="https://redis.io/commands/auth">auth</a>.
-   *
-   * @return fluent self
-   */
-  @Fluent
-  @Deprecated
-  default RedisAPI auth(List<String> args, Handler<AsyncResult<@Nullable Response>> handler) {
-    send(Command.AUTH, args.toArray(new String[0])).onComplete(handler);
-    return this;
   }
 
   /**
@@ -975,34 +447,10 @@ public interface RedisAPI {
   /**
    * Redis command <a href="https://redis.io/commands/bf.add">bfAdd</a>.
    *
-   * @return fluent self
-   */
-  @Fluent
-  @Deprecated
-  default RedisAPI bfAdd(List<String> args, Handler<AsyncResult<@Nullable Response>> handler) {
-    send(Command.BF_ADD, args.toArray(new String[0])).onComplete(handler);
-    return this;
-  }
-
-  /**
-   * Redis command <a href="https://redis.io/commands/bf.add">bfAdd</a>.
-   *
    * @return Future response.
    */
   default Future<@Nullable Response> bfAdd(List<String> args) {
     return send(Command.BF_ADD, args.toArray(new String[0]));
-  }
-
-  /**
-   * Redis command <a href="https://redis.io/commands/bf.debug">bfDebug</a>.
-   *
-   * @return fluent self
-   */
-  @Fluent
-  @Deprecated
-  default RedisAPI bfDebug(List<String> args, Handler<AsyncResult<@Nullable Response>> handler) {
-    send(Command.BF_DEBUG, args.toArray(new String[0])).onComplete(handler);
-    return this;
   }
 
   /**
@@ -1017,34 +465,10 @@ public interface RedisAPI {
   /**
    * Redis command <a href="https://redis.io/commands/bf.exists">bfExists</a>.
    *
-   * @return fluent self
-   */
-  @Fluent
-  @Deprecated
-  default RedisAPI bfExists(List<String> args, Handler<AsyncResult<@Nullable Response>> handler) {
-    send(Command.BF_EXISTS, args.toArray(new String[0])).onComplete(handler);
-    return this;
-  }
-
-  /**
-   * Redis command <a href="https://redis.io/commands/bf.exists">bfExists</a>.
-   *
    * @return Future response.
    */
   default Future<@Nullable Response> bfExists(List<String> args) {
     return send(Command.BF_EXISTS, args.toArray(new String[0]));
-  }
-
-  /**
-   * Redis command <a href="https://redis.io/commands/bf.info">bfInfo</a>.
-   *
-   * @return fluent self
-   */
-  @Fluent
-  @Deprecated
-  default RedisAPI bfInfo(List<String> args, Handler<AsyncResult<@Nullable Response>> handler) {
-    send(Command.BF_INFO, args.toArray(new String[0])).onComplete(handler);
-    return this;
   }
 
   /**
@@ -1059,34 +483,10 @@ public interface RedisAPI {
   /**
    * Redis command <a href="https://redis.io/commands/bf.insert">bfInsert</a>.
    *
-   * @return fluent self
-   */
-  @Fluent
-  @Deprecated
-  default RedisAPI bfInsert(List<String> args, Handler<AsyncResult<@Nullable Response>> handler) {
-    send(Command.BF_INSERT, args.toArray(new String[0])).onComplete(handler);
-    return this;
-  }
-
-  /**
-   * Redis command <a href="https://redis.io/commands/bf.insert">bfInsert</a>.
-   *
    * @return Future response.
    */
   default Future<@Nullable Response> bfInsert(List<String> args) {
     return send(Command.BF_INSERT, args.toArray(new String[0]));
-  }
-
-  /**
-   * Redis command <a href="https://redis.io/commands/bf.loadchunk">bfLoadchunk</a>.
-   *
-   * @return fluent self
-   */
-  @Fluent
-  @Deprecated
-  default RedisAPI bfLoadchunk(List<String> args, Handler<AsyncResult<@Nullable Response>> handler) {
-    send(Command.BF_LOADCHUNK, args.toArray(new String[0])).onComplete(handler);
-    return this;
   }
 
   /**
@@ -1101,34 +501,10 @@ public interface RedisAPI {
   /**
    * Redis command <a href="https://redis.io/commands/bf.madd">bfMadd</a>.
    *
-   * @return fluent self
-   */
-  @Fluent
-  @Deprecated
-  default RedisAPI bfMadd(List<String> args, Handler<AsyncResult<@Nullable Response>> handler) {
-    send(Command.BF_MADD, args.toArray(new String[0])).onComplete(handler);
-    return this;
-  }
-
-  /**
-   * Redis command <a href="https://redis.io/commands/bf.madd">bfMadd</a>.
-   *
    * @return Future response.
    */
   default Future<@Nullable Response> bfMadd(List<String> args) {
     return send(Command.BF_MADD, args.toArray(new String[0]));
-  }
-
-  /**
-   * Redis command <a href="https://redis.io/commands/bf.mexists">bfMexists</a>.
-   *
-   * @return fluent self
-   */
-  @Fluent
-  @Deprecated
-  default RedisAPI bfMexists(List<String> args, Handler<AsyncResult<@Nullable Response>> handler) {
-    send(Command.BF_MEXISTS, args.toArray(new String[0])).onComplete(handler);
-    return this;
   }
 
   /**
@@ -1143,34 +519,10 @@ public interface RedisAPI {
   /**
    * Redis command <a href="https://redis.io/commands/bf.reserve">bfReserve</a>.
    *
-   * @return fluent self
-   */
-  @Fluent
-  @Deprecated
-  default RedisAPI bfReserve(List<String> args, Handler<AsyncResult<@Nullable Response>> handler) {
-    send(Command.BF_RESERVE, args.toArray(new String[0])).onComplete(handler);
-    return this;
-  }
-
-  /**
-   * Redis command <a href="https://redis.io/commands/bf.reserve">bfReserve</a>.
-   *
    * @return Future response.
    */
   default Future<@Nullable Response> bfReserve(List<String> args) {
     return send(Command.BF_RESERVE, args.toArray(new String[0]));
-  }
-
-  /**
-   * Redis command <a href="https://redis.io/commands/bf.scandump">bfScandump</a>.
-   *
-   * @return fluent self
-   */
-  @Fluent
-  @Deprecated
-  default RedisAPI bfScandump(List<String> args, Handler<AsyncResult<@Nullable Response>> handler) {
-    send(Command.BF_SCANDUMP, args.toArray(new String[0])).onComplete(handler);
-    return this;
   }
 
   /**
@@ -1185,34 +537,10 @@ public interface RedisAPI {
   /**
    * Redis command <a href="https://redis.io/commands/bgrewriteaof">bgrewriteaof</a>.
    *
-   * @return fluent self
-   */
-  @Fluent
-  @Deprecated
-  default RedisAPI bgrewriteaof(Handler<AsyncResult<@Nullable Response>> handler) {
-    send(Command.BGREWRITEAOF).onComplete(handler);
-    return this;
-  }
-
-  /**
-   * Redis command <a href="https://redis.io/commands/bgrewriteaof">bgrewriteaof</a>.
-   *
    * @return Future response.
    */
   default Future<@Nullable Response> bgrewriteaof() {
     return send(Command.BGREWRITEAOF);
-  }
-
-  /**
-   * Redis command <a href="https://redis.io/commands/bgsave">bgsave</a>.
-   *
-   * @return fluent self
-   */
-  @Fluent
-  @Deprecated
-  default RedisAPI bgsave(List<String> args, Handler<AsyncResult<@Nullable Response>> handler) {
-    send(Command.BGSAVE, args.toArray(new String[0])).onComplete(handler);
-    return this;
   }
 
   /**
@@ -1227,34 +555,10 @@ public interface RedisAPI {
   /**
    * Redis command <a href="https://redis.io/commands/bitcount">bitcount</a>.
    *
-   * @return fluent self
-   */
-  @Fluent
-  @Deprecated
-  default RedisAPI bitcount(List<String> args, Handler<AsyncResult<@Nullable Response>> handler) {
-    send(Command.BITCOUNT, args.toArray(new String[0])).onComplete(handler);
-    return this;
-  }
-
-  /**
-   * Redis command <a href="https://redis.io/commands/bitcount">bitcount</a>.
-   *
    * @return Future response.
    */
   default Future<@Nullable Response> bitcount(List<String> args) {
     return send(Command.BITCOUNT, args.toArray(new String[0]));
-  }
-
-  /**
-   * Redis command <a href="https://redis.io/commands/bitfield">bitfield</a>.
-   *
-   * @return fluent self
-   */
-  @Fluent
-  @Deprecated
-  default RedisAPI bitfield(List<String> args, Handler<AsyncResult<@Nullable Response>> handler) {
-    send(Command.BITFIELD, args.toArray(new String[0])).onComplete(handler);
-    return this;
   }
 
   /**
@@ -1269,34 +573,10 @@ public interface RedisAPI {
   /**
    * Redis command <a href="https://redis.io/commands/bitfield_ro">bitfieldRo</a>.
    *
-   * @return fluent self
-   */
-  @Fluent
-  @Deprecated
-  default RedisAPI bitfieldRo(List<String> args, Handler<AsyncResult<@Nullable Response>> handler) {
-    send(Command.BITFIELD_RO, args.toArray(new String[0])).onComplete(handler);
-    return this;
-  }
-
-  /**
-   * Redis command <a href="https://redis.io/commands/bitfield_ro">bitfieldRo</a>.
-   *
    * @return Future response.
    */
   default Future<@Nullable Response> bitfieldRo(List<String> args) {
     return send(Command.BITFIELD_RO, args.toArray(new String[0]));
-  }
-
-  /**
-   * Redis command <a href="https://redis.io/commands/bitop">bitop</a>.
-   *
-   * @return fluent self
-   */
-  @Fluent
-  @Deprecated
-  default RedisAPI bitop(List<String> args, Handler<AsyncResult<@Nullable Response>> handler) {
-    send(Command.BITOP, args.toArray(new String[0])).onComplete(handler);
-    return this;
   }
 
   /**
@@ -1311,34 +591,10 @@ public interface RedisAPI {
   /**
    * Redis command <a href="https://redis.io/commands/bitpos">bitpos</a>.
    *
-   * @return fluent self
-   */
-  @Fluent
-  @Deprecated
-  default RedisAPI bitpos(List<String> args, Handler<AsyncResult<@Nullable Response>> handler) {
-    send(Command.BITPOS, args.toArray(new String[0])).onComplete(handler);
-    return this;
-  }
-
-  /**
-   * Redis command <a href="https://redis.io/commands/bitpos">bitpos</a>.
-   *
    * @return Future response.
    */
   default Future<@Nullable Response> bitpos(List<String> args) {
     return send(Command.BITPOS, args.toArray(new String[0]));
-  }
-
-  /**
-   * Redis command <a href="https://redis.io/commands/blmove">blmove</a>.
-   *
-   * @return fluent self
-   */
-  @Fluent
-  @Deprecated
-  default RedisAPI blmove(String arg0, String arg1, String arg2, String arg3, String arg4, Handler<AsyncResult<@Nullable Response>> handler) {
-    send(Command.BLMOVE, arg0, arg1, arg2, arg3, arg4).onComplete(handler);
-    return this;
   }
 
   /**
@@ -1353,34 +609,10 @@ public interface RedisAPI {
   /**
    * Redis command <a href="https://redis.io/commands/blmpop">blmpop</a>.
    *
-   * @return fluent self
-   */
-  @Fluent
-  @Deprecated
-  default RedisAPI blmpop(List<String> args, Handler<AsyncResult<@Nullable Response>> handler) {
-    send(Command.BLMPOP, args.toArray(new String[0])).onComplete(handler);
-    return this;
-  }
-
-  /**
-   * Redis command <a href="https://redis.io/commands/blmpop">blmpop</a>.
-   *
    * @return Future response.
    */
   default Future<@Nullable Response> blmpop(List<String> args) {
     return send(Command.BLMPOP, args.toArray(new String[0]));
-  }
-
-  /**
-   * Redis command <a href="https://redis.io/commands/blpop">blpop</a>.
-   *
-   * @return fluent self
-   */
-  @Fluent
-  @Deprecated
-  default RedisAPI blpop(List<String> args, Handler<AsyncResult<@Nullable Response>> handler) {
-    send(Command.BLPOP, args.toArray(new String[0])).onComplete(handler);
-    return this;
   }
 
   /**
@@ -1395,34 +627,10 @@ public interface RedisAPI {
   /**
    * Redis command <a href="https://redis.io/commands/brpop">brpop</a>.
    *
-   * @return fluent self
-   */
-  @Fluent
-  @Deprecated
-  default RedisAPI brpop(List<String> args, Handler<AsyncResult<@Nullable Response>> handler) {
-    send(Command.BRPOP, args.toArray(new String[0])).onComplete(handler);
-    return this;
-  }
-
-  /**
-   * Redis command <a href="https://redis.io/commands/brpop">brpop</a>.
-   *
    * @return Future response.
    */
   default Future<@Nullable Response> brpop(List<String> args) {
     return send(Command.BRPOP, args.toArray(new String[0]));
-  }
-
-  /**
-   * Redis command <a href="https://redis.io/commands/brpoplpush">brpoplpush</a>.
-   *
-   * @return fluent self
-   */
-  @Fluent
-  @Deprecated
-  default RedisAPI brpoplpush(String arg0, String arg1, String arg2, Handler<AsyncResult<@Nullable Response>> handler) {
-    send(Command.BRPOPLPUSH, arg0, arg1, arg2).onComplete(handler);
-    return this;
   }
 
   /**
@@ -1437,34 +645,10 @@ public interface RedisAPI {
   /**
    * Redis command <a href="https://redis.io/commands/bzmpop">bzmpop</a>.
    *
-   * @return fluent self
-   */
-  @Fluent
-  @Deprecated
-  default RedisAPI bzmpop(List<String> args, Handler<AsyncResult<@Nullable Response>> handler) {
-    send(Command.BZMPOP, args.toArray(new String[0])).onComplete(handler);
-    return this;
-  }
-
-  /**
-   * Redis command <a href="https://redis.io/commands/bzmpop">bzmpop</a>.
-   *
    * @return Future response.
    */
   default Future<@Nullable Response> bzmpop(List<String> args) {
     return send(Command.BZMPOP, args.toArray(new String[0]));
-  }
-
-  /**
-   * Redis command <a href="https://redis.io/commands/bzpopmax">bzpopmax</a>.
-   *
-   * @return fluent self
-   */
-  @Fluent
-  @Deprecated
-  default RedisAPI bzpopmax(List<String> args, Handler<AsyncResult<@Nullable Response>> handler) {
-    send(Command.BZPOPMAX, args.toArray(new String[0])).onComplete(handler);
-    return this;
   }
 
   /**
@@ -1479,34 +663,10 @@ public interface RedisAPI {
   /**
    * Redis command <a href="https://redis.io/commands/bzpopmin">bzpopmin</a>.
    *
-   * @return fluent self
-   */
-  @Fluent
-  @Deprecated
-  default RedisAPI bzpopmin(List<String> args, Handler<AsyncResult<@Nullable Response>> handler) {
-    send(Command.BZPOPMIN, args.toArray(new String[0])).onComplete(handler);
-    return this;
-  }
-
-  /**
-   * Redis command <a href="https://redis.io/commands/bzpopmin">bzpopmin</a>.
-   *
    * @return Future response.
    */
   default Future<@Nullable Response> bzpopmin(List<String> args) {
     return send(Command.BZPOPMIN, args.toArray(new String[0]));
-  }
-
-  /**
-   * Redis command <a href="https://redis.io/commands/cf.add">cfAdd</a>.
-   *
-   * @return fluent self
-   */
-  @Fluent
-  @Deprecated
-  default RedisAPI cfAdd(List<String> args, Handler<AsyncResult<@Nullable Response>> handler) {
-    send(Command.CF_ADD, args.toArray(new String[0])).onComplete(handler);
-    return this;
   }
 
   /**
@@ -1521,34 +681,10 @@ public interface RedisAPI {
   /**
    * Redis command <a href="https://redis.io/commands/cf.addnx">cfAddnx</a>.
    *
-   * @return fluent self
-   */
-  @Fluent
-  @Deprecated
-  default RedisAPI cfAddnx(List<String> args, Handler<AsyncResult<@Nullable Response>> handler) {
-    send(Command.CF_ADDNX, args.toArray(new String[0])).onComplete(handler);
-    return this;
-  }
-
-  /**
-   * Redis command <a href="https://redis.io/commands/cf.addnx">cfAddnx</a>.
-   *
    * @return Future response.
    */
   default Future<@Nullable Response> cfAddnx(List<String> args) {
     return send(Command.CF_ADDNX, args.toArray(new String[0]));
-  }
-
-  /**
-   * Redis command <a href="https://redis.io/commands/cf.compact">cfCompact</a>.
-   *
-   * @return fluent self
-   */
-  @Fluent
-  @Deprecated
-  default RedisAPI cfCompact(List<String> args, Handler<AsyncResult<@Nullable Response>> handler) {
-    send(Command.CF_COMPACT, args.toArray(new String[0])).onComplete(handler);
-    return this;
   }
 
   /**
@@ -1563,34 +699,10 @@ public interface RedisAPI {
   /**
    * Redis command <a href="https://redis.io/commands/cf.count">cfCount</a>.
    *
-   * @return fluent self
-   */
-  @Fluent
-  @Deprecated
-  default RedisAPI cfCount(List<String> args, Handler<AsyncResult<@Nullable Response>> handler) {
-    send(Command.CF_COUNT, args.toArray(new String[0])).onComplete(handler);
-    return this;
-  }
-
-  /**
-   * Redis command <a href="https://redis.io/commands/cf.count">cfCount</a>.
-   *
    * @return Future response.
    */
   default Future<@Nullable Response> cfCount(List<String> args) {
     return send(Command.CF_COUNT, args.toArray(new String[0]));
-  }
-
-  /**
-   * Redis command <a href="https://redis.io/commands/cf.debug">cfDebug</a>.
-   *
-   * @return fluent self
-   */
-  @Fluent
-  @Deprecated
-  default RedisAPI cfDebug(List<String> args, Handler<AsyncResult<@Nullable Response>> handler) {
-    send(Command.CF_DEBUG, args.toArray(new String[0])).onComplete(handler);
-    return this;
   }
 
   /**
@@ -1605,34 +717,10 @@ public interface RedisAPI {
   /**
    * Redis command <a href="https://redis.io/commands/cf.del">cfDel</a>.
    *
-   * @return fluent self
-   */
-  @Fluent
-  @Deprecated
-  default RedisAPI cfDel(List<String> args, Handler<AsyncResult<@Nullable Response>> handler) {
-    send(Command.CF_DEL, args.toArray(new String[0])).onComplete(handler);
-    return this;
-  }
-
-  /**
-   * Redis command <a href="https://redis.io/commands/cf.del">cfDel</a>.
-   *
    * @return Future response.
    */
   default Future<@Nullable Response> cfDel(List<String> args) {
     return send(Command.CF_DEL, args.toArray(new String[0]));
-  }
-
-  /**
-   * Redis command <a href="https://redis.io/commands/cf.exists">cfExists</a>.
-   *
-   * @return fluent self
-   */
-  @Fluent
-  @Deprecated
-  default RedisAPI cfExists(List<String> args, Handler<AsyncResult<@Nullable Response>> handler) {
-    send(Command.CF_EXISTS, args.toArray(new String[0])).onComplete(handler);
-    return this;
   }
 
   /**
@@ -1647,34 +735,10 @@ public interface RedisAPI {
   /**
    * Redis command <a href="https://redis.io/commands/cf.info">cfInfo</a>.
    *
-   * @return fluent self
-   */
-  @Fluent
-  @Deprecated
-  default RedisAPI cfInfo(List<String> args, Handler<AsyncResult<@Nullable Response>> handler) {
-    send(Command.CF_INFO, args.toArray(new String[0])).onComplete(handler);
-    return this;
-  }
-
-  /**
-   * Redis command <a href="https://redis.io/commands/cf.info">cfInfo</a>.
-   *
    * @return Future response.
    */
   default Future<@Nullable Response> cfInfo(List<String> args) {
     return send(Command.CF_INFO, args.toArray(new String[0]));
-  }
-
-  /**
-   * Redis command <a href="https://redis.io/commands/cf.insert">cfInsert</a>.
-   *
-   * @return fluent self
-   */
-  @Fluent
-  @Deprecated
-  default RedisAPI cfInsert(List<String> args, Handler<AsyncResult<@Nullable Response>> handler) {
-    send(Command.CF_INSERT, args.toArray(new String[0])).onComplete(handler);
-    return this;
   }
 
   /**
@@ -1689,34 +753,10 @@ public interface RedisAPI {
   /**
    * Redis command <a href="https://redis.io/commands/cf.insertnx">cfInsertnx</a>.
    *
-   * @return fluent self
-   */
-  @Fluent
-  @Deprecated
-  default RedisAPI cfInsertnx(List<String> args, Handler<AsyncResult<@Nullable Response>> handler) {
-    send(Command.CF_INSERTNX, args.toArray(new String[0])).onComplete(handler);
-    return this;
-  }
-
-  /**
-   * Redis command <a href="https://redis.io/commands/cf.insertnx">cfInsertnx</a>.
-   *
    * @return Future response.
    */
   default Future<@Nullable Response> cfInsertnx(List<String> args) {
     return send(Command.CF_INSERTNX, args.toArray(new String[0]));
-  }
-
-  /**
-   * Redis command <a href="https://redis.io/commands/cf.loadchunk">cfLoadchunk</a>.
-   *
-   * @return fluent self
-   */
-  @Fluent
-  @Deprecated
-  default RedisAPI cfLoadchunk(List<String> args, Handler<AsyncResult<@Nullable Response>> handler) {
-    send(Command.CF_LOADCHUNK, args.toArray(new String[0])).onComplete(handler);
-    return this;
   }
 
   /**
@@ -1731,34 +771,10 @@ public interface RedisAPI {
   /**
    * Redis command <a href="https://redis.io/commands/cf.mexists">cfMexists</a>.
    *
-   * @return fluent self
-   */
-  @Fluent
-  @Deprecated
-  default RedisAPI cfMexists(List<String> args, Handler<AsyncResult<@Nullable Response>> handler) {
-    send(Command.CF_MEXISTS, args.toArray(new String[0])).onComplete(handler);
-    return this;
-  }
-
-  /**
-   * Redis command <a href="https://redis.io/commands/cf.mexists">cfMexists</a>.
-   *
    * @return Future response.
    */
   default Future<@Nullable Response> cfMexists(List<String> args) {
     return send(Command.CF_MEXISTS, args.toArray(new String[0]));
-  }
-
-  /**
-   * Redis command <a href="https://redis.io/commands/cf.reserve">cfReserve</a>.
-   *
-   * @return fluent self
-   */
-  @Fluent
-  @Deprecated
-  default RedisAPI cfReserve(List<String> args, Handler<AsyncResult<@Nullable Response>> handler) {
-    send(Command.CF_RESERVE, args.toArray(new String[0])).onComplete(handler);
-    return this;
   }
 
   /**
@@ -1773,34 +789,10 @@ public interface RedisAPI {
   /**
    * Redis command <a href="https://redis.io/commands/cf.scandump">cfScandump</a>.
    *
-   * @return fluent self
-   */
-  @Fluent
-  @Deprecated
-  default RedisAPI cfScandump(List<String> args, Handler<AsyncResult<@Nullable Response>> handler) {
-    send(Command.CF_SCANDUMP, args.toArray(new String[0])).onComplete(handler);
-    return this;
-  }
-
-  /**
-   * Redis command <a href="https://redis.io/commands/cf.scandump">cfScandump</a>.
-   *
    * @return Future response.
    */
   default Future<@Nullable Response> cfScandump(List<String> args) {
     return send(Command.CF_SCANDUMP, args.toArray(new String[0]));
-  }
-
-  /**
-   * Redis command <a href="https://redis.io/commands/client">client</a>.
-   *
-   * @return fluent self
-   */
-  @Fluent
-  @Deprecated
-  default RedisAPI client(List<String> args, Handler<AsyncResult<@Nullable Response>> handler) {
-    send(Command.CLIENT, args.toArray(new String[0])).onComplete(handler);
-    return this;
   }
 
   /**
@@ -1815,34 +807,10 @@ public interface RedisAPI {
   /**
    * Redis command <a href="https://redis.io/commands/cluster">cluster</a>.
    *
-   * @return fluent self
-   */
-  @Fluent
-  @Deprecated
-  default RedisAPI cluster(List<String> args, Handler<AsyncResult<@Nullable Response>> handler) {
-    send(Command.CLUSTER, args.toArray(new String[0])).onComplete(handler);
-    return this;
-  }
-
-  /**
-   * Redis command <a href="https://redis.io/commands/cluster">cluster</a>.
-   *
    * @return Future response.
    */
   default Future<@Nullable Response> cluster(List<String> args) {
     return send(Command.CLUSTER, args.toArray(new String[0]));
-  }
-
-  /**
-   * Redis command <a href="https://redis.io/commands/cms.incrby">cmsIncrby</a>.
-   *
-   * @return fluent self
-   */
-  @Fluent
-  @Deprecated
-  default RedisAPI cmsIncrby(List<String> args, Handler<AsyncResult<@Nullable Response>> handler) {
-    send(Command.CMS_INCRBY, args.toArray(new String[0])).onComplete(handler);
-    return this;
   }
 
   /**
@@ -1857,34 +825,10 @@ public interface RedisAPI {
   /**
    * Redis command <a href="https://redis.io/commands/cms.info">cmsInfo</a>.
    *
-   * @return fluent self
-   */
-  @Fluent
-  @Deprecated
-  default RedisAPI cmsInfo(List<String> args, Handler<AsyncResult<@Nullable Response>> handler) {
-    send(Command.CMS_INFO, args.toArray(new String[0])).onComplete(handler);
-    return this;
-  }
-
-  /**
-   * Redis command <a href="https://redis.io/commands/cms.info">cmsInfo</a>.
-   *
    * @return Future response.
    */
   default Future<@Nullable Response> cmsInfo(List<String> args) {
     return send(Command.CMS_INFO, args.toArray(new String[0]));
-  }
-
-  /**
-   * Redis command <a href="https://redis.io/commands/cms.initbydim">cmsInitbydim</a>.
-   *
-   * @return fluent self
-   */
-  @Fluent
-  @Deprecated
-  default RedisAPI cmsInitbydim(List<String> args, Handler<AsyncResult<@Nullable Response>> handler) {
-    send(Command.CMS_INITBYDIM, args.toArray(new String[0])).onComplete(handler);
-    return this;
   }
 
   /**
@@ -1899,34 +843,10 @@ public interface RedisAPI {
   /**
    * Redis command <a href="https://redis.io/commands/cms.initbyprob">cmsInitbyprob</a>.
    *
-   * @return fluent self
-   */
-  @Fluent
-  @Deprecated
-  default RedisAPI cmsInitbyprob(List<String> args, Handler<AsyncResult<@Nullable Response>> handler) {
-    send(Command.CMS_INITBYPROB, args.toArray(new String[0])).onComplete(handler);
-    return this;
-  }
-
-  /**
-   * Redis command <a href="https://redis.io/commands/cms.initbyprob">cmsInitbyprob</a>.
-   *
    * @return Future response.
    */
   default Future<@Nullable Response> cmsInitbyprob(List<String> args) {
     return send(Command.CMS_INITBYPROB, args.toArray(new String[0]));
-  }
-
-  /**
-   * Redis command <a href="https://redis.io/commands/cms.merge">cmsMerge</a>.
-   *
-   * @return fluent self
-   */
-  @Fluent
-  @Deprecated
-  default RedisAPI cmsMerge(List<String> args, Handler<AsyncResult<@Nullable Response>> handler) {
-    send(Command.CMS_MERGE, args.toArray(new String[0])).onComplete(handler);
-    return this;
   }
 
   /**
@@ -1941,34 +861,10 @@ public interface RedisAPI {
   /**
    * Redis command <a href="https://redis.io/commands/cms.query">cmsQuery</a>.
    *
-   * @return fluent self
-   */
-  @Fluent
-  @Deprecated
-  default RedisAPI cmsQuery(List<String> args, Handler<AsyncResult<@Nullable Response>> handler) {
-    send(Command.CMS_QUERY, args.toArray(new String[0])).onComplete(handler);
-    return this;
-  }
-
-  /**
-   * Redis command <a href="https://redis.io/commands/cms.query">cmsQuery</a>.
-   *
    * @return Future response.
    */
   default Future<@Nullable Response> cmsQuery(List<String> args) {
     return send(Command.CMS_QUERY, args.toArray(new String[0]));
-  }
-
-  /**
-   * Redis command <a href="https://redis.io/commands/command">command</a>.
-   *
-   * @return fluent self
-   */
-  @Fluent
-  @Deprecated
-  default RedisAPI command(List<String> args, Handler<AsyncResult<@Nullable Response>> handler) {
-    send(Command.COMMAND, args.toArray(new String[0])).onComplete(handler);
-    return this;
   }
 
   /**
@@ -1983,34 +879,10 @@ public interface RedisAPI {
   /**
    * Redis command <a href="https://redis.io/commands/config">config</a>.
    *
-   * @return fluent self
-   */
-  @Fluent
-  @Deprecated
-  default RedisAPI config(List<String> args, Handler<AsyncResult<@Nullable Response>> handler) {
-    send(Command.CONFIG, args.toArray(new String[0])).onComplete(handler);
-    return this;
-  }
-
-  /**
-   * Redis command <a href="https://redis.io/commands/config">config</a>.
-   *
    * @return Future response.
    */
   default Future<@Nullable Response> config(List<String> args) {
     return send(Command.CONFIG, args.toArray(new String[0]));
-  }
-
-  /**
-   * Redis command <a href="https://redis.io/commands/copy">copy</a>.
-   *
-   * @return fluent self
-   */
-  @Fluent
-  @Deprecated
-  default RedisAPI copy(List<String> args, Handler<AsyncResult<@Nullable Response>> handler) {
-    send(Command.COPY, args.toArray(new String[0])).onComplete(handler);
-    return this;
   }
 
   /**
@@ -2025,34 +897,10 @@ public interface RedisAPI {
   /**
    * Redis command <a href="https://redis.io/commands/dbsize">dbsize</a>.
    *
-   * @return fluent self
-   */
-  @Fluent
-  @Deprecated
-  default RedisAPI dbsize(Handler<AsyncResult<@Nullable Response>> handler) {
-    send(Command.DBSIZE).onComplete(handler);
-    return this;
-  }
-
-  /**
-   * Redis command <a href="https://redis.io/commands/dbsize">dbsize</a>.
-   *
    * @return Future response.
    */
   default Future<@Nullable Response> dbsize() {
     return send(Command.DBSIZE);
-  }
-
-  /**
-   * Redis command <a href="https://redis.io/commands/debug">debug</a>.
-   *
-   * @return fluent self
-   */
-  @Fluent
-  @Deprecated
-  default RedisAPI debug(List<String> args, Handler<AsyncResult<@Nullable Response>> handler) {
-    send(Command.DEBUG, args.toArray(new String[0])).onComplete(handler);
-    return this;
   }
 
   /**
@@ -2067,34 +915,10 @@ public interface RedisAPI {
   /**
    * Redis command <a href="https://redis.io/commands/decr">decr</a>.
    *
-   * @return fluent self
-   */
-  @Fluent
-  @Deprecated
-  default RedisAPI decr(String arg0, Handler<AsyncResult<@Nullable Response>> handler) {
-    send(Command.DECR, arg0).onComplete(handler);
-    return this;
-  }
-
-  /**
-   * Redis command <a href="https://redis.io/commands/decr">decr</a>.
-   *
    * @return Future response.
    */
   default Future<@Nullable Response> decr(String arg0) {
     return send(Command.DECR, arg0);
-  }
-
-  /**
-   * Redis command <a href="https://redis.io/commands/decrby">decrby</a>.
-   *
-   * @return fluent self
-   */
-  @Fluent
-  @Deprecated
-  default RedisAPI decrby(String arg0, String arg1, Handler<AsyncResult<@Nullable Response>> handler) {
-    send(Command.DECRBY, arg0, arg1).onComplete(handler);
-    return this;
   }
 
   /**
@@ -2109,34 +933,10 @@ public interface RedisAPI {
   /**
    * Redis command <a href="https://redis.io/commands/del">del</a>.
    *
-   * @return fluent self
-   */
-  @Fluent
-  @Deprecated
-  default RedisAPI del(List<String> args, Handler<AsyncResult<@Nullable Response>> handler) {
-    send(Command.DEL, args.toArray(new String[0])).onComplete(handler);
-    return this;
-  }
-
-  /**
-   * Redis command <a href="https://redis.io/commands/del">del</a>.
-   *
    * @return Future response.
    */
   default Future<@Nullable Response> del(List<String> args) {
     return send(Command.DEL, args.toArray(new String[0]));
-  }
-
-  /**
-   * Redis command <a href="https://redis.io/commands/discard">discard</a>.
-   *
-   * @return fluent self
-   */
-  @Fluent
-  @Deprecated
-  default RedisAPI discard(Handler<AsyncResult<@Nullable Response>> handler) {
-    send(Command.DISCARD).onComplete(handler);
-    return this;
   }
 
   /**
@@ -2151,35 +951,12 @@ public interface RedisAPI {
   /**
    * Redis command <a href="https://redis.io/commands/dump">dump</a>.
    *
-   * @return fluent self
-   */
-  @Fluent
-  @Deprecated
-  default RedisAPI dump(String arg0, Handler<AsyncResult<@Nullable Response>> handler) {
-    send(Command.DUMP, arg0).onComplete(handler);
-    return this;
-  }
-
-  /**
-   * Redis command <a href="https://redis.io/commands/dump">dump</a>.
-   *
    * @return Future response.
    */
   default Future<@Nullable Response> dump(String arg0) {
     return send(Command.DUMP, arg0);
   }
 
-  /**
-   * Redis command <a href="https://redis.io/commands/echo">echo</a>.
-   *
-   * @return fluent self
-   */
-  @Fluent
-  @Deprecated
-  default RedisAPI echo(String arg0, Handler<AsyncResult<@Nullable Response>> handler) {
-    send(Command.ECHO, arg0).onComplete(handler);
-    return this;
-  }
 
   /**
    * Redis command <a href="https://redis.io/commands/echo">echo</a>.
@@ -2188,18 +965,6 @@ public interface RedisAPI {
    */
   default Future<@Nullable Response> echo(String arg0) {
     return send(Command.ECHO, arg0);
-  }
-
-  /**
-   * Redis command <a href="https://redis.io/commands/eval">eval</a>.
-   *
-   * @return fluent self
-   */
-  @Fluent
-  @Deprecated
-  default RedisAPI eval(List<String> args, Handler<AsyncResult<@Nullable Response>> handler) {
-    send(Command.EVAL, args.toArray(new String[0])).onComplete(handler);
-    return this;
   }
 
   /**
@@ -2214,34 +979,10 @@ public interface RedisAPI {
   /**
    * Redis command <a href="https://redis.io/commands/eval_ro">evalRo</a>.
    *
-   * @return fluent self
-   */
-  @Fluent
-  @Deprecated
-  default RedisAPI evalRo(List<String> args, Handler<AsyncResult<@Nullable Response>> handler) {
-    send(Command.EVAL_RO, args.toArray(new String[0])).onComplete(handler);
-    return this;
-  }
-
-  /**
-   * Redis command <a href="https://redis.io/commands/eval_ro">evalRo</a>.
-   *
    * @return Future response.
    */
   default Future<@Nullable Response> evalRo(List<String> args) {
     return send(Command.EVAL_RO, args.toArray(new String[0]));
-  }
-
-  /**
-   * Redis command <a href="https://redis.io/commands/evalsha">evalsha</a>.
-   *
-   * @return fluent self
-   */
-  @Fluent
-  @Deprecated
-  default RedisAPI evalsha(List<String> args, Handler<AsyncResult<@Nullable Response>> handler) {
-    send(Command.EVALSHA, args.toArray(new String[0])).onComplete(handler);
-    return this;
   }
 
   /**
@@ -2256,34 +997,10 @@ public interface RedisAPI {
   /**
    * Redis command <a href="https://redis.io/commands/evalsha_ro">evalshaRo</a>.
    *
-   * @return fluent self
-   */
-  @Fluent
-  @Deprecated
-  default RedisAPI evalshaRo(List<String> args, Handler<AsyncResult<@Nullable Response>> handler) {
-    send(Command.EVALSHA_RO, args.toArray(new String[0])).onComplete(handler);
-    return this;
-  }
-
-  /**
-   * Redis command <a href="https://redis.io/commands/evalsha_ro">evalshaRo</a>.
-   *
    * @return Future response.
    */
   default Future<@Nullable Response> evalshaRo(List<String> args) {
     return send(Command.EVALSHA_RO, args.toArray(new String[0]));
-  }
-
-  /**
-   * Redis command <a href="https://redis.io/commands/exec">exec</a>.
-   *
-   * @return fluent self
-   */
-  @Fluent
-  @Deprecated
-  default RedisAPI exec(Handler<AsyncResult<@Nullable Response>> handler) {
-    send(Command.EXEC).onComplete(handler);
-    return this;
   }
 
   /**
@@ -2298,34 +1015,10 @@ public interface RedisAPI {
   /**
    * Redis command <a href="https://redis.io/commands/exists">exists</a>.
    *
-   * @return fluent self
-   */
-  @Fluent
-  @Deprecated
-  default RedisAPI exists(List<String> args, Handler<AsyncResult<@Nullable Response>> handler) {
-    send(Command.EXISTS, args.toArray(new String[0])).onComplete(handler);
-    return this;
-  }
-
-  /**
-   * Redis command <a href="https://redis.io/commands/exists">exists</a>.
-   *
    * @return Future response.
    */
   default Future<@Nullable Response> exists(List<String> args) {
     return send(Command.EXISTS, args.toArray(new String[0]));
-  }
-
-  /**
-   * Redis command <a href="https://redis.io/commands/expire">expire</a>.
-   *
-   * @return fluent self
-   */
-  @Fluent
-  @Deprecated
-  default RedisAPI expire(List<String> args, Handler<AsyncResult<@Nullable Response>> handler) {
-    send(Command.EXPIRE, args.toArray(new String[0])).onComplete(handler);
-    return this;
   }
 
   /**
@@ -2340,34 +1033,10 @@ public interface RedisAPI {
   /**
    * Redis command <a href="https://redis.io/commands/expireat">expireat</a>.
    *
-   * @return fluent self
-   */
-  @Fluent
-  @Deprecated
-  default RedisAPI expireat(List<String> args, Handler<AsyncResult<@Nullable Response>> handler) {
-    send(Command.EXPIREAT, args.toArray(new String[0])).onComplete(handler);
-    return this;
-  }
-
-  /**
-   * Redis command <a href="https://redis.io/commands/expireat">expireat</a>.
-   *
    * @return Future response.
    */
   default Future<@Nullable Response> expireat(List<String> args) {
     return send(Command.EXPIREAT, args.toArray(new String[0]));
-  }
-
-  /**
-   * Redis command <a href="https://redis.io/commands/expiretime">expiretime</a>.
-   *
-   * @return fluent self
-   */
-  @Fluent
-  @Deprecated
-  default RedisAPI expiretime(String arg0, Handler<AsyncResult<@Nullable Response>> handler) {
-    send(Command.EXPIRETIME, arg0).onComplete(handler);
-    return this;
   }
 
   /**
@@ -2382,34 +1051,10 @@ public interface RedisAPI {
   /**
    * Redis command <a href="https://redis.io/commands/failover">failover</a>.
    *
-   * @return fluent self
-   */
-  @Fluent
-  @Deprecated
-  default RedisAPI failover(List<String> args, Handler<AsyncResult<@Nullable Response>> handler) {
-    send(Command.FAILOVER, args.toArray(new String[0])).onComplete(handler);
-    return this;
-  }
-
-  /**
-   * Redis command <a href="https://redis.io/commands/failover">failover</a>.
-   *
    * @return Future response.
    */
   default Future<@Nullable Response> failover(List<String> args) {
     return send(Command.FAILOVER, args.toArray(new String[0]));
-  }
-
-  /**
-   * Redis command <a href="https://redis.io/commands/fcall">fcall</a>.
-   *
-   * @return fluent self
-   */
-  @Fluent
-  @Deprecated
-  default RedisAPI fcall(List<String> args, Handler<AsyncResult<@Nullable Response>> handler) {
-    send(Command.FCALL, args.toArray(new String[0])).onComplete(handler);
-    return this;
   }
 
   /**
@@ -2424,34 +1069,10 @@ public interface RedisAPI {
   /**
    * Redis command <a href="https://redis.io/commands/fcall_ro">fcallRo</a>.
    *
-   * @return fluent self
-   */
-  @Fluent
-  @Deprecated
-  default RedisAPI fcallRo(List<String> args, Handler<AsyncResult<@Nullable Response>> handler) {
-    send(Command.FCALL_RO, args.toArray(new String[0])).onComplete(handler);
-    return this;
-  }
-
-  /**
-   * Redis command <a href="https://redis.io/commands/fcall_ro">fcallRo</a>.
-   *
    * @return Future response.
    */
   default Future<@Nullable Response> fcallRo(List<String> args) {
     return send(Command.FCALL_RO, args.toArray(new String[0]));
-  }
-
-  /**
-   * Redis command <a href="https://redis.io/commands/flushall">flushall</a>.
-   *
-   * @return fluent self
-   */
-  @Fluent
-  @Deprecated
-  default RedisAPI flushall(List<String> args, Handler<AsyncResult<@Nullable Response>> handler) {
-    send(Command.FLUSHALL, args.toArray(new String[0])).onComplete(handler);
-    return this;
   }
 
   /**
@@ -2466,34 +1087,10 @@ public interface RedisAPI {
   /**
    * Redis command <a href="https://redis.io/commands/flushdb">flushdb</a>.
    *
-   * @return fluent self
-   */
-  @Fluent
-  @Deprecated
-  default RedisAPI flushdb(List<String> args, Handler<AsyncResult<@Nullable Response>> handler) {
-    send(Command.FLUSHDB, args.toArray(new String[0])).onComplete(handler);
-    return this;
-  }
-
-  /**
-   * Redis command <a href="https://redis.io/commands/flushdb">flushdb</a>.
-   *
    * @return Future response.
    */
   default Future<@Nullable Response> flushdb(List<String> args) {
     return send(Command.FLUSHDB, args.toArray(new String[0]));
-  }
-
-  /**
-   * Redis command <a href="https://redis.io/commands/function">function</a>.
-   *
-   * @return fluent self
-   */
-  @Fluent
-  @Deprecated
-  default RedisAPI function(List<String> args, Handler<AsyncResult<@Nullable Response>> handler) {
-    send(Command.FUNCTION, args.toArray(new String[0])).onComplete(handler);
-    return this;
   }
 
   /**
@@ -2508,34 +1105,10 @@ public interface RedisAPI {
   /**
    * Redis command <a href="https://redis.io/commands/geoadd">geoadd</a>.
    *
-   * @return fluent self
-   */
-  @Fluent
-  @Deprecated
-  default RedisAPI geoadd(List<String> args, Handler<AsyncResult<@Nullable Response>> handler) {
-    send(Command.GEOADD, args.toArray(new String[0])).onComplete(handler);
-    return this;
-  }
-
-  /**
-   * Redis command <a href="https://redis.io/commands/geoadd">geoadd</a>.
-   *
    * @return Future response.
    */
   default Future<@Nullable Response> geoadd(List<String> args) {
     return send(Command.GEOADD, args.toArray(new String[0]));
-  }
-
-  /**
-   * Redis command <a href="https://redis.io/commands/geodist">geodist</a>.
-   *
-   * @return fluent self
-   */
-  @Fluent
-  @Deprecated
-  default RedisAPI geodist(List<String> args, Handler<AsyncResult<@Nullable Response>> handler) {
-    send(Command.GEODIST, args.toArray(new String[0])).onComplete(handler);
-    return this;
   }
 
   /**
@@ -2550,34 +1123,10 @@ public interface RedisAPI {
   /**
    * Redis command <a href="https://redis.io/commands/geohash">geohash</a>.
    *
-   * @return fluent self
-   */
-  @Fluent
-  @Deprecated
-  default RedisAPI geohash(List<String> args, Handler<AsyncResult<@Nullable Response>> handler) {
-    send(Command.GEOHASH, args.toArray(new String[0])).onComplete(handler);
-    return this;
-  }
-
-  /**
-   * Redis command <a href="https://redis.io/commands/geohash">geohash</a>.
-   *
    * @return Future response.
    */
   default Future<@Nullable Response> geohash(List<String> args) {
     return send(Command.GEOHASH, args.toArray(new String[0]));
-  }
-
-  /**
-   * Redis command <a href="https://redis.io/commands/geopos">geopos</a>.
-   *
-   * @return fluent self
-   */
-  @Fluent
-  @Deprecated
-  default RedisAPI geopos(List<String> args, Handler<AsyncResult<@Nullable Response>> handler) {
-    send(Command.GEOPOS, args.toArray(new String[0])).onComplete(handler);
-    return this;
   }
 
   /**
@@ -2592,34 +1141,10 @@ public interface RedisAPI {
   /**
    * Redis command <a href="https://redis.io/commands/georadius">georadius</a>.
    *
-   * @return fluent self
-   */
-  @Fluent
-  @Deprecated
-  default RedisAPI georadius(List<String> args, Handler<AsyncResult<@Nullable Response>> handler) {
-    send(Command.GEORADIUS, args.toArray(new String[0])).onComplete(handler);
-    return this;
-  }
-
-  /**
-   * Redis command <a href="https://redis.io/commands/georadius">georadius</a>.
-   *
    * @return Future response.
    */
   default Future<@Nullable Response> georadius(List<String> args) {
     return send(Command.GEORADIUS, args.toArray(new String[0]));
-  }
-
-  /**
-   * Redis command <a href="https://redis.io/commands/georadius_ro">georadiusRo</a>.
-   *
-   * @return fluent self
-   */
-  @Fluent
-  @Deprecated
-  default RedisAPI georadiusRo(List<String> args, Handler<AsyncResult<@Nullable Response>> handler) {
-    send(Command.GEORADIUS_RO, args.toArray(new String[0])).onComplete(handler);
-    return this;
   }
 
   /**
@@ -2634,34 +1159,10 @@ public interface RedisAPI {
   /**
    * Redis command <a href="https://redis.io/commands/georadiusbymember">georadiusbymember</a>.
    *
-   * @return fluent self
-   */
-  @Fluent
-  @Deprecated
-  default RedisAPI georadiusbymember(List<String> args, Handler<AsyncResult<@Nullable Response>> handler) {
-    send(Command.GEORADIUSBYMEMBER, args.toArray(new String[0])).onComplete(handler);
-    return this;
-  }
-
-  /**
-   * Redis command <a href="https://redis.io/commands/georadiusbymember">georadiusbymember</a>.
-   *
    * @return Future response.
    */
   default Future<@Nullable Response> georadiusbymember(List<String> args) {
     return send(Command.GEORADIUSBYMEMBER, args.toArray(new String[0]));
-  }
-
-  /**
-   * Redis command <a href="https://redis.io/commands/georadiusbymember_ro">georadiusbymemberRo</a>.
-   *
-   * @return fluent self
-   */
-  @Fluent
-  @Deprecated
-  default RedisAPI georadiusbymemberRo(List<String> args, Handler<AsyncResult<@Nullable Response>> handler) {
-    send(Command.GEORADIUSBYMEMBER_RO, args.toArray(new String[0])).onComplete(handler);
-    return this;
   }
 
   /**
@@ -2676,34 +1177,10 @@ public interface RedisAPI {
   /**
    * Redis command <a href="https://redis.io/commands/geosearch">geosearch</a>.
    *
-   * @return fluent self
-   */
-  @Fluent
-  @Deprecated
-  default RedisAPI geosearch(List<String> args, Handler<AsyncResult<@Nullable Response>> handler) {
-    send(Command.GEOSEARCH, args.toArray(new String[0])).onComplete(handler);
-    return this;
-  }
-
-  /**
-   * Redis command <a href="https://redis.io/commands/geosearch">geosearch</a>.
-   *
    * @return Future response.
    */
   default Future<@Nullable Response> geosearch(List<String> args) {
     return send(Command.GEOSEARCH, args.toArray(new String[0]));
-  }
-
-  /**
-   * Redis command <a href="https://redis.io/commands/geosearchstore">geosearchstore</a>.
-   *
-   * @return fluent self
-   */
-  @Fluent
-  @Deprecated
-  default RedisAPI geosearchstore(List<String> args, Handler<AsyncResult<@Nullable Response>> handler) {
-    send(Command.GEOSEARCHSTORE, args.toArray(new String[0])).onComplete(handler);
-    return this;
   }
 
   /**
@@ -2718,34 +1195,10 @@ public interface RedisAPI {
   /**
    * Redis command <a href="https://redis.io/commands/get">get</a>.
    *
-   * @return fluent self
-   */
-  @Fluent
-  @Deprecated
-  default RedisAPI get(String arg0, Handler<AsyncResult<@Nullable Response>> handler) {
-    send(Command.GET, arg0).onComplete(handler);
-    return this;
-  }
-
-  /**
-   * Redis command <a href="https://redis.io/commands/get">get</a>.
-   *
    * @return Future response.
    */
   default Future<@Nullable Response> get(String arg0) {
     return send(Command.GET, arg0);
-  }
-
-  /**
-   * Redis command <a href="https://redis.io/commands/getbit">getbit</a>.
-   *
-   * @return fluent self
-   */
-  @Fluent
-  @Deprecated
-  default RedisAPI getbit(String arg0, String arg1, Handler<AsyncResult<@Nullable Response>> handler) {
-    send(Command.GETBIT, arg0, arg1).onComplete(handler);
-    return this;
   }
 
   /**
@@ -2760,34 +1213,10 @@ public interface RedisAPI {
   /**
    * Redis command <a href="https://redis.io/commands/getdel">getdel</a>.
    *
-   * @return fluent self
-   */
-  @Fluent
-  @Deprecated
-  default RedisAPI getdel(String arg0, Handler<AsyncResult<@Nullable Response>> handler) {
-    send(Command.GETDEL, arg0).onComplete(handler);
-    return this;
-  }
-
-  /**
-   * Redis command <a href="https://redis.io/commands/getdel">getdel</a>.
-   *
    * @return Future response.
    */
   default Future<@Nullable Response> getdel(String arg0) {
     return send(Command.GETDEL, arg0);
-  }
-
-  /**
-   * Redis command <a href="https://redis.io/commands/getex">getex</a>.
-   *
-   * @return fluent self
-   */
-  @Fluent
-  @Deprecated
-  default RedisAPI getex(List<String> args, Handler<AsyncResult<@Nullable Response>> handler) {
-    send(Command.GETEX, args.toArray(new String[0])).onComplete(handler);
-    return this;
   }
 
   /**
@@ -2802,34 +1231,10 @@ public interface RedisAPI {
   /**
    * Redis command <a href="https://redis.io/commands/getrange">getrange</a>.
    *
-   * @return fluent self
-   */
-  @Fluent
-  @Deprecated
-  default RedisAPI getrange(String arg0, String arg1, String arg2, Handler<AsyncResult<@Nullable Response>> handler) {
-    send(Command.GETRANGE, arg0, arg1, arg2).onComplete(handler);
-    return this;
-  }
-
-  /**
-   * Redis command <a href="https://redis.io/commands/getrange">getrange</a>.
-   *
    * @return Future response.
    */
   default Future<@Nullable Response> getrange(String arg0, String arg1, String arg2) {
     return send(Command.GETRANGE, arg0, arg1, arg2);
-  }
-
-  /**
-   * Redis command <a href="https://redis.io/commands/getset">getset</a>.
-   *
-   * @return fluent self
-   */
-  @Fluent
-  @Deprecated
-  default RedisAPI getset(String arg0, String arg1, Handler<AsyncResult<@Nullable Response>> handler) {
-    send(Command.GETSET, arg0, arg1).onComplete(handler);
-    return this;
   }
 
   /**
@@ -2844,34 +1249,10 @@ public interface RedisAPI {
   /**
    * Redis command <a href="https://redis.io/commands/graph.BULK">graphBulk</a>.
    *
-   * @return fluent self
-   */
-  @Fluent
-  @Deprecated
-  default RedisAPI graphBulk(List<String> args, Handler<AsyncResult<@Nullable Response>> handler) {
-    send(Command.GRAPH_BULK, args.toArray(new String[0])).onComplete(handler);
-    return this;
-  }
-
-  /**
-   * Redis command <a href="https://redis.io/commands/graph.BULK">graphBulk</a>.
-   *
    * @return Future response.
    */
   default Future<@Nullable Response> graphBulk(List<String> args) {
     return send(Command.GRAPH_BULK, args.toArray(new String[0]));
-  }
-
-  /**
-   * Redis command <a href="https://redis.io/commands/graph.CONFIG">graphConfig</a>.
-   *
-   * @return fluent self
-   */
-  @Fluent
-  @Deprecated
-  default RedisAPI graphConfig(List<String> args, Handler<AsyncResult<@Nullable Response>> handler) {
-    send(Command.GRAPH_CONFIG, args.toArray(new String[0])).onComplete(handler);
-    return this;
   }
 
   /**
@@ -2886,34 +1267,10 @@ public interface RedisAPI {
   /**
    * Redis command <a href="https://redis.io/commands/graph.DEBUG">graphDebug</a>.
    *
-   * @return fluent self
-   */
-  @Fluent
-  @Deprecated
-  default RedisAPI graphDebug(List<String> args, Handler<AsyncResult<@Nullable Response>> handler) {
-    send(Command.GRAPH_DEBUG, args.toArray(new String[0])).onComplete(handler);
-    return this;
-  }
-
-  /**
-   * Redis command <a href="https://redis.io/commands/graph.DEBUG">graphDebug</a>.
-   *
    * @return Future response.
    */
   default Future<@Nullable Response> graphDebug(List<String> args) {
     return send(Command.GRAPH_DEBUG, args.toArray(new String[0]));
-  }
-
-  /**
-   * Redis command <a href="https://redis.io/commands/graph.DELETE">graphDelete</a>.
-   *
-   * @return fluent self
-   */
-  @Fluent
-  @Deprecated
-  default RedisAPI graphDelete(List<String> args, Handler<AsyncResult<@Nullable Response>> handler) {
-    send(Command.GRAPH_DELETE, args.toArray(new String[0])).onComplete(handler);
-    return this;
   }
 
   /**
@@ -2928,34 +1285,10 @@ public interface RedisAPI {
   /**
    * Redis command <a href="https://redis.io/commands/graph.EXPLAIN">graphExplain</a>.
    *
-   * @return fluent self
-   */
-  @Fluent
-  @Deprecated
-  default RedisAPI graphExplain(List<String> args, Handler<AsyncResult<@Nullable Response>> handler) {
-    send(Command.GRAPH_EXPLAIN, args.toArray(new String[0])).onComplete(handler);
-    return this;
-  }
-
-  /**
-   * Redis command <a href="https://redis.io/commands/graph.EXPLAIN">graphExplain</a>.
-   *
    * @return Future response.
    */
   default Future<@Nullable Response> graphExplain(List<String> args) {
     return send(Command.GRAPH_EXPLAIN, args.toArray(new String[0]));
-  }
-
-  /**
-   * Redis command <a href="https://redis.io/commands/graph.LIST">graphList</a>.
-   *
-   * @return fluent self
-   */
-  @Fluent
-  @Deprecated
-  default RedisAPI graphList(List<String> args, Handler<AsyncResult<@Nullable Response>> handler) {
-    send(Command.GRAPH_LIST, args.toArray(new String[0])).onComplete(handler);
-    return this;
   }
 
   /**
@@ -2970,34 +1303,10 @@ public interface RedisAPI {
   /**
    * Redis command <a href="https://redis.io/commands/graph.PROFILE">graphProfile</a>.
    *
-   * @return fluent self
-   */
-  @Fluent
-  @Deprecated
-  default RedisAPI graphProfile(List<String> args, Handler<AsyncResult<@Nullable Response>> handler) {
-    send(Command.GRAPH_PROFILE, args.toArray(new String[0])).onComplete(handler);
-    return this;
-  }
-
-  /**
-   * Redis command <a href="https://redis.io/commands/graph.PROFILE">graphProfile</a>.
-   *
    * @return Future response.
    */
   default Future<@Nullable Response> graphProfile(List<String> args) {
     return send(Command.GRAPH_PROFILE, args.toArray(new String[0]));
-  }
-
-  /**
-   * Redis command <a href="https://redis.io/commands/graph.QUERY">graphQuery</a>.
-   *
-   * @return fluent self
-   */
-  @Fluent
-  @Deprecated
-  default RedisAPI graphQuery(List<String> args, Handler<AsyncResult<@Nullable Response>> handler) {
-    send(Command.GRAPH_QUERY, args.toArray(new String[0])).onComplete(handler);
-    return this;
   }
 
   /**
@@ -3012,34 +1321,10 @@ public interface RedisAPI {
   /**
    * Redis command <a href="https://redis.io/commands/graph.RO_QUERY">graphRoQuery</a>.
    *
-   * @return fluent self
-   */
-  @Fluent
-  @Deprecated
-  default RedisAPI graphRoQuery(List<String> args, Handler<AsyncResult<@Nullable Response>> handler) {
-    send(Command.GRAPH_RO_QUERY, args.toArray(new String[0])).onComplete(handler);
-    return this;
-  }
-
-  /**
-   * Redis command <a href="https://redis.io/commands/graph.RO_QUERY">graphRoQuery</a>.
-   *
    * @return Future response.
    */
   default Future<@Nullable Response> graphRoQuery(List<String> args) {
     return send(Command.GRAPH_RO_QUERY, args.toArray(new String[0]));
-  }
-
-  /**
-   * Redis command <a href="https://redis.io/commands/graph.SLOWLOG">graphSlowlog</a>.
-   *
-   * @return fluent self
-   */
-  @Fluent
-  @Deprecated
-  default RedisAPI graphSlowlog(List<String> args, Handler<AsyncResult<@Nullable Response>> handler) {
-    send(Command.GRAPH_SLOWLOG, args.toArray(new String[0])).onComplete(handler);
-    return this;
   }
 
   /**
@@ -3054,34 +1339,10 @@ public interface RedisAPI {
   /**
    * Redis command <a href="https://redis.io/commands/hdel">hdel</a>.
    *
-   * @return fluent self
-   */
-  @Fluent
-  @Deprecated
-  default RedisAPI hdel(List<String> args, Handler<AsyncResult<@Nullable Response>> handler) {
-    send(Command.HDEL, args.toArray(new String[0])).onComplete(handler);
-    return this;
-  }
-
-  /**
-   * Redis command <a href="https://redis.io/commands/hdel">hdel</a>.
-   *
    * @return Future response.
    */
   default Future<@Nullable Response> hdel(List<String> args) {
     return send(Command.HDEL, args.toArray(new String[0]));
-  }
-
-  /**
-   * Redis command <a href="https://redis.io/commands/hello">hello</a>.
-   *
-   * @return fluent self
-   */
-  @Fluent
-  @Deprecated
-  default RedisAPI hello(List<String> args, Handler<AsyncResult<@Nullable Response>> handler) {
-    send(Command.HELLO, args.toArray(new String[0])).onComplete(handler);
-    return this;
   }
 
   /**
@@ -3096,34 +1357,10 @@ public interface RedisAPI {
   /**
    * Redis command <a href="https://redis.io/commands/hexists">hexists</a>.
    *
-   * @return fluent self
-   */
-  @Fluent
-  @Deprecated
-  default RedisAPI hexists(String arg0, String arg1, Handler<AsyncResult<@Nullable Response>> handler) {
-    send(Command.HEXISTS, arg0, arg1).onComplete(handler);
-    return this;
-  }
-
-  /**
-   * Redis command <a href="https://redis.io/commands/hexists">hexists</a>.
-   *
    * @return Future response.
    */
   default Future<@Nullable Response> hexists(String arg0, String arg1) {
     return send(Command.HEXISTS, arg0, arg1);
-  }
-
-  /**
-   * Redis command <a href="https://redis.io/commands/hget">hget</a>.
-   *
-   * @return fluent self
-   */
-  @Fluent
-  @Deprecated
-  default RedisAPI hget(String arg0, String arg1, Handler<AsyncResult<@Nullable Response>> handler) {
-    send(Command.HGET, arg0, arg1).onComplete(handler);
-    return this;
   }
 
   /**
@@ -3138,34 +1375,10 @@ public interface RedisAPI {
   /**
    * Redis command <a href="https://redis.io/commands/hgetall">hgetall</a>.
    *
-   * @return fluent self
-   */
-  @Fluent
-  @Deprecated
-  default RedisAPI hgetall(String arg0, Handler<AsyncResult<@Nullable Response>> handler) {
-    send(Command.HGETALL, arg0).onComplete(handler);
-    return this;
-  }
-
-  /**
-   * Redis command <a href="https://redis.io/commands/hgetall">hgetall</a>.
-   *
    * @return Future response.
    */
   default Future<@Nullable Response> hgetall(String arg0) {
     return send(Command.HGETALL, arg0);
-  }
-
-  /**
-   * Redis command <a href="https://redis.io/commands/hincrby">hincrby</a>.
-   *
-   * @return fluent self
-   */
-  @Fluent
-  @Deprecated
-  default RedisAPI hincrby(String arg0, String arg1, String arg2, Handler<AsyncResult<@Nullable Response>> handler) {
-    send(Command.HINCRBY, arg0, arg1, arg2).onComplete(handler);
-    return this;
   }
 
   /**
@@ -3180,34 +1393,10 @@ public interface RedisAPI {
   /**
    * Redis command <a href="https://redis.io/commands/hincrbyfloat">hincrbyfloat</a>.
    *
-   * @return fluent self
-   */
-  @Fluent
-  @Deprecated
-  default RedisAPI hincrbyfloat(String arg0, String arg1, String arg2, Handler<AsyncResult<@Nullable Response>> handler) {
-    send(Command.HINCRBYFLOAT, arg0, arg1, arg2).onComplete(handler);
-    return this;
-  }
-
-  /**
-   * Redis command <a href="https://redis.io/commands/hincrbyfloat">hincrbyfloat</a>.
-   *
    * @return Future response.
    */
   default Future<@Nullable Response> hincrbyfloat(String arg0, String arg1, String arg2) {
     return send(Command.HINCRBYFLOAT, arg0, arg1, arg2);
-  }
-
-  /**
-   * Redis command <a href="https://redis.io/commands/hkeys">hkeys</a>.
-   *
-   * @return fluent self
-   */
-  @Fluent
-  @Deprecated
-  default RedisAPI hkeys(String arg0, Handler<AsyncResult<@Nullable Response>> handler) {
-    send(Command.HKEYS, arg0).onComplete(handler);
-    return this;
   }
 
   /**
@@ -3222,34 +1411,10 @@ public interface RedisAPI {
   /**
    * Redis command <a href="https://redis.io/commands/hlen">hlen</a>.
    *
-   * @return fluent self
-   */
-  @Fluent
-  @Deprecated
-  default RedisAPI hlen(String arg0, Handler<AsyncResult<@Nullable Response>> handler) {
-    send(Command.HLEN, arg0).onComplete(handler);
-    return this;
-  }
-
-  /**
-   * Redis command <a href="https://redis.io/commands/hlen">hlen</a>.
-   *
    * @return Future response.
    */
   default Future<@Nullable Response> hlen(String arg0) {
     return send(Command.HLEN, arg0);
-  }
-
-  /**
-   * Redis command <a href="https://redis.io/commands/hmget">hmget</a>.
-   *
-   * @return fluent self
-   */
-  @Fluent
-  @Deprecated
-  default RedisAPI hmget(List<String> args, Handler<AsyncResult<@Nullable Response>> handler) {
-    send(Command.HMGET, args.toArray(new String[0])).onComplete(handler);
-    return this;
   }
 
   /**
@@ -3264,34 +1429,10 @@ public interface RedisAPI {
   /**
    * Redis command <a href="https://redis.io/commands/hmset">hmset</a>.
    *
-   * @return fluent self
-   */
-  @Fluent
-  @Deprecated
-  default RedisAPI hmset(List<String> args, Handler<AsyncResult<@Nullable Response>> handler) {
-    send(Command.HMSET, args.toArray(new String[0])).onComplete(handler);
-    return this;
-  }
-
-  /**
-   * Redis command <a href="https://redis.io/commands/hmset">hmset</a>.
-   *
    * @return Future response.
    */
   default Future<@Nullable Response> hmset(List<String> args) {
     return send(Command.HMSET, args.toArray(new String[0]));
-  }
-
-  /**
-   * Redis command <a href="https://redis.io/commands/hrandfield">hrandfield</a>.
-   *
-   * @return fluent self
-   */
-  @Fluent
-  @Deprecated
-  default RedisAPI hrandfield(List<String> args, Handler<AsyncResult<@Nullable Response>> handler) {
-    send(Command.HRANDFIELD, args.toArray(new String[0])).onComplete(handler);
-    return this;
   }
 
   /**
@@ -3306,34 +1447,10 @@ public interface RedisAPI {
   /**
    * Redis command <a href="https://redis.io/commands/hscan">hscan</a>.
    *
-   * @return fluent self
-   */
-  @Fluent
-  @Deprecated
-  default RedisAPI hscan(List<String> args, Handler<AsyncResult<@Nullable Response>> handler) {
-    send(Command.HSCAN, args.toArray(new String[0])).onComplete(handler);
-    return this;
-  }
-
-  /**
-   * Redis command <a href="https://redis.io/commands/hscan">hscan</a>.
-   *
    * @return Future response.
    */
   default Future<@Nullable Response> hscan(List<String> args) {
     return send(Command.HSCAN, args.toArray(new String[0]));
-  }
-
-  /**
-   * Redis command <a href="https://redis.io/commands/hset">hset</a>.
-   *
-   * @return fluent self
-   */
-  @Fluent
-  @Deprecated
-  default RedisAPI hset(List<String> args, Handler<AsyncResult<@Nullable Response>> handler) {
-    send(Command.HSET, args.toArray(new String[0])).onComplete(handler);
-    return this;
   }
 
   /**
@@ -3348,34 +1465,10 @@ public interface RedisAPI {
   /**
    * Redis command <a href="https://redis.io/commands/hsetnx">hsetnx</a>.
    *
-   * @return fluent self
-   */
-  @Fluent
-  @Deprecated
-  default RedisAPI hsetnx(String arg0, String arg1, String arg2, Handler<AsyncResult<@Nullable Response>> handler) {
-    send(Command.HSETNX, arg0, arg1, arg2).onComplete(handler);
-    return this;
-  }
-
-  /**
-   * Redis command <a href="https://redis.io/commands/hsetnx">hsetnx</a>.
-   *
    * @return Future response.
    */
   default Future<@Nullable Response> hsetnx(String arg0, String arg1, String arg2) {
     return send(Command.HSETNX, arg0, arg1, arg2);
-  }
-
-  /**
-   * Redis command <a href="https://redis.io/commands/hstrlen">hstrlen</a>.
-   *
-   * @return fluent self
-   */
-  @Fluent
-  @Deprecated
-  default RedisAPI hstrlen(String arg0, String arg1, Handler<AsyncResult<@Nullable Response>> handler) {
-    send(Command.HSTRLEN, arg0, arg1).onComplete(handler);
-    return this;
   }
 
   /**
@@ -3390,34 +1483,10 @@ public interface RedisAPI {
   /**
    * Redis command <a href="https://redis.io/commands/hvals">hvals</a>.
    *
-   * @return fluent self
-   */
-  @Fluent
-  @Deprecated
-  default RedisAPI hvals(String arg0, Handler<AsyncResult<@Nullable Response>> handler) {
-    send(Command.HVALS, arg0).onComplete(handler);
-    return this;
-  }
-
-  /**
-   * Redis command <a href="https://redis.io/commands/hvals">hvals</a>.
-   *
    * @return Future response.
    */
   default Future<@Nullable Response> hvals(String arg0) {
     return send(Command.HVALS, arg0);
-  }
-
-  /**
-   * Redis command <a href="https://redis.io/commands/incr">incr</a>.
-   *
-   * @return fluent self
-   */
-  @Fluent
-  @Deprecated
-  default RedisAPI incr(String arg0, Handler<AsyncResult<@Nullable Response>> handler) {
-    send(Command.INCR, arg0).onComplete(handler);
-    return this;
   }
 
   /**
@@ -3432,34 +1501,10 @@ public interface RedisAPI {
   /**
    * Redis command <a href="https://redis.io/commands/incrby">incrby</a>.
    *
-   * @return fluent self
-   */
-  @Fluent
-  @Deprecated
-  default RedisAPI incrby(String arg0, String arg1, Handler<AsyncResult<@Nullable Response>> handler) {
-    send(Command.INCRBY, arg0, arg1).onComplete(handler);
-    return this;
-  }
-
-  /**
-   * Redis command <a href="https://redis.io/commands/incrby">incrby</a>.
-   *
    * @return Future response.
    */
   default Future<@Nullable Response> incrby(String arg0, String arg1) {
     return send(Command.INCRBY, arg0, arg1);
-  }
-
-  /**
-   * Redis command <a href="https://redis.io/commands/incrbyfloat">incrbyfloat</a>.
-   *
-   * @return fluent self
-   */
-  @Fluent
-  @Deprecated
-  default RedisAPI incrbyfloat(String arg0, String arg1, Handler<AsyncResult<@Nullable Response>> handler) {
-    send(Command.INCRBYFLOAT, arg0, arg1).onComplete(handler);
-    return this;
   }
 
   /**
@@ -3474,34 +1519,10 @@ public interface RedisAPI {
   /**
    * Redis command <a href="https://redis.io/commands/info">info</a>.
    *
-   * @return fluent self
-   */
-  @Fluent
-  @Deprecated
-  default RedisAPI info(List<String> args, Handler<AsyncResult<@Nullable Response>> handler) {
-    send(Command.INFO, args.toArray(new String[0])).onComplete(handler);
-    return this;
-  }
-
-  /**
-   * Redis command <a href="https://redis.io/commands/info">info</a>.
-   *
    * @return Future response.
    */
   default Future<@Nullable Response> info(List<String> args) {
     return send(Command.INFO, args.toArray(new String[0]));
-  }
-
-  /**
-   * Redis command <a href="https://redis.io/commands/json.arrappend">jsonArrappend</a>.
-   *
-   * @return fluent self
-   */
-  @Fluent
-  @Deprecated
-  default RedisAPI jsonArrappend(List<String> args, Handler<AsyncResult<@Nullable Response>> handler) {
-    send(Command.JSON_ARRAPPEND, args.toArray(new String[0])).onComplete(handler);
-    return this;
   }
 
   /**
@@ -3516,34 +1537,10 @@ public interface RedisAPI {
   /**
    * Redis command <a href="https://redis.io/commands/json.arrindex">jsonArrindex</a>.
    *
-   * @return fluent self
-   */
-  @Fluent
-  @Deprecated
-  default RedisAPI jsonArrindex(List<String> args, Handler<AsyncResult<@Nullable Response>> handler) {
-    send(Command.JSON_ARRINDEX, args.toArray(new String[0])).onComplete(handler);
-    return this;
-  }
-
-  /**
-   * Redis command <a href="https://redis.io/commands/json.arrindex">jsonArrindex</a>.
-   *
    * @return Future response.
    */
   default Future<@Nullable Response> jsonArrindex(List<String> args) {
     return send(Command.JSON_ARRINDEX, args.toArray(new String[0]));
-  }
-
-  /**
-   * Redis command <a href="https://redis.io/commands/json.arrinsert">jsonArrinsert</a>.
-   *
-   * @return fluent self
-   */
-  @Fluent
-  @Deprecated
-  default RedisAPI jsonArrinsert(List<String> args, Handler<AsyncResult<@Nullable Response>> handler) {
-    send(Command.JSON_ARRINSERT, args.toArray(new String[0])).onComplete(handler);
-    return this;
   }
 
   /**
@@ -3558,34 +1555,10 @@ public interface RedisAPI {
   /**
    * Redis command <a href="https://redis.io/commands/json.arrlen">jsonArrlen</a>.
    *
-   * @return fluent self
-   */
-  @Fluent
-  @Deprecated
-  default RedisAPI jsonArrlen(List<String> args, Handler<AsyncResult<@Nullable Response>> handler) {
-    send(Command.JSON_ARRLEN, args.toArray(new String[0])).onComplete(handler);
-    return this;
-  }
-
-  /**
-   * Redis command <a href="https://redis.io/commands/json.arrlen">jsonArrlen</a>.
-   *
    * @return Future response.
    */
   default Future<@Nullable Response> jsonArrlen(List<String> args) {
     return send(Command.JSON_ARRLEN, args.toArray(new String[0]));
-  }
-
-  /**
-   * Redis command <a href="https://redis.io/commands/json.arrpop">jsonArrpop</a>.
-   *
-   * @return fluent self
-   */
-  @Fluent
-  @Deprecated
-  default RedisAPI jsonArrpop(List<String> args, Handler<AsyncResult<@Nullable Response>> handler) {
-    send(Command.JSON_ARRPOP, args.toArray(new String[0])).onComplete(handler);
-    return this;
   }
 
   /**
@@ -3600,34 +1573,10 @@ public interface RedisAPI {
   /**
    * Redis command <a href="https://redis.io/commands/json.arrtrim">jsonArrtrim</a>.
    *
-   * @return fluent self
-   */
-  @Fluent
-  @Deprecated
-  default RedisAPI jsonArrtrim(List<String> args, Handler<AsyncResult<@Nullable Response>> handler) {
-    send(Command.JSON_ARRTRIM, args.toArray(new String[0])).onComplete(handler);
-    return this;
-  }
-
-  /**
-   * Redis command <a href="https://redis.io/commands/json.arrtrim">jsonArrtrim</a>.
-   *
    * @return Future response.
    */
   default Future<@Nullable Response> jsonArrtrim(List<String> args) {
     return send(Command.JSON_ARRTRIM, args.toArray(new String[0]));
-  }
-
-  /**
-   * Redis command <a href="https://redis.io/commands/json.clear">jsonClear</a>.
-   *
-   * @return fluent self
-   */
-  @Fluent
-  @Deprecated
-  default RedisAPI jsonClear(List<String> args, Handler<AsyncResult<@Nullable Response>> handler) {
-    send(Command.JSON_CLEAR, args.toArray(new String[0])).onComplete(handler);
-    return this;
   }
 
   /**
@@ -3642,34 +1591,10 @@ public interface RedisAPI {
   /**
    * Redis command <a href="https://redis.io/commands/json.debug">jsonDebug</a>.
    *
-   * @return fluent self
-   */
-  @Fluent
-  @Deprecated
-  default RedisAPI jsonDebug(List<String> args, Handler<AsyncResult<@Nullable Response>> handler) {
-    send(Command.JSON_DEBUG, args.toArray(new String[0])).onComplete(handler);
-    return this;
-  }
-
-  /**
-   * Redis command <a href="https://redis.io/commands/json.debug">jsonDebug</a>.
-   *
    * @return Future response.
    */
   default Future<@Nullable Response> jsonDebug(List<String> args) {
     return send(Command.JSON_DEBUG, args.toArray(new String[0]));
-  }
-
-  /**
-   * Redis command <a href="https://redis.io/commands/json.del">jsonDel</a>.
-   *
-   * @return fluent self
-   */
-  @Fluent
-  @Deprecated
-  default RedisAPI jsonDel(List<String> args, Handler<AsyncResult<@Nullable Response>> handler) {
-    send(Command.JSON_DEL, args.toArray(new String[0])).onComplete(handler);
-    return this;
   }
 
   /**
@@ -3684,34 +1609,10 @@ public interface RedisAPI {
   /**
    * Redis command <a href="https://redis.io/commands/json.forget">jsonForget</a>.
    *
-   * @return fluent self
-   */
-  @Fluent
-  @Deprecated
-  default RedisAPI jsonForget(List<String> args, Handler<AsyncResult<@Nullable Response>> handler) {
-    send(Command.JSON_FORGET, args.toArray(new String[0])).onComplete(handler);
-    return this;
-  }
-
-  /**
-   * Redis command <a href="https://redis.io/commands/json.forget">jsonForget</a>.
-   *
    * @return Future response.
    */
   default Future<@Nullable Response> jsonForget(List<String> args) {
     return send(Command.JSON_FORGET, args.toArray(new String[0]));
-  }
-
-  /**
-   * Redis command <a href="https://redis.io/commands/json.get">jsonGet</a>.
-   *
-   * @return fluent self
-   */
-  @Fluent
-  @Deprecated
-  default RedisAPI jsonGet(List<String> args, Handler<AsyncResult<@Nullable Response>> handler) {
-    send(Command.JSON_GET, args.toArray(new String[0])).onComplete(handler);
-    return this;
   }
 
   /**
@@ -3726,34 +1627,10 @@ public interface RedisAPI {
   /**
    * Redis command <a href="https://redis.io/commands/json.mget">jsonMget</a>.
    *
-   * @return fluent self
-   */
-  @Fluent
-  @Deprecated
-  default RedisAPI jsonMget(List<String> args, Handler<AsyncResult<@Nullable Response>> handler) {
-    send(Command.JSON_MGET, args.toArray(new String[0])).onComplete(handler);
-    return this;
-  }
-
-  /**
-   * Redis command <a href="https://redis.io/commands/json.mget">jsonMget</a>.
-   *
    * @return Future response.
    */
   default Future<@Nullable Response> jsonMget(List<String> args) {
     return send(Command.JSON_MGET, args.toArray(new String[0]));
-  }
-
-  /**
-   * Redis command <a href="https://redis.io/commands/json.numincrby">jsonNumincrby</a>.
-   *
-   * @return fluent self
-   */
-  @Fluent
-  @Deprecated
-  default RedisAPI jsonNumincrby(List<String> args, Handler<AsyncResult<@Nullable Response>> handler) {
-    send(Command.JSON_NUMINCRBY, args.toArray(new String[0])).onComplete(handler);
-    return this;
   }
 
   /**
@@ -3768,34 +1645,10 @@ public interface RedisAPI {
   /**
    * Redis command <a href="https://redis.io/commands/json.nummultby">jsonNummultby</a>.
    *
-   * @return fluent self
-   */
-  @Fluent
-  @Deprecated
-  default RedisAPI jsonNummultby(List<String> args, Handler<AsyncResult<@Nullable Response>> handler) {
-    send(Command.JSON_NUMMULTBY, args.toArray(new String[0])).onComplete(handler);
-    return this;
-  }
-
-  /**
-   * Redis command <a href="https://redis.io/commands/json.nummultby">jsonNummultby</a>.
-   *
    * @return Future response.
    */
   default Future<@Nullable Response> jsonNummultby(List<String> args) {
     return send(Command.JSON_NUMMULTBY, args.toArray(new String[0]));
-  }
-
-  /**
-   * Redis command <a href="https://redis.io/commands/json.numpowby">jsonNumpowby</a>.
-   *
-   * @return fluent self
-   */
-  @Fluent
-  @Deprecated
-  default RedisAPI jsonNumpowby(List<String> args, Handler<AsyncResult<@Nullable Response>> handler) {
-    send(Command.JSON_NUMPOWBY, args.toArray(new String[0])).onComplete(handler);
-    return this;
   }
 
   /**
@@ -3810,34 +1663,10 @@ public interface RedisAPI {
   /**
    * Redis command <a href="https://redis.io/commands/json.objkeys">jsonObjkeys</a>.
    *
-   * @return fluent self
-   */
-  @Fluent
-  @Deprecated
-  default RedisAPI jsonObjkeys(List<String> args, Handler<AsyncResult<@Nullable Response>> handler) {
-    send(Command.JSON_OBJKEYS, args.toArray(new String[0])).onComplete(handler);
-    return this;
-  }
-
-  /**
-   * Redis command <a href="https://redis.io/commands/json.objkeys">jsonObjkeys</a>.
-   *
    * @return Future response.
    */
   default Future<@Nullable Response> jsonObjkeys(List<String> args) {
     return send(Command.JSON_OBJKEYS, args.toArray(new String[0]));
-  }
-
-  /**
-   * Redis command <a href="https://redis.io/commands/json.objlen">jsonObjlen</a>.
-   *
-   * @return fluent self
-   */
-  @Fluent
-  @Deprecated
-  default RedisAPI jsonObjlen(List<String> args, Handler<AsyncResult<@Nullable Response>> handler) {
-    send(Command.JSON_OBJLEN, args.toArray(new String[0])).onComplete(handler);
-    return this;
   }
 
   /**
@@ -3849,17 +1678,6 @@ public interface RedisAPI {
     return send(Command.JSON_OBJLEN, args.toArray(new String[0]));
   }
 
-  /**
-   * Redis command <a href="https://redis.io/commands/json.resp">jsonResp</a>.
-   *
-   * @return fluent self
-   */
-  @Fluent
-  @Deprecated
-  default RedisAPI jsonResp(List<String> args, Handler<AsyncResult<@Nullable Response>> handler) {
-    send(Command.JSON_RESP, args.toArray(new String[0])).onComplete(handler);
-    return this;
-  }
 
   /**
    * Redis command <a href="https://redis.io/commands/json.resp">jsonResp</a>.
@@ -3868,18 +1686,6 @@ public interface RedisAPI {
    */
   default Future<@Nullable Response> jsonResp(List<String> args) {
     return send(Command.JSON_RESP, args.toArray(new String[0]));
-  }
-
-  /**
-   * Redis command <a href="https://redis.io/commands/json.set">jsonSet</a>.
-   *
-   * @return fluent self
-   */
-  @Fluent
-  @Deprecated
-  default RedisAPI jsonSet(List<String> args, Handler<AsyncResult<@Nullable Response>> handler) {
-    send(Command.JSON_SET, args.toArray(new String[0])).onComplete(handler);
-    return this;
   }
 
   /**
@@ -3894,34 +1700,10 @@ public interface RedisAPI {
   /**
    * Redis command <a href="https://redis.io/commands/json.strappend">jsonStrappend</a>.
    *
-   * @return fluent self
-   */
-  @Fluent
-  @Deprecated
-  default RedisAPI jsonStrappend(List<String> args, Handler<AsyncResult<@Nullable Response>> handler) {
-    send(Command.JSON_STRAPPEND, args.toArray(new String[0])).onComplete(handler);
-    return this;
-  }
-
-  /**
-   * Redis command <a href="https://redis.io/commands/json.strappend">jsonStrappend</a>.
-   *
    * @return Future response.
    */
   default Future<@Nullable Response> jsonStrappend(List<String> args) {
     return send(Command.JSON_STRAPPEND, args.toArray(new String[0]));
-  }
-
-  /**
-   * Redis command <a href="https://redis.io/commands/json.strlen">jsonStrlen</a>.
-   *
-   * @return fluent self
-   */
-  @Fluent
-  @Deprecated
-  default RedisAPI jsonStrlen(List<String> args, Handler<AsyncResult<@Nullable Response>> handler) {
-    send(Command.JSON_STRLEN, args.toArray(new String[0])).onComplete(handler);
-    return this;
   }
 
   /**
@@ -3936,34 +1718,10 @@ public interface RedisAPI {
   /**
    * Redis command <a href="https://redis.io/commands/json.toggle">jsonToggle</a>.
    *
-   * @return fluent self
-   */
-  @Fluent
-  @Deprecated
-  default RedisAPI jsonToggle(List<String> args, Handler<AsyncResult<@Nullable Response>> handler) {
-    send(Command.JSON_TOGGLE, args.toArray(new String[0])).onComplete(handler);
-    return this;
-  }
-
-  /**
-   * Redis command <a href="https://redis.io/commands/json.toggle">jsonToggle</a>.
-   *
    * @return Future response.
    */
   default Future<@Nullable Response> jsonToggle(List<String> args) {
     return send(Command.JSON_TOGGLE, args.toArray(new String[0]));
-  }
-
-  /**
-   * Redis command <a href="https://redis.io/commands/json.type">jsonType</a>.
-   *
-   * @return fluent self
-   */
-  @Fluent
-  @Deprecated
-  default RedisAPI jsonType(List<String> args, Handler<AsyncResult<@Nullable Response>> handler) {
-    send(Command.JSON_TYPE, args.toArray(new String[0])).onComplete(handler);
-    return this;
   }
 
   /**
@@ -3978,34 +1736,10 @@ public interface RedisAPI {
   /**
    * Redis command <a href="https://redis.io/commands/keys">keys</a>.
    *
-   * @return fluent self
-   */
-  @Fluent
-  @Deprecated
-  default RedisAPI keys(String arg0, Handler<AsyncResult<@Nullable Response>> handler) {
-    send(Command.KEYS, arg0).onComplete(handler);
-    return this;
-  }
-
-  /**
-   * Redis command <a href="https://redis.io/commands/keys">keys</a>.
-   *
    * @return Future response.
    */
   default Future<@Nullable Response> keys(String arg0) {
     return send(Command.KEYS, arg0);
-  }
-
-  /**
-   * Redis command <a href="https://redis.io/commands/lastsave">lastsave</a>.
-   *
-   * @return fluent self
-   */
-  @Fluent
-  @Deprecated
-  default RedisAPI lastsave(Handler<AsyncResult<@Nullable Response>> handler) {
-    send(Command.LASTSAVE).onComplete(handler);
-    return this;
   }
 
   /**
@@ -4020,34 +1754,10 @@ public interface RedisAPI {
   /**
    * Redis command <a href="https://redis.io/commands/latency">latency</a>.
    *
-   * @return fluent self
-   */
-  @Fluent
-  @Deprecated
-  default RedisAPI latency(List<String> args, Handler<AsyncResult<@Nullable Response>> handler) {
-    send(Command.LATENCY, args.toArray(new String[0])).onComplete(handler);
-    return this;
-  }
-
-  /**
-   * Redis command <a href="https://redis.io/commands/latency">latency</a>.
-   *
    * @return Future response.
    */
   default Future<@Nullable Response> latency(List<String> args) {
     return send(Command.LATENCY, args.toArray(new String[0]));
-  }
-
-  /**
-   * Redis command <a href="https://redis.io/commands/lcs">lcs</a>.
-   *
-   * @return fluent self
-   */
-  @Fluent
-  @Deprecated
-  default RedisAPI lcs(List<String> args, Handler<AsyncResult<@Nullable Response>> handler) {
-    send(Command.LCS, args.toArray(new String[0])).onComplete(handler);
-    return this;
   }
 
   /**
@@ -4062,34 +1772,10 @@ public interface RedisAPI {
   /**
    * Redis command <a href="https://redis.io/commands/lindex">lindex</a>.
    *
-   * @return fluent self
-   */
-  @Fluent
-  @Deprecated
-  default RedisAPI lindex(String arg0, String arg1, Handler<AsyncResult<@Nullable Response>> handler) {
-    send(Command.LINDEX, arg0, arg1).onComplete(handler);
-    return this;
-  }
-
-  /**
-   * Redis command <a href="https://redis.io/commands/lindex">lindex</a>.
-   *
    * @return Future response.
    */
   default Future<@Nullable Response> lindex(String arg0, String arg1) {
     return send(Command.LINDEX, arg0, arg1);
-  }
-
-  /**
-   * Redis command <a href="https://redis.io/commands/linsert">linsert</a>.
-   *
-   * @return fluent self
-   */
-  @Fluent
-  @Deprecated
-  default RedisAPI linsert(String arg0, String arg1, String arg2, String arg3, Handler<AsyncResult<@Nullable Response>> handler) {
-    send(Command.LINSERT, arg0, arg1, arg2, arg3).onComplete(handler);
-    return this;
   }
 
   /**
@@ -4104,34 +1790,10 @@ public interface RedisAPI {
   /**
    * Redis command <a href="https://redis.io/commands/llen">llen</a>.
    *
-   * @return fluent self
-   */
-  @Fluent
-  @Deprecated
-  default RedisAPI llen(String arg0, Handler<AsyncResult<@Nullable Response>> handler) {
-    send(Command.LLEN, arg0).onComplete(handler);
-    return this;
-  }
-
-  /**
-   * Redis command <a href="https://redis.io/commands/llen">llen</a>.
-   *
    * @return Future response.
    */
   default Future<@Nullable Response> llen(String arg0) {
     return send(Command.LLEN, arg0);
-  }
-
-  /**
-   * Redis command <a href="https://redis.io/commands/lmove">lmove</a>.
-   *
-   * @return fluent self
-   */
-  @Fluent
-  @Deprecated
-  default RedisAPI lmove(String arg0, String arg1, String arg2, String arg3, Handler<AsyncResult<@Nullable Response>> handler) {
-    send(Command.LMOVE, arg0, arg1, arg2, arg3).onComplete(handler);
-    return this;
   }
 
   /**
@@ -4146,34 +1808,10 @@ public interface RedisAPI {
   /**
    * Redis command <a href="https://redis.io/commands/lmpop">lmpop</a>.
    *
-   * @return fluent self
-   */
-  @Fluent
-  @Deprecated
-  default RedisAPI lmpop(List<String> args, Handler<AsyncResult<@Nullable Response>> handler) {
-    send(Command.LMPOP, args.toArray(new String[0])).onComplete(handler);
-    return this;
-  }
-
-  /**
-   * Redis command <a href="https://redis.io/commands/lmpop">lmpop</a>.
-   *
    * @return Future response.
    */
   default Future<@Nullable Response> lmpop(List<String> args) {
     return send(Command.LMPOP, args.toArray(new String[0]));
-  }
-
-  /**
-   * Redis command <a href="https://redis.io/commands/lolwut">lolwut</a>.
-   *
-   * @return fluent self
-   */
-  @Fluent
-  @Deprecated
-  default RedisAPI lolwut(List<String> args, Handler<AsyncResult<@Nullable Response>> handler) {
-    send(Command.LOLWUT, args.toArray(new String[0])).onComplete(handler);
-    return this;
   }
 
   /**
@@ -4188,34 +1826,10 @@ public interface RedisAPI {
   /**
    * Redis command <a href="https://redis.io/commands/lpop">lpop</a>.
    *
-   * @return fluent self
-   */
-  @Fluent
-  @Deprecated
-  default RedisAPI lpop(List<String> args, Handler<AsyncResult<@Nullable Response>> handler) {
-    send(Command.LPOP, args.toArray(new String[0])).onComplete(handler);
-    return this;
-  }
-
-  /**
-   * Redis command <a href="https://redis.io/commands/lpop">lpop</a>.
-   *
    * @return Future response.
    */
   default Future<@Nullable Response> lpop(List<String> args) {
     return send(Command.LPOP, args.toArray(new String[0]));
-  }
-
-  /**
-   * Redis command <a href="https://redis.io/commands/lpos">lpos</a>.
-   *
-   * @return fluent self
-   */
-  @Fluent
-  @Deprecated
-  default RedisAPI lpos(List<String> args, Handler<AsyncResult<@Nullable Response>> handler) {
-    send(Command.LPOS, args.toArray(new String[0])).onComplete(handler);
-    return this;
   }
 
   /**
@@ -4230,34 +1844,10 @@ public interface RedisAPI {
   /**
    * Redis command <a href="https://redis.io/commands/lpush">lpush</a>.
    *
-   * @return fluent self
-   */
-  @Fluent
-  @Deprecated
-  default RedisAPI lpush(List<String> args, Handler<AsyncResult<@Nullable Response>> handler) {
-    send(Command.LPUSH, args.toArray(new String[0])).onComplete(handler);
-    return this;
-  }
-
-  /**
-   * Redis command <a href="https://redis.io/commands/lpush">lpush</a>.
-   *
    * @return Future response.
    */
   default Future<@Nullable Response> lpush(List<String> args) {
     return send(Command.LPUSH, args.toArray(new String[0]));
-  }
-
-  /**
-   * Redis command <a href="https://redis.io/commands/lpushx">lpushx</a>.
-   *
-   * @return fluent self
-   */
-  @Fluent
-  @Deprecated
-  default RedisAPI lpushx(List<String> args, Handler<AsyncResult<@Nullable Response>> handler) {
-    send(Command.LPUSHX, args.toArray(new String[0])).onComplete(handler);
-    return this;
   }
 
   /**
@@ -4272,34 +1862,10 @@ public interface RedisAPI {
   /**
    * Redis command <a href="https://redis.io/commands/lrange">lrange</a>.
    *
-   * @return fluent self
-   */
-  @Fluent
-  @Deprecated
-  default RedisAPI lrange(String arg0, String arg1, String arg2, Handler<AsyncResult<@Nullable Response>> handler) {
-    send(Command.LRANGE, arg0, arg1, arg2).onComplete(handler);
-    return this;
-  }
-
-  /**
-   * Redis command <a href="https://redis.io/commands/lrange">lrange</a>.
-   *
    * @return Future response.
    */
   default Future<@Nullable Response> lrange(String arg0, String arg1, String arg2) {
     return send(Command.LRANGE, arg0, arg1, arg2);
-  }
-
-  /**
-   * Redis command <a href="https://redis.io/commands/lrem">lrem</a>.
-   *
-   * @return fluent self
-   */
-  @Fluent
-  @Deprecated
-  default RedisAPI lrem(String arg0, String arg1, String arg2, Handler<AsyncResult<@Nullable Response>> handler) {
-    send(Command.LREM, arg0, arg1, arg2).onComplete(handler);
-    return this;
   }
 
   /**
@@ -4314,34 +1880,10 @@ public interface RedisAPI {
   /**
    * Redis command <a href="https://redis.io/commands/lset">lset</a>.
    *
-   * @return fluent self
-   */
-  @Fluent
-  @Deprecated
-  default RedisAPI lset(String arg0, String arg1, String arg2, Handler<AsyncResult<@Nullable Response>> handler) {
-    send(Command.LSET, arg0, arg1, arg2).onComplete(handler);
-    return this;
-  }
-
-  /**
-   * Redis command <a href="https://redis.io/commands/lset">lset</a>.
-   *
    * @return Future response.
    */
   default Future<@Nullable Response> lset(String arg0, String arg1, String arg2) {
     return send(Command.LSET, arg0, arg1, arg2);
-  }
-
-  /**
-   * Redis command <a href="https://redis.io/commands/ltrim">ltrim</a>.
-   *
-   * @return fluent self
-   */
-  @Fluent
-  @Deprecated
-  default RedisAPI ltrim(String arg0, String arg1, String arg2, Handler<AsyncResult<@Nullable Response>> handler) {
-    send(Command.LTRIM, arg0, arg1, arg2).onComplete(handler);
-    return this;
   }
 
   /**
@@ -4356,34 +1898,10 @@ public interface RedisAPI {
   /**
    * Redis command <a href="https://redis.io/commands/memory">memory</a>.
    *
-   * @return fluent self
-   */
-  @Fluent
-  @Deprecated
-  default RedisAPI memory(List<String> args, Handler<AsyncResult<@Nullable Response>> handler) {
-    send(Command.MEMORY, args.toArray(new String[0])).onComplete(handler);
-    return this;
-  }
-
-  /**
-   * Redis command <a href="https://redis.io/commands/memory">memory</a>.
-   *
    * @return Future response.
    */
   default Future<@Nullable Response> memory(List<String> args) {
     return send(Command.MEMORY, args.toArray(new String[0]));
-  }
-
-  /**
-   * Redis command <a href="https://redis.io/commands/mget">mget</a>.
-   *
-   * @return fluent self
-   */
-  @Fluent
-  @Deprecated
-  default RedisAPI mget(List<String> args, Handler<AsyncResult<@Nullable Response>> handler) {
-    send(Command.MGET, args.toArray(new String[0])).onComplete(handler);
-    return this;
   }
 
   /**
@@ -4398,34 +1916,10 @@ public interface RedisAPI {
   /**
    * Redis command <a href="https://redis.io/commands/migrate">migrate</a>.
    *
-   * @return fluent self
-   */
-  @Fluent
-  @Deprecated
-  default RedisAPI migrate(List<String> args, Handler<AsyncResult<@Nullable Response>> handler) {
-    send(Command.MIGRATE, args.toArray(new String[0])).onComplete(handler);
-    return this;
-  }
-
-  /**
-   * Redis command <a href="https://redis.io/commands/migrate">migrate</a>.
-   *
    * @return Future response.
    */
   default Future<@Nullable Response> migrate(List<String> args) {
     return send(Command.MIGRATE, args.toArray(new String[0]));
-  }
-
-  /**
-   * Redis command <a href="https://redis.io/commands/module">module</a>.
-   *
-   * @return fluent self
-   */
-  @Fluent
-  @Deprecated
-  default RedisAPI module(List<String> args, Handler<AsyncResult<@Nullable Response>> handler) {
-    send(Command.MODULE, args.toArray(new String[0])).onComplete(handler);
-    return this;
   }
 
   /**
@@ -4440,34 +1934,10 @@ public interface RedisAPI {
   /**
    * Redis command <a href="https://redis.io/commands/monitor">monitor</a>.
    *
-   * @return fluent self
-   */
-  @Fluent
-  @Deprecated
-  default RedisAPI monitor(Handler<AsyncResult<@Nullable Response>> handler) {
-    send(Command.MONITOR).onComplete(handler);
-    return this;
-  }
-
-  /**
-   * Redis command <a href="https://redis.io/commands/monitor">monitor</a>.
-   *
    * @return Future response.
    */
   default Future<@Nullable Response> monitor() {
     return send(Command.MONITOR);
-  }
-
-  /**
-   * Redis command <a href="https://redis.io/commands/move">move</a>.
-   *
-   * @return fluent self
-   */
-  @Fluent
-  @Deprecated
-  default RedisAPI move(String arg0, String arg1, Handler<AsyncResult<@Nullable Response>> handler) {
-    send(Command.MOVE, arg0, arg1).onComplete(handler);
-    return this;
   }
 
   /**
@@ -4482,34 +1952,10 @@ public interface RedisAPI {
   /**
    * Redis command <a href="https://redis.io/commands/mset">mset</a>.
    *
-   * @return fluent self
-   */
-  @Fluent
-  @Deprecated
-  default RedisAPI mset(List<String> args, Handler<AsyncResult<@Nullable Response>> handler) {
-    send(Command.MSET, args.toArray(new String[0])).onComplete(handler);
-    return this;
-  }
-
-  /**
-   * Redis command <a href="https://redis.io/commands/mset">mset</a>.
-   *
    * @return Future response.
    */
   default Future<@Nullable Response> mset(List<String> args) {
     return send(Command.MSET, args.toArray(new String[0]));
-  }
-
-  /**
-   * Redis command <a href="https://redis.io/commands/msetnx">msetnx</a>.
-   *
-   * @return fluent self
-   */
-  @Fluent
-  @Deprecated
-  default RedisAPI msetnx(List<String> args, Handler<AsyncResult<@Nullable Response>> handler) {
-    send(Command.MSETNX, args.toArray(new String[0])).onComplete(handler);
-    return this;
   }
 
   /**
@@ -4524,34 +1970,10 @@ public interface RedisAPI {
   /**
    * Redis command <a href="https://redis.io/commands/multi">multi</a>.
    *
-   * @return fluent self
-   */
-  @Fluent
-  @Deprecated
-  default RedisAPI multi(Handler<AsyncResult<@Nullable Response>> handler) {
-    send(Command.MULTI).onComplete(handler);
-    return this;
-  }
-
-  /**
-   * Redis command <a href="https://redis.io/commands/multi">multi</a>.
-   *
    * @return Future response.
    */
   default Future<@Nullable Response> multi() {
     return send(Command.MULTI);
-  }
-
-  /**
-   * Redis command <a href="https://redis.io/commands/object">object</a>.
-   *
-   * @return fluent self
-   */
-  @Fluent
-  @Deprecated
-  default RedisAPI object(List<String> args, Handler<AsyncResult<@Nullable Response>> handler) {
-    send(Command.OBJECT, args.toArray(new String[0])).onComplete(handler);
-    return this;
   }
 
   /**
@@ -4566,34 +1988,10 @@ public interface RedisAPI {
   /**
    * Redis command <a href="https://redis.io/commands/persist">persist</a>.
    *
-   * @return fluent self
-   */
-  @Fluent
-  @Deprecated
-  default RedisAPI persist(String arg0, Handler<AsyncResult<@Nullable Response>> handler) {
-    send(Command.PERSIST, arg0).onComplete(handler);
-    return this;
-  }
-
-  /**
-   * Redis command <a href="https://redis.io/commands/persist">persist</a>.
-   *
    * @return Future response.
    */
   default Future<@Nullable Response> persist(String arg0) {
     return send(Command.PERSIST, arg0);
-  }
-
-  /**
-   * Redis command <a href="https://redis.io/commands/pexpire">pexpire</a>.
-   *
-   * @return fluent self
-   */
-  @Fluent
-  @Deprecated
-  default RedisAPI pexpire(List<String> args, Handler<AsyncResult<@Nullable Response>> handler) {
-    send(Command.PEXPIRE, args.toArray(new String[0])).onComplete(handler);
-    return this;
   }
 
   /**
@@ -4608,34 +2006,10 @@ public interface RedisAPI {
   /**
    * Redis command <a href="https://redis.io/commands/pexpireat">pexpireat</a>.
    *
-   * @return fluent self
-   */
-  @Fluent
-  @Deprecated
-  default RedisAPI pexpireat(List<String> args, Handler<AsyncResult<@Nullable Response>> handler) {
-    send(Command.PEXPIREAT, args.toArray(new String[0])).onComplete(handler);
-    return this;
-  }
-
-  /**
-   * Redis command <a href="https://redis.io/commands/pexpireat">pexpireat</a>.
-   *
    * @return Future response.
    */
   default Future<@Nullable Response> pexpireat(List<String> args) {
     return send(Command.PEXPIREAT, args.toArray(new String[0]));
-  }
-
-  /**
-   * Redis command <a href="https://redis.io/commands/pexpiretime">pexpiretime</a>.
-   *
-   * @return fluent self
-   */
-  @Fluent
-  @Deprecated
-  default RedisAPI pexpiretime(String arg0, Handler<AsyncResult<@Nullable Response>> handler) {
-    send(Command.PEXPIRETIME, arg0).onComplete(handler);
-    return this;
   }
 
   /**
@@ -4650,34 +2024,10 @@ public interface RedisAPI {
   /**
    * Redis command <a href="https://redis.io/commands/pfadd">pfadd</a>.
    *
-   * @return fluent self
-   */
-  @Fluent
-  @Deprecated
-  default RedisAPI pfadd(List<String> args, Handler<AsyncResult<@Nullable Response>> handler) {
-    send(Command.PFADD, args.toArray(new String[0])).onComplete(handler);
-    return this;
-  }
-
-  /**
-   * Redis command <a href="https://redis.io/commands/pfadd">pfadd</a>.
-   *
    * @return Future response.
    */
   default Future<@Nullable Response> pfadd(List<String> args) {
     return send(Command.PFADD, args.toArray(new String[0]));
-  }
-
-  /**
-   * Redis command <a href="https://redis.io/commands/pfcount">pfcount</a>.
-   *
-   * @return fluent self
-   */
-  @Fluent
-  @Deprecated
-  default RedisAPI pfcount(List<String> args, Handler<AsyncResult<@Nullable Response>> handler) {
-    send(Command.PFCOUNT, args.toArray(new String[0])).onComplete(handler);
-    return this;
   }
 
   /**
@@ -4692,34 +2042,10 @@ public interface RedisAPI {
   /**
    * Redis command <a href="https://redis.io/commands/pfdebug">pfdebug</a>.
    *
-   * @return fluent self
-   */
-  @Fluent
-  @Deprecated
-  default RedisAPI pfdebug(List<String> args, Handler<AsyncResult<@Nullable Response>> handler) {
-    send(Command.PFDEBUG, args.toArray(new String[0])).onComplete(handler);
-    return this;
-  }
-
-  /**
-   * Redis command <a href="https://redis.io/commands/pfdebug">pfdebug</a>.
-   *
    * @return Future response.
    */
   default Future<@Nullable Response> pfdebug(List<String> args) {
     return send(Command.PFDEBUG, args.toArray(new String[0]));
-  }
-
-  /**
-   * Redis command <a href="https://redis.io/commands/pfmerge">pfmerge</a>.
-   *
-   * @return fluent self
-   */
-  @Fluent
-  @Deprecated
-  default RedisAPI pfmerge(List<String> args, Handler<AsyncResult<@Nullable Response>> handler) {
-    send(Command.PFMERGE, args.toArray(new String[0])).onComplete(handler);
-    return this;
   }
 
   /**
@@ -4734,34 +2060,10 @@ public interface RedisAPI {
   /**
    * Redis command <a href="https://redis.io/commands/pfselftest">pfselftest</a>.
    *
-   * @return fluent self
-   */
-  @Fluent
-  @Deprecated
-  default RedisAPI pfselftest(Handler<AsyncResult<@Nullable Response>> handler) {
-    send(Command.PFSELFTEST).onComplete(handler);
-    return this;
-  }
-
-  /**
-   * Redis command <a href="https://redis.io/commands/pfselftest">pfselftest</a>.
-   *
    * @return Future response.
    */
   default Future<@Nullable Response> pfselftest() {
     return send(Command.PFSELFTEST);
-  }
-
-  /**
-   * Redis command <a href="https://redis.io/commands/ping">ping</a>.
-   *
-   * @return fluent self
-   */
-  @Fluent
-  @Deprecated
-  default RedisAPI ping(List<String> args, Handler<AsyncResult<@Nullable Response>> handler) {
-    send(Command.PING, args.toArray(new String[0])).onComplete(handler);
-    return this;
   }
 
   /**
@@ -4776,34 +2078,10 @@ public interface RedisAPI {
   /**
    * Redis command <a href="https://redis.io/commands/psetex">psetex</a>.
    *
-   * @return fluent self
-   */
-  @Fluent
-  @Deprecated
-  default RedisAPI psetex(String arg0, String arg1, String arg2, Handler<AsyncResult<@Nullable Response>> handler) {
-    send(Command.PSETEX, arg0, arg1, arg2).onComplete(handler);
-    return this;
-  }
-
-  /**
-   * Redis command <a href="https://redis.io/commands/psetex">psetex</a>.
-   *
    * @return Future response.
    */
   default Future<@Nullable Response> psetex(String arg0, String arg1, String arg2) {
     return send(Command.PSETEX, arg0, arg1, arg2);
-  }
-
-  /**
-   * Redis command <a href="https://redis.io/commands/psubscribe">psubscribe</a>.
-   *
-   * @return fluent self
-   */
-  @Fluent
-  @Deprecated
-  default RedisAPI psubscribe(List<String> args, Handler<AsyncResult<@Nullable Response>> handler) {
-    send(Command.PSUBSCRIBE, args.toArray(new String[0])).onComplete(handler);
-    return this;
   }
 
   /**
@@ -4818,34 +2096,10 @@ public interface RedisAPI {
   /**
    * Redis command <a href="https://redis.io/commands/psync">psync</a>.
    *
-   * @return fluent self
-   */
-  @Fluent
-  @Deprecated
-  default RedisAPI psync(List<String> args, Handler<AsyncResult<@Nullable Response>> handler) {
-    send(Command.PSYNC, args.toArray(new String[0])).onComplete(handler);
-    return this;
-  }
-
-  /**
-   * Redis command <a href="https://redis.io/commands/psync">psync</a>.
-   *
    * @return Future response.
    */
   default Future<@Nullable Response> psync(List<String> args) {
     return send(Command.PSYNC, args.toArray(new String[0]));
-  }
-
-  /**
-   * Redis command <a href="https://redis.io/commands/pttl">pttl</a>.
-   *
-   * @return fluent self
-   */
-  @Fluent
-  @Deprecated
-  default RedisAPI pttl(String arg0, Handler<AsyncResult<@Nullable Response>> handler) {
-    send(Command.PTTL, arg0).onComplete(handler);
-    return this;
   }
 
   /**
@@ -4860,34 +2114,10 @@ public interface RedisAPI {
   /**
    * Redis command <a href="https://redis.io/commands/publish">publish</a>.
    *
-   * @return fluent self
-   */
-  @Fluent
-  @Deprecated
-  default RedisAPI publish(String arg0, String arg1, Handler<AsyncResult<@Nullable Response>> handler) {
-    send(Command.PUBLISH, arg0, arg1).onComplete(handler);
-    return this;
-  }
-
-  /**
-   * Redis command <a href="https://redis.io/commands/publish">publish</a>.
-   *
    * @return Future response.
    */
   default Future<@Nullable Response> publish(String arg0, String arg1) {
     return send(Command.PUBLISH, arg0, arg1);
-  }
-
-  /**
-   * Redis command <a href="https://redis.io/commands/pubsub">pubsub</a>.
-   *
-   * @return fluent self
-   */
-  @Fluent
-  @Deprecated
-  default RedisAPI pubsub(List<String> args, Handler<AsyncResult<@Nullable Response>> handler) {
-    send(Command.PUBSUB, args.toArray(new String[0])).onComplete(handler);
-    return this;
   }
 
   /**
@@ -4902,34 +2132,10 @@ public interface RedisAPI {
   /**
    * Redis command <a href="https://redis.io/commands/punsubscribe">punsubscribe</a>.
    *
-   * @return fluent self
-   */
-  @Fluent
-  @Deprecated
-  default RedisAPI punsubscribe(List<String> args, Handler<AsyncResult<@Nullable Response>> handler) {
-    send(Command.PUNSUBSCRIBE, args.toArray(new String[0])).onComplete(handler);
-    return this;
-  }
-
-  /**
-   * Redis command <a href="https://redis.io/commands/punsubscribe">punsubscribe</a>.
-   *
    * @return Future response.
    */
   default Future<@Nullable Response> punsubscribe(List<String> args) {
     return send(Command.PUNSUBSCRIBE, args.toArray(new String[0]));
-  }
-
-  /**
-   * Redis command <a href="https://redis.io/commands/quit">quit</a>.
-   *
-   * @return fluent self
-   */
-  @Fluent
-  @Deprecated
-  default RedisAPI quit(List<String> args, Handler<AsyncResult<@Nullable Response>> handler) {
-    send(Command.QUIT, args.toArray(new String[0])).onComplete(handler);
-    return this;
   }
 
   /**
@@ -4944,34 +2150,10 @@ public interface RedisAPI {
   /**
    * Redis command <a href="https://redis.io/commands/randomkey">randomkey</a>.
    *
-   * @return fluent self
-   */
-  @Fluent
-  @Deprecated
-  default RedisAPI randomkey(Handler<AsyncResult<@Nullable Response>> handler) {
-    send(Command.RANDOMKEY).onComplete(handler);
-    return this;
-  }
-
-  /**
-   * Redis command <a href="https://redis.io/commands/randomkey">randomkey</a>.
-   *
    * @return Future response.
    */
   default Future<@Nullable Response> randomkey() {
     return send(Command.RANDOMKEY);
-  }
-
-  /**
-   * Redis command <a href="https://redis.io/commands/readonly">readonly</a>.
-   *
-   * @return fluent self
-   */
-  @Fluent
-  @Deprecated
-  default RedisAPI readonly(Handler<AsyncResult<@Nullable Response>> handler) {
-    send(Command.READONLY).onComplete(handler);
-    return this;
   }
 
   /**
@@ -4986,34 +2168,10 @@ public interface RedisAPI {
   /**
    * Redis command <a href="https://redis.io/commands/readwrite">readwrite</a>.
    *
-   * @return fluent self
-   */
-  @Fluent
-  @Deprecated
-  default RedisAPI readwrite(Handler<AsyncResult<@Nullable Response>> handler) {
-    send(Command.READWRITE).onComplete(handler);
-    return this;
-  }
-
-  /**
-   * Redis command <a href="https://redis.io/commands/readwrite">readwrite</a>.
-   *
    * @return Future response.
    */
   default Future<@Nullable Response> readwrite() {
     return send(Command.READWRITE);
-  }
-
-  /**
-   * Redis command <a href="https://redis.io/commands/rename">rename</a>.
-   *
-   * @return fluent self
-   */
-  @Fluent
-  @Deprecated
-  default RedisAPI rename(String arg0, String arg1, Handler<AsyncResult<@Nullable Response>> handler) {
-    send(Command.RENAME, arg0, arg1).onComplete(handler);
-    return this;
   }
 
   /**
@@ -5028,34 +2186,10 @@ public interface RedisAPI {
   /**
    * Redis command <a href="https://redis.io/commands/renamenx">renamenx</a>.
    *
-   * @return fluent self
-   */
-  @Fluent
-  @Deprecated
-  default RedisAPI renamenx(String arg0, String arg1, Handler<AsyncResult<@Nullable Response>> handler) {
-    send(Command.RENAMENX, arg0, arg1).onComplete(handler);
-    return this;
-  }
-
-  /**
-   * Redis command <a href="https://redis.io/commands/renamenx">renamenx</a>.
-   *
    * @return Future response.
    */
   default Future<@Nullable Response> renamenx(String arg0, String arg1) {
     return send(Command.RENAMENX, arg0, arg1);
-  }
-
-  /**
-   * Redis command <a href="https://redis.io/commands/replconf">replconf</a>.
-   *
-   * @return fluent self
-   */
-  @Fluent
-  @Deprecated
-  default RedisAPI replconf(List<String> args, Handler<AsyncResult<@Nullable Response>> handler) {
-    send(Command.REPLCONF, args.toArray(new String[0])).onComplete(handler);
-    return this;
   }
 
   /**
@@ -5070,34 +2204,10 @@ public interface RedisAPI {
   /**
    * Redis command <a href="https://redis.io/commands/replicaof">replicaof</a>.
    *
-   * @return fluent self
-   */
-  @Fluent
-  @Deprecated
-  default RedisAPI replicaof(String arg0, String arg1, Handler<AsyncResult<@Nullable Response>> handler) {
-    send(Command.REPLICAOF, arg0, arg1).onComplete(handler);
-    return this;
-  }
-
-  /**
-   * Redis command <a href="https://redis.io/commands/replicaof">replicaof</a>.
-   *
    * @return Future response.
    */
   default Future<@Nullable Response> replicaof(String arg0, String arg1) {
     return send(Command.REPLICAOF, arg0, arg1);
-  }
-
-  /**
-   * Redis command <a href="https://redis.io/commands/reset">reset</a>.
-   *
-   * @return fluent self
-   */
-  @Fluent
-  @Deprecated
-  default RedisAPI reset(Handler<AsyncResult<@Nullable Response>> handler) {
-    send(Command.RESET).onComplete(handler);
-    return this;
   }
 
   /**
@@ -5112,34 +2222,10 @@ public interface RedisAPI {
   /**
    * Redis command <a href="https://redis.io/commands/restore">restore</a>.
    *
-   * @return fluent self
-   */
-  @Fluent
-  @Deprecated
-  default RedisAPI restore(List<String> args, Handler<AsyncResult<@Nullable Response>> handler) {
-    send(Command.RESTORE, args.toArray(new String[0])).onComplete(handler);
-    return this;
-  }
-
-  /**
-   * Redis command <a href="https://redis.io/commands/restore">restore</a>.
-   *
    * @return Future response.
    */
   default Future<@Nullable Response> restore(List<String> args) {
     return send(Command.RESTORE, args.toArray(new String[0]));
-  }
-
-  /**
-   * Redis command <a href="https://redis.io/commands/restore-asking">restoreAsking</a>.
-   *
-   * @return fluent self
-   */
-  @Fluent
-  @Deprecated
-  default RedisAPI restoreAsking(List<String> args, Handler<AsyncResult<@Nullable Response>> handler) {
-    send(Command.RESTORE_ASKING, args.toArray(new String[0])).onComplete(handler);
-    return this;
   }
 
   /**
@@ -5154,34 +2240,10 @@ public interface RedisAPI {
   /**
    * Redis command <a href="https://redis.io/commands/role">role</a>.
    *
-   * @return fluent self
-   */
-  @Fluent
-  @Deprecated
-  default RedisAPI role(Handler<AsyncResult<@Nullable Response>> handler) {
-    send(Command.ROLE).onComplete(handler);
-    return this;
-  }
-
-  /**
-   * Redis command <a href="https://redis.io/commands/role">role</a>.
-   *
    * @return Future response.
    */
   default Future<@Nullable Response> role() {
     return send(Command.ROLE);
-  }
-
-  /**
-   * Redis command <a href="https://redis.io/commands/rpop">rpop</a>.
-   *
-   * @return fluent self
-   */
-  @Fluent
-  @Deprecated
-  default RedisAPI rpop(List<String> args, Handler<AsyncResult<@Nullable Response>> handler) {
-    send(Command.RPOP, args.toArray(new String[0])).onComplete(handler);
-    return this;
   }
 
   /**
@@ -5196,34 +2258,10 @@ public interface RedisAPI {
   /**
    * Redis command <a href="https://redis.io/commands/rpoplpush">rpoplpush</a>.
    *
-   * @return fluent self
-   */
-  @Fluent
-  @Deprecated
-  default RedisAPI rpoplpush(String arg0, String arg1, Handler<AsyncResult<@Nullable Response>> handler) {
-    send(Command.RPOPLPUSH, arg0, arg1).onComplete(handler);
-    return this;
-  }
-
-  /**
-   * Redis command <a href="https://redis.io/commands/rpoplpush">rpoplpush</a>.
-   *
    * @return Future response.
    */
   default Future<@Nullable Response> rpoplpush(String arg0, String arg1) {
     return send(Command.RPOPLPUSH, arg0, arg1);
-  }
-
-  /**
-   * Redis command <a href="https://redis.io/commands/rpush">rpush</a>.
-   *
-   * @return fluent self
-   */
-  @Fluent
-  @Deprecated
-  default RedisAPI rpush(List<String> args, Handler<AsyncResult<@Nullable Response>> handler) {
-    send(Command.RPUSH, args.toArray(new String[0])).onComplete(handler);
-    return this;
   }
 
   /**
@@ -5238,34 +2276,10 @@ public interface RedisAPI {
   /**
    * Redis command <a href="https://redis.io/commands/rpushx">rpushx</a>.
    *
-   * @return fluent self
-   */
-  @Fluent
-  @Deprecated
-  default RedisAPI rpushx(List<String> args, Handler<AsyncResult<@Nullable Response>> handler) {
-    send(Command.RPUSHX, args.toArray(new String[0])).onComplete(handler);
-    return this;
-  }
-
-  /**
-   * Redis command <a href="https://redis.io/commands/rpushx">rpushx</a>.
-   *
    * @return Future response.
    */
   default Future<@Nullable Response> rpushx(List<String> args) {
     return send(Command.RPUSHX, args.toArray(new String[0]));
-  }
-
-  /**
-   * Redis command <a href="https://redis.io/commands/sadd">sadd</a>.
-   *
-   * @return fluent self
-   */
-  @Fluent
-  @Deprecated
-  default RedisAPI sadd(List<String> args, Handler<AsyncResult<@Nullable Response>> handler) {
-    send(Command.SADD, args.toArray(new String[0])).onComplete(handler);
-    return this;
   }
 
   /**
@@ -5280,34 +2294,10 @@ public interface RedisAPI {
   /**
    * Redis command <a href="https://redis.io/commands/save">save</a>.
    *
-   * @return fluent self
-   */
-  @Fluent
-  @Deprecated
-  default RedisAPI save(Handler<AsyncResult<@Nullable Response>> handler) {
-    send(Command.SAVE).onComplete(handler);
-    return this;
-  }
-
-  /**
-   * Redis command <a href="https://redis.io/commands/save">save</a>.
-   *
    * @return Future response.
    */
   default Future<@Nullable Response> save() {
     return send(Command.SAVE);
-  }
-
-  /**
-   * Redis command <a href="https://redis.io/commands/scan">scan</a>.
-   *
-   * @return fluent self
-   */
-  @Fluent
-  @Deprecated
-  default RedisAPI scan(List<String> args, Handler<AsyncResult<@Nullable Response>> handler) {
-    send(Command.SCAN, args.toArray(new String[0])).onComplete(handler);
-    return this;
   }
 
   /**
@@ -5322,34 +2312,10 @@ public interface RedisAPI {
   /**
    * Redis command <a href="https://redis.io/commands/scard">scard</a>.
    *
-   * @return fluent self
-   */
-  @Fluent
-  @Deprecated
-  default RedisAPI scard(String arg0, Handler<AsyncResult<@Nullable Response>> handler) {
-    send(Command.SCARD, arg0).onComplete(handler);
-    return this;
-  }
-
-  /**
-   * Redis command <a href="https://redis.io/commands/scard">scard</a>.
-   *
    * @return Future response.
    */
   default Future<@Nullable Response> scard(String arg0) {
     return send(Command.SCARD, arg0);
-  }
-
-  /**
-   * Redis command <a href="https://redis.io/commands/script">script</a>.
-   *
-   * @return fluent self
-   */
-  @Fluent
-  @Deprecated
-  default RedisAPI script(List<String> args, Handler<AsyncResult<@Nullable Response>> handler) {
-    send(Command.SCRIPT, args.toArray(new String[0])).onComplete(handler);
-    return this;
   }
 
   /**
@@ -5364,34 +2330,10 @@ public interface RedisAPI {
   /**
    * Redis command <a href="https://redis.io/commands/sdiff">sdiff</a>.
    *
-   * @return fluent self
-   */
-  @Fluent
-  @Deprecated
-  default RedisAPI sdiff(List<String> args, Handler<AsyncResult<@Nullable Response>> handler) {
-    send(Command.SDIFF, args.toArray(new String[0])).onComplete(handler);
-    return this;
-  }
-
-  /**
-   * Redis command <a href="https://redis.io/commands/sdiff">sdiff</a>.
-   *
    * @return Future response.
    */
   default Future<@Nullable Response> sdiff(List<String> args) {
     return send(Command.SDIFF, args.toArray(new String[0]));
-  }
-
-  /**
-   * Redis command <a href="https://redis.io/commands/sdiffstore">sdiffstore</a>.
-   *
-   * @return fluent self
-   */
-  @Fluent
-  @Deprecated
-  default RedisAPI sdiffstore(List<String> args, Handler<AsyncResult<@Nullable Response>> handler) {
-    send(Command.SDIFFSTORE, args.toArray(new String[0])).onComplete(handler);
-    return this;
   }
 
   /**
@@ -5406,34 +2348,10 @@ public interface RedisAPI {
   /**
    * Redis command <a href="https://redis.io/commands/select">select</a>.
    *
-   * @return fluent self
-   */
-  @Fluent
-  @Deprecated
-  default RedisAPI select(String arg0, Handler<AsyncResult<@Nullable Response>> handler) {
-    send(Command.SELECT, arg0).onComplete(handler);
-    return this;
-  }
-
-  /**
-   * Redis command <a href="https://redis.io/commands/select">select</a>.
-   *
    * @return Future response.
    */
   default Future<@Nullable Response> select(String arg0) {
     return send(Command.SELECT, arg0);
-  }
-
-  /**
-   * Redis command <a href="https://redis.io/commands/set">set</a>.
-   *
-   * @return fluent self
-   */
-  @Fluent
-  @Deprecated
-  default RedisAPI set(List<String> args, Handler<AsyncResult<@Nullable Response>> handler) {
-    send(Command.SET, args.toArray(new String[0])).onComplete(handler);
-    return this;
   }
 
   /**
@@ -5448,34 +2366,10 @@ public interface RedisAPI {
   /**
    * Redis command <a href="https://redis.io/commands/setbit">setbit</a>.
    *
-   * @return fluent self
-   */
-  @Fluent
-  @Deprecated
-  default RedisAPI setbit(String arg0, String arg1, String arg2, Handler<AsyncResult<@Nullable Response>> handler) {
-    send(Command.SETBIT, arg0, arg1, arg2).onComplete(handler);
-    return this;
-  }
-
-  /**
-   * Redis command <a href="https://redis.io/commands/setbit">setbit</a>.
-   *
    * @return Future response.
    */
   default Future<@Nullable Response> setbit(String arg0, String arg1, String arg2) {
     return send(Command.SETBIT, arg0, arg1, arg2);
-  }
-
-  /**
-   * Redis command <a href="https://redis.io/commands/setex">setex</a>.
-   *
-   * @return fluent self
-   */
-  @Fluent
-  @Deprecated
-  default RedisAPI setex(String arg0, String arg1, String arg2, Handler<AsyncResult<@Nullable Response>> handler) {
-    send(Command.SETEX, arg0, arg1, arg2).onComplete(handler);
-    return this;
   }
 
   /**
@@ -5490,34 +2384,10 @@ public interface RedisAPI {
   /**
    * Redis command <a href="https://redis.io/commands/setnx">setnx</a>.
    *
-   * @return fluent self
-   */
-  @Fluent
-  @Deprecated
-  default RedisAPI setnx(String arg0, String arg1, Handler<AsyncResult<@Nullable Response>> handler) {
-    send(Command.SETNX, arg0, arg1).onComplete(handler);
-    return this;
-  }
-
-  /**
-   * Redis command <a href="https://redis.io/commands/setnx">setnx</a>.
-   *
    * @return Future response.
    */
   default Future<@Nullable Response> setnx(String arg0, String arg1) {
     return send(Command.SETNX, arg0, arg1);
-  }
-
-  /**
-   * Redis command <a href="https://redis.io/commands/setrange">setrange</a>.
-   *
-   * @return fluent self
-   */
-  @Fluent
-  @Deprecated
-  default RedisAPI setrange(String arg0, String arg1, String arg2, Handler<AsyncResult<@Nullable Response>> handler) {
-    send(Command.SETRANGE, arg0, arg1, arg2).onComplete(handler);
-    return this;
   }
 
   /**
@@ -5532,34 +2402,10 @@ public interface RedisAPI {
   /**
    * Redis command <a href="https://redis.io/commands/shutdown">shutdown</a>.
    *
-   * @return fluent self
-   */
-  @Fluent
-  @Deprecated
-  default RedisAPI shutdown(List<String> args, Handler<AsyncResult<@Nullable Response>> handler) {
-    send(Command.SHUTDOWN, args.toArray(new String[0])).onComplete(handler);
-    return this;
-  }
-
-  /**
-   * Redis command <a href="https://redis.io/commands/shutdown">shutdown</a>.
-   *
    * @return Future response.
    */
   default Future<@Nullable Response> shutdown(List<String> args) {
     return send(Command.SHUTDOWN, args.toArray(new String[0]));
-  }
-
-  /**
-   * Redis command <a href="https://redis.io/commands/sinter">sinter</a>.
-   *
-   * @return fluent self
-   */
-  @Fluent
-  @Deprecated
-  default RedisAPI sinter(List<String> args, Handler<AsyncResult<@Nullable Response>> handler) {
-    send(Command.SINTER, args.toArray(new String[0])).onComplete(handler);
-    return this;
   }
 
   /**
@@ -5574,34 +2420,10 @@ public interface RedisAPI {
   /**
    * Redis command <a href="https://redis.io/commands/sintercard">sintercard</a>.
    *
-   * @return fluent self
-   */
-  @Fluent
-  @Deprecated
-  default RedisAPI sintercard(List<String> args, Handler<AsyncResult<@Nullable Response>> handler) {
-    send(Command.SINTERCARD, args.toArray(new String[0])).onComplete(handler);
-    return this;
-  }
-
-  /**
-   * Redis command <a href="https://redis.io/commands/sintercard">sintercard</a>.
-   *
    * @return Future response.
    */
   default Future<@Nullable Response> sintercard(List<String> args) {
     return send(Command.SINTERCARD, args.toArray(new String[0]));
-  }
-
-  /**
-   * Redis command <a href="https://redis.io/commands/sinterstore">sinterstore</a>.
-   *
-   * @return fluent self
-   */
-  @Fluent
-  @Deprecated
-  default RedisAPI sinterstore(List<String> args, Handler<AsyncResult<@Nullable Response>> handler) {
-    send(Command.SINTERSTORE, args.toArray(new String[0])).onComplete(handler);
-    return this;
   }
 
   /**
@@ -5616,35 +2438,12 @@ public interface RedisAPI {
   /**
    * Redis command <a href="https://redis.io/commands/sismember">sismember</a>.
    *
-   * @return fluent self
-   */
-  @Fluent
-  @Deprecated
-  default RedisAPI sismember(String arg0, String arg1, Handler<AsyncResult<@Nullable Response>> handler) {
-    send(Command.SISMEMBER, arg0, arg1).onComplete(handler);
-    return this;
-  }
-
-  /**
-   * Redis command <a href="https://redis.io/commands/sismember">sismember</a>.
-   *
    * @return Future response.
    */
   default Future<@Nullable Response> sismember(String arg0, String arg1) {
     return send(Command.SISMEMBER, arg0, arg1);
   }
 
-  /**
-   * Redis command <a href="https://redis.io/commands/slaveof">slaveof</a>.
-   *
-   * @return fluent self
-   */
-  @Fluent
-  @Deprecated
-  default RedisAPI slaveof(String arg0, String arg1, Handler<AsyncResult<@Nullable Response>> handler) {
-    send(Command.SLAVEOF, arg0, arg1).onComplete(handler);
-    return this;
-  }
 
   /**
    * Redis command <a href="https://redis.io/commands/slaveof">slaveof</a>.
@@ -5653,18 +2452,6 @@ public interface RedisAPI {
    */
   default Future<@Nullable Response> slaveof(String arg0, String arg1) {
     return send(Command.SLAVEOF, arg0, arg1);
-  }
-
-  /**
-   * Redis command <a href="https://redis.io/commands/slowlog">slowlog</a>.
-   *
-   * @return fluent self
-   */
-  @Fluent
-  @Deprecated
-  default RedisAPI slowlog(List<String> args, Handler<AsyncResult<@Nullable Response>> handler) {
-    send(Command.SLOWLOG, args.toArray(new String[0])).onComplete(handler);
-    return this;
   }
 
   /**
@@ -5679,34 +2466,10 @@ public interface RedisAPI {
   /**
    * Redis command <a href="https://redis.io/commands/smembers">smembers</a>.
    *
-   * @return fluent self
-   */
-  @Fluent
-  @Deprecated
-  default RedisAPI smembers(String arg0, Handler<AsyncResult<@Nullable Response>> handler) {
-    send(Command.SMEMBERS, arg0).onComplete(handler);
-    return this;
-  }
-
-  /**
-   * Redis command <a href="https://redis.io/commands/smembers">smembers</a>.
-   *
    * @return Future response.
    */
   default Future<@Nullable Response> smembers(String arg0) {
     return send(Command.SMEMBERS, arg0);
-  }
-
-  /**
-   * Redis command <a href="https://redis.io/commands/smismember">smismember</a>.
-   *
-   * @return fluent self
-   */
-  @Fluent
-  @Deprecated
-  default RedisAPI smismember(List<String> args, Handler<AsyncResult<@Nullable Response>> handler) {
-    send(Command.SMISMEMBER, args.toArray(new String[0])).onComplete(handler);
-    return this;
   }
 
   /**
@@ -5721,34 +2484,10 @@ public interface RedisAPI {
   /**
    * Redis command <a href="https://redis.io/commands/smove">smove</a>.
    *
-   * @return fluent self
-   */
-  @Fluent
-  @Deprecated
-  default RedisAPI smove(String arg0, String arg1, String arg2, Handler<AsyncResult<@Nullable Response>> handler) {
-    send(Command.SMOVE, arg0, arg1, arg2).onComplete(handler);
-    return this;
-  }
-
-  /**
-   * Redis command <a href="https://redis.io/commands/smove">smove</a>.
-   *
    * @return Future response.
    */
   default Future<@Nullable Response> smove(String arg0, String arg1, String arg2) {
     return send(Command.SMOVE, arg0, arg1, arg2);
-  }
-
-  /**
-   * Redis command <a href="https://redis.io/commands/sort">sort</a>.
-   *
-   * @return fluent self
-   */
-  @Fluent
-  @Deprecated
-  default RedisAPI sort(List<String> args, Handler<AsyncResult<@Nullable Response>> handler) {
-    send(Command.SORT, args.toArray(new String[0])).onComplete(handler);
-    return this;
   }
 
   /**
@@ -5763,34 +2502,10 @@ public interface RedisAPI {
   /**
    * Redis command <a href="https://redis.io/commands/sort_ro">sortRo</a>.
    *
-   * @return fluent self
-   */
-  @Fluent
-  @Deprecated
-  default RedisAPI sortRo(List<String> args, Handler<AsyncResult<@Nullable Response>> handler) {
-    send(Command.SORT_RO, args.toArray(new String[0])).onComplete(handler);
-    return this;
-  }
-
-  /**
-   * Redis command <a href="https://redis.io/commands/sort_ro">sortRo</a>.
-   *
    * @return Future response.
    */
   default Future<@Nullable Response> sortRo(List<String> args) {
     return send(Command.SORT_RO, args.toArray(new String[0]));
-  }
-
-  /**
-   * Redis command <a href="https://redis.io/commands/spop">spop</a>.
-   *
-   * @return fluent self
-   */
-  @Fluent
-  @Deprecated
-  default RedisAPI spop(List<String> args, Handler<AsyncResult<@Nullable Response>> handler) {
-    send(Command.SPOP, args.toArray(new String[0])).onComplete(handler);
-    return this;
   }
 
   /**
@@ -5805,34 +2520,10 @@ public interface RedisAPI {
   /**
    * Redis command <a href="https://redis.io/commands/spublish">spublish</a>.
    *
-   * @return fluent self
-   */
-  @Fluent
-  @Deprecated
-  default RedisAPI spublish(String arg0, String arg1, Handler<AsyncResult<@Nullable Response>> handler) {
-    send(Command.SPUBLISH, arg0, arg1).onComplete(handler);
-    return this;
-  }
-
-  /**
-   * Redis command <a href="https://redis.io/commands/spublish">spublish</a>.
-   *
    * @return Future response.
    */
   default Future<@Nullable Response> spublish(String arg0, String arg1) {
     return send(Command.SPUBLISH, arg0, arg1);
-  }
-
-  /**
-   * Redis command <a href="https://redis.io/commands/srandmember">srandmember</a>.
-   *
-   * @return fluent self
-   */
-  @Fluent
-  @Deprecated
-  default RedisAPI srandmember(List<String> args, Handler<AsyncResult<@Nullable Response>> handler) {
-    send(Command.SRANDMEMBER, args.toArray(new String[0])).onComplete(handler);
-    return this;
   }
 
   /**
@@ -5847,34 +2538,10 @@ public interface RedisAPI {
   /**
    * Redis command <a href="https://redis.io/commands/srem">srem</a>.
    *
-   * @return fluent self
-   */
-  @Fluent
-  @Deprecated
-  default RedisAPI srem(List<String> args, Handler<AsyncResult<@Nullable Response>> handler) {
-    send(Command.SREM, args.toArray(new String[0])).onComplete(handler);
-    return this;
-  }
-
-  /**
-   * Redis command <a href="https://redis.io/commands/srem">srem</a>.
-   *
    * @return Future response.
    */
   default Future<@Nullable Response> srem(List<String> args) {
     return send(Command.SREM, args.toArray(new String[0]));
-  }
-
-  /**
-   * Redis command <a href="https://redis.io/commands/sscan">sscan</a>.
-   *
-   * @return fluent self
-   */
-  @Fluent
-  @Deprecated
-  default RedisAPI sscan(List<String> args, Handler<AsyncResult<@Nullable Response>> handler) {
-    send(Command.SSCAN, args.toArray(new String[0])).onComplete(handler);
-    return this;
   }
 
   /**
@@ -5889,34 +2556,10 @@ public interface RedisAPI {
   /**
    * Redis command <a href="https://redis.io/commands/ssubscribe">ssubscribe</a>.
    *
-   * @return fluent self
-   */
-  @Fluent
-  @Deprecated
-  default RedisAPI ssubscribe(List<String> args, Handler<AsyncResult<@Nullable Response>> handler) {
-    send(Command.SSUBSCRIBE, args.toArray(new String[0])).onComplete(handler);
-    return this;
-  }
-
-  /**
-   * Redis command <a href="https://redis.io/commands/ssubscribe">ssubscribe</a>.
-   *
    * @return Future response.
    */
   default Future<@Nullable Response> ssubscribe(List<String> args) {
     return send(Command.SSUBSCRIBE, args.toArray(new String[0]));
-  }
-
-  /**
-   * Redis command <a href="https://redis.io/commands/strlen">strlen</a>.
-   *
-   * @return fluent self
-   */
-  @Fluent
-  @Deprecated
-  default RedisAPI strlen(String arg0, Handler<AsyncResult<@Nullable Response>> handler) {
-    send(Command.STRLEN, arg0).onComplete(handler);
-    return this;
   }
 
   /**
@@ -5931,34 +2574,10 @@ public interface RedisAPI {
   /**
    * Redis command <a href="https://redis.io/commands/subscribe">subscribe</a>.
    *
-   * @return fluent self
-   */
-  @Fluent
-  @Deprecated
-  default RedisAPI subscribe(List<String> args, Handler<AsyncResult<@Nullable Response>> handler) {
-    send(Command.SUBSCRIBE, args.toArray(new String[0])).onComplete(handler);
-    return this;
-  }
-
-  /**
-   * Redis command <a href="https://redis.io/commands/subscribe">subscribe</a>.
-   *
    * @return Future response.
    */
   default Future<@Nullable Response> subscribe(List<String> args) {
     return send(Command.SUBSCRIBE, args.toArray(new String[0]));
-  }
-
-  /**
-   * Redis command <a href="https://redis.io/commands/substr">substr</a>.
-   *
-   * @return fluent self
-   */
-  @Fluent
-  @Deprecated
-  default RedisAPI substr(String arg0, String arg1, String arg2, Handler<AsyncResult<@Nullable Response>> handler) {
-    send(Command.SUBSTR, arg0, arg1, arg2).onComplete(handler);
-    return this;
   }
 
   /**
@@ -5973,34 +2592,10 @@ public interface RedisAPI {
   /**
    * Redis command <a href="https://redis.io/commands/sunion">sunion</a>.
    *
-   * @return fluent self
-   */
-  @Fluent
-  @Deprecated
-  default RedisAPI sunion(List<String> args, Handler<AsyncResult<@Nullable Response>> handler) {
-    send(Command.SUNION, args.toArray(new String[0])).onComplete(handler);
-    return this;
-  }
-
-  /**
-   * Redis command <a href="https://redis.io/commands/sunion">sunion</a>.
-   *
    * @return Future response.
    */
   default Future<@Nullable Response> sunion(List<String> args) {
     return send(Command.SUNION, args.toArray(new String[0]));
-  }
-
-  /**
-   * Redis command <a href="https://redis.io/commands/sunionstore">sunionstore</a>.
-   *
-   * @return fluent self
-   */
-  @Fluent
-  @Deprecated
-  default RedisAPI sunionstore(List<String> args, Handler<AsyncResult<@Nullable Response>> handler) {
-    send(Command.SUNIONSTORE, args.toArray(new String[0])).onComplete(handler);
-    return this;
   }
 
   /**
@@ -6015,34 +2610,10 @@ public interface RedisAPI {
   /**
    * Redis command <a href="https://redis.io/commands/sunsubscribe">sunsubscribe</a>.
    *
-   * @return fluent self
-   */
-  @Fluent
-  @Deprecated
-  default RedisAPI sunsubscribe(List<String> args, Handler<AsyncResult<@Nullable Response>> handler) {
-    send(Command.SUNSUBSCRIBE, args.toArray(new String[0])).onComplete(handler);
-    return this;
-  }
-
-  /**
-   * Redis command <a href="https://redis.io/commands/sunsubscribe">sunsubscribe</a>.
-   *
    * @return Future response.
    */
   default Future<@Nullable Response> sunsubscribe(List<String> args) {
     return send(Command.SUNSUBSCRIBE, args.toArray(new String[0]));
-  }
-
-  /**
-   * Redis command <a href="https://redis.io/commands/swapdb">swapdb</a>.
-   *
-   * @return fluent self
-   */
-  @Fluent
-  @Deprecated
-  default RedisAPI swapdb(String arg0, String arg1, Handler<AsyncResult<@Nullable Response>> handler) {
-    send(Command.SWAPDB, arg0, arg1).onComplete(handler);
-    return this;
   }
 
   /**
@@ -6057,34 +2628,10 @@ public interface RedisAPI {
   /**
    * Redis command <a href="https://redis.io/commands/sync">sync</a>.
    *
-   * @return fluent self
-   */
-  @Fluent
-  @Deprecated
-  default RedisAPI sync(Handler<AsyncResult<@Nullable Response>> handler) {
-    send(Command.SYNC).onComplete(handler);
-    return this;
-  }
-
-  /**
-   * Redis command <a href="https://redis.io/commands/sync">sync</a>.
-   *
    * @return Future response.
    */
   default Future<@Nullable Response> sync() {
     return send(Command.SYNC);
-  }
-
-  /**
-   * Redis command <a href="https://redis.io/commands/time">time</a>.
-   *
-   * @return fluent self
-   */
-  @Fluent
-  @Deprecated
-  default RedisAPI time(Handler<AsyncResult<@Nullable Response>> handler) {
-    send(Command.TIME).onComplete(handler);
-    return this;
   }
 
   /**
@@ -6099,34 +2646,10 @@ public interface RedisAPI {
   /**
    * Redis command <a href="https://redis.io/commands/timeseries.CLUSTERSET">timeseriesClusterset</a>.
    *
-   * @return fluent self
-   */
-  @Fluent
-  @Deprecated
-  default RedisAPI timeseriesClusterset(List<String> args, Handler<AsyncResult<@Nullable Response>> handler) {
-    send(Command.TIMESERIES_CLUSTERSET, args.toArray(new String[0])).onComplete(handler);
-    return this;
-  }
-
-  /**
-   * Redis command <a href="https://redis.io/commands/timeseries.CLUSTERSET">timeseriesClusterset</a>.
-   *
    * @return Future response.
    */
   default Future<@Nullable Response> timeseriesClusterset(List<String> args) {
     return send(Command.TIMESERIES_CLUSTERSET, args.toArray(new String[0]));
-  }
-
-  /**
-   * Redis command <a href="https://redis.io/commands/timeseries.CLUSTERSETFROMSHARD">timeseriesClustersetfromshard</a>.
-   *
-   * @return fluent self
-   */
-  @Fluent
-  @Deprecated
-  default RedisAPI timeseriesClustersetfromshard(List<String> args, Handler<AsyncResult<@Nullable Response>> handler) {
-    send(Command.TIMESERIES_CLUSTERSETFROMSHARD, args.toArray(new String[0])).onComplete(handler);
-    return this;
   }
 
   /**
@@ -6141,34 +2664,10 @@ public interface RedisAPI {
   /**
    * Redis command <a href="https://redis.io/commands/timeseries.HELLO">timeseriesHello</a>.
    *
-   * @return fluent self
-   */
-  @Fluent
-  @Deprecated
-  default RedisAPI timeseriesHello(List<String> args, Handler<AsyncResult<@Nullable Response>> handler) {
-    send(Command.TIMESERIES_HELLO, args.toArray(new String[0])).onComplete(handler);
-    return this;
-  }
-
-  /**
-   * Redis command <a href="https://redis.io/commands/timeseries.HELLO">timeseriesHello</a>.
-   *
    * @return Future response.
    */
   default Future<@Nullable Response> timeseriesHello(List<String> args) {
     return send(Command.TIMESERIES_HELLO, args.toArray(new String[0]));
-  }
-
-  /**
-   * Redis command <a href="https://redis.io/commands/timeseries.INFOCLUSTER">timeseriesInfocluster</a>.
-   *
-   * @return fluent self
-   */
-  @Fluent
-  @Deprecated
-  default RedisAPI timeseriesInfocluster(List<String> args, Handler<AsyncResult<@Nullable Response>> handler) {
-    send(Command.TIMESERIES_INFOCLUSTER, args.toArray(new String[0])).onComplete(handler);
-    return this;
   }
 
   /**
@@ -6183,34 +2682,10 @@ public interface RedisAPI {
   /**
    * Redis command <a href="https://redis.io/commands/timeseries.INNERCOMMUNICATION">timeseriesInnercommunication</a>.
    *
-   * @return fluent self
-   */
-  @Fluent
-  @Deprecated
-  default RedisAPI timeseriesInnercommunication(List<String> args, Handler<AsyncResult<@Nullable Response>> handler) {
-    send(Command.TIMESERIES_INNERCOMMUNICATION, args.toArray(new String[0])).onComplete(handler);
-    return this;
-  }
-
-  /**
-   * Redis command <a href="https://redis.io/commands/timeseries.INNERCOMMUNICATION">timeseriesInnercommunication</a>.
-   *
    * @return Future response.
    */
   default Future<@Nullable Response> timeseriesInnercommunication(List<String> args) {
     return send(Command.TIMESERIES_INNERCOMMUNICATION, args.toArray(new String[0]));
-  }
-
-  /**
-   * Redis command <a href="https://redis.io/commands/timeseries.NETWORKTEST">timeseriesNetworktest</a>.
-   *
-   * @return fluent self
-   */
-  @Fluent
-  @Deprecated
-  default RedisAPI timeseriesNetworktest(List<String> args, Handler<AsyncResult<@Nullable Response>> handler) {
-    send(Command.TIMESERIES_NETWORKTEST, args.toArray(new String[0])).onComplete(handler);
-    return this;
   }
 
   /**
@@ -6225,34 +2700,10 @@ public interface RedisAPI {
   /**
    * Redis command <a href="https://redis.io/commands/timeseries.REFRESHCLUSTER">timeseriesRefreshcluster</a>.
    *
-   * @return fluent self
-   */
-  @Fluent
-  @Deprecated
-  default RedisAPI timeseriesRefreshcluster(List<String> args, Handler<AsyncResult<@Nullable Response>> handler) {
-    send(Command.TIMESERIES_REFRESHCLUSTER, args.toArray(new String[0])).onComplete(handler);
-    return this;
-  }
-
-  /**
-   * Redis command <a href="https://redis.io/commands/timeseries.REFRESHCLUSTER">timeseriesRefreshcluster</a>.
-   *
    * @return Future response.
    */
   default Future<@Nullable Response> timeseriesRefreshcluster(List<String> args) {
     return send(Command.TIMESERIES_REFRESHCLUSTER, args.toArray(new String[0]));
-  }
-
-  /**
-   * Redis command <a href="https://redis.io/commands/topk.add">topkAdd</a>.
-   *
-   * @return fluent self
-   */
-  @Fluent
-  @Deprecated
-  default RedisAPI topkAdd(List<String> args, Handler<AsyncResult<@Nullable Response>> handler) {
-    send(Command.TOPK_ADD, args.toArray(new String[0])).onComplete(handler);
-    return this;
   }
 
   /**
@@ -6267,34 +2718,10 @@ public interface RedisAPI {
   /**
    * Redis command <a href="https://redis.io/commands/topk.count">topkCount</a>.
    *
-   * @return fluent self
-   */
-  @Fluent
-  @Deprecated
-  default RedisAPI topkCount(List<String> args, Handler<AsyncResult<@Nullable Response>> handler) {
-    send(Command.TOPK_COUNT, args.toArray(new String[0])).onComplete(handler);
-    return this;
-  }
-
-  /**
-   * Redis command <a href="https://redis.io/commands/topk.count">topkCount</a>.
-   *
    * @return Future response.
    */
   default Future<@Nullable Response> topkCount(List<String> args) {
     return send(Command.TOPK_COUNT, args.toArray(new String[0]));
-  }
-
-  /**
-   * Redis command <a href="https://redis.io/commands/topk.incrby">topkIncrby</a>.
-   *
-   * @return fluent self
-   */
-  @Fluent
-  @Deprecated
-  default RedisAPI topkIncrby(List<String> args, Handler<AsyncResult<@Nullable Response>> handler) {
-    send(Command.TOPK_INCRBY, args.toArray(new String[0])).onComplete(handler);
-    return this;
   }
 
   /**
@@ -6309,34 +2736,10 @@ public interface RedisAPI {
   /**
    * Redis command <a href="https://redis.io/commands/topk.info">topkInfo</a>.
    *
-   * @return fluent self
-   */
-  @Fluent
-  @Deprecated
-  default RedisAPI topkInfo(List<String> args, Handler<AsyncResult<@Nullable Response>> handler) {
-    send(Command.TOPK_INFO, args.toArray(new String[0])).onComplete(handler);
-    return this;
-  }
-
-  /**
-   * Redis command <a href="https://redis.io/commands/topk.info">topkInfo</a>.
-   *
    * @return Future response.
    */
   default Future<@Nullable Response> topkInfo(List<String> args) {
     return send(Command.TOPK_INFO, args.toArray(new String[0]));
-  }
-
-  /**
-   * Redis command <a href="https://redis.io/commands/topk.list">topkList</a>.
-   *
-   * @return fluent self
-   */
-  @Fluent
-  @Deprecated
-  default RedisAPI topkList(List<String> args, Handler<AsyncResult<@Nullable Response>> handler) {
-    send(Command.TOPK_LIST, args.toArray(new String[0])).onComplete(handler);
-    return this;
   }
 
   /**
@@ -6351,34 +2754,10 @@ public interface RedisAPI {
   /**
    * Redis command <a href="https://redis.io/commands/topk.query">topkQuery</a>.
    *
-   * @return fluent self
-   */
-  @Fluent
-  @Deprecated
-  default RedisAPI topkQuery(List<String> args, Handler<AsyncResult<@Nullable Response>> handler) {
-    send(Command.TOPK_QUERY, args.toArray(new String[0])).onComplete(handler);
-    return this;
-  }
-
-  /**
-   * Redis command <a href="https://redis.io/commands/topk.query">topkQuery</a>.
-   *
    * @return Future response.
    */
   default Future<@Nullable Response> topkQuery(List<String> args) {
     return send(Command.TOPK_QUERY, args.toArray(new String[0]));
-  }
-
-  /**
-   * Redis command <a href="https://redis.io/commands/topk.reserve">topkReserve</a>.
-   *
-   * @return fluent self
-   */
-  @Fluent
-  @Deprecated
-  default RedisAPI topkReserve(List<String> args, Handler<AsyncResult<@Nullable Response>> handler) {
-    send(Command.TOPK_RESERVE, args.toArray(new String[0])).onComplete(handler);
-    return this;
   }
 
   /**
@@ -6393,34 +2772,10 @@ public interface RedisAPI {
   /**
    * Redis command <a href="https://redis.io/commands/touch">touch</a>.
    *
-   * @return fluent self
-   */
-  @Fluent
-  @Deprecated
-  default RedisAPI touch(List<String> args, Handler<AsyncResult<@Nullable Response>> handler) {
-    send(Command.TOUCH, args.toArray(new String[0])).onComplete(handler);
-    return this;
-  }
-
-  /**
-   * Redis command <a href="https://redis.io/commands/touch">touch</a>.
-   *
    * @return Future response.
    */
   default Future<@Nullable Response> touch(List<String> args) {
     return send(Command.TOUCH, args.toArray(new String[0]));
-  }
-
-  /**
-   * Redis command <a href="https://redis.io/commands/ts.add">tsAdd</a>.
-   *
-   * @return fluent self
-   */
-  @Fluent
-  @Deprecated
-  default RedisAPI tsAdd(List<String> args, Handler<AsyncResult<@Nullable Response>> handler) {
-    send(Command.TS_ADD, args.toArray(new String[0])).onComplete(handler);
-    return this;
   }
 
   /**
@@ -6435,34 +2790,10 @@ public interface RedisAPI {
   /**
    * Redis command <a href="https://redis.io/commands/ts.alter">tsAlter</a>.
    *
-   * @return fluent self
-   */
-  @Fluent
-  @Deprecated
-  default RedisAPI tsAlter(List<String> args, Handler<AsyncResult<@Nullable Response>> handler) {
-    send(Command.TS_ALTER, args.toArray(new String[0])).onComplete(handler);
-    return this;
-  }
-
-  /**
-   * Redis command <a href="https://redis.io/commands/ts.alter">tsAlter</a>.
-   *
    * @return Future response.
    */
   default Future<@Nullable Response> tsAlter(List<String> args) {
     return send(Command.TS_ALTER, args.toArray(new String[0]));
-  }
-
-  /**
-   * Redis command <a href="https://redis.io/commands/ts.create">tsCreate</a>.
-   *
-   * @return fluent self
-   */
-  @Fluent
-  @Deprecated
-  default RedisAPI tsCreate(List<String> args, Handler<AsyncResult<@Nullable Response>> handler) {
-    send(Command.TS_CREATE, args.toArray(new String[0])).onComplete(handler);
-    return this;
   }
 
   /**
@@ -6477,34 +2808,10 @@ public interface RedisAPI {
   /**
    * Redis command <a href="https://redis.io/commands/ts.createrule">tsCreaterule</a>.
    *
-   * @return fluent self
-   */
-  @Fluent
-  @Deprecated
-  default RedisAPI tsCreaterule(List<String> args, Handler<AsyncResult<@Nullable Response>> handler) {
-    send(Command.TS_CREATERULE, args.toArray(new String[0])).onComplete(handler);
-    return this;
-  }
-
-  /**
-   * Redis command <a href="https://redis.io/commands/ts.createrule">tsCreaterule</a>.
-   *
    * @return Future response.
    */
   default Future<@Nullable Response> tsCreaterule(List<String> args) {
     return send(Command.TS_CREATERULE, args.toArray(new String[0]));
-  }
-
-  /**
-   * Redis command <a href="https://redis.io/commands/ts.decrby">tsDecrby</a>.
-   *
-   * @return fluent self
-   */
-  @Fluent
-  @Deprecated
-  default RedisAPI tsDecrby(List<String> args, Handler<AsyncResult<@Nullable Response>> handler) {
-    send(Command.TS_DECRBY, args.toArray(new String[0])).onComplete(handler);
-    return this;
   }
 
   /**
@@ -6519,34 +2826,10 @@ public interface RedisAPI {
   /**
    * Redis command <a href="https://redis.io/commands/ts.del">tsDel</a>.
    *
-   * @return fluent self
-   */
-  @Fluent
-  @Deprecated
-  default RedisAPI tsDel(List<String> args, Handler<AsyncResult<@Nullable Response>> handler) {
-    send(Command.TS_DEL, args.toArray(new String[0])).onComplete(handler);
-    return this;
-  }
-
-  /**
-   * Redis command <a href="https://redis.io/commands/ts.del">tsDel</a>.
-   *
    * @return Future response.
    */
   default Future<@Nullable Response> tsDel(List<String> args) {
     return send(Command.TS_DEL, args.toArray(new String[0]));
-  }
-
-  /**
-   * Redis command <a href="https://redis.io/commands/ts.deleterule">tsDeleterule</a>.
-   *
-   * @return fluent self
-   */
-  @Fluent
-  @Deprecated
-  default RedisAPI tsDeleterule(List<String> args, Handler<AsyncResult<@Nullable Response>> handler) {
-    send(Command.TS_DELETERULE, args.toArray(new String[0])).onComplete(handler);
-    return this;
   }
 
   /**
@@ -6561,34 +2844,10 @@ public interface RedisAPI {
   /**
    * Redis command <a href="https://redis.io/commands/ts.get">tsGet</a>.
    *
-   * @return fluent self
-   */
-  @Fluent
-  @Deprecated
-  default RedisAPI tsGet(List<String> args, Handler<AsyncResult<@Nullable Response>> handler) {
-    send(Command.TS_GET, args.toArray(new String[0])).onComplete(handler);
-    return this;
-  }
-
-  /**
-   * Redis command <a href="https://redis.io/commands/ts.get">tsGet</a>.
-   *
    * @return Future response.
    */
   default Future<@Nullable Response> tsGet(List<String> args) {
     return send(Command.TS_GET, args.toArray(new String[0]));
-  }
-
-  /**
-   * Redis command <a href="https://redis.io/commands/ts.incrby">tsIncrby</a>.
-   *
-   * @return fluent self
-   */
-  @Fluent
-  @Deprecated
-  default RedisAPI tsIncrby(List<String> args, Handler<AsyncResult<@Nullable Response>> handler) {
-    send(Command.TS_INCRBY, args.toArray(new String[0])).onComplete(handler);
-    return this;
   }
 
   /**
@@ -6603,34 +2862,10 @@ public interface RedisAPI {
   /**
    * Redis command <a href="https://redis.io/commands/ts.info">tsInfo</a>.
    *
-   * @return fluent self
-   */
-  @Fluent
-  @Deprecated
-  default RedisAPI tsInfo(List<String> args, Handler<AsyncResult<@Nullable Response>> handler) {
-    send(Command.TS_INFO, args.toArray(new String[0])).onComplete(handler);
-    return this;
-  }
-
-  /**
-   * Redis command <a href="https://redis.io/commands/ts.info">tsInfo</a>.
-   *
    * @return Future response.
    */
   default Future<@Nullable Response> tsInfo(List<String> args) {
     return send(Command.TS_INFO, args.toArray(new String[0]));
-  }
-
-  /**
-   * Redis command <a href="https://redis.io/commands/ts.madd">tsMadd</a>.
-   *
-   * @return fluent self
-   */
-  @Fluent
-  @Deprecated
-  default RedisAPI tsMadd(List<String> args, Handler<AsyncResult<@Nullable Response>> handler) {
-    send(Command.TS_MADD, args.toArray(new String[0])).onComplete(handler);
-    return this;
   }
 
   /**
@@ -6645,34 +2880,10 @@ public interface RedisAPI {
   /**
    * Redis command <a href="https://redis.io/commands/ts.mget">tsMget</a>.
    *
-   * @return fluent self
-   */
-  @Fluent
-  @Deprecated
-  default RedisAPI tsMget(List<String> args, Handler<AsyncResult<@Nullable Response>> handler) {
-    send(Command.TS_MGET, args.toArray(new String[0])).onComplete(handler);
-    return this;
-  }
-
-  /**
-   * Redis command <a href="https://redis.io/commands/ts.mget">tsMget</a>.
-   *
    * @return Future response.
    */
   default Future<@Nullable Response> tsMget(List<String> args) {
     return send(Command.TS_MGET, args.toArray(new String[0]));
-  }
-
-  /**
-   * Redis command <a href="https://redis.io/commands/ts.mrange">tsMrange</a>.
-   *
-   * @return fluent self
-   */
-  @Fluent
-  @Deprecated
-  default RedisAPI tsMrange(List<String> args, Handler<AsyncResult<@Nullable Response>> handler) {
-    send(Command.TS_MRANGE, args.toArray(new String[0])).onComplete(handler);
-    return this;
   }
 
   /**
@@ -6687,34 +2898,10 @@ public interface RedisAPI {
   /**
    * Redis command <a href="https://redis.io/commands/ts.mrevrange">tsMrevrange</a>.
    *
-   * @return fluent self
-   */
-  @Fluent
-  @Deprecated
-  default RedisAPI tsMrevrange(List<String> args, Handler<AsyncResult<@Nullable Response>> handler) {
-    send(Command.TS_MREVRANGE, args.toArray(new String[0])).onComplete(handler);
-    return this;
-  }
-
-  /**
-   * Redis command <a href="https://redis.io/commands/ts.mrevrange">tsMrevrange</a>.
-   *
    * @return Future response.
    */
   default Future<@Nullable Response> tsMrevrange(List<String> args) {
     return send(Command.TS_MREVRANGE, args.toArray(new String[0]));
-  }
-
-  /**
-   * Redis command <a href="https://redis.io/commands/ts.queryindex">tsQueryindex</a>.
-   *
-   * @return fluent self
-   */
-  @Fluent
-  @Deprecated
-  default RedisAPI tsQueryindex(List<String> args, Handler<AsyncResult<@Nullable Response>> handler) {
-    send(Command.TS_QUERYINDEX, args.toArray(new String[0])).onComplete(handler);
-    return this;
   }
 
   /**
@@ -6729,34 +2916,10 @@ public interface RedisAPI {
   /**
    * Redis command <a href="https://redis.io/commands/ts.range">tsRange</a>.
    *
-   * @return fluent self
-   */
-  @Fluent
-  @Deprecated
-  default RedisAPI tsRange(List<String> args, Handler<AsyncResult<@Nullable Response>> handler) {
-    send(Command.TS_RANGE, args.toArray(new String[0])).onComplete(handler);
-    return this;
-  }
-
-  /**
-   * Redis command <a href="https://redis.io/commands/ts.range">tsRange</a>.
-   *
    * @return Future response.
    */
   default Future<@Nullable Response> tsRange(List<String> args) {
     return send(Command.TS_RANGE, args.toArray(new String[0]));
-  }
-
-  /**
-   * Redis command <a href="https://redis.io/commands/ts.revrange">tsRevrange</a>.
-   *
-   * @return fluent self
-   */
-  @Fluent
-  @Deprecated
-  default RedisAPI tsRevrange(List<String> args, Handler<AsyncResult<@Nullable Response>> handler) {
-    send(Command.TS_REVRANGE, args.toArray(new String[0])).onComplete(handler);
-    return this;
   }
 
   /**
@@ -6771,34 +2934,10 @@ public interface RedisAPI {
   /**
    * Redis command <a href="https://redis.io/commands/ttl">ttl</a>.
    *
-   * @return fluent self
-   */
-  @Fluent
-  @Deprecated
-  default RedisAPI ttl(String arg0, Handler<AsyncResult<@Nullable Response>> handler) {
-    send(Command.TTL, arg0).onComplete(handler);
-    return this;
-  }
-
-  /**
-   * Redis command <a href="https://redis.io/commands/ttl">ttl</a>.
-   *
    * @return Future response.
    */
   default Future<@Nullable Response> ttl(String arg0) {
     return send(Command.TTL, arg0);
-  }
-
-  /**
-   * Redis command <a href="https://redis.io/commands/type">type</a>.
-   *
-   * @return fluent self
-   */
-  @Fluent
-  @Deprecated
-  default RedisAPI type(String arg0, Handler<AsyncResult<@Nullable Response>> handler) {
-    send(Command.TYPE, arg0).onComplete(handler);
-    return this;
   }
 
   /**
@@ -6813,34 +2952,10 @@ public interface RedisAPI {
   /**
    * Redis command <a href="https://redis.io/commands/unlink">unlink</a>.
    *
-   * @return fluent self
-   */
-  @Fluent
-  @Deprecated
-  default RedisAPI unlink(List<String> args, Handler<AsyncResult<@Nullable Response>> handler) {
-    send(Command.UNLINK, args.toArray(new String[0])).onComplete(handler);
-    return this;
-  }
-
-  /**
-   * Redis command <a href="https://redis.io/commands/unlink">unlink</a>.
-   *
    * @return Future response.
    */
   default Future<@Nullable Response> unlink(List<String> args) {
     return send(Command.UNLINK, args.toArray(new String[0]));
-  }
-
-  /**
-   * Redis command <a href="https://redis.io/commands/unsubscribe">unsubscribe</a>.
-   *
-   * @return fluent self
-   */
-  @Fluent
-  @Deprecated
-  default RedisAPI unsubscribe(List<String> args, Handler<AsyncResult<@Nullable Response>> handler) {
-    send(Command.UNSUBSCRIBE, args.toArray(new String[0])).onComplete(handler);
-    return this;
   }
 
   /**
@@ -6855,34 +2970,10 @@ public interface RedisAPI {
   /**
    * Redis command <a href="https://redis.io/commands/unwatch">unwatch</a>.
    *
-   * @return fluent self
-   */
-  @Fluent
-  @Deprecated
-  default RedisAPI unwatch(Handler<AsyncResult<@Nullable Response>> handler) {
-    send(Command.UNWATCH).onComplete(handler);
-    return this;
-  }
-
-  /**
-   * Redis command <a href="https://redis.io/commands/unwatch">unwatch</a>.
-   *
    * @return Future response.
    */
   default Future<@Nullable Response> unwatch() {
     return send(Command.UNWATCH);
-  }
-
-  /**
-   * Redis command <a href="https://redis.io/commands/wait">wait</a>.
-   *
-   * @return fluent self
-   */
-  @Fluent
-  @Deprecated
-  default RedisAPI wait(String arg0, String arg1, Handler<AsyncResult<@Nullable Response>> handler) {
-    send(Command.WAIT, arg0, arg1).onComplete(handler);
-    return this;
   }
 
   /**
@@ -6897,34 +2988,10 @@ public interface RedisAPI {
   /**
    * Redis command <a href="https://redis.io/commands/watch">watch</a>.
    *
-   * @return fluent self
-   */
-  @Fluent
-  @Deprecated
-  default RedisAPI watch(List<String> args, Handler<AsyncResult<@Nullable Response>> handler) {
-    send(Command.WATCH, args.toArray(new String[0])).onComplete(handler);
-    return this;
-  }
-
-  /**
-   * Redis command <a href="https://redis.io/commands/watch">watch</a>.
-   *
    * @return Future response.
    */
   default Future<@Nullable Response> watch(List<String> args) {
     return send(Command.WATCH, args.toArray(new String[0]));
-  }
-
-  /**
-   * Redis command <a href="https://redis.io/commands/xack">xack</a>.
-   *
-   * @return fluent self
-   */
-  @Fluent
-  @Deprecated
-  default RedisAPI xack(List<String> args, Handler<AsyncResult<@Nullable Response>> handler) {
-    send(Command.XACK, args.toArray(new String[0])).onComplete(handler);
-    return this;
   }
 
   /**
@@ -6939,34 +3006,10 @@ public interface RedisAPI {
   /**
    * Redis command <a href="https://redis.io/commands/xadd">xadd</a>.
    *
-   * @return fluent self
-   */
-  @Fluent
-  @Deprecated
-  default RedisAPI xadd(List<String> args, Handler<AsyncResult<@Nullable Response>> handler) {
-    send(Command.XADD, args.toArray(new String[0])).onComplete(handler);
-    return this;
-  }
-
-  /**
-   * Redis command <a href="https://redis.io/commands/xadd">xadd</a>.
-   *
    * @return Future response.
    */
   default Future<@Nullable Response> xadd(List<String> args) {
     return send(Command.XADD, args.toArray(new String[0]));
-  }
-
-  /**
-   * Redis command <a href="https://redis.io/commands/xautoclaim">xautoclaim</a>.
-   *
-   * @return fluent self
-   */
-  @Fluent
-  @Deprecated
-  default RedisAPI xautoclaim(List<String> args, Handler<AsyncResult<@Nullable Response>> handler) {
-    send(Command.XAUTOCLAIM, args.toArray(new String[0])).onComplete(handler);
-    return this;
   }
 
   /**
@@ -6981,34 +3024,10 @@ public interface RedisAPI {
   /**
    * Redis command <a href="https://redis.io/commands/xclaim">xclaim</a>.
    *
-   * @return fluent self
-   */
-  @Fluent
-  @Deprecated
-  default RedisAPI xclaim(List<String> args, Handler<AsyncResult<@Nullable Response>> handler) {
-    send(Command.XCLAIM, args.toArray(new String[0])).onComplete(handler);
-    return this;
-  }
-
-  /**
-   * Redis command <a href="https://redis.io/commands/xclaim">xclaim</a>.
-   *
    * @return Future response.
    */
   default Future<@Nullable Response> xclaim(List<String> args) {
     return send(Command.XCLAIM, args.toArray(new String[0]));
-  }
-
-  /**
-   * Redis command <a href="https://redis.io/commands/xdel">xdel</a>.
-   *
-   * @return fluent self
-   */
-  @Fluent
-  @Deprecated
-  default RedisAPI xdel(List<String> args, Handler<AsyncResult<@Nullable Response>> handler) {
-    send(Command.XDEL, args.toArray(new String[0])).onComplete(handler);
-    return this;
   }
 
   /**
@@ -7023,34 +3042,10 @@ public interface RedisAPI {
   /**
    * Redis command <a href="https://redis.io/commands/xgroup">xgroup</a>.
    *
-   * @return fluent self
-   */
-  @Fluent
-  @Deprecated
-  default RedisAPI xgroup(List<String> args, Handler<AsyncResult<@Nullable Response>> handler) {
-    send(Command.XGROUP, args.toArray(new String[0])).onComplete(handler);
-    return this;
-  }
-
-  /**
-   * Redis command <a href="https://redis.io/commands/xgroup">xgroup</a>.
-   *
    * @return Future response.
    */
   default Future<@Nullable Response> xgroup(List<String> args) {
     return send(Command.XGROUP, args.toArray(new String[0]));
-  }
-
-  /**
-   * Redis command <a href="https://redis.io/commands/xinfo">xinfo</a>.
-   *
-   * @return fluent self
-   */
-  @Fluent
-  @Deprecated
-  default RedisAPI xinfo(List<String> args, Handler<AsyncResult<@Nullable Response>> handler) {
-    send(Command.XINFO, args.toArray(new String[0])).onComplete(handler);
-    return this;
   }
 
   /**
@@ -7065,34 +3060,10 @@ public interface RedisAPI {
   /**
    * Redis command <a href="https://redis.io/commands/xlen">xlen</a>.
    *
-   * @return fluent self
-   */
-  @Fluent
-  @Deprecated
-  default RedisAPI xlen(String arg0, Handler<AsyncResult<@Nullable Response>> handler) {
-    send(Command.XLEN, arg0).onComplete(handler);
-    return this;
-  }
-
-  /**
-   * Redis command <a href="https://redis.io/commands/xlen">xlen</a>.
-   *
    * @return Future response.
    */
   default Future<@Nullable Response> xlen(String arg0) {
     return send(Command.XLEN, arg0);
-  }
-
-  /**
-   * Redis command <a href="https://redis.io/commands/xpending">xpending</a>.
-   *
-   * @return fluent self
-   */
-  @Fluent
-  @Deprecated
-  default RedisAPI xpending(List<String> args, Handler<AsyncResult<@Nullable Response>> handler) {
-    send(Command.XPENDING, args.toArray(new String[0])).onComplete(handler);
-    return this;
   }
 
   /**
@@ -7107,34 +3078,10 @@ public interface RedisAPI {
   /**
    * Redis command <a href="https://redis.io/commands/xrange">xrange</a>.
    *
-   * @return fluent self
-   */
-  @Fluent
-  @Deprecated
-  default RedisAPI xrange(List<String> args, Handler<AsyncResult<@Nullable Response>> handler) {
-    send(Command.XRANGE, args.toArray(new String[0])).onComplete(handler);
-    return this;
-  }
-
-  /**
-   * Redis command <a href="https://redis.io/commands/xrange">xrange</a>.
-   *
    * @return Future response.
    */
   default Future<@Nullable Response> xrange(List<String> args) {
     return send(Command.XRANGE, args.toArray(new String[0]));
-  }
-
-  /**
-   * Redis command <a href="https://redis.io/commands/xread">xread</a>.
-   *
-   * @return fluent self
-   */
-  @Fluent
-  @Deprecated
-  default RedisAPI xread(List<String> args, Handler<AsyncResult<@Nullable Response>> handler) {
-    send(Command.XREAD, args.toArray(new String[0])).onComplete(handler);
-    return this;
   }
 
   /**
@@ -7149,34 +3096,10 @@ public interface RedisAPI {
   /**
    * Redis command <a href="https://redis.io/commands/xreadgroup">xreadgroup</a>.
    *
-   * @return fluent self
-   */
-  @Fluent
-  @Deprecated
-  default RedisAPI xreadgroup(List<String> args, Handler<AsyncResult<@Nullable Response>> handler) {
-    send(Command.XREADGROUP, args.toArray(new String[0])).onComplete(handler);
-    return this;
-  }
-
-  /**
-   * Redis command <a href="https://redis.io/commands/xreadgroup">xreadgroup</a>.
-   *
    * @return Future response.
    */
   default Future<@Nullable Response> xreadgroup(List<String> args) {
     return send(Command.XREADGROUP, args.toArray(new String[0]));
-  }
-
-  /**
-   * Redis command <a href="https://redis.io/commands/xrevrange">xrevrange</a>.
-   *
-   * @return fluent self
-   */
-  @Fluent
-  @Deprecated
-  default RedisAPI xrevrange(List<String> args, Handler<AsyncResult<@Nullable Response>> handler) {
-    send(Command.XREVRANGE, args.toArray(new String[0])).onComplete(handler);
-    return this;
   }
 
   /**
@@ -7191,34 +3114,10 @@ public interface RedisAPI {
   /**
    * Redis command <a href="https://redis.io/commands/xsetid">xsetid</a>.
    *
-   * @return fluent self
-   */
-  @Fluent
-  @Deprecated
-  default RedisAPI xsetid(List<String> args, Handler<AsyncResult<@Nullable Response>> handler) {
-    send(Command.XSETID, args.toArray(new String[0])).onComplete(handler);
-    return this;
-  }
-
-  /**
-   * Redis command <a href="https://redis.io/commands/xsetid">xsetid</a>.
-   *
    * @return Future response.
    */
   default Future<@Nullable Response> xsetid(List<String> args) {
     return send(Command.XSETID, args.toArray(new String[0]));
-  }
-
-  /**
-   * Redis command <a href="https://redis.io/commands/xtrim">xtrim</a>.
-   *
-   * @return fluent self
-   */
-  @Fluent
-  @Deprecated
-  default RedisAPI xtrim(List<String> args, Handler<AsyncResult<@Nullable Response>> handler) {
-    send(Command.XTRIM, args.toArray(new String[0])).onComplete(handler);
-    return this;
   }
 
   /**
@@ -7233,34 +3132,10 @@ public interface RedisAPI {
   /**
    * Redis command <a href="https://redis.io/commands/zadd">zadd</a>.
    *
-   * @return fluent self
-   */
-  @Fluent
-  @Deprecated
-  default RedisAPI zadd(List<String> args, Handler<AsyncResult<@Nullable Response>> handler) {
-    send(Command.ZADD, args.toArray(new String[0])).onComplete(handler);
-    return this;
-  }
-
-  /**
-   * Redis command <a href="https://redis.io/commands/zadd">zadd</a>.
-   *
    * @return Future response.
    */
   default Future<@Nullable Response> zadd(List<String> args) {
     return send(Command.ZADD, args.toArray(new String[0]));
-  }
-
-  /**
-   * Redis command <a href="https://redis.io/commands/zcard">zcard</a>.
-   *
-   * @return fluent self
-   */
-  @Fluent
-  @Deprecated
-  default RedisAPI zcard(String arg0, Handler<AsyncResult<@Nullable Response>> handler) {
-    send(Command.ZCARD, arg0).onComplete(handler);
-    return this;
   }
 
   /**
@@ -7275,34 +3150,10 @@ public interface RedisAPI {
   /**
    * Redis command <a href="https://redis.io/commands/zcount">zcount</a>.
    *
-   * @return fluent self
-   */
-  @Fluent
-  @Deprecated
-  default RedisAPI zcount(String arg0, String arg1, String arg2, Handler<AsyncResult<@Nullable Response>> handler) {
-    send(Command.ZCOUNT, arg0, arg1, arg2).onComplete(handler);
-    return this;
-  }
-
-  /**
-   * Redis command <a href="https://redis.io/commands/zcount">zcount</a>.
-   *
    * @return Future response.
    */
   default Future<@Nullable Response> zcount(String arg0, String arg1, String arg2) {
     return send(Command.ZCOUNT, arg0, arg1, arg2);
-  }
-
-  /**
-   * Redis command <a href="https://redis.io/commands/zdiff">zdiff</a>.
-   *
-   * @return fluent self
-   */
-  @Fluent
-  @Deprecated
-  default RedisAPI zdiff(List<String> args, Handler<AsyncResult<@Nullable Response>> handler) {
-    send(Command.ZDIFF, args.toArray(new String[0])).onComplete(handler);
-    return this;
   }
 
   /**
@@ -7317,34 +3168,10 @@ public interface RedisAPI {
   /**
    * Redis command <a href="https://redis.io/commands/zdiffstore">zdiffstore</a>.
    *
-   * @return fluent self
-   */
-  @Fluent
-  @Deprecated
-  default RedisAPI zdiffstore(List<String> args, Handler<AsyncResult<@Nullable Response>> handler) {
-    send(Command.ZDIFFSTORE, args.toArray(new String[0])).onComplete(handler);
-    return this;
-  }
-
-  /**
-   * Redis command <a href="https://redis.io/commands/zdiffstore">zdiffstore</a>.
-   *
    * @return Future response.
    */
   default Future<@Nullable Response> zdiffstore(List<String> args) {
     return send(Command.ZDIFFSTORE, args.toArray(new String[0]));
-  }
-
-  /**
-   * Redis command <a href="https://redis.io/commands/zincrby">zincrby</a>.
-   *
-   * @return fluent self
-   */
-  @Fluent
-  @Deprecated
-  default RedisAPI zincrby(String arg0, String arg1, String arg2, Handler<AsyncResult<@Nullable Response>> handler) {
-    send(Command.ZINCRBY, arg0, arg1, arg2).onComplete(handler);
-    return this;
   }
 
   /**
@@ -7356,17 +3183,6 @@ public interface RedisAPI {
     return send(Command.ZINCRBY, arg0, arg1, arg2);
   }
 
-  /**
-   * Redis command <a href="https://redis.io/commands/zinter">zinter</a>.
-   *
-   * @return fluent self
-   */
-  @Fluent
-  @Deprecated
-  default RedisAPI zinter(List<String> args, Handler<AsyncResult<@Nullable Response>> handler) {
-    send(Command.ZINTER, args.toArray(new String[0])).onComplete(handler);
-    return this;
-  }
 
   /**
    * Redis command <a href="https://redis.io/commands/zinter">zinter</a>.
@@ -7375,18 +3191,6 @@ public interface RedisAPI {
    */
   default Future<@Nullable Response> zinter(List<String> args) {
     return send(Command.ZINTER, args.toArray(new String[0]));
-  }
-
-  /**
-   * Redis command <a href="https://redis.io/commands/zintercard">zintercard</a>.
-   *
-   * @return fluent self
-   */
-  @Fluent
-  @Deprecated
-  default RedisAPI zintercard(List<String> args, Handler<AsyncResult<@Nullable Response>> handler) {
-    send(Command.ZINTERCARD, args.toArray(new String[0])).onComplete(handler);
-    return this;
   }
 
   /**
@@ -7401,34 +3205,10 @@ public interface RedisAPI {
   /**
    * Redis command <a href="https://redis.io/commands/zinterstore">zinterstore</a>.
    *
-   * @return fluent self
-   */
-  @Fluent
-  @Deprecated
-  default RedisAPI zinterstore(List<String> args, Handler<AsyncResult<@Nullable Response>> handler) {
-    send(Command.ZINTERSTORE, args.toArray(new String[0])).onComplete(handler);
-    return this;
-  }
-
-  /**
-   * Redis command <a href="https://redis.io/commands/zinterstore">zinterstore</a>.
-   *
    * @return Future response.
    */
   default Future<@Nullable Response> zinterstore(List<String> args) {
     return send(Command.ZINTERSTORE, args.toArray(new String[0]));
-  }
-
-  /**
-   * Redis command <a href="https://redis.io/commands/zlexcount">zlexcount</a>.
-   *
-   * @return fluent self
-   */
-  @Fluent
-  @Deprecated
-  default RedisAPI zlexcount(String arg0, String arg1, String arg2, Handler<AsyncResult<@Nullable Response>> handler) {
-    send(Command.ZLEXCOUNT, arg0, arg1, arg2).onComplete(handler);
-    return this;
   }
 
   /**
@@ -7443,34 +3223,10 @@ public interface RedisAPI {
   /**
    * Redis command <a href="https://redis.io/commands/zmpop">zmpop</a>.
    *
-   * @return fluent self
-   */
-  @Fluent
-  @Deprecated
-  default RedisAPI zmpop(List<String> args, Handler<AsyncResult<@Nullable Response>> handler) {
-    send(Command.ZMPOP, args.toArray(new String[0])).onComplete(handler);
-    return this;
-  }
-
-  /**
-   * Redis command <a href="https://redis.io/commands/zmpop">zmpop</a>.
-   *
    * @return Future response.
    */
   default Future<@Nullable Response> zmpop(List<String> args) {
     return send(Command.ZMPOP, args.toArray(new String[0]));
-  }
-
-  /**
-   * Redis command <a href="https://redis.io/commands/zmscore">zmscore</a>.
-   *
-   * @return fluent self
-   */
-  @Fluent
-  @Deprecated
-  default RedisAPI zmscore(List<String> args, Handler<AsyncResult<@Nullable Response>> handler) {
-    send(Command.ZMSCORE, args.toArray(new String[0])).onComplete(handler);
-    return this;
   }
 
   /**
@@ -7485,35 +3241,12 @@ public interface RedisAPI {
   /**
    * Redis command <a href="https://redis.io/commands/zpopmax">zpopmax</a>.
    *
-   * @return fluent self
-   */
-  @Fluent
-  @Deprecated
-  default RedisAPI zpopmax(List<String> args, Handler<AsyncResult<@Nullable Response>> handler) {
-    send(Command.ZPOPMAX, args.toArray(new String[0])).onComplete(handler);
-    return this;
-  }
-
-  /**
-   * Redis command <a href="https://redis.io/commands/zpopmax">zpopmax</a>.
-   *
    * @return Future response.
    */
   default Future<@Nullable Response> zpopmax(List<String> args) {
     return send(Command.ZPOPMAX, args.toArray(new String[0]));
   }
 
-  /**
-   * Redis command <a href="https://redis.io/commands/zpopmin">zpopmin</a>.
-   *
-   * @return fluent self
-   */
-  @Fluent
-  @Deprecated
-  default RedisAPI zpopmin(List<String> args, Handler<AsyncResult<@Nullable Response>> handler) {
-    send(Command.ZPOPMIN, args.toArray(new String[0])).onComplete(handler);
-    return this;
-  }
 
   /**
    * Redis command <a href="https://redis.io/commands/zpopmin">zpopmin</a>.
@@ -7522,18 +3255,6 @@ public interface RedisAPI {
    */
   default Future<@Nullable Response> zpopmin(List<String> args) {
     return send(Command.ZPOPMIN, args.toArray(new String[0]));
-  }
-
-  /**
-   * Redis command <a href="https://redis.io/commands/zrandmember">zrandmember</a>.
-   *
-   * @return fluent self
-   */
-  @Fluent
-  @Deprecated
-  default RedisAPI zrandmember(List<String> args, Handler<AsyncResult<@Nullable Response>> handler) {
-    send(Command.ZRANDMEMBER, args.toArray(new String[0])).onComplete(handler);
-    return this;
   }
 
   /**
@@ -7548,34 +3269,10 @@ public interface RedisAPI {
   /**
    * Redis command <a href="https://redis.io/commands/zrange">zrange</a>.
    *
-   * @return fluent self
-   */
-  @Fluent
-  @Deprecated
-  default RedisAPI zrange(List<String> args, Handler<AsyncResult<@Nullable Response>> handler) {
-    send(Command.ZRANGE, args.toArray(new String[0])).onComplete(handler);
-    return this;
-  }
-
-  /**
-   * Redis command <a href="https://redis.io/commands/zrange">zrange</a>.
-   *
    * @return Future response.
    */
   default Future<@Nullable Response> zrange(List<String> args) {
     return send(Command.ZRANGE, args.toArray(new String[0]));
-  }
-
-  /**
-   * Redis command <a href="https://redis.io/commands/zrangebylex">zrangebylex</a>.
-   *
-   * @return fluent self
-   */
-  @Fluent
-  @Deprecated
-  default RedisAPI zrangebylex(List<String> args, Handler<AsyncResult<@Nullable Response>> handler) {
-    send(Command.ZRANGEBYLEX, args.toArray(new String[0])).onComplete(handler);
-    return this;
   }
 
   /**
@@ -7590,34 +3287,10 @@ public interface RedisAPI {
   /**
    * Redis command <a href="https://redis.io/commands/zrangebyscore">zrangebyscore</a>.
    *
-   * @return fluent self
-   */
-  @Fluent
-  @Deprecated
-  default RedisAPI zrangebyscore(List<String> args, Handler<AsyncResult<@Nullable Response>> handler) {
-    send(Command.ZRANGEBYSCORE, args.toArray(new String[0])).onComplete(handler);
-    return this;
-  }
-
-  /**
-   * Redis command <a href="https://redis.io/commands/zrangebyscore">zrangebyscore</a>.
-   *
    * @return Future response.
    */
   default Future<@Nullable Response> zrangebyscore(List<String> args) {
     return send(Command.ZRANGEBYSCORE, args.toArray(new String[0]));
-  }
-
-  /**
-   * Redis command <a href="https://redis.io/commands/zrangestore">zrangestore</a>.
-   *
-   * @return fluent self
-   */
-  @Fluent
-  @Deprecated
-  default RedisAPI zrangestore(List<String> args, Handler<AsyncResult<@Nullable Response>> handler) {
-    send(Command.ZRANGESTORE, args.toArray(new String[0])).onComplete(handler);
-    return this;
   }
 
   /**
@@ -7632,34 +3305,10 @@ public interface RedisAPI {
   /**
    * Redis command <a href="https://redis.io/commands/zrank">zrank</a>.
    *
-   * @return fluent self
-   */
-  @Fluent
-  @Deprecated
-  default RedisAPI zrank(String arg0, String arg1, Handler<AsyncResult<@Nullable Response>> handler) {
-    send(Command.ZRANK, arg0, arg1).onComplete(handler);
-    return this;
-  }
-
-  /**
-   * Redis command <a href="https://redis.io/commands/zrank">zrank</a>.
-   *
    * @return Future response.
    */
   default Future<@Nullable Response> zrank(String arg0, String arg1) {
     return send(Command.ZRANK, arg0, arg1);
-  }
-
-  /**
-   * Redis command <a href="https://redis.io/commands/zrem">zrem</a>.
-   *
-   * @return fluent self
-   */
-  @Fluent
-  @Deprecated
-  default RedisAPI zrem(List<String> args, Handler<AsyncResult<@Nullable Response>> handler) {
-    send(Command.ZREM, args.toArray(new String[0])).onComplete(handler);
-    return this;
   }
 
   /**
@@ -7674,34 +3323,10 @@ public interface RedisAPI {
   /**
    * Redis command <a href="https://redis.io/commands/zremrangebylex">zremrangebylex</a>.
    *
-   * @return fluent self
-   */
-  @Fluent
-  @Deprecated
-  default RedisAPI zremrangebylex(String arg0, String arg1, String arg2, Handler<AsyncResult<@Nullable Response>> handler) {
-    send(Command.ZREMRANGEBYLEX, arg0, arg1, arg2).onComplete(handler);
-    return this;
-  }
-
-  /**
-   * Redis command <a href="https://redis.io/commands/zremrangebylex">zremrangebylex</a>.
-   *
    * @return Future response.
    */
   default Future<@Nullable Response> zremrangebylex(String arg0, String arg1, String arg2) {
     return send(Command.ZREMRANGEBYLEX, arg0, arg1, arg2);
-  }
-
-  /**
-   * Redis command <a href="https://redis.io/commands/zremrangebyrank">zremrangebyrank</a>.
-   *
-   * @return fluent self
-   */
-  @Fluent
-  @Deprecated
-  default RedisAPI zremrangebyrank(String arg0, String arg1, String arg2, Handler<AsyncResult<@Nullable Response>> handler) {
-    send(Command.ZREMRANGEBYRANK, arg0, arg1, arg2).onComplete(handler);
-    return this;
   }
 
   /**
@@ -7716,34 +3341,10 @@ public interface RedisAPI {
   /**
    * Redis command <a href="https://redis.io/commands/zremrangebyscore">zremrangebyscore</a>.
    *
-   * @return fluent self
-   */
-  @Fluent
-  @Deprecated
-  default RedisAPI zremrangebyscore(String arg0, String arg1, String arg2, Handler<AsyncResult<@Nullable Response>> handler) {
-    send(Command.ZREMRANGEBYSCORE, arg0, arg1, arg2).onComplete(handler);
-    return this;
-  }
-
-  /**
-   * Redis command <a href="https://redis.io/commands/zremrangebyscore">zremrangebyscore</a>.
-   *
    * @return Future response.
    */
   default Future<@Nullable Response> zremrangebyscore(String arg0, String arg1, String arg2) {
     return send(Command.ZREMRANGEBYSCORE, arg0, arg1, arg2);
-  }
-
-  /**
-   * Redis command <a href="https://redis.io/commands/zrevrange">zrevrange</a>.
-   *
-   * @return fluent self
-   */
-  @Fluent
-  @Deprecated
-  default RedisAPI zrevrange(List<String> args, Handler<AsyncResult<@Nullable Response>> handler) {
-    send(Command.ZREVRANGE, args.toArray(new String[0])).onComplete(handler);
-    return this;
   }
 
   /**
@@ -7758,34 +3359,10 @@ public interface RedisAPI {
   /**
    * Redis command <a href="https://redis.io/commands/zrevrangebylex">zrevrangebylex</a>.
    *
-   * @return fluent self
-   */
-  @Fluent
-  @Deprecated
-  default RedisAPI zrevrangebylex(List<String> args, Handler<AsyncResult<@Nullable Response>> handler) {
-    send(Command.ZREVRANGEBYLEX, args.toArray(new String[0])).onComplete(handler);
-    return this;
-  }
-
-  /**
-   * Redis command <a href="https://redis.io/commands/zrevrangebylex">zrevrangebylex</a>.
-   *
    * @return Future response.
    */
   default Future<@Nullable Response> zrevrangebylex(List<String> args) {
     return send(Command.ZREVRANGEBYLEX, args.toArray(new String[0]));
-  }
-
-  /**
-   * Redis command <a href="https://redis.io/commands/zrevrangebyscore">zrevrangebyscore</a>.
-   *
-   * @return fluent self
-   */
-  @Fluent
-  @Deprecated
-  default RedisAPI zrevrangebyscore(List<String> args, Handler<AsyncResult<@Nullable Response>> handler) {
-    send(Command.ZREVRANGEBYSCORE, args.toArray(new String[0])).onComplete(handler);
-    return this;
   }
 
   /**
@@ -7800,34 +3377,10 @@ public interface RedisAPI {
   /**
    * Redis command <a href="https://redis.io/commands/zrevrank">zrevrank</a>.
    *
-   * @return fluent self
-   */
-  @Fluent
-  @Deprecated
-  default RedisAPI zrevrank(String arg0, String arg1, Handler<AsyncResult<@Nullable Response>> handler) {
-    send(Command.ZREVRANK, arg0, arg1).onComplete(handler);
-    return this;
-  }
-
-  /**
-   * Redis command <a href="https://redis.io/commands/zrevrank">zrevrank</a>.
-   *
    * @return Future response.
    */
   default Future<@Nullable Response> zrevrank(String arg0, String arg1) {
     return send(Command.ZREVRANK, arg0, arg1);
-  }
-
-  /**
-   * Redis command <a href="https://redis.io/commands/zscan">zscan</a>.
-   *
-   * @return fluent self
-   */
-  @Fluent
-  @Deprecated
-  default RedisAPI zscan(List<String> args, Handler<AsyncResult<@Nullable Response>> handler) {
-    send(Command.ZSCAN, args.toArray(new String[0])).onComplete(handler);
-    return this;
   }
 
   /**
@@ -7842,18 +3395,6 @@ public interface RedisAPI {
   /**
    * Redis command <a href="https://redis.io/commands/zscore">zscore</a>.
    *
-   * @return fluent self
-   */
-  @Fluent
-  @Deprecated
-  default RedisAPI zscore(String arg0, String arg1, Handler<AsyncResult<@Nullable Response>> handler) {
-    send(Command.ZSCORE, arg0, arg1).onComplete(handler);
-    return this;
-  }
-
-  /**
-   * Redis command <a href="https://redis.io/commands/zscore">zscore</a>.
-   *
    * @return Future response.
    */
   default Future<@Nullable Response> zscore(String arg0, String arg1) {
@@ -7863,34 +3404,10 @@ public interface RedisAPI {
   /**
    * Redis command <a href="https://redis.io/commands/zunion">zunion</a>.
    *
-   * @return fluent self
-   */
-  @Fluent
-  @Deprecated
-  default RedisAPI zunion(List<String> args, Handler<AsyncResult<@Nullable Response>> handler) {
-    send(Command.ZUNION, args.toArray(new String[0])).onComplete(handler);
-    return this;
-  }
-
-  /**
-   * Redis command <a href="https://redis.io/commands/zunion">zunion</a>.
-   *
    * @return Future response.
    */
   default Future<@Nullable Response> zunion(List<String> args) {
     return send(Command.ZUNION, args.toArray(new String[0]));
-  }
-
-  /**
-   * Redis command <a href="https://redis.io/commands/zunionstore">zunionstore</a>.
-   *
-   * @return fluent self
-   */
-  @Fluent
-  @Deprecated
-  default RedisAPI zunionstore(List<String> args, Handler<AsyncResult<@Nullable Response>> handler) {
-    send(Command.ZUNIONSTORE, args.toArray(new String[0])).onComplete(handler);
-    return this;
   }
 
   /**
