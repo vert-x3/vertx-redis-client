@@ -278,7 +278,10 @@ public class RedisStandaloneConnection implements RedisConnectionInternal, Parse
         // tag this connection as tainted if needed
         taintCheck(cmd);
         // unwrap the handler into a single handler
-        callbacks.add(index, vertx.promise(command -> {
+
+        Promise<Response> p = vertx.promise();
+
+        p.future().onComplete(command -> {
           if (command.failed()) {
             if (errorMsg.length() > 0) {
               errorMsg.append(System.lineSeparator());
@@ -314,7 +317,9 @@ public class RedisStandaloneConnection implements RedisConnectionInternal, Parse
               }
             }
           }
-        }));
+        });
+
+        callbacks.add(index, p);
       }
 
       synchronized (waiting) {

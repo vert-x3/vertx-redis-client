@@ -22,6 +22,7 @@ import io.vertx.core.Promise;
 import io.vertx.core.impl.ContextInternal;
 import io.vertx.core.impl.EventLoopContext;
 import io.vertx.core.impl.VertxInternal;
+import io.vertx.core.impl.future.PromiseInternal;
 import io.vertx.core.impl.logging.Logger;
 import io.vertx.core.impl.logging.LoggerFactory;
 import io.vertx.core.net.NetClient;
@@ -129,7 +130,7 @@ class RedisConnectionManager {
     }
 
     @Override
-    public void connect(EventLoopContext ctx, Listener listener, Handler<AsyncResult<ConnectResult<RedisConnectionInternal>>> onConnect) {
+    public Future<ConnectResult<RedisConnectionInternal>> connect(EventLoopContext ctx, Listener listener) {
       // verify if we can make this connection
       final boolean netClientSsl = options.getNetClientOptions().isSsl();
       final boolean connectionStringSsl = redisURI.ssl();
@@ -140,14 +141,12 @@ class RedisConnectionManager {
       if (connectionStringInetSocket) {
         // net client is ssl and connection string is not ssl is not allowed
         if (netClientSsl && !connectionStringSsl) {
-          ctx.execute(ctx.failedFuture("Pool initialized with SSL but connection requested plain socket"), onConnect);
-          return;
+          return ctx.failedFuture("Pool initialized with SSL but connection requested plain socket");
         }
       }
 
       // all calls the user handler will happen in the user context (ctx)
-      connectAndSetup(ctx, listener, connectionStringInetSocket, connectionStringSsl, netClientSsl)
-        .onComplete(onConnect);
+      return connectAndSetup(ctx, listener, connectionStringInetSocket, connectionStringSsl, netClientSsl);
     }
 
     private Future<ConnectResult<RedisConnectionInternal>> connectAndSetup(
@@ -323,8 +322,8 @@ class RedisConnectionManager {
     final boolean metricsEnabled = metrics != null;
     final Object queueMetric = metricsEnabled ? metrics.submitted() : null;
 
-    pooledConnectionManager.getConnection(eventLoopContext, new ConnectionKey(connectionString, setup), (ctx, dispose) -> connectionEndpointProvider(ctx, dispose, connectionString, setup), promise);
-    return promise.future()
+    Future<Lease<RedisConnectionInternal>> future = pooledConnectionManager.getConnection(eventLoopContext, new ConnectionKey(connectionString, setup), (ctx, dispose) -> connectionEndpointProvider(ctx, dispose, connectionString, setup));
+    return future
       .onFailure(err -> {
         if (metricsEnabled) {
           metrics.rejected(queueMetric);
@@ -358,7 +357,8 @@ class RedisConnectionManager {
     }
 
     @Override
-    public void requestConnection(ContextInternal ctx, long timeout, Handler<AsyncResult<Lease<RedisConnectionInternal>>> handler) {
+    public Future<Lease<RedisConnectionInternal>> requestConnection(ContextInternal ctx, long timeout) {
+      PromiseInternal<Lease<RedisConnectionInternal>> promise = ctx.promise();
       pool.acquire(ctx, 0, ar -> {
         if (ar.succeeded()) {
           // increment the reference counter to avoid the pool to be closed too soon
@@ -370,8 +370,9 @@ class RedisConnectionManager {
             .evictHandler(this::decRefCount);
         }
         // proceed to user
-        handler.handle(ar);
+        promise.handle(ar);
       });
+      return promise.future();
     }
   }
 }
