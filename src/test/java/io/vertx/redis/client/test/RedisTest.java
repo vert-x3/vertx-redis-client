@@ -9,10 +9,11 @@ import io.vertx.ext.unit.TestContext;
 import io.vertx.ext.unit.junit.RunTestOnContext;
 import io.vertx.ext.unit.junit.VertxUnitRunner;
 import io.vertx.redis.client.*;
-import io.vertx.redis.client.impl.RedisClient;
+import org.junit.ClassRule;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.testcontainers.containers.GenericContainer;
 
 import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -24,6 +25,10 @@ import static io.vertx.redis.client.Request.cmd;
 @RunWith(VertxUnitRunner.class)
 public class RedisTest {
 
+  @ClassRule
+  public static final GenericContainer<?> redis = new GenericContainer<>("redis:7")
+    .withExposedPorts(6379);
+
   @Rule
   public final RunTestOnContext rule = new RunTestOnContext();
 
@@ -31,7 +36,7 @@ public class RedisTest {
   public void simpleTest(TestContext should) {
     final Async test = should.async();
 
-    Redis.createClient(rule.vertx(), "redis://localhost:7006")
+    Redis.createClient(rule.vertx(), new RedisOptions().setConnectionString("redis://" + redis.getHost() + ":" + redis.getFirstMappedPort()))
       .connect().onComplete(create -> {
         should.assertTrue(create.succeeded());
 
@@ -55,7 +60,7 @@ public class RedisTest {
   public void emptyStringTest(TestContext should) {
     final Async test = should.async();
 
-    Redis.createClient(rule.vertx(), "redis://localhost:7006")
+    Redis.createClient(rule.vertx(), new RedisOptions().setConnectionString("redis://" + redis.getHost() + ":" + redis.getFirstMappedPort()))
       .connect().onComplete(create -> {
         should.assertTrue(create.succeeded());
 
@@ -77,7 +82,7 @@ public class RedisTest {
   public void simpleSelectTest(TestContext should) {
     final Async test = should.async();
 
-    Redis.createClient(rule.vertx(), new RedisOptions().addConnectionString("redis://localhost:7006/0"))
+    Redis.createClient(rule.vertx(), new RedisOptions().setConnectionString("redis://" + redis.getHost() + ":" + redis.getFirstMappedPort() + "/0"))
       .connect().onComplete(create -> {
         should.assertTrue(create.succeeded());
 
@@ -101,7 +106,7 @@ public class RedisTest {
   public void batchTest(TestContext should) {
     final Async test = should.async();
 
-    Redis.createClient(rule.vertx(), "redis://localhost:7006")
+    Redis.createClient(rule.vertx(), new RedisOptions().setConnectionString("redis://" + redis.getHost() + ":" + redis.getFirstMappedPort()))
       .connect().onComplete(create -> {
         should.assertTrue(create.succeeded());
 
@@ -123,7 +128,7 @@ public class RedisTest {
   public void batchEmptyTest(TestContext should) {
     final Async test = should.async();
 
-    Redis.createClient(rule.vertx(), "redis://localhost:7006")
+    Redis.createClient(rule.vertx(), new RedisOptions().setConnectionString("redis://" + redis.getHost() + ":" + redis.getFirstMappedPort()))
       .connect().onComplete(create -> {
         should.assertTrue(create.succeeded());
 
@@ -140,7 +145,7 @@ public class RedisTest {
   public void simpleTestAPI(TestContext should) {
     final Async test = should.async();
 
-    Redis.createClient(rule.vertx(), "redis://localhost:7006")
+    Redis.createClient(rule.vertx(), new RedisOptions().setConnectionString("redis://" + redis.getHost() + ":" + redis.getFirstMappedPort()))
       .connect().onComplete(create -> {
         should.assertTrue(create.succeeded());
 
@@ -161,7 +166,7 @@ public class RedisTest {
     final Async test = should.async();
     final Vertx vertx = rule.vertx();
 
-    Redis.createClient(vertx, "redis://localhost:7006")
+    Redis.createClient(vertx, new RedisOptions().setConnectionString("redis://" + redis.getHost() + ":" + redis.getFirstMappedPort()))
       .connect().onComplete(create -> {
         should.assertTrue(create.succeeded());
 
@@ -192,7 +197,7 @@ public class RedisTest {
 
     RedisOptions options = new RedisOptions()
       .setMaxWaitingHandlers(10)
-      .addConnectionString("redis://localhost:7006");
+      .addConnectionString("redis://" + redis.getHost() + ":" + redis.getFirstMappedPort());
 
     Redis.createClient(rule.vertx(), options)
       .connect().onComplete(create -> {
@@ -226,7 +231,7 @@ public class RedisTest {
   public void testZAdd(TestContext should) {
     final Async test = should.async();
 
-    Redis.createClient(rule.vertx(), "redis://localhost:7006")
+    Redis.createClient(rule.vertx(), new RedisOptions().setConnectionString("redis://" + redis.getHost() + ":" + redis.getFirstMappedPort()))
       .connect().onComplete(create -> {
         should.assertTrue(create.succeeded());
 
@@ -248,7 +253,7 @@ public class RedisTest {
   public void buggyHmget(TestContext should) {
     final Async test = should.async();
 
-    Redis.createClient(rule.vertx(), "redis://localhost:7006")
+    Redis.createClient(rule.vertx(), new RedisOptions().setConnectionString("redis://" + redis.getHost() + ":" + redis.getFirstMappedPort()))
       .connect().onComplete(create -> {
         should.assertTrue(create.succeeded());
 
@@ -265,7 +270,7 @@ public class RedisTest {
   public void buggyIterator(TestContext should) {
     final Async test = should.async();
 
-    Redis.createClient(rule.vertx(), "redis://localhost:7006")
+    Redis.createClient(rule.vertx(), new RedisOptions().setConnectionString("redis://" + redis.getHost() + ":" + redis.getFirstMappedPort()))
       .connect().onComplete(create -> {
         should.assertTrue(create.succeeded());
 
@@ -311,7 +316,6 @@ public class RedisTest {
   @Test
   public void testBatch2(TestContext should) {
     final Async test = should.async();
-    RedisClient redis = (RedisClient) Redis.createClient(rule.vertx(), new RedisOptions().addConnectionString("redis://localhost:7006"));
 
     List<Request> requests = Arrays.asList(
       Request.cmd(Command.create("OOPS")),
@@ -319,7 +323,8 @@ public class RedisTest {
       Request.cmd(Command.create("OOPS")),
       Request.cmd(Command.create("OOPS")));
 
-    redis.batch(requests)
+    Redis.createClient(rule.vertx(), new RedisOptions().setConnectionString("redis://" + redis.getHost() + ":" + redis.getFirstMappedPort()))
+      .batch(requests)
       .onFailure(err -> {
         should.assertTrue(err.getMessage().contains("ERR [0]"));
         should.assertTrue(err.getMessage().contains("ERR [1]"));

@@ -19,25 +19,19 @@ import io.vertx.ext.unit.Async;
 import io.vertx.ext.unit.TestContext;
 import io.vertx.ext.unit.junit.RunTestOnContext;
 import io.vertx.ext.unit.junit.VertxUnitRunner;
-import io.vertx.redis.client.Command;
-import io.vertx.redis.client.Redis;
-import io.vertx.redis.client.RedisConnection;
-import io.vertx.redis.client.Request;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
+import io.vertx.redis.client.*;
+import org.junit.*;
 import org.junit.runner.RunWith;
+import org.testcontainers.containers.GenericContainer;
 
 import java.util.UUID;
 
-/**
- * This test relies on a Redis server, by default it will start and stop a Redis server unless
- * the <code>host</code> or <code>port</code> system property is specified. In this case the
- * test assumes an external database will be used.
- */
 @RunWith(VertxUnitRunner.class)
 public class RedisClientPubSubTest {
+
+  @ClassRule
+  public static final GenericContainer<?> redis = new GenericContainer<>("redis:7")
+    .withExposedPorts(6379);
 
   @Rule
   public final RunTestOnContext rule = new RunTestOnContext();
@@ -51,14 +45,14 @@ public class RedisClientPubSubTest {
   @Before
   public void before(TestContext should) {
     Async test = should.async();
-    redisPublish = Redis.createClient(rule.vertx(), "redis://localhost:7006");
+    redisPublish = Redis.createClient(rule.vertx(), new RedisOptions().setConnectionString("redis://" + redis.getHost() + ":" + redis.getFirstMappedPort()));
     redisPublish
       .connect().onComplete(connectPub -> {
         should.assertTrue(connectPub.succeeded());
 
         pubConn = connectPub.result();
 
-        redisSubscribe = Redis.createClient(rule.vertx(), "redis://localhost:7006");
+        redisSubscribe = Redis.createClient(rule.vertx(), new RedisOptions().setConnectionString("redis://" + redis.getHost() + ":" + redis.getFirstMappedPort()));
         redisSubscribe
           .connect().onComplete(connectSub -> {
             should.assertTrue(connectSub.succeeded());

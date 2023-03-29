@@ -357,7 +357,6 @@ class RedisConnectionManager {
     @Override
     public Future<Lease<RedisConnectionInternal>> requestConnection(ContextInternal ctx, long timeout) {
       PromiseInternal<Lease<RedisConnectionInternal>> promise = ctx.promise();
-      System.out.println("on context " + ctx);
       pool.acquire(ctx, 0, ar -> {
         if (ar.succeeded()) {
           // increment the reference counter to avoid the pool to be closed too soon
