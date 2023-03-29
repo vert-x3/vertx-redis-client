@@ -15,13 +15,10 @@
  */
 package io.vertx.redis.client;
 
-import io.vertx.codegen.annotations.Fluent;
 import io.vertx.codegen.annotations.GenIgnore;
 import io.vertx.codegen.annotations.Nullable;
 import io.vertx.codegen.annotations.VertxGen;
-import io.vertx.core.AsyncResult;
 import io.vertx.core.Future;
-import io.vertx.core.Handler;
 import io.vertx.redis.client.impl.RedisAPIImpl;
 
 import java.util.List;
@@ -46,17 +43,7 @@ public interface RedisAPI {
   }
 
   void close();
-
 {{#each .}}
-  /**
-   * Redis command <a href="https://redis.io/commands/{{ name }}">{{ camelcase safename }}</a>.
-   * @return fluent self
-   */
-  @Fluent
-  default RedisAPI {{ camelcase safename }}({{{ types }}}{{#if argLen}}, {{/if}}Handler<AsyncResult<@Nullable Response>> handler) {
-    send(Command.{{ enum }}{{#if argLen}}, {{{ args }}}{{#if variable}}.toArray(new String[0]){{/if}}{{/if}}).onComplete(handler);
-    return this;
-  }
 
   /**
    * Redis command <a href="https://redis.io/commands/{{ name }}">{{ camelcase safename }}</a>.

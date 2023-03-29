@@ -27,7 +27,7 @@ import io.vertx.redis.client.impl.keys.FindKeysRange;
  * <b>Auto generated</b> API Commands to interact with REDIS.
  *
  * @author <a href="mailto:plopes@redhat.com">Paulo Lopes</a>
- * @version redis_version:7.0.0
+ * @version redis_version:7.0.6
  */
 @VertxGen
 public interface Command {
@@ -37,6 +37,7 @@ public interface Command {
   Command ASKING = new CommandImpl("asking", 1, null, false, false);
   Command AUTH = new CommandImpl("auth", -2, null, false, false);
   Command BF_ADD = new CommandImpl("bf.add", -1, false, false, false, new KeyLocator(false, new BeginSearchIndex(1), new FindKeysRange(0, 1, 0)));
+  Command BF_CARD = new CommandImpl("bf.card", -1, true, false, false, new KeyLocator(false, new BeginSearchIndex(1), new FindKeysRange(0, 1, 0)));
   Command BF_DEBUG = new CommandImpl("bf.debug", -1, true, false, false, new KeyLocator(false, new BeginSearchIndex(1), new FindKeysRange(0, 1, 0)));
   Command BF_EXISTS = new CommandImpl("bf.exists", -1, true, false, false, new KeyLocator(false, new BeginSearchIndex(1), new FindKeysRange(0, 1, 0)));
   Command BF_INFO = new CommandImpl("bf.info", -1, true, false, false, new KeyLocator(false, new BeginSearchIndex(1), new FindKeysRange(0, 1, 0)));
@@ -96,8 +97,8 @@ public interface Command {
   Command ECHO = new CommandImpl("echo", 2, null, false, false);
   Command EVAL = new CommandImpl("eval", -3, null, false, false, new KeyLocator(false, new BeginSearchIndex(2), new FindKeysKeynum(0, 1, 1)));
   Command EVALSHA = new CommandImpl("evalsha", -3, null, false, false, new KeyLocator(false, new BeginSearchIndex(2), new FindKeysKeynum(0, 1, 1)));
-  Command EVALSHA_RO = new CommandImpl("evalsha_ro", -3, null, false, false, new KeyLocator(true, new BeginSearchIndex(2), new FindKeysKeynum(0, 1, 1)));
-  Command EVAL_RO = new CommandImpl("eval_ro", -3, null, false, false, new KeyLocator(true, new BeginSearchIndex(2), new FindKeysKeynum(0, 1, 1)));
+  Command EVALSHA_RO = new CommandImpl("evalsha_ro", -3, true, false, false, new KeyLocator(true, new BeginSearchIndex(2), new FindKeysKeynum(0, 1, 1)));
+  Command EVAL_RO = new CommandImpl("eval_ro", -3, true, false, false, new KeyLocator(true, new BeginSearchIndex(2), new FindKeysKeynum(0, 1, 1)));
   Command EXEC = new CommandImpl("exec", 1, null, false, false);
   Command EXISTS = new CommandImpl("exists", -2, true, false, false, new KeyLocator(true, new BeginSearchIndex(1), new FindKeysRange(-1, 1, 0)));
   Command EXPIRE = new CommandImpl("expire", -3, false, false, false, new KeyLocator(false, new BeginSearchIndex(1), new FindKeysRange(0, 1, 0)));
@@ -105,7 +106,7 @@ public interface Command {
   Command EXPIRETIME = new CommandImpl("expiretime", 2, true, false, false, new KeyLocator(true, new BeginSearchIndex(1), new FindKeysRange(0, 1, 0)));
   Command FAILOVER = new CommandImpl("failover", -1, null, false, false);
   Command FCALL = new CommandImpl("fcall", -3, null, false, false, new KeyLocator(false, new BeginSearchIndex(2), new FindKeysKeynum(0, 1, 1)));
-  Command FCALL_RO = new CommandImpl("fcall_ro", -3, null, false, false, new KeyLocator(true, new BeginSearchIndex(2), new FindKeysKeynum(0, 1, 1)));
+  Command FCALL_RO = new CommandImpl("fcall_ro", -3, true, false, false, new KeyLocator(true, new BeginSearchIndex(2), new FindKeysKeynum(0, 1, 1)));
   Command FLUSHALL = new CommandImpl("flushall", -1, false, false, false);
   Command FLUSHDB = new CommandImpl("flushdb", -1, false, false, false);
   Command FT_ADD = new CommandImpl("FT.ADD", -1, false, false, false, new KeyLocator(false, new BeginSearchIndex(1), new FindKeysRange(1, 1, 0)));
@@ -253,7 +254,7 @@ public interface Command {
   Command PEXPIRETIME = new CommandImpl("pexpiretime", 2, true, false, false, new KeyLocator(true, new BeginSearchIndex(1), new FindKeysRange(0, 1, 0)));
   Command PFADD = new CommandImpl("pfadd", -2, false, false, false, new KeyLocator(false, new BeginSearchIndex(1), new FindKeysRange(0, 1, 0)));
   Command PFCOUNT = new CommandImpl("pfcount", -2, true, false, false, new KeyLocator(false, new BeginSearchIndex(1), new FindKeysRange(-1, 1, 0)));
-  Command PFDEBUG = new CommandImpl("pfdebug", -3, false, false, false, new KeyLocator(false, new BeginSearchIndex(2), new FindKeysRange(0, 1, 0)));
+  Command PFDEBUG = new CommandImpl("pfdebug", 3, false, false, false, new KeyLocator(false, new BeginSearchIndex(2), new FindKeysRange(0, 1, 0)));
   Command PFMERGE = new CommandImpl("pfmerge", -2, false, false, false, new KeyLocator(false, new BeginSearchIndex(1), new FindKeysRange(0, 1, 0)), new KeyLocator(true, new BeginSearchIndex(2), new FindKeysRange(-1, 1, 0)));
   Command PFSELFTEST = new CommandImpl("pfselftest", 1, null, false, false);
   Command PING = new CommandImpl("ping", -1, null, false, false);
@@ -319,6 +320,20 @@ public interface Command {
   Command SUNSUBSCRIBE = new CommandImpl("sunsubscribe", -1, null, true, false, new KeyLocator(null, new BeginSearchIndex(1), new FindKeysRange(-1, 1, 0)));
   Command SWAPDB = new CommandImpl("swapdb", 3, false, false, false);
   Command SYNC = new CommandImpl("sync", 1, null, false, false);
+  Command TDIGEST_ADD = new CommandImpl("tdigest.add", -1, false, false, false, new KeyLocator(false, new BeginSearchIndex(1), new FindKeysRange(0, 1, 0)));
+  Command TDIGEST_BYRANK = new CommandImpl("tdigest.byrank", -1, true, false, false, new KeyLocator(false, new BeginSearchIndex(1), new FindKeysRange(0, 1, 0)));
+  Command TDIGEST_BYREVRANK = new CommandImpl("tdigest.byrevrank", -1, true, false, false, new KeyLocator(false, new BeginSearchIndex(1), new FindKeysRange(0, 1, 0)));
+  Command TDIGEST_CDF = new CommandImpl("tdigest.cdf", -1, true, false, false, new KeyLocator(false, new BeginSearchIndex(1), new FindKeysRange(0, 1, 0)));
+  Command TDIGEST_CREATE = new CommandImpl("tdigest.create", -1, false, false, false, new KeyLocator(false, new BeginSearchIndex(1), new FindKeysRange(0, 1, 0)));
+  Command TDIGEST_INFO = new CommandImpl("tdigest.info", -1, true, false, false, new KeyLocator(false, new BeginSearchIndex(1), new FindKeysRange(0, 1, 0)));
+  Command TDIGEST_MAX = new CommandImpl("tdigest.max", -1, true, false, false, new KeyLocator(false, new BeginSearchIndex(1), new FindKeysRange(0, 1, 0)));
+  Command TDIGEST_MERGE = new CommandImpl("tdigest.merge", -1, false, false, false, new KeyLocator(false, new BeginSearchIndex(1), new FindKeysRange(0, 1, 0)));
+  Command TDIGEST_MIN = new CommandImpl("tdigest.min", -1, true, false, false, new KeyLocator(false, new BeginSearchIndex(1), new FindKeysRange(0, 1, 0)));
+  Command TDIGEST_QUANTILE = new CommandImpl("tdigest.quantile", -1, true, false, false, new KeyLocator(false, new BeginSearchIndex(1), new FindKeysRange(0, 1, 0)));
+  Command TDIGEST_RANK = new CommandImpl("tdigest.rank", -1, true, false, false, new KeyLocator(false, new BeginSearchIndex(1), new FindKeysRange(0, 1, 0)));
+  Command TDIGEST_RESET = new CommandImpl("tdigest.reset", -1, false, false, false, new KeyLocator(false, new BeginSearchIndex(1), new FindKeysRange(0, 1, 0)));
+  Command TDIGEST_REVRANK = new CommandImpl("tdigest.revrank", -1, true, false, false, new KeyLocator(false, new BeginSearchIndex(1), new FindKeysRange(0, 1, 0)));
+  Command TDIGEST_TRIMMED_MEAN = new CommandImpl("tdigest.trimmed_mean", -1, true, false, false, new KeyLocator(false, new BeginSearchIndex(1), new FindKeysRange(0, 1, 0)));
   Command TIME = new CommandImpl("time", 1, null, false, false);
   Command TIMESERIES_CLUSTERSET = new CommandImpl("timeseries.CLUSTERSET", -1, true, false, false);
   Command TIMESERIES_CLUSTERSETFROMSHARD = new CommandImpl("timeseries.CLUSTERSETFROMSHARD", -1, true, false, false);
@@ -358,7 +373,7 @@ public interface Command {
   Command UNSUBSCRIBE = new CommandImpl("unsubscribe", -1, null, true, false);
   Command UNWATCH = new CommandImpl("unwatch", 1, null, false, false);
   Command WAIT = new CommandImpl("wait", 3, null, false, false);
-  Command WATCH = new CommandImpl("watch", -2, null, false, false, new KeyLocator(null, new BeginSearchIndex(1), new FindKeysRange(-1, 1, 0)));
+  Command WATCH = new CommandImpl("watch", -2, null, false, false, new KeyLocator(true, new BeginSearchIndex(1), new FindKeysRange(-1, 1, 0)));
   Command XACK = new CommandImpl("xack", -4, false, false, false, new KeyLocator(false, new BeginSearchIndex(1), new FindKeysRange(0, 1, 0)));
   Command XADD = new CommandImpl("xadd", -5, false, false, false, new KeyLocator(false, new BeginSearchIndex(1), new FindKeysRange(0, 1, 0)));
   Command XAUTOCLAIM = new CommandImpl("xautoclaim", -6, false, false, false, new KeyLocator(false, new BeginSearchIndex(1), new FindKeysRange(0, 1, 0)));

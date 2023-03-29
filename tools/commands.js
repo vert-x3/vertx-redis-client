@@ -63,7 +63,7 @@ redis.info((err, info) => {
       }
 
       commands.push({
-        enum: cmd[0].replace('-', '_').replace(':', '').toUpperCase(),
+        enum: cmd[0].replace('-', '_').replace(':', '').replace('.', '_').toUpperCase(),
         name: cmd[0],
         safename: cmd[0].replace('-', ' ').replace(':', '').toUpperCase(),
         arity: cmd[1],
