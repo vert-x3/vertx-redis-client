@@ -37,7 +37,7 @@ public abstract class BaseRedisClient implements Redis {
     final CommandImpl cmd = (CommandImpl) request.command();
     if (cmd.isPubSub()) {
       // mixing pubSub cannot be used on a one-shot operation
-      return Future.failedFuture("PubSub command in connection-less mode not allowed");
+      return vertx.getOrCreateContext().failedFuture("PubSub command in connection-less mode not allowed");
     }
 
     return connect()
@@ -53,7 +53,7 @@ public abstract class BaseRedisClient implements Redis {
   public Future<List<@Nullable Response>> batch(List<Request> requests) {
     if (requests.isEmpty()) {
       LOG.debug("Empty batch");
-      return Future.succeededFuture(Collections.emptyList());
+      return vertx.getOrCreateContext().succeededFuture(Collections.emptyList());
     } else {
       for (Request req : requests) {
         final CommandImpl cmd = (CommandImpl) req.command();

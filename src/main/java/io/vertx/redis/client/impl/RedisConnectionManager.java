@@ -42,7 +42,6 @@ class RedisConnectionManager {
   private static final Handler<Throwable> DEFAULT_EXCEPTION_HANDLER = t -> LOG.error("Unhandled Error", t);
 
   private final VertxInternal vertx;
-  private final ContextInternal context;
   private final NetClient netClient;
   private final PoolMetrics metrics;
 
@@ -52,7 +51,6 @@ class RedisConnectionManager {
 
   RedisConnectionManager(VertxInternal vertx, RedisOptions options) {
     this.vertx = vertx;
-    this.context = vertx.getOrCreateContext();
     this.options = options;
     VertxMetrics metricsSPI = this.vertx.metricsSPI();
     metrics = metricsSPI != null ? metricsSPI.createPoolMetrics("redis", options.getPoolName(), options.getMaxPoolSize()) : null;
@@ -311,7 +309,7 @@ class RedisConnectionManager {
   }
 
   public Future<RedisConnection> getConnection(String connectionString, Request setup) {
-    final Promise<Lease<RedisConnectionInternal>> promise = vertx.promise();
+    final ContextInternal context = vertx.getOrCreateContext();
     final EventLoopContext eventLoopContext;
     if (context instanceof EventLoopContext) {
       eventLoopContext = (EventLoopContext) context;
@@ -359,6 +357,7 @@ class RedisConnectionManager {
     @Override
     public Future<Lease<RedisConnectionInternal>> requestConnection(ContextInternal ctx, long timeout) {
       PromiseInternal<Lease<RedisConnectionInternal>> promise = ctx.promise();
+      System.out.println("on context " + ctx);
       pool.acquire(ctx, 0, ar -> {
         if (ar.succeeded()) {
           // increment the reference counter to avoid the pool to be closed too soon
