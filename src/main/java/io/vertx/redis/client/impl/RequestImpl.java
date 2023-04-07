@@ -22,10 +22,7 @@ import io.vertx.redis.client.Command;
 import io.vertx.redis.client.Request;
 
 import java.nio.charset.StandardCharsets;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
+import java.util.*;
 
 import static io.vertx.redis.client.impl.RESPEncoder.numToBytes;
 
@@ -201,5 +198,22 @@ public final class RequestImpl implements Request {
     } else {
       return -arity <= arglen;
     }
+  }
+
+  @Override
+  public boolean equals(Object o) {
+    if (this == o) {
+      return true;
+    }
+    if (o == null || getClass() != o.getClass()) {
+      return false;
+    }
+    RequestImpl request = (RequestImpl) o;
+    return Objects.equals(cmd, request.cmd) && Objects.equals(args, request.args);
+  }
+
+  @Override
+  public int hashCode() {
+    return Objects.hash(cmd, args);
   }
 }
