@@ -19,9 +19,7 @@ import io.vertx.redis.client.Command;
 import io.vertx.redis.client.impl.keys.KeyConsumer;
 
 import java.nio.charset.StandardCharsets;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
+import java.util.*;
 
 /**
  * Implementation of the command metadata
@@ -138,5 +136,23 @@ public class CommandImpl implements Command {
   @Override
   public String toString() {
     return command;
+  }
+
+  @Override
+  public boolean equals(Object o) {
+    if (this == o) {
+      return true;
+    }
+    if (o == null || getClass() != o.getClass()) {
+      return false;
+    }
+    CommandImpl command1 = (CommandImpl) o;
+    // the command itself must be unique, the remaining properties are not relevant as they are metadata for the command
+    return Objects.equals(command, command1.command);
+  }
+
+  @Override
+  public int hashCode() {
+    return Objects.hash(command);
   }
 }
