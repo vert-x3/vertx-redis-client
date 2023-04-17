@@ -46,6 +46,7 @@ public class RedisOptions {
   private RedisRole role;
   private RedisReplicas useReplicas;
   private volatile String password;
+  private RedisCredentialsProvider credentialsProvider;
   private boolean protocolNegotiation;
 
   // pool related options
@@ -104,6 +105,7 @@ public class RedisOptions {
     this.maxPoolWaiting = other.maxPoolWaiting;
     this.poolRecycleTimeout = other.poolRecycleTimeout;
     this.password = other.password;
+    this.credentialsProvider = other.credentialsProvider;
     this.protocolNegotiation = other.protocolNegotiation;
   }
 
@@ -484,6 +486,26 @@ public class RedisOptions {
    */
   public RedisOptions setPassword(String password) {
     this.password = password;
+    return this;
+  }
+
+  /**
+   * Get the credentials provider for cluster/sentinel connections. If not set it will return <code>null</code>.
+   *
+   * @return credentials provider
+   */
+  public RedisCredentialsProvider getCredentialsProvider() {
+    return credentialsProvider;
+  }
+
+  /**
+   * Set the credentials provider for cluster/sentinel connections.
+   *
+   * @param credentialsProvider the credentials provider to use
+   * @return fluent self
+   */
+  public RedisOptions setCredentialsProvider(final RedisCredentialsProvider credentialsProvider) {
+    this.credentialsProvider = credentialsProvider;
     return this;
   }
 

@@ -457,15 +457,26 @@ public class RedisClusterConnection implements RedisConnection {
           return;
         }
 
-        if (cause.is("NOAUTH") && options.getPassword() != null) {
-          // try to authenticate
-          connection.send(cmd(AUTH).arg(options.getPassword()), auth -> {
-            if (auth.failed()) {
-              handler.handle(Future.failedFuture(auth.cause()));
+        if (cause.is("NOAUTH") && isPasswordProvided()) {
+          // credentials provider
+          resolveCredentials(options.getCredentialsProvider()).onComplete(credentialsResult -> {
+            if (credentialsResult.failed()) {
+              handler.handle(Future.failedFuture(credentialsResult.cause()));
               return;
             }
-            // again
-            batch(endpoint, retries - 1, commands, handler);
+
+            final RedisCredentials credentials = credentialsResult.result();
+
+            // try to authenticate
+            connection.send(cmd(AUTH).arg(credentials.getPassword() != null ? credentials.getPassword() :
+                    options.getPassword()), auth -> {
+              if (auth.failed()) {
+                handler.handle(Future.failedFuture(auth.cause()));
+                return;
+              }
+              // again
+              batch(endpoint, retries - 1, commands, handler);
+            });
           });
           return;
         }
@@ -477,6 +488,20 @@ public class RedisClusterConnection implements RedisConnection {
         LOG.error("Handler failure", e);
       }
     });
+  }
+
+  private boolean isPasswordProvided() {
+    return options.getCredentialsProvider() != null || options.getPassword() != null;
+  }
+
+  private Future<RedisCredentials> resolveCredentials(final RedisCredentialsProvider credentialsProvider) {
+    if (credentialsProvider != null) {
+      return credentialsProvider.resolveCredentials();
+    } else {
+      final Promise<RedisCredentials> promise = vertx.promise();
+      promise.complete(RedisCredentials.createEmptyCredentials());
+      return promise.future();
+    }
   }
 
   @Override
