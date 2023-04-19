@@ -151,7 +151,6 @@ public class RedisExamples {
             .connect()
             .onSuccess(conn -> {
               client = conn;
-              client.close();
 
               // make sure the client is reconnected on error
               // eg, the underlying TCP connection is closed but the client side doesn't know it yet
