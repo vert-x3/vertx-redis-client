@@ -334,4 +334,53 @@ public class RedisTest {
       })
       .onSuccess(responses -> should.fail("Commands are wrong"));
   }
+
+  @Test
+  public void testEvalLua(TestContext should) {
+    final String lua = "return ARGV[2]";
+    final Async test = should.async();
+
+    Redis
+      .createClient(rule.vertx(),
+        new RedisOptions().setConnectionString("redis://" + redis.getHost() + ":" + redis.getFirstMappedPort()))
+      .connect().onComplete(create -> {
+        should.assertTrue(create.succeeded());
+
+        RedisAPI redis = RedisAPI.api(create.result());
+
+        redis.evalLua(Arrays.asList(lua, "0", "hello", "world")).onComplete(should.asyncAssertSuccess(r -> {
+          should.assertNotNull(r);
+          should.assertEquals("world", r.toString());
+          test.complete();
+        }));
+      });
+  }
+
+  @Test
+  public void testEvalLua2(TestContext should) {
+    final String script = "return ARGV[3]";
+    final int numKeys = 1;
+    final List<String> keys = Arrays.asList("hello");
+    final List<String> args = Arrays.asList("1", "22", "333");
+    final Async test = should.async();
+
+    Redis
+      .createClient(rule.vertx(),
+        new RedisOptions().setConnectionString("redis://" + redis.getHost() + ":" + redis.getFirstMappedPort()))
+      .connect().onComplete(create -> {
+        should.assertTrue(create.succeeded());
+
+        RedisAPI redis = RedisAPI.api(create.result());
+
+        redis.script(Arrays.asList("flush"))
+          .compose(_resp -> redis.evalLua(script, numKeys, keys, args))
+          .compose(_resp -> redis.script(Arrays.asList("flush")))
+          .compose(_resp -> redis.evalLua(script, numKeys, keys, args))
+          .onComplete(should.asyncAssertSuccess(r -> {
+            should.assertNotNull(r);
+            should.assertEquals("333", r.toString());
+            test.complete();
+        }));
+      });
+  }
 }
