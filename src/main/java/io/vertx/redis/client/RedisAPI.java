@@ -20,7 +20,9 @@ import io.vertx.codegen.annotations.Nullable;
 import io.vertx.codegen.annotations.VertxGen;
 import io.vertx.core.Future;
 import io.vertx.redis.client.impl.RedisAPIImpl;
+import io.vertx.redis.client.util.Hash;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import static io.vertx.codegen.annotations.GenIgnore.PERMITTED_TYPE;
@@ -3165,4 +3167,69 @@ public interface RedisAPI {
    */
   @GenIgnore
   Future<@Nullable Response> send(Command cmd, String... args);
+
+  /**
+   * Run redis command with same arguments as eval but will try evalsha first,
+   * if evalsha failed with `NOSCRIPT` error, will retry with the script, so
+   * the next try evalsha will success as script has already been cached.
+   *
+   * @return Future response.
+   */
+  default Future<Response> evalLua(List<String> args) {
+    List<String> shaArgs = new ArrayList<>(args);
+    shaArgs.set(0, Hash.sha1(shaArgs.get(0)));
+
+    return evalsha(shaArgs)
+      .compose(
+        // directly use result when succeeded
+        result -> Future.succeededFuture(result),
+        t -> {
+          // load script and try ONCE again when failed cause script missing
+          if (t.getMessage().startsWith("NOSCRIPT")) {
+            // directly eval script and then script will be cached in redis, so
+            // evalhash will success next time
+            return eval(args);
+          }
+
+          // fail when failed cause not script missing
+          return Future.failedFuture(t);
+        });
+  }
+
+  /**
+   * evalLua with a specified luaScript argument.
+   */
+  default Future<Response> evalLua(String luaScript, List<String> args) {
+    List<String> newArgs = new ArrayList<>(args.size() + 1);
+
+    newArgs.add(luaScript);
+    newArgs.addAll(args);
+
+    return evalLua(newArgs);
+  }
+
+  /**
+   * evalLua with a specified arguments and with checking on them.
+   */
+  default Future<Response> evalLua(String luaScript, int numkeys, List<String> keys, List<String> args) {
+    List<String> allArgs = new ArrayList<>();
+
+    allArgs.add(luaScript);
+    allArgs.add(String.valueOf(numkeys));
+
+    if ((keys == null && numkeys != 0) || (keys != null && keys.size() != numkeys)) {
+      throw new IllegalArgumentException(
+        "numkeys " + numkeys + " and keys " + keys + " are not match");
+    }
+
+    if (keys != null && keys.size() != 0) {
+      allArgs.addAll(keys);
+    }
+
+    if (args != null && args.size() != 0) {
+      allArgs.addAll(args);
+    }
+
+    return evalLua(allArgs);
+  }
 }
