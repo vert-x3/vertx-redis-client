@@ -3220,8 +3220,12 @@ public interface RedisAPI {
     LuaScript luaScript = new LuaScript(lua, numkeys);
 
     List<String> allArgs = new ArrayList<>();
-    allArgs.addAll(keys);
-    allArgs.addAll(args);
+    if (keys != null && keys.size() != 0) {
+      allArgs.addAll(keys);
+    }
+    if (args != null && args.size() != 0) {
+      allArgs.addAll(args);
+    }
 
     return evalLua(luaScript, allArgs);
   }
