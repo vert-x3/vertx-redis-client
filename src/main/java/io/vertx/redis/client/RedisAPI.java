@@ -3185,10 +3185,9 @@ public interface RedisAPI {
    */
   @GenIgnore
   default Future<Response> evalLua(LuaScript luaScript, List<String> args) {
-    // pass empty args if no args to avoid null check on args
-    List<String> redisArgs = new ArrayList<>(args.size() + 2);
+    // pass empty args if no args, no null check
+    List<String> redisArgs = new ArrayList<>(args.size() + 1);
     redisArgs.add(luaScript.getSha());
-    redisArgs.add(luaScript.getNumKeys());
     redisArgs.addAll(args);
 
     return evalsha(redisArgs)
@@ -3214,15 +3213,30 @@ public interface RedisAPI {
    *
    * NOTE: prefer to define a static variable with type of LuaScript and use the
    * `evalLua(LuaScript, List)`, with this method, sha will always be computed.
+   *
+   * @param lua  string of lua script
+   * @param keys list of keys, size of keys will be numkeys argument
+   * @param args list of args
+   * @return Future response.
    */
   @GenIgnore
-  default Future<Response> evalLua(String lua, int numkeys, List<String> keys, List<String> args) {
-    LuaScript luaScript = new LuaScript(lua, numkeys);
+  default Future<Response> evalLua(String lua, List<String> keys, List<String> args) {
+    LuaScript luaScript = new LuaScript(lua);
 
     List<String> allArgs = new ArrayList<>();
-    if (keys != null && keys.size() != 0) {
+
+    int numKeys;
+    if (keys != null) {
+      numKeys = keys.size();
+    } else {
+      numKeys = 0;
+    }
+    allArgs.add(String.valueOf(numKeys));
+
+    if (numKeys != 0) {
       allArgs.addAll(keys);
     }
+
     if (args != null && args.size() != 0) {
       allArgs.addAll(args);
     }
@@ -3235,9 +3249,15 @@ public interface RedisAPI {
    *
    * NOTE: prefer to define a static variable with type of LuaScript and use the
    * `evalLua(LuaScript, List)`, with this method, sha will always be computed.
+   *
+   * @param numkeys, keys, args. If args is empty, a numkeys = 0 will add by default
+   * @return Future response.
    */
   @GenIgnore
-  default Future<Response> evalLua(String lua, int numkeys, String... args) {
-    return evalLua(new LuaScript(lua, numkeys), Arrays.asList(args));
+  default Future<Response> evalLua(String lua, String... args) {
+    if (args.length == 0) {
+      return evalLua(new LuaScript(lua), Arrays.asList("0"));
+    }
+    return evalLua(new LuaScript(lua), Arrays.asList(args));
   }
 }

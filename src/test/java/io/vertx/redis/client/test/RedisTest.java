@@ -348,7 +348,7 @@ public class RedisTest {
 
         RedisAPI redis = RedisAPI.api(create.result());
 
-          redis.evalLua(lua, 0, "hello", "world").onComplete(should.asyncAssertSuccess(r -> {
+          redis.evalLua(lua, "0", "hello", "world").onComplete(should.asyncAssertSuccess(r -> {
           should.assertNotNull(r);
           should.assertEquals("world", r.toString());
           test.complete();
@@ -359,7 +359,6 @@ public class RedisTest {
   @Test
   public void testEvalLua2(TestContext should) {
     final String script = "return ARGV[3]";
-    final int numKeys = 1;
     final List<String> keys = Arrays.asList("hello");
     final List<String> args = Arrays.asList("1", "22", "333");
     final Async test = should.async();
@@ -373,9 +372,9 @@ public class RedisTest {
         RedisAPI redis = RedisAPI.api(create.result());
 
         redis.script(Arrays.asList("flush"))
-          .compose(_resp -> redis.evalLua(script, numKeys, keys, args))
+          .compose(_resp -> redis.evalLua(script, keys, args))
           .compose(_resp -> redis.script(Arrays.asList("flush")))
-          .compose(_resp -> redis.evalLua(script, numKeys, keys, args))
+          .compose(_resp -> redis.evalLua(script, keys, args))
           .onComplete(should.asyncAssertSuccess(r -> {
             should.assertNotNull(r);
             should.assertEquals("333", r.toString());

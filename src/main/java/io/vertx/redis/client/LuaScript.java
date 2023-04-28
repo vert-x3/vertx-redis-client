@@ -20,7 +20,7 @@ import io.vertx.redis.client.util.Hash;
 /**
  * LuaScript
  *
- * Lua script with pre-computed sha hash.
+ * <p>Lua script with pre-computed sha hash.
  */
 public class LuaScript {
 
@@ -30,13 +30,9 @@ public class LuaScript {
   // pre-computed sha
   private final String sha;
 
-  // pre-converted string of num of keys
-  private final String numKeys;
-
-  public LuaScript(String lua, int numKeys) {
+  public LuaScript(String lua) {
     this.lua = lua;
     this.sha = Hash.sha1(lua);
-    this.numKeys = String.valueOf(numKeys);
   }
 
   /**
@@ -51,12 +47,5 @@ public class LuaScript {
    */
   public String getSha() {
     return sha;
-  }
-
-  /**
-   * @return the numKeys
-   */
-  public String getNumKeys() {
-    return numKeys;
   }
 }
