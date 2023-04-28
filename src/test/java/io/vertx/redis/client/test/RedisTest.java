@@ -348,7 +348,7 @@ public class RedisTest {
 
         RedisAPI redis = RedisAPI.api(create.result());
 
-        redis.evalLua(Arrays.asList(lua, "0", "hello", "world")).onComplete(should.asyncAssertSuccess(r -> {
+          redis.evalLua(lua, 0, "hello", "world").onComplete(should.asyncAssertSuccess(r -> {
           should.assertNotNull(r);
           should.assertEquals("world", r.toString());
           test.complete();
