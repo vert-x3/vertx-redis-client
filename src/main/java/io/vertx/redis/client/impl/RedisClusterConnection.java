@@ -135,7 +135,7 @@ public class RedisClusterConnection implements RedisConnection {
       case 0:
         // can run anywhere
         if (REDUCERS.containsKey(cmd)) {
-          final List<Future> responses = new ArrayList<>(slots.size());
+          final List<Future<Response>> responses = new ArrayList<>(slots.size());
 
           for (int i = 0; i < slots.size(); i++) {
             String[] endpoints = slots.endpointsForSlot(i);
@@ -191,7 +191,7 @@ public class RedisClusterConnection implements RedisConnection {
                 return promise.future();
               }
 
-              final List<Future> responses = new ArrayList<>(requests.size());
+              final List<Future<Response>> responses = new ArrayList<>(requests.size());
 
               for (Map.Entry<Integer, Request> kv : requests.entrySet()) {
                 final Promise<Response> p = vertx.promise();
@@ -481,7 +481,7 @@ public class RedisClusterConnection implements RedisConnection {
 
   @Override
   public Future<Void> close() {
-    List<Future> futures = new ArrayList<>();
+    List<Future<Void>> futures = new ArrayList<>();
     for (RedisConnection conn : connections.values()) {
       if (conn != null) {
         futures.add(conn.close());

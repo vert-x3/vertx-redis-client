@@ -148,7 +148,7 @@ public class RedisReplicationConnection implements RedisConnection {
 
   @Override
   public Future<Void> close() {
-    List<Future> futures = new ArrayList<>();
+    List<Future<Void>> futures = new ArrayList<>();
 
     futures.add(master.close());
 

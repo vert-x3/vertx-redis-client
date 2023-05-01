@@ -207,7 +207,7 @@ public class RedisTest {
         final RedisAPI redisApi = RedisAPI.api(redis);
 
         AtomicInteger cnt = new AtomicInteger();
-        List<Future> futures = new ArrayList<>();
+        List<Future<Response>> futures = new ArrayList<>();
         IntStream.range(0, 100).forEach(i -> {
           Promise<Response> p = Promise.promise();
           vertx.setTimer(1, timerid -> redisApi.set(Arrays.asList("foo-" + i, "bar")).onComplete(p));

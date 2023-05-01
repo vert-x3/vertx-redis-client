@@ -286,7 +286,7 @@ public class RedisClusterTest {
       .setMaxPoolSize(8)
       .setMaxPoolWaiting(16);
 
-    List<Future> futures = new ArrayList<>(24);
+    List<Future<RedisConnection>> futures = new ArrayList<>(24);
 
     for (int i = 0; i < 24; i++) {
       futures.add(Redis.createClient(rule.vertx(), options).connect());
