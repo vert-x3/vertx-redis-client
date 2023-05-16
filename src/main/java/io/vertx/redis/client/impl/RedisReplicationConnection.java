@@ -1,7 +1,6 @@
 package io.vertx.redis.client.impl;
 
 import io.vertx.codegen.annotations.Nullable;
-import io.vertx.core.CompositeFuture;
 import io.vertx.core.Future;
 import io.vertx.core.Handler;
 import io.vertx.core.Vertx;
@@ -158,7 +157,7 @@ public class RedisReplicationConnection implements RedisConnection {
       }
     }
 
-    return CompositeFuture
+    return Future
       .all(futures)
       .mapEmpty();
   }

@@ -145,7 +145,7 @@ public class RedisClusterConnection implements RedisConnection {
             responses.add(p.future());
           }
 
-          CompositeFuture.all(responses).onComplete(composite -> {
+          Future.all(responses).onComplete(composite -> {
             if (composite.failed()) {
               // means if one of the operations failed, then we can fail the handler
               promise.fail(composite.cause());
@@ -199,7 +199,7 @@ public class RedisClusterConnection implements RedisConnection {
                 responses.add(p.future());
               }
 
-              CompositeFuture.all(responses).onComplete(composite -> {
+              Future.all(responses).onComplete(composite -> {
                 if (composite.failed()) {
                   // means if one of the operations failed, then we can fail the handler
                   promise.fail(composite.cause());
@@ -488,7 +488,7 @@ public class RedisClusterConnection implements RedisConnection {
       }
     }
 
-    return CompositeFuture.all(futures)
+    return Future.all(futures)
       .mapEmpty();
   }
 

@@ -1,6 +1,5 @@
 package io.vertx.redis.client.test;
 
-import io.vertx.core.CompositeFuture;
 import io.vertx.core.Future;
 import io.vertx.core.Promise;
 import io.vertx.core.Vertx;
@@ -214,7 +213,7 @@ public class RedisTest {
           futures.add(p.future());
         });
 
-        CompositeFuture.all(futures)
+        Future.all(futures)
           .onFailure(f -> {
             should.assertEquals("Redis waiting Queue is full", f.getMessage());
             test.complete();

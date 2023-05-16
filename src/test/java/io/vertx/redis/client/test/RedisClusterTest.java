@@ -1,6 +1,5 @@
 package io.vertx.redis.client.test;
 
-import io.vertx.core.CompositeFuture;
 import io.vertx.core.Context;
 import io.vertx.core.Future;
 import io.vertx.core.buffer.Buffer;
@@ -293,7 +292,7 @@ public class RedisClusterTest {
     }
 
 
-    CompositeFuture.all(futures).onComplete(all -> {
+    Future.all(futures).onComplete(all -> {
       should.assertFalse(all.failed());
 
       final Random rnd = new Random();
