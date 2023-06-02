@@ -12,9 +12,11 @@ import io.vertx.ext.unit.junit.RunTestOnContext;
 import io.vertx.ext.unit.junit.VertxUnitRunner;
 import io.vertx.redis.client.*;
 import io.vertx.test.fakemetrics.FakePoolMetrics;
+import org.junit.ClassRule;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.testcontainers.containers.GenericContainer;
 
 import java.util.*;
 import java.util.concurrent.atomic.AtomicReference;
@@ -50,6 +52,10 @@ public class RedisMetricsTest {
   @Rule
   public final RunTestOnContext rule = new RunTestOnContext(getOptions());
 
+  @ClassRule
+  public static final GenericContainer<?> redis = new GenericContainer<>("redis:7")
+    .withExposedPorts(6379);
+
   private FakePoolMetrics getMetrics() {
     return (FakePoolMetrics) FakePoolMetrics.getPoolMetrics().get(POOL_NAME.get());
   }
@@ -58,7 +64,7 @@ public class RedisMetricsTest {
   public void simpleTest(TestContext should) {
     final Async test = should.async();
 
-    Redis client = Redis.createClient(rule.vertx(), "redis://localhost:7006");
+    Redis client = Redis.createClient(rule.vertx(), new RedisOptions().setConnectionString("redis://" + redis.getHost() + ":" + redis.getFirstMappedPort()));
 
     client
       .connect(create -> {
@@ -96,7 +102,7 @@ public class RedisMetricsTest {
 
     Map<String, PoolMetrics> metricsMap = FakePoolMetrics.getPoolMetrics();
     should.assertEquals(Collections.emptySet(), metricsMap.keySet());
-    Redis client = Redis.createClient(rule.vertx(), "redis://localhost:7006");
+    Redis client = Redis.createClient(rule.vertx(), new RedisOptions().setConnectionString("redis://" + redis.getHost() + ":" + redis.getFirstMappedPort()));
     should.assertEquals(1, metricsMap.size());
     client.connect()
       .onFailure(should::fail)
