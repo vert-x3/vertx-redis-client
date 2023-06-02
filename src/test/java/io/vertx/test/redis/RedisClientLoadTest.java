@@ -109,7 +109,6 @@ public class RedisClientLoadTest {
               }
 
               if (countOfErrors.get() + countOfSuccess.get() >= iterations * instances) {
-                System.out.println("!!!DONE");
                 donePromise.complete();
               }
             });
@@ -160,7 +159,6 @@ public class RedisClientLoadTest {
                 }
 
                 if (countOfErrors.get() + countOfSuccess.get() >= iterations * instances) {
-                  System.out.println("!!!DONE");
                   donePromise.complete();
                 }
               });
@@ -217,7 +215,6 @@ public class RedisClientLoadTest {
                 }
 
                 if (countOfErrors.get() + countOfSuccess.get() >= iterations * instances) {
-                  System.out.println("!!!DONE");
                   donePromise.complete();
                 }
               });
