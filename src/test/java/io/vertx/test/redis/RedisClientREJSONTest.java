@@ -55,14 +55,14 @@ public class RedisClientREJSONTest {
       .send(cmd(Command.create("JSON.SET")).arg("foo").arg(".").arg("\"bar\""))
       .compose(response -> {
         // OK
-        return client.send(cmd(Command.create("JSON.GET")).arg("foo"));
-      })
-      .compose(response -> {
-        should.assertEquals("\"bar\"", response.toString());
         return client.send(cmd(Command.create("JSON.TYPE")).arg("foo").arg("."));
       })
       .compose(response -> {
         should.assertEquals("string", response.toString());
+        return client.send(cmd(Command.create("JSON.GET")).arg("foo"));
+      })
+      .compose(response -> {
+        should.assertEquals("\"bar\"", response.toString());
         return Future.succeededFuture();
       })
       .onFailure(should::fail)
