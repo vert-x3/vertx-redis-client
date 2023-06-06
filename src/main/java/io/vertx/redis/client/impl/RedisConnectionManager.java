@@ -15,10 +15,8 @@
  */
 package io.vertx.redis.client.impl;
 
-import io.vertx.core.AsyncResult;
 import io.vertx.core.Future;
 import io.vertx.core.Handler;
-import io.vertx.core.Promise;
 import io.vertx.core.impl.ContextInternal;
 import io.vertx.core.impl.EventLoopContext;
 import io.vertx.core.impl.VertxInternal;
@@ -55,10 +53,10 @@ class RedisConnectionManager {
     VertxMetrics metricsSPI = this.vertx.metricsSPI();
     metrics = metricsSPI != null ? metricsSPI.createPoolMetrics("redis", options.getPoolName(), options.getMaxPoolSize()) : null;
     this.netClient = vertx.createNetClient(options.getNetClientOptions());
-    this.pooledConnectionManager = new ConnectionManager<>();
+    this.pooledConnectionManager = new ConnectionManager<>((key, dispose) -> connectionEndpointProvider(dispose, key.string, key.setup));
   }
 
-  private Endpoint<Lease<RedisConnectionInternal>> connectionEndpointProvider(ContextInternal ctx, Runnable dispose, String connectionString, Request setup) {
+  private Endpoint<Lease<RedisConnectionInternal>> connectionEndpointProvider(Runnable dispose, String connectionString, Request setup) {
     return new RedisEndpoint(vertx, netClient, options, dispose, connectionString, setup);
   }
 
@@ -320,7 +318,7 @@ class RedisConnectionManager {
     final boolean metricsEnabled = metrics != null;
     final Object queueMetric = metricsEnabled ? metrics.submitted() : null;
 
-    Future<Lease<RedisConnectionInternal>> future = pooledConnectionManager.getConnection(eventLoopContext, new ConnectionKey(connectionString, setup), (ctx, dispose) -> connectionEndpointProvider(ctx, dispose, connectionString, setup));
+    Future<Lease<RedisConnectionInternal>> future = pooledConnectionManager.getConnection(eventLoopContext, new ConnectionKey(connectionString, setup));
     return future
       .onFailure(err -> {
         if (metricsEnabled) {
