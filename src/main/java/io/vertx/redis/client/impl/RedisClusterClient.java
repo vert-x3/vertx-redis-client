@@ -132,16 +132,17 @@ public class RedisClusterClient extends BaseRedisClient implements Redis {
 
   @Override
   public Future<RedisConnection> connect() {
-    final Promise<RedisConnection> promise = vertx.promise();
-    // attempt to load the slots from the first good endpoint
-    connect(0, promise);
-    return promise.future();
+    return mutableOptions.get().flatMap(options -> {
+      final Promise<RedisConnection> promise = vertx.promise();
+      // attempt to load the slots from the first good endpoint
+      connect(options.getEndpoints(), 0, promise);
+      return promise.future();
+    });
   }
 
-  private void connect(int index, Handler<AsyncResult<RedisConnection>> onConnect) {
+  private void connect(List<String> endpoints, int index, Handler<AsyncResult<RedisConnection>> onConnect) {
     mutableOptions.get().flatMap(options -> {
 
-      List<String> endpoints = options.getEndpoints();
       if (index >= endpoints.size()) {
         // stop condition
         onConnect.handle(Future.failedFuture("Cannot connect to any of the provided endpoints"));
@@ -151,7 +152,7 @@ public class RedisClusterClient extends BaseRedisClient implements Redis {
       return connectionManager.getConnection(endpoints.get(index), RedisReplicas.NEVER != options.getUseReplicas() ? cmd(READONLY) : null)
         .onFailure(err -> {
           // failed try with the next endpoint
-          connect(index + 1, onConnect);
+          connect(endpoints, index + 1, onConnect);
         })
         .onSuccess(conn -> {
           // fetch slots from the cluster immediately to ensure slots are correct
@@ -160,7 +161,7 @@ public class RedisClusterClient extends BaseRedisClient implements Redis {
               // the slots command failed.
               conn.close().onFailure(LOG::warn);
               // try with the next one
-              connect(index + 1, onConnect);
+              connect(endpoints, index + 1, onConnect);
               return;
             }
 
