@@ -27,7 +27,7 @@ public abstract class BaseRedisClient implements Redis {
     this.immutableOptions = options;
     this.mutableOptions = mutableOptions;
     this.vertx = (VertxInternal) vertx;
-    this.connectionManager = new RedisConnectionManager(this.vertx, options);
+    this.connectionManager = new RedisConnectionManager(this.vertx, options, mutableOptions);
     this.connectionManager.start();
   }
 

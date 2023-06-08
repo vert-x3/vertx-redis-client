@@ -150,7 +150,7 @@ public class RedisReplicationClient extends BaseRedisClient implements Redis {
               LOG.info("Skipping offline node: " + node.ip);
               if (counter.incrementAndGet() == nodes.size()) {
                 onConnect.handle(Future.succeededFuture(
-                  new RedisReplicationConnection(vertx, immutableOptions, mutableOptions, conn, connections))
+                  new RedisReplicationConnection(vertx, mutableOptions, conn, connections))
                 );
               }
               continue;
@@ -162,7 +162,7 @@ public class RedisReplicationClient extends BaseRedisClient implements Redis {
                 LOG.warn("Skipping failed node: " + node.ip, err);
                 if (counter.incrementAndGet() == nodes.size()) {
                   onConnect.handle(Future.succeededFuture(
-                    new RedisReplicationConnection(vertx, immutableOptions, mutableOptions, conn, connections))
+                    new RedisReplicationConnection(vertx, mutableOptions, conn, connections))
                   );
                 }
               })
@@ -175,7 +175,7 @@ public class RedisReplicationClient extends BaseRedisClient implements Redis {
                 }
                 if (counter.incrementAndGet() == nodes.size()) {
                   onConnect.handle(Future.succeededFuture(
-                    new RedisReplicationConnection(vertx, immutableOptions, mutableOptions, conn, connections))
+                    new RedisReplicationConnection(vertx, mutableOptions, conn, connections))
                   );
                 }
               });

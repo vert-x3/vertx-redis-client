@@ -35,8 +35,6 @@ public class RedisOptions extends MutableRedisOptions {
   private RedisClientType type;
   private NetClientOptions netClientOptions;
 
-  private RedisReplicas useReplicas;
-
   // pool related options
   private String poolName;
   private int poolCleanerInterval;
@@ -51,7 +49,6 @@ public class RedisOptions extends MutableRedisOptions {
         .setTcpNoDelay(true);
 
     type = RedisClientType.STANDALONE;
-    useReplicas = RedisReplicas.NEVER;
     poolName = UUID.randomUUID().toString();
     // thumb guess based on web browser defaults
     poolCleanerInterval = 30_000;
@@ -131,26 +128,6 @@ public class RedisOptions extends MutableRedisOptions {
    */
   public RedisOptions setNetClientOptions(NetClientOptions netClientOptions) {
     this.netClientOptions = netClientOptions;
-    return this;
-  }
-
-  /**
-   * Get whether or not to use replica nodes (only considered in Cluster mode).
-   *
-   * @return the cluster replica node use mode.
-   */
-  public RedisReplicas getUseReplicas() {
-    return useReplicas;
-  }
-
-  /**
-   * Set whether or not to use replica nodes (only considered in Cluster mode).
-   *
-   * @param useReplicas the cluster replica use mode.
-   * @return fluent self.
-   */
-  public RedisOptions setUseReplicas(RedisReplicas useReplicas) {
-    this.useReplicas = useReplicas;
     return this;
   }
 
@@ -276,76 +253,83 @@ public class RedisOptions extends MutableRedisOptions {
    * {@inheritDoc}
    */
   public RedisOptions setEndpoints(List<String> endpoints) {
-    return (RedisOptions)super.setEndpoints(endpoints);
+    return (RedisOptions) super.setEndpoints(endpoints);
   }
 
   /**
    * {@inheritDoc}
    */
   public RedisOptions addEndpoint(String connectionString) {
-    return (RedisOptions)super.addEndpoint(connectionString);
+    return (RedisOptions) super.addEndpoint(connectionString);
   }
 
   /**
    * {@inheritDoc}
    */
   public RedisOptions setEndpoint(String connectionString) {
-    return (RedisOptions)super.setEndpoint(connectionString);
+    return (RedisOptions) super.setEndpoint(connectionString);
   }
 
   /**
    * {@inheritDoc}
    */
   public RedisOptions addConnectionString(String connectionString) {
-    return (RedisOptions)super.addConnectionString(connectionString);
+    return (RedisOptions) super.addConnectionString(connectionString);
   }
 
   /**
    * {@inheritDoc}
    */
   public RedisOptions setConnectionString(String connectionString) {
-    return (RedisOptions)super.setConnectionString(connectionString);
+    return (RedisOptions) super.setConnectionString(connectionString);
   }
 
   /**
    * {@inheritDoc}
    */
   public RedisOptions setMaxWaitingHandlers(int maxWaitingHandlers) {
-    return (RedisOptions)super.setMaxWaitingHandlers(maxWaitingHandlers);
+    return (RedisOptions) super.setMaxWaitingHandlers(maxWaitingHandlers);
   }
 
   /**
    * {@inheritDoc}
    */
   public RedisOptions setMasterName(String masterName) {
-    return (RedisOptions)super.setMasterName(masterName);
+    return (RedisOptions) super.setMasterName(masterName);
   }
 
   /**
    * {@inheritDoc}
    */
   public RedisOptions setRole(RedisRole role) {
-    return (RedisOptions)super.setRole(role);
+    return (RedisOptions) super.setRole(role);
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  public RedisOptions setUseReplicas(RedisReplicas useReplicas) {
+    return (RedisOptions) super.setUseReplicas(useReplicas);
   }
 
   /**
    * {@inheritDoc}
    */
   public RedisOptions setMaxNestedArrays(int maxNestedArrays) {
-    return (RedisOptions)super.setMaxNestedArrays(maxNestedArrays);
+    return (RedisOptions) super.setMaxNestedArrays(maxNestedArrays);
   }
 
   /**
    * {@inheritDoc}
    */
   public RedisOptions setPassword(String password) {
-    return (RedisOptions)super.setPassword(password);
+    return (RedisOptions) super.setPassword(password);
   }
 
   /**
    * {@inheritDoc}
    */
   public RedisOptions setProtocolNegotiation(boolean protocolNegotiation) {
-    return (RedisOptions)super.setProtocolNegotiation(protocolNegotiation);
+    return (RedisOptions) super.setProtocolNegotiation(protocolNegotiation);
   }
 }

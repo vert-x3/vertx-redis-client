@@ -31,6 +31,8 @@ public class MutableRedisOptions {
   private int maxNestedArrays;
   private String masterName;
   private RedisRole role;
+  private String user;
+  private RedisReplicas useReplicas;
   private volatile String password;
   private boolean protocolNegotiation;
 
@@ -40,6 +42,7 @@ public class MutableRedisOptions {
     maxNestedArrays = 32;
     masterName = "mymaster";
     role = RedisRole.MASTER;
+    useReplicas = RedisReplicas.NEVER;
   }
 
   /**
@@ -60,6 +63,7 @@ public class MutableRedisOptions {
     this.maxNestedArrays = other.maxNestedArrays;
     this.masterName = other.masterName;
     this.role = other.role;
+    this.useReplicas = other.useReplicas;
     this.password = other.password;
     this.protocolNegotiation = other.protocolNegotiation;
   }
@@ -237,6 +241,26 @@ public class MutableRedisOptions {
   }
 
   /**
+   * Get whether or not to use replica nodes (only considered in Cluster mode).
+   *
+   * @return the cluster replica node use mode.
+   */
+  public RedisReplicas getUseReplicas() {
+    return useReplicas;
+  }
+
+  /**
+   * Set whether or not to use replica nodes (only considered in Cluster mode).
+   *
+   * @param useReplicas the cluster replica use mode.
+   * @return fluent self.
+   */
+  public MutableRedisOptions setUseReplicas(RedisReplicas useReplicas) {
+    this.useReplicas = useReplicas;
+    return this;
+  }
+
+  /**
    * Tune how much nested arrays are allowed on a redis response. This affects the parser performance.
    *
    * @return the configured max nested arrays allowance.
@@ -253,6 +277,27 @@ public class MutableRedisOptions {
    */
   public MutableRedisOptions setMaxNestedArrays(int maxNestedArrays) {
     this.maxNestedArrays = maxNestedArrays;
+    return this;
+  }
+
+  /**
+   * Get the user information for cluster/sentinel connections, if not set it will try to
+   * extract it from the current default endpoint.
+   *
+   * @return user
+   */
+  public String getUser() {
+    return user;
+  }
+
+  /**
+   * Set the user for cluster/sentinel connections.
+   *
+   * @param user the user
+   * @return fluent self
+   */
+  public MutableRedisOptions setUser(final String user) {
+    this.user = user;
     return this;
   }
 

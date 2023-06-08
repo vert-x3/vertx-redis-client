@@ -23,5 +23,5 @@ import io.vertx.redis.client.RedisOptions;
 @FunctionalInterface
 interface Resolver {
 
-  void resolve(String endpoint, MutableRedisOptions options, Handler<AsyncResult<RedisURI>> callback);
+  void resolve(String endpoint, Handler<AsyncResult<RedisURI>> callback);
 }
