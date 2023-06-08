@@ -16,6 +16,7 @@
 package io.vertx.redis.client;
 
 import io.vertx.codegen.annotations.Fluent;
+import io.vertx.codegen.annotations.GenIgnore;
 import io.vertx.codegen.annotations.Nullable;
 import io.vertx.codegen.annotations.VertxGen;
 import io.vertx.core.*;
@@ -25,6 +26,7 @@ import io.vertx.redis.client.impl.RedisReplicationClient;
 import io.vertx.redis.client.impl.RedisSentinelClient;
 
 import java.util.List;
+import java.util.function.Supplier;
 
 /**
  * A simple Redis client.
@@ -34,6 +36,7 @@ public interface Redis {
 
   /**
    * Create a new redis client using the default client options.
+   *
    * @param vertx the vertx instance
    * @return the client
    */
@@ -43,31 +46,47 @@ public interface Redis {
 
   /**
    * Create a new redis client using the default client options. Does not support rediss (redis over ssl scheme) for now.
+   *
    * @param connectionString a string URI following the scheme: redis://[username:password@][host][:port][/database]
-   * @param vertx the vertx instance
+   * @param vertx            the vertx instance
    * @return the client
    * @see <a href="https://www.iana.org/assignments/uri-schemes/prov/redis">Redis scheme on iana.org</a>
    */
   static Redis createClient(Vertx vertx, String connectionString) {
-    return createClient(vertx, new RedisOptions().setConnectionString(connectionString));
+    final RedisOptions redisOptions = new RedisOptions();
+    redisOptions.setConnectionString(connectionString);
+    return createClient(vertx, redisOptions);
   }
 
   /**
    * Create a new redis client using the given client options.
-   * @param vertx the vertx instance
+   *
+   * @param vertx   the vertx instance
    * @param options the user provided options
    * @return the client
    */
   static Redis createClient(Vertx vertx, RedisOptions options) {
+    return createClient(vertx, options, () -> Future.succeededFuture(new MutableRedisOptions(options)));
+  }
+
+  /**
+   * Create a new redis client using the given client options.
+   *
+   * @param vertx   the vertx instance
+   * @param options the user provided options
+   * @return the client
+   */
+  @GenIgnore
+  static Redis createClient(Vertx vertx, RedisOptions options, Supplier<Future<MutableRedisOptions>> mutableOptions) {
     switch (options.getType()) {
       case STANDALONE:
-        return new RedisClient(vertx, options);
+        return new RedisClient(vertx, options, mutableOptions);
       case SENTINEL:
-        return new RedisSentinelClient(vertx, options);
+        return new RedisSentinelClient(vertx, options, mutableOptions);
       case CLUSTER:
-        return new RedisClusterClient(vertx, options);
+        return new RedisClusterClient(vertx, options, mutableOptions);
       case REPLICATION:
-        return new RedisReplicationClient(vertx, options);
+        return new RedisReplicationClient(vertx, options, mutableOptions);
       default:
         throw new IllegalStateException("Unknown Redis Client type: " + options.getType());
     }
@@ -76,7 +95,7 @@ public interface Redis {
   /**
    * Connects to the redis server.
    *
-   * @param handler  the async result handler
+   * @param handler the async result handler
    * @return a reference to this, so the API can be used fluently
    */
   @Fluent
@@ -99,8 +118,9 @@ public interface Redis {
 
   /**
    * Send the given command to the redis server or cluster.
+   *
    * @param command the command to send
-   * @param onSend the asynchronous result handler.
+   * @param onSend  the asynchronous result handler.
    * @return fluent self.
    */
   @Fluent
@@ -111,6 +131,7 @@ public interface Redis {
 
   /**
    * Send the given command to the redis server or cluster.
+   *
    * @param command the command to send
    * @return a future with the result of the operation
    */
@@ -121,7 +142,7 @@ public interface Redis {
    * client users.
    *
    * @param commands list of command to send
-   * @param onSend the asynchronous result handler.
+   * @param onSend   the asynchronous result handler.
    * @return fluent self.
    */
   @Fluent

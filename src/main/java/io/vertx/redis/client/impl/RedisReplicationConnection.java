@@ -7,6 +7,7 @@ import io.vertx.core.impl.logging.LoggerFactory;
 import io.vertx.redis.client.*;
 
 import java.util.*;
+import java.util.function.Supplier;
 
 public class RedisReplicationConnection implements RedisConnection {
 
@@ -23,12 +24,16 @@ public class RedisReplicationConnection implements RedisConnection {
     MASTER_ONLY_COMMANDS.add(command);
   }
 
-  private final RedisOptions options;
+  private final RedisOptions immutableOptions;
+  private final Supplier<Future<MutableRedisOptions>> mutableOptions;
   private final RedisConnection master;
   private final List<RedisConnection> replicas;
 
-  RedisReplicationConnection(Vertx vertx, RedisOptions options, RedisConnection master, List<RedisConnection> replicas) {
-    this.options = options;
+  RedisReplicationConnection(Vertx vertx,
+                             RedisOptions immutableOptions, Supplier<Future<MutableRedisOptions>> mutableOptions,
+                             RedisConnection master, List<RedisConnection> replicas) {
+    this.immutableOptions = immutableOptions;
+    this.mutableOptions = mutableOptions;
     this.master = master;
     this.replicas = replicas;
   }
@@ -176,7 +181,7 @@ public class RedisReplicationConnection implements RedisConnection {
     }
 
     // always, never, share
-    RedisReplicas useReplicas = options.getUseReplicas();
+    RedisReplicas useReplicas = immutableOptions.getUseReplicas();
 
     if (read && useReplicas != RedisReplicas.NEVER && replicas.size() > 0) {
       switch (useReplicas) {
