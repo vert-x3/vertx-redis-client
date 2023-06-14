@@ -36,7 +36,6 @@ public interface Redis {
 
   /**
    * Create a new redis client using the default client options.
-   *
    * @param vertx the vertx instance
    * @return the client
    */
@@ -46,7 +45,6 @@ public interface Redis {
 
   /**
    * Create a new redis client using the default client options. Does not support rediss (redis over ssl scheme) for now.
-   *
    * @param connectionString a string URI following the scheme: redis://[username:password@][host][:port][/database]
    * @param vertx the vertx instance
    * @return the client
@@ -60,8 +58,7 @@ public interface Redis {
 
   /**
    * Create a new redis client using the given client options.
-   *
-   * @param vertx   the vertx instance
+   * @param vertx the vertx instance
    * @param options the user provided options
    * @return the client
    */
@@ -72,7 +69,7 @@ public interface Redis {
   /**
    * Create a new redis client using the given client options.
    *
-   * @param vertx   the vertx instance
+   * @param vertx the vertx instance
    * @param options the user provided options
    * @param optionsSupplier the user provided options, which can be changed dynamically.
    *                        Values like type cannot be changed.
@@ -96,7 +93,6 @@ public interface Redis {
 
   /**
    * Connects to the redis server.
-   *
    * @param handler the async result handler
    * @return a reference to this, so the API can be used fluently
    */
@@ -108,7 +104,6 @@ public interface Redis {
 
   /**
    * Connects to the redis server.
-   *
    * @return a future with the result of the operation
    */
   Future<RedisConnection> connect();
@@ -120,7 +115,6 @@ public interface Redis {
 
   /**
    * Send the given command to the redis server or cluster.
-   *
    * @param command the command to send
    * @param onSend the asynchronous result handler.
    * @return fluent self.
@@ -133,7 +127,6 @@ public interface Redis {
 
   /**
    * Send the given command to the redis server or cluster.
-   *
    * @param command the command to send
    * @return a future with the result of the operation
    */
