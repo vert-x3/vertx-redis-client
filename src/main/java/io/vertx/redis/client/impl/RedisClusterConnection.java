@@ -43,15 +43,15 @@ public class RedisClusterConnection implements RedisConnection {
 
   private final VertxInternal vertx;
   private final RedisOptions immutableOptions;
-  private final Supplier<Future<MutableRedisOptions>> mutableOptions;
+  private final Supplier<Future<RedisOptions>> optionsSupplier;
   private final Slots slots;
   private final Map<String, RedisConnection> connections;
 
-  RedisClusterConnection(Vertx vertx, RedisOptions immutableOptions, Supplier<Future<MutableRedisOptions>> mutableOptions,
+  RedisClusterConnection(Vertx vertx, RedisOptions immutableOptions, Supplier<Future<RedisOptions>> optionsSupplier,
                          Slots slots, Map<String, RedisConnection> connections) {
     this.vertx = (VertxInternal) vertx;
     this.immutableOptions = immutableOptions;
-    this.mutableOptions = mutableOptions;
+    this.optionsSupplier = optionsSupplier;
     this.slots = slots;
     this.connections = connections;
   }
@@ -118,7 +118,7 @@ public class RedisClusterConnection implements RedisConnection {
 
   @Override
   public Future<Response> send(Request request) {
-    return mutableOptions.get().flatMap(options -> {
+    return optionsSupplier.get().flatMap(options -> {
 
       final Promise<Response> promise = vertx.promise();
 
@@ -321,9 +321,9 @@ public class RedisClusterConnection implements RedisConnection {
 
         if (cause.is("NOAUTH") && immutableOptions.getPassword() != null) {
           // NOAUTH will try to authenticate
-          final Future<Response> authenticate = mutableOptions.get().flatMap(dynamicOptions -> {
+          final Future<Response> authenticate = optionsSupplier.get().flatMap(options -> {
             final Promise<Response> promise = vertx.promise();
-            connection.send(cmd(AUTH).arg(dynamicOptions.getPassword()), auth -> {
+            connection.send(cmd(AUTH).arg(options.getPassword()), auth -> {
               if (auth.failed()) {
                 promise.fail(auth.cause());
                 handler.handle(Future.failedFuture(auth.cause()));
@@ -349,7 +349,7 @@ public class RedisClusterConnection implements RedisConnection {
 
   @Override
   public Future<List<Response>> batch(List<Request> requests) {
-    return mutableOptions.get().flatMap(options -> {
+    return optionsSupplier.get().flatMap(options -> {
 
       final Promise<List<Response>> promise = vertx.promise();
 
@@ -475,9 +475,9 @@ public class RedisClusterConnection implements RedisConnection {
         if (cause.is("NOAUTH") && immutableOptions.getPassword() != null) {
           // try to authenticate
 
-          final Future<List<Response>> authenticate = mutableOptions.get().flatMap(dynamicOptions -> {
+          final Future<List<Response>> authenticate = optionsSupplier.get().flatMap(options -> {
             final Promise<List<Response>> promise = vertx.promise();
-            connection.send(cmd(AUTH).arg(dynamicOptions.getPassword()), auth -> {
+            connection.send(cmd(AUTH).arg(options.getPassword()), auth -> {
               if (auth.failed()) {
                 promise.fail(auth.cause());
                 handler.handle(Future.failedFuture(auth.cause()));
@@ -529,7 +529,7 @@ public class RedisClusterConnection implements RedisConnection {
   /**
    * Select a Redis client for the given key
    */
-  private String selectEndpoint(int keySlot, boolean readOnly, boolean forceMasterEndpoint, MutableRedisOptions options) {
+  private String selectEndpoint(int keySlot, boolean readOnly, boolean forceMasterEndpoint, RedisOptions options) {
     // this command doesn't have keys, return any connection
     // NOTE: this means replicas may be used for no key commands regardless of the config
     if (keySlot == -1) {
@@ -546,7 +546,7 @@ public class RedisClusterConnection implements RedisConnection {
   }
 
   private String selectMasterOrReplicaEndpoint(boolean readOnly, String[] endpoints, boolean forceMasterEndpoint,
-                                               MutableRedisOptions options) {
+                                               RedisOptions options) {
     if (forceMasterEndpoint) {
       return endpoints[0];
     }

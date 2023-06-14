@@ -87,8 +87,8 @@ public class RedisReplicationClient extends BaseRedisClient implements Redis {
     addMasterOnlyCommand(WAIT);
   }
 
-  public RedisReplicationClient(Vertx vertx, RedisOptions options, Supplier<Future<MutableRedisOptions>> mutableOptions) {
-    super(vertx, options, mutableOptions);
+  public RedisReplicationClient(Vertx vertx, RedisOptions options, Supplier<Future<RedisOptions>> optionsSupplier) {
+    super(vertx, options, optionsSupplier);
     // validate options
     if (options.getMaxPoolWaiting() < options.getMaxPoolSize()) {
       throw new IllegalStateException("Invalid options: maxPoolWaiting < maxPoolSize");
@@ -99,7 +99,7 @@ public class RedisReplicationClient extends BaseRedisClient implements Redis {
 
   @Override
   public Future<RedisConnection> connect() {
-    return mutableOptions.get().flatMap(options -> {
+    return optionsSupplier.get().flatMap(options -> {
       final Promise<RedisConnection> promise = vertx.promise();
       // make a copy as we may need to mutate the list during discovery
       final List<String> endpoints = new LinkedList<>(options.getEndpoints());
@@ -139,7 +139,7 @@ public class RedisReplicationClient extends BaseRedisClient implements Redis {
 
           // validate if the pool config is valid
           final int totalUniqueEndpoints = nodes.size();
-          if (immutableOptions.getMaxPoolSize() < totalUniqueEndpoints) {
+          if (options.getMaxPoolSize() < totalUniqueEndpoints) {
             // this isn't a valid setup, the connection pool will not accommodate all the required connections
             onConnect.handle(Future.failedFuture("RedisOptions maxPoolSize < Cluster size(" + totalUniqueEndpoints + "): The pool is not able to hold all required connections!"));
             return;
@@ -150,19 +150,19 @@ public class RedisReplicationClient extends BaseRedisClient implements Redis {
               LOG.info("Skipping offline node: " + node.ip);
               if (counter.incrementAndGet() == nodes.size()) {
                 onConnect.handle(Future.succeededFuture(
-                  new RedisReplicationConnection(vertx, mutableOptions, conn, connections))
+                  new RedisReplicationConnection(vertx, optionsSupplier, conn, connections))
                 );
               }
               continue;
             }
 
-            connectionManager.getConnection(node.endpoint(), RedisReplicas.NEVER != immutableOptions.getUseReplicas() ? cmd(READONLY) : null)
+            connectionManager.getConnection(node.endpoint(), RedisReplicas.NEVER != options.getUseReplicas() ? cmd(READONLY) : null)
               .onFailure(err -> {
                 // failed try with the next endpoint
                 LOG.warn("Skipping failed node: " + node.ip, err);
                 if (counter.incrementAndGet() == nodes.size()) {
                   onConnect.handle(Future.succeededFuture(
-                    new RedisReplicationConnection(vertx, mutableOptions, conn, connections))
+                    new RedisReplicationConnection(vertx, optionsSupplier, conn, connections))
                   );
                 }
               })
@@ -175,7 +175,7 @@ public class RedisReplicationClient extends BaseRedisClient implements Redis {
                 }
                 if (counter.incrementAndGet() == nodes.size()) {
                   onConnect.handle(Future.succeededFuture(
-                    new RedisReplicationConnection(vertx, mutableOptions, conn, connections))
+                    new RedisReplicationConnection(vertx, optionsSupplier, conn, connections))
                   );
                 }
               });

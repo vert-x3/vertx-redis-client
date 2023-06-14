@@ -22,13 +22,13 @@ import java.util.function.Supplier;
 
 public class RedisClient extends BaseRedisClient implements Redis {
 
-  public RedisClient(Vertx vertx, RedisOptions options, Supplier<Future<MutableRedisOptions>> mutableOptions) {
-    super(vertx, options, mutableOptions);
+  public RedisClient(Vertx vertx, RedisOptions options, Supplier<Future<RedisOptions>> optionsSupplier) {
+    super(vertx, options, optionsSupplier);
   }
 
   @Override
   public Future<RedisConnection> connect() {
-    return mutableOptions.get().flatMap(dynamicOptions ->
-            connectionManager.getConnection(dynamicOptions.getEndpoint(), null));
+    return optionsSupplier.get().flatMap(options ->
+            connectionManager.getConnection(options.getEndpoint(), null));
   }
 }

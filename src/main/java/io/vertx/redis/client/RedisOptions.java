@@ -45,6 +45,7 @@ public class RedisOptions {
   private String masterName;
   private RedisRole role;
   private RedisReplicas useReplicas;
+  private String user;
   private volatile String password;
   private boolean protocolNegotiation;
 
@@ -453,6 +454,27 @@ public class RedisOptions {
    */
   public RedisOptions setPoolRecycleTimeout(int poolRecycleTimeout) {
     this.poolRecycleTimeout = poolRecycleTimeout;
+    return this;
+  }
+
+  /**
+   * Get the user information for cluster/sentinel connections, if not set it will try to
+   * extract it from the current default endpoint.
+   *
+   * @return user
+   */
+  public String getUser() {
+    return user;
+  }
+
+  /**
+   * Set the user for cluster/sentinel connections.
+   *
+   * @param user the user
+   * @return fluent self
+   */
+  public RedisOptions setUser(final String user) {
+    this.user = user;
     return this;
   }
 

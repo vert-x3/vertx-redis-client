@@ -17,8 +17,6 @@ package io.vertx.redis.client.impl;
 
 import io.vertx.core.AsyncResult;
 import io.vertx.core.Handler;
-import io.vertx.redis.client.MutableRedisOptions;
-import io.vertx.redis.client.RedisOptions;
 
 @FunctionalInterface
 interface Resolver {

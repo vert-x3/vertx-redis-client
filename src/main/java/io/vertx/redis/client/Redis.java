@@ -48,7 +48,7 @@ public interface Redis {
    * Create a new redis client using the default client options. Does not support rediss (redis over ssl scheme) for now.
    *
    * @param connectionString a string URI following the scheme: redis://[username:password@][host][:port][/database]
-   * @param vertx            the vertx instance
+   * @param vertx the vertx instance
    * @return the client
    * @see <a href="https://www.iana.org/assignments/uri-schemes/prov/redis">Redis scheme on iana.org</a>
    */
@@ -66,7 +66,7 @@ public interface Redis {
    * @return the client
    */
   static Redis createClient(Vertx vertx, RedisOptions options) {
-    return createClient(vertx, options, () -> Future.succeededFuture(new MutableRedisOptions(options)));
+    return createClient(vertx, options, () -> Future.succeededFuture(new RedisOptions(options)));
   }
 
   /**
@@ -74,19 +74,21 @@ public interface Redis {
    *
    * @param vertx   the vertx instance
    * @param options the user provided options
+   * @param optionsSupplier the user provided options, which can be changed dynamically.
+   *                        Values like type cannot be changed.
    * @return the client
    */
   @GenIgnore
-  static Redis createClient(Vertx vertx, RedisOptions options, Supplier<Future<MutableRedisOptions>> mutableOptions) {
+  static Redis createClient(Vertx vertx, RedisOptions options, Supplier<Future<RedisOptions>> optionsSupplier) {
     switch (options.getType()) {
       case STANDALONE:
-        return new RedisClient(vertx, options, mutableOptions);
+        return new RedisClient(vertx, options, optionsSupplier);
       case SENTINEL:
-        return new RedisSentinelClient(vertx, options, mutableOptions);
+        return new RedisSentinelClient(vertx, options, optionsSupplier);
       case CLUSTER:
-        return new RedisClusterClient(vertx, options, mutableOptions);
+        return new RedisClusterClient(vertx, options, optionsSupplier);
       case REPLICATION:
-        return new RedisReplicationClient(vertx, options, mutableOptions);
+        return new RedisReplicationClient(vertx, options, optionsSupplier);
       default:
         throw new IllegalStateException("Unknown Redis Client type: " + options.getType());
     }
@@ -120,7 +122,7 @@ public interface Redis {
    * Send the given command to the redis server or cluster.
    *
    * @param command the command to send
-   * @param onSend  the asynchronous result handler.
+   * @param onSend the asynchronous result handler.
    * @return fluent self.
    */
   @Fluent
@@ -142,7 +144,7 @@ public interface Redis {
    * client users.
    *
    * @param commands list of command to send
-   * @param onSend   the asynchronous result handler.
+   * @param onSend the asynchronous result handler.
    * @return fluent self.
    */
   @Fluent

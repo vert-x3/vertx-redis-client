@@ -19,15 +19,15 @@ public abstract class BaseRedisClient implements Redis {
   protected final VertxInternal vertx;
   protected final RedisConnectionManager connectionManager;
 
-  protected final RedisOptions immutableOptions;
+  protected final RedisOptions options;
 
-  protected final Supplier<Future<MutableRedisOptions>> mutableOptions;
+  protected final Supplier<Future<RedisOptions>> optionsSupplier;
 
-  public BaseRedisClient(Vertx vertx, RedisOptions options, Supplier<Future<MutableRedisOptions>> mutableOptions) {
-    this.immutableOptions = options;
-    this.mutableOptions = mutableOptions;
+  public BaseRedisClient(Vertx vertx, RedisOptions options, Supplier<Future<RedisOptions>> optionsSupplier) {
+    this.options = options;
+    this.optionsSupplier = optionsSupplier;
     this.vertx = (VertxInternal) vertx;
-    this.connectionManager = new RedisConnectionManager(this.vertx, options, mutableOptions);
+    this.connectionManager = new RedisConnectionManager(this.vertx, options, optionsSupplier);
     this.connectionManager.start();
   }
 

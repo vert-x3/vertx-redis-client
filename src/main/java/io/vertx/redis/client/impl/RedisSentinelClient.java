@@ -23,7 +23,6 @@ import io.vertx.redis.client.impl.types.ErrorType;
 
 import java.util.List;
 import java.util.Random;
-import java.util.SplittableRandom;
 import java.util.function.Supplier;
 
 import static io.vertx.redis.client.Command.*;
@@ -48,8 +47,8 @@ public class RedisSentinelClient extends BaseRedisClient implements Redis {
   private static final Logger LOG = LoggerFactory.getLogger(RedisSentinelClient.class);
   private RedisConnection sentinel;
 
-  public RedisSentinelClient(Vertx vertx, RedisOptions options, Supplier<Future<MutableRedisOptions>> mutableOptions) {
-    super(vertx, options, mutableOptions);
+  public RedisSentinelClient(Vertx vertx, RedisOptions options, Supplier<Future<RedisOptions>> optionsSupplier) {
+    super(vertx, options, optionsSupplier);
     // validate options
     if (options.getMaxPoolSize() < 2) {
       throw new IllegalStateException("Invalid options: maxPoolSize must be at least 2");
@@ -63,7 +62,7 @@ public class RedisSentinelClient extends BaseRedisClient implements Redis {
   public Future<RedisConnection> connect() {
     final Promise<RedisConnection> promise = vertx.promise();
 
-    return mutableOptions.get().flatMap(options -> {
+    return optionsSupplier.get().flatMap(options -> {
       // sentinel (HA) requires 2 connections, one to watch for sentinel events and the connection itself
       createConnectionInternal(options, options.getRole(), createConnection -> {
         if (createConnection.failed()) {
@@ -119,7 +118,7 @@ public class RedisSentinelClient extends BaseRedisClient implements Redis {
     });
   }
 
-  private void createConnectionInternal(MutableRedisOptions options, RedisRole role, Handler<AsyncResult<RedisConnection>> onCreate) {
+  private void createConnectionInternal(RedisOptions options, RedisRole role, Handler<AsyncResult<RedisConnection>> onCreate) {
     final Handler<AsyncResult<RedisURI>> createAndConnect = resolve -> {
       if (resolve.failed()) {
         onCreate.handle(Future.failedFuture(resolve.cause()));
@@ -158,7 +157,7 @@ public class RedisSentinelClient extends BaseRedisClient implements Redis {
    * We use the algorithm from http://redis.io/topics/sentinel-clients
    * to get a sentinel client and then do 'stuff' with it
    */
-  private static void resolveClient(final Resolver checkEndpointFn, final MutableRedisOptions options, final Handler<AsyncResult<RedisURI>> callback) {
+  private static void resolveClient(final Resolver checkEndpointFn, final RedisOptions options, final Handler<AsyncResult<RedisURI>> callback) {
     // Because finding the master is going to be an async list we will terminate
     // when we find one then use promises...
     iterate(0, checkEndpointFn, options, iterate -> {
@@ -178,7 +177,7 @@ public class RedisSentinelClient extends BaseRedisClient implements Redis {
     });
   }
 
-  private static void iterate(final int idx, final Resolver checkEndpointFn, final MutableRedisOptions options, final Handler<AsyncResult<Pair<Integer, RedisURI>>> resultHandler) {
+  private static void iterate(final int idx, final Resolver checkEndpointFn, final RedisOptions options, final Handler<AsyncResult<Pair<Integer, RedisURI>>> resultHandler) {
     // stop condition
     final List<String> endpoints = options.getEndpoints();
 
@@ -226,7 +225,7 @@ public class RedisSentinelClient extends BaseRedisClient implements Redis {
     // but can contain authentication
     final RedisURI uri = new RedisURI(endpoint);
 
-    mutableOptions.get().flatMap(options ->
+    optionsSupplier.get().flatMap(options ->
       connectionManager.getConnection(getBaseEndpoint(uri), null)
         .onFailure(err -> handler.handle(Future.failedFuture(err)))
         .onSuccess(conn -> {
@@ -259,7 +258,7 @@ public class RedisSentinelClient extends BaseRedisClient implements Redis {
     // but can contain authentication
     final RedisURI uri = new RedisURI(endpoint);
 
-    mutableOptions.get().flatMap(options ->
+    optionsSupplier.get().flatMap(options ->
       connectionManager.getConnection(getBaseEndpoint(uri), null)
         .onFailure(err -> handler.handle(Future.failedFuture(err)))
         .onSuccess(conn -> {

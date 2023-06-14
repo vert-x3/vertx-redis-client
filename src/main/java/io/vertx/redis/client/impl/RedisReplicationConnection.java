@@ -23,13 +23,13 @@ public class RedisReplicationConnection implements RedisConnection {
   public static void addMasterOnlyCommand(Command command) {
     MASTER_ONLY_COMMANDS.add(command);
   }
-  private final Supplier<Future<MutableRedisOptions>> mutableOptions;
+  private final Supplier<Future<RedisOptions>> optionsSupplier;
   private final RedisConnection master;
   private final List<RedisConnection> replicas;
 
-  RedisReplicationConnection(Vertx vertx, Supplier<Future<MutableRedisOptions>> mutableOptions,
+  RedisReplicationConnection(Vertx vertx, Supplier<Future<RedisOptions>> optionsSupplier,
                              RedisConnection master, List<RedisConnection> replicas) {
-    this.mutableOptions = mutableOptions;
+    this.optionsSupplier = optionsSupplier;
     this.master = master;
     this.replicas = replicas;
   }
@@ -113,14 +113,14 @@ public class RedisReplicationConnection implements RedisConnection {
     final CommandImpl cmd = (CommandImpl) req.command();
     final boolean forceMasterEndpoint = MASTER_ONLY_COMMANDS.contains(cmd);
 
-    return mutableOptions.get().flatMap(options ->
+    return optionsSupplier.get().flatMap(options ->
       selectMasterOrReplicaEndpoint(cmd.isReadOnly(req.getArgs()), forceMasterEndpoint, options)
         .send(request));
   }
 
   @Override
   public Future<List<Response>> batch(List<Request> requests) {
-    return mutableOptions.get().flatMap(options -> {
+    return optionsSupplier.get().flatMap(options -> {
       if (requests.isEmpty()) {
         LOG.debug("Empty batch");
         return Future.succeededFuture(Collections.emptyList());
@@ -174,7 +174,7 @@ public class RedisReplicationConnection implements RedisConnection {
     return result;
   }
 
-  private RedisConnection selectMasterOrReplicaEndpoint(boolean read, boolean forceMasterEndpoint, MutableRedisOptions options) {
+  private RedisConnection selectMasterOrReplicaEndpoint(boolean read, boolean forceMasterEndpoint, RedisOptions options) {
     if (forceMasterEndpoint) {
       return master;
     }

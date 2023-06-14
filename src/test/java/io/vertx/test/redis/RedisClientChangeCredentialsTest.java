@@ -7,7 +7,6 @@ import static io.vertx.redis.client.Request.cmd;
 
 import java.util.UUID;
 
-import io.vertx.redis.client.MutableRedisOptions;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -51,17 +50,17 @@ public class RedisClientChangeCredentialsTest {
     final RedisOptions options = new RedisOptions()
       .setConnectionString("redis://" + container.getHost() + ":" + container.getFirstMappedPort());
     return createClient(options,
-      Future.succeededFuture(new MutableRedisOptions(options).setUser(username).setPassword(password)));
+      Future.succeededFuture(new RedisOptions(options).setUser(username).setPassword(password)));
   }
 
-  private Redis createClient(final GenericContainer<?> container, Future<MutableRedisOptions> mutableOptions) {
+  private Redis createClient(final GenericContainer<?> container, Future<RedisOptions> optionsFuture) {
     final RedisOptions options = new RedisOptions()
       .setConnectionString("redis://" + container.getHost() + ":" + container.getFirstMappedPort());
-    return createClient(options, mutableOptions);
+    return createClient(options, optionsFuture);
   }
 
-  private Redis createClient(final RedisOptions options, Future<MutableRedisOptions> mutableOptions) {
-    return Redis.createClient(rule.vertx(), options, () -> mutableOptions);
+  private Redis createClient(final RedisOptions options, Future<RedisOptions> optionsFuture) {
+    return Redis.createClient(rule.vertx(), options, () -> optionsFuture);
   }
 
   @Test(timeout = 10_000L)
