@@ -42,15 +42,15 @@ public class RedisClusterConnection implements RedisConnection {
   }
 
   private final VertxInternal vertx;
-  private final RedisOptions immutableOptions;
+  private final RedisOptions options;
   private final Supplier<Future<RedisOptions>> optionsSupplier;
   private final Slots slots;
   private final Map<String, RedisConnection> connections;
 
-  RedisClusterConnection(Vertx vertx, RedisOptions immutableOptions, Supplier<Future<RedisOptions>> optionsSupplier,
+  RedisClusterConnection(Vertx vertx, RedisOptions options, Supplier<Future<RedisOptions>> optionsSupplier,
                          Slots slots, Map<String, RedisConnection> connections) {
     this.vertx = (VertxInternal) vertx;
-    this.immutableOptions = immutableOptions;
+    this.options = options;
     this.optionsSupplier = optionsSupplier;
     this.slots = slots;
     this.connections = connections;
@@ -319,7 +319,7 @@ public class RedisClusterConnection implements RedisConnection {
           return;
         }
 
-        if (cause.is("NOAUTH") && immutableOptions.getPassword() != null) {
+        if (cause.is("NOAUTH") && options.getPassword() != null) {
           // NOAUTH will try to authenticate
           final Future<Response> authenticate = optionsSupplier.get().flatMap(options -> {
             final Promise<Response> promise = vertx.promise();
@@ -472,7 +472,7 @@ public class RedisClusterConnection implements RedisConnection {
           return;
         }
 
-        if (cause.is("NOAUTH") && immutableOptions.getPassword() != null) {
+        if (cause.is("NOAUTH") && options.getPassword() != null) {
           // try to authenticate
 
           final Future<List<Response>> authenticate = optionsSupplier.get().flatMap(options -> {
@@ -540,7 +540,7 @@ public class RedisClusterConnection implements RedisConnection {
 
     // if we haven't got config for this slot, try any connection
     if (endpoints == null || endpoints.length == 0) {
-      return immutableOptions.getEndpoint();
+      return this.options.getEndpoint();
     }
     return selectMasterOrReplicaEndpoint(readOnly, endpoints, forceMasterEndpoint, options);
   }

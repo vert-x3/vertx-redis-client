@@ -48,29 +48,29 @@ class RedisConnectionManager {
   private final NetClient netClient;
   private final PoolMetrics metrics;
 
-  private final RedisOptions immutableOptions;
+  private final RedisOptions options;
   private final Supplier<Future<RedisOptions>> optionsSupplier;
   private final ConnectionManager<ConnectionKey, Lease<RedisConnectionInternal>> pooledConnectionManager;
   private long timerID;
 
   RedisConnectionManager(VertxInternal vertx,
-                         RedisOptions immutableOptions, Supplier<Future<RedisOptions>> optionsSupplier) {
+                         RedisOptions options, Supplier<Future<RedisOptions>> optionsSupplier) {
     this.vertx = vertx;
     this.context = vertx.getOrCreateContext();
-    this.immutableOptions = immutableOptions;
+    this.options = options;
     this.optionsSupplier = optionsSupplier;
     VertxMetrics metricsSPI = this.vertx.metricsSPI();
-    metrics = metricsSPI != null ? metricsSPI.createPoolMetrics("redis", immutableOptions.getPoolName(), immutableOptions.getMaxPoolSize()) : null;
-    this.netClient = vertx.createNetClient(immutableOptions.getNetClientOptions());
+    metrics = metricsSPI != null ? metricsSPI.createPoolMetrics("redis", options.getPoolName(), options.getMaxPoolSize()) : null;
+    this.netClient = vertx.createNetClient(options.getNetClientOptions());
     this.pooledConnectionManager = new ConnectionManager<>();
   }
 
   private Endpoint<Lease<RedisConnectionInternal>> connectionEndpointProvider(ContextInternal ctx, Runnable dispose, String connectionString, Request setup) {
-    return new RedisEndpoint(vertx, netClient, immutableOptions, optionsSupplier, dispose, connectionString, setup);
+    return new RedisEndpoint(vertx, netClient, options, optionsSupplier, dispose, connectionString, setup);
   }
 
   synchronized void start() {
-    long period = immutableOptions.getPoolCleanerInterval();
+    long period = options.getPoolCleanerInterval();
     this.timerID = period > 0 ? vertx.setTimer(period, id -> checkExpired(period)) : -1;
   }
 
@@ -119,16 +119,16 @@ class RedisConnectionManager {
     private final NetClient netClient;
     private final RedisURI redisURI;
     private final Request setup;
-    private final RedisOptions immutableOptions;
-    private final Supplier<Future<RedisOptions>> mutableOptions;
+    private final RedisOptions options;
+    private final Supplier<Future<RedisOptions>> optionsSupplier;
 
     public RedisConnectionProvider(VertxInternal vertx, NetClient netClient,
-                                   RedisOptions immutableOptions, Supplier<Future<RedisOptions>> optionsSupplier,
+                                   RedisOptions options, Supplier<Future<RedisOptions>> optionsSupplier,
                                    String connectionString, Request setup) {
       this.vertx = vertx;
       this.netClient = netClient;
-      this.immutableOptions = immutableOptions;
-      this.mutableOptions = optionsSupplier;
+      this.options = options;
+      this.optionsSupplier = optionsSupplier;
       this.redisURI = new RedisURI(connectionString);
       this.setup = setup;
     }
@@ -141,7 +141,7 @@ class RedisConnectionManager {
     @Override
     public void connect(EventLoopContext ctx, Listener listener, Handler<AsyncResult<ConnectResult<RedisConnectionInternal>>> onConnect) {
       // verify if we can make this connection
-      final boolean netClientSsl = immutableOptions.getNetClientOptions().isSsl();
+      final boolean netClientSsl = options.getNetClientOptions().isSsl();
       final boolean connectionStringSsl = redisURI.ssl();
       final boolean connectionStringInetSocket = redisURI.socketAddress().isInetSocket();
 
@@ -192,11 +192,11 @@ class RedisConnectionManager {
 
     private void init(ContextInternal ctx, NetSocket netSocket, PoolConnector.Listener connectionListener, Handler<AsyncResult<ConnectResult<RedisConnectionInternal>>> onConnect) {
       // the connection will inherit the user event loop context
-      final RedisStandaloneConnection connection = new RedisStandaloneConnection(vertx, ctx, connectionListener, netSocket, immutableOptions);
+      final RedisStandaloneConnection connection = new RedisStandaloneConnection(vertx, ctx, connectionListener, netSocket, options);
       // initialization
       connection.exceptionHandler(DEFAULT_EXCEPTION_HANDLER);
 
-      mutableOptions.get().onComplete(optionsResult -> {
+      optionsSupplier.get().onComplete(optionsResult -> {
         if (optionsResult.failed()) {
           ctx.execute(ctx.failedFuture(optionsResult.cause()), onConnect);
         }
@@ -242,7 +242,7 @@ class RedisConnectionManager {
     }
 
     private void resolveMutableOptions(final ContextInternal ctx, Handler<AsyncResult<RedisOptions>> handler) {
-      mutableOptions.get().onComplete(handler);
+      optionsSupplier.get().onComplete(handler);
     }
 
     private void hello(ContextInternal ctx, RedisConnection connection, RedisURI redisURI, RedisOptions options,

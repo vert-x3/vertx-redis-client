@@ -51,9 +51,7 @@ public interface Redis {
    * @see <a href="https://www.iana.org/assignments/uri-schemes/prov/redis">Redis scheme on iana.org</a>
    */
   static Redis createClient(Vertx vertx, String connectionString) {
-    final RedisOptions redisOptions = new RedisOptions();
-    redisOptions.setConnectionString(connectionString);
-    return createClient(vertx, redisOptions);
+    return createClient(vertx, new RedisOptions().setConnectionString(connectionString));
   }
 
   /**
