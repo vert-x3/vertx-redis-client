@@ -152,4 +152,15 @@ public class RedisReplicationTest {
         }
       });
   }
+
+  @Test
+  public void preservesContext(TestContext should) {
+    Redis client = Redis.createClient(rule.vertx(), new RedisOptions().setType(RedisClientType.REPLICATION).addConnectionString("redis://localhost:7000"));
+
+    PreservesContext.sendWithoutConnect(client, should);
+    PreservesContext.batchWithoutConnect(client, should);
+    PreservesContext.connect(client, should);
+    PreservesContext.connectThenSend(client, should);
+    PreservesContext.connectThenBatch(client, should);
+  }
 }
