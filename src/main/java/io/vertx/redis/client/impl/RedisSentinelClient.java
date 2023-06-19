@@ -47,7 +47,6 @@ public class RedisSentinelClient extends BaseRedisClient implements Redis {
   private static final Logger LOG = LoggerFactory.getLogger(RedisSentinelClient.class);
 
   private final RedisSentinelConnectOptions connectOptions;
-  private RedisConnection sentinel;
 
   public RedisSentinelClient(Vertx vertx, NetClientOptions tcpOptions, PoolOptions poolOptions, RedisSentinelConnectOptions connectOptions) {
     super(vertx, tcpOptions, poolOptions, connectOptions);
@@ -72,7 +71,7 @@ public class RedisSentinelClient extends BaseRedisClient implements Redis {
         return;
       }
 
-      final RedisConnection conn = createConnection.result();
+      final PooledRedisConnection conn = createConnection.result();
 
       createConnectionInternal(connectOptions, RedisRole.SENTINEL, create -> {
         if (create.failed()) {
@@ -81,7 +80,7 @@ public class RedisSentinelClient extends BaseRedisClient implements Redis {
           return;
         }
 
-        sentinel = create.result();
+        PooledRedisConnection sentinel = create.result();
 
         sentinel
           .handler(msg -> {
@@ -89,7 +88,7 @@ public class RedisSentinelClient extends BaseRedisClient implements Redis {
               if ("MESSAGE".equalsIgnoreCase(msg.get(0).toString())) {
                 // we don't care about the payload
                 if (conn != null) {
-                  ((RedisStandaloneConnection) conn).fail(ErrorType.create("SWITCH-MASTER Received +switch-master message from Redis Sentinel."));
+                  ((RedisStandaloneConnection) conn.actual()).fail(ErrorType.create("SWITCH-MASTER Received +switch-master message from Redis Sentinel."));
                 } else {
                   LOG.warn("Received +switch-master message from Redis Sentinel.");
                 }
@@ -104,7 +103,7 @@ public class RedisSentinelClient extends BaseRedisClient implements Redis {
 
         sentinel.exceptionHandler(t -> {
           if (conn != null) {
-            ((RedisStandaloneConnection) conn).fail(t);
+            ((RedisStandaloneConnection) conn.actual()).fail(t);
           } else {
             LOG.error("Unhandled exception in Sentinel PUBSUB", t);
           }
@@ -115,7 +114,7 @@ public class RedisSentinelClient extends BaseRedisClient implements Redis {
     return promise.future();
   }
 
-  private void createConnectionInternal(RedisSentinelConnectOptions options, RedisRole role, Handler<AsyncResult<RedisConnection>> onCreate) {
+  private void createConnectionInternal(RedisSentinelConnectOptions options, RedisRole role, Handler<AsyncResult<PooledRedisConnection>> onCreate) {
 
     final Handler<AsyncResult<RedisURI>> createAndConnect = resolve -> {
       if (resolve.failed()) {

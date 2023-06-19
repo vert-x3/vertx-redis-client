@@ -11,10 +11,10 @@ import java.util.List;
 
 public class RedisSentinelConnection implements RedisConnection {
 
-  private final RedisConnection connection;
-  private final RedisConnection sentinel;
+  private final PooledRedisConnection connection;
+  private final PooledRedisConnection sentinel;
 
-  public RedisSentinelConnection(RedisConnection connection, RedisConnection sentinel) {
+  public RedisSentinelConnection(PooledRedisConnection connection, PooledRedisConnection sentinel) {
     this.connection = connection;
     this.sentinel = sentinel;
   }

@@ -43,9 +43,9 @@ public class RedisClusterConnection implements RedisConnection {
   private final VertxInternal vertx;
   private final RedisClusterConnectOptions connectOptions;
   private final Slots slots;
-  private final Map<String, RedisConnection> connections;
+  private final Map<String, PooledRedisConnection> connections;
 
-  RedisClusterConnection(Vertx vertx, RedisClusterConnectOptions connectOptions, Slots slots, Map<String, RedisConnection> connections) {
+  RedisClusterConnection(Vertx vertx, RedisClusterConnectOptions connectOptions, Slots slots, Map<String, PooledRedisConnection> connections) {
     this.vertx = (VertxInternal) vertx;
     this.connectOptions = connectOptions;
     this.slots = slots;
@@ -249,7 +249,7 @@ public class RedisClusterConnection implements RedisConnection {
 
   private void send(String endpoint, int retries, Request command, Handler<AsyncResult<Response>> handler) {
 
-    final RedisConnection connection = connections.get(endpoint);
+    final PooledRedisConnection connection = connections.get(endpoint);
 
     if (connection == null) {
       handler.handle(Future.failedFuture("Missing connection to: " + endpoint));
