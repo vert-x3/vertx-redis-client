@@ -334,4 +334,15 @@ public class RedisTest {
       })
       .onSuccess(responses -> should.fail("Commands are wrong"));
   }
+
+  @Test
+  public void preservesContext(TestContext should) {
+    Redis client = Redis.createClient(rule.vertx(), new RedisOptions().setConnectionString("redis://" + redis.getHost() + ":" + redis.getFirstMappedPort()));
+
+    PreservesContext.sendWithoutConnect(client, should);
+    PreservesContext.batchWithoutConnect(client, should);
+    PreservesContext.connect(client, should);
+    PreservesContext.connectThenSend(client, should);
+    PreservesContext.connectThenBatch(client, should);
+  }
 }
