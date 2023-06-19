@@ -366,7 +366,7 @@ class RedisConnectionManager {
     }
   }
 
-  public Future<RedisConnection> getConnection(String connectionString, Request setup) {
+  public Future<PooledRedisConnection> getConnection(String connectionString, Request setup) {
     final Promise<Lease<RedisConnectionInternal>> promise = vertx.promise();
     final EventLoopContext eventLoopContext;
     if (context instanceof EventLoopContext) {

@@ -138,7 +138,7 @@ public class RedisReplicationClient extends BaseRedisClient implements Redis {
           // create a cluster connection
           final List<Node> nodes = getNodes.result();
           final AtomicInteger counter = new AtomicInteger();
-          final List<RedisConnection> connections = new ArrayList<>();
+          final List<PooledRedisConnection> connections = new ArrayList<>();
 
           // validate if the pool config is valid
           final int totalUniqueEndpoints = nodes.size();

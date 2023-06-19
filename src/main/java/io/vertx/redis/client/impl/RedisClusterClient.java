@@ -172,7 +172,7 @@ public class RedisClusterClient extends BaseRedisClient implements Redis {
           final Slots slots = getSlots.result();
           final AtomicBoolean failed = new AtomicBoolean(false);
           final AtomicInteger counter = new AtomicInteger();
-          final Map<String, RedisConnection> connections = new HashMap<>();
+          final Map<String, PooledRedisConnection> connections = new HashMap<>();
 
           // validate if the pool config is valid
           final int totalUniqueEndpoints = slots.endpoints().length;
@@ -203,7 +203,7 @@ public class RedisClusterClient extends BaseRedisClient implements Redis {
       });
   }
 
-  private void connectionComplete(AtomicInteger counter, Slots slots, Map<String, RedisConnection> connections, AtomicBoolean failed, Handler<AsyncResult<RedisConnection>> onConnect) {
+  private void connectionComplete(AtomicInteger counter, Slots slots, Map<String, PooledRedisConnection> connections, AtomicBoolean failed, Handler<AsyncResult<RedisConnection>> onConnect) {
     if (counter.incrementAndGet() == slots.endpoints().length) {
       // end condition
       if (failed.get()) {

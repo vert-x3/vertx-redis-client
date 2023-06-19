@@ -28,7 +28,7 @@ public class PooledRedisConnection implements RedisConnection {
     this.metric = metric;
   }
 
-  public RedisConnection actual() {
+  public RedisConnectionInternal actual() {
     return connection;
   }
 

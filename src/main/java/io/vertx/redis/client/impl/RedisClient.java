@@ -32,7 +32,7 @@ public class RedisClient extends BaseRedisClient implements Redis {
   public Future<RedisConnection> connect() {
     // so that the caller is called back on its original context
     Promise<RedisConnection> promise = vertx.promise();
-    connectionManager.getConnection(defaultAddress, null).onComplete(promise);
+    connectionManager.getConnection(defaultAddress, null).onComplete((Promise) promise);
     return promise.future();
   }
 }
