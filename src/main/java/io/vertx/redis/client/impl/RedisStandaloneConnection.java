@@ -13,6 +13,8 @@ import io.vertx.core.impl.logging.LoggerFactory;
 import io.vertx.core.json.JsonObject;
 import io.vertx.core.net.NetSocket;
 import io.vertx.core.net.impl.pool.PoolConnector;
+import io.vertx.core.spi.metrics.ClientMetrics;
+import io.vertx.core.tracing.TracingPolicy;
 import io.vertx.redis.client.*;
 import io.vertx.redis.client.impl.types.ErrorType;
 import io.vertx.redis.client.impl.types.Multi;
@@ -42,6 +44,9 @@ public class RedisStandaloneConnection implements RedisConnectionInternal, Parse
   // waiting: commands that have been sent but not answered
   // the queue is only accessed from the event loop
   private final ArrayQueue waiting;
+  private final RedisURI uri;
+  private final ClientMetrics metrics;
+  private final TracingPolicy tracingPolicy;
 
   // state
   private Handler<Throwable> onException;
@@ -51,7 +56,7 @@ public class RedisStandaloneConnection implements RedisConnectionInternal, Parse
   private boolean closed = false;
   private boolean tainted = false;
 
-  public RedisStandaloneConnection(VertxInternal vertx, ContextInternal context, PoolConnector.Listener connectionListener, NetSocket netSocket, PoolOptions options, int maxWaitingHandlers) {
+  public RedisStandaloneConnection(VertxInternal vertx, ContextInternal context, PoolConnector.Listener connectionListener, NetSocket netSocket, PoolOptions options, int maxWaitingHandlers, RedisURI uri, ClientMetrics metrics, TracingPolicy tracingPolicy) {
     //System.out.println("<ctor>#" + this.hashCode());
     this.vertx = vertx;
     this.context = context;
@@ -60,6 +65,9 @@ public class RedisStandaloneConnection implements RedisConnectionInternal, Parse
     this.netSocket = netSocket;
     this.waiting = new ArrayQueue(maxWaitingHandlers);
     this.expiresAt = options.getRecycleTimeout() == -1 ? -1 : System.currentTimeMillis() + options.getRecycleTimeout();
+    this.uri = uri;
+    this.metrics = metrics;
+    this.tracingPolicy = tracingPolicy;
   }
 
   synchronized void setValid() {
@@ -505,5 +513,30 @@ public class RedisStandaloneConnection implements RedisConnectionInternal, Parse
         }
       }
     }
+  }
+
+  @Override
+  public boolean isTainted() {
+    return tainted;
+  }
+
+  @Override
+  public VertxInternal vertx() {
+    return vertx;
+  }
+
+  @Override
+  public RedisURI uri() {
+    return uri;
+  }
+
+  @Override
+  public ClientMetrics metrics() {
+    return metrics;
+  }
+
+  @Override
+  public TracingPolicy tracingPolicy() {
+    return tracingPolicy;
   }
 }

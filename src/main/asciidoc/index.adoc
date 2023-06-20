@@ -185,6 +185,31 @@ NOTE: It is important to remember that the commands `SUBSCRIBE`, `UNSUBSCRIBE`, 
 This means that the result in case of success is `null` not a instance of response.
 All messages are then routed through the handler on the client.
 
+== Tracing commands
+
+The Redis client can trace command execution when Vert.x has tracing enabled.
+
+The client reports a _client_ span with the following details:
+
+* operation name: `Command`
+* tags:
+** `db.user`: the database username, if set
+** `db.instance`: the database number, if known (typically `0`)
+** `db.statement`: the Redis command, without arguments (e.g. `get` or `set`)
+** `db.type`: _redis_
+
+The default tracing policy is {@link io.vertx.core.tracing.TracingPolicy#PROPAGATE}, the client
+will only create a span when involved in an active trace.
+
+You can change the client policy with {@link io.vertx.redis.client.RedisOptions#setTracingPolicy},
+e.g you can set {@link io.vertx.core.tracing.TracingPolicy#ALWAYS} to always report
+a span:
+
+[source,$lang]
+----
+{@link examples.RedisExamples#tracing1}
+----
+
 == Domain Sockets
 
 Most of the examples shown connecting to a TCP sockets, however it is also possible to use Redis connecting to a UNIX domain docket:

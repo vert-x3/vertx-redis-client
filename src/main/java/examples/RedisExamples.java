@@ -4,6 +4,7 @@ import io.vertx.core.AbstractVerticle;
 import io.vertx.core.Future;
 import io.vertx.core.Promise;
 import io.vertx.core.Vertx;
+import io.vertx.core.tracing.TracingPolicy;
 import io.vertx.redis.client.*;
 
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -240,5 +241,9 @@ public class RedisExamples {
         // and read operations will end up in the replica nodes if available
         conn.send(Request.cmd(Command.GET).arg("key"));
       });
+  }
+
+  public void tracing1(RedisOptions options) {
+    options.setTracingPolicy(TracingPolicy.ALWAYS);
   }
 }
