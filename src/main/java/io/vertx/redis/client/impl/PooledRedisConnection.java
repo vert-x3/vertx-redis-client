@@ -70,12 +70,18 @@ public class PooledRedisConnection implements RedisConnection {
 
   @Override
   public Future<@Nullable Response> send(Request command) {
-    return connection.send(command);
+    CommandReporter reporter = new CommandReporter(connection, command.command().toString());
+    reporter.before();
+    return connection.send(command)
+      .andThen(reporter::after);
   }
 
   @Override
   public Future<List<@Nullable Response>> batch(List<Request> commands) {
-    return connection.batch(commands);
+    CommandReporter reporter = new CommandReporter(connection, "batch");
+    reporter.before();
+    return connection.batch(commands)
+      .andThen(reporter::after);
   }
 
   @Override

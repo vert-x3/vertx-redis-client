@@ -19,6 +19,7 @@ import io.vertx.core.*;
 import io.vertx.core.impl.logging.Logger;
 import io.vertx.core.impl.logging.LoggerFactory;
 import io.vertx.core.net.NetClientOptions;
+import io.vertx.core.tracing.TracingPolicy;
 import io.vertx.redis.client.*;
 import io.vertx.redis.client.impl.types.MultiType;
 import io.vertx.redis.client.impl.types.NumberType;
@@ -123,8 +124,8 @@ public class RedisClusterClient extends BaseRedisClient implements Redis {
   private final RedisClusterConnectOptions connectOptions;
   private final PoolOptions poolOptions;
 
-  public RedisClusterClient(Vertx vertx, NetClientOptions tcpOptions, PoolOptions poolOptions, RedisClusterConnectOptions connectOptions) {
-    super(vertx, tcpOptions, poolOptions, connectOptions);
+  public RedisClusterClient(Vertx vertx, NetClientOptions tcpOptions, PoolOptions poolOptions, RedisClusterConnectOptions connectOptions, TracingPolicy tracingPolicy) {
+    super(vertx, tcpOptions, poolOptions, connectOptions, tracingPolicy);
     this.connectOptions = connectOptions;
     this.poolOptions = poolOptions;
     // validate options

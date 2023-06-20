@@ -19,6 +19,7 @@ import io.vertx.codegen.annotations.DataObject;
 import io.vertx.codegen.annotations.GenIgnore;
 import io.vertx.core.json.JsonObject;
 import io.vertx.core.net.NetClientOptions;
+import io.vertx.core.tracing.TracingPolicy;
 import io.vertx.redis.client.impl.RedisURI;
 
 import java.util.ArrayList;
@@ -48,6 +49,7 @@ public class RedisOptions {
   private RedisReplicas useReplicas;
   private volatile String password;
   private boolean protocolNegotiation;
+  private TracingPolicy tracingPolicy;
 
   /**
    * Creates a default configuration object using redis server defaults
@@ -346,6 +348,24 @@ public class RedisOptions {
    */
   public RedisOptions setMaxNestedArrays(int maxNestedArrays) {
     this.maxNestedArrays = maxNestedArrays;
+    return this;
+  }
+
+  /**
+   * @return the tracing policy
+   */
+  public TracingPolicy getTracingPolicy() {
+    return tracingPolicy;
+  }
+
+  /**
+   * Set the tracing policy for the client behavior when Vert.x has tracing enabled.
+   *
+   * @param tracingPolicy the tracing policy
+   * @return fluent self.
+   */
+  public RedisOptions setTracingPolicy(TracingPolicy tracingPolicy) {
+    this.tracingPolicy = tracingPolicy;
     return this;
   }
 

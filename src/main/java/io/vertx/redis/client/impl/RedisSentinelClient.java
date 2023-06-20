@@ -19,6 +19,7 @@ import io.vertx.core.*;
 import io.vertx.core.impl.logging.Logger;
 import io.vertx.core.impl.logging.LoggerFactory;
 import io.vertx.core.net.NetClientOptions;
+import io.vertx.core.tracing.TracingPolicy;
 import io.vertx.redis.client.*;
 import io.vertx.redis.client.impl.types.ErrorType;
 
@@ -48,8 +49,8 @@ public class RedisSentinelClient extends BaseRedisClient implements Redis {
 
   private final RedisSentinelConnectOptions connectOptions;
 
-  public RedisSentinelClient(Vertx vertx, NetClientOptions tcpOptions, PoolOptions poolOptions, RedisSentinelConnectOptions connectOptions) {
-    super(vertx, tcpOptions, poolOptions, connectOptions);
+  public RedisSentinelClient(Vertx vertx, NetClientOptions tcpOptions, PoolOptions poolOptions, RedisSentinelConnectOptions connectOptions, TracingPolicy tracingPolicy) {
+    super(vertx, tcpOptions, poolOptions, connectOptions, tracingPolicy);
     this.connectOptions = connectOptions;
     // validate options
     if (poolOptions.getMaxSize() < 2) {
