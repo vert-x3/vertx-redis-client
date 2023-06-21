@@ -135,7 +135,7 @@ public class RedisClusterConnection implements RedisConnection {
       case 0:
         // can run anywhere
         if (REDUCERS.containsKey(cmd)) {
-          final List<Future> responses = new ArrayList<>(slots.size());
+          final List<Future<Response>> responses = new ArrayList<>(slots.size());
 
           for (int i = 0; i < slots.size(); i++) {
             String[] endpoints = slots.endpointsForSlot(i);
@@ -145,7 +145,7 @@ public class RedisClusterConnection implements RedisConnection {
             responses.add(p.future());
           }
 
-          CompositeFuture.all(responses).onComplete(composite -> {
+          Future.all(responses).onComplete(composite -> {
             if (composite.failed()) {
               // means if one of the operations failed, then we can fail the handler
               promise.fail(composite.cause());
@@ -163,66 +163,50 @@ public class RedisClusterConnection implements RedisConnection {
         send(selectEndpoint(ZModem.generate(keys.get(0)), cmd.isReadOnly(args), forceMasterEndpoint), RETRIES, req, promise);
         return promise.future();
       default:
+        // hashSlot -1 indicates that not all keys of the command targets the same hash slot,
+        // so Redis would not be able to execute it.
         int hashSlot = ZModem.generateMultiRaw(keys);
-        // -1 indicates that not all keys of the command targets the same hash slot, so Redis would not be able to execute it.
-        // we try to perform a reduction if we know how
         if (hashSlot == -1) {
-          int currentSlot = -1;
-
-          for (byte[] key : keys) {
-            int slot = ZModem.generate(key);
-            if (currentSlot == -1) {
-              currentSlot = slot;
-              continue;
-            }
-            if (currentSlot != slot) {
-
-              if (!REDUCERS.containsKey(cmd)) {
-                // we can't continue as we don't know how to reduce this
-                promise.fail(buildCrossslotFailureMsg(req));
-                return promise.future();
-              }
-
-              final Map<Integer, Request> requests = splitRequest(cmd, args);
-
-              if (requests.isEmpty()) {
-                // we can't continue as we don't know how to split this command
-                promise.fail(buildCrossslotFailureMsg(req));
-                return promise.future();
-              }
-
-              final List<Future> responses = new ArrayList<>(requests.size());
-
-              for (Map.Entry<Integer, Request> kv : requests.entrySet()) {
-                final Promise<Response> p = vertx.promise();
-                send(selectEndpoint(kv.getKey(), cmd.isReadOnly(args), forceMasterEndpoint), RETRIES, kv.getValue(), p);
-                responses.add(p.future());
-              }
-
-              CompositeFuture.all(responses).onComplete(composite -> {
-                if (composite.failed()) {
-                  // means if one of the operations failed, then we can fail the handler
-                  promise.fail(composite.cause());
-                } else {
-                  promise.complete(REDUCERS.get(cmd).apply(composite.result().list()));
-                }
-              });
-
-              return promise.future();
-            }
-
-            // all keys are on the same slot!
-            send(selectEndpoint(currentSlot, cmd.isReadOnly(args), forceMasterEndpoint), RETRIES, req, promise);
+          // not all keys are in same slot
+          // we try to perform a reduction if we know how
+          if (!REDUCERS.containsKey(cmd)) {
+            // we can't continue as we don't know how to reduce this
+            promise.fail(buildCrossslotFailureMsg(req));
             return promise.future();
           }
 
-          promise.fail(buildCrossslotFailureMsg(req));
+          final Map<Integer, Request> requests = splitRequest(cmd, args);
+
+          if (requests.isEmpty()) {
+            // we can't continue as we don't know how to split this command
+            promise.fail(buildCrossslotFailureMsg(req));
+            return promise.future();
+          }
+
+          final List<Future<Response>> responses = new ArrayList<>(requests.size());
+
+          for (Map.Entry<Integer, Request> kv : requests.entrySet()) {
+            final Promise<Response> p = vertx.promise();
+            send(selectEndpoint(kv.getKey(), cmd.isReadOnly(args), forceMasterEndpoint), RETRIES, kv.getValue(), p);
+            responses.add(p.future());
+          }
+
+          Future.all(responses).onComplete(composite -> {
+            if (composite.failed()) {
+              // means if one of the operations failed, then we can fail the handler
+              promise.fail(composite.cause());
+            } else {
+              promise.complete(REDUCERS.get(cmd).apply(composite.result().list()));
+            }
+          });
+
+          return promise.future();
+        } else {
+          // all keys are in same slot
+          String[] endpoints = slots.endpointsForKey(hashSlot);
+          send(selectMasterOrReplicaEndpoint(cmd.isReadOnly(args), endpoints, forceMasterEndpoint), RETRIES, req, promise);
           return promise.future();
         }
-
-        String[] endpoints = slots.endpointsForKey(hashSlot);
-        send(selectMasterOrReplicaEndpoint(cmd.isReadOnly(args), endpoints, forceMasterEndpoint), RETRIES, req, promise);
-        return promise.future();
     }
   }
 
@@ -481,14 +465,14 @@ public class RedisClusterConnection implements RedisConnection {
 
   @Override
   public Future<Void> close() {
-    List<Future> futures = new ArrayList<>();
+    List<Future<Void>> futures = new ArrayList<>();
     for (RedisConnection conn : connections.values()) {
       if (conn != null) {
         futures.add(conn.close());
       }
     }
 
-    return CompositeFuture.all(futures)
+    return Future.all(futures)
       .mapEmpty();
   }
 

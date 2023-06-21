@@ -1,5 +1,6 @@
 package io.vertx.redis.client.test;
 
+import io.vertx.codegen.annotations.Nullable;
 import io.vertx.core.CompositeFuture;
 import io.vertx.core.Context;
 import io.vertx.core.Future;
@@ -17,6 +18,7 @@ import org.testcontainers.containers.GenericContainer;
 
 import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.stream.Collectors;
 
 import static io.vertx.redis.client.Command.*;
 import static io.vertx.redis.client.Request.cmd;
@@ -930,6 +932,90 @@ public class RedisClusterTest {
           });
         });
       });
+  }
+
+  @Test(timeout = 30_000)
+  public void mgetMultiKeyInDifferentSlotsWithFirstTwoInSameSlots(TestContext should) {
+    final Async test = should.async();
+
+    final String key1 = "{hash_tag}.some-key1";
+    final String argv1 = "some-value1";
+    final String key2 = "{hash_tag}.some-key2";
+    final String argv2 = "some-value2";
+
+    final String key3 = "{other_hash_tag}.other-key1";
+    final String argv3 = "other-value1";
+    final String key4 = "{other_hash_tag}.other-key2";
+    final String argv4 = "other-value2";
+
+    client.connect().compose(cluster -> {
+      cluster.exceptionHandler(should::fail);
+      Future<@Nullable Response> setFuture1 = cluster.send(cmd(SET).arg(key1).arg(argv1));
+      Future<@Nullable Response> setFuture2 = cluster.send(cmd(SET).arg(key2).arg(argv2));
+      Future<@Nullable Response> setFuture3 = cluster.send(cmd(SET).arg(key3).arg(argv3));
+      Future<@Nullable Response> setFuture4 = cluster.send(cmd(SET).arg(key4).arg(argv4));
+      return Future.all(setFuture1, setFuture2, setFuture3, setFuture4)
+        .compose(compositeRet -> {
+          System.out.println("set operations successfully");
+          return cluster.send(cmd(MGET).arg(key1).arg(key2).arg(key3).arg(key4));
+        })
+        .compose(mgetResponse -> {
+          System.out.println("mget operation successfully");
+          Set<String> mgetRet = mgetResponse.stream().map(Response::toString)
+            .collect(Collectors.toSet());
+          should.assertTrue(mgetRet.contains(argv1));
+          should.assertTrue(mgetRet.contains(argv2));
+          should.assertTrue(mgetRet.contains(argv3));
+          should.assertTrue(mgetRet.contains(argv4));
+          test.complete();
+          return Future.succeededFuture();
+        });
+    }).onFailure(throwable -> {
+      throwable.printStackTrace();
+      should.fail(throwable);
+    });
+  }
+
+  @Test(timeout = 30_000)
+  public void mgetMultiKeyInDifferentSlotsWithFirstTwoInDifferentSlots(TestContext should) {
+    final Async test = should.async();
+
+    final String key1 = "{hash_tag}.some-key1";
+    final String argv1 = "some-value1";
+    final String key2 = "{hash_tag}.some-key2";
+    final String argv2 = "some-value2";
+
+    final String key3 = "{other_hash_tag}.other-key1";
+    final String argv3 = "other-value1";
+    final String key4 = "{other_hash_tag}.other-key2";
+    final String argv4 = "other-value2";
+
+    client.connect().compose(cluster -> {
+      cluster.exceptionHandler(should::fail);
+      Future<@Nullable Response> setFuture1 = cluster.send(cmd(SET).arg(key1).arg(argv1));
+      Future<@Nullable Response> setFuture2 = cluster.send(cmd(SET).arg(key2).arg(argv2));
+      Future<@Nullable Response> setFuture3 = cluster.send(cmd(SET).arg(key3).arg(argv3));
+      Future<@Nullable Response> setFuture4 = cluster.send(cmd(SET).arg(key4).arg(argv4));
+      return Future.all(setFuture1, setFuture2, setFuture3, setFuture4)
+        .compose(compositeRet -> {
+          System.out.println("set operations successfully");
+          return cluster.send(cmd(MGET).arg(key1).arg(key3).arg(key2).arg(key4));
+        })
+        .compose(mgetResponse -> {
+          System.out.println("mget operation successfully");
+          Set<String> mgetRet = mgetResponse.stream().map(Response::toString)
+            .collect(Collectors.toSet());
+          should.assertTrue(mgetRet.contains(argv1));
+          should.assertTrue(mgetRet.contains(argv2));
+          should.assertTrue(mgetRet.contains(argv3));
+          should.assertTrue(mgetRet.contains(argv4));
+          test.complete();
+          return Future.succeededFuture();
+        });
+    }).onFailure(throwable -> {
+      throwable.printStackTrace();
+      should.fail(throwable);
+    });
   }
 
   @Test(timeout = 30_000)
