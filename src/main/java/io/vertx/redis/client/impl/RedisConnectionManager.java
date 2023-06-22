@@ -33,6 +33,8 @@ import io.vertx.core.spi.metrics.PoolMetrics;
 import io.vertx.core.spi.metrics.VertxMetrics;
 import io.vertx.redis.client.Command;
 import io.vertx.redis.client.RedisConnection;
+import io.vertx.redis.client.RedisCredentials;
+import io.vertx.redis.client.RedisCredentialsProvider;
 import io.vertx.redis.client.RedisOptions;
 import io.vertx.redis.client.Request;
 import io.vertx.redis.client.impl.types.ErrorType;
@@ -197,44 +199,60 @@ class RedisConnectionManager {
         .closeHandler(connection::end)
         .exceptionHandler(connection::fail);
 
-      // initial handshake
-      hello(ctx, connection, redisURI, hello -> {
-        if (hello.failed()) {
-          ctx.execute(ctx.failedFuture(hello.cause()), onConnect);
+      // get credentials provider result
+      resolveCredentials(ctx, options.getCredentialsProvider(), credentials -> {
+        if (credentials.failed()) {
+          ctx.execute(ctx.failedFuture(credentials.cause()), onConnect);
           return;
         }
 
-        // perform select
-        select(ctx, connection, redisURI.select(), select -> {
-          if (select.failed()) {
-            ctx.execute(ctx.failedFuture(select.cause()), onConnect);
+        // initial handshake
+        hello(ctx, connection, redisURI, credentials.result(), hello -> {
+          if (hello.failed()) {
+            ctx.execute(ctx.failedFuture(hello.cause()), onConnect);
             return;
           }
 
-          // perform setup
-          setup(ctx, connection, setup, setupResult -> {
-            if (setupResult.failed()) {
-              ctx.execute(ctx.failedFuture(setupResult.cause()), onConnect);
+          // perform select
+          select(ctx, connection, redisURI.select(), select -> {
+            if (select.failed()) {
+              ctx.execute(ctx.failedFuture(select.cause()), onConnect);
               return;
             }
 
-            // connection is valid
-            connection.setValid();
+            // perform setup
+            setup(ctx, connection, setup, setupResult -> {
+              if (setupResult.failed()) {
+                ctx.execute(ctx.failedFuture(setupResult.cause()), onConnect);
+                return;
+              }
 
-            ctx.execute(ctx.succeededFuture(new ConnectResult<>(connection, 1, 0)), onConnect);
+              // connection is valid
+              connection.setValid();
+
+              ctx.execute(ctx.succeededFuture(new ConnectResult<>(connection, 1, 0)), onConnect);
+            });
           });
         });
       });
     }
 
-    private void hello(ContextInternal ctx, RedisConnection connection, RedisURI redisURI, Handler<AsyncResult<Void>> handler) {
+    private void resolveCredentials(final ContextInternal ctx, final RedisCredentialsProvider credentialsProvider, Handler<AsyncResult<RedisCredentials>> handler) {
+      if (credentialsProvider != null) {
+        credentialsProvider.resolveCredentials().onComplete(handler);
+      } else {
+        ctx.execute(ctx.succeededFuture(RedisCredentials.createEmptyCredentials()), handler);
+      }
+    }
+
+    private void hello(ContextInternal ctx, RedisConnection connection, RedisURI redisURI, RedisCredentials redisCredentials, Handler<AsyncResult<Void>> handler) {
       if (!options.isProtocolNegotiation()) {
         ping(ctx, connection, handler);
       } else {
         Request hello = Request.cmd(Command.HELLO).arg(RESPParser.VERSION);
 
-        String password = redisURI.password() != null ? redisURI.password() : options.getPassword();
-        String user = redisURI.user();
+        String password = getPassword(redisURI, redisCredentials, options.getPassword());
+        String user = getUser(redisURI, redisCredentials);
 
         if (password != null) {
           // will perform auth at hello level
@@ -278,6 +296,24 @@ class RedisConnectionManager {
           ctx.execute(ctx.failedFuture(err), handler);
         });
       }
+    }
+
+    private static String getUser(final RedisURI redisURI, final RedisCredentials redisCredentials) {
+      // credentials provider > URI
+      return redisCredentials.getUser() != null ? redisCredentials.getUser() : redisURI.user();
+    }
+
+    private static String getPassword(final RedisURI redisURI, final RedisCredentials redisCredentials,
+            final String optionsPassword) {
+      // credentials provider > URI > options
+      if (redisCredentials.getPassword() != null) {
+        return redisCredentials.getPassword();
+      }
+
+      if (redisURI.password() != null) {
+        return redisURI.password();
+      }
+      return optionsPassword;
     }
 
     private void ping(ContextInternal ctx, RedisConnection connection, Handler<AsyncResult<Void>> handler) {
