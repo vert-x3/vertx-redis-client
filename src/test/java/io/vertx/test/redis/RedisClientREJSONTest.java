@@ -37,7 +37,7 @@ public class RedisClientREJSONTest {
   public final RunTestOnContext rule = new RunTestOnContext();
 
   @ClassRule
-  public static final GenericContainer<?> container = new GenericContainer<>("redislabs/rejson:edge")
+  public static final GenericContainer<?> container = new GenericContainer<>("redislabs/rejson:2.4.7")
     .withExposedPorts(6379);
 
   @Test(timeout = 30_000L)

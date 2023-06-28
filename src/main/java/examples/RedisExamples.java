@@ -118,6 +118,7 @@ public class RedisExamples {
       private static final int MAX_RECONNECT_RETRIES = 16;
 
       private final RedisOptions options = new RedisOptions();
+      private Redis redis;
       private RedisConnection client;
       private final AtomicBoolean CONNECTING = new AtomicBoolean();
 
@@ -136,20 +137,29 @@ public class RedisExamples {
       private Future<RedisConnection> createRedisClient() {
         Promise<RedisConnection> promise = Promise.promise();
 
+        // make sure to invalidate old connection if present
+        if (redis != null) {
+          redis.close();;
+        }
+
         if (CONNECTING.compareAndSet(false, true)) {
-          Redis.createClient(vertx, options)
+          redis = Redis.createClient(vertx, options);
+          redis
             .connect()
             .onSuccess(conn -> {
-
-              // make sure to invalidate old connection if present
-              if (client != null) {
-                client.close();
-              }
+              client = conn;
 
               // make sure the client is reconnected on error
+              // eg, the underlying TCP connection is closed but the client side doesn't know it yet
+              //     the client tries to use the staled connection to talk to server. An exceptions will be raised
               conn.exceptionHandler(e -> {
-                // attempt to reconnect,
-                // if there is an unrecoverable error
+                attemptReconnect(0);
+              });
+
+              // make sure the client is reconnected on connection close
+              // eg, the underlying TCP connection is closed with normal 4-Way-Handshake
+              //     this handler will be notified instantly
+              conn.endHandler(placeHolder -> {
                 attemptReconnect(0);
               });
 
