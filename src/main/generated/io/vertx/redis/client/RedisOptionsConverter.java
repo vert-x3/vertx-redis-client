@@ -118,6 +118,11 @@ public class RedisOptionsConverter {
             obj.setUseReplicas(io.vertx.redis.client.RedisReplicas.valueOf((String)member.getValue()));
           }
           break;
+        case "user":
+          if (member.getValue() instanceof String) {
+            obj.setUser((String)member.getValue());
+          }
+          break;
       }
     }
   }
@@ -162,6 +167,9 @@ public class RedisOptionsConverter {
     }
     if (obj.getUseReplicas() != null) {
       json.put("useReplicas", obj.getUseReplicas().name());
+    }
+    if (obj.getUser() != null) {
+      json.put("user", obj.getUser());
     }
   }
 }

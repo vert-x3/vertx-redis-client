@@ -6,13 +6,11 @@ import io.vertx.core.Vertx;
 import io.vertx.core.impl.VertxInternal;
 import io.vertx.core.impl.logging.Logger;
 import io.vertx.core.impl.logging.LoggerFactory;
-import io.vertx.redis.client.Redis;
-import io.vertx.redis.client.RedisOptions;
-import io.vertx.redis.client.Request;
-import io.vertx.redis.client.Response;
+import io.vertx.redis.client.*;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.function.Supplier;
 
 public abstract class BaseRedisClient implements Redis {
 
@@ -21,9 +19,15 @@ public abstract class BaseRedisClient implements Redis {
   protected final VertxInternal vertx;
   protected final RedisConnectionManager connectionManager;
 
-  public BaseRedisClient(Vertx vertx, RedisOptions options) {
+  protected final RedisOptions options;
+
+  protected final Supplier<Future<RedisOptions>> optionsSupplier;
+
+  public BaseRedisClient(Vertx vertx, RedisOptions options, Supplier<Future<RedisOptions>> optionsSupplier) {
+    this.options = options;
+    this.optionsSupplier = optionsSupplier;
     this.vertx = (VertxInternal) vertx;
-    this.connectionManager = new RedisConnectionManager(this.vertx, options);
+    this.connectionManager = new RedisConnectionManager(this.vertx, options, optionsSupplier);
     this.connectionManager.start();
   }
 

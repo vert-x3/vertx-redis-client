@@ -18,17 +18,17 @@ package io.vertx.redis.client.impl;
 import io.vertx.core.*;
 import io.vertx.redis.client.*;
 
+import java.util.function.Supplier;
+
 public class RedisClient extends BaseRedisClient implements Redis {
 
-  private final String defaultAddress;
-
-  public RedisClient(Vertx vertx, RedisOptions options) {
-    super(vertx, options);
-    this.defaultAddress = options.getEndpoint();
+  public RedisClient(Vertx vertx, RedisOptions options, Supplier<Future<RedisOptions>> optionsSupplier) {
+    super(vertx, options, optionsSupplier);
   }
 
   @Override
   public Future<RedisConnection> connect() {
-    return connectionManager.getConnection(defaultAddress, null);
+    return optionsSupplier.get().flatMap(options ->
+            connectionManager.getConnection(options.getEndpoint(), null));
   }
 }

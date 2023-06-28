@@ -7,6 +7,7 @@ import io.vertx.core.impl.logging.LoggerFactory;
 import io.vertx.redis.client.*;
 
 import java.util.*;
+import java.util.function.Supplier;
 
 public class RedisReplicationConnection implements RedisConnection {
 
@@ -22,13 +23,13 @@ public class RedisReplicationConnection implements RedisConnection {
   public static void addMasterOnlyCommand(Command command) {
     MASTER_ONLY_COMMANDS.add(command);
   }
-
-  private final RedisOptions options;
+  private final Supplier<Future<RedisOptions>> optionsSupplier;
   private final RedisConnection master;
   private final List<RedisConnection> replicas;
 
-  RedisReplicationConnection(Vertx vertx, RedisOptions options, RedisConnection master, List<RedisConnection> replicas) {
-    this.options = options;
+  RedisReplicationConnection(Vertx vertx, Supplier<Future<RedisOptions>> optionsSupplier,
+                             RedisConnection master, List<RedisConnection> replicas) {
+    this.optionsSupplier = optionsSupplier;
     this.master = master;
     this.replicas = replicas;
   }
@@ -112,32 +113,35 @@ public class RedisReplicationConnection implements RedisConnection {
     final CommandImpl cmd = (CommandImpl) req.command();
     final boolean forceMasterEndpoint = MASTER_ONLY_COMMANDS.contains(cmd);
 
-    return selectMasterOrReplicaEndpoint(cmd.isReadOnly(req.getArgs()), forceMasterEndpoint)
-      .send(request);
+    return optionsSupplier.get().flatMap(options ->
+      selectMasterOrReplicaEndpoint(cmd.isReadOnly(req.getArgs()), forceMasterEndpoint, options)
+        .send(request));
   }
 
   @Override
   public Future<List<Response>> batch(List<Request> requests) {
-    if (requests.isEmpty()) {
-      LOG.debug("Empty batch");
-      return Future.succeededFuture(Collections.emptyList());
-    } else {
-      boolean readOnly = false;
-      boolean forceMasterEndpoint = false;
+    return optionsSupplier.get().flatMap(options -> {
+      if (requests.isEmpty()) {
+        LOG.debug("Empty batch");
+        return Future.succeededFuture(Collections.emptyList());
+      } else {
+        boolean readOnly = false;
+        boolean forceMasterEndpoint = false;
 
-      // look up the base slot for the batch
-      for (Request request : requests) {
-        // process commands for cluster mode
-        final RequestImpl req = (RequestImpl) request;
-        final CommandImpl cmd = (CommandImpl) req.command();
+        // look up the base slot for the batch
+        for (Request request : requests) {
+          // process commands for cluster mode
+          final RequestImpl req = (RequestImpl) request;
+          final CommandImpl cmd = (CommandImpl) req.command();
 
-        readOnly |= cmd.isReadOnly(req.getArgs());
-        forceMasterEndpoint |= MASTER_ONLY_COMMANDS.contains(cmd);
+          readOnly |= cmd.isReadOnly(req.getArgs());
+          forceMasterEndpoint |= MASTER_ONLY_COMMANDS.contains(cmd);
+        }
+
+        return selectMasterOrReplicaEndpoint(readOnly, forceMasterEndpoint, options)
+          .batch(requests);
       }
-
-      return selectMasterOrReplicaEndpoint(readOnly, forceMasterEndpoint)
-        .batch(requests);
-    }
+    });
   }
 
   @Override
@@ -170,7 +174,7 @@ public class RedisReplicationConnection implements RedisConnection {
     return result;
   }
 
-  private RedisConnection selectMasterOrReplicaEndpoint(boolean read, boolean forceMasterEndpoint) {
+  private RedisConnection selectMasterOrReplicaEndpoint(boolean read, boolean forceMasterEndpoint, RedisOptions options) {
     if (forceMasterEndpoint) {
       return master;
     }

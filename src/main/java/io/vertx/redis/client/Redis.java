@@ -16,6 +16,7 @@
 package io.vertx.redis.client;
 
 import io.vertx.codegen.annotations.Fluent;
+import io.vertx.codegen.annotations.GenIgnore;
 import io.vertx.codegen.annotations.Nullable;
 import io.vertx.codegen.annotations.VertxGen;
 import io.vertx.core.*;
@@ -25,6 +26,7 @@ import io.vertx.redis.client.impl.RedisReplicationClient;
 import io.vertx.redis.client.impl.RedisSentinelClient;
 
 import java.util.List;
+import java.util.function.Supplier;
 
 /**
  * A simple Redis client.
@@ -59,15 +61,29 @@ public interface Redis {
    * @return the client
    */
   static Redis createClient(Vertx vertx, RedisOptions options) {
+    return createClient(vertx, options, () -> Future.succeededFuture(new RedisOptions(options)));
+  }
+
+  /**
+   * Create a new redis client using the given client options.
+   *
+   * @param vertx the vertx instance
+   * @param options the user provided options
+   * @param optionsSupplier the user provided options, which can be changed dynamically.
+   *                        Values like type cannot be changed.
+   * @return the client
+   */
+  @GenIgnore(GenIgnore.PERMITTED_TYPE)
+  static Redis createClient(Vertx vertx, RedisOptions options, Supplier<Future<RedisOptions>> optionsSupplier) {
     switch (options.getType()) {
       case STANDALONE:
-        return new RedisClient(vertx, options);
+        return new RedisClient(vertx, options, optionsSupplier);
       case SENTINEL:
-        return new RedisSentinelClient(vertx, options);
+        return new RedisSentinelClient(vertx, options, optionsSupplier);
       case CLUSTER:
-        return new RedisClusterClient(vertx, options);
+        return new RedisClusterClient(vertx, options, optionsSupplier);
       case REPLICATION:
-        return new RedisReplicationClient(vertx, options);
+        return new RedisReplicationClient(vertx, options, optionsSupplier);
       default:
         throw new IllegalStateException("Unknown Redis Client type: " + options.getType());
     }
@@ -75,8 +91,7 @@ public interface Redis {
 
   /**
    * Connects to the redis server.
-   *
-   * @param handler  the async result handler
+   * @param handler the async result handler
    * @return a reference to this, so the API can be used fluently
    */
   @Fluent
@@ -87,7 +102,6 @@ public interface Redis {
 
   /**
    * Connects to the redis server.
-   *
    * @return a future with the result of the operation
    */
   Future<RedisConnection> connect();
