@@ -73,7 +73,7 @@ public interface Redis {
    *                        Values like type cannot be changed.
    * @return the client
    */
-  @GenIgnore
+  @GenIgnore(GenIgnore.PERMITTED_TYPE)
   static Redis createClient(Vertx vertx, RedisOptions options, Supplier<Future<RedisOptions>> optionsSupplier) {
     switch (options.getType()) {
       case STANDALONE:
