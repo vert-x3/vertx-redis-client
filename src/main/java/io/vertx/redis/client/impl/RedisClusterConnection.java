@@ -41,13 +41,13 @@ public class RedisClusterConnection implements RedisConnection {
   }
 
   private final VertxInternal vertx;
-  private final RedisOptions options;
+  private final RedisClusterConnectOptions connectOptions;
   private final Slots slots;
   private final Map<String, RedisConnection> connections;
 
-  RedisClusterConnection(Vertx vertx, RedisOptions options, Slots slots, Map<String, RedisConnection> connections) {
+  RedisClusterConnection(Vertx vertx, RedisClusterConnectOptions connectOptions, Slots slots, Map<String, RedisConnection> connections) {
     this.vertx = (VertxInternal) vertx;
-    this.options = options;
+    this.connectOptions = connectOptions;
     this.slots = slots;
     this.connections = connections;
   }
@@ -296,9 +296,9 @@ public class RedisClusterConnection implements RedisConnection {
           return;
         }
 
-        if (cause.is("NOAUTH") && options.getPassword() != null) {
+        if (cause.is("NOAUTH") && connectOptions.getPassword() != null) {
           // NOAUTH will try to authenticate
-          connection.send(cmd(AUTH).arg(options.getPassword()), auth -> {
+          connection.send(cmd(AUTH).arg(connectOptions.getPassword()), auth -> {
             if (auth.failed()) {
               handler.handle(Future.failedFuture(auth.cause()));
               return;
@@ -441,9 +441,9 @@ public class RedisClusterConnection implements RedisConnection {
           return;
         }
 
-        if (cause.is("NOAUTH") && options.getPassword() != null) {
+        if (cause.is("NOAUTH") && connectOptions.getPassword() != null) {
           // try to authenticate
-          connection.send(cmd(AUTH).arg(options.getPassword()), auth -> {
+          connection.send(cmd(AUTH).arg(connectOptions.getPassword()), auth -> {
             if (auth.failed()) {
               handler.handle(Future.failedFuture(auth.cause()));
               return;
@@ -502,7 +502,7 @@ public class RedisClusterConnection implements RedisConnection {
 
     // if we haven't got config for this slot, try any connection
     if (endpoints == null || endpoints.length == 0) {
-      return options.getEndpoint();
+      return connectOptions.getEndpoint();
     }
     return selectMasterOrReplicaEndpoint(readOnly, endpoints, forceMasterEndpoint);
   }
@@ -513,7 +513,7 @@ public class RedisClusterConnection implements RedisConnection {
     }
 
     // always, never, share
-    RedisReplicas useReplicas = options.getUseReplicas();
+    RedisReplicas useReplicas = connectOptions.getUseReplicas();
 
     if (readOnly && useReplicas != RedisReplicas.NEVER && endpoints.length > 1) {
       switch (useReplicas) {

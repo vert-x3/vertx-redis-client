@@ -16,15 +16,16 @@
 package io.vertx.redis.client.impl;
 
 import io.vertx.core.*;
+import io.vertx.core.net.NetClientOptions;
 import io.vertx.redis.client.*;
 
 public class RedisClient extends BaseRedisClient implements Redis {
 
   private final String defaultAddress;
 
-  public RedisClient(Vertx vertx, RedisOptions options) {
-    super(vertx, options);
-    this.defaultAddress = options.getEndpoint();
+  public RedisClient(Vertx vertx, NetClientOptions tcpOptions, PoolOptions poolOptions, RedisConnectOptions connectOptions) {
+    super(vertx, tcpOptions, poolOptions, connectOptions);
+    this.defaultAddress = connectOptions.getEndpoint();
   }
 
   @Override

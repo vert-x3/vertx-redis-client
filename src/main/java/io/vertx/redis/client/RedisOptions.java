@@ -16,13 +16,13 @@
 package io.vertx.redis.client;
 
 import io.vertx.codegen.annotations.DataObject;
+import io.vertx.codegen.annotations.GenIgnore;
 import io.vertx.core.json.JsonObject;
 import io.vertx.core.net.NetClientOptions;
 import io.vertx.redis.client.impl.RedisURI;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.UUID;
 
 /**
  * Redis Client Configuration options.
@@ -40,6 +40,7 @@ public class RedisOptions {
   private RedisClientType type;
   private NetClientOptions netClientOptions;
   private List<String> endpoints;
+  private PoolOptions poolOptions;
   private int maxWaitingHandlers;
   private int maxNestedArrays;
   private String masterName;
@@ -48,39 +49,21 @@ public class RedisOptions {
   private volatile String password;
   private boolean protocolNegotiation;
 
-  // pool related options
-  private String poolName;
-  private int poolCleanerInterval;
-  private int maxPoolSize;
-  private int maxPoolWaiting;
-  private int poolRecycleTimeout;
-
-  private void init() {
+  /**
+   * Creates a default configuration object using redis server defaults
+   */
+  public RedisOptions() {
     netClientOptions =
       new NetClientOptions()
         .setTcpKeepAlive(true)
         .setTcpNoDelay(true);
 
+    poolOptions = new PoolOptions();
+    type = RedisClientType.STANDALONE;
+    useReplicas = RedisReplicas.NEVER;
+    maxNestedArrays = 32;
     protocolNegotiation = true;
     maxWaitingHandlers = 2048;
-    maxNestedArrays = 32;
-    masterName = "mymaster";
-    role = RedisRole.MASTER;
-    useReplicas = RedisReplicas.NEVER;
-    type = RedisClientType.STANDALONE;
-    poolName = UUID.randomUUID().toString();
-    // thumb guess based on web browser defaults
-    poolCleanerInterval = 30_000;
-    maxPoolSize = 6;
-    maxPoolWaiting = 24;
-    poolRecycleTimeout = 180_000;
-  }
-
-  /**
-   * Creates a default configuration object using redis server defaults
-   */
-  public RedisOptions() {
-    init();
   }
 
   /**
@@ -91,18 +74,12 @@ public class RedisOptions {
   public RedisOptions(RedisOptions other) {
     this.type = other.type;
     this.netClientOptions = other.netClientOptions;
+    this.poolOptions = new PoolOptions(other.poolOptions);
     this.endpoints = other.endpoints;
-    this.maxWaitingHandlers = other.maxWaitingHandlers;
     this.maxNestedArrays = other.maxNestedArrays;
     this.masterName = other.masterName;
     this.role = other.role;
     this.useReplicas = other.useReplicas;
-    // pool related options
-    this.poolName = other.poolName;
-    this.poolCleanerInterval = other.poolCleanerInterval;
-    this.maxPoolSize = other.maxPoolSize;
-    this.maxPoolWaiting = other.maxPoolWaiting;
-    this.poolRecycleTimeout = other.poolRecycleTimeout;
     this.password = other.password;
     this.protocolNegotiation = other.protocolNegotiation;
   }
@@ -113,7 +90,7 @@ public class RedisOptions {
    * @param json source json
    */
   public RedisOptions(JsonObject json) {
-    init();
+    this();
     RedisOptionsConverter.fromJson(json, this);
   }
 
@@ -373,12 +350,20 @@ public class RedisOptions {
   }
 
   /**
+   * @return the pool options
+   */
+  @GenIgnore
+  public PoolOptions getPoolOptions() {
+    return poolOptions;
+  }
+
+  /**
    * Tune how often in milliseconds should the connection pool cleaner execute.
    *
    * @return the cleaning internal
    */
   public int getPoolCleanerInterval() {
-    return poolCleanerInterval;
+    return poolOptions.getCleanerInterval();
   }
 
   /**
@@ -391,7 +376,7 @@ public class RedisOptions {
    * @return fluent self.
    */
   public RedisOptions setPoolCleanerInterval(int poolCleanerInterval) {
-    this.poolCleanerInterval = poolCleanerInterval;
+    poolOptions.setCleanerInterval(poolCleanerInterval);
     return this;
   }
 
@@ -401,7 +386,7 @@ public class RedisOptions {
    * @return the size.
    */
   public int getMaxPoolSize() {
-    return maxPoolSize;
+    return poolOptions.getMaxSize();
   }
 
   /**
@@ -412,7 +397,7 @@ public class RedisOptions {
    * @return fluent self.
    */
   public RedisOptions setMaxPoolSize(int maxPoolSize) {
-    this.maxPoolSize = maxPoolSize;
+    poolOptions.setMaxSize(maxPoolSize);
     return this;
   }
 
@@ -422,7 +407,7 @@ public class RedisOptions {
    * @return the maximum waiting requests.
    */
   public int getMaxPoolWaiting() {
-    return maxPoolWaiting;
+    return poolOptions.getMaxWaiting();
   }
 
   /**
@@ -432,7 +417,7 @@ public class RedisOptions {
    * @return fluent self.
    */
   public RedisOptions setMaxPoolWaiting(int maxPoolWaiting) {
-    this.maxPoolWaiting = maxPoolWaiting;
+    poolOptions.setMaxWaiting(maxPoolWaiting);
     return this;
   }
 
@@ -442,7 +427,7 @@ public class RedisOptions {
    * @return the timeout for recycling.
    */
   public int getPoolRecycleTimeout() {
-    return poolRecycleTimeout;
+    return poolOptions.getRecycleTimeout();
   }
 
   /**
@@ -452,7 +437,7 @@ public class RedisOptions {
    * @return fluent self.
    */
   public RedisOptions setPoolRecycleTimeout(int poolRecycleTimeout) {
-    this.poolRecycleTimeout = poolRecycleTimeout;
+    poolOptions.setRecycleTimeout(poolRecycleTimeout);
     return this;
   }
 
@@ -519,7 +504,7 @@ public class RedisOptions {
    * @return fluent self
    */
   public RedisOptions setPoolName(String poolName) {
-    this.poolName = poolName;
+    poolOptions.setName(poolName);
     return this;
   }
 
@@ -528,7 +513,7 @@ public class RedisOptions {
    * @return pool name.
    */
   public String getPoolName() {
-    return this.poolName;
+    return poolOptions.getName();
   }
 
   /**
