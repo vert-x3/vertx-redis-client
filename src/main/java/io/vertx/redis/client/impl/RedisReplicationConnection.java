@@ -28,12 +28,12 @@ public class RedisReplicationConnection implements RedisConnection {
     MASTER_ONLY_COMMANDS.add(command);
   }
 
-  private final RedisOptions options;
+  private final RedisClusterConnectOptions connectOptions;
   private final RedisConnection master;
   private final List<RedisConnection> replicas;
 
-  RedisReplicationConnection(Vertx vertx, RedisOptions options, RedisConnection master, List<RedisConnection> replicas) {
-    this.options = options;
+  RedisReplicationConnection(Vertx vertx, RedisClusterConnectOptions connectOptions, RedisConnection master, List<RedisConnection> replicas) {
+    this.connectOptions = connectOptions;
     this.master = master;
     this.replicas = replicas;
   }
@@ -181,7 +181,7 @@ public class RedisReplicationConnection implements RedisConnection {
     }
 
     // always, never, share
-    RedisReplicas useReplicas = options.getUseReplicas();
+    RedisReplicas useReplicas = connectOptions.getUseReplicas();
 
     if (read && useReplicas != RedisReplicas.NEVER && replicas.size() > 0) {
       switch (useReplicas) {
