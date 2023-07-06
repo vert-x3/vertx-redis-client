@@ -25,6 +25,8 @@ import io.vertx.redis.client.impl.RedisReplicationClient;
 import io.vertx.redis.client.impl.RedisSentinelClient;
 
 import java.util.List;
+import java.util.function.Consumer;
+import java.util.function.Supplier;
 
 /**
  * A simple Redis client.
@@ -64,13 +66,13 @@ public interface Redis {
   static Redis createClient(Vertx vertx, RedisOptions options) {
     switch (options.getType()) {
       case STANDALONE:
-        return new RedisClient(vertx, options);
+        return new RedisClient(vertx, options.getNetClientOptions(), options.getPoolOptions(), new RedisStandaloneConnectOptions(options));
       case SENTINEL:
-        return new RedisSentinelClient(vertx, options);
+        return new RedisSentinelClient(vertx, options.getNetClientOptions(), options.getPoolOptions(), new RedisSentinelConnectOptions(options));
       case CLUSTER:
-        return new RedisClusterClient(vertx, options);
+        return new RedisClusterClient(vertx, options.getNetClientOptions(), options.getPoolOptions(), new RedisClusterConnectOptions(options));
       case REPLICATION:
-        return new RedisReplicationClient(vertx, options);
+        return new RedisReplicationClient(vertx, options.getNetClientOptions(), options.getPoolOptions(), new RedisClusterConnectOptions(options));
       default:
         throw new IllegalStateException("Unknown Redis Client type: " + options.getType());
     }

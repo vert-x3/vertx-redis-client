@@ -24,6 +24,7 @@ import io.vertx.core.impl.future.PromiseInternal;
 import io.vertx.core.impl.logging.Logger;
 import io.vertx.core.impl.logging.LoggerFactory;
 import io.vertx.core.net.NetClient;
+import io.vertx.core.net.NetClientOptions;
 import io.vertx.core.net.NetSocket;
 import io.vertx.core.net.impl.pool.*;
 import io.vertx.core.spi.metrics.PoolMetrics;
@@ -42,26 +43,30 @@ class RedisConnectionManager {
   private final VertxInternal vertx;
   private final NetClient netClient;
   private final PoolMetrics metrics;
+  private final NetClientOptions tcpOptions;
+  private final PoolOptions poolOptions;
+  private final RedisConnectOptions connectOptions;
 
-  private final RedisOptions options;
   private final ConnectionManager<ConnectionKey, Lease<RedisConnectionInternal>> pooledConnectionManager;
   private long timerID;
 
-  RedisConnectionManager(VertxInternal vertx, RedisOptions options) {
+  RedisConnectionManager(VertxInternal vertx, NetClientOptions tcpOptions, PoolOptions poolOptions, RedisConnectOptions connectOptions) {
     this.vertx = vertx;
-    this.options = options;
+    this.tcpOptions = tcpOptions;
+    this.poolOptions = poolOptions;
+    this.connectOptions = connectOptions;
     VertxMetrics metricsSPI = this.vertx.metricsSPI();
-    metrics = metricsSPI != null ? metricsSPI.createPoolMetrics("redis", options.getPoolName(), options.getMaxPoolSize()) : null;
-    this.netClient = vertx.createNetClient(options.getNetClientOptions());
+    metrics = metricsSPI != null ? metricsSPI.createPoolMetrics("redis", poolOptions.getName(), poolOptions.getMaxSize()) : null;
+    this.netClient = vertx.createNetClient(tcpOptions);
     this.pooledConnectionManager = new ConnectionManager<>((key, dispose) -> connectionEndpointProvider(dispose, key.string, key.setup));
   }
 
   private Endpoint<Lease<RedisConnectionInternal>> connectionEndpointProvider(Runnable dispose, String connectionString, Request setup) {
-    return new RedisEndpoint(vertx, netClient, options, dispose, connectionString, setup);
+    return new RedisEndpoint(vertx, netClient, tcpOptions, poolOptions, connectOptions, dispose, connectionString, setup);
   }
 
   synchronized void start() {
-    long period = options.getPoolCleanerInterval();
+    long period = poolOptions.getCleanerInterval();
     this.timerID = period > 0 ? vertx.setTimer(period, id -> checkExpired(period)) : -1;
   }
 
@@ -110,11 +115,15 @@ class RedisConnectionManager {
     private final NetClient netClient;
     private final RedisURI redisURI;
     private final Request setup;
-    private final RedisOptions options;
+    private final NetClientOptions netClientOptions;
+    private final PoolOptions poolOptions;
+    private final RedisConnectOptions options;
 
-    public RedisConnectionProvider(VertxInternal vertx, NetClient netClient, RedisOptions options, String connectionString, Request setup) {
+    public RedisConnectionProvider(VertxInternal vertx, NetClient netClient, NetClientOptions netClientOptions, PoolOptions poolOptions, RedisConnectOptions options, String connectionString, Request setup) {
       this.vertx = vertx;
       this.netClient = netClient;
+      this.netClientOptions = netClientOptions;
+      this.poolOptions = poolOptions;
       this.options = options;
       this.redisURI = new RedisURI(connectionString);
       this.setup = setup;
@@ -128,7 +137,7 @@ class RedisConnectionManager {
     @Override
     public Future<ConnectResult<RedisConnectionInternal>> connect(EventLoopContext ctx, Listener listener) {
       // verify if we can make this connection
-      final boolean netClientSsl = options.getNetClientOptions().isSsl();
+      final boolean netClientSsl = netClientOptions.isSsl();
       final boolean connectionStringSsl = redisURI.ssl();
       final boolean connectionStringInetSocket = redisURI.socketAddress().isInetSocket();
 
@@ -174,7 +183,7 @@ class RedisConnectionManager {
 
     private Future<ConnectResult<RedisConnectionInternal>> init(ContextInternal ctx, NetSocket netSocket, PoolConnector.Listener connectionListener) {
       // the connection will inherit the user event loop context
-      final RedisStandaloneConnection connection = new RedisStandaloneConnection(vertx, ctx, connectionListener, netSocket, options);
+      final RedisStandaloneConnection connection = new RedisStandaloneConnection(vertx, ctx, connectionListener, netSocket, poolOptions, options.getMaxWaitingHandlers());
       // initialization
       connection.exceptionHandler(DEFAULT_EXCEPTION_HANDLER);
 
@@ -346,10 +355,10 @@ class RedisConnectionManager {
 
     final ConnectionPool<RedisConnectionInternal> pool;
 
-    public RedisEndpoint(VertxInternal vertx, NetClient netClient, RedisOptions options, Runnable dispose, String connectionString, Request setup) {
+    public RedisEndpoint(VertxInternal vertx, NetClient netClient, NetClientOptions netClientOptions, PoolOptions poolOptions, RedisConnectOptions connectOptions, Runnable dispose, String connectionString, Request setup) {
       super(dispose);
-      PoolConnector<RedisConnectionInternal> connector = new RedisConnectionProvider(vertx, netClient, options, connectionString, setup);
-      pool = ConnectionPool.pool(connector, new int[]{options.getMaxPoolSize()}, options.getMaxPoolWaiting());
+      PoolConnector<RedisConnectionInternal> connector = new RedisConnectionProvider(vertx, netClient, netClientOptions, poolOptions, connectOptions, connectionString, setup);
+      pool = ConnectionPool.pool(connector, new int[]{poolOptions.getMaxSize()}, poolOptions.getMaxWaiting());
     }
 
     @Override

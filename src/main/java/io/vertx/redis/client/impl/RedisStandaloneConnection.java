@@ -51,15 +51,15 @@ public class RedisStandaloneConnection implements RedisConnectionInternal, Parse
   private boolean closed = false;
   private boolean tainted = false;
 
-  public RedisStandaloneConnection(VertxInternal vertx, ContextInternal context, PoolConnector.Listener connectionListener, NetSocket netSocket, RedisOptions options) {
+  public RedisStandaloneConnection(VertxInternal vertx, ContextInternal context, PoolConnector.Listener connectionListener, NetSocket netSocket, PoolOptions options, int maxWaitingHandlers) {
     //System.out.println("<ctor>#" + this.hashCode());
     this.vertx = vertx;
     this.context = context;
     this.listener = connectionListener;
     this.eventBus = vertx.eventBus();
     this.netSocket = netSocket;
-    this.waiting = new ArrayQueue(options.getMaxWaitingHandlers());
-    this.expiresAt = options.getPoolRecycleTimeout() == -1 ? -1 : System.currentTimeMillis() + options.getPoolRecycleTimeout();
+    this.waiting = new ArrayQueue(maxWaitingHandlers);
+    this.expiresAt = options.getRecycleTimeout() == -1 ? -1 : System.currentTimeMillis() + options.getRecycleTimeout();
   }
 
   synchronized void setValid() {

@@ -18,6 +18,7 @@ package io.vertx.redis.client.impl;
 import io.vertx.core.*;
 import io.vertx.core.impl.logging.Logger;
 import io.vertx.core.impl.logging.LoggerFactory;
+import io.vertx.core.net.NetClientOptions;
 import io.vertx.redis.client.*;
 import io.vertx.redis.client.impl.types.MultiType;
 import io.vertx.redis.client.impl.types.NumberType;
@@ -119,14 +120,16 @@ public class RedisClusterClient extends BaseRedisClient implements Redis {
     addReducer(PUNSUBSCRIBE, list -> SimpleStringType.OK);
   }
 
-  private final RedisOptions options;
+  private final RedisClusterConnectOptions connectOptions;
+  private final PoolOptions poolOptions;
 
-  public RedisClusterClient(Vertx vertx, RedisOptions options) {
-    super(vertx, options);
-    this.options = options;
+  public RedisClusterClient(Vertx vertx, NetClientOptions tcpOptions, PoolOptions poolOptions, RedisClusterConnectOptions connectOptions) {
+    super(vertx, tcpOptions, poolOptions, connectOptions);
+    this.connectOptions = connectOptions;
+    this.poolOptions = poolOptions;
     // validate options
-    if (options.getMaxPoolWaiting() < options.getMaxPoolSize()) {
-      throw new IllegalStateException("Invalid options: maxPoolWaiting < maxPoolSize");
+    if (poolOptions.getMaxWaiting() < poolOptions.getMaxSize()) {
+      throw new IllegalStateException("Invalid options: maxWaiting < maxSize");
       // we can't validate the max pool size yet as we need to know the slots first
       // the remaining validation will happen at the connect time
     }
@@ -136,7 +139,7 @@ public class RedisClusterClient extends BaseRedisClient implements Redis {
   public Future<RedisConnection> connect() {
     final Promise<RedisConnection> promise = vertx.promise();
     // attempt to load the slots from the first good endpoint
-    connect(options.getEndpoints(), 0, promise);
+    connect(connectOptions.getEndpoints(), 0, promise);
     return promise.future();
   }
 
@@ -147,7 +150,7 @@ public class RedisClusterClient extends BaseRedisClient implements Redis {
       return;
     }
 
-    connectionManager.getConnection(endpoints.get(index), RedisReplicas.NEVER != options.getUseReplicas() ? cmd(READONLY) : null)
+    connectionManager.getConnection(endpoints.get(index), RedisReplicas.NEVER != connectOptions.getUseReplicas() ? cmd(READONLY) : null)
       .onFailure(err -> {
         // failed try with the next endpoint
         connect(endpoints, index + 1, onConnect);
@@ -171,14 +174,14 @@ public class RedisClusterClient extends BaseRedisClient implements Redis {
 
             // validate if the pool config is valid
             final int totalUniqueEndpoints = slots.endpoints().length;
-            if (options.getMaxPoolSize() < totalUniqueEndpoints) {
+            if (poolOptions.getMaxSize() < totalUniqueEndpoints) {
               // this isn't a valid setup, the connection pool will not accommodate all the required connections
               onConnect.handle(Future.failedFuture("RedisOptions maxPoolSize < Cluster size(" + totalUniqueEndpoints + "): The pool is not able to hold all required connections!"));
               return;
             }
 
             for (String endpoint : slots.endpoints()) {
-              connectionManager.getConnection(endpoint, RedisReplicas.NEVER != options.getUseReplicas() ? cmd(READONLY) : null)
+              connectionManager.getConnection(endpoint, RedisReplicas.NEVER !=  connectOptions.getUseReplicas() ? cmd(READONLY) : null)
                 .onFailure(err -> {
                   // failed try with the next endpoint
                   failed.set(true);
@@ -216,7 +219,7 @@ public class RedisClusterClient extends BaseRedisClient implements Redis {
         // return
         onConnect.handle(Future.failedFuture("Failed to connect to all nodes of the cluster"));
       } else {
-        onConnect.handle(Future.succeededFuture(new RedisClusterConnection(vertx, options, slots, connections)));
+        onConnect.handle(Future.succeededFuture(new RedisClusterConnection(vertx, connectOptions, slots, connections)));
       }
     }
   }
