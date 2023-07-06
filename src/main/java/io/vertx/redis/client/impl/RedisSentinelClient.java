@@ -18,12 +18,12 @@ package io.vertx.redis.client.impl;
 import io.vertx.core.*;
 import io.vertx.core.impl.logging.Logger;
 import io.vertx.core.impl.logging.LoggerFactory;
+import io.vertx.core.net.NetClientOptions;
 import io.vertx.redis.client.*;
 import io.vertx.redis.client.impl.types.ErrorType;
 
 import java.util.List;
 import java.util.Random;
-import java.util.SplittableRandom;
 
 import static io.vertx.redis.client.Command.*;
 import static io.vertx.redis.client.Request.cmd;
@@ -46,18 +46,18 @@ public class RedisSentinelClient extends BaseRedisClient implements Redis {
 
   private static final Logger LOG = LoggerFactory.getLogger(RedisSentinelClient.class);
 
-  private final RedisOptions options;
+  private final RedisSentinelConnectOptions connectOptions;
   private RedisConnection sentinel;
 
-  public RedisSentinelClient(Vertx vertx, RedisOptions options) {
-    super(vertx, options);
-    this.options = options;
+  public RedisSentinelClient(Vertx vertx, NetClientOptions tcpOptions, PoolOptions poolOptions, RedisSentinelConnectOptions connectOptions) {
+    super(vertx, tcpOptions, poolOptions, connectOptions);
+    this.connectOptions = connectOptions;
     // validate options
-    if (options.getMaxPoolSize() < 2) {
-      throw new IllegalStateException("Invalid options: maxPoolSize must be at least 2");
+    if (poolOptions.getMaxSize() < 2) {
+      throw new IllegalStateException("Invalid options: maxSize must be at least 2");
     }
-    if (options.getMaxPoolWaiting() < options.getMaxPoolSize()) {
-      throw new IllegalStateException("Invalid options: maxPoolWaiting < maxPoolSize");
+    if (poolOptions.getMaxWaiting() < poolOptions.getMaxSize()) {
+      throw new IllegalStateException("Invalid options: maxWaiting < maxSize");
     }
   }
 
@@ -66,7 +66,7 @@ public class RedisSentinelClient extends BaseRedisClient implements Redis {
     final Promise<RedisConnection> promise = vertx.promise();
 
     // sentinel (HA) requires 2 connections, one to watch for sentinel events and the connection itself
-    createConnectionInternal(options, options.getRole(), createConnection -> {
+    createConnectionInternal(connectOptions, connectOptions.getRole(), createConnection -> {
       if (createConnection.failed()) {
         promise.fail(createConnection.cause());
         return;
@@ -74,7 +74,7 @@ public class RedisSentinelClient extends BaseRedisClient implements Redis {
 
       final RedisConnection conn = createConnection.result();
 
-      createConnectionInternal(options, RedisRole.SENTINEL, create -> {
+      createConnectionInternal(connectOptions, RedisRole.SENTINEL, create -> {
         if (create.failed()) {
           LOG.error("Redis PUB/SUB wrap failed.", create.cause());
           promise.fail(create.cause());
@@ -119,7 +119,7 @@ public class RedisSentinelClient extends BaseRedisClient implements Redis {
     return promise.future();
   }
 
-  private void createConnectionInternal(RedisOptions options, RedisRole role, Handler<AsyncResult<RedisConnection>> onCreate) {
+  private void createConnectionInternal(RedisSentinelConnectOptions options, RedisRole role, Handler<AsyncResult<RedisConnection>> onCreate) {
 
     final Handler<AsyncResult<RedisURI>> createAndConnect = resolve -> {
       if (resolve.failed()) {
@@ -159,7 +159,7 @@ public class RedisSentinelClient extends BaseRedisClient implements Redis {
    * We use the algorithm from http://redis.io/topics/sentinel-clients
    * to get a sentinel client and then do 'stuff' with it
    */
-  private static void resolveClient(final Resolver checkEndpointFn, final RedisOptions options, final Handler<AsyncResult<RedisURI>> callback) {
+  private static void resolveClient(final Resolver checkEndpointFn, final RedisSentinelConnectOptions options, final Handler<AsyncResult<RedisURI>> callback) {
     // Because finding the master is going to be an async list we will terminate
     // when we find one then use promises...
     iterate(0, checkEndpointFn, options, iterate -> {
@@ -179,7 +179,7 @@ public class RedisSentinelClient extends BaseRedisClient implements Redis {
     });
   }
 
-  private static void iterate(final int idx, final Resolver checkEndpointFn, final RedisOptions argument, final Handler<AsyncResult<Pair<Integer, RedisURI>>> resultHandler) {
+  private static void iterate(final int idx, final Resolver checkEndpointFn, final RedisSentinelConnectOptions argument, final Handler<AsyncResult<Pair<Integer, RedisURI>>> resultHandler) {
     // stop condition
     final List<String> endpoints = argument.getEndpoints();
 
@@ -201,7 +201,7 @@ public class RedisSentinelClient extends BaseRedisClient implements Redis {
 
   // begin endpoint check methods
 
-  private void isSentinelOk(String endpoint, RedisOptions argument, Handler<AsyncResult<RedisURI>> handler) {
+  private void isSentinelOk(String endpoint, RedisConnectOptions argument, Handler<AsyncResult<RedisURI>> handler) {
     // we can't use the endpoint as is, it should not contain a database selection,
     // but can contain authentication
     final RedisURI uri = new RedisURI(endpoint);
@@ -222,7 +222,7 @@ public class RedisSentinelClient extends BaseRedisClient implements Redis {
       });
   }
 
-  private void getMasterFromEndpoint(String endpoint, RedisOptions options, Handler<AsyncResult<RedisURI>> handler) {
+  private void getMasterFromEndpoint(String endpoint, RedisSentinelConnectOptions options, Handler<AsyncResult<RedisURI>> handler) {
     // we can't use the endpoint as is, it should not contain a database selection,
     // but can contain authentication
     final RedisURI uri = new RedisURI(endpoint);
@@ -252,7 +252,7 @@ public class RedisSentinelClient extends BaseRedisClient implements Redis {
       });
   }
 
-  private void getReplicaFromEndpoint(String endpoint, RedisOptions options, Handler<AsyncResult<RedisURI>> handler) {
+  private void getReplicaFromEndpoint(String endpoint, RedisSentinelConnectOptions options, Handler<AsyncResult<RedisURI>> handler) {
     // we can't use the endpoint as is, it should not contain a database selection,
     // but can contain authentication
     final RedisURI uri = new RedisURI(endpoint);
