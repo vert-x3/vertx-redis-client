@@ -1,5 +1,8 @@
 package io.vertx.redis.client.test;
 
+import io.vertx.core.Future;
+import io.vertx.core.Promise;
+import io.vertx.core.Vertx;
 import io.vertx.ext.unit.Async;
 import io.vertx.ext.unit.TestContext;
 import io.vertx.ext.unit.junit.RunTestOnContext;
@@ -69,43 +72,31 @@ public class RedisReplicationTest {
   public void testGetClientToReplica(TestContext should) {
     final Async test = should.async();
 
-    Redis.createClient(rule.vertx(), "redis://localhost:7000")
-      .send(Request.cmd(Command.INFO).arg("REPLICATION"))
+    Redis client = Redis.createClient(rule.vertx(), "redis://localhost:7000");
+    waitForOnlineReplica(client, 10)
       .onFailure(should::fail)
-      .onSuccess(res -> {
-        String[] lines = res.toString(StandardCharsets.ISO_8859_1).split("\r\n");
-        for (String line : lines) {
-          if (line.startsWith("slave0")) {
-            String[] parts = line.split(",");
-            for (String part : parts) {
-              if (part.startsWith("port=")) {
-                String port = part.substring(5);
-
-                // real start of the test
-                Redis.createClient(
-                  rule.vertx(),
-                  new RedisOptions()
-                    .setType(RedisClientType.REPLICATION)
-                    .setUseReplicas(RedisReplicas.NEVER)
-                    .addConnectionString("redis://localhost:" + port)
-                    .setMaxPoolSize(4)
-                    .setMaxPoolWaiting(16))
+      .onSuccess(port -> {
+        // real start of the test
+        Redis.createClient(
+            rule.vertx(),
+            new RedisOptions()
+              .setType(RedisClientType.REPLICATION)
+              .setUseReplicas(RedisReplicas.NEVER)
+              .addConnectionString("redis://localhost:" + port)
+              .setMaxPoolSize(4)
+              .setMaxPoolWaiting(16))
                   .connect(onCreate -> {
-                    // get a connection to the master node
-                    should.assertTrue(onCreate.succeeded());
-                    // query the info
-                    onCreate.result()
+            // get a connection to the master node
+            should.assertTrue(onCreate.succeeded());
+            // query the info
+            onCreate.result()
                       .send(Request.cmd(Command.INFO), info -> {
-                        should.assertTrue(info.succeeded());
-                        // even though we list the replica node, the main connection happens to the master
-                        should.assertTrue(info.result().toString().contains("tcp_port:7000"));
-                        test.complete();
-                      });
-                  });
-              }
-            }
-          }
-        }
+                should.assertTrue(info.succeeded());
+                // even though we list the replica node, the main connection happens to the master
+                should.assertTrue(info.result().toString().contains("tcp_port:7000"));
+                test.complete();
+              });
+          });
       });
   }
 
@@ -113,44 +104,79 @@ public class RedisReplicationTest {
   public void testGetClientToReplicaUseReplicasAlways(TestContext should) {
     final Async test = should.async();
 
-    Redis.createClient(rule.vertx(), "redis://localhost:7000")
-      .send(Request.cmd(Command.INFO).arg("REPLICATION"))
+    Redis client = Redis.createClient(rule.vertx(), "redis://localhost:7000");
+    waitForOnlineReplica(client, 10)
       .onFailure(should::fail)
+      .onSuccess(port -> {
+        // real start of the test
+        Redis.createClient(
+            rule.vertx(),
+            new RedisOptions()
+              .setType(RedisClientType.REPLICATION)
+              .setUseReplicas(RedisReplicas.ALWAYS)
+              .addConnectionString("redis://localhost:" + port)
+              .setMaxPoolSize(4)
+              .setMaxPoolWaiting(16))
+                  .connect(onCreate -> {
+            // get a connection to the master node
+            should.assertTrue(onCreate.succeeded());
+            // query the info
+            onCreate.result()
+                      .send(Request.cmd(Command.INFO), info -> {
+                should.assertTrue(info.succeeded());
+                // we force read commands to go to replicas
+                should.assertTrue(info.result().toString().contains("tcp_port:" + port));
+                test.complete();
+              });
+          });
+      });
+  }
+
+  private Future<String> waitForOnlineReplica(Redis client, int maxRetries) {
+    Vertx vertx = rule.vertx();
+
+    Promise<String> promise = Promise.promise();
+    client
+      .send(Request.cmd(Command.INFO).arg("REPLICATION"))
+      .onFailure(promise::fail)
       .onSuccess(res -> {
         String[] lines = res.toString(StandardCharsets.ISO_8859_1).split("\r\n");
         for (String line : lines) {
           if (line.startsWith("slave0")) {
             String[] parts = line.split(",");
+
+            String port = null;
+            String state = null;
+
             for (String part : parts) {
               if (part.startsWith("port=")) {
-                String port = part.substring(5);
+                port = part.substring(5);
+              } else if (part.startsWith("state=")) {
+                state = part.substring(6);
+              }
+            }
 
-                // real start of the test
-                Redis.createClient(
-                  rule.vertx(),
-                  new RedisOptions()
-                    .setType(RedisClientType.REPLICATION)
-                    .setUseReplicas(RedisReplicas.ALWAYS)
-                    .addConnectionString("redis://localhost:" + port)
-                    .setMaxPoolSize(4)
-                    .setMaxPoolWaiting(16))
-                  .connect(onCreate -> {
-                    // get a connection to the master node
-                    should.assertTrue(onCreate.succeeded());
-                    // query the info
-                    onCreate.result()
-                      .send(Request.cmd(Command.INFO), info -> {
-                        should.assertTrue(info.succeeded());
-                        // we force read commands to go to replicas
-                        should.assertTrue(info.result().toString().contains("tcp_port:" + port));
-                        test.complete();
-                      });
+            if ("online".equals(state)) {
+              promise.complete(port);
+            } else {
+              if (maxRetries < 1) {
+                promise.fail("No replica came online in time, sorry");
+              } else {
+                vertx.setTimer(1000, ignored -> {
+                  waitForOnlineReplica(client, maxRetries - 1).onComplete(retryResult -> {
+                    if (retryResult.failed()) {
+                      promise.fail(retryResult.cause());
+                    } else {
+                      promise.complete(retryResult.result());
+                    }
                   });
+                });
               }
             }
           }
         }
       });
+    return promise.future();
   }
 
   @Test
