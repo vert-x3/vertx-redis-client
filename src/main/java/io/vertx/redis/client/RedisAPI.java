@@ -21,6 +21,8 @@ import io.vertx.codegen.annotations.VertxGen;
 import io.vertx.core.Future;
 import io.vertx.redis.client.impl.RedisAPIImpl;
 
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import static io.vertx.codegen.annotations.GenIgnore.PERMITTED_TYPE;
@@ -3165,4 +3167,97 @@ public interface RedisAPI {
    */
   @GenIgnore
   Future<@Nullable Response> send(Command cmd, String... args);
+
+  /**
+   * Run redis command eval lua with arguments but will try evalsha first, if
+   * evalsha failed with `NOSCRIPT` error, will retry with the script, so the
+   * next try evalsha will success as script has already been cached.
+   *
+   * Example:
+   * {@code
+   * final static LuaScript luaScript = new LuaScript("return ARGV[1]", 0);
+   * ... some codes ...
+   * evalLua(luaScript, Arrays.asList("hello"));
+   * }
+   *
+   * @param luaScript lua script with pre-computed sha hash
+   * @return Future response.
+   */
+  @GenIgnore
+  default Future<Response> evalLua(LuaScript luaScript, List<String> args) {
+    // pass empty args if no args, no null check
+    List<String> redisArgs = new ArrayList<>(args.size() + 1);
+    redisArgs.add(luaScript.getSha());
+    redisArgs.addAll(args);
+
+    return evalsha(redisArgs)
+        .compose(
+            // directly use result when succeeded
+            result -> Future.succeededFuture(result),
+            t -> {
+              // load script and try ONCE again when failed cause script missing
+              if (t.getMessage().startsWith("NOSCRIPT")) {
+                // directly eval script and then script will be cached in redis, so
+                // evalhash will success next time
+                redisArgs.set(0, luaScript.getLua());
+                return eval(redisArgs);
+              }
+
+              // fail when failed cause not script missing
+              return Future.failedFuture(t);
+            });
+  }
+
+  /**
+   * evalLua with no pre-computed sha.
+   *
+   * NOTE: prefer to define a static variable with type of LuaScript and use the
+   * `evalLua(LuaScript, List)`, with this method, sha will always be computed.
+   *
+   * @param lua  string of lua script
+   * @param keys list of keys, size of keys will be numkeys argument
+   * @param args list of args
+   * @return Future response.
+   */
+  @GenIgnore
+  default Future<Response> evalLua(String lua, List<String> keys, List<String> args) {
+    LuaScript luaScript = new LuaScript(lua);
+
+    List<String> allArgs = new ArrayList<>();
+
+    int numKeys;
+    if (keys != null) {
+      numKeys = keys.size();
+    } else {
+      numKeys = 0;
+    }
+    allArgs.add(String.valueOf(numKeys));
+
+    if (numKeys != 0) {
+      allArgs.addAll(keys);
+    }
+
+    if (args != null && args.size() != 0) {
+      allArgs.addAll(args);
+    }
+
+    return evalLua(luaScript, allArgs);
+  }
+
+  /**
+   * evalLua with no pre-computed sha.
+   *
+   * NOTE: prefer to define a static variable with type of LuaScript and use the
+   * `evalLua(LuaScript, List)`, with this method, sha will always be computed.
+   *
+   * @param numkeys, keys, args. If args is empty, a numkeys = 0 will add by default
+   * @return Future response.
+   */
+  @GenIgnore
+  default Future<Response> evalLua(String lua, String... args) {
+    if (args.length == 0) {
+      return evalLua(new LuaScript(lua), Arrays.asList("0"));
+    }
+    return evalLua(new LuaScript(lua), Arrays.asList(args));
+  }
 }
