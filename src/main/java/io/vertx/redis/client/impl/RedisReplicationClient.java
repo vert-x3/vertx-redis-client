@@ -151,7 +151,7 @@ public class RedisReplicationClient extends BaseRedisClient implements Redis {
 
           for (Node node : nodes) {
             if (!node.online) {
-              LOG.info("Skipping offline node: " + node.ip);
+              LOG.info("Skipping offline node: " + node.ip + ":" + node.port);
               if (counter.incrementAndGet() == nodes.size()) {
                 onConnect.handle(Future.succeededFuture(new RedisReplicationConnection(vertx, connectOptions, conn, connections)));
               }
@@ -161,7 +161,7 @@ public class RedisReplicationClient extends BaseRedisClient implements Redis {
             connectionManager.getConnection(node.endpoint(), RedisReplicas.NEVER != connectOptions.getUseReplicas() ? cmd(READONLY) : null)
               .onFailure(err -> {
                 // failed try with the next endpoint
-                LOG.warn("Skipping failed node: " + node.ip, err);
+                LOG.warn("Skipping failed node: " + node.ip + ":" + node.port, err);
                 if (counter.incrementAndGet() == nodes.size()) {
                   onConnect.handle(Future.succeededFuture(new RedisReplicationConnection(vertx, connectOptions, conn, connections)));
                 }
