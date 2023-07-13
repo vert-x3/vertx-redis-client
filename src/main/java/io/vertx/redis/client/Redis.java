@@ -66,13 +66,13 @@ public interface Redis {
   static Redis createClient(Vertx vertx, RedisOptions options) {
     switch (options.getType()) {
       case STANDALONE:
-        return new RedisClient(vertx, options.getNetClientOptions(), options.getPoolOptions(), new RedisStandaloneConnectOptions(options));
+        return new RedisClient(vertx, options.getNetClientOptions(), options.getPoolOptions(), new RedisStandaloneConnectOptions(options), options.getTracingPolicy());
       case SENTINEL:
-        return new RedisSentinelClient(vertx, options.getNetClientOptions(), options.getPoolOptions(), new RedisSentinelConnectOptions(options));
+        return new RedisSentinelClient(vertx, options.getNetClientOptions(), options.getPoolOptions(), new RedisSentinelConnectOptions(options), options.getTracingPolicy());
       case CLUSTER:
-        return new RedisClusterClient(vertx, options.getNetClientOptions(), options.getPoolOptions(), new RedisClusterConnectOptions(options));
+        return new RedisClusterClient(vertx, options.getNetClientOptions(), options.getPoolOptions(), new RedisClusterConnectOptions(options), options.getTracingPolicy());
       case REPLICATION:
-        return new RedisReplicationClient(vertx, options.getNetClientOptions(), options.getPoolOptions(), new RedisClusterConnectOptions(options));
+        return new RedisReplicationClient(vertx, options.getNetClientOptions(), options.getPoolOptions(), new RedisClusterConnectOptions(options), options.getTracingPolicy());
       default:
         throw new IllegalStateException("Unknown Redis Client type: " + options.getType());
     }

@@ -23,7 +23,7 @@ import java.util.Map;
 import java.util.concurrent.atomic.AtomicReference;
 
 @RunWith(VertxUnitRunner.class)
-public class RedisMetricsTest {
+public class RedisPoolMetricsTest {
 
   private static final AtomicReference<String> POOL_NAME = new AtomicReference<>();
 

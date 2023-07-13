@@ -155,4 +155,21 @@ public class RedisSentinelTest {
           });
       });
   }
+
+  @Test
+  public void preservesContext(TestContext should) {
+    Redis client = Redis.createClient(rule.vertx(), new RedisOptions()
+      .setType(RedisClientType.SENTINEL)
+      .addConnectionString("redis://localhost:5000")
+      .addConnectionString("redis://localhost:5001")
+      .addConnectionString("redis://localhost:5002")
+      .setMasterName("sentinel7000")
+      .setRole(RedisRole.MASTER));
+
+    PreservesContext.sendWithoutConnect(client, should);
+    PreservesContext.batchWithoutConnect(client, should);
+    PreservesContext.connect(client, should);
+    PreservesContext.connectThenSend(client, should);
+    PreservesContext.connectThenBatch(client, should);
+  }
 }

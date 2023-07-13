@@ -29,10 +29,10 @@ public class RedisReplicationConnection implements RedisConnection {
   }
 
   private final RedisClusterConnectOptions connectOptions;
-  private final RedisConnection master;
-  private final List<RedisConnection> replicas;
+  private final PooledRedisConnection master;
+  private final List<PooledRedisConnection> replicas;
 
-  RedisReplicationConnection(Vertx vertx, RedisClusterConnectOptions connectOptions, RedisConnection master, List<RedisConnection> replicas) {
+  RedisReplicationConnection(Vertx vertx, RedisClusterConnectOptions connectOptions, PooledRedisConnection master, List<PooledRedisConnection> replicas) {
     this.connectOptions = connectOptions;
     this.master = master;
     this.replicas = replicas;
@@ -175,7 +175,7 @@ public class RedisReplicationConnection implements RedisConnection {
     return result;
   }
 
-  private RedisConnection selectMasterOrReplicaEndpoint(boolean read, boolean forceMasterEndpoint) {
+  private PooledRedisConnection selectMasterOrReplicaEndpoint(boolean read, boolean forceMasterEndpoint) {
     if (forceMasterEndpoint) {
       return master;
     }
