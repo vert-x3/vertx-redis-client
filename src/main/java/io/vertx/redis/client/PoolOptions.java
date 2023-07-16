@@ -19,6 +19,8 @@ import io.vertx.codegen.annotations.DataObject;
 import io.vertx.core.json.JsonObject;
 
 import java.util.UUID;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 @DataObject(generateConverter = true)
 public class PoolOptions {
@@ -28,9 +30,12 @@ public class PoolOptions {
   private int maxSize;
   private int maxWaiting;
   private int recycleTimeout;
+  private final ExecutorService executor = Executors.newSingleThreadExecutor();
 
   public PoolOptions() {
-    name = UUID.randomUUID().toString();
+    executor.execute(() -> {
+      name = UUID.randomUUID().toString();
+    });
     // thumb guess based on web browser defaults
     cleanerInterval = 30_000;
     maxSize = 6;
