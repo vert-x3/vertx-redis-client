@@ -15,6 +15,9 @@
  */
 package io.vertx.redis.client.impl;
 
+import io.vertx.core.impl.VertxInternal;
+import io.vertx.core.spi.metrics.ClientMetrics;
+import io.vertx.core.tracing.TracingPolicy;
 import io.vertx.redis.client.RedisConnection;
 
 public interface RedisConnectionInternal extends RedisConnection {
@@ -27,4 +30,28 @@ public interface RedisConnectionInternal extends RedisConnection {
    * Returns {@code true} is this connection can be reset. This means that the connection didn't enter PubSub mode.
    */
   boolean reset();
+
+  /**
+   * Returns whether this connection is "tainted". A connection is called tainted if it changes the default state,
+   * for example, when a connection enters pub sub mode, or specific features are activated such as changing a database
+   * or different authentication is used.
+   */
+  boolean isTainted();
+
+  VertxInternal vertx();
+
+  /**
+   * Returns the {@linkplain RedisURI URI} of the Redis server to which this connection is connected.
+   */
+  RedisURI uri();
+
+  /**
+   * Returns the {@linkplain ClientMetrics client metrics} for this connection.
+   */
+  ClientMetrics metrics();
+
+  /**
+   * Returns the {@linkplain TracingPolicy tracing policy} configured for this connection.
+   */
+  TracingPolicy tracingPolicy();
 }

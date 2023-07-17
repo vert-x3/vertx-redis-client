@@ -19,6 +19,7 @@ import io.vertx.core.*;
 import io.vertx.core.impl.logging.Logger;
 import io.vertx.core.impl.logging.LoggerFactory;
 import io.vertx.core.net.NetClientOptions;
+import io.vertx.core.tracing.TracingPolicy;
 import io.vertx.redis.client.*;
 import io.vertx.redis.client.impl.types.MultiType;
 import io.vertx.redis.client.impl.types.NumberType;
@@ -123,8 +124,8 @@ public class RedisClusterClient extends BaseRedisClient implements Redis {
   private final RedisClusterConnectOptions connectOptions;
   private final PoolOptions poolOptions;
 
-  public RedisClusterClient(Vertx vertx, NetClientOptions tcpOptions, PoolOptions poolOptions, RedisClusterConnectOptions connectOptions) {
-    super(vertx, tcpOptions, poolOptions, connectOptions);
+  public RedisClusterClient(Vertx vertx, NetClientOptions tcpOptions, PoolOptions poolOptions, RedisClusterConnectOptions connectOptions, TracingPolicy tracingPolicy) {
+    super(vertx, tcpOptions, poolOptions, connectOptions, tracingPolicy);
     this.connectOptions = connectOptions;
     this.poolOptions = poolOptions;
     // validate options
@@ -172,7 +173,7 @@ public class RedisClusterClient extends BaseRedisClient implements Redis {
           final Slots slots = getSlots.result();
           final AtomicBoolean failed = new AtomicBoolean(false);
           final AtomicInteger counter = new AtomicInteger();
-          final Map<String, RedisConnection> connections = new HashMap<>();
+          final Map<String, PooledRedisConnection> connections = new HashMap<>();
 
           // validate if the pool config is valid
           final int totalUniqueEndpoints = slots.endpoints().length;
@@ -203,7 +204,7 @@ public class RedisClusterClient extends BaseRedisClient implements Redis {
       });
   }
 
-  private void connectionComplete(AtomicInteger counter, Slots slots, Map<String, RedisConnection> connections, AtomicBoolean failed, Handler<AsyncResult<RedisConnection>> onConnect) {
+  private void connectionComplete(AtomicInteger counter, Slots slots, Map<String, PooledRedisConnection> connections, AtomicBoolean failed, Handler<AsyncResult<RedisConnection>> onConnect) {
     if (counter.incrementAndGet() == slots.endpoints().length) {
       // end condition
       if (failed.get()) {

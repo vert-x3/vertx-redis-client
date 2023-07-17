@@ -24,7 +24,7 @@ import java.util.concurrent.atomic.AtomicReference;
 import static org.junit.Assert.assertEquals;
 
 @RunWith(VertxUnitRunner.class)
-public class RedisMetricsTest {
+public class RedisPoolMetricsTest {
 
   private static final AtomicReference<String> POOL_NAME = new AtomicReference<>();
 

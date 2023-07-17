@@ -19,6 +19,7 @@ import io.vertx.core.*;
 import io.vertx.core.impl.logging.Logger;
 import io.vertx.core.impl.logging.LoggerFactory;
 import io.vertx.core.net.NetClientOptions;
+import io.vertx.core.tracing.TracingPolicy;
 import io.vertx.redis.client.*;
 
 import java.nio.charset.StandardCharsets;
@@ -90,8 +91,8 @@ public class RedisReplicationClient extends BaseRedisClient implements Redis {
   private final RedisClusterConnectOptions connectOptions;
   private final PoolOptions poolOptions;
 
-  public RedisReplicationClient(Vertx vertx, NetClientOptions tcpOptions, PoolOptions poolOptions, RedisClusterConnectOptions connectOptions) {
-    super(vertx, tcpOptions, poolOptions, connectOptions);
+  public RedisReplicationClient(Vertx vertx, NetClientOptions tcpOptions, PoolOptions poolOptions, RedisClusterConnectOptions connectOptions, TracingPolicy tracingPolicy) {
+    super(vertx, tcpOptions, poolOptions, connectOptions, tracingPolicy);
     this.connectOptions = connectOptions;
     this.poolOptions = poolOptions;
     // validate options
@@ -138,7 +139,7 @@ public class RedisReplicationClient extends BaseRedisClient implements Redis {
           // create a cluster connection
           final List<Node> nodes = getNodes.result();
           final AtomicInteger counter = new AtomicInteger();
-          final List<RedisConnection> connections = new ArrayList<>();
+          final List<PooledRedisConnection> connections = new ArrayList<>();
 
           // validate if the pool config is valid
           final int totalUniqueEndpoints = nodes.size();
@@ -150,7 +151,7 @@ public class RedisReplicationClient extends BaseRedisClient implements Redis {
 
           for (Node node : nodes) {
             if (!node.online) {
-              LOG.info("Skipping offline node: " + node.ip);
+              LOG.info("Skipping offline node: " + node.ip + ":" + node.port);
               if (counter.incrementAndGet() == nodes.size()) {
                 onConnect.handle(Future.succeededFuture(new RedisReplicationConnection(vertx, connectOptions, conn, connections)));
               }
@@ -160,7 +161,7 @@ public class RedisReplicationClient extends BaseRedisClient implements Redis {
             connectionManager.getConnection(node.endpoint(), RedisReplicas.NEVER != connectOptions.getUseReplicas() ? cmd(READONLY) : null)
               .onFailure(err -> {
                 // failed try with the next endpoint
-                LOG.warn("Skipping failed node: " + node.ip, err);
+                LOG.warn("Skipping failed node: " + node.ip + ":" + node.port, err);
                 if (counter.incrementAndGet() == nodes.size()) {
                   onConnect.handle(Future.succeededFuture(new RedisReplicationConnection(vertx, connectOptions, conn, connections)));
                 }

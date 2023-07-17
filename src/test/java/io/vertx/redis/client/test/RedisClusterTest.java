@@ -1224,4 +1224,13 @@ public class RedisClusterTest {
         });
       });
   }
+
+  @Test
+  public void preservesContext(TestContext should) {
+    PreservesContext.sendWithoutConnect(client, should);
+    PreservesContext.batchWithoutConnect(client, should);
+    PreservesContext.connect(client, should);
+    PreservesContext.connectThenSend(client, should);
+    PreservesContext.connectThenBatch(client, should);
+  }
 }
