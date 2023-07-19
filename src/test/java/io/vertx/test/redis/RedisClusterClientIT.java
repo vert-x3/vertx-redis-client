@@ -106,7 +106,7 @@ public class RedisClusterClientIT {
   @Before
   public void before(TestContext should) {
     final Async before = should.async();
-    rule.vertx().executeBlocking(handler -> {
+    rule.vertx().executeBlocking(() -> {
       List<GenericContainer<?>> containerList = new ArrayList<>();
       containerList.add(redis7000);
       containerList.add(redis7001);
@@ -123,7 +123,7 @@ public class RedisClusterClientIT {
       String connectionString = stringBuilder.substring(0, stringBuilder.length() - 1);
       redisCli.setCommand(String.format("redis-cli --cluster create %s --cluster-replicas 1 --cluster-yes%s", connectionString, password == null ? "" : " -a " + password));
       redisCli.start();
-      handler.complete();
+      return null;
     }).onSuccess(handler -> {
       client = Redis.createClient(
         rule.vertx(), new RedisOptions()
