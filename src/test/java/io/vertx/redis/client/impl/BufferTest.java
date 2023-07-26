@@ -2,6 +2,7 @@ package io.vertx.redis.client.impl;
 
 import io.netty.buffer.Unpooled;
 import io.vertx.core.buffer.Buffer;
+import io.vertx.core.buffer.impl.BufferInternal;
 import io.vertx.redis.client.Command;
 import io.vertx.redis.client.Request;
 import org.junit.Test;
@@ -117,7 +118,7 @@ public class BufferTest {
   public void testAppendBufferWrapped() {
     Charset UTF8 = StandardCharsets.UTF_8;
     Request hmset = Request.cmd(Command.HMSET);
-    Buffer key = Buffer.buffer(Unpooled.wrappedBuffer(UTF8.encode("my-key")));
+    Buffer key = BufferInternal.buffer(Unpooled.wrappedBuffer(UTF8.encode("my-key")));
 
     for (int i = 0; i < iterations; i++) {
       hmset.arg(key).arg(i);
