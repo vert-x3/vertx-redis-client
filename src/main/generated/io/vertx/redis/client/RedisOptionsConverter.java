@@ -123,6 +123,56 @@ public class RedisOptionsConverter {
             obj.setPoolName((String)member.getValue());
           }
           break;
+        case "cachingOptions":
+          break;
+        case "cacheEnabled":
+          if (member.getValue() instanceof Boolean) {
+            obj.setCacheEnabled((Boolean)member.getValue());
+          }
+          break;
+        case "cacheMaxSize":
+          if (member.getValue() instanceof Number) {
+            obj.setCacheMaxSize(((Number)member.getValue()).intValue());
+          }
+          break;
+        case "cacheMaxAge":
+          if (member.getValue() instanceof Number) {
+            obj.setCacheMaxAge(((Number)member.getValue()).longValue());
+          }
+          break;
+        case "cacheMaxAgeUnit":
+          if (member.getValue() instanceof String) {
+            obj.setCacheMaxAgeUnit(java.util.concurrent.TimeUnit.valueOf((String)member.getValue()));
+          }
+          break;
+        case "cacheMode":
+          if (member.getValue() instanceof String) {
+            obj.setCacheMode(io.vertx.redis.client.ClientSideCacheMode.valueOf((String)member.getValue()));
+          }
+          break;
+        case "cachePrefixes":
+          if (member.getValue() instanceof JsonArray) {
+            java.util.ArrayList<java.lang.String> list =  new java.util.ArrayList<>();
+            ((Iterable<Object>)member.getValue()).forEach( item -> {
+              if (item instanceof String)
+                list.add((String)item);
+            });
+            obj.setCachePrefixes(list);
+          }
+          break;
+        case "cachePrefix":
+          if (member.getValue() instanceof String) {
+            obj.setCachePrefix((String)member.getValue());
+          }
+          break;
+        case "cachePrefixs":
+          if (member.getValue() instanceof JsonArray) {
+            ((Iterable<Object>)member.getValue()).forEach( item -> {
+              if (item instanceof String)
+                obj.addCachePrefix((String)item);
+            });
+          }
+          break;
       }
     }
   }
@@ -170,6 +220,20 @@ public class RedisOptionsConverter {
     json.put("protocolNegotiation", obj.isProtocolNegotiation());
     if (obj.getPoolName() != null) {
       json.put("poolName", obj.getPoolName());
+    }
+    json.put("cacheEnabled", obj.getCacheEnabled());
+    json.put("cacheMaxSize", obj.getCacheMaxSize());
+    json.put("cacheMaxAge", obj.getCacheMaxAge());
+    if (obj.getCacheMaxAgeUnit() != null) {
+      json.put("cacheMaxAgeUnit", obj.getCacheMaxAgeUnit().name());
+    }
+    if (obj.getCacheMode() != null) {
+      json.put("cacheMode", obj.getCacheMode().name());
+    }
+    if (obj.getCachePrefixes() != null) {
+      JsonArray array = new JsonArray();
+      obj.getCachePrefixes().forEach(item -> array.add(item));
+      json.put("cachePrefixes", array);
     }
   }
 }

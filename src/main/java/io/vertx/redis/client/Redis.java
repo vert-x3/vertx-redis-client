@@ -19,14 +19,13 @@ import io.vertx.codegen.annotations.Nullable;
 import io.vertx.codegen.annotations.VertxGen;
 import io.vertx.core.Future;
 import io.vertx.core.Vertx;
+import io.vertx.redis.client.impl.CachingRedisClient;
 import io.vertx.redis.client.impl.RedisClient;
 import io.vertx.redis.client.impl.RedisClusterClient;
 import io.vertx.redis.client.impl.RedisReplicationClient;
 import io.vertx.redis.client.impl.RedisSentinelClient;
 
 import java.util.List;
-import java.util.function.Consumer;
-import java.util.function.Supplier;
 
 /**
  * A simple Redis client.
@@ -64,18 +63,30 @@ public interface Redis {
    * @return the client
    */
   static Redis createClient(Vertx vertx, RedisOptions options) {
+    final Redis clientImpl;
+
     switch (options.getType()) {
       case STANDALONE:
-        return new RedisClient(vertx, options.getNetClientOptions(), options.getPoolOptions(), new RedisStandaloneConnectOptions(options), options.getTracingPolicy());
+        clientImpl = new RedisClient(vertx, options.getNetClientOptions(), options.getPoolOptions(), new RedisStandaloneConnectOptions(options), options.getTracingPolicy());
+        break;
       case SENTINEL:
-        return new RedisSentinelClient(vertx, options.getNetClientOptions(), options.getPoolOptions(), new RedisSentinelConnectOptions(options), options.getTracingPolicy());
+        clientImpl = new RedisSentinelClient(vertx, options.getNetClientOptions(), options.getPoolOptions(), new RedisSentinelConnectOptions(options), options.getTracingPolicy());
+        break;
       case CLUSTER:
-        return new RedisClusterClient(vertx, options.getNetClientOptions(), options.getPoolOptions(), new RedisClusterConnectOptions(options), options.getTracingPolicy());
+        clientImpl = new RedisClusterClient(vertx, options.getNetClientOptions(), options.getPoolOptions(), new RedisClusterConnectOptions(options), options.getTracingPolicy());
+        break;
       case REPLICATION:
-        return new RedisReplicationClient(vertx, options.getNetClientOptions(), options.getPoolOptions(), new RedisClusterConnectOptions(options), options.getTracingPolicy());
+        clientImpl = new RedisReplicationClient(vertx, options.getNetClientOptions(), options.getPoolOptions(), new RedisClusterConnectOptions(options), options.getTracingPolicy());
+        break;
       default:
         throw new IllegalStateException("Unknown Redis Client type: " + options.getType());
     }
+
+    if (options.getCacheEnabled()) {
+      return new CachingRedisClient(vertx, clientImpl, options.getCachingOptions());
+    }
+
+    return clientImpl;
   }
 
   /**
