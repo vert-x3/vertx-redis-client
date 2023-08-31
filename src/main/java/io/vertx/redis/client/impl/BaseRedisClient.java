@@ -43,7 +43,7 @@ public abstract class BaseRedisClient implements Redis {
       .compose(conn ->
         conn.send(request)
           // regardless of the result, return the connection to the pool
-          .eventually(e ->
+          .eventually(() ->
             conn.close()
               .onFailure(LOG::warn)));
   }
@@ -66,7 +66,7 @@ public abstract class BaseRedisClient implements Redis {
         .compose(conn ->
           conn.batch(requests)
             // regardless of the result, return the connection to the pool
-            .eventually(e ->
+            .eventually(() ->
               conn.close().onFailure(LOG::warn)));
     }
   }

@@ -210,7 +210,7 @@ public class RedisSentinelClient extends BaseRedisClient implements Redis {
           .send(cmd(PING))
           .onFailure(err -> handler.handle(Future.failedFuture(err)))
           .onSuccess(ok -> handler.handle(Future.succeededFuture(uri)))
-          .eventually(v -> conn.close().onFailure(LOG::warn));
+          .eventually(() -> conn.close().onFailure(LOG::warn));
       });
   }
 
@@ -235,7 +235,7 @@ public class RedisSentinelClient extends BaseRedisClient implements Redis {
               handler.handle(Future.succeededFuture(new RedisURI(uri, rHost.contains(":") ? "[" + rHost + "]" : rHost, rPort)));
             }
           })
-          .eventually(v -> conn.close().onFailure(LOG::warn));
+          .eventually(() -> conn.close().onFailure(LOG::warn));
       });
   }
 
@@ -281,7 +281,7 @@ public class RedisSentinelClient extends BaseRedisClient implements Redis {
               }
             }
           })
-          .eventually(v -> conn.close().onFailure(LOG::warn));
+          .eventually(() -> conn.close().onFailure(LOG::warn));
       });
   }
 
