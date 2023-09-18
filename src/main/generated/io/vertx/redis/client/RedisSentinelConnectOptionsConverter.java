@@ -20,14 +20,14 @@ public class RedisSentinelConnectOptionsConverter {
   public static void fromJson(Iterable<java.util.Map.Entry<String, Object>> json, RedisSentinelConnectOptions obj) {
     for (java.util.Map.Entry<String, Object> member : json) {
       switch (member.getKey()) {
-        case "masterName":
-          if (member.getValue() instanceof String) {
-            obj.setMasterName((String)member.getValue());
-          }
-          break;
         case "role":
           if (member.getValue() instanceof String) {
             obj.setRole(io.vertx.redis.client.RedisRole.valueOf((String)member.getValue()));
+          }
+          break;
+        case "masterName":
+          if (member.getValue() instanceof String) {
+            obj.setMasterName((String)member.getValue());
           }
           break;
       }
@@ -39,11 +39,11 @@ public class RedisSentinelConnectOptionsConverter {
   }
 
   public static void toJson(RedisSentinelConnectOptions obj, java.util.Map<String, Object> json) {
-    if (obj.getMasterName() != null) {
-      json.put("masterName", obj.getMasterName());
-    }
     if (obj.getRole() != null) {
       json.put("role", obj.getRole().name());
+    }
+    if (obj.getMasterName() != null) {
+      json.put("masterName", obj.getMasterName());
     }
   }
 }

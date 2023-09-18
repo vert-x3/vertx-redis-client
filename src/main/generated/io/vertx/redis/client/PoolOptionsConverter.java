@@ -20,6 +20,11 @@ public class PoolOptionsConverter {
   public static void fromJson(Iterable<java.util.Map.Entry<String, Object>> json, PoolOptions obj) {
     for (java.util.Map.Entry<String, Object> member : json) {
       switch (member.getKey()) {
+        case "name":
+          if (member.getValue() instanceof String) {
+            obj.setName((String)member.getValue());
+          }
+          break;
         case "cleanerInterval":
           if (member.getValue() instanceof Number) {
             obj.setCleanerInterval(((Number)member.getValue()).intValue());
@@ -33,11 +38,6 @@ public class PoolOptionsConverter {
         case "maxWaiting":
           if (member.getValue() instanceof Number) {
             obj.setMaxWaiting(((Number)member.getValue()).intValue());
-          }
-          break;
-        case "name":
-          if (member.getValue() instanceof String) {
-            obj.setName((String)member.getValue());
           }
           break;
         case "recycleTimeout":
@@ -54,12 +54,12 @@ public class PoolOptionsConverter {
   }
 
   public static void toJson(PoolOptions obj, java.util.Map<String, Object> json) {
-    json.put("cleanerInterval", obj.getCleanerInterval());
-    json.put("maxSize", obj.getMaxSize());
-    json.put("maxWaiting", obj.getMaxWaiting());
     if (obj.getName() != null) {
       json.put("name", obj.getName());
     }
+    json.put("cleanerInterval", obj.getCleanerInterval());
+    json.put("maxSize", obj.getMaxSize());
+    json.put("maxWaiting", obj.getMaxWaiting());
     json.put("recycleTimeout", obj.getRecycleTimeout());
   }
 }

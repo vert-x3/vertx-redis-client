@@ -20,20 +20,20 @@ public class RedisConnectOptionsConverter {
   public static void fromJson(Iterable<java.util.Map.Entry<String, Object>> json, RedisConnectOptions obj) {
     for (java.util.Map.Entry<String, Object> member : json) {
       switch (member.getKey()) {
-        case "connectionString":
+        case "maxNestedArrays":
+          if (member.getValue() instanceof Number) {
+            obj.setMaxNestedArrays(((Number)member.getValue()).intValue());
+          }
+          break;
+        case "protocolNegotiation":
+          if (member.getValue() instanceof Boolean) {
+            obj.setProtocolNegotiation((Boolean)member.getValue());
+          }
+          break;
+        case "password":
           if (member.getValue() instanceof String) {
-            obj.setConnectionString((String)member.getValue());
+            obj.setPassword((String)member.getValue());
           }
-          break;
-        case "connectionStrings":
-          if (member.getValue() instanceof JsonArray) {
-            ((Iterable<Object>)member.getValue()).forEach( item -> {
-              if (item instanceof String)
-                obj.addConnectionString((String)item);
-            });
-          }
-          break;
-        case "endpoint":
           break;
         case "endpoints":
           if (member.getValue() instanceof JsonArray) {
@@ -45,24 +45,24 @@ public class RedisConnectOptionsConverter {
             obj.setEndpoints(list);
           }
           break;
-        case "maxNestedArrays":
-          if (member.getValue() instanceof Number) {
-            obj.setMaxNestedArrays(((Number)member.getValue()).intValue());
+        case "endpoint":
+          break;
+        case "connectionStrings":
+          if (member.getValue() instanceof JsonArray) {
+            ((Iterable<Object>)member.getValue()).forEach( item -> {
+              if (item instanceof String)
+                obj.addConnectionString((String)item);
+            });
+          }
+          break;
+        case "connectionString":
+          if (member.getValue() instanceof String) {
+            obj.setConnectionString((String)member.getValue());
           }
           break;
         case "maxWaitingHandlers":
           if (member.getValue() instanceof Number) {
             obj.setMaxWaitingHandlers(((Number)member.getValue()).intValue());
-          }
-          break;
-        case "password":
-          if (member.getValue() instanceof String) {
-            obj.setPassword((String)member.getValue());
-          }
-          break;
-        case "protocolNegotiation":
-          if (member.getValue() instanceof Boolean) {
-            obj.setProtocolNegotiation((Boolean)member.getValue());
           }
           break;
       }
@@ -74,19 +74,19 @@ public class RedisConnectOptionsConverter {
   }
 
   public static void toJson(RedisConnectOptions obj, java.util.Map<String, Object> json) {
-    if (obj.getEndpoint() != null) {
-      json.put("endpoint", obj.getEndpoint());
+    json.put("maxNestedArrays", obj.getMaxNestedArrays());
+    json.put("protocolNegotiation", obj.isProtocolNegotiation());
+    if (obj.getPassword() != null) {
+      json.put("password", obj.getPassword());
     }
     if (obj.getEndpoints() != null) {
       JsonArray array = new JsonArray();
       obj.getEndpoints().forEach(item -> array.add(item));
       json.put("endpoints", array);
     }
-    json.put("maxNestedArrays", obj.getMaxNestedArrays());
-    json.put("maxWaitingHandlers", obj.getMaxWaitingHandlers());
-    if (obj.getPassword() != null) {
-      json.put("password", obj.getPassword());
+    if (obj.getEndpoint() != null) {
+      json.put("endpoint", obj.getEndpoint());
     }
-    json.put("protocolNegotiation", obj.isProtocolNegotiation());
+    json.put("maxWaitingHandlers", obj.getMaxWaitingHandlers());
   }
 }
