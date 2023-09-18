@@ -17,7 +17,6 @@ package io.vertx.redis.client.impl;
 
 import io.vertx.core.*;
 import io.vertx.core.impl.ContextInternal;
-import io.vertx.core.impl.EventLoopContext;
 import io.vertx.core.impl.VertxInternal;
 import io.vertx.core.impl.logging.Logger;
 import io.vertx.core.impl.logging.LoggerFactory;
@@ -146,7 +145,7 @@ class RedisConnectionManager {
     }
 
     @Override
-    public void connect(EventLoopContext ctx, Listener listener, Handler<AsyncResult<ConnectResult<RedisConnectionInternal>>> onConnect) {
+    public void connect(ContextInternal ctx, Listener listener, Handler<AsyncResult<ConnectResult<RedisConnectionInternal>>> onConnect) {
       // verify if we can make this connection
       final boolean netClientSsl = netClientOptions.isSsl();
       final boolean connectionStringSsl = redisURI.ssl();
@@ -378,9 +377,9 @@ class RedisConnectionManager {
 
   public Future<PooledRedisConnection> getConnection(String connectionString, Request setup) {
     final Promise<Lease<RedisConnectionInternal>> promise = vertx.promise();
-    final EventLoopContext eventLoopContext;
-    if (context instanceof EventLoopContext) {
-      eventLoopContext = (EventLoopContext) context;
+    final ContextInternal eventLoopContext;
+    if (context.isEventLoopContext()) {
+      eventLoopContext = context;
     } else {
       eventLoopContext = vertx.createEventLoopContext(context.nettyEventLoop(), context.workerPool(), context.classLoader());
     }
