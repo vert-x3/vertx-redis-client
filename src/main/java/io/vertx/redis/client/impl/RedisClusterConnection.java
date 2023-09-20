@@ -43,12 +43,15 @@ public class RedisClusterConnection implements RedisConnection {
   private final VertxInternal vertx;
   private final RedisClusterConnectOptions connectOptions;
   private final Slots slots;
+  private final Runnable onMoved;
   private final Map<String, PooledRedisConnection> connections;
 
-  RedisClusterConnection(Vertx vertx, RedisClusterConnectOptions connectOptions, Slots slots, Map<String, PooledRedisConnection> connections) {
+  RedisClusterConnection(Vertx vertx, RedisClusterConnectOptions connectOptions, Slots slots, Runnable onMoved,
+      Map<String, PooledRedisConnection> connections) {
     this.vertx = (VertxInternal) vertx;
     this.connectOptions = connectOptions;
     this.slots = slots;
+    this.onMoved = onMoved;
     this.connections = connections;
   }
 
@@ -261,6 +264,7 @@ public class RedisClusterConnection implements RedisConnection {
         final ErrorType cause = (ErrorType) send.cause();
 
         if (cause.is("MOVED")) {
+            this.onMoved.run();
           // cluster is unbalanced, need to reconnect
           handler.handle(Future.failedFuture(cause));
           return;
@@ -405,6 +409,7 @@ public class RedisClusterConnection implements RedisConnection {
         final ErrorType cause = (ErrorType) send.cause();
 
         if (cause.is("MOVED")) {
+            this.onMoved.run();
           // cluster is unbalanced, need to reconnect
           handler.handle(Future.failedFuture(cause));
           return;
