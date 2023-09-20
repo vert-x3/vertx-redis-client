@@ -137,13 +137,18 @@ To work with cluster the connection creation is quite similar:
 {@link examples.RedisExamples#example6}
 ----
 
-In this case the configuration requires one of more members of the cluster to be known.
+In this case the configuration requires one or more members of the cluster to be known.
 This list will be used to ask the cluster for the current configuration, which means if any of the listed members is not available it will be skipped.
 
 In cluster mode a connection is established to each node and special care is needed when executing commands.
-It is recommended to read redis manual in order to understand how clustering works.
+It is recommended to read the Redis manual in order to understand how clustering works.
 The client operating in this mode will do a best effort to identify which slot is used by the executed command in order to execute it on the right node.
 There could be cases where this isn't possible to identify and in that case as a best effort the command will be run on a random node.
+
+To know which Redis node holds which slots, the clustered Redis client holds a cache of the hash slot assignment.
+When the cache is empty, the first attempt to acquire a `RedisClusterConnection` will execute `CLUSTER SLOTS`.
+The cache has a configurable TTL (time to live), which defaults to 1 second.
+The cache is also cleared whenever any command executed by the client receives the MOVED redirection.
 
 == Replication Mode
 

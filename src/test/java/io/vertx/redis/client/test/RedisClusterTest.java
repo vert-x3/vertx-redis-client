@@ -63,7 +63,8 @@ public class RedisClusterTest {
     .addConnectionString("redis://127.0.0.1:7004")
     .addConnectionString("redis://127.0.0.1:7005")
     .setMaxPoolSize(8)
-    .setMaxPoolWaiting(16);
+    .setMaxPoolWaiting(16)
+    .setHashSlotCacheTTL(10_000);
 
   private static String makeKey() {
     return UUID.randomUUID().toString();

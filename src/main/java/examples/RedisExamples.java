@@ -79,6 +79,7 @@ public class RedisExamples {
 
   public void example6() {
     final RedisOptions options = new RedisOptions()
+      .setType(RedisClientType.CLUSTER)
       .addConnectionString("redis://127.0.0.1:7000")
       .addConnectionString("redis://127.0.0.1:7001")
       .addConnectionString("redis://127.0.0.1:7002")

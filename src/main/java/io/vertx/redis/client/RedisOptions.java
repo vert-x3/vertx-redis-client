@@ -49,6 +49,7 @@ public class RedisOptions {
   private RedisReplicas useReplicas;
   private volatile String password;
   private boolean protocolNegotiation;
+  private long hashSlotCacheTTL;
   private TracingPolicy tracingPolicy;
 
   /**
@@ -66,6 +67,7 @@ public class RedisOptions {
     maxNestedArrays = 32;
     protocolNegotiation = true;
     maxWaitingHandlers = 2048;
+    hashSlotCacheTTL = 1000;
   }
 
   /**
@@ -84,6 +86,7 @@ public class RedisOptions {
     this.useReplicas = other.useReplicas;
     this.password = other.password;
     this.protocolNegotiation = other.protocolNegotiation;
+    this.hashSlotCacheTTL = other.hashSlotCacheTTL;
   }
 
   /**
@@ -535,6 +538,31 @@ public class RedisOptions {
    */
   public String getPoolName() {
     return poolOptions.getName();
+  }
+
+  /**
+   * Returns the TTL of the hash slot cache. This is only meaningful in case of
+   * a {@linkplain RedisClientType#CLUSTER clustered} Redis client.
+   * <p>
+   * The TTL is expressed in milliseconds. Defaults to 1000 millis (1 second).
+   *
+   * @return the TTL of the hash slot cache
+   */
+  public long getHashSlotCacheTTL() {
+    return hashSlotCacheTTL;
+  }
+
+  /**
+   * Sets the TTL of the hash slot cache. This is only meaningful in case of
+   * a {@linkplain RedisClientType#CLUSTER clustered} Redis client.
+   * <p>
+   * The TTL is expressed in milliseconds. Defaults to 1000 millis (1 second).
+   *
+   * @param hashSlotCacheTTL the TTL of the hash slot cache, in millis
+   */
+  public RedisOptions setHashSlotCacheTTL(long hashSlotCacheTTL) {
+    this.hashSlotCacheTTL = hashSlotCacheTTL;
+    return this;
   }
 
   /**
