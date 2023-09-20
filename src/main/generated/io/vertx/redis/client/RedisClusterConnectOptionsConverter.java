@@ -20,6 +20,11 @@ public class RedisClusterConnectOptionsConverter {
   public static void fromJson(Iterable<java.util.Map.Entry<String, Object>> json, RedisClusterConnectOptions obj) {
     for (java.util.Map.Entry<String, Object> member : json) {
       switch (member.getKey()) {
+        case "hashSlotCacheTTL":
+          if (member.getValue() instanceof Number) {
+            obj.setHashSlotCacheTTL(((Number)member.getValue()).longValue());
+          }
+          break;
         case "useReplicas":
           if (member.getValue() instanceof String) {
             obj.setUseReplicas(io.vertx.redis.client.RedisReplicas.valueOf((String)member.getValue()));
@@ -34,6 +39,7 @@ public class RedisClusterConnectOptionsConverter {
   }
 
   public static void toJson(RedisClusterConnectOptions obj, java.util.Map<String, Object> json) {
+    json.put("hashSlotCacheTTL", obj.getHashSlotCacheTTL());
     if (obj.getUseReplicas() != null) {
       json.put("useReplicas", obj.getUseReplicas().name());
     }
