@@ -24,18 +24,22 @@ import java.util.List;
 public class RedisClusterConnectOptions extends RedisConnectOptions {
 
   private RedisReplicas useReplicas;
+  private long hashSlotCacheTTL;
 
   public RedisClusterConnectOptions(RedisOptions options) {
     super(options);
     setUseReplicas(options.getUseReplicas());
+    setHashSlotCacheTTL(options.getHashSlotCacheTTL());
   }
 
   public RedisClusterConnectOptions() {
     useReplicas = RedisReplicas.NEVER;
+    hashSlotCacheTTL = 1000;
   }
 
   public RedisClusterConnectOptions(RedisClusterConnectOptions other) {
     this.useReplicas = other.useReplicas;
+    this.hashSlotCacheTTL = other.hashSlotCacheTTL;
   }
 
   public RedisClusterConnectOptions(JsonObject json) {
@@ -60,6 +64,31 @@ public class RedisClusterConnectOptions extends RedisConnectOptions {
    */
   public RedisConnectOptions setUseReplicas(RedisReplicas useReplicas) {
     this.useReplicas = useReplicas;
+    return this;
+  }
+
+  /**
+   * Returns the TTL of the hash slot cache. This is only meaningful in case of
+   * a {@linkplain RedisClientType#CLUSTER clustered} Redis client.
+   * <p>
+   * The TTL is expressed in milliseconds. Defaults to 1000 millis (1 second).
+   *
+   * @return the TTL of the hash slot cache
+   */
+  public long getHashSlotCacheTTL() {
+    return hashSlotCacheTTL;
+  }
+
+  /**
+   * Sets the TTL of the hash slot cache. This is only meaningful in case of
+   * a {@linkplain RedisClientType#CLUSTER clustered} Redis client.
+   * <p>
+   * The TTL is expressed in milliseconds. Defaults to 1000 millis (1 second).
+   *
+   * @param hashSlotCacheTTL the TTL of the hash slot cache, in millis
+   */
+  public RedisClusterConnectOptions setHashSlotCacheTTL(long hashSlotCacheTTL) {
+    this.hashSlotCacheTTL = hashSlotCacheTTL;
     return this;
   }
 
