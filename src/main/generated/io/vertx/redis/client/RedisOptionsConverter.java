@@ -48,6 +48,11 @@ public class RedisOptionsConverter {
             obj.setEndpoints(list);
           }
           break;
+        case "hashSlotCacheTTL":
+          if (member.getValue() instanceof Number) {
+            obj.setHashSlotCacheTTL(((Number)member.getValue()).longValue());
+          }
+          break;
         case "masterName":
           if (member.getValue() instanceof String) {
             obj.setMasterName((String)member.getValue());
@@ -140,6 +145,7 @@ public class RedisOptionsConverter {
       obj.getEndpoints().forEach(item -> array.add(item));
       json.put("endpoints", array);
     }
+    json.put("hashSlotCacheTTL", obj.getHashSlotCacheTTL());
     if (obj.getMasterName() != null) {
       json.put("masterName", obj.getMasterName());
     }
