@@ -84,6 +84,8 @@ public class RedisOptions {
     this.useReplicas = other.useReplicas;
     this.password = other.password;
     this.protocolNegotiation = other.protocolNegotiation;
+    this.maxWaitingHandlers = other.maxWaitingHandlers;
+    this.tracingPolicy = other.tracingPolicy;
   }
 
   /**
