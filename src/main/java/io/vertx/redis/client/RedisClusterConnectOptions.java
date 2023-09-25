@@ -62,7 +62,7 @@ public class RedisClusterConnectOptions extends RedisConnectOptions {
    * @param useReplicas the cluster replica use mode.
    * @return fluent self.
    */
-  public RedisConnectOptions setUseReplicas(RedisReplicas useReplicas) {
+  public RedisClusterConnectOptions setUseReplicas(RedisReplicas useReplicas) {
     this.useReplicas = useReplicas;
     return this;
   }
