@@ -24,6 +24,7 @@ Redis has a rich API and it can be organized in the following groups:
 * Strings - Commands to work with Strings.
 * Transactions - Commands to handle transaction lifecycle.
 * Streams - Commands to handle streaming.
+* Client-side caching - Commands to control client-side caching.
 
 == Using Vert.x-Redis
 
@@ -182,8 +183,53 @@ And from another place in the code publish messages to the queue:
 ----
 
 NOTE: It is important to remember that the commands `SUBSCRIBE`, `UNSUBSCRIBE`, `PSUBSCRIBE` and `PUNSUBSCRIBE` are `void`.
-This means that the result in case of success is `null` not a instance of response.
+This means that the result in case of success is `null` not an instance of response.
 All messages are then routed through the handler on the client.
+
+== Client-side Caching
+
+Redis supports client-side caching implementations using a strategy called _Tracking_.
+
+All modes of the client support caching except connections that are in pub/sub mode.
+
+To create a client with client-side caching, one would do:
+
+[source,$lang]
+----
+{@link examples.RedisExamples#clientCaching1}
+----
+
+A specific interface, `CachingRedis`, is exposed for a caching client that allows an invalidation handler to be attached or a flush command to be issued.
+The invalidation handler will be invoked with all the keys being invalidated whenever a message is received on the invalidations connection.
+
+To attach an invalidations handler:
+
+[source,$lang]
+----
+{@link examples.RedisExamples#clientCaching2}
+----
+
+To manually flush the client's cache store:
+
+[source,$lang]
+----
+{@link examples.RedisExamples#clientCaching3}
+----
+
+The client comes with a default cache store out of the box, but you can write your own if you prefer.
+
+The implementations are expected to follow the `ServiceLoader` conventions and all stores that are available at runtime from the classpath will be exposed.
+When more than 1 implementation is available the first one that can be instantiated and configured with success becomes the default.
+If none is available, then the default is a simple Least-Recently-Used (LRU) cache backed by a `LinkedHashMap`.
+
+[source,$lang]
+----
+{@link examples.RedisExamples#clientCaching4}
+----
+
+NOTE: The cache is not a write-through cache. A value will not be stored in the client-side cache until the value is fetched from Redis for the first time.
+To avoid write-then-read race conditions within the same batch, read commands that are part of a batch will not check the cache first.
+Additionally, the current implementation does not support the `OPTIN` or `NOLOOP` options.
 
 == Tracing commands
 

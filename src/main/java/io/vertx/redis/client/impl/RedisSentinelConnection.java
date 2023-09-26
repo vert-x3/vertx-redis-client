@@ -19,6 +19,10 @@ public class RedisSentinelConnection implements RedisConnection {
     this.sentinel = sentinel;
   }
 
+  public RedisConnectionInternal actual() {
+    return connection.actual();
+  }
+
   @Override
   public RedisConnection exceptionHandler(Handler<Throwable> handler) {
     connection.exceptionHandler(handler);

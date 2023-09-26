@@ -55,6 +55,7 @@ public class RedisStandaloneConnection implements RedisConnectionInternal, Parse
   private Runnable onEvict;
   private boolean closed = false;
   private boolean tainted = false;
+  private boolean trackingConfigured = false;
 
   public RedisStandaloneConnection(VertxInternal vertx, ContextInternal context, PoolConnector.Listener connectionListener, NetSocket netSocket, PoolOptions options, int maxWaitingHandlers, RedisURI uri, ClientMetrics metrics, TracingPolicy tracingPolicy) {
     //System.out.println("<ctor>#" + this.hashCode());
@@ -78,6 +79,10 @@ public class RedisStandaloneConnection implements RedisConnectionInternal, Parse
     tainted = false;
   }
 
+  synchronized void setTrackingConfigured() {
+    trackingConfigured = true;
+  }
+
   @Override
   public void forceClose() {
     //System.out.println("forceClose()#" + this.hashCode());
@@ -89,6 +94,11 @@ public class RedisStandaloneConnection implements RedisConnectionInternal, Parse
   public boolean isValid() {
     //System.out.println("isValid()#" + this.hashCode());
     return !closed && (expiresAt <= 0 || System.currentTimeMillis() < expiresAt);
+  }
+
+  @Override
+  public boolean isTrackingConfigured() {
+    return trackingConfigured;
   }
 
   @Override

@@ -19,6 +19,7 @@ import io.vertx.core.buffer.Buffer;
 import io.vertx.redis.client.Command;
 import io.vertx.redis.client.Request;
 
+import io.vertx.redis.client.impl.cache.CacheKey;
 import java.nio.charset.StandardCharsets;
 import java.util.*;
 
@@ -138,6 +139,14 @@ public final class RequestImpl implements Request {
 
     args.add(arg.getBytes());
     return this;
+  }
+
+  boolean isCacheable() {
+    return keys().size() == 1 && cmd.isReadOnly(args);
+  }
+
+  CacheKey cacheKey() {
+    return new CacheKey(new String(keys().get(0), StandardCharsets.UTF_8));
   }
 
   Buffer encode() {

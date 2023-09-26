@@ -24,6 +24,7 @@ import io.vertx.redis.client.impl.RedisURI;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 /**
  * Redis Client Configuration options.
@@ -50,6 +51,7 @@ public class RedisOptions {
   private volatile String password;
   private boolean protocolNegotiation;
   private TracingPolicy tracingPolicy;
+  private CachingRedisOptions cachingOptions;
 
   /**
    * Creates a default configuration object using redis server defaults
@@ -66,6 +68,7 @@ public class RedisOptions {
     maxNestedArrays = 32;
     protocolNegotiation = true;
     maxWaitingHandlers = 2048;
+    cachingOptions = new CachingRedisOptions();
   }
 
   /**
@@ -84,6 +87,7 @@ public class RedisOptions {
     this.useReplicas = other.useReplicas;
     this.password = other.password;
     this.protocolNegotiation = other.protocolNegotiation;
+    this.cachingOptions = other.cachingOptions;
   }
 
   /**
@@ -535,6 +539,119 @@ public class RedisOptions {
    */
   public String getPoolName() {
     return poolOptions.getName();
+  }
+
+  /**
+   * @return the client-side caching options
+   */
+  public CachingRedisOptions getCachingOptions() {
+    return cachingOptions;
+  }
+
+  /**
+   * @see CachingRedisOptions#getEnabled()
+   */
+  public boolean getCacheEnabled() {
+    return cachingOptions.getEnabled();
+  }
+
+  /**
+   * @see CachingRedisOptions#setEnabled(boolean)
+   */
+  public RedisOptions setCacheEnabled(boolean cacheEnabled) {
+    cachingOptions.setEnabled(cacheEnabled);
+    return this;
+  }
+
+  /**
+   * @see CachingRedisOptions#getMaxCacheSize()
+   */
+  public int getCacheMaxSize() {
+    return cachingOptions.getMaxCacheSize();
+  }
+
+  /**
+   * @see CachingRedisOptions#setMaxCacheSize(int)
+   */
+  public RedisOptions setCacheMaxSize(int maxCacheSize) {
+    cachingOptions.setMaxCacheSize(maxCacheSize);
+    return this;
+  }
+
+  /**
+   * @see CachingRedisOptions#getMaxAge()
+   */
+  public long getCacheMaxAge() {
+    return cachingOptions.getMaxAge();
+  }
+
+  /**
+   * @see CachingRedisOptions#setMaxAge(long)
+   */
+  public RedisOptions setCacheMaxAge(long cacheMaxAge) {
+    cachingOptions.setMaxAge(cacheMaxAge);
+    return this;
+  }
+
+  /**
+   * @see CachingRedisOptions#getMaxAgeUnit()
+   */
+  public TimeUnit getCacheMaxAgeUnit() {
+    return cachingOptions.getMaxAgeUnit();
+  }
+
+  /**
+   * @see CachingRedisOptions#setMaxAgeUnit(TimeUnit)
+   */
+  public RedisOptions setCacheMaxAgeUnit(TimeUnit cacheMaxAgeUnit) {
+    cachingOptions.setMaxAgeUnit(cacheMaxAgeUnit);
+    return this;
+  }
+
+  /**
+   * @see CachingRedisOptions#getMode()
+   */
+  public ClientSideCacheMode getCacheMode() {
+    return cachingOptions.getMode();
+  }
+
+  /**
+   * @see CachingRedisOptions#setMode(ClientSideCacheMode)
+   */
+  public RedisOptions setCacheMode(ClientSideCacheMode cacheMode) {
+    cachingOptions.setMode(cacheMode);
+    return this;
+  }
+
+  /**
+   * @see CachingRedisOptions#getPrefixes()
+   */
+  public List<String> getCachePrefixes() {
+    return cachingOptions.getPrefixes();
+  }
+
+  /**
+   * @see CachingRedisOptions#setPrefixes(List)
+   */
+  public RedisOptions setCachePrefixes(List<String> cachePrefixes) {
+    cachingOptions.setPrefixes(cachePrefixes);
+    return this;
+  }
+
+  /**
+   * @see CachingRedisOptions#setPrefix(String)
+   */
+  public RedisOptions setCachePrefix(String cachePrefix) {
+    cachingOptions.setPrefix(cachePrefix);
+    return this;
+  }
+
+  /**
+   * @see CachingRedisOptions#addPrefix(String)
+   */
+  public RedisOptions addCachePrefix(String cachePrefix) {
+    cachingOptions.addPrefix(cachePrefix);
+    return this;
   }
 
   /**

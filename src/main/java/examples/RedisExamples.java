@@ -1,5 +1,6 @@
 package examples;
 
+import io.vertx.codegen.annotations.Nullable;
 import io.vertx.core.AbstractVerticle;
 import io.vertx.core.Future;
 import io.vertx.core.Promise;
@@ -7,6 +8,13 @@ import io.vertx.core.Vertx;
 import io.vertx.core.tracing.TracingPolicy;
 import io.vertx.redis.client.*;
 
+import io.vertx.redis.client.impl.CachingRedis;
+import io.vertx.redis.client.impl.CachingRedisClient;
+import io.vertx.redis.client.impl.RedisClient;
+import io.vertx.redis.client.impl.cache.CacheKey;
+import io.vertx.redis.client.spi.RedisClientCache;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
@@ -143,7 +151,7 @@ public class RedisExamples {
 
         // make sure to invalidate old connection if present
         if (redis != null) {
-          redis.close();;
+          redis.close();
         }
 
         if (CONNECTING.compareAndSet(false, true)) {
@@ -245,5 +253,83 @@ public class RedisExamples {
 
   public void tracing1(RedisOptions options) {
     options.setTracingPolicy(TracingPolicy.ALWAYS);
+  }
+
+  public void clientCaching1(Vertx vertx) {
+    Redis.createClient(
+      vertx,
+      new RedisOptions()
+        .setCacheEnabled(true)
+        .setCacheMaxSize(256)
+        .setCacheMaxAge(60_000))
+      .connect()
+      .onSuccess(conn -> {
+        // get the value for a key, returning from a local in-memory cache if
+        // it exists, or fetching from Redis if not. if the value is fetched from
+        // Redis, it will be stored in the local cache
+        conn.send(Request.cmd(Command.GET).arg("key"));
+      });
+  }
+
+  public void clientCaching2(Redis redis) {
+    CachingRedis cachingClient = (CachingRedis) redis;
+
+    cachingClient.invalidationHandler(keys -> {
+      // something...
+    });
+  }
+
+  public void clientCaching3(Redis redis) {
+    CachingRedis cachingClient = (CachingRedis) redis;
+
+    cachingClient.flush().onSuccess(ignored -> {
+      // Success!
+    });
+  }
+
+  public void clientCaching4(Vertx vertx, RedisClientCache customCache) {
+
+    // Register this class in META-INF/services/io.vertx.redis.client.spi.RedisClientCache
+    class CustomCache implements RedisClientCache {
+
+      private final Map<CacheKey, Response> store = new HashMap<>();
+
+      @Override
+      public @Nullable Response get(CacheKey key) {
+        return store.get(key);
+      }
+
+      @Override
+      public void put(CacheKey key, Response value) {
+        store.put(key, value);
+      }
+
+      @Override
+      public void delete(CacheKey key) {
+        store.remove(key);
+      }
+
+      @Override
+      public void flush() {
+        store.clear();
+      }
+
+      @Override
+      public void close() {
+        // Nothing to do here
+      }
+    }
+
+    Redis.createClient(
+      vertx,
+      new RedisOptions()
+        .setCacheEnabled(true))
+      .connect()
+      .onSuccess(conn -> {
+        // get the value for a key, returning from the custom cache if
+        // it exists, or fetching from Redis if not. if the value is fetched from
+        // Redis, it will be stored in the local cache
+        conn.send(Request.cmd(Command.GET).arg("key"));
+      });
   }
 }

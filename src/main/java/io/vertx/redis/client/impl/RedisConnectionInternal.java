@@ -38,6 +38,12 @@ public interface RedisConnectionInternal extends RedisConnection {
    */
   boolean isTainted();
 
+  /**
+   * Returns {@code true} if a {@link CachingRedis} client is being used,
+   * and tracking has been configured for this connection.
+   */
+  boolean isTrackingConfigured();
+
   VertxInternal vertx();
 
   /**
