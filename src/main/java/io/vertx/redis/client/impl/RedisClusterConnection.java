@@ -10,6 +10,7 @@ import io.vertx.redis.client.impl.types.ErrorType;
 
 import java.util.*;
 import java.util.function.Function;
+import java.util.function.Supplier;
 
 import static io.vertx.redis.client.Command.ASKING;
 import static io.vertx.redis.client.Command.AUTH;
@@ -41,13 +42,18 @@ public class RedisClusterConnection implements RedisConnection {
   }
 
   private final VertxInternal vertx;
-  private final RedisClusterConnectOptions connectOptions;
+  // This options are resolved during connection.
+  private final RedisClusterConnectOptions resolvedOptions;
+  private final Supplier<Future<RedisClusterConnectOptions>> connectOptions;
   private final Slots slots;
   private final Map<String, PooledRedisConnection> connections;
 
-  RedisClusterConnection(Vertx vertx, RedisClusterConnectOptions connectOptions, Slots slots, Map<String, PooledRedisConnection> connections) {
+  RedisClusterConnection(Vertx vertx,RedisClusterConnectOptions resolvedOptions,
+                         Supplier<Future<RedisClusterConnectOptions>> connectOptions,
+                         Slots slots, Map<String, PooledRedisConnection> connections) {
     this.vertx = (VertxInternal) vertx;
     this.connectOptions = connectOptions;
+    this.resolvedOptions = resolvedOptions;
     this.slots = slots;
     this.connections = connections;
   }
@@ -248,7 +254,6 @@ public class RedisClusterConnection implements RedisConnection {
   }
 
   private void send(String endpoint, int retries, Request command, Handler<AsyncResult<Response>> handler) {
-
     final PooledRedisConnection connection = connections.get(endpoint);
 
     if (connection == null) {
@@ -296,15 +301,24 @@ public class RedisClusterConnection implements RedisConnection {
           return;
         }
 
-        if (cause.is("NOAUTH") && connectOptions.getPassword() != null) {
-          // NOAUTH will try to authenticate
-          connection.send(cmd(AUTH).arg(connectOptions.getPassword()), auth -> {
-            if (auth.failed()) {
-              handler.handle(Future.failedFuture(auth.cause()));
-              return;
+        if (cause.is("NOAUTH")) {
+          // NOAUTH will try to authenticate. We resolve options first.
+          connectOptions.get().onComplete(optionsResult -> {
+            if (optionsResult.failed()) {
+              handler.handle(Future.failedFuture(optionsResult.cause()));
             }
-            // again
-            send(endpoint, retries - 1, command, handler);
+            final RedisClusterConnectOptions resolvedOptions = optionsResult.result();
+
+            if (resolvedOptions.getPassword() != null) {
+              connection.send(cmd(AUTH).arg(resolvedOptions.getPassword()), auth -> {
+                if (auth.failed()) {
+                  handler.handle(Future.failedFuture(auth.cause()));
+                  return;
+                }
+                // again
+                send(endpoint, retries - 1, command, handler);
+              });
+            }
           });
           return;
         }
@@ -441,15 +455,24 @@ public class RedisClusterConnection implements RedisConnection {
           return;
         }
 
-        if (cause.is("NOAUTH") && connectOptions.getPassword() != null) {
-          // try to authenticate
-          connection.send(cmd(AUTH).arg(connectOptions.getPassword()), auth -> {
-            if (auth.failed()) {
-              handler.handle(Future.failedFuture(auth.cause()));
-              return;
+        if (cause.is("NOAUTH")) {
+          // try to authenticate. We resolve options first.
+          connectOptions.get().onComplete(optionsResult -> {
+            if (optionsResult.failed()) {
+              handler.handle(Future.failedFuture(optionsResult.cause()));
             }
-            // again
-            batch(endpoint, retries - 1, commands, handler);
+            final RedisClusterConnectOptions resolvedOptions = optionsResult.result();
+
+            if (resolvedOptions.getPassword() != null) {
+              connection.send(cmd(AUTH).arg(resolvedOptions.getPassword()), auth -> {
+                if (auth.failed()) {
+                  handler.handle(Future.failedFuture(auth.cause()));
+                  return;
+                }
+                // again
+                batch(endpoint, retries - 1, commands, handler);
+              });
+            }
           });
           return;
         }
@@ -502,7 +525,7 @@ public class RedisClusterConnection implements RedisConnection {
 
     // if we haven't got config for this slot, try any connection
     if (endpoints == null || endpoints.length == 0) {
-      return connectOptions.getEndpoint();
+      return resolvedOptions.getEndpoint();
     }
     return selectMasterOrReplicaEndpoint(readOnly, endpoints, forceMasterEndpoint);
   }
@@ -513,7 +536,7 @@ public class RedisClusterConnection implements RedisConnection {
     }
 
     // always, never, share
-    RedisReplicas useReplicas = connectOptions.getUseReplicas();
+    RedisReplicas useReplicas = resolvedOptions.getUseReplicas();
 
     if (readOnly && useReplicas != RedisReplicas.NEVER && endpoints.length > 1) {
       switch (useReplicas) {

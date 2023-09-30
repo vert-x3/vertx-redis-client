@@ -192,11 +192,11 @@ public class RedisClusterClient extends BaseRedisClient<RedisClusterConnectOptio
             }
 
             for (String endpoint : slots.endpoints()) {
-              connectionManager.getConnection(endpoint, RedisReplicas.NEVER != connectOptions.getUseReplicas() ? cmd(READONLY) : null)
+              connectionManager.getConnection(endpoint, RedisReplicas.NEVER != resolvedOptions.getUseReplicas() ? cmd(READONLY) : null)
                 .onFailure(err -> {
                   // failed try with the next endpoint
                   failed.set(true);
-                  connectionComplete(counter, slots, connections, failed, onConnect);
+                  connectionComplete(counter, slots, connections, failed, resolvedOptions, onConnect);
                 })
                 .onSuccess(cconn -> {
                   // there can be concurrent access to the connection map
@@ -205,7 +205,7 @@ public class RedisClusterClient extends BaseRedisClient<RedisClusterConnectOptio
                   synchronized (connections) {
                     connections.put(endpoint, cconn);
                   }
-                  connectionComplete(counter, slots, connections, failed, onConnect);
+                  connectionComplete(counter, slots, connections, failed, resolvedOptions, onConnect);
                 });
             }
           });
@@ -213,7 +213,9 @@ public class RedisClusterClient extends BaseRedisClient<RedisClusterConnectOptio
     });
   }
 
-  private void connectionComplete(AtomicInteger counter, Slots slots, Map<String, PooledRedisConnection> connections, AtomicBoolean failed, Handler<AsyncResult<RedisConnection>> onConnect) {
+  private void connectionComplete(AtomicInteger counter, Slots slots, Map<String, PooledRedisConnection> connections,
+                                  AtomicBoolean failed, RedisClusterConnectOptions resolvedOptions,
+                                  Handler<AsyncResult<RedisConnection>> onConnect) {
     if (counter.incrementAndGet() == slots.endpoints().length) {
       // end condition
       if (failed.get()) {
@@ -231,7 +233,9 @@ public class RedisClusterClient extends BaseRedisClient<RedisClusterConnectOptio
         // return
         onConnect.handle(Future.failedFuture("Failed to connect to all nodes of the cluster"));
       } else {
-        onConnect.handle(Future.succeededFuture(new RedisClusterConnection(vertx, connectOptions, slots, connections)));
+        onConnect.handle(Future.succeededFuture(
+          new RedisClusterConnection(vertx, resolvedOptions, connectOptions, slots, connections)
+        ));
       }
     }
   }
