@@ -12,6 +12,7 @@ import io.vertx.redis.client.*;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.function.Supplier;
 
 public abstract class BaseRedisClient implements Redis {
 
@@ -20,7 +21,11 @@ public abstract class BaseRedisClient implements Redis {
   protected final VertxInternal vertx;
   protected final RedisConnectionManager connectionManager;
 
-  public BaseRedisClient(Vertx vertx, NetClientOptions tcpOptions, PoolOptions poolOptions, RedisConnectOptions connectOptions, TracingPolicy tracingPolicy) {
+  protected final Supplier<Future<RedisConnectOptions>> connectOptions;
+
+  public BaseRedisClient(Vertx vertx, NetClientOptions tcpOptions, PoolOptions poolOptions,
+                         Supplier<Future<RedisConnectOptions>> connectOptions, TracingPolicy tracingPolicy) {
+    this.connectOptions = connectOptions;
     this.vertx = (VertxInternal) vertx;
     this.connectionManager = new RedisConnectionManager(this.vertx, tcpOptions, poolOptions, connectOptions, tracingPolicy);
     this.connectionManager.start();

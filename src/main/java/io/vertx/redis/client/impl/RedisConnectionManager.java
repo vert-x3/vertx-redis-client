@@ -37,6 +37,10 @@ import io.vertx.redis.client.*;
 import io.vertx.redis.client.impl.types.ErrorType;
 
 import java.util.Objects;
+import java.util.function.Supplier;
+
+import static io.vertx.redis.client.util.OptionsResolver.resolvePassword;
+import static io.vertx.redis.client.util.OptionsResolver.resolveUser;
 
 class RedisConnectionManager {
 
@@ -50,13 +54,14 @@ class RedisConnectionManager {
   private final PoolMetrics metrics;
   private final NetClientOptions tcpOptions;
   private final PoolOptions poolOptions;
-  private final RedisConnectOptions connectOptions;
+  private final Supplier<Future<RedisConnectOptions>> connectOptions;
   private final TracingPolicy tracingPolicy;
 
   private final ConnectionManager<ConnectionKey, Lease<RedisConnectionInternal>> pooledConnectionManager;
   private long timerID;
 
-  RedisConnectionManager(VertxInternal vertx, NetClientOptions tcpOptions, PoolOptions poolOptions, RedisConnectOptions connectOptions, TracingPolicy tracingPolicy) {
+  RedisConnectionManager(VertxInternal vertx, NetClientOptions tcpOptions, PoolOptions poolOptions,
+                         Supplier<Future<RedisConnectOptions>> connectOptions, TracingPolicy tracingPolicy) {
     this.vertx = vertx;
     this.context = vertx.getOrCreateContext();
     this.tcpOptions = tcpOptions;
@@ -125,10 +130,10 @@ class RedisConnectionManager {
     private final Request setup;
     private final NetClientOptions netClientOptions;
     private final PoolOptions poolOptions;
-    private final RedisConnectOptions options;
+    private final Supplier<Future<RedisConnectOptions>> options;
     private final TracingPolicy tracingPolicy;
 
-    public RedisConnectionProvider(VertxInternal vertx, NetClient netClient, NetClientOptions netClientOptions, PoolOptions poolOptions, RedisConnectOptions options, TracingPolicy tracingPolicy, String connectionString, Request setup) {
+    public RedisConnectionProvider(VertxInternal vertx, NetClient netClient, NetClientOptions netClientOptions, PoolOptions poolOptions, Supplier<Future<RedisConnectOptions>> options, TracingPolicy tracingPolicy, String connectionString, Request setup) {
       this.vertx = vertx;
       this.netClient = netClient;
       this.netClientOptions = netClientOptions;
@@ -197,59 +202,70 @@ class RedisConnectionManager {
     }
 
     private void init(ContextInternal ctx, NetSocket netSocket, PoolConnector.Listener connectionListener, Handler<AsyncResult<ConnectResult<RedisConnectionInternal>>> onConnect) {
-      // the connection will inherit the user event loop context
-      VertxMetrics vertxMetrics = vertx.metricsSPI();
-      ClientMetrics metrics = vertxMetrics != null
-        ? vertxMetrics.createClientMetrics(redisURI.socketAddress(), "redis", netClientOptions.getMetricsName())
-        : null;
-      final RedisStandaloneConnection connection = new RedisStandaloneConnection(vertx, ctx, connectionListener, netSocket, poolOptions, options.getMaxWaitingHandlers(), redisURI, metrics, tracingPolicy);
-      // initialization
-      connection.exceptionHandler(DEFAULT_EXCEPTION_HANDLER);
 
-      // parser utility
-      netSocket
-        .handler(new RESPParser(connection, options.getMaxNestedArrays()))
-        .closeHandler(connection::end)
-        .exceptionHandler(connection::fail);
-
-      // initial handshake
-      hello(ctx, connection, redisURI, hello -> {
-        if (hello.failed()) {
-          ctx.execute(ctx.failedFuture(hello.cause()), onConnect);
-          return;
+      options.get().onComplete(optionsResult -> {
+        if (optionsResult.failed()) {
+          ctx.execute(ctx.failedFuture(optionsResult.cause()), onConnect);
         }
 
-        // perform select
-        select(ctx, connection, redisURI.select(), select -> {
-          if (select.failed()) {
-            ctx.execute(ctx.failedFuture(select.cause()), onConnect);
+        RedisConnectOptions resolvedOptions = optionsResult.result();
+
+        // the connection will inherit the user event loop context
+        VertxMetrics vertxMetrics = vertx.metricsSPI();
+        ClientMetrics metrics = vertxMetrics != null
+          ? vertxMetrics.createClientMetrics(redisURI.socketAddress(), "redis", netClientOptions.getMetricsName())
+          : null;
+        final RedisStandaloneConnection connection = new RedisStandaloneConnection(vertx, ctx, connectionListener, netSocket, poolOptions, resolvedOptions.getMaxWaitingHandlers(), redisURI, metrics, tracingPolicy);
+        // initialization
+        connection.exceptionHandler(DEFAULT_EXCEPTION_HANDLER);
+
+        // parser utility
+        netSocket
+          .handler(new RESPParser(connection, resolvedOptions.getMaxNestedArrays()))
+          .closeHandler(connection::end)
+          .exceptionHandler(connection::fail);
+
+        // initial handshake
+        hello(ctx, connection, redisURI, resolvedOptions, hello -> {
+          if (hello.failed()) {
+            ctx.execute(ctx.failedFuture(hello.cause()), onConnect);
             return;
           }
 
-          // perform setup
-          setup(ctx, connection, setup, setupResult -> {
-            if (setupResult.failed()) {
-              ctx.execute(ctx.failedFuture(setupResult.cause()), onConnect);
+          // perform select
+          select(ctx, connection, redisURI.select(), select -> {
+            if (select.failed()) {
+              ctx.execute(ctx.failedFuture(select.cause()), onConnect);
               return;
             }
 
-            // connection is valid
-            connection.setValid();
+            // perform setup
+            setup(ctx, connection, setup, setupResult -> {
+              if (setupResult.failed()) {
+                ctx.execute(ctx.failedFuture(setupResult.cause()), onConnect);
+                return;
+              }
 
-            ctx.execute(ctx.succeededFuture(new ConnectResult<>(connection, 1, 0)), onConnect);
+              // connection is valid
+              connection.setValid();
+
+              ctx.execute(ctx.succeededFuture(new ConnectResult<>(connection, 1, 0)), onConnect);
+            });
           });
         });
+
       });
     }
 
-    private void hello(ContextInternal ctx, RedisConnection connection, RedisURI redisURI, Handler<AsyncResult<Void>> handler) {
-      if (!options.isProtocolNegotiation()) {
+    private void hello(ContextInternal ctx, RedisConnection connection, RedisURI redisURI,
+                       final RedisConnectOptions resolvedOptions, Handler<AsyncResult<Void>> handler) {
+      if (!resolvedOptions.isProtocolNegotiation()) {
         ping(ctx, connection, handler);
       } else {
         Request hello = Request.cmd(Command.HELLO).arg(RESPParser.VERSION);
 
-        String password = redisURI.password() != null ? redisURI.password() : options.getPassword();
-        String user = redisURI.user();
+        String password = resolvePassword(redisURI, resolvedOptions);
+        String user = resolveUser(redisURI, resolvedOptions);
 
         if (password != null) {
           // will perform auth at hello level
@@ -276,7 +292,17 @@ class RedisConnectionManager {
             if (err instanceof ErrorType) {
               final ErrorType redisErr = (ErrorType) err;
               if (redisErr.is("NOAUTH")) {
-                authenticate(ctx, connection, user, password, handler);
+                // Not yet or not anymore authenticated. We resolve the options once again.
+                options.get().onComplete(optionsResult -> {
+                    if (optionsResult.failed()) {
+                      ctx.execute(ctx.failedFuture(optionsResult.cause()), handler);
+                    }
+                    RedisConnectOptions newResolvedOptions = optionsResult.result();
+                    authenticate(ctx, connection,
+                      resolveUser(redisURI, newResolvedOptions), resolvePassword(redisURI, newResolvedOptions),
+                      handler
+                    );
+                  });
                 return;
               }
               if (redisErr.is("ERR")) {
@@ -309,9 +335,18 @@ class RedisConnectionManager {
         if (err != null) {
           if (err instanceof ErrorType) {
             if (((ErrorType) err).is("NOAUTH")) {
-              // old authentication required
-              String password = redisURI.password() != null ? redisURI.password() : options.getPassword();
-              authenticate(ctx, connection, redisURI.user(), password, handler);
+              // Not yet or not anymore authenticated. We resolve the options once again.
+              options.get().onComplete(optionsResult -> {
+                if (optionsResult.failed()) {
+                  ctx.execute(ctx.failedFuture(optionsResult.cause()), handler);
+                }
+                RedisConnectOptions newResolvedOptions = optionsResult.result();
+                // old authentication required
+                authenticate(ctx, connection,
+                  resolveUser(redisURI, newResolvedOptions), resolvePassword(redisURI, newResolvedOptions),
+                  handler
+                );
+              });
               return;
             }
           }
@@ -415,7 +450,9 @@ class RedisConnectionManager {
 
     final ConnectionPool<RedisConnectionInternal> pool;
 
-    public RedisEndpoint(VertxInternal vertx, NetClient netClient, NetClientOptions netClientOptions, PoolOptions poolOptions, RedisConnectOptions connectOptions, TracingPolicy tracingPolicy, Runnable dispose, String connectionString, Request setup) {
+    public RedisEndpoint(VertxInternal vertx, NetClient netClient, NetClientOptions netClientOptions, PoolOptions poolOptions,
+                         Supplier<Future<RedisConnectOptions>> connectOptions, TracingPolicy tracingPolicy,
+                         Runnable dispose, String connectionString, Request setup) {
       super(dispose);
       PoolConnector<RedisConnectionInternal> connector = new RedisConnectionProvider(vertx, netClient, netClientOptions, poolOptions, connectOptions, tracingPolicy, connectionString, setup);
       pool = ConnectionPool.pool(connector, new int[]{poolOptions.getMaxSize()}, poolOptions.getMaxWaiting());

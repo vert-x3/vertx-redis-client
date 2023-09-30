@@ -19,6 +19,8 @@ import io.vertx.codegen.annotations.Fluent;
 import io.vertx.codegen.annotations.Nullable;
 import io.vertx.codegen.annotations.VertxGen;
 import io.vertx.core.*;
+import io.vertx.core.net.NetClientOptions;
+import io.vertx.core.tracing.TracingPolicy;
 import io.vertx.redis.client.impl.RedisClient;
 import io.vertx.redis.client.impl.RedisClusterClient;
 import io.vertx.redis.client.impl.RedisReplicationClient;
@@ -63,7 +65,8 @@ public interface Redis {
   static Redis createClient(Vertx vertx, RedisOptions options) {
     switch (options.getType()) {
       case STANDALONE:
-        return new RedisClient(vertx, options.getNetClientOptions(), options.getPoolOptions(), new RedisStandaloneConnectOptions(options), options.getTracingPolicy());
+        return new RedisClient(vertx, options.getNetClientOptions(), options.getPoolOptions(),
+          () -> Future.succeededFuture(new RedisStandaloneConnectOptions(options)), options.getTracingPolicy());
       case SENTINEL:
         return new RedisSentinelClient(vertx, options.getNetClientOptions(), options.getPoolOptions(), new RedisSentinelConnectOptions(options), options.getTracingPolicy());
       case CLUSTER:
@@ -73,6 +76,12 @@ public interface Redis {
       default:
         throw new IllegalStateException("Unknown Redis Client type: " + options.getType());
     }
+  }
+
+  static RedisClient createStandaloneClient(Vertx vertx, NetClientOptions tcpOptions, PoolOptions poolOptions,
+                                            Supplier<Future<RedisConnectOptions>> connectionOptionsSupplier,
+                                            TracingPolicy tracingPolicy) {
+    return new RedisClient(vertx, tcpOptions,poolOptions, connectionOptionsSupplier,tracingPolicy);
   }
 
   /**
