@@ -42,7 +42,7 @@ import java.util.function.Supplier;
 import static io.vertx.redis.client.util.OptionsResolver.resolvePassword;
 import static io.vertx.redis.client.util.OptionsResolver.resolveUser;
 
-class RedisConnectionManager {
+class RedisConnectionManager<T extends RedisConnectOptions> {
 
   private static final Logger LOG = LoggerFactory.getLogger(RedisConnectionManager.class);
 
@@ -54,14 +54,14 @@ class RedisConnectionManager {
   private final PoolMetrics metrics;
   private final NetClientOptions tcpOptions;
   private final PoolOptions poolOptions;
-  private final Supplier<Future<RedisConnectOptions>> connectOptions;
+  private final Supplier<Future<T>> connectOptions;
   private final TracingPolicy tracingPolicy;
 
   private final ConnectionManager<ConnectionKey, Lease<RedisConnectionInternal>> pooledConnectionManager;
   private long timerID;
 
   RedisConnectionManager(VertxInternal vertx, NetClientOptions tcpOptions, PoolOptions poolOptions,
-                         Supplier<Future<RedisConnectOptions>> connectOptions, TracingPolicy tracingPolicy) {
+                         Supplier<Future<T>> connectOptions, TracingPolicy tracingPolicy) {
     this.vertx = vertx;
     this.context = vertx.getOrCreateContext();
     this.tcpOptions = tcpOptions;
@@ -85,7 +85,7 @@ class RedisConnectionManager {
 
   private void checkExpired(long period) {
     pooledConnectionManager.forEach(e ->
-      ((RedisEndpoint) e).pool.evict(conn -> !conn.isValid(), ar -> {
+      ((RedisEndpoint<T>) e).pool.evict(conn -> !conn.isValid(), ar -> {
         if (ar.succeeded()) {
           for (RedisConnectionInternal conn : ar.result()) {
             // on close we reset the default handlers
@@ -122,7 +122,7 @@ class RedisConnectionManager {
     }
   }
 
-  static class RedisConnectionProvider implements PoolConnector<RedisConnectionInternal> {
+  static class RedisConnectionProvider<T extends RedisConnectOptions> implements PoolConnector<RedisConnectionInternal> {
 
     private final VertxInternal vertx;
     private final NetClient netClient;
@@ -130,10 +130,10 @@ class RedisConnectionManager {
     private final Request setup;
     private final NetClientOptions netClientOptions;
     private final PoolOptions poolOptions;
-    private final Supplier<Future<RedisConnectOptions>> options;
+    private final Supplier<Future<T>> options;
     private final TracingPolicy tracingPolicy;
 
-    public RedisConnectionProvider(VertxInternal vertx, NetClient netClient, NetClientOptions netClientOptions, PoolOptions poolOptions, Supplier<Future<RedisConnectOptions>> options, TracingPolicy tracingPolicy, String connectionString, Request setup) {
+    public RedisConnectionProvider(VertxInternal vertx, NetClient netClient, NetClientOptions netClientOptions, PoolOptions poolOptions, Supplier<Future<T>> options, TracingPolicy tracingPolicy, String connectionString, Request setup) {
       this.vertx = vertx;
       this.netClient = netClient;
       this.netClientOptions = netClientOptions;
@@ -446,12 +446,12 @@ class RedisConnectionManager {
     }
   }
 
-  static class RedisEndpoint extends Endpoint<Lease<RedisConnectionInternal>> {
+  static class RedisEndpoint<T extends RedisConnectOptions> extends Endpoint<Lease<RedisConnectionInternal>> {
 
     final ConnectionPool<RedisConnectionInternal> pool;
 
     public RedisEndpoint(VertxInternal vertx, NetClient netClient, NetClientOptions netClientOptions, PoolOptions poolOptions,
-                         Supplier<Future<RedisConnectOptions>> connectOptions, TracingPolicy tracingPolicy,
+                         Supplier<Future<T>> connectOptions, TracingPolicy tracingPolicy,
                          Runnable dispose, String connectionString, Request setup) {
       super(dispose);
       PoolConnector<RedisConnectionInternal> connector = new RedisConnectionProvider(vertx, netClient, netClientOptions, poolOptions, connectOptions, tracingPolicy, connectionString, setup);

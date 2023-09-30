@@ -25,11 +25,12 @@ import io.vertx.redis.client.impl.types.ErrorType;
 
 import java.util.List;
 import java.util.Random;
+import java.util.function.Supplier;
 
 import static io.vertx.redis.client.Command.*;
 import static io.vertx.redis.client.Request.cmd;
 
-public class RedisSentinelClient extends BaseRedisClient implements Redis {
+public class RedisSentinelClient extends BaseRedisClient<RedisSentinelConnectOptions> implements Redis {
 
   // We don't need to be secure, we just want so simple
   // randomization to avoid picking the same replica all the time
@@ -47,11 +48,9 @@ public class RedisSentinelClient extends BaseRedisClient implements Redis {
 
   private static final Logger LOG = LoggerFactory.getLogger(RedisSentinelClient.class);
 
-  private final RedisSentinelConnectOptions connectOptions;
-
-  public RedisSentinelClient(Vertx vertx, NetClientOptions tcpOptions, PoolOptions poolOptions, RedisSentinelConnectOptions connectOptions, TracingPolicy tracingPolicy) {
+  public RedisSentinelClient(Vertx vertx, NetClientOptions tcpOptions, PoolOptions poolOptions,
+                             Supplier<Future<RedisSentinelConnectOptions>> connectOptions, TracingPolicy tracingPolicy) {
     super(vertx, tcpOptions, poolOptions, connectOptions, tracingPolicy);
-    this.connectOptions = connectOptions;
     // validate options
     if (poolOptions.getMaxSize() < 2) {
       throw new IllegalStateException("Invalid options: maxSize must be at least 2");
@@ -65,58 +64,61 @@ public class RedisSentinelClient extends BaseRedisClient implements Redis {
   public Future<RedisConnection> connect() {
     final Promise<RedisConnection> promise = vertx.promise();
 
-    // sentinel (HA) requires 2 connections, one to watch for sentinel events and the connection itself
-    createConnectionInternal(connectOptions, connectOptions.getRole(), createConnection -> {
-      if (createConnection.failed()) {
-        promise.fail(createConnection.cause());
-        return;
-      }
+    return connectOptions.get()
+      .flatMap(resolvedOptions -> {
 
-      final PooledRedisConnection conn = createConnection.result();
+        // sentinel (HA) requires 2 connections, one to watch for sentinel events and the connection itself
+        createConnectionInternal(resolvedOptions, resolvedOptions.getRole(), createConnection -> {
+          if (createConnection.failed()) {
+            promise.fail(createConnection.cause());
+            return;
+          }
 
-      createConnectionInternal(connectOptions, RedisRole.SENTINEL, create -> {
-        if (create.failed()) {
-          LOG.error("Redis PUB/SUB wrap failed.", create.cause());
-          promise.fail(create.cause());
-          return;
-        }
+          final PooledRedisConnection conn = createConnection.result();
 
-        PooledRedisConnection sentinel = create.result();
-
-        sentinel
-          .handler(msg -> {
-            if (msg.type() == ResponseType.MULTI) {
-              if ("MESSAGE".equalsIgnoreCase(msg.get(0).toString())) {
-                // we don't care about the payload
-                if (conn != null) {
-                  ((RedisStandaloneConnection) conn.actual()).fail(ErrorType.create("SWITCH-MASTER Received +switch-master message from Redis Sentinel."));
-                } else {
-                  LOG.warn("Received +switch-master message from Redis Sentinel.");
-                }
-              }
+          createConnectionInternal(resolvedOptions, RedisRole.SENTINEL, create -> {
+            if (create.failed()) {
+              LOG.error("Redis PUB/SUB wrap failed.", create.cause());
+              promise.fail(create.cause());
+              return;
             }
+
+            PooledRedisConnection sentinel = create.result();
+
+            sentinel
+              .handler(msg -> {
+                if (msg.type() == ResponseType.MULTI) {
+                  if ("MESSAGE".equalsIgnoreCase(msg.get(0).toString())) {
+                    // we don't care about the payload
+                    if (conn != null) {
+                      ((RedisStandaloneConnection) conn.actual()).fail(ErrorType.create("SWITCH-MASTER Received +switch-master message from Redis Sentinel."));
+                    } else {
+                      LOG.warn("Received +switch-master message from Redis Sentinel.");
+                    }
+                  }
+                }
+              });
+
+            sentinel.send(cmd(SUBSCRIBE).arg("+switch-master"), send -> {
+              if (send.failed()) {
+                promise.fail(send.cause());
+              } else {
+                // both connections ready
+                promise.complete(new RedisSentinelConnection(conn, sentinel));
+              }
+            });
+
+            sentinel.exceptionHandler(t -> {
+              if (conn != null) {
+                ((RedisStandaloneConnection) conn.actual()).fail(t);
+              } else {
+                LOG.error("Unhandled exception in Sentinel PUBSUB", t);
+              }
+            });
           });
-
-        sentinel.send(cmd(SUBSCRIBE).arg("+switch-master"), send -> {
-          if (send.failed()) {
-            promise.fail(send.cause());
-          } else {
-            // both connections ready
-            promise.complete(new RedisSentinelConnection(conn, sentinel));
-          }
         });
-
-        sentinel.exceptionHandler(t -> {
-          if (conn != null) {
-            ((RedisStandaloneConnection) conn.actual()).fail(t);
-          } else {
-            LOG.error("Unhandled exception in Sentinel PUBSUB", t);
-          }
-        });
+        return promise.future();
       });
-    });
-
-    return promise.future();
   }
 
   private void createConnectionInternal(RedisSentinelConnectOptions options, RedisRole role, Handler<AsyncResult<PooledRedisConnection>> onCreate) {

@@ -68,9 +68,11 @@ public interface Redis {
         return new RedisClient(vertx, options.getNetClientOptions(), options.getPoolOptions(),
           () -> Future.succeededFuture(new RedisStandaloneConnectOptions(options)), options.getTracingPolicy());
       case SENTINEL:
-        return new RedisSentinelClient(vertx, options.getNetClientOptions(), options.getPoolOptions(), new RedisSentinelConnectOptions(options), options.getTracingPolicy());
+        return new RedisSentinelClient(vertx, options.getNetClientOptions(), options.getPoolOptions(),
+          () -> Future.succeededFuture(new RedisSentinelConnectOptions(options)), options.getTracingPolicy());
       case CLUSTER:
-        return new RedisClusterClient(vertx, options.getNetClientOptions(), options.getPoolOptions(), new RedisClusterConnectOptions(options), options.getTracingPolicy());
+        return new RedisClusterClient(vertx, options.getNetClientOptions(), options.getPoolOptions(),
+          () -> Future.succeededFuture(new RedisClusterConnectOptions(options)), options.getTracingPolicy());
       case REPLICATION:
         return new RedisReplicationClient(vertx, options.getNetClientOptions(), options.getPoolOptions(), new RedisClusterConnectOptions(options), options.getTracingPolicy());
       default:
@@ -78,10 +80,22 @@ public interface Redis {
     }
   }
 
-  static RedisClient createStandaloneClient(Vertx vertx, NetClientOptions tcpOptions, PoolOptions poolOptions,
-                                            Supplier<Future<RedisConnectOptions>> connectionOptionsSupplier,
+  static Redis createStandaloneClient(Vertx vertx, NetClientOptions tcpOptions, PoolOptions poolOptions,
+                                            Supplier<Future<RedisStandaloneConnectOptions>> connectionOptionsSupplier,
                                             TracingPolicy tracingPolicy) {
     return new RedisClient(vertx, tcpOptions,poolOptions, connectionOptionsSupplier,tracingPolicy);
+  }
+
+  static Redis createSentinelClient(Vertx vertx, NetClientOptions tcpOptions, PoolOptions poolOptions,
+                                            Supplier<Future<RedisSentinelConnectOptions>> connectionOptionsSupplier,
+                                            TracingPolicy tracingPolicy) {
+    return new RedisSentinelClient(vertx, tcpOptions,poolOptions, connectionOptionsSupplier,tracingPolicy);
+  }
+
+  static Redis createClusterClient(Vertx vertx, NetClientOptions tcpOptions, PoolOptions poolOptions,
+                                    Supplier<Future<RedisClusterConnectOptions>> connectionOptionsSupplier,
+                                    TracingPolicy tracingPolicy) {
+    return new RedisClusterClient(vertx, tcpOptions,poolOptions, connectionOptionsSupplier,tracingPolicy);
   }
 
   /**

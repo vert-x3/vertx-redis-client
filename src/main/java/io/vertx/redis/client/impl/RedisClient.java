@@ -22,10 +22,10 @@ import io.vertx.redis.client.*;
 
 import java.util.function.Supplier;
 
-public class RedisClient extends BaseRedisClient implements Redis {
+public class RedisClient extends BaseRedisClient<RedisStandaloneConnectOptions> implements Redis {
 
   public RedisClient(Vertx vertx, NetClientOptions tcpOptions, PoolOptions poolOptions,
-                     Supplier<Future<RedisConnectOptions>> connectOptions, TracingPolicy tracingPolicy) {
+                     Supplier<Future<RedisStandaloneConnectOptions>> connectOptions, TracingPolicy tracingPolicy) {
     super(vertx, tcpOptions, poolOptions, connectOptions, tracingPolicy);
   }
 
@@ -35,7 +35,7 @@ public class RedisClient extends BaseRedisClient implements Redis {
     Promise<RedisConnection> promise = vertx.promise();
     connectOptions.get()
       .flatMap(options -> connectionManager.getConnection(options.getEndpoint(), null))
-      .onComplete((Promise) promise);
+      .onComplete((Promise)promise);
     return promise.future();
   }
 }

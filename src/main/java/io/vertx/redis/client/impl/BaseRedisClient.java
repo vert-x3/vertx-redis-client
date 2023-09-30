@@ -14,20 +14,20 @@ import java.util.Collections;
 import java.util.List;
 import java.util.function.Supplier;
 
-public abstract class BaseRedisClient implements Redis {
+public abstract class BaseRedisClient<T extends RedisConnectOptions> implements Redis {
 
   private static final Logger LOG = LoggerFactory.getLogger(BaseRedisClient.class);
 
   protected final VertxInternal vertx;
-  protected final RedisConnectionManager connectionManager;
+  protected final RedisConnectionManager<T> connectionManager;
 
-  protected final Supplier<Future<RedisConnectOptions>> connectOptions;
+  protected final Supplier<Future<T>> connectOptions;
 
   public BaseRedisClient(Vertx vertx, NetClientOptions tcpOptions, PoolOptions poolOptions,
-                         Supplier<Future<RedisConnectOptions>> connectOptions, TracingPolicy tracingPolicy) {
+                         Supplier<Future<T>> connectOptions, TracingPolicy tracingPolicy) {
     this.connectOptions = connectOptions;
     this.vertx = (VertxInternal) vertx;
-    this.connectionManager = new RedisConnectionManager(this.vertx, tcpOptions, poolOptions, connectOptions, tracingPolicy);
+    this.connectionManager = new RedisConnectionManager<>(this.vertx, tcpOptions, poolOptions, connectOptions, tracingPolicy);
     this.connectionManager.start();
   }
 
