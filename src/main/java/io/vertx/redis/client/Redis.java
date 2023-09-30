@@ -84,25 +84,25 @@ public interface Redis {
   static Redis createStandaloneClient(Vertx vertx, NetClientOptions tcpOptions, PoolOptions poolOptions,
                                             Supplier<Future<RedisStandaloneConnectOptions>> connectionOptionsSupplier,
                                             TracingPolicy tracingPolicy) {
-    return new RedisClient(vertx, tcpOptions,poolOptions, connectionOptionsSupplier,tracingPolicy);
+    return new RedisClient(vertx, tcpOptions,poolOptions, connectionOptionsSupplier, tracingPolicy);
   }
 
   static Redis createSentinelClient(Vertx vertx, NetClientOptions tcpOptions, PoolOptions poolOptions,
                                             Supplier<Future<RedisSentinelConnectOptions>> connectionOptionsSupplier,
                                             TracingPolicy tracingPolicy) {
-    return new RedisSentinelClient(vertx, tcpOptions,poolOptions, connectionOptionsSupplier,tracingPolicy);
+    return new RedisSentinelClient(vertx, tcpOptions,poolOptions, connectionOptionsSupplier, tracingPolicy);
   }
 
   static Redis createClusterClient(Vertx vertx, NetClientOptions tcpOptions, PoolOptions poolOptions,
                                     Supplier<Future<RedisClusterConnectOptions>> connectionOptionsSupplier,
                                     TracingPolicy tracingPolicy) {
-    return new RedisClusterClient(vertx, tcpOptions,poolOptions, connectionOptionsSupplier,tracingPolicy);
+    return new RedisClusterClient(vertx, tcpOptions,poolOptions, connectionOptionsSupplier, tracingPolicy);
   }
 
   static Redis createReplicationClient(Vertx vertx, NetClientOptions tcpOptions, PoolOptions poolOptions,
                                    Supplier<Future<RedisClusterConnectOptions>> connectionOptionsSupplier,
                                    TracingPolicy tracingPolicy) {
-    return new RedisReplicationClient(vertx, tcpOptions,poolOptions, connectionOptionsSupplier,tracingPolicy);
+    return new RedisReplicationClient(vertx, tcpOptions,poolOptions, connectionOptionsSupplier, tracingPolicy);
   }
 
   /**
