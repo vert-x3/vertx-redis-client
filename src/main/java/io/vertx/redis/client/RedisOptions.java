@@ -79,6 +79,7 @@ public class RedisOptions {
     this.netClientOptions = other.netClientOptions;
     this.poolOptions = new PoolOptions(other.poolOptions);
     this.endpoints = other.endpoints;
+    this.maxWaitingHandlers = other.maxWaitingHandlers;
     this.maxNestedArrays = other.maxNestedArrays;
     this.masterName = other.masterName;
     this.role = other.role;
@@ -86,6 +87,7 @@ public class RedisOptions {
     this.user = other.user;
     this.password = other.password;
     this.protocolNegotiation = other.protocolNegotiation;
+    this.tracingPolicy = other.tracingPolicy;
   }
 
   /**

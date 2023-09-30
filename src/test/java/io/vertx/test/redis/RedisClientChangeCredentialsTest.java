@@ -33,7 +33,7 @@ public class RedisClientChangeCredentialsTest {
     new GenericContainer<>("redis:7-alpine")
       .withExposedPorts(6379)
       .withNetwork(network)
-      .withCommand("redis-server --port 6379 --cluster-enabled no --cluster-config-file nodes.conf --cluster-node-timeout 5000 --appendonly yes --requirepass test");
+      .withCommand("redis-server --port 6379 --cluster-enabled no --cluster-config-file nodes.conf --cluster-node-timeout 5000 --appendonly yes --requirepass test --loglevel verbose");
 
   @Rule
   public final RunTestOnContext rule = new RunTestOnContext();
@@ -62,7 +62,7 @@ public class RedisClientChangeCredentialsTest {
 
   private Redis createClient(final RedisOptions options, Future<RedisOptions> optionsFuture) {
     return Redis.createStandaloneClient(rule.vertx(), options.getNetClientOptions(), options.getPoolOptions(),
-      () -> optionsFuture.map(o -> new RedisStandaloneConnectOptions(options)), options.getTracingPolicy());
+      () -> optionsFuture.map(RedisStandaloneConnectOptions::new), options.getTracingPolicy());
   }
 
   @Test(timeout = 10_000L)
