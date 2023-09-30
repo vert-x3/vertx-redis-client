@@ -24,6 +24,7 @@ import java.util.List;
 @DataObject(generateConverter = true)
 public abstract class RedisConnectOptions {
 
+  private String user;
   private volatile String password;
   private List<String> endpoints;
   private int maxNestedArrays;
@@ -40,6 +41,7 @@ public abstract class RedisConnectOptions {
     setEndpoints(new ArrayList<>(options.getEndpoints()));
     setProtocolNegotiation(options.isProtocolNegotiation());
     setMaxNestedArrays(options.getMaxNestedArrays());
+    setUser(options.getUser());
     setPassword(options.getPassword());
     setMaxWaitingHandlers(options.getMaxWaitingHandlers());
     setMaxNestedArrays(options.getMaxNestedArrays());
@@ -53,6 +55,7 @@ public abstract class RedisConnectOptions {
     init();
     this.maxNestedArrays = other.maxNestedArrays;
     this.protocolNegotiation = other.protocolNegotiation;
+    this.user = other.user;
     this.password = other.password;
     this.endpoints = new ArrayList<>(other.endpoints);
     this.maxWaitingHandlers = other.maxWaitingHandlers;
@@ -106,6 +109,27 @@ public abstract class RedisConnectOptions {
    */
   public RedisConnectOptions setProtocolNegotiation(boolean protocolNegotiation) {
     this.protocolNegotiation = protocolNegotiation;
+    return this;
+  }
+
+  /**
+   * Get the default user information for cluster/sentinel connections, if not set it will try to
+   * extract it from the current default endpoint.
+   *
+   * @return user
+   */
+  public String getUser() {
+    return user;
+  }
+
+  /**
+   * Set the default user for cluster/sentinel connections.
+   *
+   * @param user the user
+   * @return fluent self
+   */
+  public RedisConnectOptions setUser(final String user) {
+    this.user = user;
     return this;
   }
 

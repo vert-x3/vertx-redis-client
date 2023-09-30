@@ -25,11 +25,12 @@ import io.vertx.redis.client.*;
 import java.nio.charset.StandardCharsets;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.function.Supplier;
 
 import static io.vertx.redis.client.Command.*;
 import static io.vertx.redis.client.Request.cmd;
 
-public class RedisReplicationClient extends BaseRedisClient implements Redis {
+public class RedisReplicationClient extends BaseRedisClient<RedisClusterConnectOptions> implements Redis {
 
   private static final Logger LOG = LoggerFactory.getLogger(RedisReplicationClient.class);
 
@@ -88,12 +89,11 @@ public class RedisReplicationClient extends BaseRedisClient implements Redis {
     addMasterOnlyCommand(WAIT);
   }
 
-  private final RedisClusterConnectOptions connectOptions;
   private final PoolOptions poolOptions;
 
-  public RedisReplicationClient(Vertx vertx, NetClientOptions tcpOptions, PoolOptions poolOptions, RedisClusterConnectOptions connectOptions, TracingPolicy tracingPolicy) {
+  public RedisReplicationClient(Vertx vertx, NetClientOptions tcpOptions, PoolOptions poolOptions,
+                                Supplier<Future<RedisClusterConnectOptions>> connectOptions, TracingPolicy tracingPolicy) {
     super(vertx, tcpOptions, poolOptions, connectOptions, tracingPolicy);
-    this.connectOptions = connectOptions;
     this.poolOptions = poolOptions;
     // validate options
     if (poolOptions.getMaxWaiting() < poolOptions.getMaxSize()) {
@@ -106,14 +106,18 @@ public class RedisReplicationClient extends BaseRedisClient implements Redis {
   @Override
   public Future<RedisConnection> connect() {
     final Promise<RedisConnection> promise = vertx.promise();
-    // make a copy as we may need to mutate the list during discovery
-    final List<String> endpoints = new LinkedList<>(connectOptions.getEndpoints());
-    // attempt to discover the topology from the first good endpoint
-    connect(endpoints, 0, promise);
-    return promise.future();
+    return connectOptions.get().flatMap(options -> {
+
+      // make a copy as we may need to mutate the list during discovery
+      final List<String> endpoints = new LinkedList<>(options.getEndpoints());
+      // attempt to discover the topology from the first good endpoint
+      connect(options, endpoints, 0, promise);
+      return promise.future();
+    });
   }
 
-  private void connect(List<String> endpoints, int index, Handler<AsyncResult<RedisConnection>> onConnect) {
+  private void connect(RedisClusterConnectOptions resolvedOptions, List<String> endpoints, int index,
+                       Handler<AsyncResult<RedisConnection>> onConnect) {
     if (index >= endpoints.size()) {
       // stop condition
       onConnect.handle(Future.failedFuture("Cannot connect to any of the provided endpoints"));
@@ -123,7 +127,7 @@ public class RedisReplicationClient extends BaseRedisClient implements Redis {
     connectionManager.getConnection(endpoints.get(index), null)
       .onFailure(err -> {
         // failed try with the next endpoint
-        connect(endpoints, index + 1, onConnect);
+        connect(resolvedOptions, endpoints, index + 1, onConnect);
       })
       .onSuccess(conn -> {
         // fetch slots from the cluster immediately to ensure slots are correct
@@ -132,7 +136,7 @@ public class RedisReplicationClient extends BaseRedisClient implements Redis {
             // the slots command failed.
             conn.close();
             // try with the next one
-            connect(endpoints, index + 1, onConnect);
+            connect(resolvedOptions, endpoints, index + 1, onConnect);
             return;
           }
 
@@ -153,17 +157,17 @@ public class RedisReplicationClient extends BaseRedisClient implements Redis {
             if (!node.online) {
               LOG.info("Skipping offline node: " + node.ip + ":" + node.port);
               if (counter.incrementAndGet() == nodes.size()) {
-                onConnect.handle(Future.succeededFuture(new RedisReplicationConnection(vertx, connectOptions, conn, connections)));
+                onConnect.handle(Future.succeededFuture(new RedisReplicationConnection(vertx, resolvedOptions, conn, connections)));
               }
               continue;
             }
 
-            connectionManager.getConnection(node.endpoint(), RedisReplicas.NEVER != connectOptions.getUseReplicas() ? cmd(READONLY) : null)
+            connectionManager.getConnection(node.endpoint(), RedisReplicas.NEVER != resolvedOptions.getUseReplicas() ? cmd(READONLY) : null)
               .onFailure(err -> {
                 // failed try with the next endpoint
                 LOG.warn("Skipping failed node: " + node.ip + ":" + node.port, err);
                 if (counter.incrementAndGet() == nodes.size()) {
-                  onConnect.handle(Future.succeededFuture(new RedisReplicationConnection(vertx, connectOptions, conn, connections)));
+                  onConnect.handle(Future.succeededFuture(new RedisReplicationConnection(vertx, resolvedOptions, conn, connections)));
                 }
               })
               .onSuccess(cconn -> {
@@ -174,7 +178,7 @@ public class RedisReplicationClient extends BaseRedisClient implements Redis {
                   connections.add(cconn);
                 }
                 if (counter.incrementAndGet() == nodes.size()) {
-                  onConnect.handle(Future.succeededFuture(new RedisReplicationConnection(vertx, connectOptions, conn, connections)));
+                  onConnect.handle(Future.succeededFuture(new RedisReplicationConnection(vertx, resolvedOptions, conn, connections)));
                 }
               });
           }

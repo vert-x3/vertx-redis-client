@@ -47,6 +47,7 @@ public class RedisOptions {
   private String masterName;
   private RedisRole role;
   private RedisReplicas useReplicas;
+  private String user;
   private volatile String password;
   private boolean protocolNegotiation;
   private TracingPolicy tracingPolicy;
@@ -78,12 +79,15 @@ public class RedisOptions {
     this.netClientOptions = other.netClientOptions;
     this.poolOptions = new PoolOptions(other.poolOptions);
     this.endpoints = other.endpoints;
+    this.maxWaitingHandlers = other.maxWaitingHandlers;
     this.maxNestedArrays = other.maxNestedArrays;
     this.masterName = other.masterName;
     this.role = other.role;
     this.useReplicas = other.useReplicas;
+    this.user = other.user;
     this.password = other.password;
     this.protocolNegotiation = other.protocolNegotiation;
+    this.tracingPolicy = other.tracingPolicy;
   }
 
   /**
@@ -458,6 +462,27 @@ public class RedisOptions {
    */
   public RedisOptions setPoolRecycleTimeout(int poolRecycleTimeout) {
     poolOptions.setRecycleTimeout(poolRecycleTimeout);
+    return this;
+  }
+
+  /**
+   * Get the default user information for cluster/sentinel connections, if not set it will try to
+   * extract it from the current default endpoint.
+   *
+   * @return user
+   */
+  public String getUser() {
+    return user;
+  }
+
+  /**
+   * Set the default user for cluster/sentinel connections.
+   *
+   * @param user the user
+   * @return fluent self
+   */
+  public RedisOptions setUser(final String user) {
+    this.user = user;
     return this;
   }
 
