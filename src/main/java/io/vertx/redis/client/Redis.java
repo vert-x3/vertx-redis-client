@@ -74,7 +74,8 @@ public interface Redis {
         return new RedisClusterClient(vertx, options.getNetClientOptions(), options.getPoolOptions(),
           () -> Future.succeededFuture(new RedisClusterConnectOptions(options)), options.getTracingPolicy());
       case REPLICATION:
-        return new RedisReplicationClient(vertx, options.getNetClientOptions(), options.getPoolOptions(), new RedisClusterConnectOptions(options), options.getTracingPolicy());
+        return new RedisReplicationClient(vertx, options.getNetClientOptions(), options.getPoolOptions(),
+          () -> Future.succeededFuture(new RedisClusterConnectOptions(options)), options.getTracingPolicy());
       default:
         throw new IllegalStateException("Unknown Redis Client type: " + options.getType());
     }
@@ -96,6 +97,12 @@ public interface Redis {
                                     Supplier<Future<RedisClusterConnectOptions>> connectionOptionsSupplier,
                                     TracingPolicy tracingPolicy) {
     return new RedisClusterClient(vertx, tcpOptions,poolOptions, connectionOptionsSupplier,tracingPolicy);
+  }
+
+  static Redis createReplicationClient(Vertx vertx, NetClientOptions tcpOptions, PoolOptions poolOptions,
+                                   Supplier<Future<RedisClusterConnectOptions>> connectionOptionsSupplier,
+                                   TracingPolicy tracingPolicy) {
+    return new RedisReplicationClient(vertx, tcpOptions,poolOptions, connectionOptionsSupplier,tracingPolicy);
   }
 
   /**

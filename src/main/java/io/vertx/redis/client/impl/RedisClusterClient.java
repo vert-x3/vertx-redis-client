@@ -141,76 +141,70 @@ public class RedisClusterClient extends BaseRedisClient<RedisClusterConnectOptio
     final Promise<RedisConnection> promise = vertx.promise();
     return connectOptions.get().flatMap(options -> {
       // attempt to load the slots from the first good endpoint
-      connect(options.getEndpoints(), 0, promise);
+      connect(options, options.getEndpoints(), 0, promise);
       return promise.future();
     });
   }
 
-  private void connect(List<String> endpoints, int index, Handler<AsyncResult<RedisConnection>> onConnect) {
-    connectOptions.get().onComplete(optionsResult -> {
-      if (optionsResult.failed()) {
-        onConnect.handle(Future.failedFuture(optionsResult.cause()));
-      }
-      final RedisClusterConnectOptions resolvedOptions = optionsResult.result();
+  private void connect(RedisClusterConnectOptions resolvedOptions, List<String> endpoints, int index,
+                       Handler<AsyncResult<RedisConnection>> onConnect) {
+    if (index >= endpoints.size()) {
+      // stop condition
+      onConnect.handle(Future.failedFuture("Cannot connect to any of the provided endpoints"));
+      return;
+    }
 
-      if (index >= endpoints.size()) {
-        // stop condition
-        onConnect.handle(Future.failedFuture("Cannot connect to any of the provided endpoints"));
-        return;
-      }
-
-      connectionManager.getConnection(endpoints.get(index), RedisReplicas.NEVER != resolvedOptions.getUseReplicas() ? cmd(READONLY) : null)
-        .onFailure(err -> {
-          // failed try with the next endpoint
-          connect(endpoints, index + 1, onConnect);
-        })
-        .onSuccess(conn -> {
-          // fetch slots from the cluster immediately to ensure slots are correct
-          getSlots(endpoints.get(index), conn, getSlots -> {
-            if (getSlots.failed()) {
-              // the slots command failed.
-              conn.close().onFailure(LOG::warn);
-              // try with the next one
-              connect(endpoints, index + 1, onConnect);
-              return;
-            }
-
-            // slots are loaded (this connection isn't needed anymore)
+    connectionManager.getConnection(endpoints.get(index), RedisReplicas.NEVER != resolvedOptions.getUseReplicas() ? cmd(READONLY) : null)
+      .onFailure(err -> {
+        // failed try with the next endpoint
+        connect(resolvedOptions, endpoints, index + 1, onConnect);
+      })
+      .onSuccess(conn -> {
+        // fetch slots from the cluster immediately to ensure slots are correct
+        getSlots(endpoints.get(index), conn, getSlots -> {
+          if (getSlots.failed()) {
+            // the slots command failed.
             conn.close().onFailure(LOG::warn);
-            // create a cluster connection
-            final Slots slots = getSlots.result();
-            final AtomicBoolean failed = new AtomicBoolean(false);
-            final AtomicInteger counter = new AtomicInteger();
-            final Map<String, PooledRedisConnection> connections = new HashMap<>();
+            // try with the next one
+            connect(resolvedOptions, endpoints, index + 1, onConnect);
+            return;
+          }
 
-            // validate if the pool config is valid
-            final int totalUniqueEndpoints = slots.endpoints().length;
-            if (poolOptions.getMaxSize() < totalUniqueEndpoints) {
-              // this isn't a valid setup, the connection pool will not accommodate all the required connections
-              onConnect.handle(Future.failedFuture("RedisOptions maxPoolSize < Cluster size(" + totalUniqueEndpoints + "): The pool is not able to hold all required connections!"));
-              return;
-            }
+          // slots are loaded (this connection isn't needed anymore)
+          conn.close().onFailure(LOG::warn);
+          // create a cluster connection
+          final Slots slots = getSlots.result();
+          final AtomicBoolean failed = new AtomicBoolean(false);
+          final AtomicInteger counter = new AtomicInteger();
+          final Map<String, PooledRedisConnection> connections = new HashMap<>();
 
-            for (String endpoint : slots.endpoints()) {
-              connectionManager.getConnection(endpoint, RedisReplicas.NEVER != resolvedOptions.getUseReplicas() ? cmd(READONLY) : null)
-                .onFailure(err -> {
-                  // failed try with the next endpoint
-                  failed.set(true);
-                  connectionComplete(counter, slots, connections, failed, resolvedOptions, onConnect);
-                })
-                .onSuccess(cconn -> {
-                  // there can be concurrent access to the connection map
-                  // since this is a one time operation we can pay the penalty of
-                  // synchronizing on each write (hopefully is only a few writes)
-                  synchronized (connections) {
-                    connections.put(endpoint, cconn);
-                  }
-                  connectionComplete(counter, slots, connections, failed, resolvedOptions, onConnect);
-                });
-            }
-          });
+          // validate if the pool config is valid
+          final int totalUniqueEndpoints = slots.endpoints().length;
+          if (poolOptions.getMaxSize() < totalUniqueEndpoints) {
+            // this isn't a valid setup, the connection pool will not accommodate all the required connections
+            onConnect.handle(Future.failedFuture("RedisOptions maxPoolSize < Cluster size(" + totalUniqueEndpoints + "): The pool is not able to hold all required connections!"));
+            return;
+          }
+
+          for (String endpoint : slots.endpoints()) {
+            connectionManager.getConnection(endpoint, RedisReplicas.NEVER != resolvedOptions.getUseReplicas() ? cmd(READONLY) : null)
+              .onFailure(err -> {
+                // failed try with the next endpoint
+                failed.set(true);
+                connectionComplete(counter, slots, connections, failed, resolvedOptions, onConnect);
+              })
+              .onSuccess(cconn -> {
+                // there can be concurrent access to the connection map
+                // since this is a one time operation we can pay the penalty of
+                // synchronizing on each write (hopefully is only a few writes)
+                synchronized (connections) {
+                  connections.put(endpoint, cconn);
+                }
+                connectionComplete(counter, slots, connections, failed, resolvedOptions, onConnect);
+              });
+          }
         });
-    });
+      });
   }
 
   private void connectionComplete(AtomicInteger counter, Slots slots, Map<String, PooledRedisConnection> connections,
