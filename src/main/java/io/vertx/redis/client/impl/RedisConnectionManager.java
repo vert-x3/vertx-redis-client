@@ -35,7 +35,7 @@ import io.vertx.redis.client.impl.types.ErrorType;
 
 import java.util.Objects;
 
-class RedisConnectionManager {
+class RedisConnectionManager implements EndpointProvider<RedisConnectionManager.ConnectionKey, Lease<RedisConnectionInternal>> {
 
   private static final Logger LOG = LoggerFactory.getLogger(RedisConnectionManager.class);
 
@@ -61,7 +61,7 @@ class RedisConnectionManager {
     VertxMetrics metricsSPI = this.vertx.metricsSPI();
     metrics = metricsSPI != null ? metricsSPI.createPoolMetrics("redis", poolOptions.getName(), poolOptions.getMaxSize()) : null;
     this.netClient = vertx.createNetClient(tcpOptions);
-    this.pooledConnectionManager = new ConnectionManager<>((key, dispose) -> connectionEndpointProvider(dispose, key.string, key.setup));
+    this.pooledConnectionManager = new ConnectionManager<>();
   }
 
   private Endpoint<Lease<RedisConnectionInternal>> connectionEndpointProvider(Runnable dispose, String connectionString, Request setup) {
@@ -324,6 +324,11 @@ class RedisConnectionManager {
     }
   }
 
+  @Override
+  public Endpoint<Lease<RedisConnectionInternal>> create(ConnectionKey key, Runnable dispose) {
+    return connectionEndpointProvider(dispose, key.string, key.setup);
+  }
+
   public Future<PooledRedisConnection> getConnection(String connectionString, Request setup) {
     final ContextInternal context = vertx.getOrCreateContext();
     final ContextInternal eventLoopContext;
@@ -335,8 +340,7 @@ class RedisConnectionManager {
 
     final boolean metricsEnabled = metrics != null;
     final Object queueMetric = metricsEnabled ? metrics.submitted() : null;
-
-    Future<Lease<RedisConnectionInternal>> future = pooledConnectionManager.getConnection(eventLoopContext, new ConnectionKey(connectionString, setup));
+    Future<Lease<RedisConnectionInternal>> future = pooledConnectionManager.getConnection(eventLoopContext, this, new ConnectionKey(connectionString, setup));
     return future
       .onFailure(err -> {
         if (metricsEnabled) {

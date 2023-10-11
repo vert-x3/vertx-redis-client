@@ -87,6 +87,8 @@ public class RedisOptions {
     this.password = other.password;
     this.protocolNegotiation = other.protocolNegotiation;
     this.hashSlotCacheTTL = other.hashSlotCacheTTL;
+    this.maxWaitingHandlers = other.maxWaitingHandlers;
+    this.tracingPolicy = other.tracingPolicy;
   }
 
   /**
