@@ -25,6 +25,11 @@ public class RedisClusterConnectOptionsConverter {
             obj.setUseReplicas(io.vertx.redis.client.RedisReplicas.valueOf((String)member.getValue()));
           }
           break;
+        case "hashSlotCacheTTL":
+          if (member.getValue() instanceof Number) {
+            obj.setHashSlotCacheTTL(((Number)member.getValue()).longValue());
+          }
+          break;
       }
     }
   }
@@ -37,5 +42,6 @@ public class RedisClusterConnectOptionsConverter {
     if (obj.getUseReplicas() != null) {
       json.put("useReplicas", obj.getUseReplicas().name());
     }
+    json.put("hashSlotCacheTTL", obj.getHashSlotCacheTTL());
   }
 }

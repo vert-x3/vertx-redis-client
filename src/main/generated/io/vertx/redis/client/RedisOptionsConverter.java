@@ -123,6 +123,11 @@ public class RedisOptionsConverter {
             obj.setPoolName((String)member.getValue());
           }
           break;
+        case "hashSlotCacheTTL":
+          if (member.getValue() instanceof Number) {
+            obj.setHashSlotCacheTTL(((Number)member.getValue()).longValue());
+          }
+          break;
       }
     }
   }
@@ -171,5 +176,6 @@ public class RedisOptionsConverter {
     if (obj.getPoolName() != null) {
       json.put("poolName", obj.getPoolName());
     }
+    json.put("hashSlotCacheTTL", obj.getHashSlotCacheTTL());
   }
 }
