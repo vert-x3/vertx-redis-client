@@ -27,7 +27,7 @@ import io.vertx.redis.client.impl.keys.FindKeysRange;
  * <b>Auto generated</b> API Commands to interact with REDIS.
  *
  * @author <a href="mailto:plopes@redhat.com">Paulo Lopes</a>
- * @version redis_version:7.0.6
+ * @version redis_version:7.0.12
  */
 @VertxGen
 public interface Command {
@@ -427,11 +427,15 @@ public interface Command {
 
   /**
    * Generic command generator for extensions.
+   * <p>
+   * To avoid inconsistent behavior, when {@code command} is one of the known commands
+   * for which a static instance exists, the static instance is returned.
    *
    * @param command command name
    * @return the cacheable immutable command instance
    */
   static Command create(String command) {
-    return new CommandImpl(command, -1, null, false, true);
+    Command known = CommandMap.getKnownCommand(command);
+    return known != null ? known : new CommandImpl(command, -1, null, false, true);
   }
 }

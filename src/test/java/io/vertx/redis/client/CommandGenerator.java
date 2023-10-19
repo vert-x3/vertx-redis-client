@@ -28,8 +28,11 @@ public class CommandGenerator extends AbstractVerticle {
       .onSuccess(res -> {
 
         List<String> commands = new ArrayList<>();
+        List<String> commandsMap = new ArrayList<>();
 
         res.forEach(cmd -> {
+          String commandName = cmd.get(0).toString();
+
           Boolean ro = null;
           boolean getkeys = false;
 
@@ -113,7 +116,7 @@ public class CommandGenerator extends AbstractVerticle {
           for (Response flag : cmd.get(2)) {
             if ("pubsub".equals(flag.toString())) {
               // we exclude PUBSUB / PUBLISH from the flag
-              if ("pubsub".equalsIgnoreCase(cmd.get(0).toString()) || "publish".equalsIgnoreCase(cmd.get(0).toString())) {
+              if ("pubsub".equalsIgnoreCase(commandName) || "publish".equalsIgnoreCase(commandName)) {
                 continue;
               }
               pubSub = true;
@@ -123,25 +126,45 @@ public class CommandGenerator extends AbstractVerticle {
 
           commands.add(
             generateCommand(
-              cmd.get(0).toString(),
+              commandName,
               cmd.get(1).toInteger(),
               ro,
               pubSub,
               getkeys,
               keyLocator
             ));
+
+          commandsMap.add(generateCommandMap(commandName));
         });
 
         commands.sort(Comparator.naturalOrder());
         for (String cmd : commands) {
           System.out.println(cmd);
         }
+
+        System.out.println();
+        System.out.println("----------------------------------------------------------------");
+        System.out.println();
+
+        commandsMap.sort(Comparator.naturalOrder());
+        for (String cmd : commandsMap) {
+          System.out.println(cmd);
+        }
+
         vertx.close();
       });
   }
 
   private String generateCommand(String name, int arity, Boolean ro, boolean pubSub, boolean getKeys, String keyLocator) {
     return
-      "Command " + name.replace('.', '_').replace('-', '_').toUpperCase() + " = new CommandImpl(\"" + name + "\", " + arity + ", " + ro + ", " + pubSub + ", " + getKeys + (keyLocator == null ? "" : ", " + keyLocator) + ");";
+      "Command " + toIdentifier(name) + " = new CommandImpl(\"" + name + "\", " + arity + ", " + ro + ", " + pubSub + ", " + getKeys + (keyLocator == null ? "" : ", " + keyLocator) + ");";
+  }
+
+  private String generateCommandMap(String name) {
+    return "KNOWN_COMMANDS.put(\"" + name.toLowerCase() + "\", Command." + toIdentifier(name) + ");";
+  }
+
+  private String toIdentifier(String name) {
+    return name.replace('.', '_').replace('-', '_').toUpperCase();
   }
 }
