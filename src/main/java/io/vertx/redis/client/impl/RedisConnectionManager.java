@@ -25,6 +25,9 @@ import io.vertx.core.impl.logging.LoggerFactory;
 import io.vertx.core.net.NetClient;
 import io.vertx.core.net.NetClientOptions;
 import io.vertx.core.net.NetSocket;
+import io.vertx.core.net.impl.endpoint.EndpointManager;
+import io.vertx.core.net.impl.endpoint.EndpointProvider;
+import io.vertx.core.net.impl.endpoint.Endpoint;
 import io.vertx.core.net.impl.pool.*;
 import io.vertx.core.spi.metrics.ClientMetrics;
 import io.vertx.core.spi.metrics.PoolMetrics;
@@ -35,7 +38,7 @@ import io.vertx.redis.client.impl.types.ErrorType;
 
 import java.util.Objects;
 
-class RedisConnectionManager implements EndpointProvider<RedisConnectionManager.ConnectionKey, Lease<RedisConnectionInternal>> {
+class RedisConnectionManager implements EndpointProvider<RedisConnectionManager.ConnectionKey, RedisConnectionManager.RedisEndpoint> {
 
   private static final Logger LOG = LoggerFactory.getLogger(RedisConnectionManager.class);
 
@@ -49,7 +52,7 @@ class RedisConnectionManager implements EndpointProvider<RedisConnectionManager.
   private final RedisConnectOptions connectOptions;
   private final TracingPolicy tracingPolicy;
 
-  private final ConnectionManager<ConnectionKey, Lease<RedisConnectionInternal>> pooledConnectionManager;
+  private final EndpointManager<ConnectionKey, RedisEndpoint> pooledConnectionManager;
   private long timerID;
 
   RedisConnectionManager(VertxInternal vertx, NetClientOptions tcpOptions, PoolOptions poolOptions, RedisConnectOptions connectOptions, TracingPolicy tracingPolicy) {
@@ -61,10 +64,10 @@ class RedisConnectionManager implements EndpointProvider<RedisConnectionManager.
     VertxMetrics metricsSPI = this.vertx.metricsSPI();
     metrics = metricsSPI != null ? metricsSPI.createPoolMetrics("redis", poolOptions.getName(), poolOptions.getMaxSize()) : null;
     this.netClient = vertx.createNetClient(tcpOptions);
-    this.pooledConnectionManager = new ConnectionManager<>();
+    this.pooledConnectionManager = new EndpointManager<>();
   }
 
-  private Endpoint<Lease<RedisConnectionInternal>> connectionEndpointProvider(Runnable dispose, String connectionString, Request setup) {
+  private RedisEndpoint connectionEndpointProvider(Runnable dispose, String connectionString, Request setup) {
     return new RedisEndpoint(vertx, netClient, tcpOptions, poolOptions, connectOptions, tracingPolicy, dispose, connectionString, setup);
   }
 
@@ -325,7 +328,7 @@ class RedisConnectionManager implements EndpointProvider<RedisConnectionManager.
   }
 
   @Override
-  public Endpoint<Lease<RedisConnectionInternal>> create(ConnectionKey key, Runnable dispose) {
+  public RedisEndpoint create(ConnectionKey key, Runnable dispose) {
     return connectionEndpointProvider(dispose, key.string, key.setup);
   }
 
@@ -340,7 +343,9 @@ class RedisConnectionManager implements EndpointProvider<RedisConnectionManager.
 
     final boolean metricsEnabled = metrics != null;
     final Object queueMetric = metricsEnabled ? metrics.submitted() : null;
-    Future<Lease<RedisConnectionInternal>> future = pooledConnectionManager.getConnection(eventLoopContext, this, new ConnectionKey(connectionString, setup));
+    Future<Lease<RedisConnectionInternal>> future = pooledConnectionManager.withEndpointAsync(new ConnectionKey(connectionString, setup), this, (endpoint, created) -> {
+      return endpoint.requestConnection(eventLoopContext);
+    });
     return future
       .onFailure(err -> {
         if (metricsEnabled) {
@@ -364,7 +369,7 @@ class RedisConnectionManager implements EndpointProvider<RedisConnectionManager.
     }
   }
 
-  static class RedisEndpoint extends Endpoint<Lease<RedisConnectionInternal>> {
+  static class RedisEndpoint extends Endpoint {
 
     final ConnectionPool<RedisConnectionInternal> pool;
 
@@ -374,8 +379,7 @@ class RedisConnectionManager implements EndpointProvider<RedisConnectionManager.
       pool = ConnectionPool.pool(connector, new int[]{poolOptions.getMaxSize()}, poolOptions.getMaxWaiting());
     }
 
-    @Override
-    public Future<Lease<RedisConnectionInternal>> requestConnection(ContextInternal ctx, long timeout) {
+    public Future<Lease<RedisConnectionInternal>> requestConnection(ContextInternal ctx) {
       PromiseInternal<Lease<RedisConnectionInternal>> promise = ctx.promise();
       pool.acquire(ctx, 0, ar -> {
         if (ar.succeeded()) {
