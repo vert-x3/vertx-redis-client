@@ -3,6 +3,7 @@ package io.vertx.test.redis;
 import io.vertx.core.AbstractVerticle;
 import io.vertx.core.DeploymentOptions;
 import io.vertx.core.Promise;
+import io.vertx.core.ThreadingModel;
 import io.vertx.core.json.JsonObject;
 import io.vertx.ext.unit.Async;
 import io.vertx.ext.unit.TestContext;
@@ -228,7 +229,7 @@ public class RedisClient7Test {
 
           onStart.complete();
         }
-      }, new DeploymentOptions().setInstances(instances).setWorker(true))
+      }, new DeploymentOptions().setInstances(instances).setThreadingModel(ThreadingModel.WORKER))
       .onComplete(res -> {
         for (int i = 0; i < iterations; i++) {
           rule.vertx().eventBus().publish("test.redis.load", i);

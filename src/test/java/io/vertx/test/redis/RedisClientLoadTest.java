@@ -1,9 +1,6 @@
 package io.vertx.test.redis;
 
-import io.vertx.core.AbstractVerticle;
-import io.vertx.core.DeploymentOptions;
-import io.vertx.core.Future;
-import io.vertx.core.Promise;
+import io.vertx.core.*;
 import io.vertx.core.impl.VertxInternal;
 import io.vertx.core.net.NetClientOptions;
 import io.vertx.ext.unit.Async;
@@ -164,7 +161,7 @@ public class RedisClientLoadTest {
               });
           });
         }
-      }, new DeploymentOptions().setInstances(instances).setWorker(true).setWorkerPoolName("RedisLoadTest"))
+      }, new DeploymentOptions().setInstances(instances).setThreadingModel(ThreadingModel.WORKER).setWorkerPoolName("RedisLoadTest"))
       .onComplete(res -> {
         for (int i = 0; i < iterations; i++) {
           rule.vertx().eventBus().publish("test.redis.load", true);
@@ -220,7 +217,7 @@ public class RedisClientLoadTest {
               });
           });
         }
-      }, new DeploymentOptions().setInstances(instances).setWorker(true).setWorkerPoolName("RedisLoadTest"))
+      }, new DeploymentOptions().setInstances(instances).setThreadingModel(ThreadingModel.WORKER).setWorkerPoolName("RedisLoadTest"))
       .onComplete(res -> {
         for (int i = 0; i < iterations; i++) {
           rule.vertx().eventBus().publish("test.redis.load", true);
