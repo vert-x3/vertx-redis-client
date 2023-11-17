@@ -44,7 +44,7 @@ public class RedisClientTLSTest {
       .setTcpKeepAlive(true)
       .setTcpNoDelay(true)
       .setSsl(true)
-      .setKeyStoreOptions(
+      .setKeyCertOptions(
         new JksOptions()
           .setPath("server-keystore.jks")
           .setPassword("wibble"));
