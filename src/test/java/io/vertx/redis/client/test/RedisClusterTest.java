@@ -1223,4 +1223,58 @@ public class RedisClusterTest {
     PreservesContext.connectThenSend(client, should);
     PreservesContext.connectThenBatch(client, should);
   }
+
+  /**
+   * This test runs EVALSHA with two keys hashed to different slots to
+   *  verify that SCRIPT LOAD was run on both nodes
+   */
+  @Test
+  public void testScriptLoadRunsOnEveryMaster(TestContext should) {
+    final Async test = should.async();
+
+    final String key1 = "{hash_tag}.some-key1";
+    final String argv1 = "some-value1";
+
+    final String key2 = "{other_hash_tag}.other-key1";
+    final String argv2 = "other-value1";
+
+    String script = "return redis.call('GET', KEYS[1])";
+
+    client.connect().compose(cluster -> {
+      cluster.exceptionHandler(should::fail);
+      Future<@Nullable Response> setFuture1 = cluster.send(cmd(SET).arg(key1).arg(argv1));
+      Future<@Nullable Response> setFuture2 = cluster.send(cmd(SET).arg(key2).arg(argv2));
+      Future<@Nullable Response> scriptLoadFuture = cluster.send(cmd(SCRIPT).arg("LOAD").arg(script));
+
+      return Future.all(setFuture1, setFuture2, scriptLoadFuture)
+        .compose(compositeRet -> {
+          System.out.println("set and script load successful");
+
+          return scriptLoadFuture;
+        })
+        .compose(scriptLoadResponse -> {
+          String scriptSha = scriptLoadResponse.toString();
+
+          System.out.println("script load successful, sha: "+scriptSha);
+
+          return Future.all(
+            cluster.send(cmd(EVALSHA).arg(scriptSha).arg(1).arg(key1)),
+            cluster.send(cmd(EVALSHA).arg(scriptSha).arg(1).arg(key2))
+          );
+        })
+        .compose(compositeEval -> {
+          System.out.println("eval operations successful");
+          Set<String> evalRet = compositeEval.list().stream().map(Object::toString)
+            .collect(Collectors.toSet());
+          should.assertTrue(evalRet.contains(argv1));
+          should.assertTrue(evalRet.contains(argv2));
+
+          test.complete();
+          return Future.succeededFuture();
+        });
+    }).onFailure(throwable -> {
+      throwable.printStackTrace();
+      should.fail(throwable);
+    });
+  }
 }

@@ -10,9 +10,11 @@ import io.vertx.redis.client.impl.types.ErrorType;
 
 import java.util.*;
 import java.util.function.Function;
+import java.util.stream.Collectors;
 
 import static io.vertx.redis.client.Command.ASKING;
 import static io.vertx.redis.client.Command.AUTH;
+import static io.vertx.redis.client.Command.SCRIPT;
 import static io.vertx.redis.client.Request.cmd;
 
 public class RedisClusterConnection implements RedisConnection {
@@ -138,23 +140,12 @@ public class RedisClusterConnection implements RedisConnection {
       case 0:
         // can run anywhere
         if (REDUCERS.containsKey(cmd)) {
-          final List<Future<Response>> responses = new ArrayList<>(slots.size());
-
-          for (int i = 0; i < slots.size(); i++) {
-            String[] endpoints = slots.endpointsForSlot(i);
-
-            final Promise<Response> p = vertx.promise();
-            send(selectMasterOrReplicaEndpoint(cmd.isReadOnly(args), endpoints, forceMasterEndpoint), RETRIES, req, p);
-            responses.add(p.future());
-          }
-
-          Future.all(responses).onComplete(composite -> {
-            if (composite.failed()) {
-              // means if one of the operations failed, then we can fail the handler
-              promise.fail(composite.cause());
-            } else {
-              promise.complete(REDUCERS.get(cmd).apply(composite.result().list()));
-            }
+          sendToAllSlots(promise, req, cmd, args, forceMasterEndpoint, REDUCERS.get(cmd));
+        } else if(cmd.equals(SCRIPT) && Arrays.equals(args.get(0), "LOAD".getBytes())) {
+          sendToAllSlots(promise, req, cmd, args, forceMasterEndpoint, responses -> {
+            // all nodes should compute the same sha
+            assert responses.stream().map(Response::toString).collect(Collectors.toSet()).size() == 1;
+            return responses.get(0);
           });
         } else {
           // it doesn't matter which node to use
@@ -211,6 +202,27 @@ public class RedisClusterConnection implements RedisConnection {
           return promise.future();
         }
     }
+  }
+
+  private void sendToAllSlots(Promise<Response> promise, RequestImpl req, CommandImpl cmd, List<byte[]> args, boolean forceMasterEndpoint, Function<List<Response>, Response> reducer) {
+    final List<Future<Response>> responses = new ArrayList<>(slots.size());
+
+    for (int i = 0; i < slots.size(); i++) {
+      String[] endpoints = slots.endpointsForSlot(i);
+
+      final Promise<Response> p = vertx.promise();
+      send(selectMasterOrReplicaEndpoint(cmd.isReadOnly(args), endpoints, forceMasterEndpoint), RETRIES, req, p);
+      responses.add(p.future());
+    }
+
+    Future.all(responses).onComplete(composite -> {
+      if (composite.failed()) {
+        // means if one of the operations failed, then we can fail the handler
+        promise.fail(composite.cause());
+      } else {
+        promise.complete(reducer.apply(composite.result().list()));
+      }
+    });
   }
 
   private Map<Integer, Request> splitRequest(CommandImpl cmd, List<byte[]> args) {
