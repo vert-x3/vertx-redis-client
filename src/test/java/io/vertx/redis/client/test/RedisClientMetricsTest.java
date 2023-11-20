@@ -38,14 +38,14 @@ public class RedisClientMetricsTest {
 
   @Before
   public void setup() {
-    vertx = Vertx.vertx(new VertxOptions().setMetricsOptions(
-      new MetricsOptions().setEnabled(true).setFactory(ignored -> new VertxMetrics() {
+    vertx = Vertx.builder()
+      .withMetrics(ignored -> new VertxMetrics() {
         @Override
         public ClientMetrics<?, ?, ?, ?> createClientMetrics(SocketAddress remoteAddress, String type, String namespace) {
           return metrics;
         }
-      }))
-    );
+      })
+      .build();
     client = Redis.createClient(vertx, new RedisOptions().setConnectionString("redis://" + redis.getHost() + ":" + redis.getFirstMappedPort()));
   }
 

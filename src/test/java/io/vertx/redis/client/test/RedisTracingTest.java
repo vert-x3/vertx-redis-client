@@ -42,8 +42,8 @@ public class RedisTracingTest {
 
   @Before
   public void setup() {
-    vertx = Vertx.vertx(new VertxOptions().setTracingOptions(
-      new TracingOptions().setFactory(ignored -> new VertxTracer() {
+    vertx = Vertx.builder()
+      .withTracer(ignored -> new VertxTracer() {
         @Override
         public Object sendRequest(Context context, SpanKind kind, TracingPolicy tracingPolicy, Object request, String operation, BiConsumer headers, TagExtractor tagExtractor) {
           return tracer.sendRequest(context, kind, tracingPolicy, request, operation, headers, tagExtractor);
@@ -52,8 +52,7 @@ public class RedisTracingTest {
         public void receiveResponse(Context context, Object response, Object payload, Throwable failure, TagExtractor tagExtractor) {
           tracer.receiveResponse(context, response, payload, failure, tagExtractor);
         }
-      }))
-    );
+      }).build();
     client = Redis.createClient(vertx, new RedisOptions().setConnectionString("redis://" + redis.getHost() + ":" + redis.getFirstMappedPort()));
   }
 

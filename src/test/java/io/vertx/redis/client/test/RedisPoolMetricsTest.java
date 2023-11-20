@@ -1,7 +1,7 @@
 package io.vertx.redis.client.test;
 
+import io.vertx.core.Vertx;
 import io.vertx.core.VertxOptions;
-import io.vertx.core.metrics.MetricsOptions;
 import io.vertx.core.metrics.impl.DummyVertxMetrics;
 import io.vertx.core.spi.VertxMetricsFactory;
 import io.vertx.core.spi.metrics.PoolMetrics;
@@ -27,29 +27,29 @@ public class RedisPoolMetricsTest {
 
   private static final AtomicReference<String> POOL_NAME = new AtomicReference<>();
 
-  private static VertxOptions getOptions() {
-    MetricsOptions options = new MetricsOptions().setEnabled(true);
-    options.setFactory(new VertxMetricsFactory() {
-      @Override
-      public VertxMetrics metrics(VertxOptions options) {
-        return new DummyVertxMetrics() {
-          @Override
-          public PoolMetrics<?> createPoolMetrics(String poolType, String poolName, int maxPoolSize) {
-            if (poolType.equals("redis")) {
-              POOL_NAME.set(poolName);
-              return new FakePoolMetrics(poolName, maxPoolSize);
-            } else {
-              return super.createPoolMetrics(poolType, poolName, maxPoolSize);
+  private static Vertx getVertx() {
+    return Vertx.builder()
+      .withMetrics(new VertxMetricsFactory() {
+        @Override
+        public VertxMetrics metrics(VertxOptions options) {
+          return new DummyVertxMetrics() {
+            @Override
+            public PoolMetrics<?> createPoolMetrics(String poolType, String poolName, int maxPoolSize) {
+              if (poolType.equals("redis")) {
+                POOL_NAME.set(poolName);
+                return new FakePoolMetrics(poolName, maxPoolSize);
+              } else {
+                return super.createPoolMetrics(poolType, poolName, maxPoolSize);
+              }
             }
-          }
-        };
-      }
-    });
-    return new VertxOptions().setMetricsOptions(options);
+          };
+        }
+      })
+      .build();
   }
 
   @Rule
-  public final RunTestOnContext rule = new RunTestOnContext(getOptions());
+  public final RunTestOnContext rule = new RunTestOnContext(RedisPoolMetricsTest::getVertx);
 
   @ClassRule
   public static final GenericContainer<?> redis = new GenericContainer<>("redis:7")
