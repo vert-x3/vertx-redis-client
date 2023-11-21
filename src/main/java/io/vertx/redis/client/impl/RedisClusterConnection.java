@@ -141,7 +141,7 @@ public class RedisClusterConnection implements RedisConnection {
         // can run anywhere
         if (REDUCERS.containsKey(cmd)) {
           sendToAllSlots(promise, req, cmd, args, forceMasterEndpoint, REDUCERS.get(cmd));
-        } else if(cmd.equals(SCRIPT) && Arrays.equals(args.get(0), "LOAD".getBytes())) {
+        } else if(cmd.equals(SCRIPT) && "LOAD".equalsIgnoreCase(new String(args.get(0)))) {
           sendToAllSlots(promise, req, cmd, args, forceMasterEndpoint, responses -> {
             // all nodes should compute the same sha
             assert responses.stream().map(Response::toString).collect(Collectors.toSet()).size() == 1;

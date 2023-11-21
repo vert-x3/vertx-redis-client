@@ -1244,7 +1244,7 @@ public class RedisClusterTest {
       cluster.exceptionHandler(should::fail);
       Future<@Nullable Response> setFuture1 = cluster.send(cmd(SET).arg(key1).arg(argv1));
       Future<@Nullable Response> setFuture2 = cluster.send(cmd(SET).arg(key2).arg(argv2));
-      Future<@Nullable Response> scriptLoadFuture = cluster.send(cmd(SCRIPT).arg("LOAD").arg(script));
+      Future<@Nullable Response> scriptLoadFuture = cluster.send(cmd(SCRIPT).arg("load").arg(script));
 
       return Future.all(setFuture1, setFuture2, scriptLoadFuture)
         .compose(compositeRet -> {
