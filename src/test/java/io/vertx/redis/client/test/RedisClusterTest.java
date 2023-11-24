@@ -26,7 +26,7 @@ import static io.vertx.redis.client.Request.cmd;
 public class RedisClusterTest {
 
   @ClassRule
-  public static final GenericContainer<?> redis = new FixedHostPortGenericContainer<>("grokzen/redis-cluster:6.2.0")
+  public static final GenericContainer<?> redis = new FixedHostPortGenericContainer<>("grokzen/redis-cluster:6.2.11")
     .withEnv("IP", "0.0.0.0")
     .withEnv("STANDALONE", "true")
     .withEnv("SENTINEL", "true")
