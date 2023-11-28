@@ -73,8 +73,8 @@ public class RedisStandaloneConnection implements RedisConnectionInternal, Parse
   synchronized void setValid() {
     //System.out.println("setValid()#" + this.hashCode());
     closed = false;
-    // tainted will be reset, as a select during the handshake could have
-    // changed the state
+    // the `tainted` flag must be reset, as a `SELECT` or `AUTH` during the handshake
+    // could have tainted the connection
     tainted = false;
   }
 

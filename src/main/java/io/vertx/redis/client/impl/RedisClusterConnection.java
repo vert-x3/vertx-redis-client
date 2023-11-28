@@ -19,17 +19,16 @@ public class RedisClusterConnection implements RedisConnection {
 
   private static final Logger LOG = LoggerFactory.getLogger(RedisClusterConnection.class);
 
-  // we need some randomness, it doesn't need
-  // to be secure or unpredictable
+  // we need some randomness, it doesn't need to be cryptographically secure
   private static final Random RANDOM = new Random();
 
   // number of attempts/redirects when we get connection errors
   // or when we get MOVED/ASK responses
   private static final int RETRIES = 16;
 
-  // reduce from list fo responses to a single response
+  // reduce from list of responses to a single response
   private static final Map<Command, Function<List<Response>, Response>> REDUCERS = new HashMap<>();
-  // List of commands they should run every time only against master nodes
+  // List of commands that should always run only against master nodes
   private static final List<Command> MASTER_ONLY_COMMANDS = new ArrayList<>();
 
   public static void addReducer(Command command, Function<List<Response>, Response> fn) {
