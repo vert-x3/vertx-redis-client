@@ -155,7 +155,7 @@ public class RedisClusterClient extends BaseRedisClient implements Redis {
     final int totalUniqueEndpoints = slots.endpoints().length;
     if (poolOptions.getMaxSize() < totalUniqueEndpoints) {
       // this isn't a valid setup, the connection pool will not accommodate all the required connections
-      onConnected.handle(Future.failedFuture("RedisOptions maxPoolSize < Cluster size(" + totalUniqueEndpoints + "): The pool is not able to hold all required connections!"));
+      onConnected.handle(Future.failedFuture(new RedisConnectException("RedisOptions maxPoolSize < Cluster size(" + totalUniqueEndpoints + "): The pool is not able to hold all required connections!")));
       return;
     }
 
@@ -204,7 +204,7 @@ public class RedisClusterClient extends BaseRedisClient implements Redis {
         for (Throwable failure : failures) {
           message.append("\n- ").append(failure);
         }
-        onConnected.handle(Future.failedFuture(message.toString()));
+        onConnected.handle(Future.failedFuture(new RedisConnectException(message.toString())));
       } else {
         onConnected.handle(Future.succeededFuture(new RedisClusterConnection(vertx, connectOptions, slots,
           () -> this.slots.set(null), connections)));
@@ -233,7 +233,7 @@ public class RedisClusterClient extends BaseRedisClient implements Redis {
   private void getSlots(List<String> endpoints, int index, Handler<AsyncResult<Slots>> onGotSlots) {
     if (index >= endpoints.size()) {
       // stop condition
-      onGotSlots.handle(Future.failedFuture("Cannot connect to any of the provided endpoints"));
+      onGotSlots.handle(Future.failedFuture(new RedisConnectException("Cannot connect to any of the provided endpoints")));
       return;
     }
 
