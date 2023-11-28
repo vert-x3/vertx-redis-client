@@ -116,7 +116,7 @@ public class RedisReplicationClient extends BaseRedisClient implements Redis {
   private void connect(List<String> endpoints, int index, Handler<AsyncResult<RedisConnection>> onConnect) {
     if (index >= endpoints.size()) {
       // stop condition
-      onConnect.handle(Future.failedFuture("Cannot connect to any of the provided endpoints"));
+      onConnect.handle(Future.failedFuture(new RedisConnectException("Cannot connect to any of the provided endpoints")));
       return;
     }
 
@@ -145,7 +145,7 @@ public class RedisReplicationClient extends BaseRedisClient implements Redis {
           final int totalUniqueEndpoints = nodes.size();
           if (poolOptions.getMaxSize() < totalUniqueEndpoints) {
             // this isn't a valid setup, the connection pool will not accommodate all the required connections
-            onConnect.handle(Future.failedFuture("RedisOptions maxPoolSize < Cluster size(" + totalUniqueEndpoints + "): The pool is not able to hold all required connections!"));
+            onConnect.handle(Future.failedFuture(new RedisConnectException("RedisOptions maxPoolSize < Cluster size(" + totalUniqueEndpoints + "): The pool is not able to hold all required connections!")));
             return;
           }
 
