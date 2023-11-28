@@ -234,6 +234,7 @@ public class RedisClusterClient extends BaseRedisClient implements Redis {
     if (index >= endpoints.size()) {
       // stop condition
       onGotSlots.handle(Future.failedFuture(new RedisConnectException("Cannot connect to any of the provided endpoints")));
+      scheduleCachedSlotsExpiration();
       return;
     }
 
@@ -254,7 +255,7 @@ public class RedisClusterClient extends BaseRedisClient implements Redis {
           } else {
             Slots slots = result.result();
             onGotSlots.handle(Future.succeededFuture(slots));
-            vertx.setTimer(connectOptions.getHashSlotCacheTTL(), ignored -> this.slots.set(null));
+            scheduleCachedSlotsExpiration();
           }
         });
       });
@@ -271,5 +272,9 @@ public class RedisClusterClient extends BaseRedisClient implements Redis {
 
         return Future.succeededFuture(new Slots(endpoint, reply));
       });
+  }
+
+  private void scheduleCachedSlotsExpiration() {
+    vertx.setTimer(connectOptions.getHashSlotCacheTTL(), ignored -> this.slots.set(null));
   }
 }
