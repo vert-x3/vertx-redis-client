@@ -115,8 +115,10 @@ public class CommandGenerator extends AbstractVerticle {
 
           for (Response flag : cmd.get(2)) {
             if ("pubsub".equals(flag.toString())) {
-              // we exclude PUBSUB / PUBLISH from the flag
-              if ("pubsub".equalsIgnoreCase(commandName) || "publish".equalsIgnoreCase(commandName)) {
+              // we exclude PUBSUB / PUBLISH / SPUBLISH from the flag
+              if ("pubsub".equalsIgnoreCase(commandName)
+                  || "publish".equalsIgnoreCase(commandName)
+                  || "spublish".equalsIgnoreCase(commandName)) {
                 continue;
               }
               pubSub = true;

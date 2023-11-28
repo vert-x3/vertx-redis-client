@@ -27,7 +27,7 @@ import static io.vertx.codegen.annotations.GenIgnore.PERMITTED_TYPE;
 
 /**
  * <b>Auto generated</b> Redis API client wrapper.
- * @version redis_version:7.0.9
+ * @version redis_version:7.0.12
  */
 @VertxGen
 public interface RedisAPI {

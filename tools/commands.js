@@ -4,7 +4,7 @@ var redis = require('redis').createClient(6379);
 var Handlebars = require('handlebars');
 require('handlebars-helpers')();
 
-const excludedPubSub = ['PUBSUB', 'PUBLISH'];
+const excludedPubSub = ['PUBSUB', 'PUBLISH', 'SPUBLISH'];
 
 redis.info((err, info) => {
   if (err) {
@@ -40,6 +40,8 @@ redis.info((err, info) => {
       let args = "";
       let argLen = 0;
 
+      let identifier = cmd[0].replace('.', '_').replace('-', '_').replace(':', '').toUpperCase();
+
       if (cmd[1] > 0) {
         for (let i = 0; i < cmd[1] - 1; i++) {
           if (i !== 0) {
@@ -63,7 +65,7 @@ redis.info((err, info) => {
       }
 
       commands.push({
-        enum: cmd[0].replace('-', '_').replace(':', '').replace('.', '_').toUpperCase(),
+        enum: identifier,
         name: cmd[0],
         safename: cmd[0].replace('-', ' ').replace(':', '').toUpperCase(),
         arity: cmd[1],
@@ -79,7 +81,7 @@ redis.info((err, info) => {
         write: cmd[2].indexOf('write') !== -1,
         readOnly: cmd[2].indexOf('readonly') !== -1,
         movable: cmd[2].indexOf('movablekeys') !== -1,
-        pubsub: cmd[2].indexOf('pubsub') !== -1 && !excludedPubSub.includes(cmd[0].replace('-', '_').replace(':', '').toUpperCase())
+        pubsub: cmd[2].indexOf('pubsub') !== -1 && !excludedPubSub.includes(identifier)
       });
     });
 
