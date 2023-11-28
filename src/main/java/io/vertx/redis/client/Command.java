@@ -304,7 +304,7 @@ public interface Command {
   Command SORT = new CommandImpl("sort", -2, false, false, true, new KeyLocator(true, new BeginSearchIndex(1), new FindKeysRange(0, 1, 0)));
   Command SORT_RO = new CommandImpl("sort_ro", -2, true, false, true, new KeyLocator(true, new BeginSearchIndex(1), new FindKeysRange(0, 1, 0)));
   Command SPOP = new CommandImpl("spop", -2, false, false, false, new KeyLocator(false, new BeginSearchIndex(1), new FindKeysRange(0, 1, 0)));
-  Command SPUBLISH = new CommandImpl("spublish", 3, null, true, false, new KeyLocator(null, new BeginSearchIndex(1), new FindKeysRange(0, 1, 0)));
+  Command SPUBLISH = new CommandImpl("spublish", 3, null, false, false, new KeyLocator(null, new BeginSearchIndex(1), new FindKeysRange(0, 1, 0)));
   Command SRANDMEMBER = new CommandImpl("srandmember", -2, true, false, false, new KeyLocator(true, new BeginSearchIndex(1), new FindKeysRange(0, 1, 0)));
   Command SREM = new CommandImpl("srem", -3, false, false, false, new KeyLocator(false, new BeginSearchIndex(1), new FindKeysRange(0, 1, 0)));
   Command SSCAN = new CommandImpl("sscan", -3, true, false, false, new KeyLocator(true, new BeginSearchIndex(1), new FindKeysRange(0, 1, 0)));

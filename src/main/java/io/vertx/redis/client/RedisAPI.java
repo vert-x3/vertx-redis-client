@@ -30,7 +30,7 @@ import static io.vertx.codegen.annotations.GenIgnore.PERMITTED_TYPE;
 
 /**
  * <b>Auto generated</b> Redis API client wrapper.
- * @version redis_version:7.0.0
+ * @version redis_version:7.0.12
  */
 @VertxGen
 public interface RedisAPI {
@@ -811,6 +811,23 @@ public interface RedisAPI {
    */
   default Future<@Nullable Response> bfAdd(List<String> args) {
     return send(Command.BF_ADD, args.toArray(new String[0]));
+  }
+  /**
+   * Redis command <a href="https://redis.io/commands/bf.card">bfCard</a>.
+   * @return fluent self
+   */
+  @Fluent
+  default RedisAPI bfCard(List<String> args, Handler<AsyncResult<@Nullable Response>> handler) {
+    send(Command.BF_CARD, args.toArray(new String[0])).onComplete(handler);
+    return this;
+  }
+
+  /**
+   * Redis command <a href="https://redis.io/commands/bf.card">bfCard</a>.
+   * @return Future response.
+   */
+  default Future<@Nullable Response> bfCard(List<String> args) {
+    return send(Command.BF_CARD, args.toArray(new String[0]));
   }
   /**
    * Redis command <a href="https://redis.io/commands/bf.debug">bfDebug</a>.
@@ -4925,6 +4942,244 @@ public interface RedisAPI {
    */
   default Future<@Nullable Response> sync() {
     return send(Command.SYNC);
+  }
+  /**
+   * Redis command <a href="https://redis.io/commands/tdigest.add">tdigestAdd</a>.
+   * @return fluent self
+   */
+  @Fluent
+  default RedisAPI tdigestAdd(List<String> args, Handler<AsyncResult<@Nullable Response>> handler) {
+    send(Command.TDIGEST_ADD, args.toArray(new String[0])).onComplete(handler);
+    return this;
+  }
+
+  /**
+   * Redis command <a href="https://redis.io/commands/tdigest.add">tdigestAdd</a>.
+   * @return Future response.
+   */
+  default Future<@Nullable Response> tdigestAdd(List<String> args) {
+    return send(Command.TDIGEST_ADD, args.toArray(new String[0]));
+  }
+  /**
+   * Redis command <a href="https://redis.io/commands/tdigest.byrank">tdigestByrank</a>.
+   * @return fluent self
+   */
+  @Fluent
+  default RedisAPI tdigestByrank(List<String> args, Handler<AsyncResult<@Nullable Response>> handler) {
+    send(Command.TDIGEST_BYRANK, args.toArray(new String[0])).onComplete(handler);
+    return this;
+  }
+
+  /**
+   * Redis command <a href="https://redis.io/commands/tdigest.byrank">tdigestByrank</a>.
+   * @return Future response.
+   */
+  default Future<@Nullable Response> tdigestByrank(List<String> args) {
+    return send(Command.TDIGEST_BYRANK, args.toArray(new String[0]));
+  }
+  /**
+   * Redis command <a href="https://redis.io/commands/tdigest.byrevrank">tdigestByrevrank</a>.
+   * @return fluent self
+   */
+  @Fluent
+  default RedisAPI tdigestByrevrank(List<String> args, Handler<AsyncResult<@Nullable Response>> handler) {
+    send(Command.TDIGEST_BYREVRANK, args.toArray(new String[0])).onComplete(handler);
+    return this;
+  }
+
+  /**
+   * Redis command <a href="https://redis.io/commands/tdigest.byrevrank">tdigestByrevrank</a>.
+   * @return Future response.
+   */
+  default Future<@Nullable Response> tdigestByrevrank(List<String> args) {
+    return send(Command.TDIGEST_BYREVRANK, args.toArray(new String[0]));
+  }
+  /**
+   * Redis command <a href="https://redis.io/commands/tdigest.cdf">tdigestCdf</a>.
+   * @return fluent self
+   */
+  @Fluent
+  default RedisAPI tdigestCdf(List<String> args, Handler<AsyncResult<@Nullable Response>> handler) {
+    send(Command.TDIGEST_CDF, args.toArray(new String[0])).onComplete(handler);
+    return this;
+  }
+
+  /**
+   * Redis command <a href="https://redis.io/commands/tdigest.cdf">tdigestCdf</a>.
+   * @return Future response.
+   */
+  default Future<@Nullable Response> tdigestCdf(List<String> args) {
+    return send(Command.TDIGEST_CDF, args.toArray(new String[0]));
+  }
+  /**
+   * Redis command <a href="https://redis.io/commands/tdigest.create">tdigestCreate</a>.
+   * @return fluent self
+   */
+  @Fluent
+  default RedisAPI tdigestCreate(List<String> args, Handler<AsyncResult<@Nullable Response>> handler) {
+    send(Command.TDIGEST_CREATE, args.toArray(new String[0])).onComplete(handler);
+    return this;
+  }
+
+  /**
+   * Redis command <a href="https://redis.io/commands/tdigest.create">tdigestCreate</a>.
+   * @return Future response.
+   */
+  default Future<@Nullable Response> tdigestCreate(List<String> args) {
+    return send(Command.TDIGEST_CREATE, args.toArray(new String[0]));
+  }
+  /**
+   * Redis command <a href="https://redis.io/commands/tdigest.info">tdigestInfo</a>.
+   * @return fluent self
+   */
+  @Fluent
+  default RedisAPI tdigestInfo(List<String> args, Handler<AsyncResult<@Nullable Response>> handler) {
+    send(Command.TDIGEST_INFO, args.toArray(new String[0])).onComplete(handler);
+    return this;
+  }
+
+  /**
+   * Redis command <a href="https://redis.io/commands/tdigest.info">tdigestInfo</a>.
+   * @return Future response.
+   */
+  default Future<@Nullable Response> tdigestInfo(List<String> args) {
+    return send(Command.TDIGEST_INFO, args.toArray(new String[0]));
+  }
+  /**
+   * Redis command <a href="https://redis.io/commands/tdigest.max">tdigestMax</a>.
+   * @return fluent self
+   */
+  @Fluent
+  default RedisAPI tdigestMax(List<String> args, Handler<AsyncResult<@Nullable Response>> handler) {
+    send(Command.TDIGEST_MAX, args.toArray(new String[0])).onComplete(handler);
+    return this;
+  }
+
+  /**
+   * Redis command <a href="https://redis.io/commands/tdigest.max">tdigestMax</a>.
+   * @return Future response.
+   */
+  default Future<@Nullable Response> tdigestMax(List<String> args) {
+    return send(Command.TDIGEST_MAX, args.toArray(new String[0]));
+  }
+  /**
+   * Redis command <a href="https://redis.io/commands/tdigest.merge">tdigestMerge</a>.
+   * @return fluent self
+   */
+  @Fluent
+  default RedisAPI tdigestMerge(List<String> args, Handler<AsyncResult<@Nullable Response>> handler) {
+    send(Command.TDIGEST_MERGE, args.toArray(new String[0])).onComplete(handler);
+    return this;
+  }
+
+  /**
+   * Redis command <a href="https://redis.io/commands/tdigest.merge">tdigestMerge</a>.
+   * @return Future response.
+   */
+  default Future<@Nullable Response> tdigestMerge(List<String> args) {
+    return send(Command.TDIGEST_MERGE, args.toArray(new String[0]));
+  }
+  /**
+   * Redis command <a href="https://redis.io/commands/tdigest.min">tdigestMin</a>.
+   * @return fluent self
+   */
+  @Fluent
+  default RedisAPI tdigestMin(List<String> args, Handler<AsyncResult<@Nullable Response>> handler) {
+    send(Command.TDIGEST_MIN, args.toArray(new String[0])).onComplete(handler);
+    return this;
+  }
+
+  /**
+   * Redis command <a href="https://redis.io/commands/tdigest.min">tdigestMin</a>.
+   * @return Future response.
+   */
+  default Future<@Nullable Response> tdigestMin(List<String> args) {
+    return send(Command.TDIGEST_MIN, args.toArray(new String[0]));
+  }
+  /**
+   * Redis command <a href="https://redis.io/commands/tdigest.quantile">tdigestQuantile</a>.
+   * @return fluent self
+   */
+  @Fluent
+  default RedisAPI tdigestQuantile(List<String> args, Handler<AsyncResult<@Nullable Response>> handler) {
+    send(Command.TDIGEST_QUANTILE, args.toArray(new String[0])).onComplete(handler);
+    return this;
+  }
+
+  /**
+   * Redis command <a href="https://redis.io/commands/tdigest.quantile">tdigestQuantile</a>.
+   * @return Future response.
+   */
+  default Future<@Nullable Response> tdigestQuantile(List<String> args) {
+    return send(Command.TDIGEST_QUANTILE, args.toArray(new String[0]));
+  }
+  /**
+   * Redis command <a href="https://redis.io/commands/tdigest.rank">tdigestRank</a>.
+   * @return fluent self
+   */
+  @Fluent
+  default RedisAPI tdigestRank(List<String> args, Handler<AsyncResult<@Nullable Response>> handler) {
+    send(Command.TDIGEST_RANK, args.toArray(new String[0])).onComplete(handler);
+    return this;
+  }
+
+  /**
+   * Redis command <a href="https://redis.io/commands/tdigest.rank">tdigestRank</a>.
+   * @return Future response.
+   */
+  default Future<@Nullable Response> tdigestRank(List<String> args) {
+    return send(Command.TDIGEST_RANK, args.toArray(new String[0]));
+  }
+  /**
+   * Redis command <a href="https://redis.io/commands/tdigest.reset">tdigestReset</a>.
+   * @return fluent self
+   */
+  @Fluent
+  default RedisAPI tdigestReset(List<String> args, Handler<AsyncResult<@Nullable Response>> handler) {
+    send(Command.TDIGEST_RESET, args.toArray(new String[0])).onComplete(handler);
+    return this;
+  }
+
+  /**
+   * Redis command <a href="https://redis.io/commands/tdigest.reset">tdigestReset</a>.
+   * @return Future response.
+   */
+  default Future<@Nullable Response> tdigestReset(List<String> args) {
+    return send(Command.TDIGEST_RESET, args.toArray(new String[0]));
+  }
+  /**
+   * Redis command <a href="https://redis.io/commands/tdigest.revrank">tdigestRevrank</a>.
+   * @return fluent self
+   */
+  @Fluent
+  default RedisAPI tdigestRevrank(List<String> args, Handler<AsyncResult<@Nullable Response>> handler) {
+    send(Command.TDIGEST_REVRANK, args.toArray(new String[0])).onComplete(handler);
+    return this;
+  }
+
+  /**
+   * Redis command <a href="https://redis.io/commands/tdigest.revrank">tdigestRevrank</a>.
+   * @return Future response.
+   */
+  default Future<@Nullable Response> tdigestRevrank(List<String> args) {
+    return send(Command.TDIGEST_REVRANK, args.toArray(new String[0]));
+  }
+  /**
+   * Redis command <a href="https://redis.io/commands/tdigest.trimmed_mean">tdigestTrimmedMean</a>.
+   * @return fluent self
+   */
+  @Fluent
+  default RedisAPI tdigestTrimmedMean(List<String> args, Handler<AsyncResult<@Nullable Response>> handler) {
+    send(Command.TDIGEST_TRIMMED_MEAN, args.toArray(new String[0])).onComplete(handler);
+    return this;
+  }
+
+  /**
+   * Redis command <a href="https://redis.io/commands/tdigest.trimmed_mean">tdigestTrimmedMean</a>.
+   * @return Future response.
+   */
+  default Future<@Nullable Response> tdigestTrimmedMean(List<String> args) {
+    return send(Command.TDIGEST_TRIMMED_MEAN, args.toArray(new String[0]));
   }
   /**
    * Redis command <a href="https://redis.io/commands/time">time</a>.

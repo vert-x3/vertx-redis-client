@@ -120,8 +120,10 @@ public class RedisClusterClient extends BaseRedisClient implements Redis {
 
     addMasterOnlyCommand(SUBSCRIBE);
     addMasterOnlyCommand(PSUBSCRIBE);
+    addMasterOnlyCommand(SSUBSCRIBE);
     addReducer(UNSUBSCRIBE, list -> SimpleStringType.OK);
     addReducer(PUNSUBSCRIBE, list -> SimpleStringType.OK);
+    addReducer(SUNSUBSCRIBE, list -> SimpleStringType.OK);
   }
 
   private final RedisClusterConnectOptions connectOptions;
