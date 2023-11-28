@@ -46,7 +46,7 @@ public interface RedisAPI {
 {{#each .}}
 
   /**
-   * Redis command <a href="https://redis.io/commands/{{ name }}">{{ camelcase safename }}</a>.
+   * Redis command <a href="https://redis.io/commands/{{ lowercase safename }}/">{{ uppercase name }}</a>.
    * @return Future response.
    */
   default Future<@Nullable Response> {{ camelcase safename }}({{{ types }}}) {
