@@ -46,10 +46,10 @@ public interface RedisAPI {
   }
 
   void close();
-
 {{#each .}}
+
   /**
-   * Redis command <a href="https://redis.io/commands/{{ name }}">{{ camelcase safename }}</a>.
+   * Redis command <a href="https://redis.io/commands/{{ lowercase safename }}/">{{ uppercase name }}</a>.
    * @return fluent self
    */
   @Fluent
@@ -59,7 +59,7 @@ public interface RedisAPI {
   }
 
   /**
-   * Redis command <a href="https://redis.io/commands/{{ name }}">{{ camelcase safename }}</a>.
+   * Redis command <a href="https://redis.io/commands/{{ lowercase safename }}/">{{ uppercase name }}</a>.
    * @return Future response.
    */
   default Future<@Nullable Response> {{ camelcase safename }}({{{ types }}}) {
