@@ -16,11 +16,13 @@
 package io.vertx.redis.client;
 
 import io.vertx.codegen.annotations.DataObject;
+import io.vertx.codegen.annotations.JsonGen;
 import io.vertx.core.json.JsonObject;
 
 import java.util.List;
 
-@DataObject(generateConverter = true)
+@DataObject
+@JsonGen(publicConverter = false)
 public class RedisSentinelConnectOptions extends RedisConnectOptions {
 
   private RedisRole role;

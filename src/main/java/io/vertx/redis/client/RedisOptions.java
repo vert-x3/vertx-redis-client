@@ -17,6 +17,7 @@ package io.vertx.redis.client;
 
 import io.vertx.codegen.annotations.DataObject;
 import io.vertx.codegen.annotations.GenIgnore;
+import io.vertx.codegen.annotations.JsonGen;
 import io.vertx.core.json.JsonObject;
 import io.vertx.core.net.NetClientOptions;
 import io.vertx.core.tracing.TracingPolicy;
@@ -30,7 +31,8 @@ import java.util.List;
  *
  * @author Paulo Lopes
  */
-@DataObject(generateConverter = true)
+@DataObject
+@JsonGen(publicConverter = false)
 public class RedisOptions {
 
   /**
