@@ -215,7 +215,7 @@ public class RedisTest {
 
         Future.all(futures)
           .onFailure(f -> {
-            should.assertEquals("Redis waiting Queue is full", f.getMessage());
+            should.assertEquals("Redis waiting queue is full", f.getMessage());
             test.complete();
           })
           .onSuccess(r -> {

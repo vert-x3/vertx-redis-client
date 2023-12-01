@@ -116,18 +116,13 @@ public class RedisClientTLSTest {
         .setConnectionString("rediss://0.0.0.0:" + port + "?test=upgrade"));
 
     client.connect()
-      .onFailure(err -> {
-        System.out.println("REDIS CLIENT (CONNECT) ERR: " + err);
-      })
-      .onSuccess(conn -> {
+      .onComplete(should.asyncAssertSuccess(conn -> {
         conn.send(Request.cmd(Command.PING))
-          .onFailure(should::fail)
-          .onSuccess(res -> {
-            System.out.println("REDIS CLIENT SUCCESS");
+          .onComplete(should.asyncAssertSuccess(ignored -> {
             conn.close();
             test.complete();
-          });
-      });
+          }));
+      }));
   }
 
   @Test(timeout = 30_000L)
@@ -145,12 +140,13 @@ public class RedisClientTLSTest {
         .setConnectionString("rediss://localhost:" + server.actualPort()));
 
     client.connect()
-      .onFailure(should::fail)
-      .onSuccess(conn -> {
+      .onComplete(should.asyncAssertSuccess(conn -> {
         conn.send(Request.cmd(Command.PING))
-          .onFailure(should::fail)
-          .onSuccess(res -> test.complete());
-      });
+          .onComplete(should.asyncAssertSuccess(ignored -> {
+            conn.close();
+            test.complete();
+          }));
+      }));
   }
 
   @Test(timeout = 30_000L)
@@ -169,7 +165,8 @@ public class RedisClientTLSTest {
         .setConnectionString("redis://localhost:" + server.actualPort()));
 
     client.connect()
-      .onFailure(t -> test.complete())
-      .onSuccess(res -> should.fail());
+      .onComplete(should.asyncAssertFailure(ignored -> {
+        test.complete();
+      }));
   }
 }
