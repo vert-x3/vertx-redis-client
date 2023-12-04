@@ -30,6 +30,11 @@ public class RedisConnectOptionsConverter {
             obj.setProtocolNegotiation((Boolean)member.getValue());
           }
           break;
+        case "preferredProtocolVersion":
+          if (member.getValue() instanceof String) {
+            obj.setPreferredProtocolVersion(io.vertx.redis.client.ProtocolVersion.valueOf((String)member.getValue()));
+          }
+          break;
         case "password":
           if (member.getValue() instanceof String) {
             obj.setPassword((String)member.getValue());
@@ -76,6 +81,9 @@ public class RedisConnectOptionsConverter {
    static void toJson(RedisConnectOptions obj, java.util.Map<String, Object> json) {
     json.put("maxNestedArrays", obj.getMaxNestedArrays());
     json.put("protocolNegotiation", obj.isProtocolNegotiation());
+    if (obj.getPreferredProtocolVersion() != null) {
+      json.put("preferredProtocolVersion", obj.getPreferredProtocolVersion().name());
+    }
     if (obj.getPassword() != null) {
       json.put("password", obj.getPassword());
     }

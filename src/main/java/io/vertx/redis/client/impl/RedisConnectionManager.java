@@ -224,7 +224,11 @@ class RedisConnectionManager implements EndpointProvider<RedisConnectionManager.
       if (!options.isProtocolNegotiation()) {
         return ping(ctx, connection);
       } else {
-        Request hello = Request.cmd(Command.HELLO).arg(RESPParser.VERSION);
+        String version = RESPParser.VERSION;
+        if (options.getPreferredProtocolVersion() != null) {
+          version = options.getPreferredProtocolVersion().getValue();
+        }
+        Request hello = Request.cmd(Command.HELLO).arg(version);
 
         String password = redisURI.password() != null ? redisURI.password() : options.getPassword();
         String user = redisURI.user();

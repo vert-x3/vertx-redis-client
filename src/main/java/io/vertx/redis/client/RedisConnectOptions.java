@@ -30,6 +30,7 @@ public abstract class RedisConnectOptions {
   private List<String> endpoints;
   private int maxNestedArrays;
   private boolean protocolNegotiation;
+  private ProtocolVersion preferredProtocolVersion;
   private int maxWaitingHandlers;
 
   private void init() {
@@ -41,6 +42,7 @@ public abstract class RedisConnectOptions {
   public RedisConnectOptions(RedisOptions options) {
     setEndpoints(new ArrayList<>(options.getEndpoints()));
     setProtocolNegotiation(options.isProtocolNegotiation());
+    setPreferredProtocolVersion(options.getPreferredProtocolVersion());
     setMaxNestedArrays(options.getMaxNestedArrays());
     setPassword(options.getPassword());
     setMaxWaitingHandlers(options.getMaxWaitingHandlers());
@@ -55,6 +57,7 @@ public abstract class RedisConnectOptions {
     init();
     this.maxNestedArrays = other.maxNestedArrays;
     this.protocolNegotiation = other.protocolNegotiation;
+    this.preferredProtocolVersion = other.preferredProtocolVersion;
     this.password = other.password;
     this.endpoints = new ArrayList<>(other.endpoints);
     this.maxWaitingHandlers = other.maxWaitingHandlers;
@@ -108,6 +111,28 @@ public abstract class RedisConnectOptions {
    */
   public RedisConnectOptions setProtocolNegotiation(boolean protocolNegotiation) {
     this.protocolNegotiation = protocolNegotiation;
+    return this;
+  }
+
+  /**
+   * Returns the preferred protocol version to be used during protocol negotiation. When not set,
+   * defaults to RESP 3. When protocol negotiation is disabled, this setting has no effect.
+   *
+   * @return preferred protocol version
+   */
+  public ProtocolVersion getPreferredProtocolVersion() {
+    return preferredProtocolVersion;
+  }
+
+  /**
+   * Sets the preferred protocol version to be used during protocol negotiation. When not set,
+   * defaults to RESP 3. When protocol negotiation is disabled, this setting has no effect.
+   *
+   * @param preferredProtocolVersion preferred protocol version
+   * @return fluent self
+   */
+  public RedisConnectOptions setPreferredProtocolVersion(ProtocolVersion preferredProtocolVersion) {
+    this.preferredProtocolVersion = preferredProtocolVersion;
     return this;
   }
 
