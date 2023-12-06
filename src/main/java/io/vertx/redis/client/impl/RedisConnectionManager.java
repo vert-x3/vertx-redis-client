@@ -17,14 +17,15 @@ package io.vertx.redis.client.impl;
 
 import io.vertx.core.Future;
 import io.vertx.core.Handler;
+import io.vertx.core.Promise;
 import io.vertx.core.impl.ContextInternal;
 import io.vertx.core.impl.VertxInternal;
-import io.vertx.core.impl.future.PromiseInternal;
 import io.vertx.core.impl.logging.Logger;
 import io.vertx.core.impl.logging.LoggerFactory;
-import io.vertx.core.net.NetClient;
+import io.vertx.core.net.ConnectOptions;
 import io.vertx.core.net.NetClientOptions;
 import io.vertx.core.net.NetSocket;
+import io.vertx.core.net.impl.NetClientInternal;
 import io.vertx.core.net.impl.endpoint.EndpointManager;
 import io.vertx.core.net.impl.endpoint.EndpointProvider;
 import io.vertx.core.net.impl.endpoint.Endpoint;
@@ -45,7 +46,7 @@ class RedisConnectionManager implements EndpointProvider<RedisConnectionManager.
   private static final Handler<Throwable> DEFAULT_EXCEPTION_HANDLER = t -> LOG.error("Unhandled Error", t);
 
   private final VertxInternal vertx;
-  private final NetClient netClient;
+  private final NetClientInternal netClient;
   private final PoolMetrics metrics;
   private final NetClientOptions tcpOptions;
   private final PoolOptions poolOptions;
@@ -63,7 +64,7 @@ class RedisConnectionManager implements EndpointProvider<RedisConnectionManager.
     this.tracingPolicy = tracingPolicy;
     VertxMetrics metricsSPI = this.vertx.metricsSPI();
     metrics = metricsSPI != null ? metricsSPI.createPoolMetrics("redis", poolOptions.getName(), poolOptions.getMaxSize()) : null;
-    this.netClient = vertx.createNetClient(tcpOptions);
+    this.netClient = (NetClientInternal) vertx.createNetClient(tcpOptions);
     this.pooledConnectionManager = new EndpointManager<>();
   }
 
@@ -118,7 +119,7 @@ class RedisConnectionManager implements EndpointProvider<RedisConnectionManager.
   static class RedisConnectionProvider implements PoolConnector<RedisConnectionInternal> {
 
     private final VertxInternal vertx;
-    private final NetClient netClient;
+    private final NetClientInternal netClient;
     private final RedisURI redisURI;
     private final Request setup;
     private final NetClientOptions netClientOptions;
@@ -126,7 +127,7 @@ class RedisConnectionManager implements EndpointProvider<RedisConnectionManager.
     private final RedisConnectOptions options;
     private final TracingPolicy tracingPolicy;
 
-    public RedisConnectionProvider(VertxInternal vertx, NetClient netClient, NetClientOptions netClientOptions, PoolOptions poolOptions, RedisConnectOptions options, TracingPolicy tracingPolicy, String connectionString, Request setup) {
+    public RedisConnectionProvider(VertxInternal vertx, NetClientInternal netClient, NetClientOptions netClientOptions, PoolOptions poolOptions, RedisConnectOptions options, TracingPolicy tracingPolicy, String connectionString, Request setup) {
       this.vertx = vertx;
       this.netClient = netClient;
       this.netClientOptions = netClientOptions;
@@ -169,8 +170,13 @@ class RedisConnectionManager implements EndpointProvider<RedisConnectionManager.
       boolean connectionStringSsl,
       boolean netClientSsl) {
       try {
-        return netClient
-          .connect(redisURI.socketAddress())
+        ConnectOptions connectOptions = new ConnectOptions()
+          .setRemoteAddress(redisURI.socketAddress())
+          .setSsl(netClientOptions.isSsl())
+          .setSslOptions(netClientOptions.getSslOptions());
+        Promise<NetSocket> promise = ctx.promise();
+        netClient.connectInternal(connectOptions, promise, ctx);
+        return promise.future()
           .compose(so -> {
             // upgrade to ssl is only possible for inet sockets
             if (connectionStringInetSocket && !netClientSsl && connectionStringSsl) {
@@ -373,14 +379,14 @@ class RedisConnectionManager implements EndpointProvider<RedisConnectionManager.
 
     final ConnectionPool<RedisConnectionInternal> pool;
 
-    public RedisEndpoint(VertxInternal vertx, NetClient netClient, NetClientOptions netClientOptions, PoolOptions poolOptions, RedisConnectOptions connectOptions, TracingPolicy tracingPolicy, Runnable dispose, String connectionString, Request setup) {
+    public RedisEndpoint(VertxInternal vertx, NetClientInternal netClient, NetClientOptions netClientOptions, PoolOptions poolOptions, RedisConnectOptions connectOptions, TracingPolicy tracingPolicy, Runnable dispose, String connectionString, Request setup) {
       super(dispose);
       PoolConnector<RedisConnectionInternal> connector = new RedisConnectionProvider(vertx, netClient, netClientOptions, poolOptions, connectOptions, tracingPolicy, connectionString, setup);
       pool = ConnectionPool.pool(connector, new int[]{poolOptions.getMaxSize()}, poolOptions.getMaxWaiting());
     }
 
     public Future<Lease<RedisConnectionInternal>> requestConnection(ContextInternal ctx) {
-      PromiseInternal<Lease<RedisConnectionInternal>> promise = ctx.promise();
+      Promise<Lease<RedisConnectionInternal>> promise = ctx.promise();
       pool.acquire(ctx, 0, ar -> {
         if (ar.succeeded()) {
           // increment the reference counter to avoid the pool to be closed too soon

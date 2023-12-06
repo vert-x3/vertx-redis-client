@@ -180,15 +180,21 @@ public class RedisStandaloneConnection implements RedisConnectionInternal, Parse
 
   @Override
   public Future<Response> send(final Request request) {
-    //System.out.println("send()#" + this.hashCode());
-    final Promise<Response> promise;
+    Promise<Response> promise = vertx.promise();
+    context.execute(() -> doSend(request, promise));
+    return promise.future();
+  }
 
+  private void doSend(final Request request, Promise<Response> promise) {
+    //System.out.println("send()#" + this.hashCode());
     if (closed) {
-      throw new IllegalStateException("Connection is closed");
+      promise.fail("Connection is closed");
+      return;
     }
 
     if (!((RequestImpl) request).valid()) {
-      return Future.failedFuture("Redis command is not valid, check https://redis.io/commands");
+      promise.fail("Redis command is not valid, check https://redis.io/commands: " + request);
+      return;
     }
 
     final CommandImpl cmd = (CommandImpl) request.command();
@@ -204,17 +210,11 @@ public class RedisStandaloneConnection implements RedisConnectionInternal, Parse
       // we might have switch thread/context
       synchronized (waiting) {
         if (waiting.isFull()) {
-          return Future.failedFuture("Redis waiting Queue is full");
+          promise.fail("Redis waiting queue is full");
+          return;
         }
-        // create a new promise bound to the caller not
-        // the instance of this object (a.k.a. "context")
-        promise = vertx.promise();
         waiting.offer(promise);
       }
-    } else {
-      // create a new promise bound to the caller not
-      // the instance of this object (a.k.a. "context")
-      promise = vertx.promise();
     }
     // write to the socket
     try {
@@ -239,26 +239,26 @@ public class RedisStandaloneConnection implements RedisConnectionInternal, Parse
       context.execute(err, this::fail);
       promise.fail(err);
     }
-
-    return promise.future();
   }
 
   @Override
   public Future<List<Response>> batch(List<Request> commands) {
-    //System.out.println("batch()#" + this.hashCode());
+    Promise<List<Response>> promise = vertx.promise();
+    context.execute(() -> doBatch(commands, promise));
+    return promise.future();
+  }
 
+  private void doBatch(List<Request> commands, Promise<List<Response>> promise) {
+    //System.out.println("batch()#" + this.hashCode());
     if (closed) {
-      throw new IllegalStateException("Connection is closed");
+      promise.fail("Connection is closed");
+      return;
     }
 
     if (commands.isEmpty()) {
       LOG.debug("Empty batch");
-      return Future.succeededFuture(Collections.emptyList());
+      promise.complete(Collections.emptyList());
     } else {
-      // create a new promise bound to the caller not
-      // the instance of this object (a.k.a. "context")
-      final Promise<List<Response>> promise = vertx.promise();
-
       // will re-encode the handler into a list of promises
       final List<Promise<Response>> callbacks = new ArrayList<>(commands.size());
       final Response[] replies = new Response[commands.size()];
@@ -274,12 +274,14 @@ public class RedisStandaloneConnection implements RedisConnectionInternal, Parse
         final CommandImpl cmd = (CommandImpl) req.command();
 
         if (!req.valid()) {
-          return Future.failedFuture("Redis command is not valid, check https://redis.io/commands");
+          promise.fail("Redis command is not valid, check https://redis.io/commands: " + req);
+          return;
         }
 
         if (cmd.isPubSub()) {
           // mixing pubSub cannot be used on a one-shot operation
-          return Future.failedFuture("PubSub command in batch not allowed");
+          promise.fail("PubSub command in batch not allowed");
+          return;
         }
         // encode to the single buffer
         req.encode(messages);
@@ -334,7 +336,8 @@ public class RedisStandaloneConnection implements RedisConnectionInternal, Parse
         // we might have switch thread/context
         // this means the check needs to be performed again
         if (waiting.freeSlots() < callbacks.size()) {
-          return Future.failedFuture("Redis waiting Queue is full");
+          promise.fail("Redis waiting queue is full");
+          return;
         }
         // offer all handlers to the waiting queue
         for (Promise<Response> callback : callbacks) {
@@ -352,8 +355,6 @@ public class RedisStandaloneConnection implements RedisConnectionInternal, Parse
         context.execute(err, this::fail);
         promise.fail(err);
       }
-
-      return promise.future();
     }
   }
 
