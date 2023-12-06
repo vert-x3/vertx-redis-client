@@ -22,8 +22,7 @@ import java.util.*;
 
 class Slots {
 
-  // we need some randomness, it doesn't need
-  // to be secure or unpredictable
+  // we need some randomness, it doesn't need to be cryptographically secure
   private static final Random RANDOM = new Random();
 
   static class Slot {
