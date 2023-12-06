@@ -103,6 +103,11 @@ public class RedisOptionsConverter {
             obj.setPoolRecycleTimeout(((Number)member.getValue()).intValue());
           }
           break;
+        case "preferredProtocolVersion":
+          if (member.getValue() instanceof String) {
+            obj.setPreferredProtocolVersion(io.vertx.redis.client.ProtocolVersion.valueOf((String)member.getValue()));
+          }
+          break;
         case "protocolNegotiation":
           if (member.getValue() instanceof Boolean) {
             obj.setProtocolNegotiation((Boolean)member.getValue());
@@ -164,6 +169,9 @@ public class RedisOptionsConverter {
       json.put("poolName", obj.getPoolName());
     }
     json.put("poolRecycleTimeout", obj.getPoolRecycleTimeout());
+    if (obj.getPreferredProtocolVersion() != null) {
+      json.put("preferredProtocolVersion", obj.getPreferredProtocolVersion().name());
+    }
     json.put("protocolNegotiation", obj.isProtocolNegotiation());
     if (obj.getRole() != null) {
       json.put("role", obj.getRole().name());

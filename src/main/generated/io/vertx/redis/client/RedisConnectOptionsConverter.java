@@ -60,6 +60,11 @@ public class RedisConnectOptionsConverter {
             obj.setPassword((String)member.getValue());
           }
           break;
+        case "preferredProtocolVersion":
+          if (member.getValue() instanceof String) {
+            obj.setPreferredProtocolVersion(io.vertx.redis.client.ProtocolVersion.valueOf((String)member.getValue()));
+          }
+          break;
         case "protocolNegotiation":
           if (member.getValue() instanceof Boolean) {
             obj.setProtocolNegotiation((Boolean)member.getValue());
@@ -86,6 +91,9 @@ public class RedisConnectOptionsConverter {
     json.put("maxWaitingHandlers", obj.getMaxWaitingHandlers());
     if (obj.getPassword() != null) {
       json.put("password", obj.getPassword());
+    }
+    if (obj.getPreferredProtocolVersion() != null) {
+      json.put("preferredProtocolVersion", obj.getPreferredProtocolVersion().name());
     }
     json.put("protocolNegotiation", obj.isProtocolNegotiation());
   }
