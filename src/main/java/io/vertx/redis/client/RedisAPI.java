@@ -27,7 +27,7 @@ import static io.vertx.codegen.annotations.GenIgnore.PERMITTED_TYPE;
 
 /**
  * <b>Auto generated</b> Redis API client wrapper.
- * @version redis_version:7.0.9
+ * @version redis_version:7.0.12
  */
 @VertxGen
 public interface RedisAPI {
@@ -45,7 +45,7 @@ public interface RedisAPI {
   void close();
 
   /**
-   * Redis command <a href="https://redis.io/commands/FT.ADD">ftAdd</a>.
+   * Redis command <a href="https://redis.io/commands/ft.add/">FT.ADD</a>.
    * @return Future response.
    */
   default Future<@Nullable Response> ftAdd(List<String> args) {
@@ -53,7 +53,7 @@ public interface RedisAPI {
   }
 
   /**
-   * Redis command <a href="https://redis.io/commands/FT.AGGREGATE">ftAggregate</a>.
+   * Redis command <a href="https://redis.io/commands/ft.aggregate/">FT.AGGREGATE</a>.
    * @return Future response.
    */
   default Future<@Nullable Response> ftAggregate(List<String> args) {
@@ -61,7 +61,7 @@ public interface RedisAPI {
   }
 
   /**
-   * Redis command <a href="https://redis.io/commands/FT.ALIASADD">ftAliasadd</a>.
+   * Redis command <a href="https://redis.io/commands/ft.aliasadd/">FT.ALIASADD</a>.
    * @return Future response.
    */
   default Future<@Nullable Response> ftAliasadd(List<String> args) {
@@ -69,7 +69,7 @@ public interface RedisAPI {
   }
 
   /**
-   * Redis command <a href="https://redis.io/commands/FT.ALIASDEL">ftAliasdel</a>.
+   * Redis command <a href="https://redis.io/commands/ft.aliasdel/">FT.ALIASDEL</a>.
    * @return Future response.
    */
   default Future<@Nullable Response> ftAliasdel(List<String> args) {
@@ -77,7 +77,7 @@ public interface RedisAPI {
   }
 
   /**
-   * Redis command <a href="https://redis.io/commands/FT.ALIASUPDATE">ftAliasupdate</a>.
+   * Redis command <a href="https://redis.io/commands/ft.aliasupdate/">FT.ALIASUPDATE</a>.
    * @return Future response.
    */
   default Future<@Nullable Response> ftAliasupdate(List<String> args) {
@@ -85,7 +85,7 @@ public interface RedisAPI {
   }
 
   /**
-   * Redis command <a href="https://redis.io/commands/FT.ALTER">ftAlter</a>.
+   * Redis command <a href="https://redis.io/commands/ft.alter/">FT.ALTER</a>.
    * @return Future response.
    */
   default Future<@Nullable Response> ftAlter(List<String> args) {
@@ -93,7 +93,7 @@ public interface RedisAPI {
   }
 
   /**
-   * Redis command <a href="https://redis.io/commands/FT.CONFIG">ftConfig</a>.
+   * Redis command <a href="https://redis.io/commands/ft.config/">FT.CONFIG</a>.
    * @return Future response.
    */
   default Future<@Nullable Response> ftConfig(List<String> args) {
@@ -101,7 +101,7 @@ public interface RedisAPI {
   }
 
   /**
-   * Redis command <a href="https://redis.io/commands/FT.CREATE">ftCreate</a>.
+   * Redis command <a href="https://redis.io/commands/ft.create/">FT.CREATE</a>.
    * @return Future response.
    */
   default Future<@Nullable Response> ftCreate(List<String> args) {
@@ -109,7 +109,7 @@ public interface RedisAPI {
   }
 
   /**
-   * Redis command <a href="https://redis.io/commands/FT.CURSOR">ftCursor</a>.
+   * Redis command <a href="https://redis.io/commands/ft.cursor/">FT.CURSOR</a>.
    * @return Future response.
    */
   default Future<@Nullable Response> ftCursor(List<String> args) {
@@ -117,7 +117,7 @@ public interface RedisAPI {
   }
 
   /**
-   * Redis command <a href="https://redis.io/commands/FT.DEBUG">ftDebug</a>.
+   * Redis command <a href="https://redis.io/commands/ft.debug/">FT.DEBUG</a>.
    * @return Future response.
    */
   default Future<@Nullable Response> ftDebug(List<String> args) {
@@ -125,7 +125,7 @@ public interface RedisAPI {
   }
 
   /**
-   * Redis command <a href="https://redis.io/commands/FT.DEL">ftDel</a>.
+   * Redis command <a href="https://redis.io/commands/ft.del/">FT.DEL</a>.
    * @return Future response.
    */
   default Future<@Nullable Response> ftDel(List<String> args) {
@@ -133,7 +133,7 @@ public interface RedisAPI {
   }
 
   /**
-   * Redis command <a href="https://redis.io/commands/FT.DICTADD">ftDictadd</a>.
+   * Redis command <a href="https://redis.io/commands/ft.dictadd/">FT.DICTADD</a>.
    * @return Future response.
    */
   default Future<@Nullable Response> ftDictadd(List<String> args) {
@@ -141,7 +141,7 @@ public interface RedisAPI {
   }
 
   /**
-   * Redis command <a href="https://redis.io/commands/FT.DICTDEL">ftDictdel</a>.
+   * Redis command <a href="https://redis.io/commands/ft.dictdel/">FT.DICTDEL</a>.
    * @return Future response.
    */
   default Future<@Nullable Response> ftDictdel(List<String> args) {
@@ -149,7 +149,7 @@ public interface RedisAPI {
   }
 
   /**
-   * Redis command <a href="https://redis.io/commands/FT.DICTDUMP">ftDictdump</a>.
+   * Redis command <a href="https://redis.io/commands/ft.dictdump/">FT.DICTDUMP</a>.
    * @return Future response.
    */
   default Future<@Nullable Response> ftDictdump(List<String> args) {
@@ -157,7 +157,7 @@ public interface RedisAPI {
   }
 
   /**
-   * Redis command <a href="https://redis.io/commands/FT.DROP">ftDrop</a>.
+   * Redis command <a href="https://redis.io/commands/ft.drop/">FT.DROP</a>.
    * @return Future response.
    */
   default Future<@Nullable Response> ftDrop(List<String> args) {
@@ -165,7 +165,7 @@ public interface RedisAPI {
   }
 
   /**
-   * Redis command <a href="https://redis.io/commands/FT.DROPINDEX">ftDropindex</a>.
+   * Redis command <a href="https://redis.io/commands/ft.dropindex/">FT.DROPINDEX</a>.
    * @return Future response.
    */
   default Future<@Nullable Response> ftDropindex(List<String> args) {
@@ -173,7 +173,7 @@ public interface RedisAPI {
   }
 
   /**
-   * Redis command <a href="https://redis.io/commands/FT.EXPLAIN">ftExplain</a>.
+   * Redis command <a href="https://redis.io/commands/ft.explain/">FT.EXPLAIN</a>.
    * @return Future response.
    */
   default Future<@Nullable Response> ftExplain(List<String> args) {
@@ -181,7 +181,7 @@ public interface RedisAPI {
   }
 
   /**
-   * Redis command <a href="https://redis.io/commands/FT.EXPLAINCLI">ftExplaincli</a>.
+   * Redis command <a href="https://redis.io/commands/ft.explaincli/">FT.EXPLAINCLI</a>.
    * @return Future response.
    */
   default Future<@Nullable Response> ftExplaincli(List<String> args) {
@@ -189,7 +189,7 @@ public interface RedisAPI {
   }
 
   /**
-   * Redis command <a href="https://redis.io/commands/FT.GET">ftGet</a>.
+   * Redis command <a href="https://redis.io/commands/ft.get/">FT.GET</a>.
    * @return Future response.
    */
   default Future<@Nullable Response> ftGet(List<String> args) {
@@ -197,7 +197,7 @@ public interface RedisAPI {
   }
 
   /**
-   * Redis command <a href="https://redis.io/commands/FT.INFO">ftInfo</a>.
+   * Redis command <a href="https://redis.io/commands/ft.info/">FT.INFO</a>.
    * @return Future response.
    */
   default Future<@Nullable Response> ftInfo(List<String> args) {
@@ -205,7 +205,7 @@ public interface RedisAPI {
   }
 
   /**
-   * Redis command <a href="https://redis.io/commands/FT.MGET">ftMget</a>.
+   * Redis command <a href="https://redis.io/commands/ft.mget/">FT.MGET</a>.
    * @return Future response.
    */
   default Future<@Nullable Response> ftMget(List<String> args) {
@@ -213,7 +213,7 @@ public interface RedisAPI {
   }
 
   /**
-   * Redis command <a href="https://redis.io/commands/FT.PROFILE">ftProfile</a>.
+   * Redis command <a href="https://redis.io/commands/ft.profile/">FT.PROFILE</a>.
    * @return Future response.
    */
   default Future<@Nullable Response> ftProfile(List<String> args) {
@@ -221,7 +221,7 @@ public interface RedisAPI {
   }
 
   /**
-   * Redis command <a href="https://redis.io/commands/FT.SAFEADD">ftSafeadd</a>.
+   * Redis command <a href="https://redis.io/commands/ft.safeadd/">FT.SAFEADD</a>.
    * @return Future response.
    */
   default Future<@Nullable Response> ftSafeadd(List<String> args) {
@@ -229,7 +229,7 @@ public interface RedisAPI {
   }
 
   /**
-   * Redis command <a href="https://redis.io/commands/FT.SEARCH">ftSearch</a>.
+   * Redis command <a href="https://redis.io/commands/ft.search/">FT.SEARCH</a>.
    * @return Future response.
    */
   default Future<@Nullable Response> ftSearch(List<String> args) {
@@ -237,7 +237,7 @@ public interface RedisAPI {
   }
 
   /**
-   * Redis command <a href="https://redis.io/commands/FT.SPELLCHECK">ftSpellcheck</a>.
+   * Redis command <a href="https://redis.io/commands/ft.spellcheck/">FT.SPELLCHECK</a>.
    * @return Future response.
    */
   default Future<@Nullable Response> ftSpellcheck(List<String> args) {
@@ -245,7 +245,7 @@ public interface RedisAPI {
   }
 
   /**
-   * Redis command <a href="https://redis.io/commands/FT.SUGADD">ftSugadd</a>.
+   * Redis command <a href="https://redis.io/commands/ft.sugadd/">FT.SUGADD</a>.
    * @return Future response.
    */
   default Future<@Nullable Response> ftSugadd(List<String> args) {
@@ -253,7 +253,7 @@ public interface RedisAPI {
   }
 
   /**
-   * Redis command <a href="https://redis.io/commands/FT.SUGDEL">ftSugdel</a>.
+   * Redis command <a href="https://redis.io/commands/ft.sugdel/">FT.SUGDEL</a>.
    * @return Future response.
    */
   default Future<@Nullable Response> ftSugdel(List<String> args) {
@@ -261,7 +261,7 @@ public interface RedisAPI {
   }
 
   /**
-   * Redis command <a href="https://redis.io/commands/FT.SUGGET">ftSugget</a>.
+   * Redis command <a href="https://redis.io/commands/ft.sugget/">FT.SUGGET</a>.
    * @return Future response.
    */
   default Future<@Nullable Response> ftSugget(List<String> args) {
@@ -269,7 +269,7 @@ public interface RedisAPI {
   }
 
   /**
-   * Redis command <a href="https://redis.io/commands/FT.SUGLEN">ftSuglen</a>.
+   * Redis command <a href="https://redis.io/commands/ft.suglen/">FT.SUGLEN</a>.
    * @return Future response.
    */
   default Future<@Nullable Response> ftSuglen(List<String> args) {
@@ -277,7 +277,7 @@ public interface RedisAPI {
   }
 
   /**
-   * Redis command <a href="https://redis.io/commands/FT.SYNADD">ftSynadd</a>.
+   * Redis command <a href="https://redis.io/commands/ft.synadd/">FT.SYNADD</a>.
    * @return Future response.
    */
   default Future<@Nullable Response> ftSynadd(List<String> args) {
@@ -285,7 +285,7 @@ public interface RedisAPI {
   }
 
   /**
-   * Redis command <a href="https://redis.io/commands/FT.SYNDUMP">ftSyndump</a>.
+   * Redis command <a href="https://redis.io/commands/ft.syndump/">FT.SYNDUMP</a>.
    * @return Future response.
    */
   default Future<@Nullable Response> ftSyndump(List<String> args) {
@@ -293,7 +293,7 @@ public interface RedisAPI {
   }
 
   /**
-   * Redis command <a href="https://redis.io/commands/FT.SYNUPDATE">ftSynupdate</a>.
+   * Redis command <a href="https://redis.io/commands/ft.synupdate/">FT.SYNUPDATE</a>.
    * @return Future response.
    */
   default Future<@Nullable Response> ftSynupdate(List<String> args) {
@@ -301,7 +301,7 @@ public interface RedisAPI {
   }
 
   /**
-   * Redis command <a href="https://redis.io/commands/FT.TAGVALS">ftTagvals</a>.
+   * Redis command <a href="https://redis.io/commands/ft.tagvals/">FT.TAGVALS</a>.
    * @return Future response.
    */
   default Future<@Nullable Response> ftTagvals(List<String> args) {
@@ -309,7 +309,7 @@ public interface RedisAPI {
   }
 
   /**
-   * Redis command <a href="https://redis.io/commands/FT._ALIASADDIFNX">ftAliasaddifnx</a>.
+   * Redis command <a href="https://redis.io/commands/ft._aliasaddifnx/">FT._ALIASADDIFNX</a>.
    * @return Future response.
    */
   default Future<@Nullable Response> ftAliasaddifnx(List<String> args) {
@@ -317,7 +317,7 @@ public interface RedisAPI {
   }
 
   /**
-   * Redis command <a href="https://redis.io/commands/FT._ALIASDELIFX">ftAliasdelifx</a>.
+   * Redis command <a href="https://redis.io/commands/ft._aliasdelifx/">FT._ALIASDELIFX</a>.
    * @return Future response.
    */
   default Future<@Nullable Response> ftAliasdelifx(List<String> args) {
@@ -325,7 +325,7 @@ public interface RedisAPI {
   }
 
   /**
-   * Redis command <a href="https://redis.io/commands/FT._ALTERIFNX">ftAlterifnx</a>.
+   * Redis command <a href="https://redis.io/commands/ft._alterifnx/">FT._ALTERIFNX</a>.
    * @return Future response.
    */
   default Future<@Nullable Response> ftAlterifnx(List<String> args) {
@@ -333,7 +333,7 @@ public interface RedisAPI {
   }
 
   /**
-   * Redis command <a href="https://redis.io/commands/FT._CREATEIFNX">ftCreateifnx</a>.
+   * Redis command <a href="https://redis.io/commands/ft._createifnx/">FT._CREATEIFNX</a>.
    * @return Future response.
    */
   default Future<@Nullable Response> ftCreateifnx(List<String> args) {
@@ -341,7 +341,7 @@ public interface RedisAPI {
   }
 
   /**
-   * Redis command <a href="https://redis.io/commands/FT._DROPIFX">ftDropifx</a>.
+   * Redis command <a href="https://redis.io/commands/ft._dropifx/">FT._DROPIFX</a>.
    * @return Future response.
    */
   default Future<@Nullable Response> ftDropifx(List<String> args) {
@@ -349,7 +349,7 @@ public interface RedisAPI {
   }
 
   /**
-   * Redis command <a href="https://redis.io/commands/FT._DROPINDEXIFX">ftDropindexifx</a>.
+   * Redis command <a href="https://redis.io/commands/ft._dropindexifx/">FT._DROPINDEXIFX</a>.
    * @return Future response.
    */
   default Future<@Nullable Response> ftDropindexifx(List<String> args) {
@@ -357,7 +357,7 @@ public interface RedisAPI {
   }
 
   /**
-   * Redis command <a href="https://redis.io/commands/FT._LIST">ftList</a>.
+   * Redis command <a href="https://redis.io/commands/ft._list/">FT._LIST</a>.
    * @return Future response.
    */
   default Future<@Nullable Response> ftList(List<String> args) {
@@ -365,7 +365,7 @@ public interface RedisAPI {
   }
 
   /**
-   * Redis command <a href="https://redis.io/commands/acl">acl</a>.
+   * Redis command <a href="https://redis.io/commands/acl/">ACL</a>.
    * @return Future response.
    */
   default Future<@Nullable Response> acl(List<String> args) {
@@ -373,7 +373,7 @@ public interface RedisAPI {
   }
 
   /**
-   * Redis command <a href="https://redis.io/commands/append">append</a>.
+   * Redis command <a href="https://redis.io/commands/append/">APPEND</a>.
    * @return Future response.
    */
   default Future<@Nullable Response> append(String arg0, String arg1) {
@@ -381,7 +381,7 @@ public interface RedisAPI {
   }
 
   /**
-   * Redis command <a href="https://redis.io/commands/asking">asking</a>.
+   * Redis command <a href="https://redis.io/commands/asking/">ASKING</a>.
    * @return Future response.
    */
   default Future<@Nullable Response> asking() {
@@ -389,7 +389,7 @@ public interface RedisAPI {
   }
 
   /**
-   * Redis command <a href="https://redis.io/commands/auth">auth</a>.
+   * Redis command <a href="https://redis.io/commands/auth/">AUTH</a>.
    * @return Future response.
    */
   default Future<@Nullable Response> auth(List<String> args) {
@@ -397,7 +397,7 @@ public interface RedisAPI {
   }
 
   /**
-   * Redis command <a href="https://redis.io/commands/bf.add">bfAdd</a>.
+   * Redis command <a href="https://redis.io/commands/bf.add/">BF.ADD</a>.
    * @return Future response.
    */
   default Future<@Nullable Response> bfAdd(List<String> args) {
@@ -405,7 +405,7 @@ public interface RedisAPI {
   }
 
   /**
-   * Redis command <a href="https://redis.io/commands/bf.card">bfCard</a>.
+   * Redis command <a href="https://redis.io/commands/bf.card/">BF.CARD</a>.
    * @return Future response.
    */
   default Future<@Nullable Response> bfCard(List<String> args) {
@@ -413,7 +413,7 @@ public interface RedisAPI {
   }
 
   /**
-   * Redis command <a href="https://redis.io/commands/bf.debug">bfDebug</a>.
+   * Redis command <a href="https://redis.io/commands/bf.debug/">BF.DEBUG</a>.
    * @return Future response.
    */
   default Future<@Nullable Response> bfDebug(List<String> args) {
@@ -421,7 +421,7 @@ public interface RedisAPI {
   }
 
   /**
-   * Redis command <a href="https://redis.io/commands/bf.exists">bfExists</a>.
+   * Redis command <a href="https://redis.io/commands/bf.exists/">BF.EXISTS</a>.
    * @return Future response.
    */
   default Future<@Nullable Response> bfExists(List<String> args) {
@@ -429,7 +429,7 @@ public interface RedisAPI {
   }
 
   /**
-   * Redis command <a href="https://redis.io/commands/bf.info">bfInfo</a>.
+   * Redis command <a href="https://redis.io/commands/bf.info/">BF.INFO</a>.
    * @return Future response.
    */
   default Future<@Nullable Response> bfInfo(List<String> args) {
@@ -437,7 +437,7 @@ public interface RedisAPI {
   }
 
   /**
-   * Redis command <a href="https://redis.io/commands/bf.insert">bfInsert</a>.
+   * Redis command <a href="https://redis.io/commands/bf.insert/">BF.INSERT</a>.
    * @return Future response.
    */
   default Future<@Nullable Response> bfInsert(List<String> args) {
@@ -445,7 +445,7 @@ public interface RedisAPI {
   }
 
   /**
-   * Redis command <a href="https://redis.io/commands/bf.loadchunk">bfLoadchunk</a>.
+   * Redis command <a href="https://redis.io/commands/bf.loadchunk/">BF.LOADCHUNK</a>.
    * @return Future response.
    */
   default Future<@Nullable Response> bfLoadchunk(List<String> args) {
@@ -453,7 +453,7 @@ public interface RedisAPI {
   }
 
   /**
-   * Redis command <a href="https://redis.io/commands/bf.madd">bfMadd</a>.
+   * Redis command <a href="https://redis.io/commands/bf.madd/">BF.MADD</a>.
    * @return Future response.
    */
   default Future<@Nullable Response> bfMadd(List<String> args) {
@@ -461,7 +461,7 @@ public interface RedisAPI {
   }
 
   /**
-   * Redis command <a href="https://redis.io/commands/bf.mexists">bfMexists</a>.
+   * Redis command <a href="https://redis.io/commands/bf.mexists/">BF.MEXISTS</a>.
    * @return Future response.
    */
   default Future<@Nullable Response> bfMexists(List<String> args) {
@@ -469,7 +469,7 @@ public interface RedisAPI {
   }
 
   /**
-   * Redis command <a href="https://redis.io/commands/bf.reserve">bfReserve</a>.
+   * Redis command <a href="https://redis.io/commands/bf.reserve/">BF.RESERVE</a>.
    * @return Future response.
    */
   default Future<@Nullable Response> bfReserve(List<String> args) {
@@ -477,7 +477,7 @@ public interface RedisAPI {
   }
 
   /**
-   * Redis command <a href="https://redis.io/commands/bf.scandump">bfScandump</a>.
+   * Redis command <a href="https://redis.io/commands/bf.scandump/">BF.SCANDUMP</a>.
    * @return Future response.
    */
   default Future<@Nullable Response> bfScandump(List<String> args) {
@@ -485,7 +485,7 @@ public interface RedisAPI {
   }
 
   /**
-   * Redis command <a href="https://redis.io/commands/bgrewriteaof">bgrewriteaof</a>.
+   * Redis command <a href="https://redis.io/commands/bgrewriteaof/">BGREWRITEAOF</a>.
    * @return Future response.
    */
   default Future<@Nullable Response> bgrewriteaof() {
@@ -493,7 +493,7 @@ public interface RedisAPI {
   }
 
   /**
-   * Redis command <a href="https://redis.io/commands/bgsave">bgsave</a>.
+   * Redis command <a href="https://redis.io/commands/bgsave/">BGSAVE</a>.
    * @return Future response.
    */
   default Future<@Nullable Response> bgsave(List<String> args) {
@@ -501,7 +501,7 @@ public interface RedisAPI {
   }
 
   /**
-   * Redis command <a href="https://redis.io/commands/bitcount">bitcount</a>.
+   * Redis command <a href="https://redis.io/commands/bitcount/">BITCOUNT</a>.
    * @return Future response.
    */
   default Future<@Nullable Response> bitcount(List<String> args) {
@@ -509,7 +509,7 @@ public interface RedisAPI {
   }
 
   /**
-   * Redis command <a href="https://redis.io/commands/bitfield">bitfield</a>.
+   * Redis command <a href="https://redis.io/commands/bitfield/">BITFIELD</a>.
    * @return Future response.
    */
   default Future<@Nullable Response> bitfield(List<String> args) {
@@ -517,7 +517,7 @@ public interface RedisAPI {
   }
 
   /**
-   * Redis command <a href="https://redis.io/commands/bitfield_ro">bitfieldRo</a>.
+   * Redis command <a href="https://redis.io/commands/bitfield_ro/">BITFIELD_RO</a>.
    * @return Future response.
    */
   default Future<@Nullable Response> bitfieldRo(List<String> args) {
@@ -525,7 +525,7 @@ public interface RedisAPI {
   }
 
   /**
-   * Redis command <a href="https://redis.io/commands/bitop">bitop</a>.
+   * Redis command <a href="https://redis.io/commands/bitop/">BITOP</a>.
    * @return Future response.
    */
   default Future<@Nullable Response> bitop(List<String> args) {
@@ -533,7 +533,7 @@ public interface RedisAPI {
   }
 
   /**
-   * Redis command <a href="https://redis.io/commands/bitpos">bitpos</a>.
+   * Redis command <a href="https://redis.io/commands/bitpos/">BITPOS</a>.
    * @return Future response.
    */
   default Future<@Nullable Response> bitpos(List<String> args) {
@@ -541,7 +541,7 @@ public interface RedisAPI {
   }
 
   /**
-   * Redis command <a href="https://redis.io/commands/blmove">blmove</a>.
+   * Redis command <a href="https://redis.io/commands/blmove/">BLMOVE</a>.
    * @return Future response.
    */
   default Future<@Nullable Response> blmove(String arg0, String arg1, String arg2, String arg3, String arg4) {
@@ -549,7 +549,7 @@ public interface RedisAPI {
   }
 
   /**
-   * Redis command <a href="https://redis.io/commands/blmpop">blmpop</a>.
+   * Redis command <a href="https://redis.io/commands/blmpop/">BLMPOP</a>.
    * @return Future response.
    */
   default Future<@Nullable Response> blmpop(List<String> args) {
@@ -557,7 +557,7 @@ public interface RedisAPI {
   }
 
   /**
-   * Redis command <a href="https://redis.io/commands/blpop">blpop</a>.
+   * Redis command <a href="https://redis.io/commands/blpop/">BLPOP</a>.
    * @return Future response.
    */
   default Future<@Nullable Response> blpop(List<String> args) {
@@ -565,7 +565,7 @@ public interface RedisAPI {
   }
 
   /**
-   * Redis command <a href="https://redis.io/commands/brpop">brpop</a>.
+   * Redis command <a href="https://redis.io/commands/brpop/">BRPOP</a>.
    * @return Future response.
    */
   default Future<@Nullable Response> brpop(List<String> args) {
@@ -573,7 +573,7 @@ public interface RedisAPI {
   }
 
   /**
-   * Redis command <a href="https://redis.io/commands/brpoplpush">brpoplpush</a>.
+   * Redis command <a href="https://redis.io/commands/brpoplpush/">BRPOPLPUSH</a>.
    * @return Future response.
    */
   default Future<@Nullable Response> brpoplpush(String arg0, String arg1, String arg2) {
@@ -581,7 +581,7 @@ public interface RedisAPI {
   }
 
   /**
-   * Redis command <a href="https://redis.io/commands/bzmpop">bzmpop</a>.
+   * Redis command <a href="https://redis.io/commands/bzmpop/">BZMPOP</a>.
    * @return Future response.
    */
   default Future<@Nullable Response> bzmpop(List<String> args) {
@@ -589,7 +589,7 @@ public interface RedisAPI {
   }
 
   /**
-   * Redis command <a href="https://redis.io/commands/bzpopmax">bzpopmax</a>.
+   * Redis command <a href="https://redis.io/commands/bzpopmax/">BZPOPMAX</a>.
    * @return Future response.
    */
   default Future<@Nullable Response> bzpopmax(List<String> args) {
@@ -597,7 +597,7 @@ public interface RedisAPI {
   }
 
   /**
-   * Redis command <a href="https://redis.io/commands/bzpopmin">bzpopmin</a>.
+   * Redis command <a href="https://redis.io/commands/bzpopmin/">BZPOPMIN</a>.
    * @return Future response.
    */
   default Future<@Nullable Response> bzpopmin(List<String> args) {
@@ -605,7 +605,7 @@ public interface RedisAPI {
   }
 
   /**
-   * Redis command <a href="https://redis.io/commands/cf.add">cfAdd</a>.
+   * Redis command <a href="https://redis.io/commands/cf.add/">CF.ADD</a>.
    * @return Future response.
    */
   default Future<@Nullable Response> cfAdd(List<String> args) {
@@ -613,7 +613,7 @@ public interface RedisAPI {
   }
 
   /**
-   * Redis command <a href="https://redis.io/commands/cf.addnx">cfAddnx</a>.
+   * Redis command <a href="https://redis.io/commands/cf.addnx/">CF.ADDNX</a>.
    * @return Future response.
    */
   default Future<@Nullable Response> cfAddnx(List<String> args) {
@@ -621,7 +621,7 @@ public interface RedisAPI {
   }
 
   /**
-   * Redis command <a href="https://redis.io/commands/cf.compact">cfCompact</a>.
+   * Redis command <a href="https://redis.io/commands/cf.compact/">CF.COMPACT</a>.
    * @return Future response.
    */
   default Future<@Nullable Response> cfCompact(List<String> args) {
@@ -629,7 +629,7 @@ public interface RedisAPI {
   }
 
   /**
-   * Redis command <a href="https://redis.io/commands/cf.count">cfCount</a>.
+   * Redis command <a href="https://redis.io/commands/cf.count/">CF.COUNT</a>.
    * @return Future response.
    */
   default Future<@Nullable Response> cfCount(List<String> args) {
@@ -637,7 +637,7 @@ public interface RedisAPI {
   }
 
   /**
-   * Redis command <a href="https://redis.io/commands/cf.debug">cfDebug</a>.
+   * Redis command <a href="https://redis.io/commands/cf.debug/">CF.DEBUG</a>.
    * @return Future response.
    */
   default Future<@Nullable Response> cfDebug(List<String> args) {
@@ -645,7 +645,7 @@ public interface RedisAPI {
   }
 
   /**
-   * Redis command <a href="https://redis.io/commands/cf.del">cfDel</a>.
+   * Redis command <a href="https://redis.io/commands/cf.del/">CF.DEL</a>.
    * @return Future response.
    */
   default Future<@Nullable Response> cfDel(List<String> args) {
@@ -653,7 +653,7 @@ public interface RedisAPI {
   }
 
   /**
-   * Redis command <a href="https://redis.io/commands/cf.exists">cfExists</a>.
+   * Redis command <a href="https://redis.io/commands/cf.exists/">CF.EXISTS</a>.
    * @return Future response.
    */
   default Future<@Nullable Response> cfExists(List<String> args) {
@@ -661,7 +661,7 @@ public interface RedisAPI {
   }
 
   /**
-   * Redis command <a href="https://redis.io/commands/cf.info">cfInfo</a>.
+   * Redis command <a href="https://redis.io/commands/cf.info/">CF.INFO</a>.
    * @return Future response.
    */
   default Future<@Nullable Response> cfInfo(List<String> args) {
@@ -669,7 +669,7 @@ public interface RedisAPI {
   }
 
   /**
-   * Redis command <a href="https://redis.io/commands/cf.insert">cfInsert</a>.
+   * Redis command <a href="https://redis.io/commands/cf.insert/">CF.INSERT</a>.
    * @return Future response.
    */
   default Future<@Nullable Response> cfInsert(List<String> args) {
@@ -677,7 +677,7 @@ public interface RedisAPI {
   }
 
   /**
-   * Redis command <a href="https://redis.io/commands/cf.insertnx">cfInsertnx</a>.
+   * Redis command <a href="https://redis.io/commands/cf.insertnx/">CF.INSERTNX</a>.
    * @return Future response.
    */
   default Future<@Nullable Response> cfInsertnx(List<String> args) {
@@ -685,7 +685,7 @@ public interface RedisAPI {
   }
 
   /**
-   * Redis command <a href="https://redis.io/commands/cf.loadchunk">cfLoadchunk</a>.
+   * Redis command <a href="https://redis.io/commands/cf.loadchunk/">CF.LOADCHUNK</a>.
    * @return Future response.
    */
   default Future<@Nullable Response> cfLoadchunk(List<String> args) {
@@ -693,7 +693,7 @@ public interface RedisAPI {
   }
 
   /**
-   * Redis command <a href="https://redis.io/commands/cf.mexists">cfMexists</a>.
+   * Redis command <a href="https://redis.io/commands/cf.mexists/">CF.MEXISTS</a>.
    * @return Future response.
    */
   default Future<@Nullable Response> cfMexists(List<String> args) {
@@ -701,7 +701,7 @@ public interface RedisAPI {
   }
 
   /**
-   * Redis command <a href="https://redis.io/commands/cf.reserve">cfReserve</a>.
+   * Redis command <a href="https://redis.io/commands/cf.reserve/">CF.RESERVE</a>.
    * @return Future response.
    */
   default Future<@Nullable Response> cfReserve(List<String> args) {
@@ -709,7 +709,7 @@ public interface RedisAPI {
   }
 
   /**
-   * Redis command <a href="https://redis.io/commands/cf.scandump">cfScandump</a>.
+   * Redis command <a href="https://redis.io/commands/cf.scandump/">CF.SCANDUMP</a>.
    * @return Future response.
    */
   default Future<@Nullable Response> cfScandump(List<String> args) {
@@ -717,7 +717,7 @@ public interface RedisAPI {
   }
 
   /**
-   * Redis command <a href="https://redis.io/commands/client">client</a>.
+   * Redis command <a href="https://redis.io/commands/client/">CLIENT</a>.
    * @return Future response.
    */
   default Future<@Nullable Response> client(List<String> args) {
@@ -725,7 +725,7 @@ public interface RedisAPI {
   }
 
   /**
-   * Redis command <a href="https://redis.io/commands/cluster">cluster</a>.
+   * Redis command <a href="https://redis.io/commands/cluster/">CLUSTER</a>.
    * @return Future response.
    */
   default Future<@Nullable Response> cluster(List<String> args) {
@@ -733,7 +733,7 @@ public interface RedisAPI {
   }
 
   /**
-   * Redis command <a href="https://redis.io/commands/cms.incrby">cmsIncrby</a>.
+   * Redis command <a href="https://redis.io/commands/cms.incrby/">CMS.INCRBY</a>.
    * @return Future response.
    */
   default Future<@Nullable Response> cmsIncrby(List<String> args) {
@@ -741,7 +741,7 @@ public interface RedisAPI {
   }
 
   /**
-   * Redis command <a href="https://redis.io/commands/cms.info">cmsInfo</a>.
+   * Redis command <a href="https://redis.io/commands/cms.info/">CMS.INFO</a>.
    * @return Future response.
    */
   default Future<@Nullable Response> cmsInfo(List<String> args) {
@@ -749,7 +749,7 @@ public interface RedisAPI {
   }
 
   /**
-   * Redis command <a href="https://redis.io/commands/cms.initbydim">cmsInitbydim</a>.
+   * Redis command <a href="https://redis.io/commands/cms.initbydim/">CMS.INITBYDIM</a>.
    * @return Future response.
    */
   default Future<@Nullable Response> cmsInitbydim(List<String> args) {
@@ -757,7 +757,7 @@ public interface RedisAPI {
   }
 
   /**
-   * Redis command <a href="https://redis.io/commands/cms.initbyprob">cmsInitbyprob</a>.
+   * Redis command <a href="https://redis.io/commands/cms.initbyprob/">CMS.INITBYPROB</a>.
    * @return Future response.
    */
   default Future<@Nullable Response> cmsInitbyprob(List<String> args) {
@@ -765,7 +765,7 @@ public interface RedisAPI {
   }
 
   /**
-   * Redis command <a href="https://redis.io/commands/cms.merge">cmsMerge</a>.
+   * Redis command <a href="https://redis.io/commands/cms.merge/">CMS.MERGE</a>.
    * @return Future response.
    */
   default Future<@Nullable Response> cmsMerge(List<String> args) {
@@ -773,7 +773,7 @@ public interface RedisAPI {
   }
 
   /**
-   * Redis command <a href="https://redis.io/commands/cms.query">cmsQuery</a>.
+   * Redis command <a href="https://redis.io/commands/cms.query/">CMS.QUERY</a>.
    * @return Future response.
    */
   default Future<@Nullable Response> cmsQuery(List<String> args) {
@@ -781,7 +781,7 @@ public interface RedisAPI {
   }
 
   /**
-   * Redis command <a href="https://redis.io/commands/command">command</a>.
+   * Redis command <a href="https://redis.io/commands/command/">COMMAND</a>.
    * @return Future response.
    */
   default Future<@Nullable Response> command(List<String> args) {
@@ -789,7 +789,7 @@ public interface RedisAPI {
   }
 
   /**
-   * Redis command <a href="https://redis.io/commands/config">config</a>.
+   * Redis command <a href="https://redis.io/commands/config/">CONFIG</a>.
    * @return Future response.
    */
   default Future<@Nullable Response> config(List<String> args) {
@@ -797,7 +797,7 @@ public interface RedisAPI {
   }
 
   /**
-   * Redis command <a href="https://redis.io/commands/copy">copy</a>.
+   * Redis command <a href="https://redis.io/commands/copy/">COPY</a>.
    * @return Future response.
    */
   default Future<@Nullable Response> copy(List<String> args) {
@@ -805,7 +805,7 @@ public interface RedisAPI {
   }
 
   /**
-   * Redis command <a href="https://redis.io/commands/dbsize">dbsize</a>.
+   * Redis command <a href="https://redis.io/commands/dbsize/">DBSIZE</a>.
    * @return Future response.
    */
   default Future<@Nullable Response> dbsize() {
@@ -813,7 +813,7 @@ public interface RedisAPI {
   }
 
   /**
-   * Redis command <a href="https://redis.io/commands/debug">debug</a>.
+   * Redis command <a href="https://redis.io/commands/debug/">DEBUG</a>.
    * @return Future response.
    */
   default Future<@Nullable Response> debug(List<String> args) {
@@ -821,7 +821,7 @@ public interface RedisAPI {
   }
 
   /**
-   * Redis command <a href="https://redis.io/commands/decr">decr</a>.
+   * Redis command <a href="https://redis.io/commands/decr/">DECR</a>.
    * @return Future response.
    */
   default Future<@Nullable Response> decr(String arg0) {
@@ -829,7 +829,7 @@ public interface RedisAPI {
   }
 
   /**
-   * Redis command <a href="https://redis.io/commands/decrby">decrby</a>.
+   * Redis command <a href="https://redis.io/commands/decrby/">DECRBY</a>.
    * @return Future response.
    */
   default Future<@Nullable Response> decrby(String arg0, String arg1) {
@@ -837,7 +837,7 @@ public interface RedisAPI {
   }
 
   /**
-   * Redis command <a href="https://redis.io/commands/del">del</a>.
+   * Redis command <a href="https://redis.io/commands/del/">DEL</a>.
    * @return Future response.
    */
   default Future<@Nullable Response> del(List<String> args) {
@@ -845,7 +845,7 @@ public interface RedisAPI {
   }
 
   /**
-   * Redis command <a href="https://redis.io/commands/discard">discard</a>.
+   * Redis command <a href="https://redis.io/commands/discard/">DISCARD</a>.
    * @return Future response.
    */
   default Future<@Nullable Response> discard() {
@@ -853,7 +853,7 @@ public interface RedisAPI {
   }
 
   /**
-   * Redis command <a href="https://redis.io/commands/dump">dump</a>.
+   * Redis command <a href="https://redis.io/commands/dump/">DUMP</a>.
    * @return Future response.
    */
   default Future<@Nullable Response> dump(String arg0) {
@@ -861,7 +861,7 @@ public interface RedisAPI {
   }
 
   /**
-   * Redis command <a href="https://redis.io/commands/echo">echo</a>.
+   * Redis command <a href="https://redis.io/commands/echo/">ECHO</a>.
    * @return Future response.
    */
   default Future<@Nullable Response> echo(String arg0) {
@@ -869,7 +869,7 @@ public interface RedisAPI {
   }
 
   /**
-   * Redis command <a href="https://redis.io/commands/eval">eval</a>.
+   * Redis command <a href="https://redis.io/commands/eval/">EVAL</a>.
    * @return Future response.
    */
   default Future<@Nullable Response> eval(List<String> args) {
@@ -877,7 +877,7 @@ public interface RedisAPI {
   }
 
   /**
-   * Redis command <a href="https://redis.io/commands/eval_ro">evalRo</a>.
+   * Redis command <a href="https://redis.io/commands/eval_ro/">EVAL_RO</a>.
    * @return Future response.
    */
   default Future<@Nullable Response> evalRo(List<String> args) {
@@ -885,7 +885,7 @@ public interface RedisAPI {
   }
 
   /**
-   * Redis command <a href="https://redis.io/commands/evalsha">evalsha</a>.
+   * Redis command <a href="https://redis.io/commands/evalsha/">EVALSHA</a>.
    * @return Future response.
    */
   default Future<@Nullable Response> evalsha(List<String> args) {
@@ -893,7 +893,7 @@ public interface RedisAPI {
   }
 
   /**
-   * Redis command <a href="https://redis.io/commands/evalsha_ro">evalshaRo</a>.
+   * Redis command <a href="https://redis.io/commands/evalsha_ro/">EVALSHA_RO</a>.
    * @return Future response.
    */
   default Future<@Nullable Response> evalshaRo(List<String> args) {
@@ -901,7 +901,7 @@ public interface RedisAPI {
   }
 
   /**
-   * Redis command <a href="https://redis.io/commands/exec">exec</a>.
+   * Redis command <a href="https://redis.io/commands/exec/">EXEC</a>.
    * @return Future response.
    */
   default Future<@Nullable Response> exec() {
@@ -909,7 +909,7 @@ public interface RedisAPI {
   }
 
   /**
-   * Redis command <a href="https://redis.io/commands/exists">exists</a>.
+   * Redis command <a href="https://redis.io/commands/exists/">EXISTS</a>.
    * @return Future response.
    */
   default Future<@Nullable Response> exists(List<String> args) {
@@ -917,7 +917,7 @@ public interface RedisAPI {
   }
 
   /**
-   * Redis command <a href="https://redis.io/commands/expire">expire</a>.
+   * Redis command <a href="https://redis.io/commands/expire/">EXPIRE</a>.
    * @return Future response.
    */
   default Future<@Nullable Response> expire(List<String> args) {
@@ -925,7 +925,7 @@ public interface RedisAPI {
   }
 
   /**
-   * Redis command <a href="https://redis.io/commands/expireat">expireat</a>.
+   * Redis command <a href="https://redis.io/commands/expireat/">EXPIREAT</a>.
    * @return Future response.
    */
   default Future<@Nullable Response> expireat(List<String> args) {
@@ -933,7 +933,7 @@ public interface RedisAPI {
   }
 
   /**
-   * Redis command <a href="https://redis.io/commands/expiretime">expiretime</a>.
+   * Redis command <a href="https://redis.io/commands/expiretime/">EXPIRETIME</a>.
    * @return Future response.
    */
   default Future<@Nullable Response> expiretime(String arg0) {
@@ -941,7 +941,7 @@ public interface RedisAPI {
   }
 
   /**
-   * Redis command <a href="https://redis.io/commands/failover">failover</a>.
+   * Redis command <a href="https://redis.io/commands/failover/">FAILOVER</a>.
    * @return Future response.
    */
   default Future<@Nullable Response> failover(List<String> args) {
@@ -949,7 +949,7 @@ public interface RedisAPI {
   }
 
   /**
-   * Redis command <a href="https://redis.io/commands/fcall">fcall</a>.
+   * Redis command <a href="https://redis.io/commands/fcall/">FCALL</a>.
    * @return Future response.
    */
   default Future<@Nullable Response> fcall(List<String> args) {
@@ -957,7 +957,7 @@ public interface RedisAPI {
   }
 
   /**
-   * Redis command <a href="https://redis.io/commands/fcall_ro">fcallRo</a>.
+   * Redis command <a href="https://redis.io/commands/fcall_ro/">FCALL_RO</a>.
    * @return Future response.
    */
   default Future<@Nullable Response> fcallRo(List<String> args) {
@@ -965,7 +965,7 @@ public interface RedisAPI {
   }
 
   /**
-   * Redis command <a href="https://redis.io/commands/flushall">flushall</a>.
+   * Redis command <a href="https://redis.io/commands/flushall/">FLUSHALL</a>.
    * @return Future response.
    */
   default Future<@Nullable Response> flushall(List<String> args) {
@@ -973,7 +973,7 @@ public interface RedisAPI {
   }
 
   /**
-   * Redis command <a href="https://redis.io/commands/flushdb">flushdb</a>.
+   * Redis command <a href="https://redis.io/commands/flushdb/">FLUSHDB</a>.
    * @return Future response.
    */
   default Future<@Nullable Response> flushdb(List<String> args) {
@@ -981,7 +981,7 @@ public interface RedisAPI {
   }
 
   /**
-   * Redis command <a href="https://redis.io/commands/function">function</a>.
+   * Redis command <a href="https://redis.io/commands/function/">FUNCTION</a>.
    * @return Future response.
    */
   default Future<@Nullable Response> function(List<String> args) {
@@ -989,7 +989,7 @@ public interface RedisAPI {
   }
 
   /**
-   * Redis command <a href="https://redis.io/commands/geoadd">geoadd</a>.
+   * Redis command <a href="https://redis.io/commands/geoadd/">GEOADD</a>.
    * @return Future response.
    */
   default Future<@Nullable Response> geoadd(List<String> args) {
@@ -997,7 +997,7 @@ public interface RedisAPI {
   }
 
   /**
-   * Redis command <a href="https://redis.io/commands/geodist">geodist</a>.
+   * Redis command <a href="https://redis.io/commands/geodist/">GEODIST</a>.
    * @return Future response.
    */
   default Future<@Nullable Response> geodist(List<String> args) {
@@ -1005,7 +1005,7 @@ public interface RedisAPI {
   }
 
   /**
-   * Redis command <a href="https://redis.io/commands/geohash">geohash</a>.
+   * Redis command <a href="https://redis.io/commands/geohash/">GEOHASH</a>.
    * @return Future response.
    */
   default Future<@Nullable Response> geohash(List<String> args) {
@@ -1013,7 +1013,7 @@ public interface RedisAPI {
   }
 
   /**
-   * Redis command <a href="https://redis.io/commands/geopos">geopos</a>.
+   * Redis command <a href="https://redis.io/commands/geopos/">GEOPOS</a>.
    * @return Future response.
    */
   default Future<@Nullable Response> geopos(List<String> args) {
@@ -1021,7 +1021,7 @@ public interface RedisAPI {
   }
 
   /**
-   * Redis command <a href="https://redis.io/commands/georadius">georadius</a>.
+   * Redis command <a href="https://redis.io/commands/georadius/">GEORADIUS</a>.
    * @return Future response.
    */
   default Future<@Nullable Response> georadius(List<String> args) {
@@ -1029,7 +1029,7 @@ public interface RedisAPI {
   }
 
   /**
-   * Redis command <a href="https://redis.io/commands/georadius_ro">georadiusRo</a>.
+   * Redis command <a href="https://redis.io/commands/georadius_ro/">GEORADIUS_RO</a>.
    * @return Future response.
    */
   default Future<@Nullable Response> georadiusRo(List<String> args) {
@@ -1037,7 +1037,7 @@ public interface RedisAPI {
   }
 
   /**
-   * Redis command <a href="https://redis.io/commands/georadiusbymember">georadiusbymember</a>.
+   * Redis command <a href="https://redis.io/commands/georadiusbymember/">GEORADIUSBYMEMBER</a>.
    * @return Future response.
    */
   default Future<@Nullable Response> georadiusbymember(List<String> args) {
@@ -1045,7 +1045,7 @@ public interface RedisAPI {
   }
 
   /**
-   * Redis command <a href="https://redis.io/commands/georadiusbymember_ro">georadiusbymemberRo</a>.
+   * Redis command <a href="https://redis.io/commands/georadiusbymember_ro/">GEORADIUSBYMEMBER_RO</a>.
    * @return Future response.
    */
   default Future<@Nullable Response> georadiusbymemberRo(List<String> args) {
@@ -1053,7 +1053,7 @@ public interface RedisAPI {
   }
 
   /**
-   * Redis command <a href="https://redis.io/commands/geosearch">geosearch</a>.
+   * Redis command <a href="https://redis.io/commands/geosearch/">GEOSEARCH</a>.
    * @return Future response.
    */
   default Future<@Nullable Response> geosearch(List<String> args) {
@@ -1061,7 +1061,7 @@ public interface RedisAPI {
   }
 
   /**
-   * Redis command <a href="https://redis.io/commands/geosearchstore">geosearchstore</a>.
+   * Redis command <a href="https://redis.io/commands/geosearchstore/">GEOSEARCHSTORE</a>.
    * @return Future response.
    */
   default Future<@Nullable Response> geosearchstore(List<String> args) {
@@ -1069,7 +1069,7 @@ public interface RedisAPI {
   }
 
   /**
-   * Redis command <a href="https://redis.io/commands/get">get</a>.
+   * Redis command <a href="https://redis.io/commands/get/">GET</a>.
    * @return Future response.
    */
   default Future<@Nullable Response> get(String arg0) {
@@ -1077,7 +1077,7 @@ public interface RedisAPI {
   }
 
   /**
-   * Redis command <a href="https://redis.io/commands/getbit">getbit</a>.
+   * Redis command <a href="https://redis.io/commands/getbit/">GETBIT</a>.
    * @return Future response.
    */
   default Future<@Nullable Response> getbit(String arg0, String arg1) {
@@ -1085,7 +1085,7 @@ public interface RedisAPI {
   }
 
   /**
-   * Redis command <a href="https://redis.io/commands/getdel">getdel</a>.
+   * Redis command <a href="https://redis.io/commands/getdel/">GETDEL</a>.
    * @return Future response.
    */
   default Future<@Nullable Response> getdel(String arg0) {
@@ -1093,7 +1093,7 @@ public interface RedisAPI {
   }
 
   /**
-   * Redis command <a href="https://redis.io/commands/getex">getex</a>.
+   * Redis command <a href="https://redis.io/commands/getex/">GETEX</a>.
    * @return Future response.
    */
   default Future<@Nullable Response> getex(List<String> args) {
@@ -1101,7 +1101,7 @@ public interface RedisAPI {
   }
 
   /**
-   * Redis command <a href="https://redis.io/commands/getrange">getrange</a>.
+   * Redis command <a href="https://redis.io/commands/getrange/">GETRANGE</a>.
    * @return Future response.
    */
   default Future<@Nullable Response> getrange(String arg0, String arg1, String arg2) {
@@ -1109,7 +1109,7 @@ public interface RedisAPI {
   }
 
   /**
-   * Redis command <a href="https://redis.io/commands/getset">getset</a>.
+   * Redis command <a href="https://redis.io/commands/getset/">GETSET</a>.
    * @return Future response.
    */
   default Future<@Nullable Response> getset(String arg0, String arg1) {
@@ -1117,7 +1117,7 @@ public interface RedisAPI {
   }
 
   /**
-   * Redis command <a href="https://redis.io/commands/graph.BULK">graphBulk</a>.
+   * Redis command <a href="https://redis.io/commands/graph.bulk/">GRAPH.BULK</a>.
    * @return Future response.
    */
   default Future<@Nullable Response> graphBulk(List<String> args) {
@@ -1125,7 +1125,7 @@ public interface RedisAPI {
   }
 
   /**
-   * Redis command <a href="https://redis.io/commands/graph.CONFIG">graphConfig</a>.
+   * Redis command <a href="https://redis.io/commands/graph.config/">GRAPH.CONFIG</a>.
    * @return Future response.
    */
   default Future<@Nullable Response> graphConfig(List<String> args) {
@@ -1133,7 +1133,7 @@ public interface RedisAPI {
   }
 
   /**
-   * Redis command <a href="https://redis.io/commands/graph.DEBUG">graphDebug</a>.
+   * Redis command <a href="https://redis.io/commands/graph.debug/">GRAPH.DEBUG</a>.
    * @return Future response.
    */
   default Future<@Nullable Response> graphDebug(List<String> args) {
@@ -1141,7 +1141,7 @@ public interface RedisAPI {
   }
 
   /**
-   * Redis command <a href="https://redis.io/commands/graph.DELETE">graphDelete</a>.
+   * Redis command <a href="https://redis.io/commands/graph.delete/">GRAPH.DELETE</a>.
    * @return Future response.
    */
   default Future<@Nullable Response> graphDelete(List<String> args) {
@@ -1149,7 +1149,7 @@ public interface RedisAPI {
   }
 
   /**
-   * Redis command <a href="https://redis.io/commands/graph.EXPLAIN">graphExplain</a>.
+   * Redis command <a href="https://redis.io/commands/graph.explain/">GRAPH.EXPLAIN</a>.
    * @return Future response.
    */
   default Future<@Nullable Response> graphExplain(List<String> args) {
@@ -1157,7 +1157,7 @@ public interface RedisAPI {
   }
 
   /**
-   * Redis command <a href="https://redis.io/commands/graph.LIST">graphList</a>.
+   * Redis command <a href="https://redis.io/commands/graph.list/">GRAPH.LIST</a>.
    * @return Future response.
    */
   default Future<@Nullable Response> graphList(List<String> args) {
@@ -1165,7 +1165,7 @@ public interface RedisAPI {
   }
 
   /**
-   * Redis command <a href="https://redis.io/commands/graph.PROFILE">graphProfile</a>.
+   * Redis command <a href="https://redis.io/commands/graph.profile/">GRAPH.PROFILE</a>.
    * @return Future response.
    */
   default Future<@Nullable Response> graphProfile(List<String> args) {
@@ -1173,7 +1173,7 @@ public interface RedisAPI {
   }
 
   /**
-   * Redis command <a href="https://redis.io/commands/graph.QUERY">graphQuery</a>.
+   * Redis command <a href="https://redis.io/commands/graph.query/">GRAPH.QUERY</a>.
    * @return Future response.
    */
   default Future<@Nullable Response> graphQuery(List<String> args) {
@@ -1181,7 +1181,7 @@ public interface RedisAPI {
   }
 
   /**
-   * Redis command <a href="https://redis.io/commands/graph.RO_QUERY">graphRoQuery</a>.
+   * Redis command <a href="https://redis.io/commands/graph.ro_query/">GRAPH.RO_QUERY</a>.
    * @return Future response.
    */
   default Future<@Nullable Response> graphRoQuery(List<String> args) {
@@ -1189,7 +1189,7 @@ public interface RedisAPI {
   }
 
   /**
-   * Redis command <a href="https://redis.io/commands/graph.SLOWLOG">graphSlowlog</a>.
+   * Redis command <a href="https://redis.io/commands/graph.slowlog/">GRAPH.SLOWLOG</a>.
    * @return Future response.
    */
   default Future<@Nullable Response> graphSlowlog(List<String> args) {
@@ -1197,7 +1197,7 @@ public interface RedisAPI {
   }
 
   /**
-   * Redis command <a href="https://redis.io/commands/hdel">hdel</a>.
+   * Redis command <a href="https://redis.io/commands/hdel/">HDEL</a>.
    * @return Future response.
    */
   default Future<@Nullable Response> hdel(List<String> args) {
@@ -1205,7 +1205,7 @@ public interface RedisAPI {
   }
 
   /**
-   * Redis command <a href="https://redis.io/commands/hello">hello</a>.
+   * Redis command <a href="https://redis.io/commands/hello/">HELLO</a>.
    * @return Future response.
    */
   default Future<@Nullable Response> hello(List<String> args) {
@@ -1213,7 +1213,7 @@ public interface RedisAPI {
   }
 
   /**
-   * Redis command <a href="https://redis.io/commands/hexists">hexists</a>.
+   * Redis command <a href="https://redis.io/commands/hexists/">HEXISTS</a>.
    * @return Future response.
    */
   default Future<@Nullable Response> hexists(String arg0, String arg1) {
@@ -1221,7 +1221,7 @@ public interface RedisAPI {
   }
 
   /**
-   * Redis command <a href="https://redis.io/commands/hget">hget</a>.
+   * Redis command <a href="https://redis.io/commands/hget/">HGET</a>.
    * @return Future response.
    */
   default Future<@Nullable Response> hget(String arg0, String arg1) {
@@ -1229,7 +1229,7 @@ public interface RedisAPI {
   }
 
   /**
-   * Redis command <a href="https://redis.io/commands/hgetall">hgetall</a>.
+   * Redis command <a href="https://redis.io/commands/hgetall/">HGETALL</a>.
    * @return Future response.
    */
   default Future<@Nullable Response> hgetall(String arg0) {
@@ -1237,7 +1237,7 @@ public interface RedisAPI {
   }
 
   /**
-   * Redis command <a href="https://redis.io/commands/hincrby">hincrby</a>.
+   * Redis command <a href="https://redis.io/commands/hincrby/">HINCRBY</a>.
    * @return Future response.
    */
   default Future<@Nullable Response> hincrby(String arg0, String arg1, String arg2) {
@@ -1245,7 +1245,7 @@ public interface RedisAPI {
   }
 
   /**
-   * Redis command <a href="https://redis.io/commands/hincrbyfloat">hincrbyfloat</a>.
+   * Redis command <a href="https://redis.io/commands/hincrbyfloat/">HINCRBYFLOAT</a>.
    * @return Future response.
    */
   default Future<@Nullable Response> hincrbyfloat(String arg0, String arg1, String arg2) {
@@ -1253,7 +1253,7 @@ public interface RedisAPI {
   }
 
   /**
-   * Redis command <a href="https://redis.io/commands/hkeys">hkeys</a>.
+   * Redis command <a href="https://redis.io/commands/hkeys/">HKEYS</a>.
    * @return Future response.
    */
   default Future<@Nullable Response> hkeys(String arg0) {
@@ -1261,7 +1261,7 @@ public interface RedisAPI {
   }
 
   /**
-   * Redis command <a href="https://redis.io/commands/hlen">hlen</a>.
+   * Redis command <a href="https://redis.io/commands/hlen/">HLEN</a>.
    * @return Future response.
    */
   default Future<@Nullable Response> hlen(String arg0) {
@@ -1269,7 +1269,7 @@ public interface RedisAPI {
   }
 
   /**
-   * Redis command <a href="https://redis.io/commands/hmget">hmget</a>.
+   * Redis command <a href="https://redis.io/commands/hmget/">HMGET</a>.
    * @return Future response.
    */
   default Future<@Nullable Response> hmget(List<String> args) {
@@ -1277,7 +1277,7 @@ public interface RedisAPI {
   }
 
   /**
-   * Redis command <a href="https://redis.io/commands/hmset">hmset</a>.
+   * Redis command <a href="https://redis.io/commands/hmset/">HMSET</a>.
    * @return Future response.
    */
   default Future<@Nullable Response> hmset(List<String> args) {
@@ -1285,7 +1285,7 @@ public interface RedisAPI {
   }
 
   /**
-   * Redis command <a href="https://redis.io/commands/hrandfield">hrandfield</a>.
+   * Redis command <a href="https://redis.io/commands/hrandfield/">HRANDFIELD</a>.
    * @return Future response.
    */
   default Future<@Nullable Response> hrandfield(List<String> args) {
@@ -1293,7 +1293,7 @@ public interface RedisAPI {
   }
 
   /**
-   * Redis command <a href="https://redis.io/commands/hscan">hscan</a>.
+   * Redis command <a href="https://redis.io/commands/hscan/">HSCAN</a>.
    * @return Future response.
    */
   default Future<@Nullable Response> hscan(List<String> args) {
@@ -1301,7 +1301,7 @@ public interface RedisAPI {
   }
 
   /**
-   * Redis command <a href="https://redis.io/commands/hset">hset</a>.
+   * Redis command <a href="https://redis.io/commands/hset/">HSET</a>.
    * @return Future response.
    */
   default Future<@Nullable Response> hset(List<String> args) {
@@ -1309,7 +1309,7 @@ public interface RedisAPI {
   }
 
   /**
-   * Redis command <a href="https://redis.io/commands/hsetnx">hsetnx</a>.
+   * Redis command <a href="https://redis.io/commands/hsetnx/">HSETNX</a>.
    * @return Future response.
    */
   default Future<@Nullable Response> hsetnx(String arg0, String arg1, String arg2) {
@@ -1317,7 +1317,7 @@ public interface RedisAPI {
   }
 
   /**
-   * Redis command <a href="https://redis.io/commands/hstrlen">hstrlen</a>.
+   * Redis command <a href="https://redis.io/commands/hstrlen/">HSTRLEN</a>.
    * @return Future response.
    */
   default Future<@Nullable Response> hstrlen(String arg0, String arg1) {
@@ -1325,7 +1325,7 @@ public interface RedisAPI {
   }
 
   /**
-   * Redis command <a href="https://redis.io/commands/hvals">hvals</a>.
+   * Redis command <a href="https://redis.io/commands/hvals/">HVALS</a>.
    * @return Future response.
    */
   default Future<@Nullable Response> hvals(String arg0) {
@@ -1333,7 +1333,7 @@ public interface RedisAPI {
   }
 
   /**
-   * Redis command <a href="https://redis.io/commands/incr">incr</a>.
+   * Redis command <a href="https://redis.io/commands/incr/">INCR</a>.
    * @return Future response.
    */
   default Future<@Nullable Response> incr(String arg0) {
@@ -1341,7 +1341,7 @@ public interface RedisAPI {
   }
 
   /**
-   * Redis command <a href="https://redis.io/commands/incrby">incrby</a>.
+   * Redis command <a href="https://redis.io/commands/incrby/">INCRBY</a>.
    * @return Future response.
    */
   default Future<@Nullable Response> incrby(String arg0, String arg1) {
@@ -1349,7 +1349,7 @@ public interface RedisAPI {
   }
 
   /**
-   * Redis command <a href="https://redis.io/commands/incrbyfloat">incrbyfloat</a>.
+   * Redis command <a href="https://redis.io/commands/incrbyfloat/">INCRBYFLOAT</a>.
    * @return Future response.
    */
   default Future<@Nullable Response> incrbyfloat(String arg0, String arg1) {
@@ -1357,7 +1357,7 @@ public interface RedisAPI {
   }
 
   /**
-   * Redis command <a href="https://redis.io/commands/info">info</a>.
+   * Redis command <a href="https://redis.io/commands/info/">INFO</a>.
    * @return Future response.
    */
   default Future<@Nullable Response> info(List<String> args) {
@@ -1365,7 +1365,7 @@ public interface RedisAPI {
   }
 
   /**
-   * Redis command <a href="https://redis.io/commands/json.arrappend">jsonArrappend</a>.
+   * Redis command <a href="https://redis.io/commands/json.arrappend/">JSON.ARRAPPEND</a>.
    * @return Future response.
    */
   default Future<@Nullable Response> jsonArrappend(List<String> args) {
@@ -1373,7 +1373,7 @@ public interface RedisAPI {
   }
 
   /**
-   * Redis command <a href="https://redis.io/commands/json.arrindex">jsonArrindex</a>.
+   * Redis command <a href="https://redis.io/commands/json.arrindex/">JSON.ARRINDEX</a>.
    * @return Future response.
    */
   default Future<@Nullable Response> jsonArrindex(List<String> args) {
@@ -1381,7 +1381,7 @@ public interface RedisAPI {
   }
 
   /**
-   * Redis command <a href="https://redis.io/commands/json.arrinsert">jsonArrinsert</a>.
+   * Redis command <a href="https://redis.io/commands/json.arrinsert/">JSON.ARRINSERT</a>.
    * @return Future response.
    */
   default Future<@Nullable Response> jsonArrinsert(List<String> args) {
@@ -1389,7 +1389,7 @@ public interface RedisAPI {
   }
 
   /**
-   * Redis command <a href="https://redis.io/commands/json.arrlen">jsonArrlen</a>.
+   * Redis command <a href="https://redis.io/commands/json.arrlen/">JSON.ARRLEN</a>.
    * @return Future response.
    */
   default Future<@Nullable Response> jsonArrlen(List<String> args) {
@@ -1397,7 +1397,7 @@ public interface RedisAPI {
   }
 
   /**
-   * Redis command <a href="https://redis.io/commands/json.arrpop">jsonArrpop</a>.
+   * Redis command <a href="https://redis.io/commands/json.arrpop/">JSON.ARRPOP</a>.
    * @return Future response.
    */
   default Future<@Nullable Response> jsonArrpop(List<String> args) {
@@ -1405,7 +1405,7 @@ public interface RedisAPI {
   }
 
   /**
-   * Redis command <a href="https://redis.io/commands/json.arrtrim">jsonArrtrim</a>.
+   * Redis command <a href="https://redis.io/commands/json.arrtrim/">JSON.ARRTRIM</a>.
    * @return Future response.
    */
   default Future<@Nullable Response> jsonArrtrim(List<String> args) {
@@ -1413,7 +1413,7 @@ public interface RedisAPI {
   }
 
   /**
-   * Redis command <a href="https://redis.io/commands/json.clear">jsonClear</a>.
+   * Redis command <a href="https://redis.io/commands/json.clear/">JSON.CLEAR</a>.
    * @return Future response.
    */
   default Future<@Nullable Response> jsonClear(List<String> args) {
@@ -1421,7 +1421,7 @@ public interface RedisAPI {
   }
 
   /**
-   * Redis command <a href="https://redis.io/commands/json.debug">jsonDebug</a>.
+   * Redis command <a href="https://redis.io/commands/json.debug/">JSON.DEBUG</a>.
    * @return Future response.
    */
   default Future<@Nullable Response> jsonDebug(List<String> args) {
@@ -1429,7 +1429,7 @@ public interface RedisAPI {
   }
 
   /**
-   * Redis command <a href="https://redis.io/commands/json.del">jsonDel</a>.
+   * Redis command <a href="https://redis.io/commands/json.del/">JSON.DEL</a>.
    * @return Future response.
    */
   default Future<@Nullable Response> jsonDel(List<String> args) {
@@ -1437,7 +1437,7 @@ public interface RedisAPI {
   }
 
   /**
-   * Redis command <a href="https://redis.io/commands/json.forget">jsonForget</a>.
+   * Redis command <a href="https://redis.io/commands/json.forget/">JSON.FORGET</a>.
    * @return Future response.
    */
   default Future<@Nullable Response> jsonForget(List<String> args) {
@@ -1445,7 +1445,7 @@ public interface RedisAPI {
   }
 
   /**
-   * Redis command <a href="https://redis.io/commands/json.get">jsonGet</a>.
+   * Redis command <a href="https://redis.io/commands/json.get/">JSON.GET</a>.
    * @return Future response.
    */
   default Future<@Nullable Response> jsonGet(List<String> args) {
@@ -1453,7 +1453,7 @@ public interface RedisAPI {
   }
 
   /**
-   * Redis command <a href="https://redis.io/commands/json.mget">jsonMget</a>.
+   * Redis command <a href="https://redis.io/commands/json.mget/">JSON.MGET</a>.
    * @return Future response.
    */
   default Future<@Nullable Response> jsonMget(List<String> args) {
@@ -1461,7 +1461,7 @@ public interface RedisAPI {
   }
 
   /**
-   * Redis command <a href="https://redis.io/commands/json.numincrby">jsonNumincrby</a>.
+   * Redis command <a href="https://redis.io/commands/json.numincrby/">JSON.NUMINCRBY</a>.
    * @return Future response.
    */
   default Future<@Nullable Response> jsonNumincrby(List<String> args) {
@@ -1469,7 +1469,7 @@ public interface RedisAPI {
   }
 
   /**
-   * Redis command <a href="https://redis.io/commands/json.nummultby">jsonNummultby</a>.
+   * Redis command <a href="https://redis.io/commands/json.nummultby/">JSON.NUMMULTBY</a>.
    * @return Future response.
    */
   default Future<@Nullable Response> jsonNummultby(List<String> args) {
@@ -1477,7 +1477,7 @@ public interface RedisAPI {
   }
 
   /**
-   * Redis command <a href="https://redis.io/commands/json.numpowby">jsonNumpowby</a>.
+   * Redis command <a href="https://redis.io/commands/json.numpowby/">JSON.NUMPOWBY</a>.
    * @return Future response.
    */
   default Future<@Nullable Response> jsonNumpowby(List<String> args) {
@@ -1485,7 +1485,7 @@ public interface RedisAPI {
   }
 
   /**
-   * Redis command <a href="https://redis.io/commands/json.objkeys">jsonObjkeys</a>.
+   * Redis command <a href="https://redis.io/commands/json.objkeys/">JSON.OBJKEYS</a>.
    * @return Future response.
    */
   default Future<@Nullable Response> jsonObjkeys(List<String> args) {
@@ -1493,7 +1493,7 @@ public interface RedisAPI {
   }
 
   /**
-   * Redis command <a href="https://redis.io/commands/json.objlen">jsonObjlen</a>.
+   * Redis command <a href="https://redis.io/commands/json.objlen/">JSON.OBJLEN</a>.
    * @return Future response.
    */
   default Future<@Nullable Response> jsonObjlen(List<String> args) {
@@ -1501,7 +1501,7 @@ public interface RedisAPI {
   }
 
   /**
-   * Redis command <a href="https://redis.io/commands/json.resp">jsonResp</a>.
+   * Redis command <a href="https://redis.io/commands/json.resp/">JSON.RESP</a>.
    * @return Future response.
    */
   default Future<@Nullable Response> jsonResp(List<String> args) {
@@ -1509,7 +1509,7 @@ public interface RedisAPI {
   }
 
   /**
-   * Redis command <a href="https://redis.io/commands/json.set">jsonSet</a>.
+   * Redis command <a href="https://redis.io/commands/json.set/">JSON.SET</a>.
    * @return Future response.
    */
   default Future<@Nullable Response> jsonSet(List<String> args) {
@@ -1517,7 +1517,7 @@ public interface RedisAPI {
   }
 
   /**
-   * Redis command <a href="https://redis.io/commands/json.strappend">jsonStrappend</a>.
+   * Redis command <a href="https://redis.io/commands/json.strappend/">JSON.STRAPPEND</a>.
    * @return Future response.
    */
   default Future<@Nullable Response> jsonStrappend(List<String> args) {
@@ -1525,7 +1525,7 @@ public interface RedisAPI {
   }
 
   /**
-   * Redis command <a href="https://redis.io/commands/json.strlen">jsonStrlen</a>.
+   * Redis command <a href="https://redis.io/commands/json.strlen/">JSON.STRLEN</a>.
    * @return Future response.
    */
   default Future<@Nullable Response> jsonStrlen(List<String> args) {
@@ -1533,7 +1533,7 @@ public interface RedisAPI {
   }
 
   /**
-   * Redis command <a href="https://redis.io/commands/json.toggle">jsonToggle</a>.
+   * Redis command <a href="https://redis.io/commands/json.toggle/">JSON.TOGGLE</a>.
    * @return Future response.
    */
   default Future<@Nullable Response> jsonToggle(List<String> args) {
@@ -1541,7 +1541,7 @@ public interface RedisAPI {
   }
 
   /**
-   * Redis command <a href="https://redis.io/commands/json.type">jsonType</a>.
+   * Redis command <a href="https://redis.io/commands/json.type/">JSON.TYPE</a>.
    * @return Future response.
    */
   default Future<@Nullable Response> jsonType(List<String> args) {
@@ -1549,7 +1549,7 @@ public interface RedisAPI {
   }
 
   /**
-   * Redis command <a href="https://redis.io/commands/keys">keys</a>.
+   * Redis command <a href="https://redis.io/commands/keys/">KEYS</a>.
    * @return Future response.
    */
   default Future<@Nullable Response> keys(String arg0) {
@@ -1557,7 +1557,7 @@ public interface RedisAPI {
   }
 
   /**
-   * Redis command <a href="https://redis.io/commands/lastsave">lastsave</a>.
+   * Redis command <a href="https://redis.io/commands/lastsave/">LASTSAVE</a>.
    * @return Future response.
    */
   default Future<@Nullable Response> lastsave() {
@@ -1565,7 +1565,7 @@ public interface RedisAPI {
   }
 
   /**
-   * Redis command <a href="https://redis.io/commands/latency">latency</a>.
+   * Redis command <a href="https://redis.io/commands/latency/">LATENCY</a>.
    * @return Future response.
    */
   default Future<@Nullable Response> latency(List<String> args) {
@@ -1573,7 +1573,7 @@ public interface RedisAPI {
   }
 
   /**
-   * Redis command <a href="https://redis.io/commands/lcs">lcs</a>.
+   * Redis command <a href="https://redis.io/commands/lcs/">LCS</a>.
    * @return Future response.
    */
   default Future<@Nullable Response> lcs(List<String> args) {
@@ -1581,7 +1581,7 @@ public interface RedisAPI {
   }
 
   /**
-   * Redis command <a href="https://redis.io/commands/lindex">lindex</a>.
+   * Redis command <a href="https://redis.io/commands/lindex/">LINDEX</a>.
    * @return Future response.
    */
   default Future<@Nullable Response> lindex(String arg0, String arg1) {
@@ -1589,7 +1589,7 @@ public interface RedisAPI {
   }
 
   /**
-   * Redis command <a href="https://redis.io/commands/linsert">linsert</a>.
+   * Redis command <a href="https://redis.io/commands/linsert/">LINSERT</a>.
    * @return Future response.
    */
   default Future<@Nullable Response> linsert(String arg0, String arg1, String arg2, String arg3) {
@@ -1597,7 +1597,7 @@ public interface RedisAPI {
   }
 
   /**
-   * Redis command <a href="https://redis.io/commands/llen">llen</a>.
+   * Redis command <a href="https://redis.io/commands/llen/">LLEN</a>.
    * @return Future response.
    */
   default Future<@Nullable Response> llen(String arg0) {
@@ -1605,7 +1605,7 @@ public interface RedisAPI {
   }
 
   /**
-   * Redis command <a href="https://redis.io/commands/lmove">lmove</a>.
+   * Redis command <a href="https://redis.io/commands/lmove/">LMOVE</a>.
    * @return Future response.
    */
   default Future<@Nullable Response> lmove(String arg0, String arg1, String arg2, String arg3) {
@@ -1613,7 +1613,7 @@ public interface RedisAPI {
   }
 
   /**
-   * Redis command <a href="https://redis.io/commands/lmpop">lmpop</a>.
+   * Redis command <a href="https://redis.io/commands/lmpop/">LMPOP</a>.
    * @return Future response.
    */
   default Future<@Nullable Response> lmpop(List<String> args) {
@@ -1621,7 +1621,7 @@ public interface RedisAPI {
   }
 
   /**
-   * Redis command <a href="https://redis.io/commands/lolwut">lolwut</a>.
+   * Redis command <a href="https://redis.io/commands/lolwut/">LOLWUT</a>.
    * @return Future response.
    */
   default Future<@Nullable Response> lolwut(List<String> args) {
@@ -1629,7 +1629,7 @@ public interface RedisAPI {
   }
 
   /**
-   * Redis command <a href="https://redis.io/commands/lpop">lpop</a>.
+   * Redis command <a href="https://redis.io/commands/lpop/">LPOP</a>.
    * @return Future response.
    */
   default Future<@Nullable Response> lpop(List<String> args) {
@@ -1637,7 +1637,7 @@ public interface RedisAPI {
   }
 
   /**
-   * Redis command <a href="https://redis.io/commands/lpos">lpos</a>.
+   * Redis command <a href="https://redis.io/commands/lpos/">LPOS</a>.
    * @return Future response.
    */
   default Future<@Nullable Response> lpos(List<String> args) {
@@ -1645,7 +1645,7 @@ public interface RedisAPI {
   }
 
   /**
-   * Redis command <a href="https://redis.io/commands/lpush">lpush</a>.
+   * Redis command <a href="https://redis.io/commands/lpush/">LPUSH</a>.
    * @return Future response.
    */
   default Future<@Nullable Response> lpush(List<String> args) {
@@ -1653,7 +1653,7 @@ public interface RedisAPI {
   }
 
   /**
-   * Redis command <a href="https://redis.io/commands/lpushx">lpushx</a>.
+   * Redis command <a href="https://redis.io/commands/lpushx/">LPUSHX</a>.
    * @return Future response.
    */
   default Future<@Nullable Response> lpushx(List<String> args) {
@@ -1661,7 +1661,7 @@ public interface RedisAPI {
   }
 
   /**
-   * Redis command <a href="https://redis.io/commands/lrange">lrange</a>.
+   * Redis command <a href="https://redis.io/commands/lrange/">LRANGE</a>.
    * @return Future response.
    */
   default Future<@Nullable Response> lrange(String arg0, String arg1, String arg2) {
@@ -1669,7 +1669,7 @@ public interface RedisAPI {
   }
 
   /**
-   * Redis command <a href="https://redis.io/commands/lrem">lrem</a>.
+   * Redis command <a href="https://redis.io/commands/lrem/">LREM</a>.
    * @return Future response.
    */
   default Future<@Nullable Response> lrem(String arg0, String arg1, String arg2) {
@@ -1677,7 +1677,7 @@ public interface RedisAPI {
   }
 
   /**
-   * Redis command <a href="https://redis.io/commands/lset">lset</a>.
+   * Redis command <a href="https://redis.io/commands/lset/">LSET</a>.
    * @return Future response.
    */
   default Future<@Nullable Response> lset(String arg0, String arg1, String arg2) {
@@ -1685,7 +1685,7 @@ public interface RedisAPI {
   }
 
   /**
-   * Redis command <a href="https://redis.io/commands/ltrim">ltrim</a>.
+   * Redis command <a href="https://redis.io/commands/ltrim/">LTRIM</a>.
    * @return Future response.
    */
   default Future<@Nullable Response> ltrim(String arg0, String arg1, String arg2) {
@@ -1693,7 +1693,7 @@ public interface RedisAPI {
   }
 
   /**
-   * Redis command <a href="https://redis.io/commands/memory">memory</a>.
+   * Redis command <a href="https://redis.io/commands/memory/">MEMORY</a>.
    * @return Future response.
    */
   default Future<@Nullable Response> memory(List<String> args) {
@@ -1701,7 +1701,7 @@ public interface RedisAPI {
   }
 
   /**
-   * Redis command <a href="https://redis.io/commands/mget">mget</a>.
+   * Redis command <a href="https://redis.io/commands/mget/">MGET</a>.
    * @return Future response.
    */
   default Future<@Nullable Response> mget(List<String> args) {
@@ -1709,7 +1709,7 @@ public interface RedisAPI {
   }
 
   /**
-   * Redis command <a href="https://redis.io/commands/migrate">migrate</a>.
+   * Redis command <a href="https://redis.io/commands/migrate/">MIGRATE</a>.
    * @return Future response.
    */
   default Future<@Nullable Response> migrate(List<String> args) {
@@ -1717,7 +1717,7 @@ public interface RedisAPI {
   }
 
   /**
-   * Redis command <a href="https://redis.io/commands/module">module</a>.
+   * Redis command <a href="https://redis.io/commands/module/">MODULE</a>.
    * @return Future response.
    */
   default Future<@Nullable Response> module(List<String> args) {
@@ -1725,7 +1725,7 @@ public interface RedisAPI {
   }
 
   /**
-   * Redis command <a href="https://redis.io/commands/monitor">monitor</a>.
+   * Redis command <a href="https://redis.io/commands/monitor/">MONITOR</a>.
    * @return Future response.
    */
   default Future<@Nullable Response> monitor() {
@@ -1733,7 +1733,7 @@ public interface RedisAPI {
   }
 
   /**
-   * Redis command <a href="https://redis.io/commands/move">move</a>.
+   * Redis command <a href="https://redis.io/commands/move/">MOVE</a>.
    * @return Future response.
    */
   default Future<@Nullable Response> move(String arg0, String arg1) {
@@ -1741,7 +1741,7 @@ public interface RedisAPI {
   }
 
   /**
-   * Redis command <a href="https://redis.io/commands/mset">mset</a>.
+   * Redis command <a href="https://redis.io/commands/mset/">MSET</a>.
    * @return Future response.
    */
   default Future<@Nullable Response> mset(List<String> args) {
@@ -1749,7 +1749,7 @@ public interface RedisAPI {
   }
 
   /**
-   * Redis command <a href="https://redis.io/commands/msetnx">msetnx</a>.
+   * Redis command <a href="https://redis.io/commands/msetnx/">MSETNX</a>.
    * @return Future response.
    */
   default Future<@Nullable Response> msetnx(List<String> args) {
@@ -1757,7 +1757,7 @@ public interface RedisAPI {
   }
 
   /**
-   * Redis command <a href="https://redis.io/commands/multi">multi</a>.
+   * Redis command <a href="https://redis.io/commands/multi/">MULTI</a>.
    * @return Future response.
    */
   default Future<@Nullable Response> multi() {
@@ -1765,7 +1765,7 @@ public interface RedisAPI {
   }
 
   /**
-   * Redis command <a href="https://redis.io/commands/object">object</a>.
+   * Redis command <a href="https://redis.io/commands/object/">OBJECT</a>.
    * @return Future response.
    */
   default Future<@Nullable Response> object(List<String> args) {
@@ -1773,7 +1773,7 @@ public interface RedisAPI {
   }
 
   /**
-   * Redis command <a href="https://redis.io/commands/persist">persist</a>.
+   * Redis command <a href="https://redis.io/commands/persist/">PERSIST</a>.
    * @return Future response.
    */
   default Future<@Nullable Response> persist(String arg0) {
@@ -1781,7 +1781,7 @@ public interface RedisAPI {
   }
 
   /**
-   * Redis command <a href="https://redis.io/commands/pexpire">pexpire</a>.
+   * Redis command <a href="https://redis.io/commands/pexpire/">PEXPIRE</a>.
    * @return Future response.
    */
   default Future<@Nullable Response> pexpire(List<String> args) {
@@ -1789,7 +1789,7 @@ public interface RedisAPI {
   }
 
   /**
-   * Redis command <a href="https://redis.io/commands/pexpireat">pexpireat</a>.
+   * Redis command <a href="https://redis.io/commands/pexpireat/">PEXPIREAT</a>.
    * @return Future response.
    */
   default Future<@Nullable Response> pexpireat(List<String> args) {
@@ -1797,7 +1797,7 @@ public interface RedisAPI {
   }
 
   /**
-   * Redis command <a href="https://redis.io/commands/pexpiretime">pexpiretime</a>.
+   * Redis command <a href="https://redis.io/commands/pexpiretime/">PEXPIRETIME</a>.
    * @return Future response.
    */
   default Future<@Nullable Response> pexpiretime(String arg0) {
@@ -1805,7 +1805,7 @@ public interface RedisAPI {
   }
 
   /**
-   * Redis command <a href="https://redis.io/commands/pfadd">pfadd</a>.
+   * Redis command <a href="https://redis.io/commands/pfadd/">PFADD</a>.
    * @return Future response.
    */
   default Future<@Nullable Response> pfadd(List<String> args) {
@@ -1813,7 +1813,7 @@ public interface RedisAPI {
   }
 
   /**
-   * Redis command <a href="https://redis.io/commands/pfcount">pfcount</a>.
+   * Redis command <a href="https://redis.io/commands/pfcount/">PFCOUNT</a>.
    * @return Future response.
    */
   default Future<@Nullable Response> pfcount(List<String> args) {
@@ -1821,7 +1821,7 @@ public interface RedisAPI {
   }
 
   /**
-   * Redis command <a href="https://redis.io/commands/pfdebug">pfdebug</a>.
+   * Redis command <a href="https://redis.io/commands/pfdebug/">PFDEBUG</a>.
    * @return Future response.
    */
   default Future<@Nullable Response> pfdebug(String arg0, String arg1) {
@@ -1829,7 +1829,7 @@ public interface RedisAPI {
   }
 
   /**
-   * Redis command <a href="https://redis.io/commands/pfmerge">pfmerge</a>.
+   * Redis command <a href="https://redis.io/commands/pfmerge/">PFMERGE</a>.
    * @return Future response.
    */
   default Future<@Nullable Response> pfmerge(List<String> args) {
@@ -1837,7 +1837,7 @@ public interface RedisAPI {
   }
 
   /**
-   * Redis command <a href="https://redis.io/commands/pfselftest">pfselftest</a>.
+   * Redis command <a href="https://redis.io/commands/pfselftest/">PFSELFTEST</a>.
    * @return Future response.
    */
   default Future<@Nullable Response> pfselftest() {
@@ -1845,7 +1845,7 @@ public interface RedisAPI {
   }
 
   /**
-   * Redis command <a href="https://redis.io/commands/ping">ping</a>.
+   * Redis command <a href="https://redis.io/commands/ping/">PING</a>.
    * @return Future response.
    */
   default Future<@Nullable Response> ping(List<String> args) {
@@ -1853,7 +1853,7 @@ public interface RedisAPI {
   }
 
   /**
-   * Redis command <a href="https://redis.io/commands/psetex">psetex</a>.
+   * Redis command <a href="https://redis.io/commands/psetex/">PSETEX</a>.
    * @return Future response.
    */
   default Future<@Nullable Response> psetex(String arg0, String arg1, String arg2) {
@@ -1861,7 +1861,7 @@ public interface RedisAPI {
   }
 
   /**
-   * Redis command <a href="https://redis.io/commands/psubscribe">psubscribe</a>.
+   * Redis command <a href="https://redis.io/commands/psubscribe/">PSUBSCRIBE</a>.
    * @return Future response.
    */
   default Future<@Nullable Response> psubscribe(List<String> args) {
@@ -1869,7 +1869,7 @@ public interface RedisAPI {
   }
 
   /**
-   * Redis command <a href="https://redis.io/commands/psync">psync</a>.
+   * Redis command <a href="https://redis.io/commands/psync/">PSYNC</a>.
    * @return Future response.
    */
   default Future<@Nullable Response> psync(List<String> args) {
@@ -1877,7 +1877,7 @@ public interface RedisAPI {
   }
 
   /**
-   * Redis command <a href="https://redis.io/commands/pttl">pttl</a>.
+   * Redis command <a href="https://redis.io/commands/pttl/">PTTL</a>.
    * @return Future response.
    */
   default Future<@Nullable Response> pttl(String arg0) {
@@ -1885,7 +1885,7 @@ public interface RedisAPI {
   }
 
   /**
-   * Redis command <a href="https://redis.io/commands/publish">publish</a>.
+   * Redis command <a href="https://redis.io/commands/publish/">PUBLISH</a>.
    * @return Future response.
    */
   default Future<@Nullable Response> publish(String arg0, String arg1) {
@@ -1893,7 +1893,7 @@ public interface RedisAPI {
   }
 
   /**
-   * Redis command <a href="https://redis.io/commands/pubsub">pubsub</a>.
+   * Redis command <a href="https://redis.io/commands/pubsub/">PUBSUB</a>.
    * @return Future response.
    */
   default Future<@Nullable Response> pubsub(List<String> args) {
@@ -1901,7 +1901,7 @@ public interface RedisAPI {
   }
 
   /**
-   * Redis command <a href="https://redis.io/commands/punsubscribe">punsubscribe</a>.
+   * Redis command <a href="https://redis.io/commands/punsubscribe/">PUNSUBSCRIBE</a>.
    * @return Future response.
    */
   default Future<@Nullable Response> punsubscribe(List<String> args) {
@@ -1909,7 +1909,7 @@ public interface RedisAPI {
   }
 
   /**
-   * Redis command <a href="https://redis.io/commands/quit">quit</a>.
+   * Redis command <a href="https://redis.io/commands/quit/">QUIT</a>.
    * @return Future response.
    */
   default Future<@Nullable Response> quit(List<String> args) {
@@ -1917,7 +1917,7 @@ public interface RedisAPI {
   }
 
   /**
-   * Redis command <a href="https://redis.io/commands/randomkey">randomkey</a>.
+   * Redis command <a href="https://redis.io/commands/randomkey/">RANDOMKEY</a>.
    * @return Future response.
    */
   default Future<@Nullable Response> randomkey() {
@@ -1925,7 +1925,7 @@ public interface RedisAPI {
   }
 
   /**
-   * Redis command <a href="https://redis.io/commands/readonly">readonly</a>.
+   * Redis command <a href="https://redis.io/commands/readonly/">READONLY</a>.
    * @return Future response.
    */
   default Future<@Nullable Response> readonly() {
@@ -1933,7 +1933,7 @@ public interface RedisAPI {
   }
 
   /**
-   * Redis command <a href="https://redis.io/commands/readwrite">readwrite</a>.
+   * Redis command <a href="https://redis.io/commands/readwrite/">READWRITE</a>.
    * @return Future response.
    */
   default Future<@Nullable Response> readwrite() {
@@ -1941,7 +1941,7 @@ public interface RedisAPI {
   }
 
   /**
-   * Redis command <a href="https://redis.io/commands/rename">rename</a>.
+   * Redis command <a href="https://redis.io/commands/rename/">RENAME</a>.
    * @return Future response.
    */
   default Future<@Nullable Response> rename(String arg0, String arg1) {
@@ -1949,7 +1949,7 @@ public interface RedisAPI {
   }
 
   /**
-   * Redis command <a href="https://redis.io/commands/renamenx">renamenx</a>.
+   * Redis command <a href="https://redis.io/commands/renamenx/">RENAMENX</a>.
    * @return Future response.
    */
   default Future<@Nullable Response> renamenx(String arg0, String arg1) {
@@ -1957,7 +1957,7 @@ public interface RedisAPI {
   }
 
   /**
-   * Redis command <a href="https://redis.io/commands/replconf">replconf</a>.
+   * Redis command <a href="https://redis.io/commands/replconf/">REPLCONF</a>.
    * @return Future response.
    */
   default Future<@Nullable Response> replconf(List<String> args) {
@@ -1965,7 +1965,7 @@ public interface RedisAPI {
   }
 
   /**
-   * Redis command <a href="https://redis.io/commands/replicaof">replicaof</a>.
+   * Redis command <a href="https://redis.io/commands/replicaof/">REPLICAOF</a>.
    * @return Future response.
    */
   default Future<@Nullable Response> replicaof(String arg0, String arg1) {
@@ -1973,7 +1973,7 @@ public interface RedisAPI {
   }
 
   /**
-   * Redis command <a href="https://redis.io/commands/reset">reset</a>.
+   * Redis command <a href="https://redis.io/commands/reset/">RESET</a>.
    * @return Future response.
    */
   default Future<@Nullable Response> reset() {
@@ -1981,7 +1981,7 @@ public interface RedisAPI {
   }
 
   /**
-   * Redis command <a href="https://redis.io/commands/restore">restore</a>.
+   * Redis command <a href="https://redis.io/commands/restore/">RESTORE</a>.
    * @return Future response.
    */
   default Future<@Nullable Response> restore(List<String> args) {
@@ -1989,7 +1989,7 @@ public interface RedisAPI {
   }
 
   /**
-   * Redis command <a href="https://redis.io/commands/restore-asking">restoreAsking</a>.
+   * Redis command <a href="https://redis.io/commands/restore asking/">RESTORE-ASKING</a>.
    * @return Future response.
    */
   default Future<@Nullable Response> restoreAsking(List<String> args) {
@@ -1997,7 +1997,7 @@ public interface RedisAPI {
   }
 
   /**
-   * Redis command <a href="https://redis.io/commands/role">role</a>.
+   * Redis command <a href="https://redis.io/commands/role/">ROLE</a>.
    * @return Future response.
    */
   default Future<@Nullable Response> role() {
@@ -2005,7 +2005,7 @@ public interface RedisAPI {
   }
 
   /**
-   * Redis command <a href="https://redis.io/commands/rpop">rpop</a>.
+   * Redis command <a href="https://redis.io/commands/rpop/">RPOP</a>.
    * @return Future response.
    */
   default Future<@Nullable Response> rpop(List<String> args) {
@@ -2013,7 +2013,7 @@ public interface RedisAPI {
   }
 
   /**
-   * Redis command <a href="https://redis.io/commands/rpoplpush">rpoplpush</a>.
+   * Redis command <a href="https://redis.io/commands/rpoplpush/">RPOPLPUSH</a>.
    * @return Future response.
    */
   default Future<@Nullable Response> rpoplpush(String arg0, String arg1) {
@@ -2021,7 +2021,7 @@ public interface RedisAPI {
   }
 
   /**
-   * Redis command <a href="https://redis.io/commands/rpush">rpush</a>.
+   * Redis command <a href="https://redis.io/commands/rpush/">RPUSH</a>.
    * @return Future response.
    */
   default Future<@Nullable Response> rpush(List<String> args) {
@@ -2029,7 +2029,7 @@ public interface RedisAPI {
   }
 
   /**
-   * Redis command <a href="https://redis.io/commands/rpushx">rpushx</a>.
+   * Redis command <a href="https://redis.io/commands/rpushx/">RPUSHX</a>.
    * @return Future response.
    */
   default Future<@Nullable Response> rpushx(List<String> args) {
@@ -2037,7 +2037,7 @@ public interface RedisAPI {
   }
 
   /**
-   * Redis command <a href="https://redis.io/commands/sadd">sadd</a>.
+   * Redis command <a href="https://redis.io/commands/sadd/">SADD</a>.
    * @return Future response.
    */
   default Future<@Nullable Response> sadd(List<String> args) {
@@ -2045,7 +2045,7 @@ public interface RedisAPI {
   }
 
   /**
-   * Redis command <a href="https://redis.io/commands/save">save</a>.
+   * Redis command <a href="https://redis.io/commands/save/">SAVE</a>.
    * @return Future response.
    */
   default Future<@Nullable Response> save() {
@@ -2053,7 +2053,7 @@ public interface RedisAPI {
   }
 
   /**
-   * Redis command <a href="https://redis.io/commands/scan">scan</a>.
+   * Redis command <a href="https://redis.io/commands/scan/">SCAN</a>.
    * @return Future response.
    */
   default Future<@Nullable Response> scan(List<String> args) {
@@ -2061,7 +2061,7 @@ public interface RedisAPI {
   }
 
   /**
-   * Redis command <a href="https://redis.io/commands/scard">scard</a>.
+   * Redis command <a href="https://redis.io/commands/scard/">SCARD</a>.
    * @return Future response.
    */
   default Future<@Nullable Response> scard(String arg0) {
@@ -2069,7 +2069,7 @@ public interface RedisAPI {
   }
 
   /**
-   * Redis command <a href="https://redis.io/commands/script">script</a>.
+   * Redis command <a href="https://redis.io/commands/script/">SCRIPT</a>.
    * @return Future response.
    */
   default Future<@Nullable Response> script(List<String> args) {
@@ -2077,7 +2077,7 @@ public interface RedisAPI {
   }
 
   /**
-   * Redis command <a href="https://redis.io/commands/sdiff">sdiff</a>.
+   * Redis command <a href="https://redis.io/commands/sdiff/">SDIFF</a>.
    * @return Future response.
    */
   default Future<@Nullable Response> sdiff(List<String> args) {
@@ -2085,7 +2085,7 @@ public interface RedisAPI {
   }
 
   /**
-   * Redis command <a href="https://redis.io/commands/sdiffstore">sdiffstore</a>.
+   * Redis command <a href="https://redis.io/commands/sdiffstore/">SDIFFSTORE</a>.
    * @return Future response.
    */
   default Future<@Nullable Response> sdiffstore(List<String> args) {
@@ -2093,7 +2093,7 @@ public interface RedisAPI {
   }
 
   /**
-   * Redis command <a href="https://redis.io/commands/select">select</a>.
+   * Redis command <a href="https://redis.io/commands/select/">SELECT</a>.
    * @return Future response.
    */
   default Future<@Nullable Response> select(String arg0) {
@@ -2101,7 +2101,7 @@ public interface RedisAPI {
   }
 
   /**
-   * Redis command <a href="https://redis.io/commands/set">set</a>.
+   * Redis command <a href="https://redis.io/commands/set/">SET</a>.
    * @return Future response.
    */
   default Future<@Nullable Response> set(List<String> args) {
@@ -2109,7 +2109,7 @@ public interface RedisAPI {
   }
 
   /**
-   * Redis command <a href="https://redis.io/commands/setbit">setbit</a>.
+   * Redis command <a href="https://redis.io/commands/setbit/">SETBIT</a>.
    * @return Future response.
    */
   default Future<@Nullable Response> setbit(String arg0, String arg1, String arg2) {
@@ -2117,7 +2117,7 @@ public interface RedisAPI {
   }
 
   /**
-   * Redis command <a href="https://redis.io/commands/setex">setex</a>.
+   * Redis command <a href="https://redis.io/commands/setex/">SETEX</a>.
    * @return Future response.
    */
   default Future<@Nullable Response> setex(String arg0, String arg1, String arg2) {
@@ -2125,7 +2125,7 @@ public interface RedisAPI {
   }
 
   /**
-   * Redis command <a href="https://redis.io/commands/setnx">setnx</a>.
+   * Redis command <a href="https://redis.io/commands/setnx/">SETNX</a>.
    * @return Future response.
    */
   default Future<@Nullable Response> setnx(String arg0, String arg1) {
@@ -2133,7 +2133,7 @@ public interface RedisAPI {
   }
 
   /**
-   * Redis command <a href="https://redis.io/commands/setrange">setrange</a>.
+   * Redis command <a href="https://redis.io/commands/setrange/">SETRANGE</a>.
    * @return Future response.
    */
   default Future<@Nullable Response> setrange(String arg0, String arg1, String arg2) {
@@ -2141,7 +2141,7 @@ public interface RedisAPI {
   }
 
   /**
-   * Redis command <a href="https://redis.io/commands/shutdown">shutdown</a>.
+   * Redis command <a href="https://redis.io/commands/shutdown/">SHUTDOWN</a>.
    * @return Future response.
    */
   default Future<@Nullable Response> shutdown(List<String> args) {
@@ -2149,7 +2149,7 @@ public interface RedisAPI {
   }
 
   /**
-   * Redis command <a href="https://redis.io/commands/sinter">sinter</a>.
+   * Redis command <a href="https://redis.io/commands/sinter/">SINTER</a>.
    * @return Future response.
    */
   default Future<@Nullable Response> sinter(List<String> args) {
@@ -2157,7 +2157,7 @@ public interface RedisAPI {
   }
 
   /**
-   * Redis command <a href="https://redis.io/commands/sintercard">sintercard</a>.
+   * Redis command <a href="https://redis.io/commands/sintercard/">SINTERCARD</a>.
    * @return Future response.
    */
   default Future<@Nullable Response> sintercard(List<String> args) {
@@ -2165,7 +2165,7 @@ public interface RedisAPI {
   }
 
   /**
-   * Redis command <a href="https://redis.io/commands/sinterstore">sinterstore</a>.
+   * Redis command <a href="https://redis.io/commands/sinterstore/">SINTERSTORE</a>.
    * @return Future response.
    */
   default Future<@Nullable Response> sinterstore(List<String> args) {
@@ -2173,7 +2173,7 @@ public interface RedisAPI {
   }
 
   /**
-   * Redis command <a href="https://redis.io/commands/sismember">sismember</a>.
+   * Redis command <a href="https://redis.io/commands/sismember/">SISMEMBER</a>.
    * @return Future response.
    */
   default Future<@Nullable Response> sismember(String arg0, String arg1) {
@@ -2181,7 +2181,7 @@ public interface RedisAPI {
   }
 
   /**
-   * Redis command <a href="https://redis.io/commands/slaveof">slaveof</a>.
+   * Redis command <a href="https://redis.io/commands/slaveof/">SLAVEOF</a>.
    * @return Future response.
    */
   default Future<@Nullable Response> slaveof(String arg0, String arg1) {
@@ -2189,7 +2189,7 @@ public interface RedisAPI {
   }
 
   /**
-   * Redis command <a href="https://redis.io/commands/slowlog">slowlog</a>.
+   * Redis command <a href="https://redis.io/commands/slowlog/">SLOWLOG</a>.
    * @return Future response.
    */
   default Future<@Nullable Response> slowlog(List<String> args) {
@@ -2197,7 +2197,7 @@ public interface RedisAPI {
   }
 
   /**
-   * Redis command <a href="https://redis.io/commands/smembers">smembers</a>.
+   * Redis command <a href="https://redis.io/commands/smembers/">SMEMBERS</a>.
    * @return Future response.
    */
   default Future<@Nullable Response> smembers(String arg0) {
@@ -2205,7 +2205,7 @@ public interface RedisAPI {
   }
 
   /**
-   * Redis command <a href="https://redis.io/commands/smismember">smismember</a>.
+   * Redis command <a href="https://redis.io/commands/smismember/">SMISMEMBER</a>.
    * @return Future response.
    */
   default Future<@Nullable Response> smismember(List<String> args) {
@@ -2213,7 +2213,7 @@ public interface RedisAPI {
   }
 
   /**
-   * Redis command <a href="https://redis.io/commands/smove">smove</a>.
+   * Redis command <a href="https://redis.io/commands/smove/">SMOVE</a>.
    * @return Future response.
    */
   default Future<@Nullable Response> smove(String arg0, String arg1, String arg2) {
@@ -2221,7 +2221,7 @@ public interface RedisAPI {
   }
 
   /**
-   * Redis command <a href="https://redis.io/commands/sort">sort</a>.
+   * Redis command <a href="https://redis.io/commands/sort/">SORT</a>.
    * @return Future response.
    */
   default Future<@Nullable Response> sort(List<String> args) {
@@ -2229,7 +2229,7 @@ public interface RedisAPI {
   }
 
   /**
-   * Redis command <a href="https://redis.io/commands/sort_ro">sortRo</a>.
+   * Redis command <a href="https://redis.io/commands/sort_ro/">SORT_RO</a>.
    * @return Future response.
    */
   default Future<@Nullable Response> sortRo(List<String> args) {
@@ -2237,7 +2237,7 @@ public interface RedisAPI {
   }
 
   /**
-   * Redis command <a href="https://redis.io/commands/spop">spop</a>.
+   * Redis command <a href="https://redis.io/commands/spop/">SPOP</a>.
    * @return Future response.
    */
   default Future<@Nullable Response> spop(List<String> args) {
@@ -2245,7 +2245,7 @@ public interface RedisAPI {
   }
 
   /**
-   * Redis command <a href="https://redis.io/commands/spublish">spublish</a>.
+   * Redis command <a href="https://redis.io/commands/spublish/">SPUBLISH</a>.
    * @return Future response.
    */
   default Future<@Nullable Response> spublish(String arg0, String arg1) {
@@ -2253,7 +2253,7 @@ public interface RedisAPI {
   }
 
   /**
-   * Redis command <a href="https://redis.io/commands/srandmember">srandmember</a>.
+   * Redis command <a href="https://redis.io/commands/srandmember/">SRANDMEMBER</a>.
    * @return Future response.
    */
   default Future<@Nullable Response> srandmember(List<String> args) {
@@ -2261,7 +2261,7 @@ public interface RedisAPI {
   }
 
   /**
-   * Redis command <a href="https://redis.io/commands/srem">srem</a>.
+   * Redis command <a href="https://redis.io/commands/srem/">SREM</a>.
    * @return Future response.
    */
   default Future<@Nullable Response> srem(List<String> args) {
@@ -2269,7 +2269,7 @@ public interface RedisAPI {
   }
 
   /**
-   * Redis command <a href="https://redis.io/commands/sscan">sscan</a>.
+   * Redis command <a href="https://redis.io/commands/sscan/">SSCAN</a>.
    * @return Future response.
    */
   default Future<@Nullable Response> sscan(List<String> args) {
@@ -2277,7 +2277,7 @@ public interface RedisAPI {
   }
 
   /**
-   * Redis command <a href="https://redis.io/commands/ssubscribe">ssubscribe</a>.
+   * Redis command <a href="https://redis.io/commands/ssubscribe/">SSUBSCRIBE</a>.
    * @return Future response.
    */
   default Future<@Nullable Response> ssubscribe(List<String> args) {
@@ -2285,7 +2285,7 @@ public interface RedisAPI {
   }
 
   /**
-   * Redis command <a href="https://redis.io/commands/strlen">strlen</a>.
+   * Redis command <a href="https://redis.io/commands/strlen/">STRLEN</a>.
    * @return Future response.
    */
   default Future<@Nullable Response> strlen(String arg0) {
@@ -2293,7 +2293,7 @@ public interface RedisAPI {
   }
 
   /**
-   * Redis command <a href="https://redis.io/commands/subscribe">subscribe</a>.
+   * Redis command <a href="https://redis.io/commands/subscribe/">SUBSCRIBE</a>.
    * @return Future response.
    */
   default Future<@Nullable Response> subscribe(List<String> args) {
@@ -2301,7 +2301,7 @@ public interface RedisAPI {
   }
 
   /**
-   * Redis command <a href="https://redis.io/commands/substr">substr</a>.
+   * Redis command <a href="https://redis.io/commands/substr/">SUBSTR</a>.
    * @return Future response.
    */
   default Future<@Nullable Response> substr(String arg0, String arg1, String arg2) {
@@ -2309,7 +2309,7 @@ public interface RedisAPI {
   }
 
   /**
-   * Redis command <a href="https://redis.io/commands/sunion">sunion</a>.
+   * Redis command <a href="https://redis.io/commands/sunion/">SUNION</a>.
    * @return Future response.
    */
   default Future<@Nullable Response> sunion(List<String> args) {
@@ -2317,7 +2317,7 @@ public interface RedisAPI {
   }
 
   /**
-   * Redis command <a href="https://redis.io/commands/sunionstore">sunionstore</a>.
+   * Redis command <a href="https://redis.io/commands/sunionstore/">SUNIONSTORE</a>.
    * @return Future response.
    */
   default Future<@Nullable Response> sunionstore(List<String> args) {
@@ -2325,7 +2325,7 @@ public interface RedisAPI {
   }
 
   /**
-   * Redis command <a href="https://redis.io/commands/sunsubscribe">sunsubscribe</a>.
+   * Redis command <a href="https://redis.io/commands/sunsubscribe/">SUNSUBSCRIBE</a>.
    * @return Future response.
    */
   default Future<@Nullable Response> sunsubscribe(List<String> args) {
@@ -2333,7 +2333,7 @@ public interface RedisAPI {
   }
 
   /**
-   * Redis command <a href="https://redis.io/commands/swapdb">swapdb</a>.
+   * Redis command <a href="https://redis.io/commands/swapdb/">SWAPDB</a>.
    * @return Future response.
    */
   default Future<@Nullable Response> swapdb(String arg0, String arg1) {
@@ -2341,7 +2341,7 @@ public interface RedisAPI {
   }
 
   /**
-   * Redis command <a href="https://redis.io/commands/sync">sync</a>.
+   * Redis command <a href="https://redis.io/commands/sync/">SYNC</a>.
    * @return Future response.
    */
   default Future<@Nullable Response> sync() {
@@ -2349,7 +2349,7 @@ public interface RedisAPI {
   }
 
   /**
-   * Redis command <a href="https://redis.io/commands/tdigest.add">tdigestAdd</a>.
+   * Redis command <a href="https://redis.io/commands/tdigest.add/">TDIGEST.ADD</a>.
    * @return Future response.
    */
   default Future<@Nullable Response> tdigestAdd(List<String> args) {
@@ -2357,7 +2357,7 @@ public interface RedisAPI {
   }
 
   /**
-   * Redis command <a href="https://redis.io/commands/tdigest.byrank">tdigestByrank</a>.
+   * Redis command <a href="https://redis.io/commands/tdigest.byrank/">TDIGEST.BYRANK</a>.
    * @return Future response.
    */
   default Future<@Nullable Response> tdigestByrank(List<String> args) {
@@ -2365,7 +2365,7 @@ public interface RedisAPI {
   }
 
   /**
-   * Redis command <a href="https://redis.io/commands/tdigest.byrevrank">tdigestByrevrank</a>.
+   * Redis command <a href="https://redis.io/commands/tdigest.byrevrank/">TDIGEST.BYREVRANK</a>.
    * @return Future response.
    */
   default Future<@Nullable Response> tdigestByrevrank(List<String> args) {
@@ -2373,7 +2373,7 @@ public interface RedisAPI {
   }
 
   /**
-   * Redis command <a href="https://redis.io/commands/tdigest.cdf">tdigestCdf</a>.
+   * Redis command <a href="https://redis.io/commands/tdigest.cdf/">TDIGEST.CDF</a>.
    * @return Future response.
    */
   default Future<@Nullable Response> tdigestCdf(List<String> args) {
@@ -2381,7 +2381,7 @@ public interface RedisAPI {
   }
 
   /**
-   * Redis command <a href="https://redis.io/commands/tdigest.create">tdigestCreate</a>.
+   * Redis command <a href="https://redis.io/commands/tdigest.create/">TDIGEST.CREATE</a>.
    * @return Future response.
    */
   default Future<@Nullable Response> tdigestCreate(List<String> args) {
@@ -2389,7 +2389,7 @@ public interface RedisAPI {
   }
 
   /**
-   * Redis command <a href="https://redis.io/commands/tdigest.info">tdigestInfo</a>.
+   * Redis command <a href="https://redis.io/commands/tdigest.info/">TDIGEST.INFO</a>.
    * @return Future response.
    */
   default Future<@Nullable Response> tdigestInfo(List<String> args) {
@@ -2397,7 +2397,7 @@ public interface RedisAPI {
   }
 
   /**
-   * Redis command <a href="https://redis.io/commands/tdigest.max">tdigestMax</a>.
+   * Redis command <a href="https://redis.io/commands/tdigest.max/">TDIGEST.MAX</a>.
    * @return Future response.
    */
   default Future<@Nullable Response> tdigestMax(List<String> args) {
@@ -2405,7 +2405,7 @@ public interface RedisAPI {
   }
 
   /**
-   * Redis command <a href="https://redis.io/commands/tdigest.merge">tdigestMerge</a>.
+   * Redis command <a href="https://redis.io/commands/tdigest.merge/">TDIGEST.MERGE</a>.
    * @return Future response.
    */
   default Future<@Nullable Response> tdigestMerge(List<String> args) {
@@ -2413,7 +2413,7 @@ public interface RedisAPI {
   }
 
   /**
-   * Redis command <a href="https://redis.io/commands/tdigest.min">tdigestMin</a>.
+   * Redis command <a href="https://redis.io/commands/tdigest.min/">TDIGEST.MIN</a>.
    * @return Future response.
    */
   default Future<@Nullable Response> tdigestMin(List<String> args) {
@@ -2421,7 +2421,7 @@ public interface RedisAPI {
   }
 
   /**
-   * Redis command <a href="https://redis.io/commands/tdigest.quantile">tdigestQuantile</a>.
+   * Redis command <a href="https://redis.io/commands/tdigest.quantile/">TDIGEST.QUANTILE</a>.
    * @return Future response.
    */
   default Future<@Nullable Response> tdigestQuantile(List<String> args) {
@@ -2429,7 +2429,7 @@ public interface RedisAPI {
   }
 
   /**
-   * Redis command <a href="https://redis.io/commands/tdigest.rank">tdigestRank</a>.
+   * Redis command <a href="https://redis.io/commands/tdigest.rank/">TDIGEST.RANK</a>.
    * @return Future response.
    */
   default Future<@Nullable Response> tdigestRank(List<String> args) {
@@ -2437,7 +2437,7 @@ public interface RedisAPI {
   }
 
   /**
-   * Redis command <a href="https://redis.io/commands/tdigest.reset">tdigestReset</a>.
+   * Redis command <a href="https://redis.io/commands/tdigest.reset/">TDIGEST.RESET</a>.
    * @return Future response.
    */
   default Future<@Nullable Response> tdigestReset(List<String> args) {
@@ -2445,7 +2445,7 @@ public interface RedisAPI {
   }
 
   /**
-   * Redis command <a href="https://redis.io/commands/tdigest.revrank">tdigestRevrank</a>.
+   * Redis command <a href="https://redis.io/commands/tdigest.revrank/">TDIGEST.REVRANK</a>.
    * @return Future response.
    */
   default Future<@Nullable Response> tdigestRevrank(List<String> args) {
@@ -2453,7 +2453,7 @@ public interface RedisAPI {
   }
 
   /**
-   * Redis command <a href="https://redis.io/commands/tdigest.trimmed_mean">tdigestTrimmedMean</a>.
+   * Redis command <a href="https://redis.io/commands/tdigest.trimmed_mean/">TDIGEST.TRIMMED_MEAN</a>.
    * @return Future response.
    */
   default Future<@Nullable Response> tdigestTrimmedMean(List<String> args) {
@@ -2461,7 +2461,7 @@ public interface RedisAPI {
   }
 
   /**
-   * Redis command <a href="https://redis.io/commands/time">time</a>.
+   * Redis command <a href="https://redis.io/commands/time/">TIME</a>.
    * @return Future response.
    */
   default Future<@Nullable Response> time() {
@@ -2469,7 +2469,7 @@ public interface RedisAPI {
   }
 
   /**
-   * Redis command <a href="https://redis.io/commands/timeseries.CLUSTERSET">timeseriesClusterset</a>.
+   * Redis command <a href="https://redis.io/commands/timeseries.clusterset/">TIMESERIES.CLUSTERSET</a>.
    * @return Future response.
    */
   default Future<@Nullable Response> timeseriesClusterset(List<String> args) {
@@ -2477,7 +2477,7 @@ public interface RedisAPI {
   }
 
   /**
-   * Redis command <a href="https://redis.io/commands/timeseries.CLUSTERSETFROMSHARD">timeseriesClustersetfromshard</a>.
+   * Redis command <a href="https://redis.io/commands/timeseries.clustersetfromshard/">TIMESERIES.CLUSTERSETFROMSHARD</a>.
    * @return Future response.
    */
   default Future<@Nullable Response> timeseriesClustersetfromshard(List<String> args) {
@@ -2485,7 +2485,7 @@ public interface RedisAPI {
   }
 
   /**
-   * Redis command <a href="https://redis.io/commands/timeseries.HELLO">timeseriesHello</a>.
+   * Redis command <a href="https://redis.io/commands/timeseries.hello/">TIMESERIES.HELLO</a>.
    * @return Future response.
    */
   default Future<@Nullable Response> timeseriesHello(List<String> args) {
@@ -2493,7 +2493,7 @@ public interface RedisAPI {
   }
 
   /**
-   * Redis command <a href="https://redis.io/commands/timeseries.INFOCLUSTER">timeseriesInfocluster</a>.
+   * Redis command <a href="https://redis.io/commands/timeseries.infocluster/">TIMESERIES.INFOCLUSTER</a>.
    * @return Future response.
    */
   default Future<@Nullable Response> timeseriesInfocluster(List<String> args) {
@@ -2501,7 +2501,7 @@ public interface RedisAPI {
   }
 
   /**
-   * Redis command <a href="https://redis.io/commands/timeseries.INNERCOMMUNICATION">timeseriesInnercommunication</a>.
+   * Redis command <a href="https://redis.io/commands/timeseries.innercommunication/">TIMESERIES.INNERCOMMUNICATION</a>.
    * @return Future response.
    */
   default Future<@Nullable Response> timeseriesInnercommunication(List<String> args) {
@@ -2509,7 +2509,7 @@ public interface RedisAPI {
   }
 
   /**
-   * Redis command <a href="https://redis.io/commands/timeseries.NETWORKTEST">timeseriesNetworktest</a>.
+   * Redis command <a href="https://redis.io/commands/timeseries.networktest/">TIMESERIES.NETWORKTEST</a>.
    * @return Future response.
    */
   default Future<@Nullable Response> timeseriesNetworktest(List<String> args) {
@@ -2517,7 +2517,7 @@ public interface RedisAPI {
   }
 
   /**
-   * Redis command <a href="https://redis.io/commands/timeseries.REFRESHCLUSTER">timeseriesRefreshcluster</a>.
+   * Redis command <a href="https://redis.io/commands/timeseries.refreshcluster/">TIMESERIES.REFRESHCLUSTER</a>.
    * @return Future response.
    */
   default Future<@Nullable Response> timeseriesRefreshcluster(List<String> args) {
@@ -2525,7 +2525,7 @@ public interface RedisAPI {
   }
 
   /**
-   * Redis command <a href="https://redis.io/commands/topk.add">topkAdd</a>.
+   * Redis command <a href="https://redis.io/commands/topk.add/">TOPK.ADD</a>.
    * @return Future response.
    */
   default Future<@Nullable Response> topkAdd(List<String> args) {
@@ -2533,7 +2533,7 @@ public interface RedisAPI {
   }
 
   /**
-   * Redis command <a href="https://redis.io/commands/topk.count">topkCount</a>.
+   * Redis command <a href="https://redis.io/commands/topk.count/">TOPK.COUNT</a>.
    * @return Future response.
    */
   default Future<@Nullable Response> topkCount(List<String> args) {
@@ -2541,7 +2541,7 @@ public interface RedisAPI {
   }
 
   /**
-   * Redis command <a href="https://redis.io/commands/topk.incrby">topkIncrby</a>.
+   * Redis command <a href="https://redis.io/commands/topk.incrby/">TOPK.INCRBY</a>.
    * @return Future response.
    */
   default Future<@Nullable Response> topkIncrby(List<String> args) {
@@ -2549,7 +2549,7 @@ public interface RedisAPI {
   }
 
   /**
-   * Redis command <a href="https://redis.io/commands/topk.info">topkInfo</a>.
+   * Redis command <a href="https://redis.io/commands/topk.info/">TOPK.INFO</a>.
    * @return Future response.
    */
   default Future<@Nullable Response> topkInfo(List<String> args) {
@@ -2557,7 +2557,7 @@ public interface RedisAPI {
   }
 
   /**
-   * Redis command <a href="https://redis.io/commands/topk.list">topkList</a>.
+   * Redis command <a href="https://redis.io/commands/topk.list/">TOPK.LIST</a>.
    * @return Future response.
    */
   default Future<@Nullable Response> topkList(List<String> args) {
@@ -2565,7 +2565,7 @@ public interface RedisAPI {
   }
 
   /**
-   * Redis command <a href="https://redis.io/commands/topk.query">topkQuery</a>.
+   * Redis command <a href="https://redis.io/commands/topk.query/">TOPK.QUERY</a>.
    * @return Future response.
    */
   default Future<@Nullable Response> topkQuery(List<String> args) {
@@ -2573,7 +2573,7 @@ public interface RedisAPI {
   }
 
   /**
-   * Redis command <a href="https://redis.io/commands/topk.reserve">topkReserve</a>.
+   * Redis command <a href="https://redis.io/commands/topk.reserve/">TOPK.RESERVE</a>.
    * @return Future response.
    */
   default Future<@Nullable Response> topkReserve(List<String> args) {
@@ -2581,7 +2581,7 @@ public interface RedisAPI {
   }
 
   /**
-   * Redis command <a href="https://redis.io/commands/touch">touch</a>.
+   * Redis command <a href="https://redis.io/commands/touch/">TOUCH</a>.
    * @return Future response.
    */
   default Future<@Nullable Response> touch(List<String> args) {
@@ -2589,7 +2589,7 @@ public interface RedisAPI {
   }
 
   /**
-   * Redis command <a href="https://redis.io/commands/ts.add">tsAdd</a>.
+   * Redis command <a href="https://redis.io/commands/ts.add/">TS.ADD</a>.
    * @return Future response.
    */
   default Future<@Nullable Response> tsAdd(List<String> args) {
@@ -2597,7 +2597,7 @@ public interface RedisAPI {
   }
 
   /**
-   * Redis command <a href="https://redis.io/commands/ts.alter">tsAlter</a>.
+   * Redis command <a href="https://redis.io/commands/ts.alter/">TS.ALTER</a>.
    * @return Future response.
    */
   default Future<@Nullable Response> tsAlter(List<String> args) {
@@ -2605,7 +2605,7 @@ public interface RedisAPI {
   }
 
   /**
-   * Redis command <a href="https://redis.io/commands/ts.create">tsCreate</a>.
+   * Redis command <a href="https://redis.io/commands/ts.create/">TS.CREATE</a>.
    * @return Future response.
    */
   default Future<@Nullable Response> tsCreate(List<String> args) {
@@ -2613,7 +2613,7 @@ public interface RedisAPI {
   }
 
   /**
-   * Redis command <a href="https://redis.io/commands/ts.createrule">tsCreaterule</a>.
+   * Redis command <a href="https://redis.io/commands/ts.createrule/">TS.CREATERULE</a>.
    * @return Future response.
    */
   default Future<@Nullable Response> tsCreaterule(List<String> args) {
@@ -2621,7 +2621,7 @@ public interface RedisAPI {
   }
 
   /**
-   * Redis command <a href="https://redis.io/commands/ts.decrby">tsDecrby</a>.
+   * Redis command <a href="https://redis.io/commands/ts.decrby/">TS.DECRBY</a>.
    * @return Future response.
    */
   default Future<@Nullable Response> tsDecrby(List<String> args) {
@@ -2629,7 +2629,7 @@ public interface RedisAPI {
   }
 
   /**
-   * Redis command <a href="https://redis.io/commands/ts.del">tsDel</a>.
+   * Redis command <a href="https://redis.io/commands/ts.del/">TS.DEL</a>.
    * @return Future response.
    */
   default Future<@Nullable Response> tsDel(List<String> args) {
@@ -2637,7 +2637,7 @@ public interface RedisAPI {
   }
 
   /**
-   * Redis command <a href="https://redis.io/commands/ts.deleterule">tsDeleterule</a>.
+   * Redis command <a href="https://redis.io/commands/ts.deleterule/">TS.DELETERULE</a>.
    * @return Future response.
    */
   default Future<@Nullable Response> tsDeleterule(List<String> args) {
@@ -2645,7 +2645,7 @@ public interface RedisAPI {
   }
 
   /**
-   * Redis command <a href="https://redis.io/commands/ts.get">tsGet</a>.
+   * Redis command <a href="https://redis.io/commands/ts.get/">TS.GET</a>.
    * @return Future response.
    */
   default Future<@Nullable Response> tsGet(List<String> args) {
@@ -2653,7 +2653,7 @@ public interface RedisAPI {
   }
 
   /**
-   * Redis command <a href="https://redis.io/commands/ts.incrby">tsIncrby</a>.
+   * Redis command <a href="https://redis.io/commands/ts.incrby/">TS.INCRBY</a>.
    * @return Future response.
    */
   default Future<@Nullable Response> tsIncrby(List<String> args) {
@@ -2661,7 +2661,7 @@ public interface RedisAPI {
   }
 
   /**
-   * Redis command <a href="https://redis.io/commands/ts.info">tsInfo</a>.
+   * Redis command <a href="https://redis.io/commands/ts.info/">TS.INFO</a>.
    * @return Future response.
    */
   default Future<@Nullable Response> tsInfo(List<String> args) {
@@ -2669,7 +2669,7 @@ public interface RedisAPI {
   }
 
   /**
-   * Redis command <a href="https://redis.io/commands/ts.madd">tsMadd</a>.
+   * Redis command <a href="https://redis.io/commands/ts.madd/">TS.MADD</a>.
    * @return Future response.
    */
   default Future<@Nullable Response> tsMadd(List<String> args) {
@@ -2677,7 +2677,7 @@ public interface RedisAPI {
   }
 
   /**
-   * Redis command <a href="https://redis.io/commands/ts.mget">tsMget</a>.
+   * Redis command <a href="https://redis.io/commands/ts.mget/">TS.MGET</a>.
    * @return Future response.
    */
   default Future<@Nullable Response> tsMget(List<String> args) {
@@ -2685,7 +2685,7 @@ public interface RedisAPI {
   }
 
   /**
-   * Redis command <a href="https://redis.io/commands/ts.mrange">tsMrange</a>.
+   * Redis command <a href="https://redis.io/commands/ts.mrange/">TS.MRANGE</a>.
    * @return Future response.
    */
   default Future<@Nullable Response> tsMrange(List<String> args) {
@@ -2693,7 +2693,7 @@ public interface RedisAPI {
   }
 
   /**
-   * Redis command <a href="https://redis.io/commands/ts.mrevrange">tsMrevrange</a>.
+   * Redis command <a href="https://redis.io/commands/ts.mrevrange/">TS.MREVRANGE</a>.
    * @return Future response.
    */
   default Future<@Nullable Response> tsMrevrange(List<String> args) {
@@ -2701,7 +2701,7 @@ public interface RedisAPI {
   }
 
   /**
-   * Redis command <a href="https://redis.io/commands/ts.queryindex">tsQueryindex</a>.
+   * Redis command <a href="https://redis.io/commands/ts.queryindex/">TS.QUERYINDEX</a>.
    * @return Future response.
    */
   default Future<@Nullable Response> tsQueryindex(List<String> args) {
@@ -2709,7 +2709,7 @@ public interface RedisAPI {
   }
 
   /**
-   * Redis command <a href="https://redis.io/commands/ts.range">tsRange</a>.
+   * Redis command <a href="https://redis.io/commands/ts.range/">TS.RANGE</a>.
    * @return Future response.
    */
   default Future<@Nullable Response> tsRange(List<String> args) {
@@ -2717,7 +2717,7 @@ public interface RedisAPI {
   }
 
   /**
-   * Redis command <a href="https://redis.io/commands/ts.revrange">tsRevrange</a>.
+   * Redis command <a href="https://redis.io/commands/ts.revrange/">TS.REVRANGE</a>.
    * @return Future response.
    */
   default Future<@Nullable Response> tsRevrange(List<String> args) {
@@ -2725,7 +2725,7 @@ public interface RedisAPI {
   }
 
   /**
-   * Redis command <a href="https://redis.io/commands/ttl">ttl</a>.
+   * Redis command <a href="https://redis.io/commands/ttl/">TTL</a>.
    * @return Future response.
    */
   default Future<@Nullable Response> ttl(String arg0) {
@@ -2733,7 +2733,7 @@ public interface RedisAPI {
   }
 
   /**
-   * Redis command <a href="https://redis.io/commands/type">type</a>.
+   * Redis command <a href="https://redis.io/commands/type/">TYPE</a>.
    * @return Future response.
    */
   default Future<@Nullable Response> type(String arg0) {
@@ -2741,7 +2741,7 @@ public interface RedisAPI {
   }
 
   /**
-   * Redis command <a href="https://redis.io/commands/unlink">unlink</a>.
+   * Redis command <a href="https://redis.io/commands/unlink/">UNLINK</a>.
    * @return Future response.
    */
   default Future<@Nullable Response> unlink(List<String> args) {
@@ -2749,7 +2749,7 @@ public interface RedisAPI {
   }
 
   /**
-   * Redis command <a href="https://redis.io/commands/unsubscribe">unsubscribe</a>.
+   * Redis command <a href="https://redis.io/commands/unsubscribe/">UNSUBSCRIBE</a>.
    * @return Future response.
    */
   default Future<@Nullable Response> unsubscribe(List<String> args) {
@@ -2757,7 +2757,7 @@ public interface RedisAPI {
   }
 
   /**
-   * Redis command <a href="https://redis.io/commands/unwatch">unwatch</a>.
+   * Redis command <a href="https://redis.io/commands/unwatch/">UNWATCH</a>.
    * @return Future response.
    */
   default Future<@Nullable Response> unwatch() {
@@ -2765,7 +2765,7 @@ public interface RedisAPI {
   }
 
   /**
-   * Redis command <a href="https://redis.io/commands/wait">wait</a>.
+   * Redis command <a href="https://redis.io/commands/wait/">WAIT</a>.
    * @return Future response.
    */
   default Future<@Nullable Response> wait(String arg0, String arg1) {
@@ -2773,7 +2773,7 @@ public interface RedisAPI {
   }
 
   /**
-   * Redis command <a href="https://redis.io/commands/watch">watch</a>.
+   * Redis command <a href="https://redis.io/commands/watch/">WATCH</a>.
    * @return Future response.
    */
   default Future<@Nullable Response> watch(List<String> args) {
@@ -2781,7 +2781,7 @@ public interface RedisAPI {
   }
 
   /**
-   * Redis command <a href="https://redis.io/commands/xack">xack</a>.
+   * Redis command <a href="https://redis.io/commands/xack/">XACK</a>.
    * @return Future response.
    */
   default Future<@Nullable Response> xack(List<String> args) {
@@ -2789,7 +2789,7 @@ public interface RedisAPI {
   }
 
   /**
-   * Redis command <a href="https://redis.io/commands/xadd">xadd</a>.
+   * Redis command <a href="https://redis.io/commands/xadd/">XADD</a>.
    * @return Future response.
    */
   default Future<@Nullable Response> xadd(List<String> args) {
@@ -2797,7 +2797,7 @@ public interface RedisAPI {
   }
 
   /**
-   * Redis command <a href="https://redis.io/commands/xautoclaim">xautoclaim</a>.
+   * Redis command <a href="https://redis.io/commands/xautoclaim/">XAUTOCLAIM</a>.
    * @return Future response.
    */
   default Future<@Nullable Response> xautoclaim(List<String> args) {
@@ -2805,7 +2805,7 @@ public interface RedisAPI {
   }
 
   /**
-   * Redis command <a href="https://redis.io/commands/xclaim">xclaim</a>.
+   * Redis command <a href="https://redis.io/commands/xclaim/">XCLAIM</a>.
    * @return Future response.
    */
   default Future<@Nullable Response> xclaim(List<String> args) {
@@ -2813,7 +2813,7 @@ public interface RedisAPI {
   }
 
   /**
-   * Redis command <a href="https://redis.io/commands/xdel">xdel</a>.
+   * Redis command <a href="https://redis.io/commands/xdel/">XDEL</a>.
    * @return Future response.
    */
   default Future<@Nullable Response> xdel(List<String> args) {
@@ -2821,7 +2821,7 @@ public interface RedisAPI {
   }
 
   /**
-   * Redis command <a href="https://redis.io/commands/xgroup">xgroup</a>.
+   * Redis command <a href="https://redis.io/commands/xgroup/">XGROUP</a>.
    * @return Future response.
    */
   default Future<@Nullable Response> xgroup(List<String> args) {
@@ -2829,7 +2829,7 @@ public interface RedisAPI {
   }
 
   /**
-   * Redis command <a href="https://redis.io/commands/xinfo">xinfo</a>.
+   * Redis command <a href="https://redis.io/commands/xinfo/">XINFO</a>.
    * @return Future response.
    */
   default Future<@Nullable Response> xinfo(List<String> args) {
@@ -2837,7 +2837,7 @@ public interface RedisAPI {
   }
 
   /**
-   * Redis command <a href="https://redis.io/commands/xlen">xlen</a>.
+   * Redis command <a href="https://redis.io/commands/xlen/">XLEN</a>.
    * @return Future response.
    */
   default Future<@Nullable Response> xlen(String arg0) {
@@ -2845,7 +2845,7 @@ public interface RedisAPI {
   }
 
   /**
-   * Redis command <a href="https://redis.io/commands/xpending">xpending</a>.
+   * Redis command <a href="https://redis.io/commands/xpending/">XPENDING</a>.
    * @return Future response.
    */
   default Future<@Nullable Response> xpending(List<String> args) {
@@ -2853,7 +2853,7 @@ public interface RedisAPI {
   }
 
   /**
-   * Redis command <a href="https://redis.io/commands/xrange">xrange</a>.
+   * Redis command <a href="https://redis.io/commands/xrange/">XRANGE</a>.
    * @return Future response.
    */
   default Future<@Nullable Response> xrange(List<String> args) {
@@ -2861,7 +2861,7 @@ public interface RedisAPI {
   }
 
   /**
-   * Redis command <a href="https://redis.io/commands/xread">xread</a>.
+   * Redis command <a href="https://redis.io/commands/xread/">XREAD</a>.
    * @return Future response.
    */
   default Future<@Nullable Response> xread(List<String> args) {
@@ -2869,7 +2869,7 @@ public interface RedisAPI {
   }
 
   /**
-   * Redis command <a href="https://redis.io/commands/xreadgroup">xreadgroup</a>.
+   * Redis command <a href="https://redis.io/commands/xreadgroup/">XREADGROUP</a>.
    * @return Future response.
    */
   default Future<@Nullable Response> xreadgroup(List<String> args) {
@@ -2877,7 +2877,7 @@ public interface RedisAPI {
   }
 
   /**
-   * Redis command <a href="https://redis.io/commands/xrevrange">xrevrange</a>.
+   * Redis command <a href="https://redis.io/commands/xrevrange/">XREVRANGE</a>.
    * @return Future response.
    */
   default Future<@Nullable Response> xrevrange(List<String> args) {
@@ -2885,7 +2885,7 @@ public interface RedisAPI {
   }
 
   /**
-   * Redis command <a href="https://redis.io/commands/xsetid">xsetid</a>.
+   * Redis command <a href="https://redis.io/commands/xsetid/">XSETID</a>.
    * @return Future response.
    */
   default Future<@Nullable Response> xsetid(List<String> args) {
@@ -2893,7 +2893,7 @@ public interface RedisAPI {
   }
 
   /**
-   * Redis command <a href="https://redis.io/commands/xtrim">xtrim</a>.
+   * Redis command <a href="https://redis.io/commands/xtrim/">XTRIM</a>.
    * @return Future response.
    */
   default Future<@Nullable Response> xtrim(List<String> args) {
@@ -2901,7 +2901,7 @@ public interface RedisAPI {
   }
 
   /**
-   * Redis command <a href="https://redis.io/commands/zadd">zadd</a>.
+   * Redis command <a href="https://redis.io/commands/zadd/">ZADD</a>.
    * @return Future response.
    */
   default Future<@Nullable Response> zadd(List<String> args) {
@@ -2909,7 +2909,7 @@ public interface RedisAPI {
   }
 
   /**
-   * Redis command <a href="https://redis.io/commands/zcard">zcard</a>.
+   * Redis command <a href="https://redis.io/commands/zcard/">ZCARD</a>.
    * @return Future response.
    */
   default Future<@Nullable Response> zcard(String arg0) {
@@ -2917,7 +2917,7 @@ public interface RedisAPI {
   }
 
   /**
-   * Redis command <a href="https://redis.io/commands/zcount">zcount</a>.
+   * Redis command <a href="https://redis.io/commands/zcount/">ZCOUNT</a>.
    * @return Future response.
    */
   default Future<@Nullable Response> zcount(String arg0, String arg1, String arg2) {
@@ -2925,7 +2925,7 @@ public interface RedisAPI {
   }
 
   /**
-   * Redis command <a href="https://redis.io/commands/zdiff">zdiff</a>.
+   * Redis command <a href="https://redis.io/commands/zdiff/">ZDIFF</a>.
    * @return Future response.
    */
   default Future<@Nullable Response> zdiff(List<String> args) {
@@ -2933,7 +2933,7 @@ public interface RedisAPI {
   }
 
   /**
-   * Redis command <a href="https://redis.io/commands/zdiffstore">zdiffstore</a>.
+   * Redis command <a href="https://redis.io/commands/zdiffstore/">ZDIFFSTORE</a>.
    * @return Future response.
    */
   default Future<@Nullable Response> zdiffstore(List<String> args) {
@@ -2941,7 +2941,7 @@ public interface RedisAPI {
   }
 
   /**
-   * Redis command <a href="https://redis.io/commands/zincrby">zincrby</a>.
+   * Redis command <a href="https://redis.io/commands/zincrby/">ZINCRBY</a>.
    * @return Future response.
    */
   default Future<@Nullable Response> zincrby(String arg0, String arg1, String arg2) {
@@ -2949,7 +2949,7 @@ public interface RedisAPI {
   }
 
   /**
-   * Redis command <a href="https://redis.io/commands/zinter">zinter</a>.
+   * Redis command <a href="https://redis.io/commands/zinter/">ZINTER</a>.
    * @return Future response.
    */
   default Future<@Nullable Response> zinter(List<String> args) {
@@ -2957,7 +2957,7 @@ public interface RedisAPI {
   }
 
   /**
-   * Redis command <a href="https://redis.io/commands/zintercard">zintercard</a>.
+   * Redis command <a href="https://redis.io/commands/zintercard/">ZINTERCARD</a>.
    * @return Future response.
    */
   default Future<@Nullable Response> zintercard(List<String> args) {
@@ -2965,7 +2965,7 @@ public interface RedisAPI {
   }
 
   /**
-   * Redis command <a href="https://redis.io/commands/zinterstore">zinterstore</a>.
+   * Redis command <a href="https://redis.io/commands/zinterstore/">ZINTERSTORE</a>.
    * @return Future response.
    */
   default Future<@Nullable Response> zinterstore(List<String> args) {
@@ -2973,7 +2973,7 @@ public interface RedisAPI {
   }
 
   /**
-   * Redis command <a href="https://redis.io/commands/zlexcount">zlexcount</a>.
+   * Redis command <a href="https://redis.io/commands/zlexcount/">ZLEXCOUNT</a>.
    * @return Future response.
    */
   default Future<@Nullable Response> zlexcount(String arg0, String arg1, String arg2) {
@@ -2981,7 +2981,7 @@ public interface RedisAPI {
   }
 
   /**
-   * Redis command <a href="https://redis.io/commands/zmpop">zmpop</a>.
+   * Redis command <a href="https://redis.io/commands/zmpop/">ZMPOP</a>.
    * @return Future response.
    */
   default Future<@Nullable Response> zmpop(List<String> args) {
@@ -2989,7 +2989,7 @@ public interface RedisAPI {
   }
 
   /**
-   * Redis command <a href="https://redis.io/commands/zmscore">zmscore</a>.
+   * Redis command <a href="https://redis.io/commands/zmscore/">ZMSCORE</a>.
    * @return Future response.
    */
   default Future<@Nullable Response> zmscore(List<String> args) {
@@ -2997,7 +2997,7 @@ public interface RedisAPI {
   }
 
   /**
-   * Redis command <a href="https://redis.io/commands/zpopmax">zpopmax</a>.
+   * Redis command <a href="https://redis.io/commands/zpopmax/">ZPOPMAX</a>.
    * @return Future response.
    */
   default Future<@Nullable Response> zpopmax(List<String> args) {
@@ -3005,7 +3005,7 @@ public interface RedisAPI {
   }
 
   /**
-   * Redis command <a href="https://redis.io/commands/zpopmin">zpopmin</a>.
+   * Redis command <a href="https://redis.io/commands/zpopmin/">ZPOPMIN</a>.
    * @return Future response.
    */
   default Future<@Nullable Response> zpopmin(List<String> args) {
@@ -3013,7 +3013,7 @@ public interface RedisAPI {
   }
 
   /**
-   * Redis command <a href="https://redis.io/commands/zrandmember">zrandmember</a>.
+   * Redis command <a href="https://redis.io/commands/zrandmember/">ZRANDMEMBER</a>.
    * @return Future response.
    */
   default Future<@Nullable Response> zrandmember(List<String> args) {
@@ -3021,7 +3021,7 @@ public interface RedisAPI {
   }
 
   /**
-   * Redis command <a href="https://redis.io/commands/zrange">zrange</a>.
+   * Redis command <a href="https://redis.io/commands/zrange/">ZRANGE</a>.
    * @return Future response.
    */
   default Future<@Nullable Response> zrange(List<String> args) {
@@ -3029,7 +3029,7 @@ public interface RedisAPI {
   }
 
   /**
-   * Redis command <a href="https://redis.io/commands/zrangebylex">zrangebylex</a>.
+   * Redis command <a href="https://redis.io/commands/zrangebylex/">ZRANGEBYLEX</a>.
    * @return Future response.
    */
   default Future<@Nullable Response> zrangebylex(List<String> args) {
@@ -3037,7 +3037,7 @@ public interface RedisAPI {
   }
 
   /**
-   * Redis command <a href="https://redis.io/commands/zrangebyscore">zrangebyscore</a>.
+   * Redis command <a href="https://redis.io/commands/zrangebyscore/">ZRANGEBYSCORE</a>.
    * @return Future response.
    */
   default Future<@Nullable Response> zrangebyscore(List<String> args) {
@@ -3045,7 +3045,7 @@ public interface RedisAPI {
   }
 
   /**
-   * Redis command <a href="https://redis.io/commands/zrangestore">zrangestore</a>.
+   * Redis command <a href="https://redis.io/commands/zrangestore/">ZRANGESTORE</a>.
    * @return Future response.
    */
   default Future<@Nullable Response> zrangestore(List<String> args) {
@@ -3053,7 +3053,7 @@ public interface RedisAPI {
   }
 
   /**
-   * Redis command <a href="https://redis.io/commands/zrank">zrank</a>.
+   * Redis command <a href="https://redis.io/commands/zrank/">ZRANK</a>.
    * @return Future response.
    */
   default Future<@Nullable Response> zrank(String arg0, String arg1) {
@@ -3061,7 +3061,7 @@ public interface RedisAPI {
   }
 
   /**
-   * Redis command <a href="https://redis.io/commands/zrem">zrem</a>.
+   * Redis command <a href="https://redis.io/commands/zrem/">ZREM</a>.
    * @return Future response.
    */
   default Future<@Nullable Response> zrem(List<String> args) {
@@ -3069,7 +3069,7 @@ public interface RedisAPI {
   }
 
   /**
-   * Redis command <a href="https://redis.io/commands/zremrangebylex">zremrangebylex</a>.
+   * Redis command <a href="https://redis.io/commands/zremrangebylex/">ZREMRANGEBYLEX</a>.
    * @return Future response.
    */
   default Future<@Nullable Response> zremrangebylex(String arg0, String arg1, String arg2) {
@@ -3077,7 +3077,7 @@ public interface RedisAPI {
   }
 
   /**
-   * Redis command <a href="https://redis.io/commands/zremrangebyrank">zremrangebyrank</a>.
+   * Redis command <a href="https://redis.io/commands/zremrangebyrank/">ZREMRANGEBYRANK</a>.
    * @return Future response.
    */
   default Future<@Nullable Response> zremrangebyrank(String arg0, String arg1, String arg2) {
@@ -3085,7 +3085,7 @@ public interface RedisAPI {
   }
 
   /**
-   * Redis command <a href="https://redis.io/commands/zremrangebyscore">zremrangebyscore</a>.
+   * Redis command <a href="https://redis.io/commands/zremrangebyscore/">ZREMRANGEBYSCORE</a>.
    * @return Future response.
    */
   default Future<@Nullable Response> zremrangebyscore(String arg0, String arg1, String arg2) {
@@ -3093,7 +3093,7 @@ public interface RedisAPI {
   }
 
   /**
-   * Redis command <a href="https://redis.io/commands/zrevrange">zrevrange</a>.
+   * Redis command <a href="https://redis.io/commands/zrevrange/">ZREVRANGE</a>.
    * @return Future response.
    */
   default Future<@Nullable Response> zrevrange(List<String> args) {
@@ -3101,7 +3101,7 @@ public interface RedisAPI {
   }
 
   /**
-   * Redis command <a href="https://redis.io/commands/zrevrangebylex">zrevrangebylex</a>.
+   * Redis command <a href="https://redis.io/commands/zrevrangebylex/">ZREVRANGEBYLEX</a>.
    * @return Future response.
    */
   default Future<@Nullable Response> zrevrangebylex(List<String> args) {
@@ -3109,7 +3109,7 @@ public interface RedisAPI {
   }
 
   /**
-   * Redis command <a href="https://redis.io/commands/zrevrangebyscore">zrevrangebyscore</a>.
+   * Redis command <a href="https://redis.io/commands/zrevrangebyscore/">ZREVRANGEBYSCORE</a>.
    * @return Future response.
    */
   default Future<@Nullable Response> zrevrangebyscore(List<String> args) {
@@ -3117,7 +3117,7 @@ public interface RedisAPI {
   }
 
   /**
-   * Redis command <a href="https://redis.io/commands/zrevrank">zrevrank</a>.
+   * Redis command <a href="https://redis.io/commands/zrevrank/">ZREVRANK</a>.
    * @return Future response.
    */
   default Future<@Nullable Response> zrevrank(String arg0, String arg1) {
@@ -3125,7 +3125,7 @@ public interface RedisAPI {
   }
 
   /**
-   * Redis command <a href="https://redis.io/commands/zscan">zscan</a>.
+   * Redis command <a href="https://redis.io/commands/zscan/">ZSCAN</a>.
    * @return Future response.
    */
   default Future<@Nullable Response> zscan(List<String> args) {
@@ -3133,7 +3133,7 @@ public interface RedisAPI {
   }
 
   /**
-   * Redis command <a href="https://redis.io/commands/zscore">zscore</a>.
+   * Redis command <a href="https://redis.io/commands/zscore/">ZSCORE</a>.
    * @return Future response.
    */
   default Future<@Nullable Response> zscore(String arg0, String arg1) {
@@ -3141,7 +3141,7 @@ public interface RedisAPI {
   }
 
   /**
-   * Redis command <a href="https://redis.io/commands/zunion">zunion</a>.
+   * Redis command <a href="https://redis.io/commands/zunion/">ZUNION</a>.
    * @return Future response.
    */
   default Future<@Nullable Response> zunion(List<String> args) {
@@ -3149,7 +3149,7 @@ public interface RedisAPI {
   }
 
   /**
-   * Redis command <a href="https://redis.io/commands/zunionstore">zunionstore</a>.
+   * Redis command <a href="https://redis.io/commands/zunionstore/">ZUNIONSTORE</a>.
    * @return Future response.
    */
   default Future<@Nullable Response> zunionstore(List<String> args) {

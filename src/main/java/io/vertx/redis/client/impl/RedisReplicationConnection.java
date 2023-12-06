@@ -17,8 +17,7 @@ public class RedisReplicationConnection implements RedisConnection {
 
   private static final Logger LOG = LoggerFactory.getLogger(RedisReplicationConnection.class);
 
-  // we need some randomness, it doesn't need
-  // to be secure or unpredictable
+  // we need some randomness, it doesn't need to be cryptographically secure
   private static final Random RANDOM = new Random();
 
   // List of commands they should run every time only against master nodes

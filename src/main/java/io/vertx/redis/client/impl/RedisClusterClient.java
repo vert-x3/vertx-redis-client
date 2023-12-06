@@ -29,7 +29,8 @@ import io.vertx.redis.client.impl.types.SimpleStringType;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Function;
@@ -119,8 +120,10 @@ public class RedisClusterClient extends BaseRedisClient implements Redis {
 
     addMasterOnlyCommand(SUBSCRIBE);
     addMasterOnlyCommand(PSUBSCRIBE);
+    addMasterOnlyCommand(SSUBSCRIBE);
     addReducer(UNSUBSCRIBE, list -> SimpleStringType.OK);
     addReducer(PUNSUBSCRIBE, list -> SimpleStringType.OK);
+    addReducer(SUNSUBSCRIBE, list -> SimpleStringType.OK);
   }
 
   private final RedisClusterConnectOptions connectOptions;
@@ -154,12 +157,12 @@ public class RedisClusterClient extends BaseRedisClient implements Redis {
     final int totalUniqueEndpoints = slots.endpoints().length;
     if (poolOptions.getMaxSize() < totalUniqueEndpoints) {
       // this isn't a valid setup, the connection pool will not accommodate all the required connections
-      onConnected.handle(Future.failedFuture("RedisOptions maxPoolSize < Cluster size(" + totalUniqueEndpoints + "): The pool is not able to hold all required connections!"));
+      onConnected.handle(Future.failedFuture(new RedisConnectException("RedisOptions maxPoolSize < Cluster size(" + totalUniqueEndpoints + "): The pool is not able to hold all required connections!")));
       return;
     }
 
     // create a cluster connection
-    final AtomicBoolean failed = new AtomicBoolean(false);
+    final Set<Throwable> failures = ConcurrentHashMap.newKeySet();
     final AtomicInteger counter = new AtomicInteger();
     final Map<String, PooledRedisConnection> connections = new HashMap<>();
 
@@ -167,8 +170,8 @@ public class RedisClusterClient extends BaseRedisClient implements Redis {
       connectionManager.getConnection(endpoint, RedisReplicas.NEVER !=  connectOptions.getUseReplicas() ? cmd(READONLY) : null)
         .onFailure(err -> {
           // failed try with the next endpoint
-          failed.set(true);
-          connectionComplete(counter, slots, connections, failed, onConnected);
+          failures.add(err);
+          connectionComplete(counter, slots, connections, failures, onConnected);
         })
         .onSuccess(cconn -> {
           // there can be concurrent access to the connection map
@@ -177,16 +180,16 @@ public class RedisClusterClient extends BaseRedisClient implements Redis {
           synchronized (connections) {
             connections.put(endpoint, cconn);
           }
-          connectionComplete(counter, slots, connections, failed, onConnected);
+          connectionComplete(counter, slots, connections, failures, onConnected);
         });
     }
   }
 
   private void connectionComplete(AtomicInteger counter, Slots slots, Map<String, PooledRedisConnection> connections,
-      AtomicBoolean failed, Handler<AsyncResult<RedisConnection>> onConnected) {
+      Set<Throwable> failures, Handler<AsyncResult<RedisConnection>> onConnected) {
     if (counter.incrementAndGet() == slots.endpoints().length) {
       // end condition
-      if (failed.get()) {
+      if (!failures.isEmpty()) {
         // cleanup
 
         // during an error we lock the map because we will change it
@@ -199,7 +202,11 @@ public class RedisClusterClient extends BaseRedisClient implements Redis {
           }
         }
         // return
-        onConnected.handle(Future.failedFuture("Failed to connect to all nodes of the cluster"));
+        StringBuilder message = new StringBuilder("Failed to connect to all nodes of the cluster");
+        for (Throwable failure : failures) {
+          message.append("\n- ").append(failure);
+        }
+        onConnected.handle(Future.failedFuture(new RedisConnectException(message.toString())));
       } else {
         onConnected.handle(Future.succeededFuture(new RedisClusterConnection(vertx, connectOptions, slots,
           () -> this.slots.set(null), connections)));
@@ -228,7 +235,8 @@ public class RedisClusterClient extends BaseRedisClient implements Redis {
   private void getSlots(List<String> endpoints, int index, Handler<AsyncResult<Slots>> onGotSlots) {
     if (index >= endpoints.size()) {
       // stop condition
-      onGotSlots.handle(Future.failedFuture("Cannot connect to any of the provided endpoints"));
+      onGotSlots.handle(Future.failedFuture(new RedisConnectException("Cannot connect to any of the provided endpoints")));
+      scheduleCachedSlotsExpiration();
       return;
     }
 
@@ -249,7 +257,7 @@ public class RedisClusterClient extends BaseRedisClient implements Redis {
           } else {
             Slots slots = result.result();
             onGotSlots.handle(Future.succeededFuture(slots));
-            vertx.setTimer(connectOptions.getHashSlotCacheTTL(), ignored -> this.slots.set(null));
+            scheduleCachedSlotsExpiration();
           }
         });
       });
@@ -266,5 +274,9 @@ public class RedisClusterClient extends BaseRedisClient implements Redis {
 
         return Future.succeededFuture(new Slots(endpoint, reply));
       });
+  }
+
+  private void scheduleCachedSlotsExpiration() {
+    vertx.setTimer(connectOptions.getHashSlotCacheTTL(), ignored -> this.slots.set(null));
   }
 }
