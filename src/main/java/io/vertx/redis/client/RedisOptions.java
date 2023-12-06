@@ -51,6 +51,7 @@ public class RedisOptions {
   private RedisReplicas useReplicas;
   private volatile String password;
   private boolean protocolNegotiation;
+  private ProtocolVersion preferredProtocolVersion;
   private long hashSlotCacheTTL;
   private TracingPolicy tracingPolicy;
 
@@ -88,6 +89,7 @@ public class RedisOptions {
     this.useReplicas = other.useReplicas;
     this.password = other.password;
     this.protocolNegotiation = other.protocolNegotiation;
+    this.preferredProtocolVersion = other.preferredProtocolVersion;
     this.hashSlotCacheTTL = other.hashSlotCacheTTL;
     this.maxWaitingHandlers = other.maxWaitingHandlers;
     this.tracingPolicy = other.tracingPolicy;
@@ -523,6 +525,29 @@ public class RedisOptions {
     this.protocolNegotiation = protocolNegotiation;
     return this;
   }
+
+  /**
+   * Returns the preferred protocol version to be used during protocol negotiation. When not set,
+   * defaults to RESP 3. When protocol negotiation is disabled, this setting has no effect.
+   *
+   * @return preferred protocol version
+   */
+  public ProtocolVersion getPreferredProtocolVersion() {
+    return preferredProtocolVersion;
+  }
+
+  /**
+   * Sets the preferred protocol version to be used during protocol negotiation. When not set,
+   * defaults to RESP 3. When protocol negotiation is disabled, this setting has no effect.
+   *
+   * @param preferredProtocolVersion preferred protocol version
+   * @return fluent self
+   */
+  public RedisOptions setPreferredProtocolVersion(ProtocolVersion preferredProtocolVersion) {
+    this.preferredProtocolVersion = preferredProtocolVersion;
+    return this;
+  }
+
 
   /**
    * Set a user defined pool name (for metrics reporting).

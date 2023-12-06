@@ -247,4 +247,8 @@ public class RedisExamples {
   public void tracing1(RedisOptions options) {
     options.setTracingPolicy(TracingPolicy.ALWAYS);
   }
+
+  public void preferredProtocolVersion1(RedisOptions options) {
+    options.setPreferredProtocolVersion(ProtocolVersion.RESP2);
+  }
 }

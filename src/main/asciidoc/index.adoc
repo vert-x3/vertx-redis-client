@@ -286,7 +286,15 @@ It is important to note that, the reconnect will create a new connection object,
 
 == Protocol Parser
 
-This client supports both `RESP2` and `RESP3` protocols, at the connection handshake time the client will automatically detect which version is supported by the server and use it.
+This client supports both `RESP2` and `RESP3` protocols.
+By default, the client attempts to negotiate support for `RESP3` at connection handshake time.
+
+It is possible to use the {@link io.vertx.redis.client.RedisOptions#setPreferredProtocolVersion} method to select the preferred version, `RESP2` or `RESP3`:
+
+[source,$lang]
+----
+{@link examples.RedisExamples#preferredProtocolVersion1}
+----
 
 The parser internally creates an "infinite" readable buffer from all the chunks received from the server, in order to avoid creating too much garbage in terms of memory collection, a tunnable watermark value is configurable at JVM startup time.
 The system property `io.vertx.redis.parser.watermark` defines how much data is keept in this readable buffer before it gets discarded.
