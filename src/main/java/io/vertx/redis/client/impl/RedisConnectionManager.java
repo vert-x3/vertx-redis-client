@@ -20,9 +20,9 @@ import io.vertx.core.impl.ContextInternal;
 import io.vertx.core.impl.VertxInternal;
 import io.vertx.core.impl.logging.Logger;
 import io.vertx.core.impl.logging.LoggerFactory;
-import io.vertx.core.net.NetClient;
 import io.vertx.core.net.NetClientOptions;
 import io.vertx.core.net.NetSocket;
+import io.vertx.core.net.impl.NetClientImpl;
 import io.vertx.core.net.impl.pool.ConnectResult;
 import io.vertx.core.net.impl.pool.ConnectionManager;
 import io.vertx.core.net.impl.pool.Endpoint;
@@ -46,7 +46,7 @@ class RedisConnectionManager {
 
   private final VertxInternal vertx;
   private final ContextInternal context;
-  private final NetClient netClient;
+  private final NetClientImpl netClient;
   private final PoolMetrics metrics;
   private final NetClientOptions tcpOptions;
   private final PoolOptions poolOptions;
@@ -65,7 +65,7 @@ class RedisConnectionManager {
     this.tracingPolicy = tracingPolicy;
     VertxMetrics metricsSPI = this.vertx.metricsSPI();
     metrics = metricsSPI != null ? metricsSPI.createPoolMetrics("redis", poolOptions.getName(), poolOptions.getMaxSize()) : null;
-    this.netClient = vertx.createNetClient(tcpOptions);
+    this.netClient = (NetClientImpl) vertx.createNetClient(tcpOptions);
     this.pooledConnectionManager = new ConnectionManager<>();
   }
 
@@ -120,7 +120,7 @@ class RedisConnectionManager {
   static class RedisConnectionProvider implements PoolConnector<RedisConnectionInternal> {
 
     private final VertxInternal vertx;
-    private final NetClient netClient;
+    private final NetClientImpl netClient;
     private final RedisURI redisURI;
     private final Request setup;
     private final NetClientOptions netClientOptions;
@@ -128,7 +128,7 @@ class RedisConnectionManager {
     private final RedisConnectOptions options;
     private final TracingPolicy tracingPolicy;
 
-    public RedisConnectionProvider(VertxInternal vertx, NetClient netClient, NetClientOptions netClientOptions, PoolOptions poolOptions, RedisConnectOptions options, TracingPolicy tracingPolicy, String connectionString, Request setup) {
+    public RedisConnectionProvider(VertxInternal vertx, NetClientImpl netClient, NetClientOptions netClientOptions, PoolOptions poolOptions, RedisConnectOptions options, TracingPolicy tracingPolicy, String connectionString, Request setup) {
       this.vertx = vertx;
       this.netClient = netClient;
       this.netClientOptions = netClientOptions;
@@ -164,7 +164,7 @@ class RedisConnectionManager {
       // all calls the user handler will happen in the user context (ctx)
       try {
         netClient
-          .connect(redisURI.socketAddress(), clientConnect -> {
+          .connect(ctx, redisURI.socketAddress(), null).onComplete(clientConnect -> {
             if (clientConnect.failed()) {
               // connection failed
               ctx.execute(ctx.failedFuture(clientConnect.cause()), onConnect);
@@ -415,7 +415,7 @@ class RedisConnectionManager {
 
     final ConnectionPool<RedisConnectionInternal> pool;
 
-    public RedisEndpoint(VertxInternal vertx, NetClient netClient, NetClientOptions netClientOptions, PoolOptions poolOptions, RedisConnectOptions connectOptions, TracingPolicy tracingPolicy, Runnable dispose, String connectionString, Request setup) {
+    public RedisEndpoint(VertxInternal vertx, NetClientImpl netClient, NetClientOptions netClientOptions, PoolOptions poolOptions, RedisConnectOptions connectOptions, TracingPolicy tracingPolicy, Runnable dispose, String connectionString, Request setup) {
       super(dispose);
       PoolConnector<RedisConnectionInternal> connector = new RedisConnectionProvider(vertx, netClient, netClientOptions, poolOptions, connectOptions, tracingPolicy, connectionString, setup);
       pool = ConnectionPool.pool(connector, new int[]{poolOptions.getMaxSize()}, poolOptions.getMaxWaiting());
