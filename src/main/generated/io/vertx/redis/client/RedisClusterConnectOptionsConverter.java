@@ -17,7 +17,7 @@ public class RedisClusterConnectOptionsConverter {
   private static final Base64.Decoder BASE64_DECODER = JsonUtil.BASE64_DECODER;
   private static final Base64.Encoder BASE64_ENCODER = JsonUtil.BASE64_ENCODER;
 
-  public static void fromJson(Iterable<java.util.Map.Entry<String, Object>> json, RedisClusterConnectOptions obj) {
+   static void fromJson(Iterable<java.util.Map.Entry<String, Object>> json, RedisClusterConnectOptions obj) {
     for (java.util.Map.Entry<String, Object> member : json) {
       switch (member.getKey()) {
         case "hashSlotCacheTTL":
@@ -34,11 +34,11 @@ public class RedisClusterConnectOptionsConverter {
     }
   }
 
-  public static void toJson(RedisClusterConnectOptions obj, JsonObject json) {
+   static void toJson(RedisClusterConnectOptions obj, JsonObject json) {
     toJson(obj, json.getMap());
   }
 
-  public static void toJson(RedisClusterConnectOptions obj, java.util.Map<String, Object> json) {
+   static void toJson(RedisClusterConnectOptions obj, java.util.Map<String, Object> json) {
     json.put("hashSlotCacheTTL", obj.getHashSlotCacheTTL());
     if (obj.getUseReplicas() != null) {
       json.put("useReplicas", obj.getUseReplicas().name());

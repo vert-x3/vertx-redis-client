@@ -17,7 +17,7 @@ public class RedisConnectOptionsConverter {
   private static final Base64.Decoder BASE64_DECODER = JsonUtil.BASE64_DECODER;
   private static final Base64.Encoder BASE64_ENCODER = JsonUtil.BASE64_ENCODER;
 
-  public static void fromJson(Iterable<java.util.Map.Entry<String, Object>> json, RedisConnectOptions obj) {
+   static void fromJson(Iterable<java.util.Map.Entry<String, Object>> json, RedisConnectOptions obj) {
     for (java.util.Map.Entry<String, Object> member : json) {
       switch (member.getKey()) {
         case "connectionString":
@@ -74,11 +74,11 @@ public class RedisConnectOptionsConverter {
     }
   }
 
-  public static void toJson(RedisConnectOptions obj, JsonObject json) {
+   static void toJson(RedisConnectOptions obj, JsonObject json) {
     toJson(obj, json.getMap());
   }
 
-  public static void toJson(RedisConnectOptions obj, java.util.Map<String, Object> json) {
+   static void toJson(RedisConnectOptions obj, java.util.Map<String, Object> json) {
     if (obj.getEndpoint() != null) {
       json.put("endpoint", obj.getEndpoint());
     }
