@@ -226,16 +226,20 @@ public class RedisClusterClient extends BaseRedisClient implements Redis {
       if (this.slots.compareAndSet(null, future)) {
         LOG.debug("Obtaining hash slot assignment");
         // attempt to load the slots from the first good endpoint
-        getSlots(connectOptions.getEndpoints(), 0, promise);
+        getSlots(connectOptions.getEndpoints(), 0, ConcurrentHashMap.newKeySet(), promise);
         return future;
       }
     }
   }
 
-  private void getSlots(List<String> endpoints, int index, Handler<AsyncResult<Slots>> onGotSlots) {
+  private void getSlots(List<String> endpoints, int index, Set<Throwable> failures, Handler<AsyncResult<Slots>> onGotSlots) {
     if (index >= endpoints.size()) {
       // stop condition
-      onGotSlots.handle(Future.failedFuture(new RedisConnectException("Cannot connect to any of the provided endpoints")));
+      StringBuilder message = new StringBuilder("Cannot connect to any of the provided endpoints");
+      for (Throwable failure : failures) {
+        message.append("\n- ").append(failure);
+      }
+      onGotSlots.handle(Future.failedFuture(new RedisConnectException(message.toString())));
       scheduleCachedSlotsExpiration();
       return;
     }
@@ -243,7 +247,8 @@ public class RedisClusterClient extends BaseRedisClient implements Redis {
     connectionManager.getConnection(endpoints.get(index), RedisReplicas.NEVER != connectOptions.getUseReplicas() ? cmd(READONLY) : null)
       .onFailure(err -> {
         // try with the next endpoint
-        getSlots(endpoints, index + 1, onGotSlots);
+        failures.add(err);
+        getSlots(endpoints, index + 1, failures, onGotSlots);
       })
       .onSuccess(conn -> {
         getSlots(endpoints.get(index), conn, result -> {
@@ -253,7 +258,8 @@ public class RedisClusterClient extends BaseRedisClient implements Redis {
 
           if (result.failed()) {
             // the slots command failed, try with next endpoint
-            getSlots(endpoints, index + 1, onGotSlots);
+            failures.add(result.cause());
+            getSlots(endpoints, index + 1, failures, onGotSlots);
           } else {
             Slots slots = result.result();
             onGotSlots.handle(Future.succeededFuture(slots));
@@ -276,11 +282,18 @@ public class RedisClusterClient extends BaseRedisClient implements Redis {
 
       if (reply == null || reply.size() == 0) {
         // no slots available we can't really proceed
-        onGetSlots.handle(Future.failedFuture("SLOTS No slots available in the cluster."));
+        onGetSlots.handle(Future.failedFuture("CLUSTER SLOTS No slots available in the cluster."));
         return;
       }
 
-      onGetSlots.handle(Future.succeededFuture(new Slots(endpoint, reply)));
+      Slots result;
+      try {
+        result = new Slots(endpoint, reply);
+      } catch (Exception e) {
+        onGetSlots.handle(Future.failedFuture("CLUSTER SLOTS response invalid: " + e));
+        return;
+      }
+      onGetSlots.handle(Future.succeededFuture(result));
     });
   }
 
