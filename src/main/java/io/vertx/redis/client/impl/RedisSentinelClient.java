@@ -25,6 +25,8 @@ import io.vertx.redis.client.impl.types.ErrorType;
 
 import java.util.List;
 import java.util.Random;
+import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 
 import static io.vertx.redis.client.Command.*;
 import static io.vertx.redis.client.Request.cmd;
@@ -162,7 +164,7 @@ public class RedisSentinelClient extends BaseRedisClient implements Redis {
   private static void resolveClient(final Resolver checkEndpointFn, final RedisSentinelConnectOptions options, final Handler<AsyncResult<RedisURI>> callback) {
     // Because finding the master is going to be an async list we will terminate
     // when we find one then use promises...
-    iterate(0, checkEndpointFn, options, iterate -> {
+    iterate(0, ConcurrentHashMap.newKeySet(), checkEndpointFn, options, iterate -> {
       if (iterate.failed()) {
         callback.handle(Future.failedFuture(iterate.cause()));
       } else {
@@ -179,12 +181,16 @@ public class RedisSentinelClient extends BaseRedisClient implements Redis {
     });
   }
 
-  private static void iterate(final int idx, final Resolver checkEndpointFn, final RedisSentinelConnectOptions argument, final Handler<AsyncResult<Pair<Integer, RedisURI>>> resultHandler) {
+  private static void iterate(final int idx, final Set<Throwable> failures, final Resolver checkEndpointFn, final RedisSentinelConnectOptions argument, final Handler<AsyncResult<Pair<Integer, RedisURI>>> resultHandler) {
     // stop condition
     final List<String> endpoints = argument.getEndpoints();
 
     if (idx >= endpoints.size()) {
-      resultHandler.handle(Future.failedFuture("No more endpoints in chain."));
+      StringBuilder message = new StringBuilder("Cannot connect to any of the provided endpoints");
+      for (Throwable failure : failures) {
+        message.append("\n- ").append(failure);
+      }
+      resultHandler.handle(Future.failedFuture(new RedisConnectException(message.toString())));
       return;
     }
 
@@ -194,7 +200,8 @@ public class RedisSentinelClient extends BaseRedisClient implements Redis {
         resultHandler.handle(Future.succeededFuture(new Pair<>(idx, res.result())));
       } else {
         // try again with next endpoint
-        iterate(idx + 1, checkEndpointFn, argument, resultHandler);
+        failures.add(res.cause());
+        iterate(idx + 1, failures, checkEndpointFn, argument, resultHandler);
       }
     });
   }
