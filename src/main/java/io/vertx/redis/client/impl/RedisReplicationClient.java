@@ -24,6 +24,7 @@ import io.vertx.redis.client.*;
 
 import java.nio.charset.StandardCharsets;
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import static io.vertx.redis.client.Command.*;
@@ -109,21 +110,26 @@ public class RedisReplicationClient extends BaseRedisClient implements Redis {
     // make a copy as we may need to mutate the list during discovery
     final List<String> endpoints = new LinkedList<>(connectOptions.getEndpoints());
     // attempt to discover the topology from the first good endpoint
-    connect(endpoints, 0, promise);
+    connect(endpoints, 0, ConcurrentHashMap.newKeySet(), promise);
     return promise.future();
   }
 
-  private void connect(List<String> endpoints, int index, Handler<AsyncResult<RedisConnection>> onConnect) {
+  private void connect(List<String> endpoints, int index, Set<Throwable> failures, Handler<AsyncResult<RedisConnection>> onConnect) {
     if (index >= endpoints.size()) {
       // stop condition
-      onConnect.handle(Future.failedFuture(new RedisConnectException("Cannot connect to any of the provided endpoints")));
+      StringBuilder message = new StringBuilder("Cannot connect to any of the provided endpoints");
+      for (Throwable failure : failures) {
+        message.append("\n- ").append(failure);
+      }
+      onConnect.handle(Future.failedFuture(new RedisConnectException(message.toString())));
       return;
     }
 
     connectionManager.getConnection(endpoints.get(index), null)
       .onFailure(err -> {
         // failed try with the next endpoint
-        connect(endpoints, index + 1, onConnect);
+        failures.add(err);
+        connect(endpoints, index + 1, failures, onConnect);
       })
       .onSuccess(conn -> {
         // fetch slots from the cluster immediately to ensure slots are correct
@@ -132,7 +138,8 @@ public class RedisReplicationClient extends BaseRedisClient implements Redis {
             // the slots command failed.
             conn.close();
             // try with the next one
-            connect(endpoints, index + 1, onConnect);
+            failures.add(getNodes.cause());
+            connect(endpoints, index + 1, failures, onConnect);
             return;
           }
 
