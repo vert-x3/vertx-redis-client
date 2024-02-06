@@ -59,17 +59,18 @@ public class RedisOptions {
    * Creates a default configuration object using redis server defaults
    */
   public RedisOptions() {
+    type = RedisClientType.STANDALONE;
     netClientOptions =
       new NetClientOptions()
         .setTcpKeepAlive(true)
         .setTcpNoDelay(true);
-
     poolOptions = new PoolOptions();
-    type = RedisClientType.STANDALONE;
-    useReplicas = RedisReplicas.NEVER;
-    maxNestedArrays = 32;
-    protocolNegotiation = true;
     maxWaitingHandlers = 2048;
+    maxNestedArrays = 32;
+    masterName = "mymaster";
+    role = RedisRole.MASTER;
+    useReplicas = RedisReplicas.NEVER;
+    protocolNegotiation = true;
     hashSlotCacheTTL = 1000;
   }
 
@@ -79,10 +80,12 @@ public class RedisOptions {
    * @param other the object to clone.
    */
   public RedisOptions(RedisOptions other) {
+    this();
     this.type = other.type;
     this.netClientOptions = other.netClientOptions;
-    this.poolOptions = new PoolOptions(other.poolOptions);
     this.endpoints = other.endpoints;
+    this.poolOptions = new PoolOptions(other.poolOptions);
+    this.maxWaitingHandlers = other.maxWaitingHandlers;
     this.maxNestedArrays = other.maxNestedArrays;
     this.masterName = other.masterName;
     this.role = other.role;
@@ -91,6 +94,7 @@ public class RedisOptions {
     this.protocolNegotiation = other.protocolNegotiation;
     this.preferredProtocolVersion = other.preferredProtocolVersion;
     this.hashSlotCacheTTL = other.hashSlotCacheTTL;
+    this.tracingPolicy = other.tracingPolicy;
   }
 
   /**

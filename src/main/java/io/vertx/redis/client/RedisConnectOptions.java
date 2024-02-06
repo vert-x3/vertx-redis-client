@@ -33,38 +33,34 @@ public abstract class RedisConnectOptions {
   private ProtocolVersion preferredProtocolVersion;
   private int maxWaitingHandlers;
 
-  private void init() {
+  public RedisConnectOptions() {
     maxNestedArrays = 32;
     protocolNegotiation = true;
     maxWaitingHandlers = 2048;
   }
 
   public RedisConnectOptions(RedisOptions options) {
+    this();
+    setPassword(options.getPassword());
     setEndpoints(new ArrayList<>(options.getEndpoints()));
+    setMaxNestedArrays(options.getMaxNestedArrays());
     setProtocolNegotiation(options.isProtocolNegotiation());
     setPreferredProtocolVersion(options.getPreferredProtocolVersion());
-    setMaxNestedArrays(options.getMaxNestedArrays());
-    setPassword(options.getPassword());
     setMaxWaitingHandlers(options.getMaxWaitingHandlers());
-    setMaxNestedArrays(options.getMaxNestedArrays());
-  }
-
-  public RedisConnectOptions() {
-    init();
   }
 
   public RedisConnectOptions(RedisConnectOptions other) {
-    init();
-    this.maxNestedArrays = other.maxNestedArrays;
-    this.protocolNegotiation = other.protocolNegotiation;
-    this.preferredProtocolVersion = other.preferredProtocolVersion;
-    this.password = other.password;
-    this.endpoints = new ArrayList<>(other.endpoints);
-    this.maxWaitingHandlers = other.maxWaitingHandlers;
+    this();
+    setPassword(other.getPassword());
+    setEndpoints(new ArrayList<>(other.getEndpoints()));
+    setMaxNestedArrays(other.getMaxNestedArrays());
+    setProtocolNegotiation(other.isProtocolNegotiation());
+    setPreferredProtocolVersion(other.getPreferredProtocolVersion());
+    setMaxWaitingHandlers(other.getMaxWaitingHandlers());
   }
 
   public RedisConnectOptions(JsonObject json) {
-    init();
+    this();
     RedisConnectOptionsConverter.fromJson(json, this);
   }
 

@@ -28,25 +28,27 @@ public class RedisClusterConnectOptions extends RedisConnectOptions {
   private RedisReplicas useReplicas;
   private long hashSlotCacheTTL;
 
+  public RedisClusterConnectOptions() {
+    super();
+    useReplicas = RedisReplicas.NEVER;
+    hashSlotCacheTTL = 1000;
+  }
+
   public RedisClusterConnectOptions(RedisOptions options) {
     super(options);
     setUseReplicas(options.getUseReplicas());
     setHashSlotCacheTTL(options.getHashSlotCacheTTL());
   }
 
-  public RedisClusterConnectOptions() {
-    useReplicas = RedisReplicas.NEVER;
-    hashSlotCacheTTL = 1000;
-  }
-
   public RedisClusterConnectOptions(RedisClusterConnectOptions other) {
-    this.useReplicas = other.useReplicas;
-    this.hashSlotCacheTTL = other.hashSlotCacheTTL;
+    super(other);
+    setUseReplicas(other.getUseReplicas());
+    setHashSlotCacheTTL(other.getHashSlotCacheTTL());
   }
 
   public RedisClusterConnectOptions(JsonObject json) {
-    this();
-    RedisConnectOptionsConverter.fromJson(json, this);
+    super(json);
+    RedisClusterConnectOptionsConverter.fromJson(json, this);
   }
 
   /**
