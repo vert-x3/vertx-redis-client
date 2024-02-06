@@ -28,25 +28,27 @@ public class RedisSentinelConnectOptions extends RedisConnectOptions {
   private RedisRole role;
   private String masterName;
 
+  public RedisSentinelConnectOptions() {
+    super();
+    role = RedisRole.MASTER;
+    masterName = "mymaster";
+  }
+
   public RedisSentinelConnectOptions(RedisOptions options) {
     super(options);
     setRole(options.getRole());
     setMasterName(options.getMasterName());
   }
 
-  public RedisSentinelConnectOptions() {
-    role = RedisRole.MASTER;
-    masterName = "mymaster";
-  }
-
   public RedisSentinelConnectOptions(RedisSentinelConnectOptions other) {
-    this.role = other.role;
-    this.masterName = other.masterName;
+    super(other);
+    setRole(other.getRole());
+    setMasterName(other.getMasterName());
   }
 
   public RedisSentinelConnectOptions(JsonObject json) {
-    this();
-    RedisConnectOptionsConverter.fromJson(json, this);
+    super(json);
+    RedisSentinelConnectOptionsConverter.fromJson(json, this);
   }
 
   /**

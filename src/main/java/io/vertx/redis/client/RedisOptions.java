@@ -59,17 +59,18 @@ public class RedisOptions {
    * Creates a default configuration object using redis server defaults
    */
   public RedisOptions() {
+    type = RedisClientType.STANDALONE;
     netClientOptions =
       new NetClientOptions()
         .setTcpKeepAlive(true)
         .setTcpNoDelay(true);
-
     poolOptions = new PoolOptions();
-    type = RedisClientType.STANDALONE;
-    useReplicas = RedisReplicas.NEVER;
-    maxNestedArrays = 32;
-    protocolNegotiation = true;
     maxWaitingHandlers = 2048;
+    maxNestedArrays = 32;
+    masterName = "mymaster";
+    role = RedisRole.MASTER;
+    useReplicas = RedisReplicas.NEVER;
+    protocolNegotiation = true;
     hashSlotCacheTTL = 1000;
   }
 
@@ -79,10 +80,12 @@ public class RedisOptions {
    * @param other the object to clone.
    */
   public RedisOptions(RedisOptions other) {
+    this();
     this.type = other.type;
     this.netClientOptions = other.netClientOptions;
-    this.poolOptions = new PoolOptions(other.poolOptions);
     this.endpoints = other.endpoints;
+    this.poolOptions = new PoolOptions(other.poolOptions);
+    this.maxWaitingHandlers = other.maxWaitingHandlers;
     this.maxNestedArrays = other.maxNestedArrays;
     this.masterName = other.masterName;
     this.role = other.role;
@@ -91,7 +94,6 @@ public class RedisOptions {
     this.protocolNegotiation = other.protocolNegotiation;
     this.preferredProtocolVersion = other.preferredProtocolVersion;
     this.hashSlotCacheTTL = other.hashSlotCacheTTL;
-    this.maxWaitingHandlers = other.maxWaitingHandlers;
     this.tracingPolicy = other.tracingPolicy;
   }
 
@@ -147,19 +149,6 @@ public class RedisOptions {
   }
 
   /**
-   * Gets the list of redis endpoints to use (mostly used while connecting to a cluster)
-   *
-   * @return list of socket addresses.
-   */
-  public List<String> getEndpoints() {
-    if (endpoints == null) {
-      endpoints = new ArrayList<>();
-      endpoints.add(DEFAULT_ENDPOINT);
-    }
-    return endpoints;
-  }
-
-  /**
    * Gets the redis endpoint to use
    *
    * @return the Redis connection string URI
@@ -170,18 +159,6 @@ public class RedisOptions {
     }
 
     return endpoints.get(0);
-  }
-
-  /**
-   * Set the endpoints to use while connecting to the redis server. Only the cluster mode will consider more than
-   * 1 element. If more are provided, they are not considered by the client when in single server mode.
-   *
-   * @param endpoints list of socket addresses.
-   * @return fluent self.
-   */
-  public RedisOptions setEndpoints(List<String> endpoints) {
-    this.endpoints = endpoints;
-    return this;
   }
 
   /**
@@ -253,6 +230,31 @@ public class RedisOptions {
     }
 
     this.endpoints.add(connectionString);
+    return this;
+  }
+
+  /**
+   * Gets the list of redis endpoints to use (mostly used while connecting to a cluster)
+   *
+   * @return list of socket addresses.
+   */
+  public List<String> getEndpoints() {
+    if (endpoints == null) {
+      endpoints = new ArrayList<>();
+      endpoints.add(DEFAULT_ENDPOINT);
+    }
+    return endpoints;
+  }
+
+  /**
+   * Set the endpoints to use while connecting to the redis server. Only the cluster mode will consider more than
+   * 1 element. If more are provided, they are not considered by the client when in single server mode.
+   *
+   * @param endpoints list of socket addresses.
+   * @return fluent self.
+   */
+  public RedisOptions setEndpoints(List<String> endpoints) {
+    this.endpoints = endpoints;
     return this;
   }
 

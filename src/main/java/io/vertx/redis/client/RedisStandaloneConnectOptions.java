@@ -25,19 +25,21 @@ import java.util.List;
 @JsonGen(publicConverter = false)
 public class RedisStandaloneConnectOptions extends RedisConnectOptions {
 
+  public RedisStandaloneConnectOptions() {
+    super();
+  }
+
   public RedisStandaloneConnectOptions(RedisOptions options) {
     super(options);
   }
 
-  public RedisStandaloneConnectOptions() {
-  }
-
   public RedisStandaloneConnectOptions(RedisStandaloneConnectOptions other) {
+    super(other);
   }
 
   public RedisStandaloneConnectOptions(JsonObject json) {
-    this();
-    RedisConnectOptionsConverter.fromJson(json, this);
+    super(json);
+    RedisStandaloneConnectOptionsConverter.fromJson(json, this);
   }
 
   @Override
