@@ -40,16 +40,6 @@ public class RedisConnectOptionsConverter {
             obj.setPassword((String)member.getValue());
           }
           break;
-        case "endpoints":
-          if (member.getValue() instanceof JsonArray) {
-            java.util.ArrayList<java.lang.String> list =  new java.util.ArrayList<>();
-            ((Iterable<Object>)member.getValue()).forEach( item -> {
-              if (item instanceof String)
-                list.add((String)item);
-            });
-            obj.setEndpoints(list);
-          }
-          break;
         case "endpoint":
           break;
         case "connectionStrings":
@@ -63,6 +53,16 @@ public class RedisConnectOptionsConverter {
         case "connectionString":
           if (member.getValue() instanceof String) {
             obj.setConnectionString((String)member.getValue());
+          }
+          break;
+        case "endpoints":
+          if (member.getValue() instanceof JsonArray) {
+            java.util.ArrayList<java.lang.String> list =  new java.util.ArrayList<>();
+            ((Iterable<Object>)member.getValue()).forEach( item -> {
+              if (item instanceof String)
+                list.add((String)item);
+            });
+            obj.setEndpoints(list);
           }
           break;
         case "maxWaitingHandlers":
@@ -87,13 +87,13 @@ public class RedisConnectOptionsConverter {
     if (obj.getPassword() != null) {
       json.put("password", obj.getPassword());
     }
+    if (obj.getEndpoint() != null) {
+      json.put("endpoint", obj.getEndpoint());
+    }
     if (obj.getEndpoints() != null) {
       JsonArray array = new JsonArray();
       obj.getEndpoints().forEach(item -> array.add(item));
       json.put("endpoints", array);
-    }
-    if (obj.getEndpoint() != null) {
-      json.put("endpoint", obj.getEndpoint());
     }
     json.put("maxWaitingHandlers", obj.getMaxWaitingHandlers());
   }
