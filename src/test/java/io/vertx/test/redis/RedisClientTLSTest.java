@@ -112,8 +112,9 @@ public class RedisClientTLSTest {
         .setNetClientOptions(new NetClientOptions().setTrustAll(true)
           // default values
           .setTcpKeepAlive(true)
-          .setTcpNoDelay(true))
-        .setConnectionString("rediss://0.0.0.0:" + port + "?test=upgrade"));
+          .setTcpNoDelay(true)
+          .setHostnameVerificationAlgorithm("HTTPS"))
+        .setConnectionString("rediss://localhost:" + port + "?test=upgrade"));
 
     client.connect()
       .onComplete(should.asyncAssertSuccess(conn -> {
@@ -133,7 +134,7 @@ public class RedisClientTLSTest {
       rule.vertx(),
       new RedisOptions()
         // were using self signed certificates so we need to trust all
-        .setNetClientOptions(new NetClientOptions().setSsl(true).setTrustAll(true)
+        .setNetClientOptions(new NetClientOptions().setSsl(true).setTrustAll(true).setHostnameVerificationAlgorithm("HTTPS")
           // default values
           .setTcpKeepAlive(true)
           .setTcpNoDelay(true))
@@ -157,7 +158,7 @@ public class RedisClientTLSTest {
       rule.vertx(),
       new RedisOptions()
         // were using self signed certificates so we need to trust all
-        .setNetClientOptions(new NetClientOptions().setSsl(true).setTrustAll(true)
+        .setNetClientOptions(new NetClientOptions().setSsl(true).setTrustAll(true).setHostnameVerificationAlgorithm("HTTPS")
           // default values
           .setTcpKeepAlive(true)
           .setTcpNoDelay(true))
