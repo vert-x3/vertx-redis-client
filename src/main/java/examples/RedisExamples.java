@@ -1,9 +1,8 @@
 package examples;
 
-import io.vertx.core.AbstractVerticle;
-import io.vertx.core.Future;
-import io.vertx.core.Promise;
-import io.vertx.core.Vertx;
+import io.vertx.core.*;
+import io.vertx.core.net.NetClientOptions;
+import io.vertx.core.net.PemTrustOptions;
 import io.vertx.core.tracing.TracingPolicy;
 import io.vertx.redis.client.*;
 
@@ -31,6 +30,23 @@ public class RedisExamples {
         // numerical path of the URL and the password is the password field of
         // the URL authority
         "redis://:abracadabra@localhost:6379/1")
+      .connect()
+      .onSuccess(conn -> {
+        // use the connection
+      });
+  }
+
+  public void tls(Vertx vertx) {
+    RedisOptions options = new RedisOptions();
+    options.setConnectionString("redis://:abracadabra@localhost:6379/1");
+    NetClientOptions tcpOptions = options.getNetClientOptions();
+    tcpOptions
+      .setSsl(true)
+      .setTrustOptions(new PemTrustOptions().addCertPath("/path/to/server.crt"))
+      .setHostnameVerificationAlgorithm("HTTPS");
+    Redis.createClient(
+        vertx,
+        options)
       .connect()
       .onSuccess(conn -> {
         // use the connection
