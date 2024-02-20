@@ -36,14 +36,15 @@ public class RedisExamples {
       });
   }
 
-  public void tls(Vertx vertx) {
+  public void tls(Vertx vertx, String algo) {
     RedisOptions options = new RedisOptions();
     options.setConnectionString("redis://:abracadabra@localhost:6379/1");
     NetClientOptions tcpOptions = options.getNetClientOptions();
     tcpOptions
       .setSsl(true)
       .setTrustOptions(new PemTrustOptions().addCertPath("/path/to/server.crt"))
-      .setHostnameVerificationAlgorithm("HTTPS");
+      // Algo can be the empty string "" or "HTTPS" to verify the server hostname
+      .setHostnameVerificationAlgorithm(algo);
     Redis.createClient(
         vertx,
         options)
