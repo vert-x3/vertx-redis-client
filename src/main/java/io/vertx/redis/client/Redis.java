@@ -72,7 +72,7 @@ public interface Redis {
       case CLUSTER:
         return new RedisClusterClient(vertx, options.getNetClientOptions(), options.getPoolOptions(), new RedisClusterConnectOptions(options), options.getTracingPolicy());
       case REPLICATION:
-        return new RedisReplicationClient(vertx, options.getNetClientOptions(), options.getPoolOptions(), new RedisClusterConnectOptions(options), options.getTracingPolicy());
+        return new RedisReplicationClient(vertx, options.getNetClientOptions(), options.getPoolOptions(), new RedisReplicationConnectOptions(options), options.getTracingPolicy());
       default:
         throw new IllegalStateException("Unknown Redis Client type: " + options.getType());
     }

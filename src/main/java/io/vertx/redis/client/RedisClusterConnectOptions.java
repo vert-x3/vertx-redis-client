@@ -74,10 +74,6 @@ public class RedisClusterConnectOptions extends RedisConnectOptions {
   /**
    * Returns the TTL of the hash slot cache. The TTL is expressed in milliseconds.
    * Defaults to 1000 millis (1 second).
-   * <p>
-   * This is only meaningful in case of a {@linkplain RedisClientType#CLUSTER cluster} Redis client
-   * and is ignored otherwise.
-   * </p>
    *
    * @return the TTL of the hash slot cache
    */
@@ -88,10 +84,6 @@ public class RedisClusterConnectOptions extends RedisConnectOptions {
   /**
    * Sets the TTL of the hash slot cache. The TTL is expressed in milliseconds.
    * Defaults to 1000 millis (1 second).
-   * <p>
-   * This is only meaningful in case of a {@linkplain RedisClientType#CLUSTER cluster} Redis client
-   * and is ignored otherwise.
-   * </p>
    *
    * @param hashSlotCacheTTL the TTL of the hash slot cache, in millis
    */
