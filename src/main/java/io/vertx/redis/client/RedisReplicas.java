@@ -19,6 +19,10 @@ import io.vertx.codegen.annotations.VertxGen;
 
 /**
  * When should Redis replica nodes be used for queries.
+ * <p>
+ * This is only meaningful in case of a {@linkplain RedisClientType#REPLICATION replication}
+ * and {@linkplain RedisClientType#CLUSTER cluster} Redis client.
+ * </p>
  */
 @VertxGen
 public enum RedisReplicas {
