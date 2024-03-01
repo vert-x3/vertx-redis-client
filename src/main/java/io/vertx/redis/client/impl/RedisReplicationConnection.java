@@ -22,11 +22,11 @@ public class RedisReplicationConnection implements RedisConnection {
     MASTER_ONLY_COMMANDS.add(command);
   }
 
-  private final RedisClusterConnectOptions connectOptions;
+  private final RedisReplicationConnectOptions connectOptions;
   private final PooledRedisConnection master;
   private final List<PooledRedisConnection> replicas;
 
-  RedisReplicationConnection(Vertx vertx, RedisClusterConnectOptions connectOptions, PooledRedisConnection master, List<PooledRedisConnection> replicas) {
+  RedisReplicationConnection(Vertx vertx, RedisReplicationConnectOptions connectOptions, PooledRedisConnection master, List<PooledRedisConnection> replicas) {
     this.connectOptions = connectOptions;
     this.master = master;
     this.replicas = replicas;
