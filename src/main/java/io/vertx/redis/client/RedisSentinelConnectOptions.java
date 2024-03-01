@@ -102,6 +102,11 @@ public class RedisSentinelConnectOptions extends RedisConnectOptions {
   }
 
   @Override
+  public RedisSentinelConnectOptions setPreferredProtocolVersion(ProtocolVersion preferredProtocolVersion) {
+    return (RedisSentinelConnectOptions) super.setPreferredProtocolVersion(preferredProtocolVersion);
+  }
+
+  @Override
   public RedisSentinelConnectOptions setPassword(String password) {
     return (RedisSentinelConnectOptions) super.setPassword(password);
   }
@@ -109,6 +114,11 @@ public class RedisSentinelConnectOptions extends RedisConnectOptions {
   @Override
   public RedisSentinelConnectOptions setEndpoints(List<String> endpoints) {
     return (RedisSentinelConnectOptions) super.setEndpoints(endpoints);
+  }
+
+  @Override
+  public RedisSentinelConnectOptions addConnectionString(String connectionString) {
+    return (RedisSentinelConnectOptions) super.addConnectionString(connectionString);
   }
 
   @Override

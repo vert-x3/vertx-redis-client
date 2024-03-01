@@ -53,6 +53,11 @@ public class RedisStandaloneConnectOptions extends RedisConnectOptions {
   }
 
   @Override
+  public RedisStandaloneConnectOptions setPreferredProtocolVersion(ProtocolVersion preferredProtocolVersion) {
+    return (RedisStandaloneConnectOptions) super.setPreferredProtocolVersion(preferredProtocolVersion);
+  }
+
+  @Override
   public RedisStandaloneConnectOptions setPassword(String password) {
     return (RedisStandaloneConnectOptions) super.setPassword(password);
   }
@@ -60,6 +65,11 @@ public class RedisStandaloneConnectOptions extends RedisConnectOptions {
   @Override
   public RedisStandaloneConnectOptions setEndpoints(List<String> endpoints) {
     return (RedisStandaloneConnectOptions) super.setEndpoints(endpoints);
+  }
+
+  @Override
+  public RedisStandaloneConnectOptions addConnectionString(String connectionString) {
+    return (RedisStandaloneConnectOptions) super.addConnectionString(connectionString);
   }
 
   @Override
