@@ -52,19 +52,19 @@ public class RedisSentinelConnectOptions extends RedisConnectOptions {
   }
 
   /**
-   * Get the role name (only considered in HA mode).
+   * Get the client role; that is, to which kind of node should the connection be established.
    *
-   * @return the master name.
+   * @return the role
    */
   public RedisRole getRole() {
     return role;
   }
 
   /**
-   * Set the role name (only considered in HA mode).
+   * Set the client role; that is, to which kind of node should the connection be established.
    *
-   * @param role the master name.
-   * @return fluent self.
+   * @param role the role
+   * @return fluent self
    */
   public RedisConnectOptions setRole(RedisRole role) {
     this.role = role;
@@ -72,19 +72,19 @@ public class RedisSentinelConnectOptions extends RedisConnectOptions {
   }
 
   /**
-   * Get the master name (only considered in HA mode).
+   * Get the name of the master set.
    *
-   * @return the master name.
+   * @return the master set name
    */
   public String getMasterName() {
     return masterName;
   }
 
   /**
-   * Set the master name (only considered in HA mode).
+   * Set the name of the master set.
    *
-   * @param masterName the master name.
-   * @return fluent self.
+   * @param masterName the master set name
+   * @return fluent self
    */
   public RedisConnectOptions setMasterName(String masterName) {
     this.masterName = masterName;
