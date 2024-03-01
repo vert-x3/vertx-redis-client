@@ -107,6 +107,11 @@ public class RedisClusterConnectOptions extends RedisConnectOptions {
   }
 
   @Override
+  public RedisClusterConnectOptions setPreferredProtocolVersion(ProtocolVersion preferredProtocolVersion) {
+    return (RedisClusterConnectOptions) super.setPreferredProtocolVersion(preferredProtocolVersion);
+  }
+
+  @Override
   public RedisClusterConnectOptions setPassword(String password) {
     return (RedisClusterConnectOptions) super.setPassword(password);
   }
@@ -114,6 +119,11 @@ public class RedisClusterConnectOptions extends RedisConnectOptions {
   @Override
   public RedisClusterConnectOptions setEndpoints(List<String> endpoints) {
     return (RedisClusterConnectOptions) super.setEndpoints(endpoints);
+  }
+
+  @Override
+  public RedisClusterConnectOptions addConnectionString(String connectionString) {
+    return (RedisClusterConnectOptions) super.addConnectionString(connectionString);
   }
 
   @Override
