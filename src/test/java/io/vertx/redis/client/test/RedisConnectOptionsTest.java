@@ -2,6 +2,7 @@ package io.vertx.redis.client.test;
 
 import io.vertx.redis.client.RedisClusterConnectOptions;
 import io.vertx.redis.client.RedisReplicas;
+import io.vertx.redis.client.RedisReplicationConnectOptions;
 import io.vertx.redis.client.RedisRole;
 import io.vertx.redis.client.RedisSentinelConnectOptions;
 import io.vertx.redis.client.RedisStandaloneConnectOptions;
@@ -65,6 +66,39 @@ public class RedisConnectOptionsTest {
     original.setUseReplicas(RedisReplicas.SHARE);
 
     RedisClusterConnectOptions copy = new RedisClusterConnectOptions(original.toJson());
+    assertTrue(copy.isProtocolNegotiation()); // default value
+    assertEquals("password", copy.getPassword());
+    assertEquals(RedisReplicas.SHARE, copy.getUseReplicas());
+  }
+
+  // ---
+
+  @Test
+  public void testRedisReplicationConnectOptions() {
+    RedisReplicationConnectOptions options = new RedisReplicationConnectOptions();
+    assertTrue(options.isProtocolNegotiation()); // default value
+    assertEquals(RedisReplicas.NEVER, options.getUseReplicas()); // default value
+  }
+
+  @Test
+  public void testRedisReplicationConnectOptionsCopy() {
+    RedisReplicationConnectOptions original = new RedisReplicationConnectOptions();
+    original.setPassword("password");
+    original.setUseReplicas(RedisReplicas.ALWAYS);
+
+    RedisReplicationConnectOptions copy = new RedisReplicationConnectOptions(original);
+    assertTrue(copy.isProtocolNegotiation()); // default value
+    assertEquals("password", copy.getPassword());
+    assertEquals(RedisReplicas.ALWAYS, copy.getUseReplicas());
+  }
+
+  @Test
+  public void testRedisReplicationConnectOptionsFromJson() {
+    RedisReplicationConnectOptions original = new RedisReplicationConnectOptions();
+    original.setPassword("password");
+    original.setUseReplicas(RedisReplicas.SHARE);
+
+    RedisReplicationConnectOptions copy = new RedisReplicationConnectOptions(original.toJson());
     assertTrue(copy.isProtocolNegotiation()); // default value
     assertEquals("password", copy.getPassword());
     assertEquals(RedisReplicas.SHARE, copy.getUseReplicas());
