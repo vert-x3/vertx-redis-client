@@ -29,21 +29,21 @@ public enum RedisClientType {
   STANDALONE,
 
   /**
-   * The client should work in sentinel mode. When this mode is active
+   * The client should work in sentinel mode. When this mode is active,
    * use the {@link RedisRole} to define which role to get the client
    * connection to.
    */
   SENTINEL,
 
   /**
-   * The client should work in cluster mode. When this mode is active
+   * The client should work in cluster mode. When this mode is active,
    * use the {@link RedisReplicas} to define when replica nodes can be
    * used for read only queries.
    */
   CLUSTER,
 
   /**
-   * The client should work in replication mode. When this mode is active
+   * The client should work in replication mode. When this mode is active,
    * use the {@link RedisReplicas} to define when replica nodes can be
    * used for read only queries.
    */

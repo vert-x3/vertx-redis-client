@@ -18,7 +18,10 @@ package io.vertx.redis.client;
 import io.vertx.codegen.annotations.VertxGen;
 
 /**
- * Define which kind of role to be used in HA mode.
+ * The client role; that is, to which kind of node should the connection be established.
+ * <p>
+ * This is only meaningful in case of a {@linkplain RedisClientType#SENTINEL sentinel} Redis client.
+ * </p>
  */
 @VertxGen
 public enum RedisRole {
