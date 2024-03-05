@@ -182,7 +182,7 @@ public class RedisReplicationConnection implements RedisConnection {
     // always, never, share
     RedisReplicas useReplicas = connectOptions.getUseReplicas();
 
-    if (read && useReplicas != RedisReplicas.NEVER && replicas.size() > 0) {
+    if (read && useReplicas != RedisReplicas.NEVER && !replicas.isEmpty()) {
       switch (useReplicas) {
         // always use a replica for read commands
         case ALWAYS:
