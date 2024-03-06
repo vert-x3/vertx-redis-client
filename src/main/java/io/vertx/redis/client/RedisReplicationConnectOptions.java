@@ -25,26 +25,52 @@ import java.util.List;
 @JsonGen(publicConverter = false)
 public class RedisReplicationConnectOptions extends RedisConnectOptions {
 
+  private RedisTopology topology;
   private RedisReplicas useReplicas;
 
   public RedisReplicationConnectOptions() {
     super();
+    topology = RedisTopology.DISCOVER;
     useReplicas = RedisReplicas.NEVER;
   }
 
   public RedisReplicationConnectOptions(RedisOptions options) {
     super(options);
+    setTopology(options.getTopology());
     setUseReplicas(options.getUseReplicas());
   }
 
   public RedisReplicationConnectOptions(RedisReplicationConnectOptions other) {
     super(other);
+    setTopology(other.getTopology());
     setUseReplicas(other.getUseReplicas());
   }
 
   public RedisReplicationConnectOptions(JsonObject json) {
     super(json);
     RedisReplicationConnectOptionsConverter.fromJson(json, this);
+  }
+
+  /**
+   * Get how the {@linkplain RedisTopology topology} should be obtained. By default,
+   * the topology is {@linkplain RedisTopology#DISCOVER discovered} automatically.
+   *
+   * @return the topology mode
+   */
+  public RedisTopology getTopology() {
+    return topology;
+  }
+
+  /**
+   * Set how the {@linkplain RedisTopology topology} should be obtained. By default,
+   * the topology is {@linkplain RedisTopology#DISCOVER discovered} automatically.
+   *
+   * @param topology the topology mode
+   * @return fluent self
+   */
+  public RedisReplicationConnectOptions setTopology(RedisTopology topology) {
+    this.topology = topology;
+    return this;
   }
 
   /**

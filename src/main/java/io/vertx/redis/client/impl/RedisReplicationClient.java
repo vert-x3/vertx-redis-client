@@ -107,14 +107,19 @@ public class RedisReplicationClient extends BaseRedisClient implements Redis {
   @Override
   public Future<RedisConnection> connect() {
     final Promise<RedisConnection> promise = vertx.promise();
-    // make a copy as we may need to mutate the list during discovery
-    final List<String> endpoints = new LinkedList<>(connectOptions.getEndpoints());
-    // attempt to discover the topology from the first good endpoint
-    connect(endpoints, 0, ConcurrentHashMap.newKeySet(), promise);
+    List<String> endpoints = connectOptions.getEndpoints();
+    if (connectOptions.getTopology() == RedisTopology.DISCOVER) {
+      // discover the topology from the first good endpoint
+      // we make a copy of the list as we sometimes need to modify it during discovery
+      connectWithDiscoverTopology(new LinkedList<>(endpoints), 0, ConcurrentHashMap.newKeySet(), promise);
+    } else {
+      // statically defined topology, first is master, rest are replicas
+      connectWithStaticTopology(endpoints.get(0), endpoints.subList(1, endpoints.size()), promise);
+    }
     return promise.future();
   }
 
-  private void connect(List<String> endpoints, int index, Set<Throwable> failures, Handler<AsyncResult<RedisConnection>> onConnect) {
+  private void connectWithDiscoverTopology(List<String> endpoints, int index, Set<Throwable> failures, Handler<AsyncResult<RedisConnection>> onConnect) {
     if (index >= endpoints.size()) {
       // stop condition
       StringBuilder message = new StringBuilder("Cannot connect to any of the provided endpoints");
@@ -129,7 +134,7 @@ public class RedisReplicationClient extends BaseRedisClient implements Redis {
       .onFailure(err -> {
         // failed try with the next endpoint
         failures.add(err);
-        connect(endpoints, index + 1, failures, onConnect);
+        connectWithDiscoverTopology(endpoints, index + 1, failures, onConnect);
       })
       .onSuccess(conn -> {
         // fetch slots from the cluster immediately to ensure slots are correct
@@ -139,7 +144,7 @@ public class RedisReplicationClient extends BaseRedisClient implements Redis {
             conn.close();
             // try with the next one
             failures.add(getReplicas.cause());
-            connect(endpoints, index + 1, failures, onConnect);
+            connectWithDiscoverTopology(endpoints, index + 1, failures, onConnect);
             return;
           }
 
@@ -237,6 +242,38 @@ public class RedisReplicationClient extends BaseRedisClient implements Redis {
           default:
             onGetReplicas.handle(Future.failedFuture("INFO REPLICATION invalid role: " + reply.get("role")));
             break;
+        }
+      });
+  }
+
+  private void connectWithStaticTopology(String master, List<String> replicas, Promise<RedisConnection> promise) {
+    connectionManager.getConnection(master, null)
+      .onFailure(error -> {
+        promise.fail(new RedisConnectException("Cannot connect to statically configured master: " + master + "\n- " + error));
+      })
+      .onSuccess(masterConnection -> {
+        AtomicInteger counter = new AtomicInteger();
+        List<PooledRedisConnection> replicaConnections = new ArrayList<>();
+
+        for (String replica : replicas) {
+          connectionManager.getConnection(replica, RedisReplicas.NEVER != connectOptions.getUseReplicas() ? cmd(READONLY) : null)
+            .onFailure(err -> {
+              LOG.warn("Skipping failed replica: " + replica, err);
+              if (counter.incrementAndGet() == replicas.size()) {
+                promise.complete(new RedisReplicationConnection(vertx, connectOptions, masterConnection, replicaConnections));
+              }
+            })
+            .onSuccess(replicaConnection -> {
+              // there can be concurrent access to the connection map
+              // since this is a one time operation we can pay the penalty of
+              // synchronizing on each write (hopefully is only a few writes)
+              synchronized (replicaConnections) {
+                replicaConnections.add(replicaConnection);
+              }
+              if (counter.incrementAndGet() == replicas.size()) {
+                promise.complete(new RedisReplicationConnection(vertx, connectOptions, masterConnection, replicaConnections));
+              }
+            });
         }
       });
   }

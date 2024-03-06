@@ -253,10 +253,32 @@ public class RedisExamples {
           .setMaxPoolWaiting(16))
       .connect()
       .onSuccess(conn -> {
-        // this is a replication client.
-        // write operations will end up in the master node
+        // this is a replication client,
+        // write operations will end up on the master node
         conn.send(Request.cmd(Command.SET).arg("key").arg("value"));
-        // and read operations will end up in the replica nodes if available
+        // and read operations may end up on the replica nodes
+        // (depending on configuration and their availability)
+        conn.send(Request.cmd(Command.GET).arg("key"));
+      });
+  }
+
+  public void example14(Vertx vertx) {
+    Redis.createClient(
+        vertx,
+        new RedisOptions()
+          .setType(RedisClientType.REPLICATION)
+          .setTopology(RedisTopology.STATIC)
+          .addConnectionString("redis://localhost:7000")
+          .addConnectionString("redis://localhost:7004")
+          .setMaxPoolSize(4)
+          .setMaxPoolWaiting(16))
+      .connect()
+      .onSuccess(conn -> {
+        // this is a replication client,
+        // write operations will end up on the master node
+        conn.send(Request.cmd(Command.SET).arg("key").arg("value"));
+        // and read operations may end up on the replica nodes
+        // (depending on configuration and their availability)
         conn.send(Request.cmd(Command.GET).arg("key"));
       });
   }
