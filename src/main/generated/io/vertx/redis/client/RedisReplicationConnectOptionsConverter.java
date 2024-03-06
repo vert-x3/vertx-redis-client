@@ -20,6 +20,11 @@ public class RedisReplicationConnectOptionsConverter {
    static void fromJson(Iterable<java.util.Map.Entry<String, Object>> json, RedisReplicationConnectOptions obj) {
     for (java.util.Map.Entry<String, Object> member : json) {
       switch (member.getKey()) {
+        case "topology":
+          if (member.getValue() instanceof String) {
+            obj.setTopology(io.vertx.redis.client.RedisTopology.valueOf((String)member.getValue()));
+          }
+          break;
         case "useReplicas":
           if (member.getValue() instanceof String) {
             obj.setUseReplicas(io.vertx.redis.client.RedisReplicas.valueOf((String)member.getValue()));
@@ -34,6 +39,9 @@ public class RedisReplicationConnectOptionsConverter {
   }
 
    static void toJson(RedisReplicationConnectOptions obj, java.util.Map<String, Object> json) {
+    if (obj.getTopology() != null) {
+      json.put("topology", obj.getTopology().name());
+    }
     if (obj.getUseReplicas() != null) {
       json.put("useReplicas", obj.getUseReplicas().name());
     }
