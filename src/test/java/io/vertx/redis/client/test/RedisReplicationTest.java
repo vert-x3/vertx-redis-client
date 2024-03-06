@@ -47,31 +47,57 @@ public class RedisReplicationTest {
   public final RunTestOnContext rule = new RunTestOnContext();
 
   @Test
-  public void testGetClientToMaster(TestContext should) {
+  public void testGetClientToMaster_discoverTopology(TestContext should) {
     final Async test = should.async();
 
     Redis.createClient(
-      rule.vertx(),
-      new RedisOptions()
-        .setType(RedisClientType.REPLICATION)
-        .addConnectionString("redis://localhost:7000")
-        .setMaxPoolSize(4)
-        .setMaxPoolWaiting(16))
-      .connect(onCreate -> {
-        // get a connection to the master node
+        rule.vertx(),
+        new RedisOptions()
+          .setType(RedisClientType.REPLICATION)
+          .addConnectionString("redis://localhost:7000")
+          .setMaxPoolSize(4)
+          .setMaxPoolWaiting(16))
+      .connect().onComplete(onCreate -> {
         should.assertTrue(onCreate.succeeded());
         // query the info
         onCreate.result()
-          .send(Request.cmd(Command.INFO), info -> {
+          .send(Request.cmd(Command.INFO)).onComplete(info -> {
             should.assertTrue(info.succeeded());
             should.assertTrue(info.result().toString().contains("tcp_port:7000"));
+            should.assertTrue(info.result().toString().contains("role:master"));
             test.complete();
           });
       });
   }
 
   @Test
-  public void testGetClientToReplica(TestContext should) {
+  public void testGetClientToMaster_staticTopology(TestContext should) {
+    final Async test = should.async();
+
+    Redis.createClient(
+      rule.vertx(),
+      new RedisOptions()
+        .setType(RedisClientType.REPLICATION)
+        .setTopology(RedisTopology.STATIC)
+          .addConnectionString("redis://localhost:7000")
+        .addConnectionString("redis://localhost:7001")
+          .setMaxPoolSize(4)
+        .setMaxPoolWaiting(16))
+      .connect(onCreate -> {
+        should.assertTrue(onCreate.succeeded());
+        // query the info
+        onCreate.result()
+          .send(Request.cmd(Command.INFO)).onComplete(info -> {
+            should.assertTrue(info.succeeded());
+            should.assertTrue(info.result().toString().contains("tcp_port:7000"));
+            should.assertTrue(info.result().toString().contains("role:master"));
+            test.complete();
+          });
+      });
+  }
+
+  @Test
+  public void testGetClientToReplica_replicasNever_discoverTopology(TestContext should) {
     final Async test = should.async();
 
     Redis client = Redis.createClient(rule.vertx(), "redis://localhost:7000");
@@ -87,15 +113,15 @@ public class RedisReplicationTest {
               .addConnectionString("redis://localhost:" + port)
               .setMaxPoolSize(4)
               .setMaxPoolWaiting(16))
-                  .connect(onCreate -> {
-            // get a connection to the master node
+          .connect().onComplete(onCreate -> {
             should.assertTrue(onCreate.succeeded());
             // query the info
             onCreate.result()
-                      .send(Request.cmd(Command.INFO), info -> {
+              .send(Request.cmd(Command.INFO), info -> {
                 should.assertTrue(info.succeeded());
-                // even though we list the replica node, the main connection happens to the master
+                // we force read commands to go to the master
                 should.assertTrue(info.result().toString().contains("tcp_port:7000"));
+                should.assertTrue(info.result().toString().contains("role:master"));
                 test.complete();
               });
           });
@@ -103,7 +129,41 @@ public class RedisReplicationTest {
   }
 
   @Test
-  public void testGetClientToReplicaUseReplicasAlways(TestContext should) {
+  public void testGetClientToReplica_replicasNever_staticTopology(TestContext should) {
+    final Async test = should.async();
+
+    Redis client = Redis.createClient(rule.vertx(), "redis://localhost:7000");
+    waitForOnlineReplica(client, 10)
+      .onFailure(should::fail)
+      .onSuccess(port -> {
+        // real start of the test
+        Redis.createClient(
+            rule.vertx(),
+            new RedisOptions()
+              .setType(RedisClientType.REPLICATION)
+              .setTopology(RedisTopology.STATIC)
+              .setUseReplicas(RedisReplicas.NEVER)
+              .addConnectionString("redis://localhost:7000")
+              .addConnectionString("redis://localhost:" + port)
+              .setMaxPoolSize(4)
+              .setMaxPoolWaiting(16))
+                  .connect(onCreate -> {
+            should.assertTrue(onCreate.succeeded());
+            // query the info
+            onCreate.result()
+                      .send(Request.cmd(Command.INFO), info -> {
+                should.assertTrue(info.succeeded());
+                // we force read commands to go to the master
+                should.assertTrue(info.result().toString().contains("tcp_port:7000"));
+                should.assertTrue(info.result().toString().contains("role:master"));
+                test.complete();
+              });
+          });
+      });
+  }
+
+  @Test
+  public void testGetClientToReplica_replicasAlways_discoverTopology(TestContext should) {
     final Async test = should.async();
 
     Redis client = Redis.createClient(rule.vertx(), "redis://localhost:7000");
@@ -120,7 +180,6 @@ public class RedisReplicationTest {
               .setMaxPoolSize(4)
               .setMaxPoolWaiting(16))
                   .connect(onCreate -> {
-            // get a connection to the master node
             should.assertTrue(onCreate.succeeded());
             // query the info
             onCreate.result()
@@ -128,6 +187,41 @@ public class RedisReplicationTest {
                 should.assertTrue(info.succeeded());
                 // we force read commands to go to replicas
                 should.assertTrue(info.result().toString().contains("tcp_port:" + port));
+                should.assertTrue(info.result().toString().contains("role:slave"));
+                test.complete();
+              });
+          });
+      });
+  }
+
+  @Test
+  public void testGetClientToReplica_replicasAlways_staticTopology(TestContext should) {
+    final Async test = should.async();
+
+    Redis client = Redis.createClient(rule.vertx(), "redis://localhost:7000");
+    waitForOnlineReplica(client, 10)
+      .onFailure(should::fail)
+      .onSuccess(port -> {
+        // real start of the test
+        Redis.createClient(
+            rule.vertx(),
+            new RedisOptions()
+              .setType(RedisClientType.REPLICATION)
+              .setTopology(RedisTopology.STATIC)
+              .setUseReplicas(RedisReplicas.ALWAYS)
+              .addConnectionString("redis://localhost:7000")
+              .addConnectionString("redis://localhost:" + port)
+              .setMaxPoolSize(4)
+              .setMaxPoolWaiting(16))
+          .connect().onComplete(onCreate -> {
+            should.assertTrue(onCreate.succeeded());
+            // query the info
+            onCreate.result()
+              .send(Request.cmd(Command.INFO)).onComplete(info -> {
+                should.assertTrue(info.succeeded());
+                // we force read commands to go to replicas
+                should.assertTrue(info.result().toString().contains("tcp_port:" + port));
+                should.assertTrue(info.result().toString().contains("role:slave"));
                 test.complete();
               });
           });
@@ -182,8 +276,25 @@ public class RedisReplicationTest {
   }
 
   @Test
-  public void preservesContext(TestContext should) {
-    Redis client = Redis.createClient(rule.vertx(), new RedisOptions().setType(RedisClientType.REPLICATION).addConnectionString("redis://localhost:7000"));
+  public void preservesContext_discoverTopology(TestContext should) {
+    Redis client = Redis.createClient(rule.vertx(), new RedisOptions()
+      .setType(RedisClientType.REPLICATION)
+      .addConnectionString("redis://localhost:7000"));
+
+    PreservesContext.sendWithoutConnect(client, should);
+    PreservesContext.batchWithoutConnect(client, should);
+    PreservesContext.connect(client, should);
+    PreservesContext.connectThenSend(client, should);
+    PreservesContext.connectThenBatch(client, should);
+  }
+
+  @Test
+  public void preservesContext_staticTopology(TestContext should) {
+    Redis client = Redis.createClient(rule.vertx(), new RedisOptions()
+      .setType(RedisClientType.REPLICATION)
+      .setTopology(RedisTopology.STATIC)
+      .addConnectionString("redis://localhost:7000")
+      .addConnectionString("redis://localhost:7001"));
 
     PreservesContext.sendWithoutConnect(client, should);
     PreservesContext.batchWithoutConnect(client, should);

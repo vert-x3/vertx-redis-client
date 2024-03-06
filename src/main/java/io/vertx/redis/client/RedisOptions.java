@@ -36,13 +36,14 @@ import java.util.List;
 public class RedisOptions {
 
   /**
-   * The default redis endpoint = {@code redis://localhost:6379}
+   * The default Redis endpoint: {@code redis://localhost:6379}
    */
   public static final String DEFAULT_ENDPOINT = "redis://localhost:6379";
 
   private RedisClientType type;
   private NetClientOptions netClientOptions;
   private List<String> endpoints;
+  private RedisTopology topology;
   private PoolOptions poolOptions;
   private int maxWaitingHandlers;
   private int maxNestedArrays;
@@ -64,6 +65,7 @@ public class RedisOptions {
       new NetClientOptions()
         .setTcpKeepAlive(true)
         .setTcpNoDelay(true);
+    topology = RedisTopology.DISCOVER;
     poolOptions = new PoolOptions();
     maxWaitingHandlers = 2048;
     maxNestedArrays = 32;
@@ -84,6 +86,7 @@ public class RedisOptions {
     this.type = other.type;
     this.netClientOptions = other.netClientOptions;
     this.endpoints = other.endpoints;
+    this.topology = other.topology;
     this.poolOptions = new PoolOptions(other.poolOptions);
     this.maxWaitingHandlers = other.maxWaitingHandlers;
     this.maxNestedArrays = other.maxNestedArrays;
@@ -256,6 +259,40 @@ public class RedisOptions {
     }
 
     this.endpoints.add(connectionString);
+    return this;
+  }
+
+  /**
+   * Get how the {@linkplain RedisTopology topology} should be obtained. By default,
+   * the topology is {@linkplain RedisTopology#DISCOVER discovered} automatically.
+   * <p>
+   * This is only meaningful in case of a {@linkplain RedisClientType#REPLICATION replication}
+   * Redis client. In case of a {@linkplain RedisClientType#CLUSTER cluster} and
+   * {@linkplain RedisClientType#SENTINEL sentinel} Redis client, topology is currently
+   * always discovered automatically and the topology mode is ignored.
+   * </p>
+   *
+   * @return the topology mode
+   */
+  public RedisTopology getTopology() {
+    return topology;
+  }
+
+  /**
+   * Set how the {@linkplain RedisTopology topology} should be obtained. By default,
+   * the topology is {@linkplain RedisTopology#DISCOVER discovered} automatically.
+   * <p>
+   * This is only meaningful in case of a {@linkplain RedisClientType#REPLICATION replication}
+   * Redis client. In case of a {@linkplain RedisClientType#CLUSTER cluster} and
+   * {@linkplain RedisClientType#SENTINEL sentinel} Redis client, topology is currently
+   * always discovered automatically and the topology mode is ignored.
+   * </p>
+   *
+   * @param topology the topology mode
+   * @return fluent self
+   */
+  public RedisOptions setTopology(RedisTopology topology) {
+    this.topology = topology;
     return this;
   }
 
