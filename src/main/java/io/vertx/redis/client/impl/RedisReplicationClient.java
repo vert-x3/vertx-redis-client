@@ -170,7 +170,8 @@ public class RedisReplicationClient extends BaseRedisClient implements Redis {
               continue;
             }
 
-            connectionManager.getConnection(replica.endpoint(), RedisReplicas.NEVER != connectOptions.getUseReplicas() ? cmd(READONLY) : null)
+            // we don't send `READONLY` setup to replica nodes, because that's a cluster-only command
+            connectionManager.getConnection(replica.endpoint(), null)
               .onFailure(err -> {
                 // failed try with the next endpoint
                 LOG.warn("Skipping failed replica: " + replica.ip + ":" + replica.port, err);
@@ -259,7 +260,8 @@ public class RedisReplicationClient extends BaseRedisClient implements Redis {
         List<PooledRedisConnection> replicaConnections = new ArrayList<>();
 
         for (String replica : replicas) {
-          connectionManager.getConnection(replica, RedisReplicas.NEVER != connectOptions.getUseReplicas() ? cmd(READONLY) : null)
+          // we don't send `READONLY` setup to replica nodes, because that's a cluster-only command
+          connectionManager.getConnection(replica, null)
             .onFailure(err -> {
               LOG.warn("Skipping failed replica: " + replica, err);
               if (counter.incrementAndGet() == replicas.size()) {
