@@ -129,10 +129,11 @@ public class RedisSentinelClient extends BaseRedisClient implements Redis {
       final String endpoint = getBaseEndpoint(uri);
       final Request setup;
 
-      // SELECT is only allowed on non sentinel
+      // `SELECT` is only allowed on non-sentinel nodes
       if (role != RedisRole.SENTINEL && uri.select() != null) {
         setup = cmd(SELECT).arg(uri.select());
       } else {
+        // we don't send `READONLY` setup to replica nodes, because that's a cluster-only command
         setup = null;
       }
 
