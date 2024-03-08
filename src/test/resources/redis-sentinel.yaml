@@ -1,0 +1,55 @@
+# io.vertx.test.redis.containers.RedisSentinel
+services:
+  redis-master:
+    image: docker.io/bitnami/redis:7.2
+    environment:
+      ALLOW_EMPTY_PASSWORD: "yes"
+      REDIS_REPLICATION_MODE: master
+
+  redis-replica0:
+    image: docker.io/bitnami/redis:7.2
+    depends_on:
+    - redis-master
+    environment:
+      ALLOW_EMPTY_PASSWORD: "yes"
+      REDIS_REPLICATION_MODE: replica
+      REDIS_MASTER_HOST: redis-master
+
+  redis-replica1:
+    image: docker.io/bitnami/redis:7.2
+    depends_on:
+    - redis-master
+    environment:
+      ALLOW_EMPTY_PASSWORD: "yes"
+      REDIS_REPLICATION_MODE: replica
+      REDIS_MASTER_HOST: redis-master
+
+  redis-sentinel0:
+    image: docker.io/bitnami/redis-sentinel:7.2
+    depends_on:
+    - redis-master
+    - redis-replica0
+    - redis-replica1
+    environment:
+      ALLOW_EMPTY_PASSWORD: "yes"
+      REDIS_MASTER_HOST: redis-master
+
+  redis-sentinel1:
+    image: docker.io/bitnami/redis-sentinel:7.2
+    depends_on:
+    - redis-master
+    - redis-replica0
+    - redis-replica1
+    environment:
+      ALLOW_EMPTY_PASSWORD: "yes"
+      REDIS_MASTER_HOST: redis-master
+
+  redis-sentinel2:
+    image: docker.io/bitnami/redis-sentinel:7.2
+    depends_on:
+    - redis-master
+    - redis-replica0
+    - redis-replica1
+    environment:
+      ALLOW_EMPTY_PASSWORD: "yes"
+      REDIS_MASTER_HOST: redis-master

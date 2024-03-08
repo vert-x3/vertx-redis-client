@@ -1,0 +1,44 @@
+# io.vertx.test.redis.containers.RedisCluster
+services:
+  redis-node0:
+    image: docker.io/bitnami/redis-cluster:7.2
+    environment:
+      ALLOW_EMPTY_PASSWORD: "yes"
+      REDIS_NODES: redis-node0 redis-node1 redis-node2 redis-node3 redis-node4 redis-node5
+
+  redis-node1:
+    image: docker.io/bitnami/redis-cluster:7.2
+    environment:
+      ALLOW_EMPTY_PASSWORD: "yes"
+      REDIS_NODES: redis-node0 redis-node1 redis-node2 redis-node3 redis-node4 redis-node5
+
+  redis-node2:
+    image: docker.io/bitnami/redis-cluster:7.2
+    environment:
+      ALLOW_EMPTY_PASSWORD: "yes"
+      REDIS_NODES: redis-node0 redis-node1 redis-node2 redis-node3 redis-node4 redis-node5
+
+  redis-node3:
+    image: docker.io/bitnami/redis-cluster:7.2
+    environment:
+      ALLOW_EMPTY_PASSWORD: "yes"
+      REDIS_NODES: redis-node0 redis-node1 redis-node2 redis-node3 redis-node4 redis-node5
+
+  redis-node4:
+    image: docker.io/bitnami/redis-cluster:7.2
+    environment:
+      ALLOW_EMPTY_PASSWORD: "yes"
+      REDIS_NODES: redis-node0 redis-node1 redis-node2 redis-node3 redis-node4 redis-node5
+
+  redis-node5:
+    image: docker.io/bitnami/redis-cluster:7.2
+    depends_on:
+    - redis-node0
+    - redis-node1
+    - redis-node2
+    - redis-node3
+    - redis-node4
+    environment:
+      ALLOW_EMPTY_PASSWORD: "yes"
+      REDIS_NODES: redis-node0 redis-node1 redis-node2 redis-node3 redis-node4 redis-node5
+      REDIS_CLUSTER_CREATOR: "yes"
