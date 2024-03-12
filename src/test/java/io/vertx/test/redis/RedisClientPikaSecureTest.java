@@ -7,15 +7,20 @@ import io.vertx.ext.unit.junit.RunTestOnContext;
 import io.vertx.ext.unit.junit.VertxUnitRunner;
 import io.vertx.redis.client.Redis;
 import io.vertx.redis.client.RedisOptions;
-import org.junit.*;
+import org.junit.After;
+import org.junit.Before;
+import org.junit.ClassRule;
+import org.junit.Rule;
+import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.testcontainers.containers.BindMode;
 import org.testcontainers.containers.GenericContainer;
 
-import java.util.UUID;
-
-import static io.vertx.redis.client.Command.*;
+import static io.vertx.redis.client.Command.GET;
+import static io.vertx.redis.client.Command.HSET;
+import static io.vertx.redis.client.Command.SET;
 import static io.vertx.redis.client.Request.cmd;
+import static io.vertx.redis.client.test.TestUtils.randomKey;
 
 @RunWith(VertxUnitRunner.class)
 public class RedisClientPikaSecureTest {
@@ -49,15 +54,11 @@ public class RedisClientPikaSecureTest {
     client.close();
   }
 
-  private static String makeKey() {
-    return UUID.randomUUID().toString();
-  }
-
   @Test(timeout = 10_000L)
   public void testBasicInterop(TestContext should) {
     final Async test = should.async();
-    final String nonexisting = makeKey();
-    final String mykey = makeKey();
+    final String nonexisting = randomKey();
+    final String mykey = randomKey();
 
     client.send(cmd(GET).arg(nonexisting)).onComplete(reply0 -> {
       should.assertTrue(reply0.succeeded());
@@ -77,7 +78,7 @@ public class RedisClientPikaSecureTest {
   @Test(timeout = 10_000L)
   public void testJson(TestContext should) {
     final Async test = should.async();
-    final String mykey = makeKey();
+    final String mykey = randomKey();
 
     JsonObject json = new JsonObject()
       .putNull("nullKey");
