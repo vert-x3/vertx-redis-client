@@ -7,37 +7,25 @@ import io.vertx.ext.unit.Async;
 import io.vertx.ext.unit.TestContext;
 import io.vertx.ext.unit.junit.RunTestOnContext;
 import io.vertx.ext.unit.junit.VertxUnitRunner;
-import io.vertx.redis.client.*;
-import org.junit.*;
+import io.vertx.redis.client.Command;
+import io.vertx.redis.client.Redis;
+import io.vertx.redis.client.RedisClientType;
+import io.vertx.redis.client.RedisConnection;
+import io.vertx.redis.client.RedisOptions;
+import io.vertx.redis.client.Request;
+import io.vertx.redis.containers.RedisCluster;
+import org.junit.After;
+import org.junit.Before;
+import org.junit.ClassRule;
+import org.junit.Rule;
+import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.testcontainers.containers.FixedHostPortGenericContainer;
-import org.testcontainers.containers.GenericContainer;
 
 @RunWith(VertxUnitRunner.class)
 public class RedisPubSubTest {
 
   @ClassRule
-  public static final GenericContainer<?> redis = new FixedHostPortGenericContainer<>("grokzen/redis-cluster:6.2.0")
-    .withEnv("IP", "0.0.0.0")
-    .withEnv("STANDALONE", "true")
-    .withEnv("SENTINEL", "true")
-    .withExposedPorts(7000, 7001, 7002, 7003, 7004, 7005, 7006, 7007, 5000, 5001, 5002)
-    // cluster ports (7000-7005) 6x (master+replica) 3 nodes
-    .withFixedExposedPort(7000, 7000)
-    .withFixedExposedPort(7001, 7001)
-    .withFixedExposedPort(7002, 7002)
-    .withFixedExposedPort(7003, 7003)
-    .withFixedExposedPort(7004, 7004)
-    .withFixedExposedPort(7005, 7005)
-    // standalone ports (7006-7007) 2x
-    .withFixedExposedPort(7006, 7006)
-    .withFixedExposedPort(7007, 7007)
-    // sentinel ports (5000-5002) 3x (match the cluster master nodes)
-    .withFixedExposedPort(5000, 5000)
-    .withFixedExposedPort(5001, 5001)
-    .withFixedExposedPort(5002, 5002)
-    // workaround for new version of the Docker image that doesn't use the built `redis-sentinel` binary correctly
-    .withCommand("/bin/bash", "-c", "sed -i -e 's|redis-sentinel|/redis/src/redis-sentinel|g' /docker-entrypoint.sh && exec /docker-entrypoint.sh redis-cluster");
+  public static final RedisCluster redis = new RedisCluster();
 
   @Rule
   public final RunTestOnContext rule = new RunTestOnContext(new VertxOptions().setEventLoopPoolSize(1));
@@ -52,7 +40,7 @@ public class RedisPubSubTest {
   public void before(TestContext should) {
     Async test = should.async();
     RedisOptions options = new RedisOptions()
-      .setConnectionString("redis://localhost:7001")
+      .setConnectionString(redis.getRedisNode0Uri())
       .setType(RedisClientType.CLUSTER);
     redisPublish = Redis.createClient(rule.vertx(), options)
       .connect(connectPub -> {

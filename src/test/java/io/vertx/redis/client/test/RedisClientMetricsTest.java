@@ -14,12 +14,12 @@ import io.vertx.redis.client.Redis;
 import io.vertx.redis.client.RedisOptions;
 import io.vertx.redis.client.Request;
 import io.vertx.redis.client.impl.CommandImpl;
+import io.vertx.redis.containers.RedisStandalone;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.ClassRule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.testcontainers.containers.GenericContainer;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -29,8 +29,7 @@ import java.util.List;
 @RunWith(VertxUnitRunner.class)
 public class RedisClientMetricsTest {
   @ClassRule
-  public static final GenericContainer<?> redis = new GenericContainer<>("redis:7")
-    .withExposedPorts(6379);
+  public static final RedisStandalone redis = new RedisStandalone();
 
   Vertx vertx;
   ClientMetrics metrics;
@@ -46,7 +45,7 @@ public class RedisClientMetricsTest {
         }
       }))
     );
-    client = Redis.createClient(vertx, new RedisOptions().setConnectionString("redis://" + redis.getHost() + ":" + redis.getFirstMappedPort()));
+    client = Redis.createClient(vertx, new RedisOptions().setConnectionString(redis.getRedisUri()));
   }
 
   @After
