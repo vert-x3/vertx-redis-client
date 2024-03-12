@@ -13,25 +13,36 @@ import io.vertx.redis.client.Redis;
 import io.vertx.redis.client.RedisOptions;
 import io.vertx.redis.client.Response;
 import io.vertx.redis.client.impl.types.ErrorType;
-import org.junit.*;
+import io.vertx.redis.containers.RedisStandalone;
+import org.junit.After;
+import org.junit.Before;
+import org.junit.ClassRule;
+import org.junit.Ignore;
+import org.junit.Rule;
+import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.testcontainers.containers.GenericContainer;
 
-import java.util.UUID;
 import java.util.concurrent.atomic.AtomicInteger;
 
-import static io.vertx.redis.client.Command.*;
+import static io.vertx.redis.client.Command.ACL;
+import static io.vertx.redis.client.Command.CLIENT;
+import static io.vertx.redis.client.Command.EVAL;
+import static io.vertx.redis.client.Command.GET;
+import static io.vertx.redis.client.Command.HGETALL;
+import static io.vertx.redis.client.Command.HSET;
+import static io.vertx.redis.client.Command.SET;
+import static io.vertx.redis.client.Command.SUBSCRIBE;
 import static io.vertx.redis.client.Request.cmd;
+import static io.vertx.redis.client.test.TestUtils.randomKey;
 
 @RunWith(VertxUnitRunner.class)
 public class RedisClient7Test {
 
+  @ClassRule
+  public static final RedisStandalone redis = new RedisStandalone();
+
   @Rule
   public final RunTestOnContext rule = new RunTestOnContext();
-
-  @ClassRule
-  public static final GenericContainer<?> redis = new GenericContainer<>("redis:7.0")
-    .withExposedPorts(6379);
 
   private Redis client;
 
@@ -41,7 +52,7 @@ public class RedisClient7Test {
 
     client = Redis.createClient(
       rule.vertx(),
-      new RedisOptions().setConnectionString("redis://" + redis.getHost() + ":" + redis.getFirstMappedPort() + "?client=tester"));
+      new RedisOptions().setConnectionString("redis://" + redis.getHost() + ":" + redis.getPort() + "?client=tester"));
 
     client.connect().onComplete(onConnect -> {
       should.assertTrue(onConnect.succeeded());
@@ -55,15 +66,11 @@ public class RedisClient7Test {
     client.close();
   }
 
-  private static String makeKey() {
-    return UUID.randomUUID().toString();
-  }
-
-  @Test(timeout = 10_000L)
+  @Test
   public void testBasicInterop(TestContext should) {
     final Async test = should.async();
-    final String nonexisting = makeKey();
-    final String mykey = makeKey();
+    final String nonexisting = randomKey();
+    final String mykey = randomKey();
 
     client.send(cmd(GET).arg(nonexisting)).onComplete(reply0 -> {
       should.assertTrue(reply0.succeeded());
@@ -134,7 +141,7 @@ public class RedisClient7Test {
   @Test
   public void testBoolean(TestContext should) {
     final Async test = should.async();
-    final String key = makeKey();
+    final String key = randomKey();
 
     client.send(cmd(HSET).arg(key).arg("true").arg(true).arg("false").arg(false))
       .onFailure(should::fail)
@@ -152,7 +159,7 @@ public class RedisClient7Test {
   @Test(timeout = 10_000L)
   public void testJson(TestContext should) {
     final Async test = should.async();
-    final String mykey = makeKey();
+    final String mykey = randomKey();
 
     JsonObject json = new JsonObject()
       .putNull("nullKey");
@@ -176,7 +183,7 @@ public class RedisClient7Test {
         // create a new client, this time using alice ACL
         Redis alice = Redis.createClient(
           rule.vertx(),
-          new RedisOptions().setConnectionString("redis://alice:p1pp0@" + redis.getHost() + ":" + redis.getFirstMappedPort() + "?client=tester"));
+          new RedisOptions().setConnectionString("redis://alice:p1pp0@" + redis.getHost() + ":" + redis.getPort() + "?client=tester"));
 
         // connect should be fine
         alice.connect()
@@ -210,7 +217,7 @@ public class RedisClient7Test {
         @Override
         public void start(Promise<Void> onStart) {
           Redis redisClient = Redis.createClient(rule.vertx(), new RedisOptions()
-            .setConnectionString("redis://" + redis.getHost() + ":" + redis.getFirstMappedPort() + "/0")
+            .setConnectionString("redis://" + redis.getHost() + ":" + redis.getPort() + "/0")
             .setMaxPoolSize(10)
             .setMaxPoolWaiting(10000));
 
@@ -241,7 +248,7 @@ public class RedisClient7Test {
   @Test
   public void testBooleanVarArgs(TestContext should) {
     final Async test = should.async();
-    final String key = makeKey();
+    final String key = randomKey();
 
     client.send(cmd(HSET, key, "true", true, "false", false))
       .onFailure(should::fail)
@@ -259,7 +266,7 @@ public class RedisClient7Test {
   @Test
   public void testNaN(TestContext should) {
     final Async test = should.async();
-    final String key = makeKey();
+    final String key = randomKey();
 
     client.send(cmd(EVAL).arg("return tostring(0/0)").arg(0))
       .onFailure(should::fail)
