@@ -9,11 +9,11 @@ import io.vertx.redis.client.ProtocolVersion;
 import io.vertx.redis.client.Redis;
 import io.vertx.redis.client.RedisOptions;
 import io.vertx.redis.client.Request;
+import io.vertx.redis.containers.RedisStandalone;
 import org.junit.ClassRule;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.testcontainers.containers.GenericContainer;
 
 import java.util.Arrays;
 import java.util.HashSet;
@@ -21,8 +21,7 @@ import java.util.HashSet;
 @RunWith(VertxUnitRunner.class)
 public class RedisProtocolVersionTest {
   @ClassRule
-  public static final GenericContainer<?> redis = new GenericContainer<>("redis:7")
-    .withExposedPorts(6379);
+  public static final RedisStandalone redis = new RedisStandalone();
 
   @Rule
   public final RunTestOnContext rule = new RunTestOnContext();
@@ -30,7 +29,7 @@ public class RedisProtocolVersionTest {
   @Test
   public void resp2(TestContext test) {
     RedisOptions options = new RedisOptions()
-      .setConnectionString("redis://" + redis.getHost() + ":" + redis.getFirstMappedPort())
+      .setConnectionString(redis.getRedisUri())
       .setPreferredProtocolVersion(ProtocolVersion.RESP2);
 
     Redis client = Redis.createClient(rule.vertx(), options);
@@ -66,7 +65,7 @@ public class RedisProtocolVersionTest {
   @Test
   public void resp3(TestContext test) {
     RedisOptions options = new RedisOptions()
-      .setConnectionString("redis://" + redis.getHost() + ":" + redis.getFirstMappedPort())
+      .setConnectionString(redis.getRedisUri())
       .setPreferredProtocolVersion(ProtocolVersion.RESP3);
 
     Redis client = Redis.createClient(rule.vertx(), options);

@@ -10,11 +10,11 @@ import io.vertx.ext.unit.junit.VertxUnitRunner;
 import io.vertx.redis.client.Redis;
 import io.vertx.redis.client.RedisAPI;
 import io.vertx.redis.client.RedisOptions;
+import io.vertx.redis.containers.RedisStandalone;
 import org.junit.ClassRule;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.testcontainers.containers.GenericContainer;
 
 import java.util.Collections;
 
@@ -22,7 +22,7 @@ import java.util.Collections;
 public class RedisThreadConsistencyTest {
 
   @ClassRule
-  public static final GenericContainer<?> container = new GenericContainer<>("redis:6.0.6").withExposedPorts(6379);
+  public static final RedisStandalone redis = new RedisStandalone();
 
   @Rule
   public final RunTestOnContext rule = new RunTestOnContext();
@@ -36,7 +36,7 @@ public class RedisThreadConsistencyTest {
         RedisAPI.api(
           Redis.createClient(
             rule.vertx(),
-            new RedisOptions().setConnectionString("redis://" + container.getContainerIpAddress() + ":" + container.getFirstMappedPort())))))
+            new RedisOptions().setConnectionString(redis.getRedisUri())))))
       .onFailure(should::fail)
       .onSuccess(id -> {
         rule.vertx()
