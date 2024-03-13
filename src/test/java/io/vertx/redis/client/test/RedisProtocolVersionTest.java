@@ -15,6 +15,9 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.testcontainers.containers.GenericContainer;
 
+import java.util.Arrays;
+import java.util.HashSet;
+
 @RunWith(VertxUnitRunner.class)
 public class RedisProtocolVersionTest {
   @ClassRule
@@ -43,13 +46,15 @@ public class RedisProtocolVersionTest {
         return client.send(Request.cmd(Command.HGETALL).arg("myhash"));
       })
       .onSuccess(response -> {
-        test.assertTrue(response.toString().startsWith("[")); // list
+        test.assertTrue(response.isArray());
 
         test.assertTrue(response.containsKey("field1"));
         test.assertEquals(1, response.get("field1").toInteger());
 
         test.assertTrue(response.containsKey("field2"));
         test.assertEquals(2, response.get("field2").toInteger());
+
+        test.assertEquals(new HashSet<>(Arrays.asList("field1", "field2")), response.getKeys());
 
         test.assertEquals("field1", response.get(0).toString());
 
@@ -77,13 +82,15 @@ public class RedisProtocolVersionTest {
         return client.send(Request.cmd(Command.HGETALL).arg("myhash"));
       })
       .onSuccess(response -> {
-        test.assertTrue(response.toString().startsWith("{")); // map
+        test.assertTrue(response.isMap());
 
         test.assertTrue(response.containsKey("field1"));
         test.assertEquals(3, response.get("field1").toInteger());
 
         test.assertTrue(response.containsKey("field2"));
         test.assertEquals(4, response.get("field2").toInteger());
+
+        test.assertEquals(new HashSet<>(Arrays.asList("field1", "field2")), response.getKeys());
 
         try {
           response.get(0);

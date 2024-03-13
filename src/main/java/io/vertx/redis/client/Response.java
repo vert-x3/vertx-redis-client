@@ -287,6 +287,29 @@ public interface Response extends Iterable<Response> {
   }
 
   /**
+   * Returns whether this multi response is an array and hence {@link #get(int)} can be called.
+   * <p>
+   * Returns {@code true} also for {@link ResponseType#PUSH} and {@link ResponseType#ATTRIBUTE}.
+   *
+   * @return whether this multi response is an array
+   */
+  default boolean isArray() {
+    throw new UnsupportedOperationException("This type doesn't hold an Array/Map type");
+  }
+
+  /**
+   * Returns whether this multi response is a map and hence {@link #get(String)},
+   * {@link #containsKey(String)} and {@link #getKeys()} may be called.
+   * <p>
+   * Returns {@code true} also for {@link ResponseType#ATTRIBUTE}.
+   *
+   * @return whether this multi response is a map
+   */
+  default boolean isMap() {
+    throw new UnsupportedOperationException("This type doesn't hold an Array/Map type");
+  }
+
+  /**
    * Return an iterator so it can be iterated using the foreach construct.
    *
    * @return response iterator.
@@ -294,7 +317,7 @@ public interface Response extends Iterable<Response> {
   @Override
   @GenIgnore
   default Iterator<Response> iterator() {
-    throw new UnsupportedOperationException("This type doesn't hold a Array type");
+    throw new UnsupportedOperationException("This type doesn't hold an Array/Map type");
   }
 
   /**
