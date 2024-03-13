@@ -75,6 +75,11 @@ public final class AttributeType implements Multi {
   }
 
   @Override
+  public boolean containsKey(String key) {
+    return map.containsKey(key);
+  }
+
+  @Override
   public Set<String> getKeys() {
     return map.keySet();
   }
@@ -82,6 +87,16 @@ public final class AttributeType implements Multi {
   @Override
   public int size() {
     return replies.length;
+  }
+
+  @Override
+  public boolean isArray() {
+    return true;
+  }
+
+  @Override
+  public boolean isMap() {
+    return true;
   }
 
   @Override
