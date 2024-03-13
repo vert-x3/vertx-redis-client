@@ -193,6 +193,16 @@ public final class MultiType implements Multi {
   }
 
   @Override
+  public boolean isArray() {
+    return multi != null;
+  }
+
+  @Override
+  public boolean isMap() {
+    return map != null;
+  }
+
+  @Override
   public String toString() {
     final StringBuilder sb = new StringBuilder();
 
