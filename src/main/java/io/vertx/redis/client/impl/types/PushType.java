@@ -59,6 +59,16 @@ public final class PushType implements Multi {
   }
 
   @Override
+  public boolean isArray() {
+    return true;
+  }
+
+  @Override
+  public boolean isMap() {
+    return false;
+  }
+
+  @Override
   public String toString() {
     final StringBuilder sb = new StringBuilder();
 
