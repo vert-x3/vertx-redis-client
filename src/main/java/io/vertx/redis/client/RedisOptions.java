@@ -385,22 +385,35 @@ public class RedisOptions {
   }
 
   /**
-   * Tune how often in milliseconds should the connection pool cleaner execute.
+   * Get how often the connection pool will be cleaned. Cleaning the connection pool
+   * means scanning for unused invalid connections and if any are found, they are forcibly
+   * closed and evicted from the pool.
+   * <p>
+   * A connection is marked invalid if it enters a exception or fatal state or if it exists
+   * longer than the {@linkplain #getPoolRecycleTimeout() recycle timeout}.
+   * <p>
+   * The return value is in milliseconds. By default, the cleaning interval is 30 seconds.
+   * The value of -1 means connection pool cleaning is disabled.
    *
-   * @return the cleaning internal
+   * @return the cleaning interval in milliseconds, or -1 for never
    */
   public int getPoolCleanerInterval() {
     return poolOptions.getCleanerInterval();
   }
 
   /**
-   * Tune how often in milliseconds should the connection pool cleaner execute.
+   * Set how often the connection pool will be cleaned. Cleaning the connection pool
+   * means scanning for unused invalid connections and if any are found, they are forcibly
+   * closed and evicted from the pool.
+   * <p>
+   * A connection is marked invalid if it enters a exception or fatal state or if it exists
+   * longer than the {@linkplain #setPoolRecycleTimeout(int) recycle timeout}.
+   * <p>
+   * The value is in milliseconds. By default, the cleaning interval is 30 seconds.
+   * The value of -1 means connection pool cleaning is disabled.
    *
-   * For each connection in the pool, connections marked as invalid will be forcibly closed. A connection is marked
-   * invalid if it enters a exception or fatal state.
-   *
-   * @param poolCleanerInterval the interval in milliseconds (-1 for never)
-   * @return fluent self.
+   * @param poolCleanerInterval the cleaning interval in milliseconds, or -1 for never
+   * @return fluent self
    */
   public RedisOptions setPoolCleanerInterval(int poolCleanerInterval) {
     poolOptions.setCleanerInterval(poolCleanerInterval);
@@ -408,20 +421,26 @@ public class RedisOptions {
   }
 
   /**
-   * Tune the maximum size of the connection pool.
+   * Get the maximum size of the connection pool.
+   * <p>
+   * By default, the maximum pool size is 6.
    *
-   * @return the size.
+   * @return the maximum pool size
    */
   public int getMaxPoolSize() {
     return poolOptions.getMaxSize();
   }
 
   /**
-   * Tune the maximum size of the connection pool. When working with cluster or sentinel
-   * this value should be atleast the total number of cluster member (or number of sentinels + 1)
+   * Set the maximum size of the connection pool.
+   * <p>
+   * By default, the maximum pool size is 6.
+   * <p>
+   * When working with cluster or sentinel, this value should be at least the total
+   * number of cluster member (or number of sentinels + 1).
    *
-   * @param maxPoolSize the max pool size.
-   * @return fluent self.
+   * @param maxPoolSize the maximum pool size
+   * @return fluent self
    */
   public RedisOptions setMaxPoolSize(int maxPoolSize) {
     poolOptions.setMaxSize(maxPoolSize);
@@ -429,19 +448,23 @@ public class RedisOptions {
   }
 
   /**
-   * Tune the maximum waiting requests for a connection from the pool.
+   * Get the maximum number of requests waiting for a connection from the pool.
+   * <p>
+   * By default, the maximum number of waiting requests size is 24.
    *
-   * @return the maximum waiting requests.
+   * @return the maximum number of waiting requests
    */
   public int getMaxPoolWaiting() {
     return poolOptions.getMaxWaiting();
   }
 
   /**
-   * Tune the maximum waiting requests for a connection from the pool.
+   * Set the maximum number of requests waiting for a connection from the pool.
+   * <p>
+   * By default, the maximum number of waiting requests size is 24.
    *
-   * @param maxPoolWaiting max waiting requests
-   * @return fluent self.
+   * @param maxPoolWaiting the maximum number of waiting requests
+   * @return fluent self
    */
   public RedisOptions setMaxPoolWaiting(int maxPoolWaiting) {
     poolOptions.setMaxWaiting(maxPoolWaiting);
@@ -449,19 +472,27 @@ public class RedisOptions {
   }
 
   /**
-   * Tune when a connection should be recycled in milliseconds.
+   * Get how long a connection can exist before it is recycled during connection pool
+   * {@linkplain #getPoolCleanerInterval() cleaning}.
+   * <p>
+   * The value is in milliseconds. By default, the recycle timeout is 3 minutes.
+   * The value of -1 means connection recycling is disabled.
    *
-   * @return the timeout for recycling.
+   * @return the recycle timeout
    */
   public int getPoolRecycleTimeout() {
     return poolOptions.getRecycleTimeout();
   }
 
   /**
-   * Tune when a connection should be recycled in milliseconds.
+   * Set how long a connection can exist before it is recycled during connection pool
+   * {@linkplain #setPoolCleanerInterval(int) cleaning}.
+   * <p>
+   * The value is in milliseconds. By default, the recycle timeout is 3 minutes.
+   * The value of -1 means connection recycling is disabled.
    *
-   * @param poolRecycleTimeout the timeout for recycling.
-   * @return fluent self.
+   * @param poolRecycleTimeout the recycle timeout
+   * @return fluent self
    */
   public RedisOptions setPoolRecycleTimeout(int poolRecycleTimeout) {
     poolOptions.setRecycleTimeout(poolRecycleTimeout);
@@ -549,21 +580,23 @@ public class RedisOptions {
 
 
   /**
-   * Set a user defined pool name (for metrics reporting).
-   * @param poolName the user desired pool name.
+   * Get the connection pool name to be used for metrics reporting. The default name is a random UUID.
+   *
+   * @return the pool name
+   */
+  public String getPoolName() {
+    return poolOptions.getName();
+  }
+
+  /**
+   * Set the connection pool name to be used for metrics reporting. The default name is a random UUID.
+   *
+   * @param poolName the pool name
    * @return fluent self
    */
   public RedisOptions setPoolName(String poolName) {
     poolOptions.setName(poolName);
     return this;
-  }
-
-  /**
-   * Get the pool name to be used in this client. The default name is a random UUID.
-   * @return pool name.
-   */
-  public String getPoolName() {
-    return poolOptions.getName();
   }
 
   /**
