@@ -54,8 +54,18 @@ public class PoolOptions {
   }
 
   /**
-   * Set a user defined pool name (for metrics reporting).
-   * @param name the user desired pool name.
+   * Get the connection pool name to be used for metrics reporting. The default name is a random UUID.
+   *
+   * @return the pool name
+   */
+  public String getName() {
+    return this.name;
+  }
+
+  /**
+   * Set the connection pool name to be used for metrics reporting. The default name is a random UUID.
+   *
+   * @param name the pool name
    * @return fluent self
    */
   public PoolOptions setName(String name) {
@@ -64,30 +74,35 @@ public class PoolOptions {
   }
 
   /**
-   * Get the pool name to be used in this client. The default name is a random UUID.
-   * @return pool name.
-   */
-  public String getName() {
-    return this.name;
-  }
-
-  /**
-   * Tune how often in milliseconds should the connection pool cleaner execute.
+   * Get how often the connection pool will be cleaned. Cleaning the connection pool
+   * means scanning for unused invalid connections and if any are found, they are forcibly
+   * closed and evicted from the pool.
+   * <p>
+   * A connection is marked invalid if it enters a exception or fatal state or if it exists
+   * longer than the {@linkplain #getRecycleTimeout() recycle timeout}.
+   * <p>
+   * The return value is in milliseconds. By default, the cleaning interval is 30 seconds.
+   * The value of -1 means connection pool cleaning is disabled.
    *
-   * @return the cleaning internal
+   * @return the cleaning interval in milliseconds, or -1 for never
    */
   public int getCleanerInterval() {
     return cleanerInterval;
   }
 
   /**
-   * Tune how often in milliseconds should the connection pool cleaner execute.
+   * Set how often the connection pool will be cleaned. Cleaning the connection pool
+   * means scanning for unused invalid connections and if any are found, they are forcibly
+   * closed and evicted from the pool.
+   * <p>
+   * A connection is marked invalid if it enters a exception or fatal state or if it exists
+   * longer than the {@linkplain #setRecycleTimeout(int)} recycle timeout}.
+   * <p>
+   * The value is in milliseconds. By default, the cleaning interval is 30 seconds.
+   * The value of -1 means connection pool cleaning is disabled.
    *
-   * For each connection in the pool, connections marked as invalid will be forcibly closed. A connection is marked
-   * invalid if it enters a exception or fatal state.
-   *
-   * @param cleanerInterval the interval in milliseconds (-1 for never)
-   * @return fluent self.
+   * @param cleanerInterval the cleaning interval in milliseconds, or -1 for never
+   * @return fluent self
    */
   public PoolOptions setCleanerInterval(int cleanerInterval) {
     this.cleanerInterval = cleanerInterval;
@@ -95,20 +110,26 @@ public class PoolOptions {
   }
 
   /**
-   * Tune the maximum size of the connection pool.
+   * Get the maximum size of the connection pool.
+   * <p>
+   * By default, the maximum pool size is 6.
    *
-   * @return the size.
+   * @return the maximum pool size
    */
   public int getMaxSize() {
     return maxSize;
   }
 
   /**
-   * Tune the maximum size of the connection pool. When working with cluster or sentinel
-   * this value should be atleast the total number of cluster member (or number of sentinels + 1)
+   * Set the maximum size of the connection pool.
+   * <p>
+   * By default, the maximum pool size is 6.
+   * <p>
+   * When working with cluster or sentinel, this value should be at least the total
+   * number of cluster member (or number of sentinels + 1).
    *
-   * @param maxSize the max pool size.
-   * @return fluent self.
+   * @param maxSize the maximum pool size
+   * @return fluent self
    */
   public PoolOptions setMaxSize(int maxSize) {
     this.maxSize = maxSize;
@@ -116,19 +137,23 @@ public class PoolOptions {
   }
 
   /**
-   * Tune the maximum waiting requests for a connection from the pool.
+   * Get the maximum number of requests waiting for a connection from the pool.
+   * <p>
+   * By default, the maximum number of waiting requests size is 24.
    *
-   * @return the maximum waiting requests.
+   * @return the maximum number of waiting requests
    */
   public int getMaxWaiting() {
     return maxWaiting;
   }
 
   /**
-   * Tune the maximum waiting requests for a connection from the pool.
+   * Set the maximum number of requests waiting for a connection from the pool.
+   * <p>
+   * By default, the maximum number of waiting requests size is 24.
    *
-   * @param maxWaiting max waiting requests
-   * @return fluent self.
+   * @param maxWaiting the maximum number of waiting requests
+   * @return fluent self
    */
   public PoolOptions setMaxWaiting(int maxWaiting) {
     this.maxWaiting = maxWaiting;
@@ -136,19 +161,27 @@ public class PoolOptions {
   }
 
   /**
-   * Tune when a connection should be recycled in milliseconds.
+   * Get how long a connection can exist before it is recycled during connection pool
+   * {@linkplain #getCleanerInterval() cleaning}.
+   * <p>
+   * The value is in milliseconds. By default, the recycle timeout is 3 minutes.
+   * The value of -1 means connection recycling is disabled.
    *
-   * @return the timeout for recycling.
+   * @return the recycle timeout
    */
   public int getRecycleTimeout() {
     return recycleTimeout;
   }
 
   /**
-   * Tune when a connection should be recycled in milliseconds.
+   * Set how long a connection can exist before it is recycled during connection pool
+   * {@linkplain #setCleanerInterval(int) cleaning}.
+   * <p>
+   * The value is in milliseconds. By default, the recycle timeout is 3 minutes.
+   * The value of -1 means connection recycling is disabled.
    *
-   * @param recycleTimeout the timeout for recycling.
-   * @return fluent self.
+   * @param recycleTimeout the recycle timeout
+   * @return fluent self
    */
   public PoolOptions setRecycleTimeout(int recycleTimeout) {
     this.recycleTimeout = recycleTimeout;
