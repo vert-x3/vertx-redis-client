@@ -451,11 +451,11 @@ public class RedisOptions {
 
   /**
    * Get how often the connection pool will be cleaned. Cleaning the connection pool
-   * means scanning for unused invalid connections and if any are found, they are forcibly
+   * means scanning for unused and invalid connections and if any are found, they are forcibly
    * closed and evicted from the pool.
    * <p>
-   * A connection is marked invalid if it enters a exception or fatal state or if it exists
-   * longer than the {@linkplain #getPoolRecycleTimeout() recycle timeout}.
+   * A connection is marked invalid if it enters a exception or fatal state. It is marked unused
+   * if it is unused for longer than the {@linkplain #getPoolRecycleTimeout() recycle timeout}.
    * <p>
    * The return value is in milliseconds. By default, the cleaning interval is 30 seconds.
    * The value of -1 means connection pool cleaning is disabled.
@@ -468,11 +468,11 @@ public class RedisOptions {
 
   /**
    * Set how often the connection pool will be cleaned. Cleaning the connection pool
-   * means scanning for unused invalid connections and if any are found, they are forcibly
+   * means scanning for unused and invalid connections and if any are found, they are forcibly
    * closed and evicted from the pool.
    * <p>
-   * A connection is marked invalid if it enters a exception or fatal state or if it exists
-   * longer than the {@linkplain #setPoolRecycleTimeout(int) recycle timeout}.
+   * A connection is marked invalid if it enters a exception or fatal state. It is marked unused
+   * if it is unused for longer than the {@linkplain #setPoolRecycleTimeout(int) recycle timeout}.
    * <p>
    * The value is in milliseconds. By default, the cleaning interval is 30 seconds.
    * The value of -1 means connection pool cleaning is disabled.
@@ -537,7 +537,7 @@ public class RedisOptions {
   }
 
   /**
-   * Get how long a connection can exist before it is recycled during connection pool
+   * Get how long a connection can stay unused before it is recycled during connection pool
    * {@linkplain #getPoolCleanerInterval() cleaning}.
    * <p>
    * The value is in milliseconds. By default, the recycle timeout is 3 minutes.
@@ -550,7 +550,7 @@ public class RedisOptions {
   }
 
   /**
-   * Set how long a connection can exist before it is recycled during connection pool
+   * Set how long a connection can stay unused before it is recycled during connection pool
    * {@linkplain #setPoolCleanerInterval(int) cleaning}.
    * <p>
    * The value is in milliseconds. By default, the recycle timeout is 3 minutes.
