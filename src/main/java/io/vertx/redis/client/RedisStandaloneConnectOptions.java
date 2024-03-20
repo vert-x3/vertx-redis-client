@@ -25,19 +25,21 @@ import java.util.List;
 @JsonGen(publicConverter = false)
 public class RedisStandaloneConnectOptions extends RedisConnectOptions {
 
+  public RedisStandaloneConnectOptions() {
+    super();
+  }
+
   public RedisStandaloneConnectOptions(RedisOptions options) {
     super(options);
   }
 
-  public RedisStandaloneConnectOptions() {
-  }
-
   public RedisStandaloneConnectOptions(RedisStandaloneConnectOptions other) {
+    super(other);
   }
 
   public RedisStandaloneConnectOptions(JsonObject json) {
-    this();
-    RedisConnectOptionsConverter.fromJson(json, this);
+    super(json);
+    RedisStandaloneConnectOptionsConverter.fromJson(json, this);
   }
 
   @Override
@@ -51,6 +53,11 @@ public class RedisStandaloneConnectOptions extends RedisConnectOptions {
   }
 
   @Override
+  public RedisStandaloneConnectOptions setPreferredProtocolVersion(ProtocolVersion preferredProtocolVersion) {
+    return (RedisStandaloneConnectOptions) super.setPreferredProtocolVersion(preferredProtocolVersion);
+  }
+
+  @Override
   public RedisStandaloneConnectOptions setPassword(String password) {
     return (RedisStandaloneConnectOptions) super.setPassword(password);
   }
@@ -58,6 +65,11 @@ public class RedisStandaloneConnectOptions extends RedisConnectOptions {
   @Override
   public RedisStandaloneConnectOptions setEndpoints(List<String> endpoints) {
     return (RedisStandaloneConnectOptions) super.setEndpoints(endpoints);
+  }
+
+  @Override
+  public RedisStandaloneConnectOptions addConnectionString(String connectionString) {
+    return (RedisStandaloneConnectOptions) super.addConnectionString(connectionString);
   }
 
   @Override
