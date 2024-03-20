@@ -20,6 +20,7 @@ import io.vertx.redis.client.Response;
 
 import java.util.*;
 
+// see https://redis.io/commands/cluster-slots/
 class Slots {
 
   // we need some randomness, it doesn't need to be cryptographically secure
@@ -67,9 +68,17 @@ class Slots {
       // array of all clients, clients[2] = master, others are replicas
       for (int index = 2; index < s.size(); index++) {
         final Response c = s.get(index);
-        final String host = c.get(0).toString().contains(":") ? "[" + c.get(0).toString() + "]" : c.get(0).toString();
+        final Response hostField = c.get(0);
+        final Response portField = c.get(1);
+        final String host;
+        if (hostField == null || "".equals(hostField.toString())) {
+          // since Redis 7.0, `null` or `""` means the "current" host should be used
+          host = uri.socketAddress().host();
+        } else {
+          host = hostField.toString().contains(":") ? "[" + hostField + "]" : hostField.toString();
+        }
 
-        final String endpoint = uri.protocol() + "://" + uri.userinfo() + host + ":" + c.get(1).toInteger();
+        final String endpoint = uri.protocol() + "://" + uri.userinfo() + host + ":" + portField.toInteger();
         slots[i].endpoints[index - 2] = endpoint;
         uniqueEndpoints.add(endpoint);
         if (index == 2) {
