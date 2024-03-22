@@ -30,11 +30,6 @@ public class RedisOptionsConverter {
             obj.setNetClientOptions(new io.vertx.core.net.NetClientOptions((io.vertx.core.json.JsonObject)member.getValue()));
           }
           break;
-        case "endpoint":
-          if (member.getValue() instanceof String) {
-            obj.setEndpoint((String)member.getValue());
-          }
-          break;
         case "endpoints":
           if (member.getValue() instanceof JsonArray) {
             java.util.ArrayList<java.lang.String> list =  new java.util.ArrayList<>();
@@ -43,19 +38,6 @@ public class RedisOptionsConverter {
                 list.add((String)item);
             });
             obj.setEndpoints(list);
-          }
-          break;
-        case "connectionStrings":
-          if (member.getValue() instanceof JsonArray) {
-            ((Iterable<Object>)member.getValue()).forEach( item -> {
-              if (item instanceof String)
-                obj.addConnectionString((String)item);
-            });
-          }
-          break;
-        case "connectionString":
-          if (member.getValue() instanceof String) {
-            obj.setConnectionString((String)member.getValue());
           }
           break;
         case "maxWaitingHandlers":
@@ -147,9 +129,6 @@ public class RedisOptionsConverter {
     }
     if (obj.getNetClientOptions() != null) {
       json.put("netClientOptions", obj.getNetClientOptions().toJson());
-    }
-    if (obj.getEndpoint() != null) {
-      json.put("endpoint", obj.getEndpoint());
     }
     if (obj.getEndpoints() != null) {
       JsonArray array = new JsonArray();
