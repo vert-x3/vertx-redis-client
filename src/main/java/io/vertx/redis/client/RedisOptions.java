@@ -153,6 +153,7 @@ public class RedisOptions {
    *
    * @return the Redis connection string URI
    */
+  @GenIgnore
   public String getEndpoint() {
     if (endpoints == null || endpoints.isEmpty()) {
       return DEFAULT_ENDPOINT;
@@ -170,6 +171,7 @@ public class RedisOptions {
    * @deprecated see {@link #setConnectionString(String connectionString)} for a better naming
    */
   @Deprecated
+  @GenIgnore
   public RedisOptions addEndpoint(String connectionString) {
     if (endpoints == null) {
       endpoints = new ArrayList<>();
@@ -187,6 +189,7 @@ public class RedisOptions {
    * @deprecated see {@link #setConnectionString(String connectionString)} for a better naming
    */
   @Deprecated
+  @GenIgnore
   public RedisOptions setEndpoint(String connectionString) {
     if (endpoints == null) {
       endpoints = new ArrayList<>();
@@ -206,6 +209,7 @@ public class RedisOptions {
    * @return fluent self.
    * @see <a href="https://www.iana.org/assignments/uri-schemes/prov/redis">Redis scheme on iana.org</a>
    */
+  @GenIgnore
   public RedisOptions addConnectionString(String connectionString) {
     if (endpoints == null) {
       endpoints = new ArrayList<>();
@@ -222,6 +226,7 @@ public class RedisOptions {
    * @return fluent self.
    * @see <a href="https://www.iana.org/assignments/uri-schemes/prov/redis">Redis scheme on iana.org</a>
    */
+  @GenIgnore
   public RedisOptions setConnectionString(String connectionString) {
     if (endpoints == null) {
       endpoints = new ArrayList<>();
