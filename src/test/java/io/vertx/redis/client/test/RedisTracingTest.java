@@ -2,11 +2,9 @@ package io.vertx.redis.client.test;
 
 import io.vertx.core.Context;
 import io.vertx.core.Vertx;
-import io.vertx.core.VertxOptions;
 import io.vertx.core.spi.tracing.SpanKind;
 import io.vertx.core.spi.tracing.TagExtractor;
 import io.vertx.core.spi.tracing.VertxTracer;
-import io.vertx.core.tracing.TracingOptions;
 import io.vertx.core.tracing.TracingPolicy;
 import io.vertx.ext.unit.Async;
 import io.vertx.ext.unit.TestContext;
@@ -81,8 +79,13 @@ public class RedisTracingTest {
       @Override
       public Object sendRequest(Context context, SpanKind kind, TracingPolicy policy, Object request, String operation, BiConsumer headers, TagExtractor tagExtractor) {
         Map<String, String> tags = tagExtractor.extract(request);
+        String redisPort = String.valueOf(redis.getFirstMappedPort());
         test.assertEquals("client", tags.get("span.kind"));
         test.assertEquals("redis", tags.get("db.type"));
+        test.assertEquals("127.0.0.1", tags.get("network.peer.address"));
+        test.assertEquals(redisPort, tags.get("network.peer.port"));
+        test.assertEquals("localhost", tags.get("server.address"));
+        test.assertEquals(redisPort, tags.get("server.port"));
         test.assertEquals(clientRequest.command().toString(), tags.get("db.statement"));
         actions.add("sendRequest");
         return trace;
