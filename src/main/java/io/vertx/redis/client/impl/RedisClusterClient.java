@@ -117,6 +117,7 @@ public class RedisClusterClient extends BaseRedisClient implements Redis {
         }).sum()));
 
     addMasterOnlyCommand(WAIT);
+    addMasterOnlyCommand(SCRIPT);
 
     addMasterOnlyCommand(SUBSCRIBE);
     addMasterOnlyCommand(PSUBSCRIBE);
