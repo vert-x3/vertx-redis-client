@@ -16,6 +16,7 @@
 package io.vertx.redis.client.impl;
 
 import io.vertx.core.impl.VertxInternal;
+import io.vertx.core.net.SocketAddress;
 import io.vertx.core.spi.metrics.ClientMetrics;
 import io.vertx.core.tracing.TracingPolicy;
 import io.vertx.redis.client.RedisConnection;
@@ -54,4 +55,9 @@ public interface RedisConnectionInternal extends RedisConnection {
    * Returns the {@linkplain TracingPolicy tracing policy} configured for this connection.
    */
   TracingPolicy tracingPolicy();
+
+  /**
+   * Returns the {@linkplain SocketAddress remote address} of the Redis server to which this connection is connected.
+   */
+  SocketAddress remoteAddress();
 }
