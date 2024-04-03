@@ -14,7 +14,11 @@ import java.util.function.Function;
 class CommandReporter {
   enum Tags {
     // Generic
+    NETWORK_PEER_ADDRESS("network.peer.address", reporter-> reporter.networkPeerAddress),
+    NETWORK_PEER_PORT("network.peer.port", reporter -> reporter.networkPeerPort),
     PEER_ADDRESS("peer.address", reporter -> reporter.address),
+    SERVER_ADDRESS("server.address", reporter -> reporter.serverAddress),
+    SERVER_PORT("server.port", reporter -> reporter.serverPort),
     SPAN_KIND("span.kind", reporter -> "client"),
 
     // DB
@@ -59,6 +63,10 @@ class CommandReporter {
   private final String address;
   private final String user;
   private final String database;
+  private final String networkPeerAddress;
+  private final String networkPeerPort;
+  private final String serverAddress;
+  private final String serverPort;
 
   private Object trace;
   private Object metric;
@@ -72,6 +80,10 @@ class CommandReporter {
     this.tracingPolicy = conn.tracingPolicy();
     this.command = command;
     this.address = uri.socketAddress().toString();
+    this.networkPeerAddress = conn.remoteAddress().hostAddress();
+    this.networkPeerPort = String.valueOf(conn.remoteAddress().port());
+    this.serverAddress = uri.socketAddress().host();
+    this.serverPort = String.valueOf(uri.socketAddress().port());
     this.user = uri.user();
     // the connection doesn't track the current database, so we have to report "unknown" when tainted
     this.database = conn.isTainted() ? null : (uri.select() == null ? "0" : String.valueOf(uri.select()));

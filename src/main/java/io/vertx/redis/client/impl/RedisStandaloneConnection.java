@@ -12,6 +12,7 @@ import io.vertx.core.impl.logging.Logger;
 import io.vertx.core.impl.logging.LoggerFactory;
 import io.vertx.core.json.JsonObject;
 import io.vertx.core.net.NetSocket;
+import io.vertx.core.net.SocketAddress;
 import io.vertx.core.net.impl.pool.PoolConnector;
 import io.vertx.core.spi.metrics.ClientMetrics;
 import io.vertx.core.tracing.TracingPolicy;
@@ -531,5 +532,10 @@ public class RedisStandaloneConnection implements RedisConnectionInternal, Parse
   @Override
   public TracingPolicy tracingPolicy() {
     return tracingPolicy;
+  }
+
+  @Override
+  public SocketAddress remoteAddress() {
+    return netSocket.remoteAddress();
   }
 }
