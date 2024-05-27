@@ -6,26 +6,32 @@ import io.vertx.ext.unit.junit.RunTestOnContext;
 import io.vertx.ext.unit.junit.VertxUnitRunner;
 import io.vertx.redis.client.Redis;
 import io.vertx.redis.client.RedisConnection;
+import io.vertx.redis.client.RedisOptions;
 import io.vertx.redis.client.Request;
-import org.junit.*;
+import io.vertx.redis.containers.RedisStandalone;
+import org.junit.After;
+import org.junit.Before;
+import org.junit.ClassRule;
+import org.junit.Rule;
+import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.testcontainers.containers.GenericContainer;
 
 import java.util.HashSet;
 import java.util.concurrent.atomic.AtomicInteger;
 
+import static io.vertx.redis.client.Command.PSUBSCRIBE;
+import static io.vertx.redis.client.Command.PUBLISH;
+import static io.vertx.redis.client.Command.SUBSCRIBE;
 import static io.vertx.redis.client.Request.cmd;
-import static io.vertx.redis.client.Command.*;
 
 @RunWith(VertxUnitRunner.class)
 public class RedisPubSubTest {
 
+  @ClassRule
+  public static final RedisStandalone redis = new RedisStandalone();
+
   @Rule
   public final RunTestOnContext rule = new RunTestOnContext();
-
-  @ClassRule
-  public static final GenericContainer<?> redis = new GenericContainer<>("redis:7")
-    .withExposedPorts(6379);
 
   private RedisConnection pub;
   private RedisConnection sub;
@@ -34,14 +40,14 @@ public class RedisPubSubTest {
   public void setUp(TestContext should) {
     final Async setUp = should.async();
 
-    Redis.createClient(rule.vertx(), "redis://" + redis.getHost() + ":" + redis.getFirstMappedPort())
-      .connect(onCreate -> {
+    Redis.createClient(rule.vertx(), new RedisOptions().setConnectionString(redis.getRedisUri()))
+      .connect().onComplete(onCreate -> {
         should.assertTrue(onCreate.succeeded());
         pub = onCreate.result();
         pub.exceptionHandler(should::fail);
 
-        Redis.createClient(rule.vertx(), "redis://" + redis.getHost() + ":" + redis.getFirstMappedPort())
-          .connect(onCreate2 -> {
+        Redis.createClient(rule.vertx(), new RedisOptions().setConnectionString(redis.getRedisUri()))
+          .connect().onComplete(onCreate2 -> {
             should.assertTrue(onCreate2.succeeded());
             sub = onCreate2.result();
             sub.exceptionHandler(should::fail);

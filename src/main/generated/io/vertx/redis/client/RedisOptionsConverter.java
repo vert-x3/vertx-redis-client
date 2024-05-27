@@ -118,6 +118,11 @@ public class RedisOptionsConverter {
             obj.setRole(io.vertx.redis.client.RedisRole.valueOf((String)member.getValue()));
           }
           break;
+        case "topology":
+          if (member.getValue() instanceof String) {
+            obj.setTopology(io.vertx.redis.client.RedisTopology.valueOf((String)member.getValue()));
+          }
+          break;
         case "tracingPolicy":
           if (member.getValue() instanceof String) {
             obj.setTracingPolicy(io.vertx.core.tracing.TracingPolicy.valueOf((String)member.getValue()));
@@ -175,6 +180,9 @@ public class RedisOptionsConverter {
     json.put("protocolNegotiation", obj.isProtocolNegotiation());
     if (obj.getRole() != null) {
       json.put("role", obj.getRole().name());
+    }
+    if (obj.getTopology() != null) {
+      json.put("topology", obj.getTopology().name());
     }
     if (obj.getTracingPolicy() != null) {
       json.put("tracingPolicy", obj.getTracingPolicy().name());
