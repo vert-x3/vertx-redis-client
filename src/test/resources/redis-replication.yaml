@@ -1,0 +1,45 @@
+# io.vertx.test.redis.containers.RedisReplication
+services:
+  redis-master:
+    image: docker.io/bitnami/redis:7.2
+    environment:
+      ALLOW_EMPTY_PASSWORD: "yes"
+      REDIS_REPLICATION_MODE: master
+
+  # usually, it would be enough for the replicas to just configure
+  #
+  # environment:
+  #   REDIS_MASTER_HOST: redis-master
+  #
+  # here, we jump through extra hoops to configure REDIS_MASTER_HOST to
+  # the IP address of the master container, because that configuration
+  # is also what replicas expose in the INFO REPLICATION response, and
+  # that information may be used by the Vert.x Redis client to discover
+  # the master when only replicas are known (not a typical situation,
+  # but some tests in this project do this for better coverage)
+
+  redis-replica0:
+    image: docker.io/bitnami/redis:7.2
+    depends_on:
+    - redis-master
+    environment:
+      ALLOW_EMPTY_PASSWORD: "yes"
+      REDIS_REPLICATION_MODE: replica
+      REDIS_MASTER_HOST_FILE: /opt/bitnami/redis/master.txt
+    entrypoint:
+    - "/bin/bash"
+    - "-c"
+    - "source /opt/bitnami/scripts/libos.sh && source /opt/bitnami/scripts/libnet.sh && echo $(wait_for_dns_lookup redis-master) > /opt/bitnami/redis/master.txt && exec /opt/bitnami/scripts/redis/entrypoint.sh /opt/bitnami/scripts/redis/run.sh"
+
+  redis-replica1:
+    image: docker.io/bitnami/redis:7.2
+    depends_on:
+    - redis-master
+    environment:
+      ALLOW_EMPTY_PASSWORD: "yes"
+      REDIS_REPLICATION_MODE: replica
+      REDIS_MASTER_HOST_FILE: /opt/bitnami/redis/master.txt
+    entrypoint:
+    - "/bin/bash"
+    - "-c"
+    - "source /opt/bitnami/scripts/libos.sh && source /opt/bitnami/scripts/libnet.sh && echo $(wait_for_dns_lookup redis-master) > /opt/bitnami/redis/master.txt && exec /opt/bitnami/scripts/redis/entrypoint.sh /opt/bitnami/scripts/redis/run.sh"

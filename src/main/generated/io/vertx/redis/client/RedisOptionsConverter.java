@@ -58,6 +58,11 @@ public class RedisOptionsConverter {
             obj.setConnectionString((String)member.getValue());
           }
           break;
+        case "topology":
+          if (member.getValue() instanceof String) {
+            obj.setTopology(io.vertx.redis.client.RedisTopology.valueOf((String)member.getValue()));
+          }
+          break;
         case "maxWaitingHandlers":
           if (member.getValue() instanceof Number) {
             obj.setMaxWaitingHandlers(((Number)member.getValue()).intValue());
@@ -155,6 +160,9 @@ public class RedisOptionsConverter {
       JsonArray array = new JsonArray();
       obj.getEndpoints().forEach(item -> array.add(item));
       json.put("endpoints", array);
+    }
+    if (obj.getTopology() != null) {
+      json.put("topology", obj.getTopology().name());
     }
     json.put("maxWaitingHandlers", obj.getMaxWaitingHandlers());
     if (obj.getMasterName() != null) {

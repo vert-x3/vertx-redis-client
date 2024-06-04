@@ -12,7 +12,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 
 @RunWith(VertxUnitRunner.class)
-public class RedisClientHelloTest {
+public class RedisClientToBadServerTest {
 
   @Rule
   public final RunTestOnContext rule = new RunTestOnContext();
