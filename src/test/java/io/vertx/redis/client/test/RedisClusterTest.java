@@ -9,7 +9,7 @@ import io.vertx.ext.unit.TestContext;
 import io.vertx.ext.unit.junit.RunTestOnContext;
 import io.vertx.ext.unit.junit.VertxUnitRunner;
 import io.vertx.redis.client.*;
-import java.util.stream.Collectors;
+import io.vertx.redis.client.impl.ZModem;
 import org.junit.*;
 import org.junit.runner.RunWith;
 import org.testcontainers.containers.FixedHostPortGenericContainer;
@@ -17,6 +17,7 @@ import org.testcontainers.containers.GenericContainer;
 
 import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.stream.Collectors;
 
 import static io.vertx.redis.client.Command.*;
 import static io.vertx.redis.client.Request.cmd;
@@ -1161,6 +1162,70 @@ public class RedisClusterTest {
         }));
       }
     ));
+  }
+
+  @Test(timeout = 30_000)
+  @SuppressWarnings("unchecked")
+  public void batchSameSlotGroupByMultipleSlotsCommands(TestContext should) {
+    final Async test = should.async();
+
+    Map<Integer, List<Request>> mapCommands = new HashMap<>();
+    for (int i = 0; i < 100000; i++) {
+      String key = "key-" + i;
+      String value = "value-" + i;
+      int endpoint;
+      int slot = ZModem.generate(key);
+      if (slot < 16384 / (options.getEndpoints().size() / 2)) {
+        endpoint = 0;
+      } else if (slot <= 2 * 16384 / (options.getEndpoints().size() / 2)) {
+        endpoint = 1;
+      } else {
+        endpoint = 2;
+      }
+      List<Request> commands = mapCommands.computeIfAbsent(endpoint, k -> new ArrayList<>());
+      commands.add(Request.cmd(Command.SET).arg(key).arg(value));
+    }
+
+    Redis.createClient(rule.vertx(), options)
+      .connect()
+      .onComplete(should.asyncAssertSuccess(cluster -> {
+          List<Future<List<Response>>> futures = new ArrayList<>();
+          for (Map.Entry<Integer, List<Request>> entry : mapCommands.entrySet()) {
+            futures.add(cluster.batch(entry.getValue()));
+          }
+          Future.all(futures).onComplete(should.asyncAssertSuccess(responses -> {
+            should.assertEquals(mapCommands.values().stream().map(List::size).reduce(0 , Integer::sum), responses.result().list().stream().map(item -> ((List<Request>) item).size()).reduce(0, Integer::sum));
+
+            test.countDown();
+          })).onFailure(should::fail);
+        }
+      ));
+  }
+
+  @Test(timeout = 30_000)
+  public void batchSameSlotsCommands(TestContext should) {
+    final Async test = should.async();
+
+    List<Request> rawCommands = new ArrayList<>();
+    for (int i = 0; i < 100000; i++) {
+      String key = "key-" + i;
+      String value = "value-" + i;
+      int endpoint;
+      int slot = ZModem.generate(key);
+      if (slot < 16384 / (options.getEndpoints().size() / 2)) {
+        rawCommands.add(Request.cmd(Command.SET).arg(key).arg(value));
+      }
+    }
+
+    Redis.createClient(rule.vertx(), options)
+      .connect()
+      .onComplete(should.asyncAssertSuccess(cluster -> {
+          cluster.batch(rawCommands).onComplete(should.asyncAssertSuccess(responses -> {
+            should.assertEquals(rawCommands.size(), responses.size());
+            test.countDown();
+          })).onFailure(should::fail);
+        }
+      ));
   }
 
   @Test(timeout = 30_000)
