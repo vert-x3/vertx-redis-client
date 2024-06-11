@@ -329,7 +329,8 @@ public class RedisClusterConnection implements RedisConnection {
       LOG.debug("Empty batch");
       promise.complete(Collections.emptyList());
     } else {
-      int currentSlot = -1;
+      int correctSlot = -1;
+      String currentEndpoint = null;
       boolean readOnly = false;
       boolean forceMasterEndpoint = false;
 
@@ -353,6 +354,7 @@ public class RedisClusterConnection implements RedisConnection {
         final List<byte[]> keys = req.keys();
         forceMasterEndpoint |= MASTER_ONLY_COMMANDS.contains(cmd);
         int slot;
+        String endpoint;
 
         // process slots, need to verify if we can run this batch
         switch (keys.size()) {
@@ -362,10 +364,14 @@ public class RedisClusterConnection implements RedisConnection {
           case 1:
             // command is single key, as long as we're on the same slot, it's OK
             slot = ZModem.generate(keys.get(0));
+            // as cluster server serves range of slots we need to compare to server range and not exact slot
+            //always take master to make sure we have same endpoint
+            endpoint = slots.endpointsForKey(slot)[0];
             // we are checking the first request key
-            if (currentSlot == -1) {
-              currentSlot = slot;
-            } else if (currentSlot != slot) {
+            if (currentEndpoint == null) {
+              currentEndpoint = endpoint;
+              correctSlot = slot;
+            } else if (!currentEndpoint.equals(endpoint)) {
               // in cluster mode we currently do not handle batching commands which keys are not on the same slot
               promise.fail(buildCrossslotFailureMsg(req));
               return promise.future();
@@ -375,9 +381,11 @@ public class RedisClusterConnection implements RedisConnection {
             // multiple keys on the command
             for (byte[] key : keys) {
               slot = ZModem.generate(key);
-              if (currentSlot == -1) {
-                currentSlot = slot;
-              } else if (currentSlot != slot) {
+              endpoint = slots.endpointsForKey(slot)[0];
+              if (currentEndpoint == null) {
+                correctSlot = slot;
+                currentEndpoint = endpoint;
+              } else if (!currentEndpoint.equals(endpoint)) {
                 // in cluster mode we currently do not handle batching commands which keys are not on the same slot
                 promise.fail(buildCrossslotFailureMsg(req));
                 return promise.future();
@@ -388,7 +396,8 @@ public class RedisClusterConnection implements RedisConnection {
       }
 
       // all keys are on the same slot!
-      batch(selectEndpoint(currentSlot, readOnly, forceMasterEndpoint), RETRIES, requests, promise);
+      //we just need to decide which endpoint to use based on additional options
+      batch(selectEndpoint(correctSlot, readOnly, forceMasterEndpoint), RETRIES, requests, promise);
     }
 
     return promise.future();

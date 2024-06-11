@@ -6,11 +6,13 @@ import io.vertx.core.Context;
 import io.vertx.core.Future;
 import io.vertx.core.Promise;
 import io.vertx.core.buffer.Buffer;
+import io.vertx.core.json.JsonObject;
 import io.vertx.ext.unit.Async;
 import io.vertx.ext.unit.TestContext;
 import io.vertx.ext.unit.junit.RunTestOnContext;
 import io.vertx.ext.unit.junit.VertxUnitRunner;
 import io.vertx.redis.client.*;
+import io.vertx.redis.client.impl.ZModem;
 import org.junit.*;
 import org.junit.runner.RunWith;
 import org.testcontainers.containers.FixedHostPortGenericContainer;
@@ -1171,6 +1173,98 @@ public class RedisClusterTest {
           }));
       }
     ));
+  }
+
+  @Test(timeout = 30_000)
+  @SuppressWarnings("unchecked")
+  public void batchSameSlotGroupByMultipleSlotsCommands(TestContext should) {
+    final Async test = should.async();
+
+    Redis.createClient(rule.vertx(), options)
+      .connect()
+      .onComplete(should.asyncAssertSuccess(cluster -> {
+        cluster
+          .send(cmd(CLUSTER).arg("SLOTS"))
+          .compose(reply -> {
+            if (reply == null || reply.size() == 0) {
+              // no slots available we can't really proceed
+              return Future.failedFuture("CLUSTER SLOTS No slots available in the cluster.");
+            }
+
+            Map<Integer, JsonObject> slotRangeMap = new HashMap<>();
+            for (int i = 0; i < reply.size(); i++) {
+              Response s = reply.get(i);
+              JsonObject slotRange = new JsonObject()
+                .put("start", s.get(0).toInteger())
+                .put("end", s.get(1).toInteger());
+              slotRangeMap.put(i, slotRange);
+            }
+
+            Map<Integer, List<Request>> mapCommands = new HashMap<>();
+            for (int i = 0; i < 100000; i++) {
+              String key = "key-" + i;
+              String value = "value-" + i;
+              int group;
+              int slot = ZModem.generate(key);
+              for (Map.Entry<Integer, JsonObject> entry : slotRangeMap.entrySet()) {
+                if (slot >= entry.getValue().getInteger("start") && slot <= entry.getValue().getInteger("end")) {
+                  mapCommands.computeIfAbsent(entry.getKey(), k -> new ArrayList<>()).add(cmd(SET).arg(key).arg(value));
+                  break;
+                }
+              }
+            }
+
+            List<Future<List<Response>>> futures = new ArrayList<>();
+            for (Map.Entry<Integer, List<Request>> entry : mapCommands.entrySet()) {
+              futures.add(cluster.batch(entry.getValue()));
+            }
+
+            return Future.all(futures)
+              .onComplete(should.asyncAssertSuccess(responses -> {
+                should.assertEquals(mapCommands.values().stream().map(List::size).reduce(0, Integer::sum), responses.result().list().stream().map(item -> ((List<Request>) item).size()).reduce(0, Integer::sum));
+                test.complete();
+              }));
+          }).onFailure(should::fail);
+      })).onFailure(should::fail);
+  }
+
+  @Test(timeout = 30_000)
+  public void batchSameSlotsCommands(TestContext should) {
+    final Async test = should.async();
+
+    Redis.createClient(rule.vertx(), options)
+      .connect()
+      .onComplete(should.asyncAssertSuccess(cluster -> {
+        cluster
+          .send(cmd(CLUSTER).arg("SLOTS"))
+          .compose(reply -> {
+            if (reply == null || reply.size() == 0) {
+              // no slots available we can't really proceed
+              return Future.failedFuture("CLUSTER SLOTS No slots available in the cluster.");
+            }
+
+            //take random slot
+            Response s = reply.get(0);
+            JsonObject slotRange = new JsonObject()
+              .put("start", s.get(0).toInteger())
+              .put("end", s.get(1).toInteger());
+
+            List<Request> rawCommands = new ArrayList<>();
+            for (int i = 0; i < 100000; i++) {
+              String key = "key-" + i;
+              String value = "value-" + i;
+              int endpoint;
+              int slot = ZModem.generate(key);
+              if (slot >= slotRange.getInteger("start") && slot <= slotRange.getInteger("end")) {
+                rawCommands.add(Request.cmd(Command.SET).arg(key).arg(value));
+              }
+            }
+            return cluster.batch(rawCommands).onComplete(should.asyncAssertSuccess(responses -> {
+              should.assertEquals(rawCommands.size(), responses.size());
+              test.complete();
+            }));
+          }).onFailure(should::fail);
+      })).onFailure(should::fail);
   }
 
   @Test(timeout = 30_000)
