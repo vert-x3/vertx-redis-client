@@ -16,6 +16,7 @@
 package io.vertx.redis.client;
 
 import io.vertx.codegen.annotations.DataObject;
+import io.vertx.codegen.annotations.GenIgnore;
 import io.vertx.codegen.json.annotations.JsonGen;
 import io.vertx.core.json.JsonObject;
 
@@ -158,6 +159,7 @@ public abstract class RedisConnectOptions {
    *
    * @return the Redis connection string URI
    */
+  @GenIgnore
   public String getEndpoint() {
     if (endpoints == null || endpoints.isEmpty()) {
       return RedisOptions.DEFAULT_ENDPOINT;
@@ -175,6 +177,7 @@ public abstract class RedisConnectOptions {
    *
    * @see <a href="https://www.iana.org/assignments/uri-schemes/prov/redis">Redis scheme on iana.org</a>
    */
+  @GenIgnore
   public RedisConnectOptions addConnectionString(String connectionString) {
     if (endpoints == null) {
       endpoints = new ArrayList<>();
@@ -191,6 +194,7 @@ public abstract class RedisConnectOptions {
    * @return fluent self.
    * @see <a href="https://www.iana.org/assignments/uri-schemes/prov/redis">Redis scheme on iana.org</a>
    */
+  @GenIgnore
   public RedisConnectOptions setConnectionString(String connectionString) {
     if (endpoints == null) {
       endpoints = new ArrayList<>();
