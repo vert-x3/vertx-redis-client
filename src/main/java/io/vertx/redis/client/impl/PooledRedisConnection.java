@@ -3,7 +3,7 @@ package io.vertx.redis.client.impl;
 import io.vertx.codegen.annotations.Nullable;
 import io.vertx.core.Future;
 import io.vertx.core.Handler;
-import io.vertx.core.net.impl.pool.Lease;
+import io.vertx.core.internal.pool.Lease;
 import io.vertx.core.spi.metrics.PoolMetrics;
 import io.vertx.redis.client.RedisConnection;
 import io.vertx.redis.client.Request;

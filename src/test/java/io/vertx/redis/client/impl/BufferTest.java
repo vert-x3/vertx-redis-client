@@ -2,7 +2,7 @@ package io.vertx.redis.client.impl;
 
 import io.netty.buffer.Unpooled;
 import io.vertx.core.buffer.Buffer;
-import io.vertx.core.buffer.impl.BufferInternal;
+import io.vertx.core.internal.buffer.BufferInternal;
 import io.vertx.redis.client.Command;
 import io.vertx.redis.client.Request;
 import org.junit.Test;
