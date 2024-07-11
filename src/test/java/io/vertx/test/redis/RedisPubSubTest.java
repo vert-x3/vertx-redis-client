@@ -35,7 +35,9 @@ public class RedisPubSubTest {
     // sentinel ports (5000-5002) 3x (match the cluster master nodes)
     .withFixedExposedPort(5000, 5000)
     .withFixedExposedPort(5001, 5001)
-    .withFixedExposedPort(5002, 5002);
+    .withFixedExposedPort(5002, 5002)
+    // workaround for new version of the Docker image that doesn't use the built `redis-sentinel` binary correctly
+    .withCommand("/bin/bash", "-c", "sed -i -e 's|redis-sentinel|/redis/src/redis-sentinel|g' /docker-entrypoint.sh && exec /docker-entrypoint.sh redis-cluster");
 
   @Rule
   public final RunTestOnContext rule = new RunTestOnContext(new VertxOptions().setEventLoopPoolSize(1));
