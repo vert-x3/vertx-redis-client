@@ -69,7 +69,7 @@ public class RedisClientPubSubTest {
   }
 
   @After
-  public void after(TestContext should) {
+  public void after() {
     redisPublish.close();
     redisSubscribe.close();
   }
@@ -77,7 +77,7 @@ public class RedisClientPubSubTest {
   @Test
   public void testPublishSubscribe(TestContext should) {
     final Async test = should.async();
-    pubConn.send(Request.cmd(Command.SUBSCRIBE).arg("news")).onComplete(reply -> {
+    subConn.send(Request.cmd(Command.SUBSCRIBE).arg("news")).onComplete(reply -> {
       should.assertTrue(reply.succeeded());
       rule.vertx().eventBus().consumer("io.vertx.redis.news", msg -> test.complete());
       pubConn.send(Request.cmd(Command.PUBLISH).arg("news").arg("foo")).onComplete(preply -> should.assertTrue(preply.succeeded()));
