@@ -5,37 +5,45 @@ import io.vertx.ext.unit.Async;
 import io.vertx.ext.unit.TestContext;
 import io.vertx.ext.unit.junit.RunTestOnContext;
 import io.vertx.ext.unit.junit.VertxUnitRunner;
-import io.vertx.redis.client.*;
-import org.junit.*;
+import io.vertx.redis.client.Command;
+import io.vertx.redis.client.Redis;
+import io.vertx.redis.client.RedisConnection;
+import io.vertx.redis.client.RedisOptions;
+import io.vertx.redis.client.Request;
+import io.vertx.redis.containers.RedisStandalone;
+import org.junit.After;
+import org.junit.Before;
+import org.junit.ClassRule;
+import org.junit.Rule;
+import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.testcontainers.containers.GenericContainer;
 
 @RunWith(VertxUnitRunner.class)
 public class RedisReconnectTest {
 
-  @Rule
-  public final RunTestOnContext rule = new RunTestOnContext();
+  private static final int RETRIES = 10;
 
   @ClassRule
-  public static final GenericContainer<?> container = new GenericContainer<>("redis:6.0.6")
-    .withExposedPorts(6379);
+  public static final RedisStandalone redis = new RedisStandalone();
+
+  @Rule
+  public final RunTestOnContext rule = new RunTestOnContext();
 
   private Redis client;
 
   // this connection will mutate during tests with re-connect
-  private final int RETRIES = 10;
-  private RedisConnection redis;
+  private RedisConnection connection;
 
   @Before
   public void before(TestContext should) {
     final Async before = should.async();
 
     Context context = rule.vertx().getOrCreateContext();
-    client = Redis.createClient(rule.vertx(), new RedisOptions().setConnectionString("redis://" + container.getContainerIpAddress() + ":" + container.getFirstMappedPort()));
-    client.connect(onConnect -> {
+    client = Redis.createClient(rule.vertx(), new RedisOptions().setConnectionString(redis.getRedisUri()));
+    client.connect().onComplete(onConnect -> {
       should.assertTrue(onConnect.succeeded());
       should.assertEquals(context, rule.vertx().getOrCreateContext());
-      redis = onConnect.result();
+      connection = onConnect.result();
       before.complete();
     });
   }
@@ -49,7 +57,7 @@ public class RedisReconnectTest {
   public void testConnection(TestContext should) {
     final Async test = should.async();
 
-    redis
+    connection
       .exceptionHandler(should::fail)
       .endHandler(end -> {
         // the connection was closed, will reconnect
@@ -63,17 +71,17 @@ public class RedisReconnectTest {
         String id = res.substring(3, res.indexOf(' '));
 
         // kill the connection
-        final RedisConnection orig = redis;
+        final RedisConnection orig = connection;
 
-        redis
+        connection
           .send(Request.cmd(Command.CLIENT).arg("KILL").arg("SKIPME").arg("no").arg("ID").arg(id))
           .onFailure(should::fail)
           .onSuccess(kill -> {
             should.assertEquals(1, kill.toInteger());
             // wait until the connection is updated
             rule.vertx()
-              .setPeriodic(500, t ->{
-                if (orig != redis) {
+              .setPeriodic(500, t -> {
+                if (orig != connection) {
                   // when the 2 references change
                   // it means the connection has been replaced
                   test.complete();
@@ -85,7 +93,7 @@ public class RedisReconnectTest {
   }
 
   private void reconnect(int retry) {
-    if (RETRIES >= 0 && retry < RETRIES) {
+    if (retry < RETRIES) {
       // retry with backoff
       long backoff = (long) (Math.pow(2, Math.min(retry, RETRIES)) * RETRIES);
 
@@ -95,7 +103,7 @@ public class RedisReconnectTest {
           if (onReconnect.failed()) {
             reconnect(retry + 1);
           } else {
-            redis = onReconnect.result();
+            connection = onReconnect.result();
           }
         }));
     }

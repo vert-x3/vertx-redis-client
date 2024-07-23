@@ -52,7 +52,7 @@ public class RedisClusterConnectOptions extends RedisConnectOptions {
   }
 
   /**
-   * Get whether or not to use replica nodes (only considered in Cluster mode).
+   * Get whether to use replica nodes for read only queries.
    *
    * @return the cluster replica node use mode.
    */
@@ -61,7 +61,7 @@ public class RedisClusterConnectOptions extends RedisConnectOptions {
   }
 
   /**
-   * Set whether or not to use replica nodes (only considered in Cluster mode).
+   * Set whether to use replica nodes for read only queries.
    *
    * @param useReplicas the cluster replica use mode.
    * @return fluent self.
@@ -72,10 +72,8 @@ public class RedisClusterConnectOptions extends RedisConnectOptions {
   }
 
   /**
-   * Returns the TTL of the hash slot cache. This is only meaningful in case of
-   * a {@linkplain RedisClientType#CLUSTER clustered} Redis client.
-   * <p>
-   * The TTL is expressed in milliseconds. Defaults to 1000 millis (1 second).
+   * Returns the TTL of the hash slot cache. The TTL is expressed in milliseconds.
+   * Defaults to 1000 millis (1 second).
    *
    * @return the TTL of the hash slot cache
    */
@@ -84,10 +82,8 @@ public class RedisClusterConnectOptions extends RedisConnectOptions {
   }
 
   /**
-   * Sets the TTL of the hash slot cache. This is only meaningful in case of
-   * a {@linkplain RedisClientType#CLUSTER clustered} Redis client.
-   * <p>
-   * The TTL is expressed in milliseconds. Defaults to 1000 millis (1 second).
+   * Sets the TTL of the hash slot cache. The TTL is expressed in milliseconds.
+   * Defaults to 1000 millis (1 second).
    *
    * @param hashSlotCacheTTL the TTL of the hash slot cache, in millis
    */

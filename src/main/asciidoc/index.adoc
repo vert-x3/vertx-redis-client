@@ -182,6 +182,34 @@ The recommended usage of this mode, given the connection acquisition cost, is to
 {@link examples.RedisExamples#example13}
 ----
 
+=== Static topology
+
+The replication mode allows configuring the multi-node topology statically.
+With static topology, the first node in the configuration is assumed to be a _master_ node, while the remaining nodes are assumed to be _replicas_.
+The nodes are not verified; it is a responsibility of the application developer to ensure that the static configuration is correct.
+
+To do this:
+
+* call `RedisOptions.addConnectionString()` repeatedly to configure the static topology (the first call configures the master node, subsequent calls configure replica nodes), and
+* call `RedisOptions.setTopology(RedisTopology.STATIC)`.
+
+[source,$lang]
+----
+{@link examples.RedisExamples#example14}
+----
+
+Note that automatic discovery of the topology is usually the preferred choice.
+Static configuration should only be used when necessary.
+One such case is _Amazon Elasticache for Redis (Cluster Mode Disabled)_, where:
+
+* master node should be set to the _primary endpoint_, and
+* one replica node should be set to the _reader endpoint_.
+
+WARNING: Note that the reader endpoint of Elasticache for Redis (Cluster Mode Disabled) is a domain name which resolves to a CNAME record that points to one of the replicas.
+The CNAME record to which the reader endpoint resolves changes over time.
+This form of DNS-based load balancing does not work well with DNS resolution caching and connection pooling.
+As a result, some replicas are likely to be underutilized.
+Elasticache for Redis (Cluster Mode Enabled) doesn't suffer from this problem, because it uses classic round-robin DNS.
 
 == Pub/Sub mode
 

@@ -5,25 +5,30 @@ import io.vertx.ext.unit.Async;
 import io.vertx.ext.unit.TestContext;
 import io.vertx.ext.unit.junit.RunTestOnContext;
 import io.vertx.ext.unit.junit.VertxUnitRunner;
-import io.vertx.redis.client.*;
-import org.junit.*;
+import io.vertx.redis.client.Redis;
+import io.vertx.redis.client.RedisOptions;
+import io.vertx.redis.containers.RedisStandalone;
+import org.junit.After;
+import org.junit.Before;
+import org.junit.ClassRule;
+import org.junit.Rule;
+import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.testcontainers.containers.GenericContainer;
 
-import java.util.UUID;
-
+import static io.vertx.redis.client.Command.GET;
+import static io.vertx.redis.client.Command.HSET;
+import static io.vertx.redis.client.Command.SET;
 import static io.vertx.redis.client.Request.cmd;
-import static io.vertx.redis.client.Command.*;
+import static io.vertx.redis.client.test.TestUtils.randomKey;
 
 @RunWith(VertxUnitRunner.class)
 public class RedisClient5Test {
 
+  @ClassRule
+  public static final RedisStandalone redis = RedisStandalone.builder().setVersion("5.0").build();
+
   @Rule
   public final RunTestOnContext rule = new RunTestOnContext();
-
-  @ClassRule
-  public static final GenericContainer<?> redis = new GenericContainer<>("redis:5")
-    .withExposedPorts(6379);
 
   private Redis client;
 
@@ -33,7 +38,7 @@ public class RedisClient5Test {
 
     client = Redis.createClient(
       rule.vertx(),
-      new RedisOptions().setConnectionString("redis://" + redis.getContainerIpAddress() + ":" + redis.getFirstMappedPort()));
+      new RedisOptions().setConnectionString(redis.getRedisUri()));
 
     client.connect(onConnect -> {
       should.assertTrue(onConnect.succeeded());
@@ -46,15 +51,11 @@ public class RedisClient5Test {
     client.close();
   }
 
-  private static String makeKey() {
-    return UUID.randomUUID().toString();
-  }
-
   @Test(timeout = 10_000L)
   public void testBasicInterop(TestContext should) {
     final Async test = should.async();
-    final String nonexisting = makeKey();
-    final String mykey = makeKey();
+    final String nonexisting = randomKey();
+    final String mykey = randomKey();
 
     client.send(cmd(GET).arg(nonexisting), reply0 -> {
       should.assertTrue(reply0.succeeded());
@@ -74,7 +75,7 @@ public class RedisClient5Test {
   @Test(timeout = 10_000L)
   public void testJson(TestContext should) {
     final Async test = should.async();
-    final String mykey = makeKey();
+    final String mykey = randomKey();
 
     JsonObject json = new JsonObject()
       .putNull("nullKey");

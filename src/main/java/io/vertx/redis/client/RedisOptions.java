@@ -36,13 +36,14 @@ import java.util.List;
 public class RedisOptions {
 
   /**
-   * The default redis endpoint = {@code redis://localhost:6379}
+   * The default Redis endpoint: {@code redis://localhost:6379}
    */
   public static final String DEFAULT_ENDPOINT = "redis://localhost:6379";
 
   private RedisClientType type;
   private NetClientOptions netClientOptions;
   private List<String> endpoints;
+  private RedisTopology topology;
   private PoolOptions poolOptions;
   private int maxWaitingHandlers;
   private int maxNestedArrays;
@@ -64,6 +65,7 @@ public class RedisOptions {
       new NetClientOptions()
         .setTcpKeepAlive(true)
         .setTcpNoDelay(true);
+    topology = RedisTopology.DISCOVER;
     poolOptions = new PoolOptions();
     maxWaitingHandlers = 2048;
     maxNestedArrays = 32;
@@ -84,6 +86,7 @@ public class RedisOptions {
     this.type = other.type;
     this.netClientOptions = other.netClientOptions;
     this.endpoints = other.endpoints;
+    this.topology = other.topology;
     this.poolOptions = new PoolOptions(other.poolOptions);
     this.maxWaitingHandlers = other.maxWaitingHandlers;
     this.maxNestedArrays = other.maxNestedArrays;
@@ -260,6 +263,40 @@ public class RedisOptions {
   }
 
   /**
+   * Get how the {@linkplain RedisTopology topology} should be obtained. By default,
+   * the topology is {@linkplain RedisTopology#DISCOVER discovered} automatically.
+   * <p>
+   * This is only meaningful in case of a {@linkplain RedisClientType#REPLICATION replication}
+   * Redis client. In case of a {@linkplain RedisClientType#CLUSTER cluster} and
+   * {@linkplain RedisClientType#SENTINEL sentinel} Redis client, topology is currently
+   * always discovered automatically and the topology mode is ignored.
+   * </p>
+   *
+   * @return the topology mode
+   */
+  public RedisTopology getTopology() {
+    return topology;
+  }
+
+  /**
+   * Set how the {@linkplain RedisTopology topology} should be obtained. By default,
+   * the topology is {@linkplain RedisTopology#DISCOVER discovered} automatically.
+   * <p>
+   * This is only meaningful in case of a {@linkplain RedisClientType#REPLICATION replication}
+   * Redis client. In case of a {@linkplain RedisClientType#CLUSTER cluster} and
+   * {@linkplain RedisClientType#SENTINEL sentinel} Redis client, topology is currently
+   * always discovered automatically and the topology mode is ignored.
+   * </p>
+   *
+   * @param topology the topology mode
+   * @return fluent self
+   */
+  public RedisOptions setTopology(RedisTopology topology) {
+    this.topology = topology;
+    return this;
+  }
+
+  /**
    * The client will always work on pipeline mode, this means that messages can start queueing. You can control how much
    * backlog you're willing to accept. This methods returns how much handlers is the client willing to queue.
    *
@@ -282,19 +319,27 @@ public class RedisOptions {
   }
 
   /**
-   * Get the master name (only considered in HA mode).
+   * Get the name of the master set.
+   * <p>
+   * This is only meaningful in case of a {@linkplain RedisClientType#SENTINEL sentinel} Redis client
+   * and is ignored otherwise.
+   * </p>
    *
-   * @return the master name.
+   * @return the master set name
    */
   public String getMasterName() {
     return masterName;
   }
 
   /**
-   * Set the master name (only considered in HA mode).
+   * Set the name of the master set.
+   * <p>
+   * This is only meaningful in case of a {@linkplain RedisClientType#SENTINEL sentinel} Redis client
+   * and is ignored otherwise.
+   * </p>
    *
-   * @param masterName the master name.
-   * @return fluent self.
+   * @param masterName the master set name
+   * @return fluent self
    */
   public RedisOptions setMasterName(String masterName) {
     this.masterName = masterName;
@@ -302,19 +347,27 @@ public class RedisOptions {
   }
 
   /**
-   * Get the role name (only considered in HA mode).
+   * Get the client role; that is, to which kind of node should the connection be established.
+   * <p>
+   * This is only meaningful in case of a {@linkplain RedisClientType#SENTINEL sentinel} Redis client
+   * and is ignored otherwise.
+   * </p>
    *
-   * @return the master name.
+   * @return the role
    */
   public RedisRole getRole() {
     return role;
   }
 
   /**
-   * Set the role name (only considered in HA mode).
+   * Set the client role; that is, to which kind of node should the connection be established.
+   * <p>
+   * This is only meaningful in case of a {@linkplain RedisClientType#SENTINEL sentinel} Redis client
+   * and is ignored otherwise.
+   * </p>
    *
-   * @param role the master name.
-   * @return fluent self.
+   * @param role the role
+   * @return fluent self
    */
   public RedisOptions setRole(RedisRole role) {
     this.role = role;
@@ -322,7 +375,11 @@ public class RedisOptions {
   }
 
   /**
-   * Get whether or not to use replica nodes (only considered in Cluster mode).
+   * Get whether to use replica nodes for read only queries.
+   * <p>
+   * This is only meaningful in case of a {@linkplain RedisClientType#REPLICATION replication} and
+   * {@linkplain RedisClientType#CLUSTER cluster} Redis client and is ignored otherwise.
+   * </p>
    *
    * @return the cluster replica node use mode.
    */
@@ -331,7 +388,11 @@ public class RedisOptions {
   }
 
   /**
-   * Set whether or not to use replica nodes (only considered in Cluster mode).
+   * Set whether to use replica nodes for read only queries.
+   * <p>
+   * This is only meaningful in case of a {@linkplain RedisClientType#REPLICATION replication} and
+   * {@linkplain RedisClientType#CLUSTER cluster} Redis client and is ignored otherwise.
+   * </p>
    *
    * @param useReplicas the cluster replica use mode.
    * @return fluent self.
@@ -604,10 +665,12 @@ public class RedisOptions {
   }
 
   /**
-   * Returns the TTL of the hash slot cache. This is only meaningful in case of
-   * a {@linkplain RedisClientType#CLUSTER clustered} Redis client.
+   * Returns the TTL of the hash slot cache. The TTL is expressed in milliseconds.
+   * Defaults to 1000 millis (1 second).
    * <p>
-   * The TTL is expressed in milliseconds. Defaults to 1000 millis (1 second).
+   * This is only meaningful in case of a {@linkplain RedisClientType#CLUSTER cluster} Redis client
+   * and is ignored otherwise.
+   * </p>
    *
    * @return the TTL of the hash slot cache
    */
@@ -616,10 +679,12 @@ public class RedisOptions {
   }
 
   /**
-   * Sets the TTL of the hash slot cache. This is only meaningful in case of
-   * a {@linkplain RedisClientType#CLUSTER clustered} Redis client.
+   * Sets the TTL of the hash slot cache. The TTL is expressed in milliseconds.
+   * Defaults to 1000 millis (1 second).
    * <p>
-   * The TTL is expressed in milliseconds. Defaults to 1000 millis (1 second).
+   * This is only meaningful in case of a {@linkplain RedisClientType#CLUSTER cluster} Redis client
+   * and is ignored otherwise.
+   * </p>
    *
    * @param hashSlotCacheTTL the TTL of the hash slot cache, in millis
    */

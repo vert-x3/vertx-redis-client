@@ -11,74 +11,89 @@ import io.vertx.ext.unit.Async;
 import io.vertx.ext.unit.TestContext;
 import io.vertx.ext.unit.junit.RunTestOnContext;
 import io.vertx.ext.unit.junit.VertxUnitRunner;
-import io.vertx.redis.client.*;
+import io.vertx.redis.client.Redis;
+import io.vertx.redis.client.RedisClientType;
+import io.vertx.redis.client.RedisConnection;
+import io.vertx.redis.client.RedisOptions;
+import io.vertx.redis.client.RedisReplicas;
+import io.vertx.redis.client.Request;
+import io.vertx.redis.client.Response;
 import io.vertx.redis.client.impl.ZModem;
-import org.junit.*;
+import io.vertx.redis.containers.RedisCluster;
+import org.junit.After;
+import org.junit.Before;
+import org.junit.ClassRule;
+import org.junit.Ignore;
+import org.junit.Rule;
+import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.testcontainers.containers.FixedHostPortGenericContainer;
-import org.testcontainers.containers.GenericContainer;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Random;
+import java.util.Set;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 
-import static io.vertx.redis.client.Command.*;
+import static io.vertx.redis.client.Command.ACL;
+import static io.vertx.redis.client.Command.APPEND;
+import static io.vertx.redis.client.Command.BITCOUNT;
+import static io.vertx.redis.client.Command.BITOP;
+import static io.vertx.redis.client.Command.BITPOS;
+import static io.vertx.redis.client.Command.BLPOP;
+import static io.vertx.redis.client.Command.BRPOP;
+import static io.vertx.redis.client.Command.CLUSTER;
+import static io.vertx.redis.client.Command.DBSIZE;
+import static io.vertx.redis.client.Command.DECR;
+import static io.vertx.redis.client.Command.DECRBY;
+import static io.vertx.redis.client.Command.DEL;
+import static io.vertx.redis.client.Command.ECHO;
+import static io.vertx.redis.client.Command.EVAL;
+import static io.vertx.redis.client.Command.EXISTS;
+import static io.vertx.redis.client.Command.EXPIRE;
+import static io.vertx.redis.client.Command.EXPIREAT;
+import static io.vertx.redis.client.Command.FLUSHDB;
+import static io.vertx.redis.client.Command.GET;
+import static io.vertx.redis.client.Command.HGETALL;
+import static io.vertx.redis.client.Command.HSET;
+import static io.vertx.redis.client.Command.KEYS;
+import static io.vertx.redis.client.Command.MGET;
+import static io.vertx.redis.client.Command.MSET;
+import static io.vertx.redis.client.Command.RPUSH;
+import static io.vertx.redis.client.Command.SET;
+import static io.vertx.redis.client.Command.TTL;
+import static io.vertx.redis.client.Command.WAIT;
 import static io.vertx.redis.client.Request.cmd;
+import static io.vertx.redis.client.test.TestUtils.randomKey;
+import static io.vertx.redis.client.test.TestUtils.retryUntilSuccess;
 
 
 @RunWith(VertxUnitRunner.class)
 public class RedisClusterTest {
 
   @ClassRule
-  public static final GenericContainer<?> redis = new FixedHostPortGenericContainer<>("grokzen/redis-cluster:6.2.0")
-    .withEnv("IP", "0.0.0.0")
-    .withEnv("STANDALONE", "true")
-    .withEnv("SENTINEL", "true")
-    .withExposedPorts(7000, 7001, 7002, 7003, 7004, 7005, 7006, 7007, 5000, 5001, 5002)
-    // cluster ports (7000-7005) 6x (master+replica) 3 nodes
-    .withFixedExposedPort(7000, 7000)
-    .withFixedExposedPort(7001, 7001)
-    .withFixedExposedPort(7002, 7002)
-    .withFixedExposedPort(7003, 7003)
-    .withFixedExposedPort(7004, 7004)
-    .withFixedExposedPort(7005, 7005)
-    // standalone ports (7006-7007) 2x
-    .withFixedExposedPort(7006, 7006)
-    .withFixedExposedPort(7007, 7007)
-    // sentinel ports (5000-5002) 3x (match the cluster master nodes)
-    .withFixedExposedPort(5000, 5000)
-    .withFixedExposedPort(5001, 5001)
-    .withFixedExposedPort(5002, 5002)
-    // workaround for new version of the Docker image that doesn't use the built `redis-sentinel` binary correctly
-    .withCommand("/bin/bash", "-c", "sed -i -e 's|redis-sentinel|/redis/src/redis-sentinel|g' /docker-entrypoint.sh && exec /docker-entrypoint.sh redis-cluster");
-
+  public static final RedisCluster redis = new RedisCluster();
 
   @Rule
   public final RunTestOnContext rule = new RunTestOnContext();
 
-  // Server: https://github.com/Grokzen/docker-redis-cluster
   private final RedisOptions options = new RedisOptions()
     .setType(RedisClientType.CLUSTER)
     .setUseReplicas(RedisReplicas.SHARE)
     // we will flood the redis server
     .setMaxWaitingHandlers(128 * 1024)
-    .addConnectionString("redis://127.0.0.1:7000")
-    .addConnectionString("redis://127.0.0.1:7001")
-    .addConnectionString("redis://127.0.0.1:7002")
-    .addConnectionString("redis://127.0.0.1:7003")
-    .addConnectionString("redis://127.0.0.1:7004")
-    .addConnectionString("redis://127.0.0.1:7005")
+    .addConnectionString(redis.getRedisNode0Uri())
+    .addConnectionString(redis.getRedisNode1Uri())
+    .addConnectionString(redis.getRedisNode2Uri())
+    .addConnectionString(redis.getRedisNode3Uri())
+    .addConnectionString(redis.getRedisNode4Uri())
+    .addConnectionString(redis.getRedisNode5Uri())
     .setMaxPoolSize(8)
     .setMaxPoolWaiting(16)
     .setHashSlotCacheTTL(10_000);
-
-  private static String makeKey() {
-    return UUID.randomUUID().toString();
-  }
-
-  private static String[] toStringArray(final String... params) {
-    return params;
-  }
 
   private Redis client;
 
@@ -122,7 +137,7 @@ public class RedisClusterTest {
       // the first hosts are fake to simulate wrong setup
       .addConnectionString("redis://127.0.0.1:9999")
       .addConnectionString("redis://127.0.0.1:8888")
-      .addConnectionString("redis://127.0.0.1:7005")
+      .addConnectionString(redis.getRedisNode0Uri())
       .setMaxPoolSize(8)
       .setMaxPoolWaiting(16);
 
@@ -190,9 +205,9 @@ public class RedisClusterTest {
       .setType(RedisClientType.CLUSTER)
       // we will flood the redis server
       .setMaxWaitingHandlers(128 * 1024)
-      .addConnectionString("redis://127.0.0.1:7000")
-      .addConnectionString("redis://127.0.0.1:7002")
-      .addConnectionString("redis://127.0.0.1:7004")
+      .addConnectionString(redis.getRedisNode0Uri())
+      .addConnectionString(redis.getRedisNode2Uri())
+      .addConnectionString(redis.getRedisNode4Uri())
       .setMaxPoolSize(8)
       .setMaxPoolWaiting(16);
 
@@ -241,7 +256,7 @@ public class RedisClusterTest {
       .setType(RedisClientType.CLUSTER)
       // we will flood the redis server
       .setMaxWaitingHandlers(128 * 1024)
-      .addConnectionString("redis://127.0.0.1:7000")
+      .addConnectionString(redis.getRedisNode0Uri())
       .setMaxPoolSize(8)
       .setMaxPoolWaiting(16);
 
@@ -290,7 +305,7 @@ public class RedisClusterTest {
       .setType(RedisClientType.CLUSTER)
       // we will flood the redis server
       .setMaxWaitingHandlers(128 * 1024)
-      .addConnectionString("redis://127.0.0.1:7000")
+      .addConnectionString(redis.getRedisNode0Uri())
       .setMaxPoolSize(8)
       .setMaxPoolWaiting(16);
 
@@ -375,7 +390,7 @@ public class RedisClusterTest {
   @Test
   public void testAppend(TestContext should) {
     final Async test = should.async();
-    final String key = makeKey();
+    final String key = randomKey();
 
     client
       .connect(onCreate -> {
@@ -409,7 +424,7 @@ public class RedisClusterTest {
   @Test
   public void testBitCount(TestContext should) {
     final Async test = should.async();
-    final String key = makeKey();
+    final String key = randomKey();
 
     client
       .connect(onCreate -> {
@@ -444,9 +459,9 @@ public class RedisClusterTest {
   @Ignore
   public void testBitTop(TestContext should) {
     final Async test = should.async();
-    final String key1 = makeKey();
-    final String key2 = makeKey();
-    final String destkey = makeKey();
+    final String key1 = randomKey();
+    final String key2 = randomKey();
+    final String destkey = randomKey();
 
     client
       .connect(onCreate -> {
@@ -476,8 +491,8 @@ public class RedisClusterTest {
   @Test(timeout = 30_000)
   public void testBlPop(TestContext should) {
     final Async test = should.async();
-    final String list1 = makeKey();
-    final String list2 = makeKey();
+    final String list1 = randomKey();
+    final String list2 = randomKey();
 
     client
       .connect(onCreate -> {
@@ -499,7 +514,7 @@ public class RedisClusterTest {
                 should.assertTrue(blPop.succeeded());
                 should.assertEquals(list1, blPop.result().get(0).toString());
                 should.assertEquals("a", blPop.result().get(1).toString());
-                should.assertEquals("[" + String.join(", ", toStringArray(list1, "a")) + "]", blPop.result().toString());
+                should.assertEquals("[" + String.join(", ", list1, "a") + "]", blPop.result().toString());
                 test.complete();
               });
             });
@@ -512,7 +527,7 @@ public class RedisClusterTest {
   @Test
   public void testBitPos(TestContext should) {
     final Async test = should.async();
-    final String key = makeKey();
+    final String key = randomKey();
     final byte[] value1 = new byte[]{(byte) 0xff, (byte) 0xf0, (byte) 0x00};
     final byte[] value2 = new byte[]{0, 0, 0};
 
@@ -548,8 +563,8 @@ public class RedisClusterTest {
   @Ignore
   public void testBrPop(TestContext should) {
     final Async test = should.async();
-    final String list1 = makeKey();
-    final String list2 = makeKey();
+    final String list1 = randomKey();
+    final String list2 = randomKey();
 
     client
       .connect(onCreate -> {
@@ -569,7 +584,7 @@ public class RedisClusterTest {
 
               cluster.send(cmd(BRPOP).arg(list1).arg(list2).arg(0), brPop -> {
                 should.assertTrue(brPop.succeeded());
-                should.assertEquals(String.join(",", toStringArray(list1, "a")), brPop.result().toString());
+                should.assertEquals(String.join(",", list1, "a"), brPop.result().toString());
                 test.complete();
               });
             });
@@ -581,7 +596,7 @@ public class RedisClusterTest {
   @Test
   public void testDecr(TestContext should) {
     final Async test = should.async();
-    final String key = makeKey();
+    final String key = randomKey();
 
     client
       .connect(onCreate -> {
@@ -605,7 +620,7 @@ public class RedisClusterTest {
   @Test
   public void testDecrBy(TestContext should) {
     final Async test = should.async();
-    final String key = makeKey();
+    final String key = randomKey();
 
     client
       .connect(onCreate -> {
@@ -629,8 +644,8 @@ public class RedisClusterTest {
   @Test
   public void testDel(TestContext should) {
     final Async test = should.async();
-    final String key1 = makeKey();
-    final String key2 = makeKey();
+    final String key1 = randomKey();
+    final String key2 = randomKey();
 
     client.connect(onCreate -> {
       should.assertTrue(onCreate.succeeded());
@@ -676,8 +691,8 @@ public class RedisClusterTest {
   @Test
   public void testExists(TestContext should) {
     final Async test = should.async();
-    final String key1 = makeKey();
-    final String key2 = makeKey();
+    final String key1 = randomKey();
+    final String key2 = randomKey();
 
     final AtomicInteger counter = new AtomicInteger();
 
@@ -713,7 +728,7 @@ public class RedisClusterTest {
   @Test
   public void testExpire(TestContext should) {
     final Async test = should.async();
-    final String key = makeKey();
+    final String key = randomKey();
 
     client
       .connect(onCreate -> {
@@ -752,7 +767,7 @@ public class RedisClusterTest {
   @Test
   public void testExpireAt(TestContext should) {
     final Async test = should.async();
-    final String key = makeKey();
+    final String key = randomKey();
 
     client
       .connect(onCreate -> {
@@ -787,7 +802,7 @@ public class RedisClusterTest {
   @Test(timeout = 10_000)
   public void testGet(TestContext should) {
     final Async test = should.async();
-    final String key = makeKey();
+    final String key = randomKey();
     final String nonExistentKey = "---";
 
 
@@ -1258,7 +1273,7 @@ public class RedisClusterTest {
               int endpoint;
               int slot = ZModem.generate(key);
               if (slot >= slotRange.getInteger("start") && slot <= slotRange.getInteger("end")) {
-                rawCommands.add(Request.cmd(Command.SET).arg(key).arg(value));
+                rawCommands.add(Request.cmd(SET).arg(key).arg(value));
               }
             }
             return cluster.batch(rawCommands).onComplete(should.asyncAssertSuccess(responses -> {
@@ -1329,5 +1344,35 @@ public class RedisClusterTest {
     PreservesContext.connect(client, should);
     PreservesContext.connectThenSend(client, should);
     PreservesContext.connectThenBatch(client, should);
+  }
+
+  @Test
+  public void testWriteToMasterReadFromReplica(TestContext should) {
+    final Async test = should.async();
+    final String key = randomKey();
+
+    Redis.createClient(
+        rule.vertx(),
+        new RedisOptions()
+          .setType(RedisClientType.CLUSTER)
+          .setUseReplicas(RedisReplicas.ALWAYS)
+          .addConnectionString(redis.getRedisNode0Uri())
+          .addConnectionString(redis.getRedisNode1Uri())
+          .addConnectionString(redis.getRedisNode2Uri())
+          .addConnectionString(redis.getRedisNode3Uri())
+          .addConnectionString(redis.getRedisNode4Uri())
+          .addConnectionString(redis.getRedisNode5Uri())
+          .setMaxPoolSize(8)
+          .setMaxPoolWaiting(16))
+      .connect().onComplete(should.asyncAssertSuccess(conn -> {
+        conn.send(Request.cmd(SET).arg(key).arg("foobar"))
+          .compose(ignored -> retryUntilSuccess(rule.vertx(), () -> {
+            return conn.send(Request.cmd(GET).arg(key));
+          }, 10))
+          .onComplete(should.asyncAssertSuccess(result -> {
+            should.assertEquals("foobar", result.toString());
+            test.complete();
+          }));
+      }));
   }
 }

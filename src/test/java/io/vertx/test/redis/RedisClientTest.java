@@ -16,37 +16,44 @@
 package io.vertx.test.redis;
 
 import io.vertx.core.Context;
-import io.vertx.core.json.JsonArray;
-import io.vertx.core.net.NetSocket;
 import io.vertx.core.net.impl.pool.PoolConnector;
 import io.vertx.ext.unit.Async;
 import io.vertx.ext.unit.TestContext;
 import io.vertx.ext.unit.junit.RunTestOnContext;
 import io.vertx.ext.unit.junit.VertxUnitRunner;
-import io.vertx.redis.client.*;
+import io.vertx.redis.client.Command;
+import io.vertx.redis.client.Redis;
+import io.vertx.redis.client.RedisAPI;
+import io.vertx.redis.client.RedisConnection;
+import io.vertx.redis.client.RedisOptions;
+import io.vertx.redis.client.Request;
 import io.vertx.redis.client.impl.PooledRedisConnection;
+import io.vertx.redis.client.impl.RedisConnectionInternal;
 import io.vertx.redis.client.impl.RedisStandaloneConnection;
-import org.junit.*;
+import io.vertx.redis.containers.RedisStandalone;
+import org.junit.After;
+import org.junit.Before;
+import org.junit.ClassRule;
+import org.junit.Rule;
+import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.testcontainers.containers.GenericContainer;
 
 import java.lang.reflect.Field;
-import java.util.*;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
-/**
- * This test relies on a Redis server, by default it will start and stop a Redis server unless
- * the <code>host</code> or <code>port</code> system property is specified. In this case the
- * test assumes an external database will be used.
- */
+import static io.vertx.redis.client.test.TestUtils.randomKey;
+
 @RunWith(VertxUnitRunner.class)
 public class RedisClientTest {
 
+  @ClassRule
+  public static final RedisStandalone redisServer = new RedisStandalone();
+
   @Rule
   public final RunTestOnContext rule = new RunTestOnContext();
-
-  @ClassRule
-  public static final GenericContainer<?> container = new GenericContainer<>("redis:6.0.6")
-    .withExposedPorts(6379);
 
   private Redis client;
   private RedisAPI redis;
@@ -56,8 +63,8 @@ public class RedisClientTest {
     final Async before = should.async();
 
     Context context = rule.vertx().getOrCreateContext();
-    client = Redis.createClient(rule.vertx(), new RedisOptions().setConnectionString("redis://" + container.getContainerIpAddress() + ":" + container.getFirstMappedPort()));
-    client.connect(onConnect -> {
+    client = Redis.createClient(rule.vertx(), new RedisOptions().setConnectionString(redisServer.getRedisUri()));
+    client.connect().onComplete(onConnect -> {
       should.assertTrue(onConnect.succeeded());
       should.assertEquals(context, rule.vertx().getOrCreateContext());
       redis = RedisAPI.api(onConnect.result());
@@ -68,44 +75,6 @@ public class RedisClientTest {
   @After
   public void after() {
     client.close();
-  }
-
-  private static String getProperty(String name) {
-    String s = System.getProperty(name);
-    return (s != null && s.trim().length() > 0) ? s : null;
-  }
-
-  private static JsonArray toJsonArray(final Object... params) {
-    return (params != null) ? new JsonArray(Arrays.asList(params)) : null;
-  }
-
-  private static Object[] toArray(final Object... params) {
-    return params;
-  }
-
-  private static String errorMessage(Throwable t) {
-    return t != null ? t.getMessage() : "";
-  }
-
-  private static String makeKey() {
-    return UUID.randomUUID().toString();
-  }
-
-  private static Map<String, Object> toMap(final String... params) {
-    if (params.length % 2 != 0) {
-      throw new IllegalArgumentException("Last key has no value");
-    }
-    Map<String, Object> result = new HashMap<>();
-    String key = null;
-    for (String param : params) {
-      if (key == null) {
-        key = param;
-      } else {
-        result.put(key, param);
-        key = null;
-      }
-    }
-    return result;
   }
 
   @SafeVarargs
@@ -133,8 +102,7 @@ public class RedisClientTest {
       RedisConnection conn = onConnect.result();
       try {
         // conn is a PooledRedisConnection object
-        Field connectionField = getAccessibleField(PooledRedisConnection.class, "connection");
-        RedisConnection internalConnection = (RedisConnection) connectionField.get(conn);
+        RedisConnectionInternal internalConnection = ((PooledRedisConnection) conn).actual();
         // internalConnection is a RedisStandaloneConnection object
         Field listenerField = getAccessibleField(RedisStandaloneConnection.class, "listener");
         PoolConnector.Listener originalListener = (PoolConnector.Listener) listenerField.get(internalConnection);
@@ -153,9 +121,7 @@ public class RedisClientTest {
           }
         });
 
-        Field socketField = getAccessibleField(RedisStandaloneConnection.class, "netSocket");
-        NetSocket socket = (NetSocket) socketField.get(internalConnection);
-        socket.close(); // this should cause the evict to occur
+        internalConnection.forceClose(); // this should cause the evict to occur
       } catch (NoSuchFieldException | IllegalAccessException e) {
         should.fail(e);
       }
@@ -166,7 +132,7 @@ public class RedisClientTest {
   public void testContextReturn(TestContext should) {
     final Async test = should.async();
     Context context = rule.vertx().getOrCreateContext();
-    redis.append(makeKey(), "Hello", reply1 -> {
+    redis.append(randomKey(), "Hello").onComplete(reply1 -> {
       should.assertEquals(context, rule.vertx().getOrCreateContext());
       test.complete();
     });
@@ -175,7 +141,7 @@ public class RedisClientTest {
   @Test
   public void testAppend(TestContext should) {
     final Async test = should.async();
-    final String key = makeKey();
+    final String key = randomKey();
 
     redis.del(toList(key), reply0 -> {
       should.assertTrue(reply0.succeeded());
@@ -227,7 +193,7 @@ public class RedisClientTest {
   @Test
   public void testBitcount(TestContext should) {
     final Async test = should.async();
-    final String key = makeKey();
+    final String key = randomKey();
 
     redis.set(toList(key, "foobar"), reply0 -> {
       should.assertTrue(reply0.succeeded());
@@ -254,9 +220,9 @@ public class RedisClientTest {
   @Test
   public void testBitop(TestContext should) {
     final Async test = should.async();
-    final String key1 = makeKey();
-    final String key2 = makeKey();
-    final String destkey = makeKey();
+    final String key1 = randomKey();
+    final String key2 = randomKey();
+    final String destkey = randomKey();
 
     redis.set(toList(key1, "foobar"), reply0 -> {
       should.assertTrue(reply0.succeeded());
@@ -276,13 +242,13 @@ public class RedisClientTest {
   @Test
   public void testBlpop(TestContext should) {
     final Async test = should.async();
-    final String list1 = makeKey();
-    final String list2 = makeKey();
+    final String list1 = randomKey();
+    final String list2 = randomKey();
 
     redis.del(toList(list1, list2), reply0 -> {
       should.assertTrue(reply0.succeeded());
 
-      redis.rpush(toList(list1,"a", "b", "c"), reply1 -> {
+      redis.rpush(toList(list1, "a", "b", "c"), reply1 -> {
         should.assertTrue(reply1.succeeded());
         should.assertEquals(3, reply1.result().toInteger());
 
@@ -300,8 +266,8 @@ public class RedisClientTest {
   @Test
   public void testBrpop(TestContext should) {
     final Async test = should.async();
-    final String list1 = makeKey();
-    final String list2 = makeKey();
+    final String list1 = randomKey();
+    final String list2 = randomKey();
 
     redis.del(toList(list1, list2), reply0 -> {
       should.assertTrue(reply0.succeeded());
@@ -338,7 +304,7 @@ public class RedisClientTest {
       }
     });
 
-    Redis redis2 = Redis.createClient(rule.vertx(), new RedisOptions().setConnectionString("redis://" + container.getContainerIpAddress() + ":" + container.getFirstMappedPort()));
+    Redis redis2 = Redis.createClient(rule.vertx(), new RedisOptions().setConnectionString(redisServer.getRedisUri()));
 
     redis2.send(Request.cmd(Command.LPUSH).arg("list1").arg("hello"), result -> {
     });
@@ -380,26 +346,21 @@ public class RedisClientTest {
     });
   }
 
-//  @Test
-//  public void testClientSetAndGetName(TestContext should) {
-//    final Async test = should.async();
-//    redis.clientGetname(result -> {
-//      should.assertTrue(String.valueOf(result.cause()), result.succeeded());
-//      should.assertNull(result.result());
-//      redis.clientSetname("test-connection", result1 -> {
-//        should.assertTrue(result1.succeeded());
-//        redis.clientGetname(result2 -> {
-//          should.assertTrue(result2.succeeded());
-//          should.assertEquals("test-connection", result2.result());
-//
-//          test.complete();
-//        });
-//      });
-//    });
-//
-//
-//  }
+  @Test
+  public void testClientSetAndGetName(TestContext should) {
+    final Async test = should.async();
 
+    redis.client(toList("GETNAME"))
+      .compose(result -> {
+        should.assertNull(result);
+        return redis.client(toList("SETNAME", "test-connection"));
+      })
+      .compose(result -> redis.client(toList("GETNAME")))
+      .onComplete(should.asyncAssertSuccess(result -> {
+        should.assertEquals("test-connection", result.toString());
+        test.complete();
+      }));
+  }
 
   @Test
   public void testConfigGet(TestContext should) {
@@ -415,17 +376,13 @@ public class RedisClientTest {
   public void testConfigSetAndGet(TestContext should) {
     final Async test = should.async();
 
-    redis.config(toList("SET", "dbfilename", "redis.dump"), reply -> {
-      if (reply.succeeded()) {
-        redis.config(toList("GET", "dbfilename"), reply2 -> {
-          if (reply2.succeeded()) {
-            should.assertNotNull(reply2.result().get("dbfilename"));
-            should.assertTrue(reply2.result().get("dbfilename").toString().equals("redis.dump"));
-            test.complete();
-          }
-        });
-      }
-    });
+    redis.config(toList("SET", "set-max-intset-entries", "1024"))
+      .compose(reply -> redis.config(toList("GET", "set-max-intset-entries")))
+      .onComplete(should.asyncAssertSuccess(reply2 -> {
+        should.assertNotNull(reply2.get("set-max-intset-entries"));
+        should.assertTrue(reply2.get("set-max-intset-entries").toString().equals("1024"));
+        test.complete();
+      }));
   }
 
 //  @Test
@@ -493,7 +450,7 @@ public class RedisClientTest {
   @Test
   public void testDecr(TestContext should) {
     final Async test = should.async();
-    final String mykey = makeKey();
+    final String mykey = randomKey();
 
     redis.set(toList(mykey, "10"), reply0 -> {
       should.assertTrue(reply0.succeeded());
@@ -508,7 +465,7 @@ public class RedisClientTest {
   @Test
   public void testDecrby(TestContext should) {
     final Async test = should.async();
-    final String mykey = makeKey();
+    final String mykey = randomKey();
 
     redis.set(toList(mykey, "10"), reply0 -> {
       should.assertTrue(reply0.succeeded());
@@ -524,9 +481,9 @@ public class RedisClientTest {
   @Test
   public void testDel(TestContext should) {
     final Async test = should.async();
-    final String key1 = makeKey();
-    final String key2 = makeKey();
-    final String key3 = makeKey();
+    final String key1 = randomKey();
+    final String key2 = randomKey();
+    final String key3 = randomKey();
 
     redis.set(toList(key1, "Hello"), reply0 -> {
       should.assertTrue(reply0.succeeded());
@@ -545,25 +502,17 @@ public class RedisClientTest {
   public void testDiscard(TestContext should) {
     final Async test = should.async();
 
-    String key = makeKey();
-    redis.set(toList(key, "0"), reply -> {
-      should.assertTrue(reply.succeeded());
-      redis.multi(reply2 -> {
-        should.assertTrue(reply2.succeeded());
-        redis.incr(key, reply3 -> {
-          should.assertTrue(reply3.succeeded());
-          redis.discard(reply4 -> {
-            should.assertTrue(reply4.succeeded());
-            redis.get(key, reply5 -> {
-              should.assertTrue(reply5.succeeded());
-              should.assertEquals(0, reply5.result().toInteger());
-              test.complete();
-            });
-          });
-        });
-      });
-    });
+    String key = randomKey();
 
+    redis.set(toList(key, "0"))
+      .compose(reply -> redis.multi())
+      .compose(reply -> redis.incr(key))
+      .compose(reply -> redis.discard())
+      .compose(reply -> redis.get(key))
+      .onComplete(should.asyncAssertSuccess(reply -> {
+        should.assertEquals(0, reply.toInteger());
+        test.complete();
+      }));
   }
 
   @Test
@@ -581,14 +530,14 @@ public class RedisClientTest {
   public void testEval(TestContext should) {
     final Async test = should.async();
 
-    final String key1 = makeKey();
-    final String key2 = makeKey();
-    redis.eval(toList("return {KEYS[1],KEYS[2],ARGV[1],ARGV[2]}", "2", key1, key2, "first", "second"), reply -> {
-      should.assertTrue(reply.succeeded());
-      Object r = reply.result();
-      should.assertNotNull(r);
-      test.complete();
-    });
+    final String key1 = randomKey();
+    final String key2 = randomKey();
+    redis
+      .eval(toList("return {KEYS[1],KEYS[2],ARGV[1],ARGV[2]}", "2", key1, key2, "first", "second"))
+      .onComplete(should.asyncAssertSuccess(reply -> {
+        should.assertNotNull(reply);
+        test.complete();
+      }));
 
   }
 
@@ -645,52 +594,30 @@ public class RedisClientTest {
   @Test
   public void testExists(TestContext should) {
     final Async test = should.async();
-    final String key1 = makeKey();
-    final String key2 = makeKey();
+    final String key1 = randomKey();
+    final String key2 = randomKey();
 
-    redis.set(toList(key1, "Hello"), reply0 -> {
-      should.assertTrue(reply0.succeeded());
-      redis.exists(toList(key1), reply1 -> {
-        should.assertTrue(reply1.succeeded());
-        should.assertEquals(1L, reply1.result().toLong());
-
-        redis.exists(toList(key2), reply2 -> {
-          should.assertTrue(reply2.succeeded());
-          should.assertEquals(0L, reply2.result().toLong());
-          test.complete();
-        });
-      });
-    });
-
+    redis.set(toList(key1, "Hello"))
+      .compose(reply0 -> redis.exists(toList(key1)))
+      .compose(reply1 -> {
+        should.assertEquals(1L, reply1.toLong());
+        return redis.exists(toList(key2));
+      })
+      .compose(reply2 -> {
+        should.assertEquals(0L, reply2.toLong());
+        return redis.set(toList(key2, "Hello"));
+      })
+      .compose(reply3 -> redis.exists(toList(key1, key2)))
+      .onComplete(should.asyncAssertSuccess(reply4 -> {
+        should.assertEquals(2, reply4.toInteger());
+        test.complete();
+      }));
   }
-
-//  // Require a more recent version of Redis
-//  @Test
-//  public void testExistsMany(TestContext should) {
-//    final Async test = should.async();
-//    String key1 = makeKey();
-//    String key2 = makeKey();
-//    redis.set(key1, "Hello", onSuccess(reply0 -> {
-//      redis.existsMany(toList(key1, key2), onSuccess(reply1 -> {
-//        should.assertEquals(1, reply1.toLong());
-//        redis.set(key2, "Hello", onSuccess(reply2 -> {
-//          redis.existsMany(toList(key1, key2), onSuccess(reply3 -> {
-//            should.assertEquals(2, reply3.toLong());
-//            redis.existsMany(toList(key1), onSuccess(reply4 -> {
-//              should.assertEquals(1, reply4.toLong());
-//              test.complete();
-//            }));
-//          }));
-//        }));
-//      }));
-//    }));
-//
-//  }
 
   @Test
   public void testExpire(TestContext should) {
     final Async test = should.async();
-    final String mykey = makeKey();
+    final String mykey = randomKey();
 
     redis.set(toList(mykey, "Hello"), reply0 -> {
       should.assertTrue(reply0.succeeded());
@@ -719,7 +646,7 @@ public class RedisClientTest {
   @Test
   public void testExpireat(TestContext should) {
     final Async test = should.async();
-    final String mykey = makeKey();
+    final String mykey = randomKey();
 
     redis.set(toList(mykey, "Hello"), reply0 -> {
       should.assertTrue(reply0.succeeded());
@@ -745,7 +672,7 @@ public class RedisClientTest {
   public void testFlushall(TestContext should) {
     final Async test = should.async();
 
-    String key = makeKey();
+    String key = randomKey();
     //As per the doc, this never fails
     redis.set(toList(key, "blah"), reply -> {
       should.assertTrue(reply.succeeded());
@@ -764,7 +691,7 @@ public class RedisClientTest {
   @Test
   public void testFlushdb(TestContext should) {
     final Async test = should.async();
-    String key = makeKey();
+    String key = randomKey();
     //As per the doc, this never fails
     redis.set(toList(key, "blah"), reply -> {
       should.assertTrue(reply.succeeded());
@@ -782,8 +709,8 @@ public class RedisClientTest {
   @Test
   public void testGet(TestContext should) {
     final Async test = should.async();
-    final String nonexisting = makeKey();
-    final String mykey = makeKey();
+    final String nonexisting = randomKey();
+    final String mykey = randomKey();
 
     redis.get(nonexisting, reply0 -> {
       should.assertTrue(reply0.succeeded());
@@ -803,7 +730,7 @@ public class RedisClientTest {
   @Test
   public void testGetbit(TestContext should) {
     final Async test = should.async();
-    final String mykey = makeKey();
+    final String mykey = randomKey();
 
     redis.setbit(mykey, "7", "1", reply0 -> {
       should.assertTrue(reply0.succeeded());
@@ -831,7 +758,7 @@ public class RedisClientTest {
   @Test
   public void testGetrange(TestContext should) {
     final Async test = should.async();
-    final String mykey = makeKey();
+    final String mykey = randomKey();
 
     redis.set(toList(mykey, "This is a string"), reply0 -> {
       should.assertTrue(reply0.succeeded());
@@ -861,7 +788,7 @@ public class RedisClientTest {
   @Test
   public void testGetset(TestContext should) {
     final Async test = should.async();
-    final String mycounter = makeKey();
+    final String mycounter = randomKey();
 
     redis.incr(mycounter, reply0 -> {
       should.assertTrue(reply0.succeeded());
@@ -883,7 +810,7 @@ public class RedisClientTest {
   @Test
   public void testHdel(TestContext should) {
     final Async test = should.async();
-    final String myhash = makeKey();
+    final String myhash = randomKey();
 
     redis.hset(toList(myhash, "field1", "foo"), reply0 -> {
       should.assertTrue(reply0.succeeded());
@@ -906,7 +833,7 @@ public class RedisClientTest {
   @Test
   public void testHexists(TestContext should) {
     final Async test = should.async();
-    final String myhash = makeKey();
+    final String myhash = randomKey();
 
     redis.hset(toList(myhash, "field1", "foo"), reply0 -> {
       should.assertTrue(reply0.succeeded());
@@ -929,7 +856,7 @@ public class RedisClientTest {
   @Test
   public void testHget(TestContext should) {
     final Async test = should.async();
-    final String myhash = makeKey();
+    final String myhash = randomKey();
 
     redis.hset(toList(myhash, "field1", "foo"), reply0 -> {
       should.assertTrue(reply0.succeeded());
@@ -949,35 +876,31 @@ public class RedisClientTest {
 
   }
 
-//  @Test
-//  public void testHgetall(TestContext should) {
-//    final Async test = should.async();
-//    final String myhash = makeKey();
-//
-//    redis.hset(toList(myhash, "field1", "Hello"), reply0 -> {
-//      should.assertTrue(reply0.succeeded());
-//      should.assertEquals(1L, reply0.result().toLong());
-//
-//      redis.hset(toList(myhash, "field2", "World"), reply1 -> {
-//        should.assertTrue(reply1.succeeded());
-//        should.assertEquals(1L, reply1.result().toLong());
-//
-//        redis.hgetall(myhash, reply2 -> {
-//          should.assertTrue(reply2.succeeded());
-//          JsonObject obj = reply2.result();
-//          should.assertEquals("Hello", obj.getString("field1"));
-//          should.assertEquals("World", obj.getString("field2"));
-//          test.complete();
-//        });
-//      });
-//    });
-//
-//  }
+  @Test
+  public void testHgetall(TestContext should) {
+    final Async test = should.async();
+    final String myhash = randomKey();
+
+    redis.hset(toList(myhash, "field1", "Hello"))
+      .compose(reply0 -> {
+        should.assertEquals(1L, reply0.toLong());
+        return redis.hset(toList(myhash, "field2", "World"));
+      })
+      .compose(reply1 -> {
+        should.assertEquals(1L, reply1.toLong());
+        return redis.hgetall(myhash);
+      })
+      .onComplete(should.asyncAssertSuccess(reply2 -> {
+        should.assertEquals("Hello", reply2.get("field1").toString());
+        should.assertEquals("World", reply2.get("field2").toString());
+        test.complete();
+      }));
+  }
 
   @Test
   public void testHincrby(TestContext should) {
     final Async test = should.async();
-    final String myhash = makeKey();
+    final String myhash = randomKey();
 
     redis.hset(toList(myhash, "field", "5"), reply0 -> {
       should.assertTrue(reply0.succeeded());
@@ -1004,7 +927,7 @@ public class RedisClientTest {
   @Test
   public void testHIncrbyfloat(TestContext should) {
     final Async test = should.async();
-    final String mykey = makeKey();
+    final String mykey = randomKey();
 
     redis.hset(toList(mykey, "field", "10.50"), reply0 -> {
       should.assertTrue(reply0.succeeded());
@@ -1028,33 +951,32 @@ public class RedisClientTest {
     });
   }
 
-//  @Test
-//  public void testHkeys(TestContext should) {
-//    final Async test = should.async();
-//    final String myhash = makeKey();
-//
-//    redis.hset(myhash, "field1", "Hello", reply0 -> {
-//      should.assertTrue(reply0.succeeded());
-//      should.assertEquals(1, reply0.result().toLong());
-//
-//      redis.hset(myhash, "field2", "World", reply1 -> {
-//        should.assertTrue(reply1.succeeded());
-//        should.assertEquals(1, reply1.result().toLong());
-//
-//        redis.hkeys(myhash, reply2 -> {
-//          should.assertTrue(reply2.succeeded());
-//          should.assertArrayEquals(toArray("field1", "field2"), reply2.result().getList().toArray());
-//          test.complete();
-//        });
-//      });
-//    });
-//
-//  }
+  @Test
+  public void testHkeys(TestContext should) {
+    final Async test = should.async();
+    final String myhash = randomKey();
+
+    redis.hset(toList(myhash, "field1", "Hello"))
+      .compose(reply0 -> {
+        should.assertEquals(1, reply0.toInteger());
+        return redis.hset(toList(myhash, "field2", "World"));
+      })
+      .compose(reply1 -> {
+        should.assertEquals(1, reply1.toInteger());
+        return redis.hkeys(myhash);
+      })
+      .onComplete(should.asyncAssertSuccess(reply2 -> {
+        should.assertEquals(2, reply2.size());
+        should.assertEquals("field1", reply2.get(0).toString());
+        should.assertEquals("field2", reply2.get(1).toString());
+        test.complete();
+      }));
+  }
 
   @Test
   public void testHlen(TestContext should) {
     final Async test = should.async();
-    final String myhash = makeKey();
+    final String myhash = randomKey();
 
     redis.hset(toList(myhash, "field1", "Hello"), reply0 -> {
       should.assertTrue(reply0.succeeded());
@@ -1073,33 +995,32 @@ public class RedisClientTest {
     });
   }
 
-//  @Test
-//  public void testHmget(TestContext should) {
-//    final Async test = should.async();
-//    final String myhash = makeKey();
-//
-//    redis.hset(toList(myhash, "field1", "Hello"), reply0 -> {
-//      should.assertTrue(reply0.succeeded());
-//      should.assertEquals(1L, reply0.result().toLong());
-//
-//      redis.hset(toList(myhash, "field2", "World"), reply1 -> {
-//        should.assertTrue(reply1.succeeded());
-//        should.assertEquals(1L, reply1.result().toLong());
-//
-//        redis.hmget(toList(myhash, "field1", "field2", "nofield"), reply2 -> {
-//          should.assertTrue(reply2.succeeded());
-//          should.assertEquals(toList("Hello", "World", null), reply2.result().getList());
-//          test.complete();
-//        });
-//      });
-//    });
-//
-//  }
+  @Test
+  public void testHmget(TestContext should) {
+    final Async test = should.async();
+    final String myhash = randomKey();
+
+    redis.hset(toList(myhash, "field1", "Hello"))
+      .compose(reply0 -> {
+        should.assertEquals(1L, reply0.toLong());
+        return redis.hset(toList(myhash, "field2", "World"));
+      })
+      .compose(reply1 -> {
+        should.assertEquals(1L, reply1.toLong());
+        return redis.hmget(toList(myhash, "field1", "field2", "nofield"));
+      }).onComplete(should.asyncAssertSuccess(reply2 -> {
+        should.assertEquals(3, reply2.size());
+        should.assertEquals("Hello", reply2.get(0).toString());
+        should.assertEquals("World", reply2.get(1).toString());
+        should.assertEquals(null, reply2.get(2));
+        test.complete();
+      }));
+  }
 
   @Test
   public void testHmset(TestContext should) {
     final Async test = should.async();
-    final String myhash = makeKey();
+    final String myhash = randomKey();
 
     redis.hmset(toList(myhash, "field1", "Hello", "field2", "World"), reply0 -> {
       should.assertTrue(reply0.succeeded());
@@ -1118,7 +1039,7 @@ public class RedisClientTest {
   @Test
   public void testHset(TestContext should) {
     final Async test = should.async();
-    final String myhash = makeKey();
+    final String myhash = randomKey();
 
     redis.hset(toList(myhash, "field1", "Hello"), reply0 -> {
       should.assertTrue(reply0.succeeded());
@@ -1135,7 +1056,7 @@ public class RedisClientTest {
   @Test
   public void testHsetnx(TestContext should) {
     final Async test = should.async();
-    final String myhash = makeKey();
+    final String myhash = randomKey();
 
     redis.hsetnx(myhash, "field", "Hello", reply0 -> {
       should.assertTrue(reply0.succeeded());
@@ -1154,32 +1075,31 @@ public class RedisClientTest {
     });
   }
 
-//  @Test
-//  public void testHvals(TestContext should) {
-//    final Async test = should.async();
-//    final String myhash = makeKey();
-//
-//    redis.hset(toList(myhash, "field1", "Hello"), reply0 -> {
-//      should.assertTrue(reply0.succeeded());
-//      should.assertEquals(1L, reply0.result().toLong());
-//
-//      redis.hset(toList(myhash, "field2", "World"), reply1 -> {
-//        should.assertTrue(reply1.succeeded());
-//        should.assertEquals(1L, reply1.result().toLong());
-//
-//        redis.hvals(myhash, reply2 -> {
-//          should.assertTrue(reply2.succeeded());
-//          should.assertEquals(toList("Hello", "World"), reply2.result().getList());
-//          test.complete();
-//        });
-//      });
-//    });
-//  }
+  @Test
+  public void testHvals(TestContext should) {
+    final Async test = should.async();
+    final String myhash = randomKey();
+
+    redis.hset(toList(myhash, "field1", "Hello"))
+      .compose(reply0 -> {
+        should.assertEquals(1L, reply0.toLong());
+        return redis.hset(toList(myhash, "field2", "World"));
+      })
+      .compose(reply1 -> {
+        should.assertEquals(1L, reply1.toLong());
+        return redis.hvals(myhash);
+      }).onComplete(should.asyncAssertSuccess(reply2 -> {
+        should.assertEquals(2, reply2.size());
+        should.assertEquals("Hello", reply2.get(0).toString());
+        should.assertEquals("World", reply2.get(1).toString());
+        test.complete();
+      }));
+  }
 
   @Test
   public void testIncr(TestContext should) {
     final Async test = should.async();
-    final String mykey = makeKey();
+    final String mykey = randomKey();
 
     redis.set(toList(mykey, "10"), reply0 -> {
       should.assertTrue(reply0.succeeded());
@@ -1199,7 +1119,7 @@ public class RedisClientTest {
   @Test
   public void testIncrby(TestContext should) {
     final Async test = should.async();
-    final String mykey = makeKey();
+    final String mykey = randomKey();
 
     redis.set(toList(mykey, "10"), reply0 -> {
       should.assertTrue(reply0.succeeded());
@@ -1214,7 +1134,7 @@ public class RedisClientTest {
   @Test
   public void testIncrbyfloat(TestContext should) {
     final Async test = should.async();
-    final String mykey = makeKey();
+    final String mykey = randomKey();
 
     redis.set(toList(mykey, "10.50"), reply0 -> {
       should.assertTrue(reply0.succeeded());
@@ -1244,32 +1164,24 @@ public class RedisClientTest {
     });
   }
 
-//  @Test
-//  public void testKeys(TestContext should) {
-//    final Async test = should.async();
-//    redis.mset(new JsonObject(toMap("one", "1", "two", "2", "three", "3", "four", "4")), reply0 -> {
-//      should.assertTrue(reply0.succeeded());
-//      redis.keys("*o*", reply1 -> {
-//        should.assertTrue(reply1.succeeded());
-//        JsonArray array = reply1.result();
-//        // this is because there are leftovers from previous tests
-//        should.assertTrue(3 <= array.size());
-//
-//        redis.keys("t??", reply2 -> {
-//          should.assertTrue(reply2.succeeded());
-//          JsonArray array2 = reply2.result();
-//          should.assertTrue(1 == array2.size());
-//
-//          redis.keys("*", reply3 -> {
-//            should.assertTrue(reply3.succeeded());
-//            JsonArray array3 = reply3.result();
-//            should.assertTrue(4 <= array3.size());
-//            test.complete();
-//          });
-//        });
-//      });
-//    });
-//  }
+  @Test
+  public void testKeys(TestContext should) {
+    final Async test = should.async();
+
+    redis.mset(toList("one", "1", "two", "2", "three", "3", "four", "4"))
+      .compose(reply0 -> redis.keys("*o*"))
+      .compose(reply1 -> {
+        // there may be leftovers from previous tests
+        should.assertTrue(3 <= reply1.size());
+        return redis.keys("t??");
+      }).compose(reply2 -> {
+        should.assertEquals(1, reply2.size());
+        return redis.keys("*");
+      }).onComplete(should.asyncAssertSuccess(reply3 -> {
+        should.assertTrue(4 <= reply3.size());
+        test.complete();
+      }));
+  }
 
   @Test
   public void testLastsave(TestContext should) {
@@ -1283,7 +1195,7 @@ public class RedisClientTest {
   @Test
   public void testLindex(TestContext should) {
     final Async test = should.async();
-    final String mykey = makeKey();
+    final String mykey = randomKey();
 
     redis.lpush(toList(mykey, "World"), reply0 -> {
       should.assertTrue(reply0.succeeded());
@@ -1311,7 +1223,7 @@ public class RedisClientTest {
   @Test
   public void testLinsert(TestContext should) {
     final Async test = should.async();
-    final String mykey = makeKey();
+    final String mykey = randomKey();
 
     redis.rpush(toList(mykey, "Hello"), reply0 -> {
       should.assertTrue(reply0.succeeded());
@@ -1333,44 +1245,45 @@ public class RedisClientTest {
   @Test
   public void testLlen(TestContext should) {
     final Async test = should.async();
-    final String mykey = makeKey();
-    redis.lpush(toList(mykey, "World"), reply0 -> {
-      should.assertTrue(reply0.succeeded());
-      should.assertEquals(1L, reply0.result().toLong());
-      redis.lpush(toList(mykey, "Hello"), reply1 -> {
-        should.assertTrue(reply1.succeeded());
-        should.assertEquals(2L, reply1.result().toLong());
-        redis.llen(mykey, reply2 -> {
-          should.assertTrue(reply2.succeeded());
-          should.assertEquals(2L, reply2.result().toLong());
-          test.complete();
-        });
-      });
-    });
+    final String mykey = randomKey();
 
+    redis.lpush(toList(mykey, "World"))
+      .compose(reply0 -> {
+        should.assertEquals(1L, reply0.toLong());
+        return redis.lpush(toList(mykey, "Hello"));
+      })
+      .compose(reply1 -> {
+        should.assertEquals(2L, reply1.toLong());
+        return redis.llen(mykey);
+      })
+      .onComplete(should.asyncAssertSuccess(reply2 -> {
+        should.assertEquals(2L, reply2.toLong());
+        test.complete();
+      }));
   }
 
   @Test
   public void testLpop(TestContext should) {
     final Async test = should.async();
-    final String mykey = makeKey();
-    redis.rpush(toList(mykey, "one"), reply0 -> {
-      should.assertTrue(reply0.succeeded());
-      should.assertEquals(1L, reply0.result().toLong());
-      redis.rpush(toList(mykey, "two"), reply1 -> {
-        should.assertTrue(reply1.succeeded());
-        should.assertEquals(2L, reply1.result().toLong());
-        redis.rpush(toList(mykey, "three"), reply2 -> {
-          should.assertTrue(reply2.succeeded());
-          should.assertEquals(3L, reply2.result().toLong());
-          redis.lpop(toList(mykey), reply3 -> {
-            should.assertTrue(reply3.succeeded());
-            should.assertEquals("one", reply3.result().toString());
-            test.complete();
-          });
-        });
-      });
-    });
+    final String mykey = randomKey();
+
+    redis.rpush(toList(mykey, "one"))
+      .compose(reply0 -> {
+        should.assertEquals(1L, reply0.toLong());
+        return redis.rpush(toList(mykey, "two"));
+      })
+      .compose(reply1 -> {
+        should.assertEquals(2L, reply1.toLong());
+        return redis.rpush(toList(mykey, "three"));
+      })
+      .compose(reply2 -> {
+        should.assertEquals(3L, reply2.toLong());
+        return redis.lpop(toList(mykey));
+      })
+      .onComplete(should.asyncAssertSuccess(reply3 -> {
+        should.assertEquals("one", reply3.toString());
+        test.complete();
+      }));
   }
 
 //  @Test
@@ -1621,34 +1534,32 @@ public class RedisClientTest {
   public void testMove(TestContext should) {
     final Async test = should.async();
 
-    String key = makeKey();
-    redis.set(toList(key, "moved_key"), reply -> {
-      should.assertTrue(reply.succeeded());
-      redis.move(key, "1", reply2 -> {
-        should.assertTrue(reply2.succeeded());
-        should.assertEquals(1L, reply2.result().toLong());
+    String key = randomKey();
+
+    redis.set(toList(key, "moved_key"))
+      .compose(reply -> redis.move(key, "1"))
+      .onComplete(should.asyncAssertSuccess(reply2 -> {
+        should.assertEquals(1L, reply2.toLong());
         test.complete();
-      });
-    });
+      }));
   }
 
   @Test
   public void testMset(TestContext should) {
     final Async test = should.async();
-    final String mykey1 = makeKey();
-    final String mykey2 = makeKey();
-    redis.mset(toList(mykey1, "Hello", mykey2, "World"), reply0 -> {
-      should.assertTrue(reply0.succeeded());
-      redis.get(mykey1, reply1 -> {
-        should.assertTrue(reply1.succeeded());
-        should.assertEquals("Hello", reply1.result().toString());
-        redis.get(mykey2, reply2 -> {
-          should.assertTrue(reply2.succeeded());
-          should.assertEquals("World", reply2.result().toString());
-          test.complete();
-        });
-      });
-    });
+    final String mykey1 = randomKey();
+    final String mykey2 = randomKey();
+
+    redis.mset(toList(mykey1, "Hello", mykey2, "World"))
+      .compose(reply0 -> redis.get(mykey1))
+      .compose(reply1 -> {
+        should.assertEquals("Hello", reply1.toString());
+        return redis.get(mykey2);
+      })
+      .onComplete(should.asyncAssertSuccess(reply2 -> {
+        should.assertEquals("World", reply2.toString());
+        test.complete();
+      }));
   }
 
 //  @Test
@@ -1677,84 +1588,67 @@ public class RedisClientTest {
   @Test
   public void testMulti(TestContext should) {
     final Async test = should.async();
-    String key = makeKey();
-    redis.set(toList(key, "0"), rep -> {
-      should.assertTrue(rep.succeeded());
-      redis.multi(reply -> {
-        should.assertTrue(reply.succeeded());
-        redis.set(toList(makeKey(), "0"), reply2 -> {
-          should.assertTrue(reply2.succeeded());
-          redis.set(toList(makeKey(), "0"), reply3 -> should.assertTrue(reply3.succeeded()));
-          redis.exec(reply4 -> {
-            should.assertTrue(reply4.succeeded());
-            test.complete();
-          });
-        });
-      });
-    });
+    String key = randomKey();
+
+    redis.set(toList(key, "0"))
+      .compose(reply0 -> redis.multi())
+      .compose(reply1 -> redis.set(toList(randomKey(), "0")))
+      .compose(reply2 -> redis.set(toList(randomKey(), "0")))
+      .compose(reply3 -> redis.exec())
+      .onComplete(should.asyncAssertSuccess(reply4 -> test.complete()));
   }
 
   @Test
   public void testObject(TestContext should) {
     final Async test = should.async();
 
-    String mykey = makeKey();
-    redis.set(toList(mykey, "test"), reply -> {
-      should.assertTrue(reply.succeeded());
-      redis.object(toList("REFCOUNT", mykey), reply2 -> {
-        should.assertTrue(reply2.succeeded());
-        redis.object(toList("ENCODING", mykey), reply3 -> {
-          should.assertTrue(reply3.succeeded());
-          redis.object(toList("IDLETIME", mykey), reply4 -> {
-            should.assertTrue(reply4.succeeded());
-            test.complete();
-          });
-        });
-      });
-    });
+    String mykey = randomKey();
+    redis.set(toList(mykey, "test"))
+      .compose(reply -> redis.object(toList("REFCOUNT", mykey)))
+      .compose(reply -> redis.object(toList("ENCODING", mykey)))
+      .compose(reply -> redis.object(toList("IDLETIME", mykey)))
+      .onComplete(should.asyncAssertSuccess(reply -> test.complete()));
   }
 
   @Test
   public void testPersist(TestContext should) {
     final Async test = should.async();
-    final String mykey = makeKey();
-    redis.set(toList(mykey, "Hello"), reply0 -> {
-      should.assertTrue(reply0.succeeded());
-      redis.expire(Arrays.asList(mykey, "10"), reply1 -> {
-        should.assertTrue(reply1.succeeded());
-        should.assertEquals(1L, reply1.result().toLong());
-        redis.ttl(mykey, reply2 -> {
-          should.assertTrue(reply2.succeeded());
-          should.assertEquals(10L, reply2.result().toLong());
-          redis.persist(mykey, reply3 -> {
-            should.assertTrue(reply3.succeeded());
-            should.assertEquals(1L, reply3.result().toLong());
-            redis.ttl(mykey, reply4 -> {
-              should.assertTrue(reply4.succeeded());
-              should.assertEquals(-1L, reply4.result().toLong());
-              test.complete();
-            });
-          });
-        });
-      });
-    });
+    final String mykey = randomKey();
+
+    redis.set(toList(mykey, "Hello"))
+      .compose(reply0 -> redis.expire(Arrays.asList(mykey, "10")))
+      .compose(reply1 -> {
+        should.assertEquals(1L, reply1.toLong());
+        return redis.ttl(mykey);
+      })
+      .compose(reply2 -> {
+        should.assertEquals(10L, reply2.toLong());
+        return redis.persist(mykey);
+      })
+      .compose(reply3 -> {
+        should.assertEquals(1L, reply3.toLong());
+        return redis.ttl(mykey);
+      })
+      .onComplete(should.asyncAssertSuccess(reply4 -> {
+        should.assertEquals(-1L, reply4.toLong());
+        test.complete();
+      }));
   }
 
   @Test
   public void testPexpire(TestContext should) {
     final Async test = should.async();
-    final String mykey = makeKey();
-    redis.set(toList(mykey, "Hello"), reply0 -> {
-      should.assertTrue(reply0.succeeded());
-      redis.pexpire(Arrays.asList(mykey, "1000"), reply1 -> {
-        should.assertTrue(reply1.succeeded());
-        should.assertEquals(1L, reply1.result().toLong());
-        redis.get(mykey, reply2 -> {
-          should.assertTrue(reply2.succeeded());
-          test.complete();
-        });
-      });
-    });
+    final String mykey = randomKey();
+
+    redis.set(toList(mykey, "Hello"))
+      .compose(reply0 -> redis.pexpire(Arrays.asList(mykey, "1000")))
+      .compose(reply1 -> {
+        should.assertEquals(1L, reply1.toLong());
+        return redis.get(mykey);
+      })
+      .onComplete(should.asyncAssertSuccess(reply2 -> {
+        test.complete();
+      }));
   }
 
 //  @Test
@@ -1779,14 +1673,18 @@ public class RedisClientTest {
 //    });
 //  }
 
-//  @Test
-//  public void testPing(TestContext should) {
-//    final Async test = should.async();
-//    redis.ping(reply0 -> {
-//      should.assertEquals("PONG", reply0.result());
-//      test.complete();
-//    });
-//  }
+  @Test
+  public void testPing(TestContext should) {
+    final Async test = should.async();
+    redis.ping(toList())
+      .compose(reply0 -> {
+        should.assertEquals("PONG", reply0.toString());
+        return redis.ping(toList("HELLO"));
+      }).onComplete(should.asyncAssertSuccess(reply1 -> {
+        should.assertEquals("HELLO", reply1.toString());
+        test.complete();
+      }));
+  }
 
 //  @Test
 //  public void testPsetex(TestContext should) {
@@ -1859,8 +1757,8 @@ public class RedisClientTest {
   @Test
   public void testRename(TestContext should) {
     final Async test = should.async();
-    final String mykey = makeKey();
-    final String myotherkey = makeKey();
+    final String mykey = randomKey();
+    final String myotherkey = randomKey();
 
     redis.set(toList(mykey, "Hello"), reply0 -> {
       should.assertTrue(reply0.succeeded());
@@ -1878,8 +1776,8 @@ public class RedisClientTest {
   @Test
   public void testRenamenx(TestContext should) {
     final Async test = should.async();
-    final String mykey = makeKey();
-    final String myotherkey = makeKey();
+    final String mykey = randomKey();
+    final String myotherkey = randomKey();
 
     redis.set(toList(mykey, "Hello"), reply0 -> {
       should.assertTrue(reply0.succeeded());
@@ -2075,16 +1973,16 @@ public class RedisClientTest {
   @Test
   public void testScard(TestContext should) {
     final Async test = should.async();
-    final String mykey = makeKey();
-    redis.sadd(toList(mykey, "Hello", "World"), reply0 -> {
-      should.assertTrue(reply0.succeeded());
-      should.assertEquals(2L, reply0.result().toLong());
-      redis.scard(mykey, reply2 -> {
-        should.assertTrue(reply2.succeeded());
-        should.assertEquals(2L, reply2.result().toLong());
+    final String mykey = randomKey();
+    redis.sadd(toList(mykey, "Hello", "World"))
+      .compose(reply0 -> {
+        should.assertEquals(2L, reply0.toLong());
+        return redis.scard(mykey);
+      })
+      .onComplete(should.asyncAssertSuccess(reply2 -> {
+        should.assertEquals(2L, reply2.toLong());
         test.complete();
-      });
-    });
+      }));
 
   }
 
@@ -2224,45 +2122,39 @@ public class RedisClientTest {
   @Test
   public void testSet(TestContext should) {
     final Async test = should.async();
-    final String mykey = makeKey();
-    redis.set(toList(mykey, "Hello"), reply0 -> {
-      should.assertTrue(reply0.succeeded());
-      redis.get(mykey, reply1 -> {
-        should.assertTrue(reply1.succeeded());
-        should.assertEquals("Hello", reply1.result().toString());
+    final String mykey = randomKey();
+
+    redis.set(toList(mykey, "Hello"))
+      .compose(reply -> redis.get(mykey))
+      .onComplete(should.asyncAssertSuccess(reply1 -> {
+        should.assertEquals("Hello", reply1.toString());
         test.complete();
-      });
-    });
+      }));
   }
 
   @Test
   public void testSetWithOptions(TestContext should) {
     final Async test = should.async();
-    final String mykey = makeKey();
-    redis.set(toList(mykey, "Hello!", "NX", "EX", "10"), reply0 -> {
-      should.assertTrue(reply0.succeeded());
-      redis.get(mykey, reply1 -> {
-        should.assertTrue(reply1.succeeded());
-        should.assertEquals("Hello!", reply1.result().toString());
+    final String mykey = randomKey();
 
-        redis.set(toList(mykey, "Hello again!", "NX", "EX", "10"), reply2 -> {
-          should.assertTrue(reply2.succeeded());
-          redis.get(mykey, reply3 -> {
-            should.assertTrue(reply3.succeeded());
-            // It's not 'Hello again!' but the old value since we used NX which means set unless exists
-            should.assertEquals("Hello!", reply1.result().toString());
-            test.complete();
-          });
-        });
-      });
-    });
-
+    redis.set(toList(mykey, "Hello!", "NX", "EX", "10"))
+      .compose(reply0 -> redis.get(mykey))
+      .compose(reply1 -> {
+        should.assertEquals("Hello!", reply1.toString());
+        return redis.set(toList(mykey, "Hello again!", "NX", "EX", "10"));
+      })
+      .compose(reply2 -> redis.get(mykey))
+      .onComplete(should.asyncAssertSuccess(reply3 -> {
+        // It's not 'Hello again!' but the old value since we used NX which means set unless exists
+        should.assertEquals("Hello!", reply3.toString());
+        test.complete();
+      }));
   }
 
   @Test
   public void testSetWithOptions2(TestContext should) {
     final Async test = should.async();
-    final String mykey = makeKey();
+    final String mykey = randomKey();
     // 1st case SET k v NX -> OK
     redis.set(toList(mykey, "Hello!", "NX"), reply0 -> {
       should.assertTrue(reply0.succeeded());
@@ -2278,75 +2170,75 @@ public class RedisClientTest {
   @Test
   public void testSetbit(TestContext should) {
     final Async test = should.async();
-    final String mykey = makeKey();
-    redis.setbit(mykey, "7", "1", reply0 -> {
-      should.assertTrue(reply0.succeeded());
-      should.assertEquals(0L, reply0.result().toLong());
-      redis.setbit(mykey, "7", "0", reply1 -> {
-        should.assertTrue(reply1.succeeded());
-        should.assertEquals(1L, reply1.result().toLong());
-        redis.get(mykey, reply2 -> {
-          should.assertTrue(reply2.succeeded());
-          should.assertEquals("\u0000", reply2.result().toString());
-          test.complete();
-        });
-      });
-    });
+    final String mykey = randomKey();
+
+    redis.setbit(mykey, "7", "1")
+      .compose(reply0 -> {
+        should.assertEquals(0L, reply0.toLong());
+        return redis.setbit(mykey, "7", "0");
+      })
+      .compose(reply1 -> {
+        should.assertEquals(1L, reply1.toLong());
+        return redis.get(mykey);
+      })
+      .onComplete(should.asyncAssertSuccess(reply2 -> {
+        should.assertEquals("\u0000", reply2.toString());
+        test.complete();
+      }));
   }
 
   @Test
   public void testSetex(TestContext should) {
     final Async test = should.async();
-    final String mykey = makeKey();
-    redis.setex(mykey, "10", "Hello", reply0 -> {
-      should.assertTrue(reply0.succeeded());
-      redis.ttl(mykey, reply1 -> {
-        should.assertTrue(reply1.succeeded());
-        should.assertEquals(10L, reply1.result().toLong());
-        redis.get(mykey, reply2 -> {
-          should.assertTrue(reply2.succeeded());
-          should.assertEquals("Hello", reply2.result().toString());
-          test.complete();
-        });
-      });
-    });
+    final String mykey = randomKey();
+
+    redis.setex(mykey, "10", "Hello")
+      .compose(reply0 -> redis.ttl(mykey))
+      .compose(reply1 -> {
+        should.assertEquals(10L, reply1.toLong());
+        return redis.get(mykey);
+      })
+      .onComplete(should.asyncAssertSuccess(reply2 -> {
+        should.assertEquals("Hello", reply2.toString());
+        test.complete();
+      }));
   }
 
   @Test
   public void testSetnx(TestContext should) {
     final Async test = should.async();
-    final String mykey = makeKey();
-    redis.setnx(mykey, "Hello", reply0 -> {
-      should.assertTrue(reply0.succeeded());
-      should.assertEquals(1L, reply0.result().toLong());
-      redis.setnx(mykey, "World", reply1 -> {
-        should.assertTrue(reply1.succeeded());
-        should.assertEquals(0L, reply1.result().toLong());
-        redis.get(mykey, reply2 -> {
-          should.assertTrue(reply2.succeeded());
-          should.assertEquals("Hello", reply2.result().toString());
-          test.complete();
-        });
-      });
-    });
+    final String mykey = randomKey();
+
+    redis.setnx(mykey, "Hello")
+      .compose(reply0 -> {
+        should.assertEquals(1L, reply0.toLong());
+        return redis.setnx(mykey, "World");
+      })
+      .compose(reply1 -> {
+        should.assertEquals(0L, reply1.toLong());
+        return redis.get(mykey);
+      })
+      .onComplete(should.asyncAssertSuccess(reply2 -> {
+        should.assertEquals("Hello", reply2.toString());
+        test.complete();
+      }));
   }
 
   @Test
   public void testSetrange(TestContext should) {
     final Async test = should.async();
-    final String mykey = makeKey();
-    redis.set(toList(mykey, "Hello World"), reply0 -> {
-      should.assertTrue(reply0.succeeded());
-      redis.setrange(mykey, "6", "Redis", reply1 -> {
-        should.assertTrue(reply1.succeeded());
-        should.assertEquals(11L, reply1.result().toLong());
-        redis.get(mykey, reply2 -> {
-          should.assertTrue(reply2.succeeded());
-          should.assertEquals("Hello Redis", reply2.result().toString());
-          test.complete();
-        });
-      });
-    });
+    final String mykey = randomKey();
+
+    redis.set(toList(mykey, "Hello World"))
+      .compose(reply0 -> redis.setrange(mykey, "6", "Redis"))
+      .compose(reply1 -> {
+        should.assertEquals(11L, reply1.toLong());
+        return redis.get(mykey);
+      })
+      .onComplete(should.asyncAssertSuccess(reply2 -> {
+        should.assertEquals("Hello Redis", reply2.toString());
+        test.complete();
+      }));
   }
 
 //  @Test
@@ -2398,19 +2290,18 @@ public class RedisClientTest {
   @Test
   public void testSismember(TestContext should) {
     final Async test = should.async();
-    final String mykey = makeKey();
-    redis.sadd(toList(mykey, "one"), reply0 -> {
-      should.assertTrue(reply0.succeeded());
-      redis.sismember(mykey, "one", reply1 -> {
-        should.assertTrue(reply1.succeeded());
-        should.assertEquals(1L, reply1.result().toLong());
-        redis.sismember(mykey, "two", reply2 -> {
-          should.assertTrue(reply2.succeeded());
-          should.assertEquals(0L, reply2.result().toLong());
-          test.complete();
-        });
-      });
-    });
+    final String mykey = randomKey();
+
+    redis.sadd(toList(mykey, "one"))
+      .compose(reply0 -> redis.sismember(mykey, "one"))
+      .compose(reply1 -> {
+        should.assertEquals(1L, reply1.toLong());
+        return redis.sismember(mykey, "two");
+      })
+      .onComplete(should.asyncAssertSuccess(reply2 -> {
+        should.assertEquals(0L, reply2.toLong());
+        test.complete();
+      }));
   }
 
 //  @Test
@@ -2569,52 +2460,51 @@ public class RedisClientTest {
   @Test
   public void testSrem(TestContext should) {
     final Async test = should.async();
-    final String mykey = makeKey();
-    redis.sadd(toList(mykey, "one", "two", "three"), reply0 -> {
-      should.assertTrue(reply0.succeeded());
-      should.assertEquals(3L, reply0.result().toLong());
-      redis.srem(toList(mykey, "one"), reply1 -> {
-        should.assertTrue(reply1.succeeded());
-        should.assertEquals(1L, reply1.result().toLong());
-        redis.srem(toList(mykey, "four"), reply2 -> {
-          should.assertTrue(reply2.succeeded());
-          should.assertEquals(0L, reply2.result().toLong());
-          test.complete();
-        });
-      });
-    });
+    final String mykey = randomKey();
+
+    redis.sadd(toList(mykey, "one", "two", "three"))
+      .compose(reply0 -> {
+        should.assertEquals(3L, reply0.toLong());
+        return redis.srem(toList(mykey, "one"));
+      })
+      .compose(reply1 -> {
+        should.assertEquals(1L, reply1.toLong());
+        return redis.srem(toList(mykey, "four"));
+      })
+      .onComplete(should.asyncAssertSuccess(reply2 -> {
+        should.assertEquals(0L, reply2.toLong());
+        test.complete();
+      }));
   }
 
   @Test
   public void testStrlen(TestContext should) {
     final Async test = should.async();
-    final String mykey = makeKey();
-    redis.set(toList(mykey, "Hello world"), reply0 -> {
-      should.assertTrue(reply0.succeeded());
-      redis.strlen(mykey, reply1 -> {
-        should.assertTrue(reply1.succeeded());
-        should.assertEquals(11L, reply1.result().toLong());
-        redis.strlen("nonexisting", reply2 -> {
-          should.assertTrue(reply2.succeeded());
-          should.assertEquals(0L, reply2.result().toLong());
-          test.complete();
-        });
-      });
-    });
+    final String mykey = randomKey();
+
+    redis.set(toList(mykey, "Hello world"))
+      .compose(reply0 -> redis.strlen(mykey))
+      .compose(reply1 -> {
+        should.assertEquals(11L, reply1.toLong());
+        return redis.strlen("nonexisting");
+      })
+      .onComplete(should.asyncAssertSuccess(reply2 -> {
+        should.assertEquals(0L, reply2.toLong());
+        test.complete();
+      }));
   }
 
   @Test
   public void testSubscribe(TestContext should) {
     final Async test = should.async();
 
-    String key = makeKey();
-    redis.subscribe(toList(key), reply -> {
-      should.assertTrue(reply.succeeded());
-      redis.unsubscribe(toList(key), reply2 -> {
-        should.assertTrue(reply2.succeeded());
-        test.complete();
-      });
-    });
+    String key = randomKey();
+
+    redis.subscribe(toList(key))
+      .compose(reply -> redis.unsubscribe(toList(key)))
+        .onComplete(should.asyncAssertSuccess(reply2 -> {
+          test.complete();
+        }));
   }
 
 //  @Test
@@ -2724,27 +2614,26 @@ public class RedisClientTest {
   @Test
   public void testTtl(TestContext should) {
     final Async test = should.async();
-    final String mykey = makeKey();
-    redis.set(toList(mykey, "Hello"), reply0 -> {
-      should.assertTrue(reply0.succeeded());
-      redis.expire(Arrays.asList(mykey, "10"), reply1 -> {
-        should.assertTrue(reply1.succeeded());
-        should.assertEquals(1L, reply1.result().toLong());
-        redis.ttl(mykey, reply2 -> {
-          should.assertTrue(reply2.succeeded());
-          should.assertEquals(10L, reply2.result().toLong());
-          test.complete();
-        });
-      });
-    });
+    final String mykey = randomKey();
+
+    redis.set(toList(mykey, "Hello"))
+      .compose(reply0 -> redis.expire(Arrays.asList(mykey, "10")))
+      .compose(reply1 -> {
+        should.assertEquals(1L, reply1.toLong());
+        return redis.ttl(mykey);
+      })
+      .onComplete(should.asyncAssertSuccess(reply2 -> {
+        should.assertEquals(10L, reply2.toLong());
+        test.complete();
+      }));
   }
 
   @Test
   public void testType(TestContext should) {
     final Async test = should.async();
-    final String key1 = makeKey();
-    final String key2 = makeKey();
-    final String key3 = makeKey();
+    final String key1 = randomKey();
+    final String key2 = randomKey();
+    final String key3 = randomKey();
 
     redis.set(toList(key1, "value"), reply0 -> {
       should.assertTrue(reply0.succeeded());
@@ -2775,14 +2664,13 @@ public class RedisClientTest {
   @Test
   public void testUnsubscribe(TestContext should) {
     final Async test = should.async();
-    String key = makeKey();
-    redis.subscribe(toList(key), reply -> {
-      should.assertTrue(reply.succeeded());
-      redis.unsubscribe(toList(key), reply2 -> {
-        should.assertTrue(reply2.succeeded());
+    String key = randomKey();
+
+    redis.subscribe(toList(key))
+      .compose(reply -> redis.unsubscribe(toList(key)))
+      .onComplete(should.asyncAssertSuccess(reply2 -> {
         test.complete();
-      });
-    });
+      }));
   }
 
 //  @Test
@@ -2862,70 +2750,73 @@ public class RedisClientTest {
   @Test
   public void testZcard(TestContext should) {
     final Async test = should.async();
-    final String key = makeKey();
-    redis.zadd(toList(key, "1", "one"), reply0 -> {
-      should.assertTrue(reply0.succeeded());
-      should.assertEquals(1L, reply0.result().toLong());
-      redis.zadd(toList(key, "2", "two"), reply1 -> {
-        should.assertTrue(reply1.succeeded());
-        should.assertEquals(1L, reply1.result().toLong());
-        redis.zcard(key, reply2 -> {
-          should.assertTrue(reply2.succeeded());
-          should.assertEquals(2L, reply2.result().toLong());
-          test.complete();
-        });
-      });
-    });
+    final String key = randomKey();
+
+    redis.zadd(toList(key, "1", "one"))
+      .compose(reply0 -> {
+        should.assertEquals(1L, reply0.toLong());
+        return redis.zadd(toList(key, "2", "two"));
+      })
+      .compose(reply1 -> {
+        should.assertEquals(1L, reply1.toLong());
+        return redis.zcard(key);
+      })
+      .onComplete(should.asyncAssertSuccess(reply2 -> {
+        should.assertEquals(2L, reply2.toLong());
+        test.complete();
+      }));
   }
 
   @Test
   public void testZcount(TestContext should) {
     final Async test = should.async();
-    final String key = makeKey();
-    redis.zadd(toList(key, "1", "one"), reply0 -> {
-      should.assertTrue(reply0.succeeded());
-      should.assertEquals(1L, reply0.result().toLong());
-      redis.zadd(toList(key, "2", "two"), reply1 -> {
-        should.assertTrue(reply1.succeeded());
-        should.assertEquals(1L, reply1.result().toLong());
-        redis.zadd(toList(key, "3", "three"), reply2 -> {
-          should.assertTrue(reply2.succeeded());
-          should.assertEquals(1L, reply2.result().toLong());
-          redis.zcount(key, Double.toString(Double.NEGATIVE_INFINITY), Double.toString(Double.POSITIVE_INFINITY), reply3 -> {
-            should.assertTrue(reply3.succeeded());
-            should.assertEquals(3L, reply3.result().toLong());
-            test.complete();
-          });
-        });
-      });
-    });
+    final String key = randomKey();
+
+    redis.zadd(toList(key, "1", "one"))
+      .compose(reply0 -> {
+        should.assertEquals(1L, reply0.toLong());
+        return redis.zadd(toList(key, "2", "two"));
+      })
+      .compose(reply1 -> {
+        should.assertEquals(1L, reply1.toLong());
+        return redis.zadd(toList(key, "3", "three"));
+      })
+      .compose(reply2 -> {
+        should.assertEquals(1L, reply2.toLong());
+        return redis.zcount(key, Double.toString(Double.NEGATIVE_INFINITY), Double.toString(Double.POSITIVE_INFINITY));
+      })
+      .onComplete(should.asyncAssertSuccess(reply3 -> {
+        should.assertEquals(3L, reply3.toLong());
+        test.complete();
+      }));
   }
 
   @Test
   public void testZincrby(TestContext should) {
     final Async test = should.async();
-    final String key = makeKey();
-    redis.zadd(toList(key, "1", "one"), reply0 -> {
-      should.assertTrue(reply0.succeeded());
-      should.assertEquals(1L, reply0.result().toLong());
-      redis.zadd(toList(key, "2", "two"), reply1 -> {
-        should.assertTrue(reply1.succeeded());
-        should.assertEquals(1L, reply1.result().toLong());
-        redis.zincrby(key, "2", "one", reply2 -> {
-          should.assertTrue(reply2.succeeded());
-          should.assertEquals(3.0, reply2.result().toDouble());
-          test.complete();
-        });
-      });
-    });
+    final String key = randomKey();
+
+    redis.zadd(toList(key, "1", "one"))
+      .compose(reply0 -> {
+        should.assertEquals(1L, reply0.toLong());
+        return redis.zadd(toList(key, "2", "two"));
+      })
+      .compose(reply1 -> {
+        should.assertEquals(1L, reply1.toLong());
+        return redis.zincrby(key, "2", "one");
+      })
+      .onComplete(should.asyncAssertSuccess(reply2 -> {
+        should.assertEquals(3.0, reply2.toDouble());
+        test.complete();
+      }));
   }
 
   @Test
   public void testZinterstore(TestContext should) {
     final Async test = should.async();
-    final String key1 = makeKey();
-    final String key2 = makeKey();
-    final String key3 = makeKey();
+    final String key1 = randomKey();
+    final String key2 = randomKey();
+    final String key3 = randomKey();
 
     redis.zadd(toList(key1, "1", "one"), reply0 -> {
       should.assertTrue(reply0.succeeded());
@@ -3015,7 +2906,7 @@ public class RedisClientTest {
   @Test
   public void testZrank(TestContext should) {
     final Async test = should.async();
-    final String key = makeKey();
+    final String key = randomKey();
     Map<String, Double> values = new HashMap<>();
     values.put("one", 1.0);
     values.put("two", 2.0);
@@ -3035,7 +2926,7 @@ public class RedisClientTest {
   @Test
   public void testZrem(TestContext should) {
     final Async test = should.async();
-    final String key = makeKey();
+    final String key = randomKey();
     Map<String, Double> values = new HashMap<>();
     values.put("one", 1.0);
     values.put("two", 2.0);
@@ -3054,7 +2945,7 @@ public class RedisClientTest {
   @Test
   public void testZremrangebyrank(TestContext should) {
     final Async test = should.async();
-    final String key = makeKey();
+    final String key = randomKey();
     Map<String, Double> values = new HashMap<>();
     values.put("one", 1.0);
     values.put("two", 2.0);
@@ -3073,7 +2964,7 @@ public class RedisClientTest {
   @Test
   public void testZremrangebyscore(TestContext should) {
     final Async test = should.async();
-    final String key = makeKey();
+    final String key = randomKey();
     Map<String, Double> values = new HashMap<>();
     values.put("one", 1.0);
     values.put("two", 2.0);
@@ -3132,7 +3023,7 @@ public class RedisClientTest {
   @Test
   public void testZrevrank(TestContext should) {
     final Async test = should.async();
-    final String key = makeKey();
+    final String key = randomKey();
     Map<String, Double> values = new HashMap<>();
     values.put("one", 1.0);
     values.put("two", 2.0);
@@ -3151,16 +3042,16 @@ public class RedisClientTest {
   @Test
   public void testZscore(TestContext should) {
     final Async test = should.async();
-    final String key = makeKey();
-    redis.zadd(toList(key, "1.0", "one"), reply0 -> {
-      should.assertTrue(reply0.succeeded());
-      should.assertEquals(1L, reply0.result().toLong());
-      redis.zscore(key, "one", reply1 -> {
-        should.assertTrue(reply1.succeeded());
-        should.assertEquals(1.0, reply1.result().toDouble());
+    final String key = randomKey();
+    redis.zadd(toList(key, "1.0", "one"))
+      .compose(reply0 -> {
+        should.assertEquals(1L, reply0.toLong());
+        return redis.zscore(key, "one");
+      })
+      .onComplete(should.asyncAssertSuccess(reply1 -> {
+        should.assertEquals(1.0, reply1.toDouble());
         test.complete();
-      });
-    });
+      }));
   }
 
 //  @Test
@@ -3292,7 +3183,7 @@ public class RedisClientTest {
   @Test
   public void testIssue5BlockingCall_report(TestContext should) {
     final Async test = should.async();
-    final String list = makeKey();
+    final String list = randomKey();
 
     redis.brpop(toList(list, "2"), reply1 -> {
       should.assertTrue(reply1.succeeded());
@@ -3302,22 +3193,20 @@ public class RedisClientTest {
     });
   }
 
-//  @Test
-//  public void testSscan(TestContext should) {
-//    final Async test = should.async();
-//    final String key = makeKey();
-//    redis.sadd(toList(key, "1", "2", "3", "foo", "bar", "feelsgood"), reply1 -> {
-//      should.assertTrue(reply1.succeeded());
-//      should.assertEquals(6L, reply1.result().toLong());
-//      redis.sscan(toList(key, "0", "MATCH", "f*"), reply2 -> {
-//        should.assertTrue(reply2.succeeded());
-//        should.assertEquals("0", reply2.result().getString(0));
-//
-//        should.assertTrue(reply2.result().getJsonArray(1).contains("foo"));
-//        should.assertTrue(reply2.result().getJsonArray(1).contains("feelsgood"));
-//
-//        test.complete();
-//      });
-//    });
-//  }
+  @Test
+  public void testSscan(TestContext should) {
+    final Async test = should.async();
+    final String key = randomKey();
+
+    redis.sadd(toList(key, "1", "2", "3", "foo", "bar", "feelsgood"))
+      .compose(reply1 -> {
+        should.assertEquals(6L, reply1.toLong());
+        return redis.sscan(toList(key, "0", "MATCH", "f*"));
+      }).onComplete(should.asyncAssertSuccess(reply2 -> {
+        should.assertEquals(0, reply2.get(0).toInteger());
+        should.assertEquals("foo", reply2.get(1).get(0).toString());
+        should.assertEquals("feelsgood", reply2.get(1).get(1).toString());
+        test.complete();
+      }));
+  }
 }
