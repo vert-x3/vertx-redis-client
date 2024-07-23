@@ -19,19 +19,24 @@ import io.vertx.ext.unit.Async;
 import io.vertx.ext.unit.TestContext;
 import io.vertx.ext.unit.junit.RunTestOnContext;
 import io.vertx.ext.unit.junit.VertxUnitRunner;
-import io.vertx.redis.client.*;
-import org.junit.*;
+import io.vertx.redis.client.Command;
+import io.vertx.redis.client.Redis;
+import io.vertx.redis.client.RedisConnection;
+import io.vertx.redis.client.RedisOptions;
+import io.vertx.redis.client.Request;
+import io.vertx.redis.containers.RedisStandalone;
+import org.junit.After;
+import org.junit.Before;
+import org.junit.ClassRule;
+import org.junit.Rule;
+import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.testcontainers.containers.GenericContainer;
-
-import java.util.UUID;
 
 @RunWith(VertxUnitRunner.class)
 public class RedisClientPubSubTest {
 
   @ClassRule
-  public static final GenericContainer<?> redis = new GenericContainer<>("redis:7")
-    .withExposedPorts(6379);
+  public static final RedisStandalone redis = new RedisStandalone();
 
   @Rule
   public final RunTestOnContext rule = new RunTestOnContext();
@@ -45,14 +50,14 @@ public class RedisClientPubSubTest {
   @Before
   public void before(TestContext should) {
     Async test = should.async();
-    redisPublish = Redis.createClient(rule.vertx(), new RedisOptions().setConnectionString("redis://" + redis.getHost() + ":" + redis.getFirstMappedPort()));
+    redisPublish = Redis.createClient(rule.vertx(), new RedisOptions().setConnectionString(redis.getRedisUri()));
     redisPublish
       .connect().onComplete(connectPub -> {
         should.assertTrue(connectPub.succeeded());
 
         pubConn = connectPub.result();
 
-        redisSubscribe = Redis.createClient(rule.vertx(), new RedisOptions().setConnectionString("redis://" + redis.getHost() + ":" + redis.getFirstMappedPort()));
+        redisSubscribe = Redis.createClient(rule.vertx(), new RedisOptions().setConnectionString(redis.getRedisUri()));
         redisSubscribe
           .connect().onComplete(connectSub -> {
             should.assertTrue(connectSub.succeeded());
@@ -64,19 +69,15 @@ public class RedisClientPubSubTest {
   }
 
   @After
-  public void after(TestContext should) {
+  public void after() {
     redisPublish.close();
     redisSubscribe.close();
-  }
-
-  private static String makeKey() {
-    return UUID.randomUUID().toString();
   }
 
   @Test
   public void testPublishSubscribe(TestContext should) {
     final Async test = should.async();
-    pubConn.send(Request.cmd(Command.SUBSCRIBE).arg("news")).onComplete(reply -> {
+    subConn.send(Request.cmd(Command.SUBSCRIBE).arg("news")).onComplete(reply -> {
       should.assertTrue(reply.succeeded());
       rule.vertx().eventBus().consumer("io.vertx.redis.news", msg -> test.complete());
       pubConn.send(Request.cmd(Command.PUBLISH).arg("news").arg("foo")).onComplete(preply -> should.assertTrue(preply.succeeded()));

@@ -7,26 +7,42 @@ import io.vertx.ext.unit.Async;
 import io.vertx.ext.unit.TestContext;
 import io.vertx.ext.unit.junit.RunTestOnContext;
 import io.vertx.ext.unit.junit.VertxUnitRunner;
-import io.vertx.redis.client.*;
+import io.vertx.redis.client.Command;
+import io.vertx.redis.client.Redis;
+import io.vertx.redis.client.RedisAPI;
+import io.vertx.redis.client.RedisConnection;
+import io.vertx.redis.client.RedisOptions;
+import io.vertx.redis.client.Request;
+import io.vertx.redis.client.Response;
+import io.vertx.redis.client.ResponseType;
+import io.vertx.redis.containers.RedisStandalone;
 import org.junit.ClassRule;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.testcontainers.containers.GenericContainer;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.IntStream;
 
-import static io.vertx.redis.client.Command.*;
+import static io.vertx.redis.client.Command.EXEC;
+import static io.vertx.redis.client.Command.HMGET;
+import static io.vertx.redis.client.Command.LPOP;
+import static io.vertx.redis.client.Command.MULTI;
+import static io.vertx.redis.client.Command.SET;
+import static io.vertx.redis.client.Command.ZADD;
+import static io.vertx.redis.client.Command.ZRANGEBYSCORE;
 import static io.vertx.redis.client.Request.cmd;
+import static io.vertx.redis.client.test.TestUtils.randomKey;
 
 @RunWith(VertxUnitRunner.class)
 public class RedisTest {
 
   @ClassRule
-  public static final GenericContainer<?> redis = new GenericContainer<>("redis:7")
-    .withExposedPorts(6379);
+  public static final RedisStandalone redis = new RedisStandalone();
 
   @Rule
   public final RunTestOnContext rule = new RunTestOnContext();
@@ -35,7 +51,7 @@ public class RedisTest {
   public void simpleTest(TestContext should) {
     final Async test = should.async();
 
-    Redis.createClient(rule.vertx(), new RedisOptions().setConnectionString("redis://" + redis.getHost() + ":" + redis.getFirstMappedPort()))
+    Redis.createClient(rule.vertx(), new RedisOptions().setConnectionString(redis.getRedisUri()))
       .connect().onComplete(create -> {
         should.assertTrue(create.succeeded());
 
@@ -59,7 +75,7 @@ public class RedisTest {
   public void emptyStringTest(TestContext should) {
     final Async test = should.async();
 
-    Redis.createClient(rule.vertx(), new RedisOptions().setConnectionString("redis://" + redis.getHost() + ":" + redis.getFirstMappedPort()))
+    Redis.createClient(rule.vertx(), new RedisOptions().setConnectionString(redis.getRedisUri()))
       .connect().onComplete(create -> {
         should.assertTrue(create.succeeded());
 
@@ -67,7 +83,7 @@ public class RedisTest {
 
         redis.exceptionHandler(should::fail);
 
-        redis.send(Request.cmd(Command.SET).arg(UUID.randomUUID().toString()).arg("")).onComplete(send -> {
+        redis.send(Request.cmd(Command.SET).arg(randomKey()).arg("")).onComplete(send -> {
           should.assertTrue(send.succeeded());
           should.assertNotNull(send.result());
 
@@ -81,7 +97,7 @@ public class RedisTest {
   public void simpleSelectTest(TestContext should) {
     final Async test = should.async();
 
-    Redis.createClient(rule.vertx(), new RedisOptions().setConnectionString("redis://" + redis.getHost() + ":" + redis.getFirstMappedPort() + "/0"))
+    Redis.createClient(rule.vertx(), new RedisOptions().setConnectionString(redis.getRedisUri() + "/0"))
       .connect().onComplete(create -> {
         should.assertTrue(create.succeeded());
 
@@ -105,7 +121,7 @@ public class RedisTest {
   public void batchTest(TestContext should) {
     final Async test = should.async();
 
-    Redis.createClient(rule.vertx(), new RedisOptions().setConnectionString("redis://" + redis.getHost() + ":" + redis.getFirstMappedPort()))
+    Redis.createClient(rule.vertx(), new RedisOptions().setConnectionString(redis.getRedisUri()))
       .connect().onComplete(create -> {
         should.assertTrue(create.succeeded());
 
@@ -127,7 +143,7 @@ public class RedisTest {
   public void batchEmptyTest(TestContext should) {
     final Async test = should.async();
 
-    Redis.createClient(rule.vertx(), new RedisOptions().setConnectionString("redis://" + redis.getHost() + ":" + redis.getFirstMappedPort()))
+    Redis.createClient(rule.vertx(), new RedisOptions().setConnectionString(redis.getRedisUri()))
       .connect().onComplete(create -> {
         should.assertTrue(create.succeeded());
 
@@ -144,7 +160,7 @@ public class RedisTest {
   public void simpleTestAPI(TestContext should) {
     final Async test = should.async();
 
-    Redis.createClient(rule.vertx(), new RedisOptions().setConnectionString("redis://" + redis.getHost() + ":" + redis.getFirstMappedPort()))
+    Redis.createClient(rule.vertx(), new RedisOptions().setConnectionString(redis.getRedisUri()))
       .connect().onComplete(create -> {
         should.assertTrue(create.succeeded());
 
@@ -165,7 +181,7 @@ public class RedisTest {
     final Async test = should.async();
     final Vertx vertx = rule.vertx();
 
-    Redis.createClient(vertx, new RedisOptions().setConnectionString("redis://" + redis.getHost() + ":" + redis.getFirstMappedPort()))
+    Redis.createClient(vertx, new RedisOptions().setConnectionString(redis.getRedisUri()))
       .connect().onComplete(create -> {
         should.assertTrue(create.succeeded());
 
@@ -196,7 +212,7 @@ public class RedisTest {
 
     RedisOptions options = new RedisOptions()
       .setMaxWaitingHandlers(10)
-      .addConnectionString("redis://" + redis.getHost() + ":" + redis.getFirstMappedPort());
+      .addConnectionString(redis.getRedisUri());
 
     Redis.createClient(rule.vertx(), options)
       .connect().onComplete(create -> {
@@ -230,7 +246,7 @@ public class RedisTest {
   public void testZAdd(TestContext should) {
     final Async test = should.async();
 
-    Redis.createClient(rule.vertx(), new RedisOptions().setConnectionString("redis://" + redis.getHost() + ":" + redis.getFirstMappedPort()))
+    Redis.createClient(rule.vertx(), new RedisOptions().setConnectionString(redis.getRedisUri()))
       .connect().onComplete(create -> {
         should.assertTrue(create.succeeded());
 
@@ -252,7 +268,7 @@ public class RedisTest {
   public void buggyHmget(TestContext should) {
     final Async test = should.async();
 
-    Redis.createClient(rule.vertx(), new RedisOptions().setConnectionString("redis://" + redis.getHost() + ":" + redis.getFirstMappedPort()))
+    Redis.createClient(rule.vertx(), new RedisOptions().setConnectionString(redis.getRedisUri()))
       .connect().onComplete(create -> {
         should.assertTrue(create.succeeded());
 
@@ -269,12 +285,12 @@ public class RedisTest {
   public void buggyIterator(TestContext should) {
     final Async test = should.async();
 
-    Redis.createClient(rule.vertx(), new RedisOptions().setConnectionString("redis://" + redis.getHost() + ":" + redis.getFirstMappedPort()))
+    Redis.createClient(rule.vertx(), new RedisOptions().setConnectionString(redis.getRedisUri()))
       .connect().onComplete(create -> {
         should.assertTrue(create.succeeded());
 
         final RedisConnection redis = create.result();
-        final String key = UUID.randomUUID().toString();
+        final String key = randomKey();
 
         redis.send(cmd(ZADD).arg(key).arg("1.0").arg("testValue1").arg("2.0").arg("testValue2")).onComplete(zadd -> {
           should.assertTrue(zadd.succeeded());
@@ -322,7 +338,7 @@ public class RedisTest {
       Request.cmd(Command.create("OOPS")),
       Request.cmd(Command.create("OOPS")));
 
-    Redis.createClient(rule.vertx(), new RedisOptions().setConnectionString("redis://" + redis.getHost() + ":" + redis.getFirstMappedPort()))
+    Redis.createClient(rule.vertx(), new RedisOptions().setConnectionString(redis.getRedisUri()))
       .batch(requests)
       .onFailure(err -> {
         should.assertTrue(err.getMessage().contains("ERR [0]"));
@@ -336,7 +352,7 @@ public class RedisTest {
 
   @Test
   public void preservesContext(TestContext should) {
-    Redis client = Redis.createClient(rule.vertx(), new RedisOptions().setConnectionString("redis://" + redis.getHost() + ":" + redis.getFirstMappedPort()));
+    Redis client = Redis.createClient(rule.vertx(), new RedisOptions().setConnectionString(redis.getRedisUri()));
 
     PreservesContext.sendWithoutConnect(client, should);
     PreservesContext.batchWithoutConnect(client, should);

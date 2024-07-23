@@ -3,35 +3,28 @@ package io.vertx.redis.client.test;
 import io.vertx.core.AbstractVerticle;
 import io.vertx.core.DeploymentOptions;
 import io.vertx.core.Future;
-import io.vertx.core.Promise;
 import io.vertx.core.Vertx;
 import io.vertx.ext.unit.Async;
 import io.vertx.ext.unit.TestContext;
 import io.vertx.ext.unit.junit.VertxUnitRunner;
 import io.vertx.redis.client.Redis;
 import io.vertx.redis.client.RedisAPI;
-import io.vertx.redis.client.RedisClientType;
 import io.vertx.redis.client.RedisOptions;
 import io.vertx.redis.client.Response;
+import io.vertx.redis.containers.RedisStandalone;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.ClassRule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.testcontainers.containers.GenericContainer;
 
-import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.List;
-import java.util.Set;
-import java.util.stream.Collectors;
 
 @RunWith(VertxUnitRunner.class)
 public class SharedRedisConnectionTest {
 
   @ClassRule
-  public static final GenericContainer<?> redis = new GenericContainer<>("redis:7")
-    .withExposedPorts(6379);
+  public static final RedisStandalone redis = new RedisStandalone();
 
   private static final int VERTICLES_COUNT = 10;
   private static final int ITERATIONS_COUNT = 1000;
@@ -47,7 +40,7 @@ public class SharedRedisConnectionTest {
     Async async = test.async();
     vertx = Vertx.vertx();
     RedisOptions options = new RedisOptions()
-      .setConnectionString("redis://" + redis.getHost() + ":" + redis.getFirstMappedPort())
+      .setConnectionString(redis.getRedisUri())
       .setMaxWaitingHandlers(VERTICLES_COUNT * ITERATIONS_COUNT * 2); // 2 requests per iteration
     Redis.createClient(vertx, options)
       .connect()
