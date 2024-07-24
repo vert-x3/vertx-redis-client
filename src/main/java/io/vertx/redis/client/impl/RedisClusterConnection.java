@@ -515,7 +515,8 @@ public class RedisClusterConnection implements RedisConnection {
 
     // if we haven't got config for this slot, try any connection
     if (endpoints == null || endpoints.length == 0) {
-      return connectOptions.getEndpoint();
+      RedisURI uri = new RedisURI(connectOptions.getEndpoint());
+      return uri.protocol() + "://" + uri.userinfo() + uri.socketAddress();
     }
     return selectMasterOrReplicaEndpoint(readOnly, endpoints, forceMasterEndpoint);
   }
