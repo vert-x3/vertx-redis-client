@@ -55,9 +55,6 @@ public class RedisSentinelClient extends BaseRedisClient implements Redis {
     super(vertx, tcpOptions, poolOptions, connectOptions, tracingPolicy);
     this.connectOptions = connectOptions;
     // validate options
-    if (poolOptions.getMaxSize() < 2) {
-      throw new IllegalStateException("Invalid options: maxSize must be at least 2");
-    }
     if (poolOptions.getMaxWaiting() < poolOptions.getMaxSize()) {
       throw new IllegalStateException("Invalid options: maxWaiting < maxSize");
     }
