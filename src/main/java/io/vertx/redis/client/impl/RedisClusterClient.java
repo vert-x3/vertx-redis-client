@@ -138,8 +138,6 @@ public class RedisClusterClient extends BaseRedisClient implements Redis {
     // validate options
     if (poolOptions.getMaxWaiting() < poolOptions.getMaxSize()) {
       throw new IllegalStateException("Invalid options: maxWaiting < maxSize");
-      // we can't validate the max pool size yet as we need to know the slots first
-      // the remaining validation will happen at the connect time
     }
   }
 
@@ -153,14 +151,6 @@ public class RedisClusterClient extends BaseRedisClient implements Redis {
   }
 
   private void connect(Slots slots, Handler<AsyncResult<RedisConnection>> onConnected) {
-    // validate if the pool config is valid
-    final int totalUniqueEndpoints = slots.endpoints().length;
-    if (poolOptions.getMaxSize() < totalUniqueEndpoints) {
-      // this isn't a valid setup, the connection pool will not accommodate all the required connections
-      onConnected.handle(Future.failedFuture(new RedisConnectException("RedisOptions maxPoolSize < Cluster size(" + totalUniqueEndpoints + "): The pool is not able to hold all required connections!")));
-      return;
-    }
-
     // create a cluster connection
     final Set<Throwable> failures = ConcurrentHashMap.newKeySet();
     final AtomicInteger counter = new AtomicInteger();
