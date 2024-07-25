@@ -34,6 +34,7 @@ public class RedisStandaloneConnection implements RedisConnectionInternal, Parse
 
   private static final ErrorType CONNECTION_CLOSED = ErrorType.create("CONNECTION_CLOSED");
 
+  private final PoolOptions poolOptions;
   private final PoolConnector.Listener listener;
   // to be used for callbacks
   private final VertxInternal vertx;
@@ -41,7 +42,6 @@ public class RedisStandaloneConnection implements RedisConnectionInternal, Parse
   private final ContextInternal context;
   private final EventBus eventBus;
   private final NetSocket netSocket;
-  private final long expiresAt;
   // waiting: commands that have been sent but not answered
   // the queue is only accessed from the event loop
   private final ArrayQueue waiting;
@@ -56,19 +56,25 @@ public class RedisStandaloneConnection implements RedisConnectionInternal, Parse
   private Runnable onEvict;
   private boolean closed = false;
   private boolean tainted = false;
+  private long expiresAt;
 
   public RedisStandaloneConnection(VertxInternal vertx, ContextInternal context, PoolConnector.Listener connectionListener, NetSocket netSocket, PoolOptions options, int maxWaitingHandlers, RedisURI uri, ClientMetrics metrics, TracingPolicy tracingPolicy) {
     //System.out.println("<ctor>#" + this.hashCode());
     this.vertx = vertx;
     this.context = context;
+    this.poolOptions = options;
     this.listener = connectionListener;
     this.eventBus = vertx.eventBus();
     this.netSocket = netSocket;
     this.waiting = new ArrayQueue(maxWaitingHandlers);
-    this.expiresAt = options.getRecycleTimeout() == -1 ? -1 : System.currentTimeMillis() + options.getRecycleTimeout();
+    this.expiresAt = computeExpiration();
     this.uri = uri;
     this.metrics = metrics;
     this.tracingPolicy = tracingPolicy;
+  }
+
+  private long computeExpiration() {
+    return poolOptions.getRecycleTimeout() == -1 ? -1 : System.currentTimeMillis() + poolOptions.getRecycleTimeout();
   }
 
   synchronized void setValid() {
@@ -87,7 +93,7 @@ public class RedisStandaloneConnection implements RedisConnectionInternal, Parse
   }
 
   @Override
-  public boolean isValid() {
+  public synchronized boolean isValid() {
     //System.out.println("isValid()#" + this.hashCode());
     return !closed && (expiresAt <= 0 || System.currentTimeMillis() < expiresAt);
   }
@@ -483,6 +489,7 @@ public class RedisStandaloneConnection implements RedisConnectionInternal, Parse
       forceClose();
       return false;
     }
+    expiresAt = computeExpiration();
     return true;
   }
 
