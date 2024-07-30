@@ -1,19 +1,31 @@
 package io.vertx.redis.client.impl;
 
 import io.vertx.codegen.annotations.Nullable;
-import io.vertx.core.*;
+import io.vertx.core.AsyncResult;
+import io.vertx.core.Future;
+import io.vertx.core.Handler;
+import io.vertx.core.Promise;
+import io.vertx.core.Vertx;
 import io.vertx.core.internal.VertxInternal;
 import io.vertx.core.internal.logging.Logger;
 import io.vertx.core.internal.logging.LoggerFactory;
-import io.vertx.redis.client.*;
+import io.vertx.redis.client.Command;
+import io.vertx.redis.client.RedisClusterConnectOptions;
+import io.vertx.redis.client.RedisConnection;
+import io.vertx.redis.client.RedisReplicas;
+import io.vertx.redis.client.Request;
+import io.vertx.redis.client.Response;
 import io.vertx.redis.client.impl.types.ErrorType;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.IdentityHashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Random;
 import java.util.function.Function;
-
-import static io.vertx.redis.client.Command.ASKING;
-import static io.vertx.redis.client.Command.AUTH;
-import static io.vertx.redis.client.Request.cmd;
 
 public class RedisClusterConnection implements RedisConnection {
 
@@ -250,9 +262,7 @@ public class RedisClusterConnection implements RedisConnection {
   }
 
   private void send(String endpoint, int retries, Request command, Handler<AsyncResult<Response>> handler) {
-
-    final PooledRedisConnection connection = connections.get(endpoint);
-
+    PooledRedisConnection connection = connections.get(endpoint);
     if (connection == null) {
       handler.handle(Future.failedFuture("Missing connection to: " + endpoint));
       return;
@@ -264,32 +274,42 @@ public class RedisClusterConnection implements RedisConnection {
         if (send.failed() && send.cause() instanceof ErrorType && retries >= 0) {
           final ErrorType cause = (ErrorType) send.cause();
 
-          if (cause.is("MOVED")) {
-            this.onMoved.run();
-            // cluster is unbalanced, need to reconnect
-            handler.handle(Future.failedFuture(cause));
-            return;
-          }
+          boolean ask = cause.is("ASK");
+          boolean moved = cause.is("MOVED");
+          if (ask || moved) {
+            if (moved) {
+              this.onMoved.run();
+            }
 
-          if (cause.is("ASK")) {
-            connection
-              .send(cmd(ASKING))
-              .onFailure(err -> handler.handle(Future.failedFuture(err)))
-              .onSuccess(asking -> {
-                // attempt to recover
-                // REQUERY THE NEW ONE (we've got the correct details)
-                String addr = cause.slice(' ', cause.is("ERR") ? 3 : 2);
+            // attempt to recover
+            String addr = cause.slice(' ', 2);
+            if (addr == null) {
+              // bad message
+              handler.handle(Future.failedFuture("Cannot find endpoint:port in redirection: " + cause));
+              return;
+            }
 
-                if (addr == null) {
-                  // bad message
-                  handler.handle(Future.failedFuture(cause));
-                  return;
-                }
-                // inherit protocol config from the current connection
-                final RedisURI uri = new RedisURI(endpoint);
-                // re-run on the new endpoint
-                send(uri.protocol() + "://" + uri.userinfo() + addr, retries - 1, command, handler);
-              });
+            RedisURI uri = new RedisURI(endpoint);
+            if (addr.startsWith(":")) {
+              // unknown endpoint, need to use the current one but the provided port
+              addr = uri.socketAddress().host() + addr;
+            }
+            String newEndpoint = uri.protocol() + "://" + uri.userinfo() + addr;
+            PooledRedisConnection newConnection = connections.get(newEndpoint);
+            if (newConnection != null) {
+              if (ask) {
+                newConnection.send(Request.cmd(Command.ASKING))
+                  .onFailure(err -> handler.handle(Future.failedFuture("Failed ASKING: " + err + ", caused by " + cause)))
+                  .onSuccess(asking -> {
+                    send(newEndpoint, retries - 1, command, handler);
+                  });
+              } else {
+                send(newEndpoint, retries - 1, command, handler);
+              }
+            } else {
+              // unknown node, not sure how to handle that right now
+              handler.handle(Future.failedFuture("Unknown node on redirection, must reconnect: " + cause));
+            }
             return;
           }
 
@@ -303,7 +323,7 @@ public class RedisClusterConnection implements RedisConnection {
           if (cause.is("NOAUTH") && connectOptions.getPassword() != null) {
             // NOAUTH will try to authenticate
             connection
-              .send(cmd(AUTH).arg(connectOptions.getPassword()))
+              .send(Request.cmd(Command.AUTH).arg(connectOptions.getPassword()))
               .onFailure(err -> handler.handle(Future.failedFuture(err)))
               .onSuccess(auth -> {
                 // again
@@ -404,9 +424,7 @@ public class RedisClusterConnection implements RedisConnection {
   }
 
   private void batch(String endpoint, int retries, List<Request> commands, Handler<AsyncResult<List<Response>>> handler) {
-
-    final RedisConnection connection = connections.get(endpoint);
-
+    RedisConnection connection = connections.get(endpoint);
     if (connection == null) {
       handler.handle(Future.failedFuture("Missing connection to: " + endpoint));
       return;
@@ -418,33 +436,42 @@ public class RedisClusterConnection implements RedisConnection {
         if (send.failed() && send.cause() instanceof ErrorType && retries >= 0) {
           final ErrorType cause = (ErrorType) send.cause();
 
-          if (cause.is("MOVED")) {
-            this.onMoved.run();
-            // cluster is unbalanced, need to reconnect
-            handler.handle(Future.failedFuture(cause));
-            return;
-          }
+          boolean ask = cause.is("ASK");
+          boolean moved = cause.is("MOVED");
+          if (ask || moved) {
+            if (moved) {
+              this.onMoved.run();
+            }
 
-          if (cause.is("ASK")) {
-            connection
-              .send(cmd(ASKING))
-              .onFailure(err -> handler.handle(Future.failedFuture(err)))
-              .onSuccess(asking -> {
-                // attempt to recover
-                // REQUERY THE NEW ONE (we've got the correct details)
-                String addr = cause.slice(' ', cause.is("ERR") ? 3 : 2);
+            // attempt to recover
+            String addr = cause.slice(' ', 2);
+            if (addr == null) {
+              // bad message
+              handler.handle(Future.failedFuture("Cannot find endpoint:port in redirection: " + cause));
+              return;
+            }
 
-                if (addr == null) {
-                  // bad message
-                  handler.handle(Future.failedFuture(cause));
-                  return;
-                }
-
-                // inherit protocol config from the current connection
-                final RedisURI uri = new RedisURI(endpoint);
-                // re-run on the new endpoint
-                batch(uri.protocol() + "://" + uri.userinfo() + addr, retries - 1, commands, handler);
-              });
+            RedisURI uri = new RedisURI(endpoint);
+            if (addr.startsWith(":")) {
+              // unknown endpoint, need to use the current one but the provided port
+              addr = uri.socketAddress().host() + addr;
+            }
+            String newEndpoint = uri.protocol() + "://" + uri.userinfo() + addr;
+            PooledRedisConnection newConnection = connections.get(newEndpoint);
+            if (newConnection != null) {
+              if (ask) {
+                newConnection.send(Request.cmd(Command.ASKING))
+                  .onFailure(err -> handler.handle(Future.failedFuture("Failed ASKING: " + err + ", caused by " + cause)))
+                  .onSuccess(asking -> {
+                    batch(newEndpoint, retries - 1, commands, handler);
+                  });
+              } else {
+                batch(newEndpoint, retries - 1, commands, handler);
+              }
+            } else {
+              // unknown node, not sure how to handle that right now
+              handler.handle(Future.failedFuture("Unknown node on redirection, must reconnect: " + cause));
+            }
             return;
           }
 
@@ -458,7 +485,7 @@ public class RedisClusterConnection implements RedisConnection {
           if (cause.is("NOAUTH") && connectOptions.getPassword() != null) {
             // try to authenticate
             connection
-              .send(cmd(AUTH).arg(connectOptions.getPassword()))
+              .send(Request.cmd(Command.AUTH).arg(connectOptions.getPassword()))
               .onFailure(err -> handler.handle(Future.failedFuture(err)))
               .onSuccess(auth -> {
                 // again
