@@ -15,13 +15,23 @@
  */
 package io.vertx.redis.client.impl;
 
-import io.vertx.core.*;
-import io.vertx.core.impl.ContextInternal;
+import io.vertx.core.AsyncResult;
+import io.vertx.core.Future;
+import io.vertx.core.Handler;
+import io.vertx.core.Promise;
+import io.vertx.core.Vertx;
 import io.vertx.core.impl.logging.Logger;
 import io.vertx.core.impl.logging.LoggerFactory;
 import io.vertx.core.net.NetClientOptions;
 import io.vertx.core.tracing.TracingPolicy;
-import io.vertx.redis.client.*;
+import io.vertx.redis.client.Command;
+import io.vertx.redis.client.PoolOptions;
+import io.vertx.redis.client.Redis;
+import io.vertx.redis.client.RedisClusterConnectOptions;
+import io.vertx.redis.client.RedisConnection;
+import io.vertx.redis.client.RedisReplicas;
+import io.vertx.redis.client.Request;
+import io.vertx.redis.client.Response;
 import io.vertx.redis.client.impl.types.MultiType;
 import io.vertx.redis.client.impl.types.NumberType;
 import io.vertx.redis.client.impl.types.SimpleStringType;
@@ -34,9 +44,6 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Function;
-
-import static io.vertx.redis.client.Command.*;
-import static io.vertx.redis.client.Request.cmd;
 
 public class RedisClusterClient extends BaseRedisClient implements Redis {
 
@@ -53,11 +60,11 @@ public class RedisClusterClient extends BaseRedisClient implements Redis {
   static {
     // provided reducers
 
-    addReducer(MSET, list ->
+    addReducer(Command.MSET, list ->
       // Simple string reply: always OK since MSET can't fail.
       SimpleStringType.OK);
 
-    addReducer(DEL, list ->
+    addReducer(Command.DEL, list ->
       NumberType.create(list.stream()
         .mapToLong(el -> {
           Long l = el.toLong();
@@ -68,7 +75,7 @@ public class RedisClusterClient extends BaseRedisClient implements Redis {
           }
         }).sum()));
 
-    addReducer(MGET, list -> {
+    addReducer(Command.MGET, list -> {
       int total = 0;
       for (Response resp : list) {
         total += resp.size();
@@ -84,7 +91,7 @@ public class RedisClusterClient extends BaseRedisClient implements Redis {
       return multi;
     });
 
-    addReducer(KEYS, list -> {
+    addReducer(Command.KEYS, list -> {
       int total = 0;
       for (Response resp : list) {
         total += resp.size();
@@ -100,11 +107,11 @@ public class RedisClusterClient extends BaseRedisClient implements Redis {
       return multi;
     });
 
-    addReducer(FLUSHDB, list ->
+    addReducer(Command.FLUSHDB, list ->
       // Simple string reply: always OK since FLUSHDB can't fail.
       SimpleStringType.OK);
 
-    addReducer(DBSIZE, list ->
+    addReducer(Command.DBSIZE, list ->
       // Sum of key numbers on all Key Slots
       NumberType.create(list.stream()
         .mapToLong(el -> {
@@ -116,14 +123,14 @@ public class RedisClusterClient extends BaseRedisClient implements Redis {
           }
         }).sum()));
 
-    addMasterOnlyCommand(WAIT);
+    addMasterOnlyCommand(Command.WAIT);
 
-    addMasterOnlyCommand(SUBSCRIBE);
-    addMasterOnlyCommand(PSUBSCRIBE);
-    addMasterOnlyCommand(SSUBSCRIBE);
-    addReducer(UNSUBSCRIBE, list -> SimpleStringType.OK);
-    addReducer(PUNSUBSCRIBE, list -> SimpleStringType.OK);
-    addReducer(SUNSUBSCRIBE, list -> SimpleStringType.OK);
+    addMasterOnlyCommand(Command.SUBSCRIBE);
+    addMasterOnlyCommand(Command.PSUBSCRIBE);
+    addMasterOnlyCommand(Command.SSUBSCRIBE);
+    addReducer(Command.UNSUBSCRIBE, list -> SimpleStringType.OK);
+    addReducer(Command.PUNSUBSCRIBE, list -> SimpleStringType.OK);
+    addReducer(Command.SUNSUBSCRIBE, list -> SimpleStringType.OK);
   }
 
   private final RedisClusterConnectOptions connectOptions;
@@ -157,7 +164,7 @@ public class RedisClusterClient extends BaseRedisClient implements Redis {
     final Map<String, PooledRedisConnection> connections = new HashMap<>();
 
     for (String endpoint : slots.endpoints()) {
-      connectionManager.getConnection(endpoint, RedisReplicas.NEVER !=  connectOptions.getUseReplicas() ? cmd(READONLY) : null)
+      connectionManager.getConnection(endpoint, RedisReplicas.NEVER != connectOptions.getUseReplicas() ? Request.cmd(Command.READONLY) : null)
         .onFailure(err -> {
           // failed try with the next endpoint
           failures.add(err);
