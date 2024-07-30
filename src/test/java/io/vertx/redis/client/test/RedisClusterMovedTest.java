@@ -99,7 +99,7 @@ public class RedisClusterMovedTest {
             })
             .compose(result -> {
               test.assertEquals("fubar", result.toString());
-              return clusterConn.send(Request.cmd(Command.GET).arg(key2)); // MOVED
+              return clusterConn.send(Request.cmd(Command.GET).arg(key2)); // not MOVED, slots were reread
             })
             .compose(result -> {
               test.assertEquals("quux", result.toString());

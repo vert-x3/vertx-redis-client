@@ -53,16 +53,14 @@ public class RedisClusterConnection implements RedisConnection {
 
   private final VertxInternal vertx;
   private final RedisClusterConnectOptions connectOptions;
-  private final Slots slots;
-  private final Runnable onMoved;
+  private final SharedSlots sharedSlots;
   private final Map<String, PooledRedisConnection> connections;
 
-  RedisClusterConnection(Vertx vertx, RedisClusterConnectOptions connectOptions, Slots slots, Runnable onMoved,
-      Map<String, PooledRedisConnection> connections) {
+  RedisClusterConnection(Vertx vertx, RedisClusterConnectOptions connectOptions, SharedSlots sharedSlots,
+    Map<String, PooledRedisConnection> connections) {
     this.vertx = (VertxInternal) vertx;
     this.connectOptions = connectOptions;
-    this.slots = slots;
-    this.onMoved = onMoved;
+    this.sharedSlots = sharedSlots;
     this.connections = connections;
   }
 
@@ -128,6 +126,11 @@ public class RedisClusterConnection implements RedisConnection {
 
   @Override
   public Future<Response> send(Request request) {
+    return sharedSlots.get()
+      .compose(slots -> send(request, slots));
+  }
+
+  private Future<Response> send(Request request, Slots slots) {
     final Promise<Response> promise = vertx.promise();
 
     // process commands for cluster mode
@@ -138,7 +141,7 @@ public class RedisClusterConnection implements RedisConnection {
     if (cmd.needsGetKeys()) {
       // it is required to resolve the keys at the server side as we cannot deduct where they are algorithmically
       // we shall run this commands on the master node always
-      send(selectEndpoint(-1, cmd.isReadOnly(args), true), RETRIES, req, promise);
+      send(selectEndpoint(slots, -1, cmd.isReadOnly(args), true), RETRIES, req, promise);
       return promise.future();
     }
 
@@ -169,12 +172,12 @@ public class RedisClusterConnection implements RedisConnection {
           });
         } else {
           // it doesn't matter which node to use
-          send(selectEndpoint(-1, cmd.isReadOnly(args), forceMasterEndpoint), RETRIES, req, promise);
+          send(selectEndpoint(slots, -1, cmd.isReadOnly(args), forceMasterEndpoint), RETRIES, req, promise);
         }
         return promise.future();
       case 1:
         // trivial option the command is single key
-        send(selectEndpoint(ZModem.generate(keys.get(0)), cmd.isReadOnly(args), forceMasterEndpoint), RETRIES, req, promise);
+        send(selectEndpoint(slots, ZModem.generate(keys.get(0)), cmd.isReadOnly(args), forceMasterEndpoint), RETRIES, req, promise);
         return promise.future();
       default:
         // hashSlot -1 indicates that not all keys of the command targets the same hash slot,
@@ -201,7 +204,7 @@ public class RedisClusterConnection implements RedisConnection {
 
           for (Map.Entry<Integer, Request> kv : requests.entrySet()) {
             final Promise<Response> p = vertx.promise();
-            send(selectEndpoint(kv.getKey(), cmd.isReadOnly(args), forceMasterEndpoint), RETRIES, kv.getValue(), p);
+            send(selectEndpoint(slots, kv.getKey(), cmd.isReadOnly(args), forceMasterEndpoint), RETRIES, kv.getValue(), p);
             responses.add(p.future());
           }
 
@@ -275,7 +278,7 @@ public class RedisClusterConnection implements RedisConnection {
         boolean ask = cause.is("ASK");
           boolean moved = cause.is("MOVED");
           if (ask || moved) {
-            if (moved) {  this.onMoved.run();
+            if (moved) {  sharedSlots.invalidate();
 
         }
 
@@ -342,6 +345,11 @@ public class RedisClusterConnection implements RedisConnection {
 
   @Override
   public Future<List<Response>> batch(List<Request> requests) {
+    return sharedSlots.get()
+      .compose(slots -> batch(requests, slots));
+  }
+
+  private Future<List<Response>> batch(List<Request> requests, Slots slots) {
     final Promise<List<Response>> promise = vertx.promise();
 
     if (requests.isEmpty()) {
@@ -416,7 +424,7 @@ public class RedisClusterConnection implements RedisConnection {
 
       // all keys are on the same slot!
       //we just need to decide which endpoint to use based on additional options
-      batch(selectEndpoint(correctSlot, readOnly, forceMasterEndpoint), RETRIES, requests, promise);
+      batch(selectEndpoint(slots, correctSlot, readOnly, forceMasterEndpoint), RETRIES, requests, promise);
     }
 
     return promise.future();
@@ -436,7 +444,7 @@ public class RedisClusterConnection implements RedisConnection {
         boolean ask = cause.is("ASK");
           boolean moved = cause.is("MOVED");
           if (ask || moved) {
-            if (moved) {  this.onMoved.run();
+            if (moved) {  sharedSlots.invalidate();
 
         }
 
@@ -529,7 +537,7 @@ public class RedisClusterConnection implements RedisConnection {
   /**
    * Select a Redis client for the given key
    */
-  private String selectEndpoint(int keySlot, boolean readOnly, boolean forceMasterEndpoint) {
+  private String selectEndpoint(Slots slots, int keySlot, boolean readOnly, boolean forceMasterEndpoint) {
     // this command doesn't have keys, return any connection
     // NOTE: this means replicas may be used for no key commands regardless of the config
     if (keySlot == -1) {
