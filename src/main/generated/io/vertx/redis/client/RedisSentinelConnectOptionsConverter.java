@@ -20,6 +20,11 @@ public class RedisSentinelConnectOptionsConverter {
    static void fromJson(Iterable<java.util.Map.Entry<String, Object>> json, RedisSentinelConnectOptions obj) {
     for (java.util.Map.Entry<String, Object> member : json) {
       switch (member.getKey()) {
+        case "autoFailover":
+          if (member.getValue() instanceof Boolean) {
+            obj.setAutoFailover((Boolean)member.getValue());
+          }
+          break;
         case "masterName":
           if (member.getValue() instanceof String) {
             obj.setMasterName((String)member.getValue());
@@ -39,6 +44,7 @@ public class RedisSentinelConnectOptionsConverter {
   }
 
    static void toJson(RedisSentinelConnectOptions obj, java.util.Map<String, Object> json) {
+    json.put("autoFailover", obj.isAutoFailover());
     if (obj.getMasterName() != null) {
       json.put("masterName", obj.getMasterName());
     }

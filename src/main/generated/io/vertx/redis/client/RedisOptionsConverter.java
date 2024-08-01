@@ -20,6 +20,11 @@ public class RedisOptionsConverter {
    static void fromJson(Iterable<java.util.Map.Entry<String, Object>> json, RedisOptions obj) {
     for (java.util.Map.Entry<String, Object> member : json) {
       switch (member.getKey()) {
+        case "autoFailover":
+          if (member.getValue() instanceof Boolean) {
+            obj.setAutoFailover((Boolean)member.getValue());
+          }
+          break;
         case "connectionString":
           if (member.getValue() instanceof String) {
             obj.setConnectionString((String)member.getValue());
@@ -147,6 +152,7 @@ public class RedisOptionsConverter {
   }
 
    static void toJson(RedisOptions obj, java.util.Map<String, Object> json) {
+    json.put("autoFailover", obj.isAutoFailover());
     if (obj.getEndpoint() != null) {
       json.put("endpoint", obj.getEndpoint());
     }

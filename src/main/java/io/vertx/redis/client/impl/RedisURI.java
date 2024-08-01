@@ -246,6 +246,29 @@ public final class RedisURI {
     }
   }
 
+  /**
+   * Returns the base of this URI, which consists of the scheme, optional user info, host and port
+   * (or path in case of a UNIX domain socket). Does not include the database number or the query parameters.
+   */
+  public String baseUri() {
+    StringBuilder result = new StringBuilder();
+    if (unix()) {
+      result.append("unix://");
+      result.append(socketAddress().path());
+    } else {
+      result.append("redis");
+      if (ssl()) {
+        result.append('s');
+      }
+      result.append("://");
+      result.append(userinfo());
+      result.append(socketAddress().host());
+      result.append(':');
+      result.append(socketAddress().port());
+    }
+    return result.toString();
+  }
+
   @Override
   public String toString() {
     return protocol() + "://" + socketAddress() + "/" + (select == null ? "" : select);
