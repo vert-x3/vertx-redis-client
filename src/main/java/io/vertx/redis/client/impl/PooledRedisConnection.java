@@ -88,9 +88,10 @@ public class PooledRedisConnection implements RedisConnection {
   public Future<Void> close() {
     if (connection.reset()) {
       lease.recycle();
-    }
-    if (metrics != null) {
-      metrics.end(metric, true);
+
+      if (metrics != null) {
+        metrics.end(metric, true);
+      }
     }
 
     return Future.succeededFuture();
