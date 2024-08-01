@@ -118,6 +118,11 @@ public class RedisOptionsConverter {
             obj.setHashSlotCacheTTL(((Number)member.getValue()).longValue());
           }
           break;
+        case "autoFailover":
+          if (member.getValue() instanceof Boolean) {
+            obj.setAutoFailover((Boolean)member.getValue());
+          }
+          break;
       }
     }
   }
@@ -170,5 +175,6 @@ public class RedisOptionsConverter {
       json.put("poolName", obj.getPoolName());
     }
     json.put("hashSlotCacheTTL", obj.getHashSlotCacheTTL());
+    json.put("autoFailover", obj.isAutoFailover());
   }
 }
