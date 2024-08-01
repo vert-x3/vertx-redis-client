@@ -1,7 +1,7 @@
-= Vert.x-redis
+= Vert.x Redis
 :toc: left
 
-Vert.x-redis is redis client to be used with Vert.x.
+Vert.x Redis is a Redis client to be used with Vert.x.
 
 This module allows data to be saved, retrieved, searched for, and deleted in a Redis. Redis is an open source, advanced
 key-value store. It is often referred to as a data structure server since keys can contain  strings, hashes, lists, sets
@@ -9,14 +9,14 @@ and sorted sets. To use this module you must have a Redis server instance runnin
 
 Redis has a rich API and it can be organized in the following groups:
 
-* Cluster - Commands related to cluster management, note that using most of these commands you will need a redis server with version &gt;=3.0.0
+* Cluster - Commands related to cluster management, note that using most of these commands you will need a Redis server with version &gt;=3.0.0
 * Connection - Commands that allow you to switch DBs, connect, disconnect and authenticate to a server.
 * Hashes - Commands that allow operations on hashes.
 * HyperLogLog - Commands to approximating the number of distinct elements in a multiset, a HyperLogLog.
 * Keys - Commands to work with Keys.
 * List - Commands to work with Lists.
 * Pub/Sub - Commands to create queues and pub/sub clients.
-* Scripting - Commands to run Lua Scripts in redis.
+* Scripting - Commands to run Lua Scripts in Redis.
 * Server - Commands to manage and get server configurations.
 * Sets - Commands to work with un ordered sets.
 * Sorted Sets - Commands to work with sorted sets.
@@ -24,46 +24,46 @@ Redis has a rich API and it can be organized in the following groups:
 * Transactions - Commands to handle transaction lifecycle.
 * Streams - Commands to handle streaming.
 
-== Using Vert.x-Redis
+== Using Vert.x Redis
 
-To use the Vert.x Redis client, add the following dependency to the _dependencies_ section of your build descriptor:
+To use the Vert.x Redis client, add the following dependency to the _dependencies_ section of your build descriptor.
 
 * Maven (in your `pom.xml`):
 
 [source,xml,subs="+attributes"]
 ----
 <dependency>
-<groupId>io.vertx</groupId>
-<artifactId>vertx-redis-client</artifactId>
-<version>${maven.version}</version>
+  <groupId>io.vertx</groupId>
+  <artifactId>vertx-redis-client</artifactId>
+  <version>${vertx-redis.version}</version>
 </dependency>
 ----
 
-* Gradle (in your `build.gradle` file):
+* Gradle (in your `build.gradle`):
 
 [source,groovy,subs="+attributes"]
 ----
-compile 'io.vertx:vertx-redis-client:${maven.version}'
+compile 'io.vertx:vertx-redis-client:${vertx-redis.version}'
 ----
 
 == Connecting to Redis
 
 The Redis client can operate in 4 distinct modes:
 
-* Simple client (probably what most users need).
+* Standalone client (probably what most users need).
 * Sentinel (when working with Redis in High Availability mode).
 * Cluster (when working with Redis in Clustered mode).
-* Replication (single shard, one node write, multiple read).
+* Replication (single shard, one node writes, multiple read).
 
-The connection mode is selected by the factory method on the Redis interface. Regardless of the mode the client can be
+The connection mode is selected by the factory method on the Redis interface. Regardless of the mode, the client can be
 configured using a {@link io.vertx.redis.client.RedisOptions} data object. By default, some configuration values are
 initialized with the following values:
 
 * `netClientOptions`: default is `TcpKeepAlive: true`, `TcpNoDelay: true`
 * `endpoint`: default is `redis://localhost:6379`
 * `masterName`: default is `mymaster`
-* `role` default is `MASTER`
-* `useReplicas` default is `NEVER`
+* `role`: default is `MASTER`
+* `useReplicas`: default is `NEVER`
 
 In order to obtain a connection use the following code:
 
@@ -86,14 +86,14 @@ You can connect to a Redis server using TLS by configuring the client TCP option
 
 - the ssl flag
 - the server certificate or the trust all flag
-- the hostname verification algorithm to `"HTTPS"` if you want to verify the server identity otherwise `""`
+- the hostname verification algorithm to `"HTTPS"` if you want to verify the server identity; otherwise `""`
 
 [source,$lang]
 ----
 {@link examples.RedisExamples#tls}
 ----
 
-NOTE: more details on the TLS client config can be found https://vertx.io/docs/vertx-core/java/#_enabling_ssltls_on_the_client[here]
+NOTE: More details on the TLS client config can be found https://vertx.io/docs/vertx-core/java/#_enabling_ssltls_on_the_client[here].
 
 == Connection String
 
@@ -109,13 +109,13 @@ Or
 unix://[:password@]/domain/docker.sock[?select=db-number]
 ----
 
-When specifying a password or a database those commands are always executed on connection start.
+When specifying a password or a database, those commands are always executed on connection start.
 
 
 == Running commands
 
-Given that the redis client is connected to the server, all commands are now possible to execute using this module.
-The module offers a clean API for executing commands without the need to hand write the command itself, for example
+Given that the Redis client is connected to the server, all commands are now possible to execute using this module.
+The module offers a clean API for executing commands without the need to handwrite the command itself, for example
 if one wants to get a value of a key it can be done as:
 
 [source,$lang]
@@ -123,9 +123,9 @@ if one wants to get a value of a key it can be done as:
 {@link examples.RedisExamples#example3}
 ----
 
-The response object is a generic type that allow converting from the basic redis types to your language types. For
+The response object is a generic type that allows converting from the basic Redis types to your language types. For
 example, if your response is of type `INTEGER` then you can get the value as any numeric primitive type `int`, `long`,
-etc...
+etc.
 
 Or you can perform more complex tasks such as handling responses as iterators:
 
@@ -134,40 +134,43 @@ Or you can perform more complex tasks such as handling responses as iterators:
 {@link examples.RedisExamples#example4}
 ----
 
-== High Availability mode
+== Sentinel mode
 
-To work with high availability mode the connection creation is quite similar:
+To work with the sentinel mode (also known as high availability), the connection creation is quite similar:
 
 [source,$lang]
 ----
 {@link examples.RedisExamples#example5}
 ----
 
-What is important to notice is that in this mode, an extra connection is established to the server(s) and behind the
-scenes the client will listen for events from the sentinel. When the sentinel notifies that we switched masters, then
-an exception is send to the client and you can decide what to do next.
+The connection strings here point to the _sentinel_ nodes, which are used to discover the actual master and replica nodes.
+
+What is important to notice is that in this mode, when the selected role is `MASTER` (which is the default) and when automatic failover is enabled (`RedisOptions.setAutoFailover(true)`), there is an extra connection to one of the sentinels that listens for failover events. When the sentinel notifies that a new master was elected, all clients will close their connection to the old master and transparently reconnect to the new master.
+
+Note that there is a brief period of time between the old master failing and the new master being elected when the existing connections will temporarily fail all operations.
+After the new master is elected, the connections will automatically switch to it and start working again.
 
 == Cluster mode
 
-To work with cluster the connection creation is quite similar:
+To work with cluster, the connection creation is quite similar:
 
 [source,$lang]
 ----
 {@link examples.RedisExamples#example6}
 ----
 
-In this case the configuration requires one or more members of the cluster to be known.
-This list will be used to ask the cluster for the current configuration, which means if any of the listed members is not available it will be skipped.
+In this case, the configuration requires one or more members of the cluster to be known.
+This list will be used to ask the cluster for the current configuration, which means if any of the listed members is not available, it will be skipped.
 
-In cluster mode a connection is established to each node and special care is needed when executing commands.
+In cluster mode, a connection is established to each node and special care is needed when executing commands.
 It is recommended to read the Redis manual in order to understand how clustering works.
 The client operating in this mode will do a best effort to identify which slot is used by the executed command in order to execute it on the right node.
-There could be cases where this isn't possible to identify and in that case as a best effort the command will be run on a random node.
+There could be cases where this isn't possible to identify and in that case, as a best effort, the command will be run on a random node.
 
 To know which Redis node holds which slots, the clustered Redis client holds a cache of the hash slot assignment.
-When the cache is empty, the first attempt to acquire a `RedisClusterConnection` will execute `CLUSTER SLOTS`.
+When the cache is empty, the first attempt to acquire a connection will execute `CLUSTER SLOTS`.
 The cache has a configurable TTL (time to live), which defaults to 1 second.
-The cache is also cleared whenever any command executed by the client receives the MOVED redirection.
+The cache is also cleared whenever any command executed by the client receives the `MOVED` redirection.
 
 == Replication Mode
 
@@ -274,13 +277,13 @@ combination is not possible. Not because of this client but how Redis works.
 
 == Connection Pooling
 
-All client variations are backed by a connection pool. By default the configuration sets the pool size to 1, which means
-that it operates just like a single connection. There are 4 tunnables for the pool:
+All client variations are backed by a connection pool. By default, the configuration sets the pool size to 1, which means
+that it operates just like a single connection. There are 4 tunables for the pool:
 
 * `maxPoolSize` the max number of connections on the pool (default `6`)
 * `maxPoolWaiting` the max waiting handlers to get a connection on a queue (default `24`)
-* `poolCleanerInterval` the interval when connections will be clean default is `-1` (disabled)
-* `poolRecycleTimeout` the timeout to keep an open connection on the pool waiting and then close (default `15_000`)
+* `poolCleanerInterval` the interval how often connections will be cleaned (default `30 seconds`)
+* `poolRecycleTimeout` the timeout to keep an unused connection in the pool (default `3 mintues`)
 
 Pooling is quite useful to avoid custom connection management, for example you can just use as:
 
@@ -289,9 +292,9 @@ Pooling is quite useful to avoid custom connection management, for example you c
 {@link examples.RedisExamples#example11}
 ----
 
-It is important to observe that no connection was acquired or returned, it's all handled by the pool. However there might
-be some scalability issues when more than 1 concurrent request attempts to get a connection from the pool, in order to
-overcome this we need to tune the pool. A common configuration is to set the maximum size of the pool to the number of
+It is important to observe that no connection was acquired or returned, it's all handled by the pool. However, there might
+be some scalability issues when more than 1 concurrent request attempts to get a connection from the pool; in order to
+overcome this, we need to tune the pool. A common configuration is to set the maximum size of the pool to the number of
 available CPU cores and allow requests to get a connection from the pool to queue:
 
 [source,$lang]
@@ -299,7 +302,7 @@ available CPU cores and allow requests to get a connection from the pool to queu
 {@link examples.RedisExamples#example12}
 ----
 
-NOTE: Pooling is not compatible with `SUBSCRIBE`, `UNSUBSCRIBE`, `PSUBSCRIBE` or `PUNSUBSCRIBE` because these commands
+NOTE: Pooling is not compatible with `SUBSCRIBE`, `UNSUBSCRIBE`, `PSUBSCRIBE` or `PUNSUBSCRIBE`, because these commands
 will modify the way the connection operates and the connection cannot be reused.
 
 == Implementing Reconnect on Error
@@ -316,7 +319,7 @@ is not part of the redis client as it will force a behaviour that might not matc
 4. Should the previous state (db, authentication, subscriptions) be restored?
 5. Etc...
 
-In order to give the user full flexibility, this decision should not be performed by the client. However a simple
+In order to give the user full flexibility, this decision should not be performed by the client. However, a simple
 reconnect with backoff timeout could be implemented as follows:
 
 [source,$lang]
@@ -324,11 +327,11 @@ reconnect with backoff timeout could be implemented as follows:
 {@link examples.RedisExamples#example10}
 ----
 
-In this example the client object will be replaced on reconnect and the application will retry up to 16 times with a
+In this example, the client object will be replaced on reconnect and the application will retry up to 16 times with a
 backoff up to 1280ms. By discarding the client we ensure that all old inflight responses are lost and all new ones
 will be on the new connection.
 
-It is important to note that, the reconnect will create a new connection object, so these object references should not
+It is important to note that the reconnect will create a new connection object, so these object references should not
 be cached and evaluated every time.
 
 == Protocol Parser
@@ -344,9 +347,9 @@ It is possible to use the {@link io.vertx.redis.client.RedisOptions#setPreferred
 ----
 
 The parser internally creates an "infinite" readable buffer from all the chunks received from the server, in order to
-avoid creating too much garbage in terms of memory collection, a tunnable watermark value is configurable at JVM startup
-time. The system property `io.vertx.redis.parser.watermark` defines how much data is keept in this readable buffer
-before it gets discarded. By default this value is 512Kb. This means that each connection to the server will use at
+avoid creating too much garbage in terms of memory collection, a tunable watermark value is configurable at JVM startup
+time. The system property `io.vertx.redis.parser.watermark` defines how much data is kept in this readable buffer
+before it gets discarded. By default, this value is 16 KB. This means that each connection to the server will use at
 least this amount of memory. As the client works in pipeline mode, keeping the number of connections low provides best
-results, which means `512Kb * nconn` memory will be used. If the application will require a large number of connections,
+results, which means `16 KB * nconn` memory will be used. If the application will require a large number of connections,
 then reducing the watermark value to a smaller value or even disable it entirely is advisable.
