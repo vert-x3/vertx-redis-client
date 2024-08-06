@@ -202,8 +202,8 @@ public class RedisClusterClient extends BaseRedisClient implements Redis {
         }
         onConnected.handle(Future.failedFuture(new RedisConnectException(message.toString())));
       } else {
-        onConnected.handle(Future.succeededFuture(new RedisClusterConnection(vertx, connectOptions, sharedSlots,
-          connections)));
+        onConnected.handle(Future.succeededFuture(new RedisClusterConnection(vertx, connectionManager,
+          connectOptions, sharedSlots, connections)));
       }
     }
   }

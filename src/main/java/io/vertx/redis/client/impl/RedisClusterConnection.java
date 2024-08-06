@@ -52,13 +52,15 @@ public class RedisClusterConnection implements RedisConnection {
   }
 
   private final VertxInternal vertx;
+  private final RedisConnectionManager connectionManager;
   private final RedisClusterConnectOptions connectOptions;
   private final SharedSlots sharedSlots;
   private final Map<String, PooledRedisConnection> connections;
 
-  RedisClusterConnection(Vertx vertx, RedisClusterConnectOptions connectOptions, SharedSlots sharedSlots,
-    Map<String, PooledRedisConnection> connections) {
+  RedisClusterConnection(Vertx vertx, RedisConnectionManager connectionManager, RedisClusterConnectOptions connectOptions,
+      SharedSlots sharedSlots, Map<String, PooledRedisConnection> connections) {
     this.vertx = (VertxInternal) vertx;
+    this.connectionManager = connectionManager;
     this.connectOptions = connectOptions;
     this.sharedSlots = sharedSlots;
     this.connections = connections;
@@ -267,7 +269,25 @@ public class RedisClusterConnection implements RedisConnection {
   private void send(String endpoint, int retries, Request command, Handler<AsyncResult<Response>> handler) {
     PooledRedisConnection connection = connections.get(endpoint);
     if (connection == null) {
-      handler.handle(Future.failedFuture("Missing connection to: " + endpoint));
+      connectionManager.getConnection(endpoint, RedisReplicas.NEVER != connectOptions.getUseReplicas() ? Request.cmd(Command.READONLY) : null)
+        .onSuccess(conn -> {
+          synchronized (connections) {
+            if (connections.containsKey(endpoint)) {
+              conn.close()
+                .onFailure(t -> LOG.warn("Failed closing connection: " + t));
+            } else {
+              connections.put(endpoint, conn);
+            }
+          }
+          send(endpoint, retries, command, handler);
+        })
+        .onFailure(t -> {
+          if (retries > 0) {
+            send(endpoint, retries - 1, command, handler);
+          } else {
+            handler.handle(Future.failedFuture("Failed obtaining connection to: " + endpoint));
+          }
+        });
       return;
     }
 
@@ -296,20 +316,16 @@ public class RedisClusterConnection implements RedisConnection {
               addr = uri.socketAddress().host() + addr;
             }
             String newEndpoint = uri.protocol() + "://" + uri.userinfo() + addr;
-            PooledRedisConnection newConnection = connections.get(newEndpoint);
-            if (newConnection != null) {
-              if (ask) {
-                newConnection.send(Request.cmd(Command.ASKING))
-                  .onFailure(err -> handler.handle(Future.failedFuture("Failed ASKING: " + err + ", caused by " + cause)))
-                  .onSuccess(asking -> {
-                    send(newEndpoint, retries - 1, command, handler);
-                  });
-              } else {
-                send(newEndpoint, retries - 1, command, handler);
-              }
+            if (ask) {
+              send(newEndpoint, retries - 1, Request.cmd(Command.ASKING), resp -> {
+                if (resp.failed()) {
+                  handler.handle(Future.failedFuture("Failed ASKING: " + resp.cause() + ", caused by " + cause));
+                } else {
+                  send(newEndpoint, retries - 1, command, handler);
+                }
+              });
             } else {
-              // unknown node, not sure how to handle that right now
-              handler.handle(Future.failedFuture("Unknown node on redirection, must reconnect: " + cause));
+              send(newEndpoint, retries - 1, command, handler);
             }
             return;
           }
@@ -433,7 +449,25 @@ public class RedisClusterConnection implements RedisConnection {
   private void batch(String endpoint, int retries, List<Request> commands, Handler<AsyncResult<List<Response>>> handler) {
     RedisConnection connection = connections.get(endpoint);
     if (connection == null) {
-      handler.handle(Future.failedFuture("Missing connection to: " + endpoint));
+      connectionManager.getConnection(endpoint, RedisReplicas.NEVER != connectOptions.getUseReplicas() ? Request.cmd(Command.READONLY) : null)
+        .onSuccess(conn -> {
+          synchronized (connections) {
+            if (connections.containsKey(endpoint)) {
+              conn.close()
+                .onFailure(t -> LOG.warn("Failed closing connection: " + t));
+            } else {
+              connections.put(endpoint, conn);
+            }
+          }
+          batch(endpoint, retries, commands, handler);
+        })
+        .onFailure(t -> {
+          if (retries > 0) {
+            batch(endpoint, retries - 1, commands, handler);
+          } else {
+            handler.handle(Future.failedFuture("Failed obtaining connection to: " + endpoint));
+          }
+        });
       return;
     }
 
@@ -462,20 +496,16 @@ public class RedisClusterConnection implements RedisConnection {
               addr = uri.socketAddress().host() + addr;
             }
             String newEndpoint = uri.protocol() + "://" + uri.userinfo() + addr;
-            PooledRedisConnection newConnection = connections.get(newEndpoint);
-            if (newConnection != null) {
-              if (ask) {
-                newConnection.send(Request.cmd(Command.ASKING))
-                  .onFailure(err -> handler.handle(Future.failedFuture("Failed ASKING: " + err + ", caused by " + cause)))
-                  .onSuccess(asking -> {
-                    batch(newEndpoint, retries - 1, commands, handler);
-                  });
-              } else {
-                batch(newEndpoint, retries - 1, commands, handler);
-              }
+            if (ask) {
+              batch(newEndpoint, retries - 1, Collections.singletonList(Request.cmd(Command.ASKING)), resp -> {
+                if (resp.failed()) {
+                  handler.handle(Future.failedFuture("Failed ASKING: " + resp.cause() + ", caused by " + cause));
+                } else {
+                  batch(newEndpoint, retries - 1, commands, handler);
+                }
+              });
             } else {
-              // unknown node, not sure how to handle that right now
-              handler.handle(Future.failedFuture("Unknown node on redirection, must reconnect: " + cause));
+              batch(newEndpoint, retries - 1, commands, handler);
           }
           return;
         }
