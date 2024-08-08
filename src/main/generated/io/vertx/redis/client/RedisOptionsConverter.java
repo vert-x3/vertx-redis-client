@@ -2,7 +2,6 @@ package io.vertx.redis.client;
 
 import io.vertx.core.json.JsonObject;
 import io.vertx.core.json.JsonArray;
-import io.vertx.core.json.impl.JsonUtil;
 import java.time.Instant;
 import java.time.format.DateTimeFormatter;
 import java.util.Base64;
@@ -13,9 +12,8 @@ import java.util.Base64;
  */
 public class RedisOptionsConverter {
 
-
-  private static final Base64.Decoder BASE64_DECODER = JsonUtil.BASE64_DECODER;
-  private static final Base64.Encoder BASE64_ENCODER = JsonUtil.BASE64_ENCODER;
+  private static final Base64.Decoder BASE64_DECODER = Base64.getUrlDecoder();
+  private static final Base64.Encoder BASE64_ENCODER = Base64.getUrlEncoder().withoutPadding();
 
    static void fromJson(Iterable<java.util.Map.Entry<String, Object>> json, RedisOptions obj) {
     for (java.util.Map.Entry<String, Object> member : json) {
@@ -30,6 +28,11 @@ public class RedisOptionsConverter {
             obj.setNetClientOptions(new io.vertx.core.net.NetClientOptions((io.vertx.core.json.JsonObject)member.getValue()));
           }
           break;
+        case "topology":
+          if (member.getValue() instanceof String) {
+            obj.setTopology(io.vertx.redis.client.RedisTopology.valueOf((String)member.getValue()));
+          }
+          break;
         case "endpoints":
           if (member.getValue() instanceof JsonArray) {
             java.util.ArrayList<java.lang.String> list =  new java.util.ArrayList<>();
@@ -38,11 +41,6 @@ public class RedisOptionsConverter {
                 list.add((String)item);
             });
             obj.setEndpoints(list);
-          }
-          break;
-        case "topology":
-          if (member.getValue() instanceof String) {
-            obj.setTopology(io.vertx.redis.client.RedisTopology.valueOf((String)member.getValue()));
           }
           break;
         case "maxWaitingHandlers":
@@ -135,13 +133,13 @@ public class RedisOptionsConverter {
     if (obj.getNetClientOptions() != null) {
       json.put("netClientOptions", obj.getNetClientOptions().toJson());
     }
+    if (obj.getTopology() != null) {
+      json.put("topology", obj.getTopology().name());
+    }
     if (obj.getEndpoints() != null) {
       JsonArray array = new JsonArray();
       obj.getEndpoints().forEach(item -> array.add(item));
       json.put("endpoints", array);
-    }
-    if (obj.getTopology() != null) {
-      json.put("topology", obj.getTopology().name());
     }
     json.put("maxWaitingHandlers", obj.getMaxWaitingHandlers());
     if (obj.getMasterName() != null) {
