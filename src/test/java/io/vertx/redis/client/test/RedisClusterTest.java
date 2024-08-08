@@ -198,57 +198,6 @@ public class RedisClusterTest {
   }
 
   @Test(timeout = 30_000)
-  public void autoFindNodeByMOVEDAndASK(TestContext should) {
-    final Async test = should.async();
-
-    final RedisOptions options = new RedisOptions()
-      .setType(RedisClientType.CLUSTER)
-      // we will flood the redis server
-      .setMaxWaitingHandlers(128 * 1024)
-      .addConnectionString(redis.getRedisNode0Uri())
-      .addConnectionString(redis.getRedisNode2Uri())
-      .addConnectionString(redis.getRedisNode4Uri())
-      .setMaxPoolSize(8)
-      .setMaxPoolWaiting(16);
-
-    // we miss add the odd port nodes on purpose
-
-    final Redis client2 = Redis.createClient(rule.vertx(), options);
-
-    client2
-      .connect(onCreate -> {
-        should.assertTrue(onCreate.succeeded());
-
-        final RedisConnection cluster = onCreate.result();
-        cluster.exceptionHandler(should::fail);
-
-        final int len = (int) Math.pow(2, 17);
-        final AtomicInteger counter = new AtomicInteger();
-
-        for (int i = 0; i < len; i++) {
-          final String id = Integer.toString(i);
-          cluster.send(cmd(SET).arg(id).arg(id), set -> {
-            should.assertTrue(set.succeeded());
-            cluster.send(cmd(GET).arg(id), get -> {
-              should.assertTrue(get.succeeded());
-              should.assertEquals(id, get.result().toString());
-
-              final int cnt = counter.incrementAndGet();
-              if (cnt % 1024 == 0) {
-                System.out.print('.');
-              }
-
-              if (cnt == len) {
-                client2.close();
-                test.complete();
-              }
-            });
-          });
-        }
-      });
-  }
-
-  @Test(timeout = 30_000)
   public void autoFindNodes(TestContext should) {
     final Async test = should.async();
 

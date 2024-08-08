@@ -15,13 +15,23 @@
  */
 package io.vertx.redis.client.impl;
 
-import io.vertx.core.*;
-import io.vertx.core.impl.ContextInternal;
+import io.vertx.core.AsyncResult;
+import io.vertx.core.Future;
+import io.vertx.core.Handler;
+import io.vertx.core.Promise;
+import io.vertx.core.Vertx;
 import io.vertx.core.impl.logging.Logger;
 import io.vertx.core.impl.logging.LoggerFactory;
 import io.vertx.core.net.NetClientOptions;
 import io.vertx.core.tracing.TracingPolicy;
-import io.vertx.redis.client.*;
+import io.vertx.redis.client.Command;
+import io.vertx.redis.client.PoolOptions;
+import io.vertx.redis.client.Redis;
+import io.vertx.redis.client.RedisClusterConnectOptions;
+import io.vertx.redis.client.RedisConnection;
+import io.vertx.redis.client.RedisReplicas;
+import io.vertx.redis.client.Request;
+import io.vertx.redis.client.Response;
 import io.vertx.redis.client.impl.types.MultiType;
 import io.vertx.redis.client.impl.types.NumberType;
 import io.vertx.redis.client.impl.types.SimpleStringType;
@@ -32,11 +42,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicInteger;
-import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Function;
-
-import static io.vertx.redis.client.Command.*;
-import static io.vertx.redis.client.Request.cmd;
 
 public class RedisClusterClient extends BaseRedisClient implements Redis {
 
@@ -53,11 +59,11 @@ public class RedisClusterClient extends BaseRedisClient implements Redis {
   static {
     // provided reducers
 
-    addReducer(MSET, list ->
+    addReducer(Command.MSET, list ->
       // Simple string reply: always OK since MSET can't fail.
       SimpleStringType.OK);
 
-    addReducer(DEL, list ->
+    addReducer(Command.DEL, list ->
       NumberType.create(list.stream()
         .mapToLong(el -> {
           Long l = el.toLong();
@@ -68,7 +74,7 @@ public class RedisClusterClient extends BaseRedisClient implements Redis {
           }
         }).sum()));
 
-    addReducer(MGET, list -> {
+    addReducer(Command.MGET, list -> {
       int total = 0;
       for (Response resp : list) {
         total += resp.size();
@@ -84,7 +90,7 @@ public class RedisClusterClient extends BaseRedisClient implements Redis {
       return multi;
     });
 
-    addReducer(KEYS, list -> {
+    addReducer(Command.KEYS, list -> {
       int total = 0;
       for (Response resp : list) {
         total += resp.size();
@@ -100,11 +106,11 @@ public class RedisClusterClient extends BaseRedisClient implements Redis {
       return multi;
     });
 
-    addReducer(FLUSHDB, list ->
+    addReducer(Command.FLUSHDB, list ->
       // Simple string reply: always OK since FLUSHDB can't fail.
       SimpleStringType.OK);
 
-    addReducer(DBSIZE, list ->
+    addReducer(Command.DBSIZE, list ->
       // Sum of key numbers on all Key Slots
       NumberType.create(list.stream()
         .mapToLong(el -> {
@@ -116,25 +122,23 @@ public class RedisClusterClient extends BaseRedisClient implements Redis {
           }
         }).sum()));
 
-    addMasterOnlyCommand(WAIT);
+    addMasterOnlyCommand(Command.WAIT);
 
-    addMasterOnlyCommand(SUBSCRIBE);
-    addMasterOnlyCommand(PSUBSCRIBE);
-    addMasterOnlyCommand(SSUBSCRIBE);
-    addReducer(UNSUBSCRIBE, list -> SimpleStringType.OK);
-    addReducer(PUNSUBSCRIBE, list -> SimpleStringType.OK);
-    addReducer(SUNSUBSCRIBE, list -> SimpleStringType.OK);
+    addMasterOnlyCommand(Command.SUBSCRIBE);
+    addMasterOnlyCommand(Command.PSUBSCRIBE);
+    addMasterOnlyCommand(Command.SSUBSCRIBE);
+    addReducer(Command.UNSUBSCRIBE, list -> SimpleStringType.OK);
+    addReducer(Command.PUNSUBSCRIBE, list -> SimpleStringType.OK);
+    addReducer(Command.SUNSUBSCRIBE, list -> SimpleStringType.OK);
   }
 
-  private final RedisClusterConnectOptions connectOptions;
-  private final PoolOptions poolOptions;
-
-  private final AtomicReference<Future<Slots>> slots = new AtomicReference<>();
+  final RedisClusterConnectOptions connectOptions;
+  final SharedSlots sharedSlots;
 
   public RedisClusterClient(Vertx vertx, NetClientOptions tcpOptions, PoolOptions poolOptions, RedisClusterConnectOptions connectOptions, TracingPolicy tracingPolicy) {
     super(vertx, tcpOptions, poolOptions, connectOptions, tracingPolicy);
     this.connectOptions = connectOptions;
-    this.poolOptions = poolOptions;
+    this.sharedSlots = new SharedSlots(vertx, connectOptions, connectionManager);
     // validate options
     if (poolOptions.getMaxWaiting() < poolOptions.getMaxSize()) {
       throw new IllegalStateException("Invalid options: maxWaiting < maxSize");
@@ -144,7 +148,7 @@ public class RedisClusterClient extends BaseRedisClient implements Redis {
   @Override
   public Future<RedisConnection> connect() {
     final Promise<RedisConnection> promise = vertx.promise();
-    getSlots(vertx.getOrCreateContext())
+    sharedSlots.get()
       .onSuccess(slots -> connect(slots, promise))
       .onFailure(promise::fail);
     return promise.future();
@@ -157,7 +161,7 @@ public class RedisClusterClient extends BaseRedisClient implements Redis {
     final Map<String, PooledRedisConnection> connections = new HashMap<>();
 
     for (String endpoint : slots.endpoints()) {
-      connectionManager.getConnection(endpoint, RedisReplicas.NEVER !=  connectOptions.getUseReplicas() ? cmd(READONLY) : null)
+      connectionManager.getConnection(endpoint, RedisReplicas.NEVER != connectOptions.getUseReplicas() ? Request.cmd(Command.READONLY) : null)
         .onFailure(err -> {
           // failed try with the next endpoint
           failures.add(err);
@@ -198,96 +202,10 @@ public class RedisClusterClient extends BaseRedisClient implements Redis {
         }
         onConnected.handle(Future.failedFuture(new RedisConnectException(message.toString())));
       } else {
-        onConnected.handle(Future.succeededFuture(new RedisClusterConnection(vertx, connectOptions, slots,
-          () -> this.slots.set(null), connections)));
+        onConnected.handle(Future.succeededFuture(new RedisClusterConnection(vertx, connectionManager,
+          connectOptions, sharedSlots, connections)));
       }
     }
   }
 
-  private Future<Slots> getSlots(ContextInternal context) {
-    while (true) {
-      Future<Slots> slots = this.slots.get();
-      if (slots != null) {
-        return slots;
-      }
-
-      Promise<Slots> promise = context.promise();
-      Future<Slots> future = promise.future();
-      if (this.slots.compareAndSet(null, future)) {
-        LOG.debug("Obtaining hash slot assignment");
-        // attempt to load the slots from the first good endpoint
-        getSlots(connectOptions.getEndpoints(), 0, ConcurrentHashMap.newKeySet(), promise);
-        return future;
-      }
-    }
-  }
-
-  private void getSlots(List<String> endpoints, int index, Set<Throwable> failures, Handler<AsyncResult<Slots>> onGotSlots) {
-    if (index >= endpoints.size()) {
-      // stop condition
-      StringBuilder message = new StringBuilder("Cannot connect to any of the provided endpoints");
-      for (Throwable failure : failures) {
-        message.append("\n- ").append(failure);
-      }
-      onGotSlots.handle(Future.failedFuture(new RedisConnectException(message.toString())));
-      scheduleCachedSlotsExpiration();
-      return;
-    }
-
-    connectionManager.getConnection(endpoints.get(index), RedisReplicas.NEVER != connectOptions.getUseReplicas() ? cmd(READONLY) : null)
-      .onFailure(err -> {
-        // try with the next endpoint
-        failures.add(err);
-        getSlots(endpoints, index + 1, failures, onGotSlots);
-      })
-      .onSuccess(conn -> {
-        getSlots(endpoints.get(index), conn, result -> {
-          // the connection is not needed anymore, regardless of success or failure
-          // (on success, we just finish, on failure, we'll try another endpoint)
-          conn.close().onFailure(LOG::warn);
-
-          if (result.failed()) {
-            // the slots command failed, try with next endpoint
-            failures.add(result.cause());
-            getSlots(endpoints, index + 1, failures, onGotSlots);
-          } else {
-            Slots slots = result.result();
-            onGotSlots.handle(Future.succeededFuture(slots));
-            scheduleCachedSlotsExpiration();
-          }
-        });
-      });
-  }
-
-  private void getSlots(String endpoint, RedisConnection conn, Handler<AsyncResult<Slots>> onGetSlots) {
-
-    conn.send(cmd(CLUSTER).arg("SLOTS"), send -> {
-      if (send.failed()) {
-        // failed to load the slots from this connection
-        onGetSlots.handle(Future.failedFuture(send.cause()));
-        return;
-      }
-
-      final Response reply = send.result();
-
-      if (reply == null || reply.size() == 0) {
-        // no slots available we can't really proceed
-        onGetSlots.handle(Future.failedFuture("CLUSTER SLOTS No slots available in the cluster."));
-        return;
-      }
-
-      Slots result;
-      try {
-        result = new Slots(endpoint, reply);
-      } catch (Exception e) {
-        onGetSlots.handle(Future.failedFuture("CLUSTER SLOTS response invalid: " + e));
-        return;
-      }
-      onGetSlots.handle(Future.succeededFuture(result));
-    });
-  }
-
-  private void scheduleCachedSlotsExpiration() {
-    vertx.setTimer(connectOptions.getHashSlotCacheTTL(), ignored -> this.slots.set(null));
-  }
 }
