@@ -17,11 +17,11 @@ package io.vertx.redis.client.impl;
 
 import io.vertx.core.net.SocketAddress;
 
-import java.io.UnsupportedEncodingException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URLDecoder;
 import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
@@ -162,19 +162,11 @@ public final class RedisURI {
   }
 
   private static String urlDecode(String raw) {
-    try {
-      return URLDecoder.decode(raw, "UTF-8");
-    } catch (UnsupportedEncodingException e) {
-      throw new RuntimeException(e);
-    }
+    return URLDecoder.decode(raw, StandardCharsets.UTF_8);
   }
 
   private static String urlEncode(String raw) {
-    try {
-      return URLEncoder.encode(raw, "UTF-8");
-    } catch (UnsupportedEncodingException e) {
-      throw new RuntimeException(e);
-    }
+    return URLEncoder.encode(raw, StandardCharsets.UTF_8);
   }
 
   private static Map<String, String> parseQuery(URI uri) {
@@ -244,6 +236,29 @@ public final class RedisURI {
         return "redis";
       }
     }
+  }
+
+  /**
+   * Returns the base of this URI, which consists of the scheme, optional user info, host and port
+   * (or path in case of a UNIX domain socket). Does not include the database number or the query parameters.
+   */
+  public String baseUri() {
+    StringBuilder result = new StringBuilder();
+    if (unix()) {
+      result.append("unix://");
+      result.append(socketAddress().path());
+    } else {
+      result.append("redis");
+      if (ssl()) {
+        result.append('s');
+      }
+      result.append("://");
+      result.append(userinfo());
+      result.append(socketAddress().host());
+      result.append(':');
+      result.append(socketAddress().port());
+    }
+    return result.toString();
   }
 
   @Override

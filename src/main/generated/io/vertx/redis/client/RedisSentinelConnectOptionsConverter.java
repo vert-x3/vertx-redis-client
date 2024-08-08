@@ -28,6 +28,11 @@ public class RedisSentinelConnectOptionsConverter {
             obj.setMasterName((String)member.getValue());
           }
           break;
+        case "autoFailover":
+          if (member.getValue() instanceof Boolean) {
+            obj.setAutoFailover((Boolean)member.getValue());
+          }
+          break;
       }
     }
   }
@@ -43,5 +48,6 @@ public class RedisSentinelConnectOptionsConverter {
     if (obj.getMasterName() != null) {
       json.put("masterName", obj.getMasterName());
     }
+    json.put("autoFailover", obj.isAutoFailover());
   }
 }

@@ -1,19 +1,31 @@
 package io.vertx.redis.client.impl;
 
 import io.vertx.codegen.annotations.Nullable;
-import io.vertx.core.*;
+import io.vertx.core.AsyncResult;
+import io.vertx.core.Future;
+import io.vertx.core.Handler;
+import io.vertx.core.Promise;
+import io.vertx.core.Vertx;
 import io.vertx.core.internal.VertxInternal;
 import io.vertx.core.internal.logging.Logger;
 import io.vertx.core.internal.logging.LoggerFactory;
-import io.vertx.redis.client.*;
+import io.vertx.redis.client.Command;
+import io.vertx.redis.client.RedisClusterConnectOptions;
+import io.vertx.redis.client.RedisConnection;
+import io.vertx.redis.client.RedisReplicas;
+import io.vertx.redis.client.Request;
+import io.vertx.redis.client.Response;
 import io.vertx.redis.client.impl.types.ErrorType;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.IdentityHashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Random;
 import java.util.function.Function;
-
-import static io.vertx.redis.client.Command.ASKING;
-import static io.vertx.redis.client.Command.AUTH;
-import static io.vertx.redis.client.Request.cmd;
 
 public class RedisClusterConnection implements RedisConnection {
 
@@ -40,17 +52,17 @@ public class RedisClusterConnection implements RedisConnection {
   }
 
   private final VertxInternal vertx;
+  private final RedisConnectionManager connectionManager;
   private final RedisClusterConnectOptions connectOptions;
-  private final Slots slots;
-  private final Runnable onMoved;
+  private final SharedSlots sharedSlots;
   private final Map<String, PooledRedisConnection> connections;
 
-  RedisClusterConnection(Vertx vertx, RedisClusterConnectOptions connectOptions, Slots slots, Runnable onMoved,
-      Map<String, PooledRedisConnection> connections) {
+  RedisClusterConnection(Vertx vertx, RedisConnectionManager connectionManager, RedisClusterConnectOptions connectOptions,
+      SharedSlots sharedSlots, Map<String, PooledRedisConnection> connections) {
     this.vertx = (VertxInternal) vertx;
+    this.connectionManager = connectionManager;
     this.connectOptions = connectOptions;
-    this.slots = slots;
-    this.onMoved = onMoved;
+    this.sharedSlots = sharedSlots;
     this.connections = connections;
   }
 
@@ -116,6 +128,11 @@ public class RedisClusterConnection implements RedisConnection {
 
   @Override
   public Future<Response> send(Request request) {
+    return sharedSlots.get()
+      .compose(slots -> send(request, slots));
+  }
+
+  private Future<Response> send(Request request, Slots slots) {
     final Promise<Response> promise = vertx.promise();
 
     // process commands for cluster mode
@@ -126,7 +143,7 @@ public class RedisClusterConnection implements RedisConnection {
     if (cmd.needsGetKeys()) {
       // it is required to resolve the keys at the server side as we cannot deduct where they are algorithmically
       // we shall run this commands on the master node always
-      send(selectEndpoint(-1, cmd.isReadOnly(args), true), RETRIES, req, promise);
+      send(selectEndpoint(slots, -1, cmd.isReadOnly(args), true), RETRIES, req, promise);
       return promise.future();
     }
 
@@ -157,12 +174,12 @@ public class RedisClusterConnection implements RedisConnection {
           });
         } else {
           // it doesn't matter which node to use
-          send(selectEndpoint(-1, cmd.isReadOnly(args), forceMasterEndpoint), RETRIES, req, promise);
+          send(selectEndpoint(slots, -1, cmd.isReadOnly(args), forceMasterEndpoint), RETRIES, req, promise);
         }
         return promise.future();
       case 1:
         // trivial option the command is single key
-        send(selectEndpoint(ZModem.generate(keys.get(0)), cmd.isReadOnly(args), forceMasterEndpoint), RETRIES, req, promise);
+        send(selectEndpoint(slots, ZModem.generate(keys.get(0)), cmd.isReadOnly(args), forceMasterEndpoint), RETRIES, req, promise);
         return promise.future();
       default:
         // hashSlot -1 indicates that not all keys of the command targets the same hash slot,
@@ -189,7 +206,7 @@ public class RedisClusterConnection implements RedisConnection {
 
           for (Map.Entry<Integer, Request> kv : requests.entrySet()) {
             final Promise<Response> p = vertx.promise();
-            send(selectEndpoint(kv.getKey(), cmd.isReadOnly(args), forceMasterEndpoint), RETRIES, kv.getValue(), p);
+            send(selectEndpoint(slots, kv.getKey(), cmd.isReadOnly(args), forceMasterEndpoint), RETRIES, kv.getValue(), p);
             responses.add(p.future());
           }
 
@@ -250,11 +267,27 @@ public class RedisClusterConnection implements RedisConnection {
   }
 
   private void send(String endpoint, int retries, Request command, Handler<AsyncResult<Response>> handler) {
-
-    final PooledRedisConnection connection = connections.get(endpoint);
-
+    PooledRedisConnection connection = connections.get(endpoint);
     if (connection == null) {
-      handler.handle(Future.failedFuture("Missing connection to: " + endpoint));
+      connectionManager.getConnection(endpoint, RedisReplicas.NEVER != connectOptions.getUseReplicas() ? Request.cmd(Command.READONLY) : null)
+        .onSuccess(conn -> {
+          synchronized (connections) {
+            if (connections.containsKey(endpoint)) {
+              conn.close()
+                .onFailure(t -> LOG.warn("Failed closing connection: " + t));
+            } else {
+              connections.put(endpoint, conn);
+            }
+          }
+          send(endpoint, retries, command, handler);
+        })
+        .onFailure(t -> {
+          if (retries > 0) {
+            send(endpoint, retries - 1, command, handler);
+          } else {
+            handler.handle(Future.failedFuture("Failed obtaining connection to: " + endpoint));
+          }
+        });
       return;
     }
 
@@ -264,32 +297,38 @@ public class RedisClusterConnection implements RedisConnection {
         if (send.failed() && send.cause() instanceof ErrorType && retries >= 0) {
           final ErrorType cause = (ErrorType) send.cause();
 
-          if (cause.is("MOVED")) {
-            this.onMoved.run();
-            // cluster is unbalanced, need to reconnect
-            handler.handle(Future.failedFuture(cause));
-            return;
-          }
+          boolean ask = cause.is("ASK");
+          boolean moved = cause.is("MOVED");
+          if (ask || moved) {
+            if (moved) {
+              sharedSlots.invalidate();
+            }
 
-          if (cause.is("ASK")) {
-            connection
-              .send(cmd(ASKING))
-              .onFailure(err -> handler.handle(Future.failedFuture(err)))
-              .onSuccess(asking -> {
-                // attempt to recover
-                // REQUERY THE NEW ONE (we've got the correct details)
-                String addr = cause.slice(' ', cause.is("ERR") ? 3 : 2);
+            // attempt to recover
+            String addr = cause.slice(' ', 2);
+            if (addr == null) {
+              // bad message
+              handler.handle(Future.failedFuture("Cannot find endpoint:port in redirection: " + cause));
+              return;
+            }
 
-                if (addr == null) {
-                  // bad message
-                  handler.handle(Future.failedFuture(cause));
-                  return;
+            RedisURI uri = new RedisURI(endpoint);
+            if (addr.startsWith(":")) {
+              // unknown endpoint, need to use the current one but the provided port
+              addr = uri.socketAddress().host() + addr;
+            }
+            String newEndpoint = uri.protocol() + "://" + uri.userinfo() + addr;
+            if (ask) {
+              send(newEndpoint, retries - 1, Request.cmd(Command.ASKING), resp -> {
+                if (resp.failed()) {
+                  handler.handle(Future.failedFuture("Failed ASKING: " + resp.cause() + ", caused by " + cause));
+                } else {
+                  send(newEndpoint, retries - 1, command, handler);
                 }
-                // inherit protocol config from the current connection
-                final RedisURI uri = new RedisURI(endpoint);
-                // re-run on the new endpoint
-                send(uri.protocol() + "://" + uri.userinfo() + addr, retries - 1, command, handler);
               });
+            } else {
+              send(newEndpoint, retries - 1, command, handler);
+            }
             return;
           }
 
@@ -303,7 +342,7 @@ public class RedisClusterConnection implements RedisConnection {
           if (cause.is("NOAUTH") && connectOptions.getPassword() != null) {
             // NOAUTH will try to authenticate
             connection
-              .send(cmd(AUTH).arg(connectOptions.getPassword()))
+              .send(Request.cmd(Command.AUTH).arg(connectOptions.getPassword()))
               .onFailure(err -> handler.handle(Future.failedFuture(err)))
               .onSuccess(auth -> {
                 // again
@@ -323,6 +362,11 @@ public class RedisClusterConnection implements RedisConnection {
 
   @Override
   public Future<List<Response>> batch(List<Request> requests) {
+    return sharedSlots.get()
+      .compose(slots -> batch(requests, slots));
+  }
+
+  private Future<List<Response>> batch(List<Request> requests, Slots slots) {
     final Promise<List<Response>> promise = vertx.promise();
 
     if (requests.isEmpty()) {
@@ -397,18 +441,34 @@ public class RedisClusterConnection implements RedisConnection {
 
       // all keys are on the same slot!
       //we just need to decide which endpoint to use based on additional options
-      batch(selectEndpoint(correctSlot, readOnly, forceMasterEndpoint), RETRIES, requests, promise);
+      batch(selectEndpoint(slots, correctSlot, readOnly, forceMasterEndpoint), RETRIES, requests, promise);
     }
 
     return promise.future();
   }
 
   private void batch(String endpoint, int retries, List<Request> commands, Handler<AsyncResult<List<Response>>> handler) {
-
-    final RedisConnection connection = connections.get(endpoint);
-
+    RedisConnection connection = connections.get(endpoint);
     if (connection == null) {
-      handler.handle(Future.failedFuture("Missing connection to: " + endpoint));
+      connectionManager.getConnection(endpoint, RedisReplicas.NEVER != connectOptions.getUseReplicas() ? Request.cmd(Command.READONLY) : null)
+        .onSuccess(conn -> {
+          synchronized (connections) {
+            if (connections.containsKey(endpoint)) {
+              conn.close()
+                .onFailure(t -> LOG.warn("Failed closing connection: " + t));
+            } else {
+              connections.put(endpoint, conn);
+            }
+          }
+          batch(endpoint, retries, commands, handler);
+        })
+        .onFailure(t -> {
+          if (retries > 0) {
+            batch(endpoint, retries - 1, commands, handler);
+          } else {
+            handler.handle(Future.failedFuture("Failed obtaining connection to: " + endpoint));
+          }
+        });
       return;
     }
 
@@ -418,33 +478,38 @@ public class RedisClusterConnection implements RedisConnection {
         if (send.failed() && send.cause() instanceof ErrorType && retries >= 0) {
           final ErrorType cause = (ErrorType) send.cause();
 
-          if (cause.is("MOVED")) {
-            this.onMoved.run();
-            // cluster is unbalanced, need to reconnect
-            handler.handle(Future.failedFuture(cause));
-            return;
-          }
+          boolean ask = cause.is("ASK");
+          boolean moved = cause.is("MOVED");
+          if (ask || moved) {
+            if (moved) {
+              sharedSlots.invalidate();
+            }
 
-          if (cause.is("ASK")) {
-            connection
-              .send(cmd(ASKING))
-              .onFailure(err -> handler.handle(Future.failedFuture(err)))
-              .onSuccess(asking -> {
-                // attempt to recover
-                // REQUERY THE NEW ONE (we've got the correct details)
-                String addr = cause.slice(' ', cause.is("ERR") ? 3 : 2);
+            // attempt to recover
+            String addr = cause.slice(' ', 2);
+            if (addr == null) {
+              // bad message
+              handler.handle(Future.failedFuture("Cannot find endpoint:port in redirection: " + cause));
+              return;
+            }
 
-                if (addr == null) {
-                  // bad message
-                  handler.handle(Future.failedFuture(cause));
-                  return;
+            RedisURI uri = new RedisURI(endpoint);
+            if (addr.startsWith(":")) {
+              // unknown endpoint, need to use the current one but the provided port
+              addr = uri.socketAddress().host() + addr;
+            }
+            String newEndpoint = uri.protocol() + "://" + uri.userinfo() + addr;
+            if (ask) {
+              batch(newEndpoint, retries - 1, Collections.singletonList(Request.cmd(Command.ASKING)), resp -> {
+                if (resp.failed()) {
+                  handler.handle(Future.failedFuture("Failed ASKING: " + resp.cause() + ", caused by " + cause));
+                } else {
+                  batch(newEndpoint, retries - 1, commands, handler);
                 }
-
-                // inherit protocol config from the current connection
-                final RedisURI uri = new RedisURI(endpoint);
-                // re-run on the new endpoint
-                batch(uri.protocol() + "://" + uri.userinfo() + addr, retries - 1, commands, handler);
               });
+            } else {
+              batch(newEndpoint, retries - 1, commands, handler);
+            }
             return;
           }
 
@@ -458,7 +523,7 @@ public class RedisClusterConnection implements RedisConnection {
           if (cause.is("NOAUTH") && connectOptions.getPassword() != null) {
             // try to authenticate
             connection
-              .send(cmd(AUTH).arg(connectOptions.getPassword()))
+              .send(Request.cmd(Command.AUTH).arg(connectOptions.getPassword()))
               .onFailure(err -> handler.handle(Future.failedFuture(err)))
               .onSuccess(auth -> {
                 // again
@@ -504,7 +569,7 @@ public class RedisClusterConnection implements RedisConnection {
   /**
    * Select a Redis client for the given key
    */
-  private String selectEndpoint(int keySlot, boolean readOnly, boolean forceMasterEndpoint) {
+  private String selectEndpoint(Slots slots, int keySlot, boolean readOnly, boolean forceMasterEndpoint) {
     // this command doesn't have keys, return any connection
     // NOTE: this means replicas may be used for no key commands regardless of the config
     if (keySlot == -1) {

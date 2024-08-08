@@ -15,26 +15,34 @@
  */
 package io.vertx.redis.client.impl;
 
-import io.vertx.core.*;
+import io.vertx.core.AsyncResult;
+import io.vertx.core.Future;
+import io.vertx.core.Handler;
+import io.vertx.core.Promise;
+import io.vertx.core.Vertx;
 import io.vertx.core.internal.logging.Logger;
 import io.vertx.core.internal.logging.LoggerFactory;
 import io.vertx.core.net.NetClientOptions;
 import io.vertx.core.tracing.TracingPolicy;
-import io.vertx.redis.client.*;
-import io.vertx.redis.client.impl.types.ErrorType;
+import io.vertx.redis.client.Command;
+import io.vertx.redis.client.PoolOptions;
+import io.vertx.redis.client.Redis;
+import io.vertx.redis.client.RedisConnectOptions;
+import io.vertx.redis.client.RedisConnection;
+import io.vertx.redis.client.RedisRole;
+import io.vertx.redis.client.RedisSentinelConnectOptions;
+import io.vertx.redis.client.Request;
+import io.vertx.redis.client.Response;
 
 import java.util.List;
 import java.util.Random;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
-
-import static io.vertx.redis.client.Command.*;
-import static io.vertx.redis.client.Request.cmd;
+import java.util.concurrent.atomic.AtomicReference;
 
 public class RedisSentinelClient extends BaseRedisClient implements Redis {
 
-  // We don't need to be secure, we just want so simple
-  // randomization to avoid picking the same replica all the time
+  // we need some randomness, it doesn't need to be cryptographically secure
   private static final Random RANDOM = new Random();
 
   private static class Pair<L, R> {
@@ -50,6 +58,7 @@ public class RedisSentinelClient extends BaseRedisClient implements Redis {
   private static final Logger LOG = LoggerFactory.getLogger(RedisSentinelClient.class);
 
   private final RedisSentinelConnectOptions connectOptions;
+  private final AtomicReference<SentinelFailover> failover = new AtomicReference<>();
 
   public RedisSentinelClient(Vertx vertx, NetClientOptions tcpOptions, PoolOptions poolOptions, RedisSentinelConnectOptions connectOptions, TracingPolicy tracingPolicy) {
     super(vertx, tcpOptions, poolOptions, connectOptions, tracingPolicy);
@@ -64,7 +73,6 @@ public class RedisSentinelClient extends BaseRedisClient implements Redis {
   public Future<RedisConnection> connect() {
     final Promise<RedisConnection> promise = vertx.promise();
 
-    // sentinel (HA) requires 2 connections, one to watch for sentinel events and the connection itself
     createConnectionInternal(connectOptions, connectOptions.getRole(), createConnection -> {
       if (createConnection.failed()) {
         promise.fail(createConnection.cause());
@@ -73,44 +81,52 @@ public class RedisSentinelClient extends BaseRedisClient implements Redis {
 
       final PooledRedisConnection conn = createConnection.result();
 
-      createConnectionInternal(connectOptions, RedisRole.SENTINEL, create -> {
-        if (create.failed()) {
-          LOG.error("Redis PUB/SUB wrap failed.", create.cause());
-          promise.fail(create.cause());
-          return;
-        }
+      if (connectOptions.getRole() == RedisRole.SENTINEL || connectOptions.getRole() == RedisRole.REPLICA) {
+        // it is possible that a replica is later promoted to a master, but that shouldn't be too big of a deal
+        promise.complete(conn);
+        return;
+      }
+      if (!connectOptions.isAutoFailover()) {
+        // no auto failover, return the master connection directly
+        promise.complete(conn);
+        return;
+      }
 
-        PooledRedisConnection sentinel = create.result();
-
-        sentinel
-          .handler(msg -> {
-            if (msg.type() == ResponseType.MULTI) {
-              if ("MESSAGE".equalsIgnoreCase(msg.get(0).toString())) {
-                // we don't care about the payload
-                if (conn != null) {
-                  ((RedisStandaloneConnection) conn.actual()).fail(ErrorType.create("SWITCH-MASTER Received +switch-master message from Redis Sentinel."));
-                } else {
-                  LOG.warn("Received +switch-master message from Redis Sentinel.");
-                }
-              }
-            }
-          });
-
-        sentinel
-          .send(cmd(SUBSCRIBE).arg("+switch-master"))
-          .onFailure(promise::fail)
-          .onSuccess(ok -> promise.complete(new RedisSentinelConnection(conn, sentinel)));
-
-        sentinel.exceptionHandler(t -> {
-          if (conn != null) {
-            ((RedisStandaloneConnection) conn.actual()).fail(t);
-          } else {
-            LOG.error("Unhandled exception in Sentinel PUBSUB", t);
-          }
-        });
-      });
+      SentinelFailover failover = setupFailover();
+      RedisSentinelConnection sentinelConn = new RedisSentinelConnection(conn, failover);
+      promise.complete(sentinelConn);
     });
 
+    return promise.future();
+  }
+
+  private SentinelFailover setupFailover() {
+    SentinelFailover result = this.failover.get();
+
+    if (result == null) {
+      result = new SentinelFailover(connectOptions.getMasterName(), this::createConnectionInternal);
+      if (this.failover.compareAndSet(null, result)) {
+        result.start();
+      } else {
+        result = this.failover.get();
+      }
+    }
+
+    return result;
+  }
+
+  @Override
+  public void close() {
+    SentinelFailover failover = this.failover.get();
+    if (failover != null) {
+      failover.close();
+    }
+    super.close();
+  }
+
+  private Future<PooledRedisConnection> createConnectionInternal(RedisRole role) {
+    Promise<PooledRedisConnection> promise = Promise.promise();
+    createConnectionInternal(connectOptions, role, promise);
     return promise.future();
   }
 
@@ -123,19 +139,18 @@ public class RedisSentinelClient extends BaseRedisClient implements Redis {
       }
 
       final RedisURI uri = resolve.result();
-      final String endpoint = getBaseEndpoint(uri);
       final Request setup;
 
       // `SELECT` is only allowed on non-sentinel nodes
+      // we don't send `READONLY` setup to replica nodes, because that's a cluster-only command
       if (role != RedisRole.SENTINEL && uri.select() != null) {
-        setup = cmd(SELECT).arg(uri.select());
+        setup = Request.cmd(Command.SELECT).arg(uri.select());
       } else {
-        // we don't send `READONLY` setup to replica nodes, because that's a cluster-only command
         setup = null;
       }
 
       // wrap a new client
-      connectionManager.getConnection(endpoint, setup).onComplete(onCreate);
+      connectionManager.getConnection(uri.baseUri(), setup).onComplete(onCreate);
     };
 
     switch (role) {
@@ -207,12 +222,12 @@ public class RedisSentinelClient extends BaseRedisClient implements Redis {
     // but can contain authentication
     final RedisURI uri = new RedisURI(endpoint);
 
-    connectionManager.getConnection(getBaseEndpoint(uri), null)
+    connectionManager.getConnection(uri.baseUri(), null)
       .onFailure(err -> handler.handle(Future.failedFuture(err)))
       .onSuccess(conn -> {
         // Send a command just to check we have a working node
         conn
-          .send(cmd(PING))
+          .send(Request.cmd(Command.PING))
           .onFailure(err -> handler.handle(Future.failedFuture(err)))
           .onSuccess(ok -> handler.handle(Future.succeededFuture(uri)))
           .eventually(() -> conn.close().onFailure(LOG::warn));
@@ -223,13 +238,13 @@ public class RedisSentinelClient extends BaseRedisClient implements Redis {
     // we can't use the endpoint as is, it should not contain a database selection,
     // but can contain authentication
     final RedisURI uri = new RedisURI(endpoint);
-    connectionManager.getConnection(getBaseEndpoint(uri), null)
+    connectionManager.getConnection(uri.baseUri(), null)
       .onFailure(err -> handler.handle(Future.failedFuture(err)))
       .onSuccess(conn -> {
         final String masterName = options.getMasterName();
         // Send a command just to check we have a working node
         conn
-          .send(cmd(SENTINEL).arg("GET-MASTER-ADDR-BY-NAME").arg(masterName))
+          .send(Request.cmd(Command.SENTINEL).arg("GET-MASTER-ADDR-BY-NAME").arg(masterName))
           .onFailure(err -> handler.handle(Future.failedFuture(err)))
           .onSuccess(response -> {
             if (response == null) {
@@ -248,13 +263,13 @@ public class RedisSentinelClient extends BaseRedisClient implements Redis {
     // we can't use the endpoint as is, it should not contain a database selection,
     // but can contain authentication
     final RedisURI uri = new RedisURI(endpoint);
-    connectionManager.getConnection(getBaseEndpoint(uri), null)
+    connectionManager.getConnection(uri.baseUri(), null)
       .onFailure(err -> handler.handle(Future.failedFuture(err)))
       .onSuccess(conn -> {
         final String masterName = options.getMasterName();
         // Send a command just to check we have a working node
         conn
-          .send(cmd(SENTINEL).arg("SLAVES").arg(masterName))
+          .send(Request.cmd(Command.SENTINEL).arg("SLAVES").arg(masterName))
           .onFailure(err -> handler.handle(Future.failedFuture(err)))
           .onSuccess(response -> {
             // Test the response
@@ -290,24 +305,4 @@ public class RedisSentinelClient extends BaseRedisClient implements Redis {
       });
   }
 
-  private String getBaseEndpoint(RedisURI uri) {
-    StringBuilder sb = new StringBuilder();
-
-    if (uri.unix()) {
-      sb.append("unix://");
-      sb.append(uri.socketAddress().path());
-    } else {
-      sb.append("redis");
-      if (uri.ssl()) {
-        sb.append('s');
-      }
-      sb.append("://");
-      sb.append(uri.userinfo());
-      sb.append(uri.socketAddress().host());
-      sb.append(':');
-      sb.append(uri.socketAddress().port());
-    }
-
-    return sb.toString();
-  }
 }

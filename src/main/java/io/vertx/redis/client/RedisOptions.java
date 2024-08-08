@@ -18,6 +18,7 @@ package io.vertx.redis.client;
 import io.vertx.codegen.annotations.DataObject;
 import io.vertx.codegen.annotations.GenIgnore;
 import io.vertx.codegen.json.annotations.JsonGen;
+import io.vertx.core.Handler;
 import io.vertx.core.json.JsonObject;
 import io.vertx.core.net.NetClientOptions;
 import io.vertx.core.tracing.TracingPolicy;
@@ -55,6 +56,7 @@ public class RedisOptions {
   private ProtocolVersion preferredProtocolVersion;
   private long hashSlotCacheTTL;
   private TracingPolicy tracingPolicy;
+  private boolean autoFailover;
 
   /**
    * Creates a default configuration object using redis server defaults
@@ -98,6 +100,7 @@ public class RedisOptions {
     this.preferredProtocolVersion = other.preferredProtocolVersion;
     this.hashSlotCacheTTL = other.hashSlotCacheTTL;
     this.tracingPolicy = other.tracingPolicy;
+    this.autoFailover = other.autoFailover;
   }
 
   /**
@@ -691,9 +694,68 @@ public class RedisOptions {
    * </p>
    *
    * @param hashSlotCacheTTL the TTL of the hash slot cache, in millis
+   * @return fluent self
    */
   public RedisOptions setHashSlotCacheTTL(long hashSlotCacheTTL) {
     this.hashSlotCacheTTL = hashSlotCacheTTL;
+    return this;
+  }
+
+  /**
+   * Returns whether automatic failover is enabled. This only makes sense for sentinel clients
+   * with role of {@link RedisRole#MASTER} and is ignored otherwise.
+   * <p>
+   * If enabled, the sentinel client will additionally create a connection to one sentinel node
+   * and watch for failover events. When new master is elected, all connections to the old master
+   * are automatically closed and new connections to the new master are created. Note that
+   * these new connections will <em>not</em> have the same event handlers
+   * ({@link RedisConnection#handler(Handler) handler()},
+   * {@link RedisConnection#exceptionHandler(Handler) exceptionHandler()} and
+   * {@link RedisConnection#endHandler(Handler) endHandler()}), will <em>not</em> be
+   * in the same streaming mode ({@link RedisConnection#pause() pause()},
+   * {@link RedisConnection#resume() resume()} and {@link RedisConnection#fetch(long) fetch()}),
+   * and will <em>not</em> watch the same subscriptions ({@code SUBSCRIBE}, {@code PSUBSCRIBE}, etc.)
+   * as the old ones. In other words, automatic failover makes sense for connections executing
+   * regular commands, but not for connections used to subscribe to Redis pub/sub channels.
+   * <p>
+   * Note that there is a brief period of time between the old master failing and the new
+   * master being elected when the existing connections will temporarily fail all operations.
+   * After the new master is elected, the connections will automatically fail over and
+   * start working again.
+   *
+   * @return whether automatic failover is enabled
+   */
+  public boolean isAutoFailover() {
+    return autoFailover;
+  }
+
+  /**
+   * Returns whether automatic failover is enabled. This only makes sense for sentinel clients
+   * with role of {@link RedisRole#MASTER} and is ignored otherwise.
+   * <p>
+   * If enabled, the sentinel client will additionally create a connection to one sentinel node
+   * and watch for failover events. When new master is elected, all connections to the old master
+   * are automatically closed and new connections to the new master are created. Note that
+   * these new connections will <em>not</em> have the same event handlers
+   * ({@link RedisConnection#handler(Handler) handler()},
+   * {@link RedisConnection#exceptionHandler(Handler) exceptionHandler()} and
+   * {@link RedisConnection#endHandler(Handler) endHandler()}), will <em>not</em> be
+   * in the same streaming mode ({@link RedisConnection#pause() pause()},
+   * {@link RedisConnection#resume() resume()} and {@link RedisConnection#fetch(long) fetch()}),
+   * and will <em>not</em> watch the same subscriptions ({@code SUBSCRIBE}, {@code PSUBSCRIBE}, etc.)
+   * as the old ones. In other words, automatic failover makes sense for connections executing
+   * regular commands, but not for connections used to subscribe to Redis pub/sub channels.
+   * <p>
+   * Note that there is a brief period of time between the old master failing and the new
+   * master being elected when the existing connections will temporarily fail all operations.
+   * After the new master is elected, the connections will automatically fail over and
+   * start working again.
+   *
+   * @param autoFailover whether automatic failover should be enabled
+   * @return fluent self
+   */
+  public RedisOptions setAutoFailover(boolean autoFailover) {
+    this.autoFailover = autoFailover;
     return this;
   }
 

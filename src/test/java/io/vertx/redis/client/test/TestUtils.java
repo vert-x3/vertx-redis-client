@@ -14,6 +14,11 @@ public class TestUtils {
 
   public static <T> Future<T> retryUntilSuccess(Vertx vertx, Supplier<Future<T>> action, int maxRetries) {
     Promise<T> promise = Promise.promise();
+    retryUntilSuccess(vertx, action, maxRetries, promise);
+    return promise.future();
+  }
+
+  private static <T> void retryUntilSuccess(Vertx vertx, Supplier<Future<T>> action, int maxRetries, Promise<T> promise) {
     action.get().onComplete(result -> {
       if (result.succeeded()) {
         promise.complete(result.result());
@@ -22,11 +27,10 @@ public class TestUtils {
           promise.fail(result.cause());
         } else {
           vertx.setTimer(500, ignored -> {
-            retryUntilSuccess(vertx, action, maxRetries - 1).onComplete(promise);
+            retryUntilSuccess(vertx, action, maxRetries - 1, promise);
           });
         }
       }
     });
-    return promise.future();
   }
 }
