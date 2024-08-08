@@ -85,7 +85,7 @@ public interface Request {
   @Fluent
   default Request arg(String arg) {
     if (arg == null) {
-      return nullArg();
+      throw new IllegalArgumentException("Null argument not allowed");
     }
     return arg(arg.getBytes(StandardCharsets.UTF_8));
   }
@@ -98,7 +98,7 @@ public interface Request {
   @Fluent
   default Request arg(String arg, String enc) {
     if (arg == null) {
-      return nullArg();
+      throw new IllegalArgumentException("Null argument not allowed");
     }
     return arg(arg.getBytes(Charset.forName(enc)));
   }
@@ -190,23 +190,21 @@ public interface Request {
   /**
    * Adds a JsonObject argument, the encoding will serialize the json as key0, value0, key1, value1, ... keyN, valueN.
    * This is a non-optimized serialization and will just use the string encoding of the values for non buffers.
-   * <p>
-   * All {@code null} values will follow the encoding rules of {@link #nullArg()}.
    *
    * @return self
-   * @throws IllegalArgumentException when values are of type JsonArray or JsonObject
+   * @throws IllegalArgumentException when values are {@code null} or of type JsonArray or JsonObject
    */
   @Fluent
   default Request arg(JsonObject arg) {
     if (arg == null) {
-      nullArg();
+      throw new IllegalArgumentException("Null argument not allowed");
     } else {
       for (Map.Entry<String, Object> kv : arg) {
         arg(kv.getKey());
         Object val = kv.getValue();
 
         if (val == null) {
-          nullArg();
+          throw new IllegalArgumentException("Null argument not allowed");
         } else if (val instanceof Buffer) {
           arg((Buffer) val);
         } else if (val instanceof JsonArray || val instanceof JsonObject) {
@@ -222,20 +220,18 @@ public interface Request {
   /**
    * Adds a JsonArray argument, the encoding will serialize the json as value0, value1, ... valueN.
    * This is a non-optimized serialization and will just use the string encoding of the values for non buffers.
-   * <p>
-   * All {@code null} values will follow the encoding rules of {@link #nullArg()}.
    *
    * @return self
-   * @throws IllegalArgumentException when values are of type JsonArray or JsonObject
+   * @throws IllegalArgumentException when values are {@code null} or of type JsonArray or JsonObject
    */
   @Fluent
   default Request arg(JsonArray arg) {
     if (arg == null) {
-      nullArg();
+      throw new IllegalArgumentException("Null argument not allowed");
     } else {
       for (Object el : arg) {
         if (el == null) {
-          nullArg();
+          throw new IllegalArgumentException("Null argument not allowed");
         } else if (el instanceof Buffer) {
           arg((Buffer) el);
         } else if (el instanceof JsonArray || el instanceof JsonObject) {
@@ -247,21 +243,6 @@ public interface Request {
     }
     return this;
   }
-
-  /**
-   * @return self
-   * @deprecated REDIS does not support {@code null} as a parameter, only as response. This was a deviation from the
-   * official protocol which should be avoided. Other clients explicitly do not allow this.
-   * <p>
-   * Adds a {@code null} encoded string. Redis does not allow storing the {@code null} value by itself. This method
-   * will encode any null value as the four character long string {@code "null"}.
-   * <p>
-   * As a recommendation, this method should not be used directly unless this is the intented behavior. It is present
-   * to handle special cases such as encoding of {@link JsonObject} and {@link JsonArray} which may contain null values.
-   */
-  @Fluent
-  @Deprecated
-  Request nullArg();
 
   /**
    * Get the Command that is to be used by this request.

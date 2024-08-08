@@ -16,6 +16,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 
 import static io.vertx.redis.client.Command.GET;
+import static io.vertx.redis.client.Command.HGETALL;
 import static io.vertx.redis.client.Command.HSET;
 import static io.vertx.redis.client.Command.SET;
 import static io.vertx.redis.client.Request.cmd;
@@ -78,13 +79,13 @@ public class RedisClient5Test {
     final String mykey = randomKey();
 
     JsonObject json = new JsonObject()
-      .putNull("nullKey");
+      .put("key", "value");
 
     client.send(cmd(HSET).arg(mykey).arg(json))
-      .onSuccess(res -> {
-        System.out.println(res);
+      .compose(ignored -> client.send(cmd(HGETALL).arg(mykey)))
+      .onComplete(should.asyncAssertSuccess(value -> {
+        should.assertEquals("value", value.get("key").toString());
         test.complete();
-      })
-      .onFailure(should::fail);
+      }));
   }
 }

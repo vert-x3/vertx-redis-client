@@ -44,7 +44,7 @@ public class RedisAPIImpl implements RedisAPI {
     if (args != null) {
       for (String o : args) {
         if (o == null) {
-          req.nullArg();
+          throw new IllegalArgumentException("Null argument not allowed");
         } else {
           req.arg(o);
         }
