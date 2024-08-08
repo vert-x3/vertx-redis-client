@@ -162,14 +162,14 @@ public class RedisClient7Test {
     final String mykey = randomKey();
 
     JsonObject json = new JsonObject()
-      .putNull("nullKey");
+      .put("key", "value");
 
     client.send(cmd(HSET).arg(mykey).arg(json))
-      .onSuccess(res -> {
-        System.out.println(res);
+      .compose(ignored -> client.send(cmd(HGETALL).arg(mykey)))
+      .onComplete(should.asyncAssertSuccess(value -> {
+        should.assertEquals("value", value.get("key").toString());
         test.complete();
-      })
-      .onFailure(should::fail);
+      }));
   }
 
   @Test(timeout = 10_000L)

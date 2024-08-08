@@ -105,20 +105,12 @@ public final class RequestImpl implements Request {
     return this;
   }
 
-  // null
-
-  @Override
-  public Request nullArg() {
-    args.add(null);
-    return this;
-  }
-
   // bulk string
 
   @Override
   public Request arg(byte[] arg) {
     if (arg == null) {
-      return nullArg();
+      throw new IllegalArgumentException("Null argument not allowed");
     }
 
     args.add(arg);
@@ -128,7 +120,7 @@ public final class RequestImpl implements Request {
   @Override
   public Request arg(Buffer arg) {
     if (arg == null) {
-      return nullArg();
+      throw new IllegalArgumentException("Null argument not allowed");
     }
 
     if (arg.length() == 0) {
