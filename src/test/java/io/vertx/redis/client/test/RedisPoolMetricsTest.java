@@ -2,7 +2,6 @@ package io.vertx.redis.client.test;
 
 import io.vertx.core.Vertx;
 import io.vertx.core.VertxOptions;
-import io.vertx.core.metrics.impl.DummyVertxMetrics;
 import io.vertx.core.spi.VertxMetricsFactory;
 import io.vertx.core.spi.metrics.PoolMetrics;
 import io.vertx.core.spi.metrics.VertxMetrics;
@@ -36,14 +35,14 @@ public class RedisPoolMetricsTest {
       .withMetrics(new VertxMetricsFactory() {
         @Override
         public VertxMetrics metrics(VertxOptions options) {
-          return new DummyVertxMetrics() {
+          return new VertxMetrics() {
             @Override
-            public PoolMetrics<?> createPoolMetrics(String poolType, String poolName, int maxPoolSize) {
+            public PoolMetrics<?, ?> createPoolMetrics(String poolType, String poolName, int maxPoolSize) {
               if (poolType.equals("redis")) {
                 POOL_NAME.set(poolName);
                 return new FakePoolMetrics(poolName, maxPoolSize);
               } else {
-                return super.createPoolMetrics(poolType, poolName, maxPoolSize);
+                return VertxMetrics.super.createPoolMetrics(poolType, poolName, maxPoolSize);
               }
             }
           };
@@ -59,7 +58,7 @@ public class RedisPoolMetricsTest {
   public final RunTestOnContext rule = new RunTestOnContext(RedisPoolMetricsTest::getVertx);
 
   private FakePoolMetrics getMetrics() {
-    return (FakePoolMetrics) FakePoolMetrics.getPoolMetrics().get(POOL_NAME.get());
+    return FakePoolMetrics.getMetrics(POOL_NAME.get());
   }
 
   @Test
@@ -72,8 +71,8 @@ public class RedisPoolMetricsTest {
       .connect().onComplete(create -> {
         should.assertTrue(create.succeeded());
 
-        should.assertEquals(0, getMetrics().numberOfWaitingTasks());
-        should.assertEquals(1, getMetrics().numberOfRunningTasks());
+        should.assertEquals(0, getMetrics().pending());
+        should.assertEquals(1, getMetrics().inUse());
 
         final RedisConnection redis = create.result();
 
@@ -89,8 +88,8 @@ public class RedisPoolMetricsTest {
 
           redis.close();
 
-          should.assertEquals(0, getMetrics().numberOfWaitingTasks());
-          should.assertEquals(0, getMetrics().numberOfRunningTasks());
+          should.assertEquals(0, getMetrics().pending());
+          should.assertEquals(0, getMetrics().inUse());
 
           client.close();
           test.complete();
@@ -102,7 +101,7 @@ public class RedisPoolMetricsTest {
   public void testLifecycle(TestContext should) {
     final Async test = should.async();
 
-    Map<String, PoolMetrics> metricsMap = FakePoolMetrics.getPoolMetrics();
+    Map<String, FakePoolMetrics> metricsMap = FakePoolMetrics.getMetrics();
     should.assertEquals(Collections.emptySet(), metricsMap.keySet());
     Redis client = Redis.createClient(rule.vertx(), new RedisOptions().setConnectionString(redis.getRedisUri()));
     should.assertEquals(1, metricsMap.size());
@@ -110,7 +109,7 @@ public class RedisPoolMetricsTest {
       .onFailure(should::fail)
       .onSuccess(conn -> {
         should.assertEquals(1, metricsMap.size());
-        should.assertEquals(6, getMetrics().getPoolSize());
+        should.assertEquals(6, getMetrics().maxSize());
         conn.close();
         should.assertEquals(1, metricsMap.size());
         client.close();

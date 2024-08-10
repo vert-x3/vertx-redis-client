@@ -38,7 +38,7 @@ public class RedisClientMetricsTest {
     vertx = Vertx.builder()
       .withMetrics(ignored -> new VertxMetrics() {
         @Override
-        public ClientMetrics<?, ?, ?, ?> createClientMetrics(SocketAddress remoteAddress, String type, String namespace) {
+        public ClientMetrics<?, ?, ?> createClientMetrics(SocketAddress remoteAddress, String type, String namespace) {
           return metrics;
         }
       })
