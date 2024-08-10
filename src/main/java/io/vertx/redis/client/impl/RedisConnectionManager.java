@@ -352,17 +352,17 @@ class RedisConnectionManager implements EndpointProvider<RedisConnectionManager.
     }
 
     final boolean metricsEnabled = metrics != null;
-    final Object queueMetric = metricsEnabled ? metrics.submitted() : null;
+    final Object queueMetric = metricsEnabled ? metrics.enqueue() : null;
     Future<Lease<RedisConnectionInternal>> future = pooledConnectionManager.withEndpointAsync(new ConnectionKey(connectionString, setup), this, (endpoint, created) -> {
       return endpoint.requestConnection(eventLoopContext);
     });
     return future
-      .onFailure(err -> {
+      .andThen(ar -> {
         if (metricsEnabled) {
-          metrics.rejected(queueMetric);
+          metrics.dequeue(queueMetric);
         }
       })
-      .compose(lease -> Future.succeededFuture(new PooledRedisConnection(lease, metrics, metricsEnabled ? metrics.begin(queueMetric) : null)));
+      .map(lease -> new PooledRedisConnection(lease, metrics, metricsEnabled ? metrics.begin() : null));
   }
 
   public void close() {

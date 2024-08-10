@@ -21,7 +21,7 @@ public class PooledRedisConnection implements RedisConnection {
   private final PoolMetrics metrics;
   private final Object metric;
 
-  public PooledRedisConnection(Lease<RedisConnectionInternal> lease, PoolMetrics<?> poolMetrics, Object metric) {
+  public PooledRedisConnection(Lease<RedisConnectionInternal> lease, PoolMetrics<?, ?> poolMetrics, Object metric) {
     this.lease = lease;
     this.connection = lease.get();
     this.metrics = poolMetrics;
@@ -88,9 +88,8 @@ public class PooledRedisConnection implements RedisConnection {
   public Future<Void> close() {
     if (connection.reset()) {
       lease.recycle();
-
       if (metrics != null) {
-        metrics.end(metric, true);
+        metrics.end(metric);
       }
     }
 
