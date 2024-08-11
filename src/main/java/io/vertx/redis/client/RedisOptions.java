@@ -668,6 +668,25 @@ public class RedisOptions {
   }
 
   /**
+   * @return the metrics name identifying the reported metrics.
+   */
+  public String getMetricsName() {
+    return netClientOptions.getMetricsName();
+  }
+
+  /**
+   * Set the metrics name identifying the reported metrics, useful for grouping metrics
+   * with the same name.
+   *
+   * @param metricsName the metrics name
+   * @return a reference to this, so the API can be used fluently
+   */
+  public RedisOptions setMetricsName(String metricsName) {
+    netClientOptions.setMetricsName(metricsName);
+    return this;
+  }
+
+  /**
    * Returns the TTL of the hash slot cache. The TTL is expressed in milliseconds.
    * Defaults to 1000 millis (1 second).
    * <p>
