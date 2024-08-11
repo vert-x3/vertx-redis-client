@@ -32,6 +32,7 @@ public class RedisClientMetricsTest {
   Vertx vertx;
   ClientMetrics metrics;
   Redis client;
+  String reportedNamespace;
 
   @Before
   public void setup() {
@@ -39,11 +40,12 @@ public class RedisClientMetricsTest {
       .withMetrics(ignored -> new VertxMetrics() {
         @Override
         public ClientMetrics<?, ?, ?> createClientMetrics(SocketAddress remoteAddress, String type, String namespace) {
+          reportedNamespace = namespace;
           return metrics;
         }
       })
       .build();
-    client = Redis.createClient(vertx, new RedisOptions().setConnectionString(redis.getRedisUri()));
+    client = Redis.createClient(vertx, new RedisOptions().setConnectionString(redis.getRedisUri()).setMetricsName("the-namespace"));
   }
 
   @After
@@ -108,6 +110,7 @@ public class RedisClientMetricsTest {
           test.assertTrue(result.failed());
           test.assertEquals(Arrays.asList("requestBegin", "requestEnd", "fail"), actions);
         }
+        test.assertEquals("the-namespace", reportedNamespace);
         async.complete();
       });
     });
