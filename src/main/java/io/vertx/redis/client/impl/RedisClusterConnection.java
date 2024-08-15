@@ -36,7 +36,7 @@ public class RedisClusterConnection implements RedisConnection {
 
   // number of attempts/redirects when we get connection errors
   // or when we get MOVED/ASK responses
-  private static final int RETRIES = 16;
+  static final int RETRIES = 16;
 
   // reduce from list of responses to a single response
   private static final Map<Command, Function<List<Response>, Response>> REDUCERS = new HashMap<>();
@@ -51,10 +51,10 @@ public class RedisClusterConnection implements RedisConnection {
     MASTER_ONLY_COMMANDS.add(command);
   }
 
-  private final VertxInternal vertx;
+  final VertxInternal vertx;
   private final RedisConnectionManager connectionManager;
   private final RedisClusterConnectOptions connectOptions;
-  private final SharedSlots sharedSlots;
+  final SharedSlots sharedSlots;
   private final Map<String, PooledRedisConnection> connections;
 
   RedisClusterConnection(Vertx vertx, RedisConnectionManager connectionManager, RedisClusterConnectOptions connectOptions,
@@ -266,7 +266,7 @@ public class RedisClusterConnection implements RedisConnection {
     return map;
   }
 
-  private void send(String endpoint, int retries, Request command, Handler<AsyncResult<Response>> handler) {
+  void send(String endpoint, int retries, Request command, Handler<AsyncResult<Response>> handler) {
     PooledRedisConnection connection = connections.get(endpoint);
     if (connection == null) {
       connectionManager.getConnection(endpoint, RedisReplicas.NEVER != connectOptions.getUseReplicas() ? Request.cmd(Command.READONLY) : null)
@@ -608,7 +608,7 @@ public class RedisClusterConnection implements RedisConnection {
     return endpoints[0];
   }
 
-  private String buildCrossslotFailureMsg(RequestImpl req) {
+  String buildCrossslotFailureMsg(RequestImpl req) {
     return "Keys of command or batch: \"" + req.toString() + "\" targets not all in the same hash slot (CROSSSLOT) and client side resharding is not supported";
   }
 }

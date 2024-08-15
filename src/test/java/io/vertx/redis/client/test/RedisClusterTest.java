@@ -6,11 +6,11 @@ import io.vertx.core.Context;
 import io.vertx.core.Future;
 import io.vertx.core.Promise;
 import io.vertx.core.buffer.Buffer;
-import io.vertx.core.json.JsonObject;
 import io.vertx.ext.unit.Async;
 import io.vertx.ext.unit.TestContext;
 import io.vertx.ext.unit.junit.RunTestOnContext;
 import io.vertx.ext.unit.junit.VertxUnitRunner;
+import io.vertx.redis.client.Command;
 import io.vertx.redis.client.Redis;
 import io.vertx.redis.client.RedisClientType;
 import io.vertx.redis.client.RedisConnection;
@@ -18,7 +18,7 @@ import io.vertx.redis.client.RedisOptions;
 import io.vertx.redis.client.RedisReplicas;
 import io.vertx.redis.client.Request;
 import io.vertx.redis.client.Response;
-import io.vertx.redis.client.impl.ZModem;
+import io.vertx.redis.client.ResponseType;
 import io.vertx.redis.containers.RedisCluster;
 import org.junit.After;
 import org.junit.Before;
@@ -29,10 +29,10 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
-import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
 import java.util.Random;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -1148,50 +1148,30 @@ public class RedisClusterTest {
 
     Redis.createClient(rule.vertx(), options)
       .connect()
-      .onComplete(should.asyncAssertSuccess(cluster -> {
-        cluster
-          .send(cmd(CLUSTER).arg("SLOTS"))
-          .compose(reply -> {
-            if (reply == null || reply.size() == 0) {
-              // no slots available we can't really proceed
-              return Future.failedFuture("CLUSTER SLOTS No slots available in the cluster.");
-            }
+      .onComplete(should.asyncAssertSuccess(conn -> {
+        io.vertx.redis.client.RedisCluster cluster = io.vertx.redis.client.RedisCluster.create(conn);
 
-            Map<Integer, JsonObject> slotRangeMap = new HashMap<>();
-            for (int i = 0; i < reply.size(); i++) {
-              Response s = reply.get(i);
-              JsonObject slotRange = new JsonObject()
-                .put("start", s.get(0).toInteger())
-                .put("end", s.get(1).toInteger());
-              slotRangeMap.put(i, slotRange);
-            }
+        List<Request> commands = new ArrayList<>();
+        for (int i = 0; i < 100000; i++) {
+          String key = "key-" + i;
+          String value = "value-" + i;
+          commands.add(cmd(SET).arg(key).arg(value));
+        }
 
-            Map<Integer, List<Request>> mapCommands = new HashMap<>();
-            for (int i = 0; i < 100000; i++) {
-              String key = "key-" + i;
-              String value = "value-" + i;
-              int group;
-              int slot = ZModem.generate(key);
-              for (Map.Entry<Integer, JsonObject> entry : slotRangeMap.entrySet()) {
-                if (slot >= entry.getValue().getInteger("start") && slot <= entry.getValue().getInteger("end")) {
-                  mapCommands.computeIfAbsent(entry.getKey(), k -> new ArrayList<>()).add(cmd(SET).arg(key).arg(value));
-                  break;
-                }
-              }
-            }
-
+        cluster.groupByNodes(commands)
+          .onComplete(should.asyncAssertSuccess(groupedCommands -> {
             List<Future<List<Response>>> futures = new ArrayList<>();
-            for (Map.Entry<Integer, List<Request>> entry : mapCommands.entrySet()) {
-              futures.add(cluster.batch(entry.getValue()));
+            for (List<Request> commandGroup : groupedCommands) {
+              futures.add(conn.batch(commandGroup));
             }
-
-            return Future.all(futures)
+            Future.all(futures)
               .onComplete(should.asyncAssertSuccess(responses -> {
-                should.assertEquals(mapCommands.values().stream().map(List::size).reduce(0, Integer::sum), responses.result().list().stream().map(item -> ((List<Request>) item).size()).reduce(0, Integer::sum));
+                should.assertEquals(groupedCommands.stream().map(List::size).reduce(0, Integer::sum),
+                  responses.result().list().stream().map(item -> ((List<Request>) item).size()).reduce(0, Integer::sum));
                 test.complete();
               }));
-          }).onFailure(should::fail);
-      })).onFailure(should::fail);
+          }));
+      }));
   }
 
   @Test(timeout = 30_000)
@@ -1200,37 +1180,46 @@ public class RedisClusterTest {
 
     Redis.createClient(rule.vertx(), options)
       .connect()
-      .onComplete(should.asyncAssertSuccess(cluster -> {
-        cluster
-          .send(cmd(CLUSTER).arg("SLOTS"))
-          .compose(reply -> {
-            if (reply == null || reply.size() == 0) {
-              // no slots available we can't really proceed
-              return Future.failedFuture("CLUSTER SLOTS No slots available in the cluster.");
-            }
+      .onComplete(should.asyncAssertSuccess(conn -> {
+        io.vertx.redis.client.RedisCluster cluster = io.vertx.redis.client.RedisCluster.create(conn);
 
-            //take random slot
-            Response s = reply.get(0);
-            JsonObject slotRange = new JsonObject()
-              .put("start", s.get(0).toInteger())
-              .put("end", s.get(1).toInteger());
+        List<Request> commands = new ArrayList<>();
+        for (int i = 0; i < 100000; i++) {
+          String key = "key-" + i;
+          String value = "value-" + i;
+          commands.add(cmd(SET).arg(key).arg(value));
+        }
 
-            List<Request> rawCommands = new ArrayList<>();
-            for (int i = 0; i < 100000; i++) {
-              String key = "key-" + i;
-              String value = "value-" + i;
-              int endpoint;
-              int slot = ZModem.generate(key);
-              if (slot >= slotRange.getInteger("start") && slot <= slotRange.getInteger("end")) {
-                rawCommands.add(Request.cmd(SET).arg(key).arg(value));
-              }
-            }
-            return cluster.batch(rawCommands).onComplete(should.asyncAssertSuccess(responses -> {
-              should.assertEquals(rawCommands.size(), responses.size());
-              test.complete();
-            }));
-          }).onFailure(should::fail);
-      })).onFailure(should::fail);
+        cluster.groupByNodes(commands)
+          .onComplete(should.asyncAssertSuccess(groupedCommands -> {
+            List<Request> commandGroup = groupedCommands.get(0);
+
+            conn.batch(commandGroup)
+              .onComplete(should.asyncAssertSuccess(responses -> {
+                should.assertEquals(commandGroup.size(), responses.size());
+                test.complete();
+              }));
+          }));
+      }));
+  }
+
+  @Test(timeout = 30_000)
+  public void groupByNodesCrossSlotFailure(TestContext test) {
+    Async async = test.async();
+
+    Redis.createClient(rule.vertx(), options)
+      .connect()
+      .onComplete(test.asyncAssertSuccess(conn -> {
+        io.vertx.redis.client.RedisCluster cluster = io.vertx.redis.client.RedisCluster.create(conn);
+
+        List<Request> commands = Collections.singletonList(cmd(DEL).arg("key1").arg("key2").arg("key3"));
+
+        cluster.groupByNodes(commands)
+          .onComplete(test.asyncAssertFailure(err -> {
+            test.assertTrue(err.getMessage().contains("CROSSSLOT"));
+            async.complete();
+          }));
+      }));
   }
 
   @Test(timeout = 30_000)
@@ -1322,6 +1311,42 @@ public class RedisClusterTest {
             should.assertEquals("foobar", result.toString());
             test.complete();
           }));
+      }));
+  }
+
+  @Test
+  public void testRedisClusterOnAllNodes(TestContext test) {
+    Async async = test.async();
+
+    client.connect()
+      .compose(conn -> {
+        io.vertx.redis.client.RedisCluster cluster = io.vertx.redis.client.RedisCluster.create(conn);
+        return cluster.onAllMasterNodes(cmd(FLUSHDB))
+          .compose(result -> {
+            for (Response response : result) {
+              test.assertEquals(ResponseType.SIMPLE, response.type());
+            }
+
+            return conn.send(cmd(SET).arg("key1").arg("value1"));
+          }).compose(ignored -> {
+            return conn.send(cmd(SET).arg("key2").arg("value2"));
+          }).compose(ignored -> {
+            return conn.send(cmd(SET).arg("key3").arg("value3"));
+          }).compose(ignored -> {
+            return cluster.onAllMasterNodes(cmd(KEYS).arg("*"));
+          }).compose(responses -> {
+            Set<String> keys = new HashSet<>();
+            for (Response response : responses) {
+              for (Response item : response) {
+                keys.add(item.toString());
+              }
+            }
+            test.assertEquals(new HashSet<>(Arrays.asList("key1", "key2", "key3")), keys);
+            return Future.succeededFuture();
+          });
+      })
+      .onComplete(test.asyncAssertSuccess(ignored -> {
+        async.complete();
       }));
   }
 }
