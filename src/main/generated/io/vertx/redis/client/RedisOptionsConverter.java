@@ -83,6 +83,11 @@ public class RedisOptionsConverter {
             obj.setMaxWaitingHandlers(((Number)member.getValue()).intValue());
           }
           break;
+        case "metricsName":
+          if (member.getValue() instanceof String) {
+            obj.setMetricsName((String)member.getValue());
+          }
+          break;
         case "netClientOptions":
           if (member.getValue() instanceof JsonObject) {
             obj.setNetClientOptions(new io.vertx.core.net.NetClientOptions((io.vertx.core.json.JsonObject)member.getValue()));
@@ -169,6 +174,9 @@ public class RedisOptionsConverter {
     json.put("maxPoolSize", obj.getMaxPoolSize());
     json.put("maxPoolWaiting", obj.getMaxPoolWaiting());
     json.put("maxWaitingHandlers", obj.getMaxWaitingHandlers());
+    if (obj.getMetricsName() != null) {
+      json.put("metricsName", obj.getMetricsName());
+    }
     if (obj.getNetClientOptions() != null) {
       json.put("netClientOptions", obj.getNetClientOptions().toJson());
     }

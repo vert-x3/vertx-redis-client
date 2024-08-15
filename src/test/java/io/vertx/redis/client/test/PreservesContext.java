@@ -16,7 +16,7 @@ class PreservesContext {
   static void sendWithoutConnect(Redis client, TestContext test) {
     Async async = test.async();
 
-    Context context = ContextInternal.current().duplicate();
+    Context context = ContextInternal.current(Thread.currentThread()).duplicate();
     context.runOnContext(ignored -> {
       client.send(Request.cmd(Command.PING)).onComplete(result -> {
         test.assertTrue(result.succeeded());
@@ -29,7 +29,7 @@ class PreservesContext {
   static void batchWithoutConnect(Redis client, TestContext test) {
     Async async = test.async();
 
-    Context context = ContextInternal.current().duplicate();
+    Context context = ContextInternal.current(Thread.currentThread()).duplicate();
     context.runOnContext(ignored -> {
       client.batch(Collections.singletonList(Request.cmd(Command.PING))).onComplete(result -> {
         test.assertTrue(result.succeeded());
@@ -42,7 +42,7 @@ class PreservesContext {
   static void connect(Redis client, TestContext test) {
     Async async = test.async();
 
-    Context context = ContextInternal.current().duplicate();
+    Context context = ContextInternal.current(Thread.currentThread()).duplicate();
     context.runOnContext(ignored -> {
       client.connect().onComplete(connectResult -> {
         test.assertTrue(connectResult.succeeded());
@@ -55,7 +55,7 @@ class PreservesContext {
   static void connectThenSend(Redis client, TestContext test) {
     Async async = test.async();
 
-    Context context = ContextInternal.current().duplicate();
+    Context context = ContextInternal.current(Thread.currentThread()).duplicate();
     context.runOnContext(ignored -> {
       client.connect().onComplete(connectResult -> {
         test.assertTrue(connectResult.succeeded());
@@ -73,7 +73,7 @@ class PreservesContext {
   static void connectThenBatch(Redis client, TestContext test) {
     Async async = test.async();
 
-    Context context = ContextInternal.current().duplicate();
+    Context context = ContextInternal.current(Thread.currentThread()).duplicate();
     context.runOnContext(ignored -> {
       client.connect().onComplete(connectResult -> {
         test.assertTrue(connectResult.succeeded());
