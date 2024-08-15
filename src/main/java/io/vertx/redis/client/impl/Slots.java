@@ -132,6 +132,10 @@ class Slots {
     return endpoints;
   }
 
+  String[] masterEndpoints() {
+    return masterEndpoints;
+  }
+
   long timestamp() {
     return ts;
   }
