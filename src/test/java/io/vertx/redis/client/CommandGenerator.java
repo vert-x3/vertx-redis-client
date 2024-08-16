@@ -3,7 +3,11 @@ package io.vertx.redis.client;
 import io.vertx.core.AbstractVerticle;
 import io.vertx.core.Vertx;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 import static io.vertx.redis.client.Command.COMMAND;
 import static io.vertx.redis.client.Request.cmd;
@@ -18,15 +22,46 @@ public class CommandGenerator extends AbstractVerticle {
   public void start() {
     Redis client = Redis.createClient(vertx);
 
-    client.send(cmd(COMMAND))
-      .onFailure(err -> {
-        err.printStackTrace();
-        System.exit(1);
-      })
-      .onSuccess(res -> {
+    Map<String, String> commandDocs = new HashMap<>();
 
+    client.send(cmd(COMMAND).arg("DOCS"))
+      .compose(resp -> {
+        for (String key : resp.getKeys()) {
+          Response doc = resp.get(key);
+
+          String summary = doc.containsKey("summary") ? doc.get("summary").toString() : null;
+          if (summary != null) {
+            summary = summary.trim();
+            if (!summary.endsWith(".")) {
+              summary += ".";
+            }
+          }
+
+          boolean deprecated = false;
+          if (doc.containsKey("doc_flags")) {
+            for (Response flag : doc.get("doc_flags")) {
+              if (flag.toString().equals("deprecated")) {
+                deprecated = true;
+                break;
+              }
+            }
+          }
+          String deprecatedSince = null;
+          String replacedBy = null;
+          if (deprecated) {
+            deprecatedSince = doc.containsKey("deprecated_since") ? doc.get("deprecated_since").toString() : "unknown";
+            replacedBy = doc.containsKey("replaced_by") ? doc.get("replaced_by").toString() : "unknown";
+            replacedBy = replacedBy.replaceAll("`(.*?)`", "{@code $1}");
+          }
+
+          commandDocs.put(key, generateCommandDocs(summary, deprecatedSince, replacedBy));
+        }
+
+        return client.send(cmd(COMMAND).arg("INFO"));
+      }).onSuccess(res -> {
         List<String> commands = new ArrayList<>();
-        List<String> commandsMap = new ArrayList<>();
+        Map<String, String> commandInstantiation = new HashMap<>();
+        Map<String, String> knownCommands = new HashMap<>();
 
         res.forEach(cmd -> {
           String commandName = cmd.get(0).toString();
@@ -124,7 +159,9 @@ public class CommandGenerator extends AbstractVerticle {
             }
           }
 
-          commands.add(
+          commands.add(commandName);
+
+          commandInstantiation.put(commandName,
             generateCommand(
               commandName,
               cmd.get(1).toInteger(),
@@ -134,25 +171,47 @@ public class CommandGenerator extends AbstractVerticle {
               keyLocator
             ));
 
-          commandsMap.add(generateCommandMap(commandName));
+          knownCommands.put(commandName, generateCommandMap(commandName));
         });
 
-        commands.sort(Comparator.naturalOrder());
+        commands.sort(Comparator.comparing(this::toIdentifier));
         for (String cmd : commands) {
-          System.out.println(cmd);
+          System.out.print(commandDocs.get(cmd));
+          System.out.println(commandInstantiation.get(cmd));
         }
 
         System.out.println();
         System.out.println("----------------------------------------------------------------");
         System.out.println();
 
-        commandsMap.sort(Comparator.naturalOrder());
-        for (String cmd : commandsMap) {
-          System.out.println(cmd);
+        for (String cmd : commands) {
+          System.out.println(knownCommands.get(cmd));
         }
 
         vertx.close();
+      })
+      .onFailure(err -> {
+        err.printStackTrace();
+        System.exit(1);
       });
+  }
+
+  private String generateCommandDocs(String summary, String deprecatedSince, String replacedBy) {
+    if (summary == null) {
+      return "";
+    }
+
+    StringBuilder result = new StringBuilder()
+      .append("/**\n")
+      .append(" * ").append(summary).append("\n");
+    if (deprecatedSince != null) {
+      result.append(" * @deprecated since: ").append(deprecatedSince).append(", replaced by: ").append(replacedBy).append("\n");
+    }
+    result.append(" */\n");
+    if (deprecatedSince != null) {
+      result.append("@Deprecated\n");
+    }
+    return result.toString();
   }
 
   private String generateCommand(String name, int arity, Boolean ro, boolean pubSub, boolean getKeys, String keyLocator) {
