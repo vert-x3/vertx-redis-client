@@ -28,7 +28,6 @@ public final class RequestImpl implements Request {
 
   private static final byte[] EMPTY_BULK = "$0\r\n\r\n".getBytes(StandardCharsets.ISO_8859_1);
   private static final byte[] EMPTY_BYTES = new byte[0];
-  private static final byte[] NULL_BULK = "$4\r\nnull\r\n".getBytes(StandardCharsets.ISO_8859_1);
   private static final byte[] EOL = "\r\n".getBytes(StandardCharsets.ISO_8859_1);
   private static final byte[] TRUE = new byte[]{'t'};
   private static final byte[] FALSE = new byte[]{'f'};
@@ -48,39 +47,31 @@ public final class RequestImpl implements Request {
 
   public RequestImpl(Command cmd, Object[] args) {
     this.cmd = (CommandImpl) cmd;
-    if (args != null) {
-      final int len = args.length;
-      if (len > 0) {
-        for (int i = 0; i < args.length; i++) {
-          final Object o = args[i];
-          if (o != null) {
-            if (o instanceof Number) {
-              args[i] = o.toString().getBytes(StandardCharsets.US_ASCII);
-              continue;
-            }
-            if (o instanceof Boolean) {
-              args[i] = ((Boolean) o) ? TRUE : FALSE;
-              continue;
-            }
-            if (o instanceof String) {
-              args[i] = ((String) o).getBytes(StandardCharsets.UTF_8);
-              continue;
-            }
-            if (o instanceof byte[]) {
-              continue;
-            }
-            if (o instanceof Buffer) {
-              args[i] = ((Buffer) o).getBytes();
-              continue;
-            }
-            throw new IllegalArgumentException("Unsupported argument type: " + o.getClass());
-          }
-        }
-        this.args = (List) Arrays.asList(args);
-        return;
+
+    if (args == null) {
+      this.args = Collections.emptyList();
+      return;
+    }
+
+    for (int i = 0; i < args.length; i++) {
+      final Object o = args[i];
+      if (o == null) {
+        throw new IllegalArgumentException("Null argument at index " + i);
+      } else if (o instanceof Number) {
+        args[i] = o.toString().getBytes(StandardCharsets.US_ASCII);
+      } else if (o instanceof Boolean) {
+        args[i] = ((Boolean) o) ? TRUE : FALSE;
+      } else if (o instanceof String) {
+        args[i] = ((String) o).getBytes(StandardCharsets.UTF_8);
+      } else if (o instanceof byte[]) {
+        // already OK
+      } else if (o instanceof Buffer) {
+        args[i] = ((Buffer) o).getBytes();
+      } else {
+        throw new IllegalArgumentException("Unsupported argument type at index " + i + ": " + o.getClass());
       }
     }
-    this.args = Collections.emptyList();
+    this.args = (List) Arrays.asList(args);
   }
 
   @Override
@@ -146,11 +137,6 @@ public final class RequestImpl implements Request {
       .appendBytes(cmd.getBytes());
 
     for (final byte[] arg : args) {
-      if (arg == null) {
-        buffer.appendBytes(NULL_BULK);
-        continue;
-      }
-
       if (arg.length == 0) {
         buffer.appendBytes(EMPTY_BULK);
         continue;

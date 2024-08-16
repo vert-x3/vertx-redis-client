@@ -28,8 +28,8 @@ import java.nio.charset.StandardCharsets;
 import java.util.Map;
 
 /**
- * Builder for REDIS requests that will be encoded according to the RESP protocol was introduced in Redis 1.2.
- * Which became the standard way for talking with the Redis server in Redis 2.0.
+ * Builder for Redis requests that will be encoded according to the RESP protocol.
+ * RESP was introduced in Redis 1.2 and became the standard way for talking with the Redis server in Redis 2.0.
  * <p>
  * Redis <a href="https://redis.io/topics/protocol">protocol documentation</a> states:
  *
@@ -45,7 +45,7 @@ import java.util.Map;
 public interface Request {
 
   /**
-   * Creates a new request command. Requests can be reused to avoid GC.
+   * Creates a new request. Requests can be reused to avoid GC.
    *
    * @param command the command to use
    * @return a new request instance
@@ -55,9 +55,10 @@ public interface Request {
   }
 
   /**
-   * Creates a new request command only with simple types: {@link Number}, {@link Boolean}, {@link String},
-   * {@code byte[]} or {@link Buffer}. This factory reduces the GC as it allocates the arguments array with
-   * the right size.
+   * Creates a new request only with simple types of arguments: {@link Number}, {@link Boolean},
+   * {@link String}, {@code byte[]} or {@link Buffer}. Other kinds of arguments throw an exception.
+   * <p>
+   * This factory reduces the GC pressure as it allocates the arguments array with the right size.
    *
    * @param command the command to use
    * @param args    the fixed list of arguments
