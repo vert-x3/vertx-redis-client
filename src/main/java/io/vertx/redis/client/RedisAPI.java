@@ -365,6 +365,8 @@ public interface RedisAPI {
   }
 
   /**
+   * A container for Access List Control commands.
+   * <p>
    * Redis command <a href="https://redis.io/commands/acl/">ACL</a>.
    * @return Future response.
    */
@@ -373,6 +375,8 @@ public interface RedisAPI {
   }
 
   /**
+   * Append a value to a key.
+   * <p>
    * Redis command <a href="https://redis.io/commands/append/">APPEND</a>.
    * @return Future response.
    */
@@ -381,6 +385,8 @@ public interface RedisAPI {
   }
 
   /**
+   * Sent by cluster clients after an -ASK redirect.
+   * <p>
    * Redis command <a href="https://redis.io/commands/asking/">ASKING</a>.
    * @return Future response.
    */
@@ -389,6 +395,8 @@ public interface RedisAPI {
   }
 
   /**
+   * Authenticate to the server.
+   * <p>
    * Redis command <a href="https://redis.io/commands/auth/">AUTH</a>.
    * @return Future response.
    */
@@ -485,6 +493,8 @@ public interface RedisAPI {
   }
 
   /**
+   * Asynchronously rewrite the append-only file.
+   * <p>
    * Redis command <a href="https://redis.io/commands/bgrewriteaof/">BGREWRITEAOF</a>.
    * @return Future response.
    */
@@ -493,6 +503,8 @@ public interface RedisAPI {
   }
 
   /**
+   * Asynchronously save the dataset to disk.
+   * <p>
    * Redis command <a href="https://redis.io/commands/bgsave/">BGSAVE</a>.
    * @return Future response.
    */
@@ -501,6 +513,8 @@ public interface RedisAPI {
   }
 
   /**
+   * Count set bits in a string.
+   * <p>
    * Redis command <a href="https://redis.io/commands/bitcount/">BITCOUNT</a>.
    * @return Future response.
    */
@@ -509,6 +523,8 @@ public interface RedisAPI {
   }
 
   /**
+   * Perform arbitrary bitfield integer operations on strings.
+   * <p>
    * Redis command <a href="https://redis.io/commands/bitfield/">BITFIELD</a>.
    * @return Future response.
    */
@@ -517,6 +533,8 @@ public interface RedisAPI {
   }
 
   /**
+   * Perform arbitrary bitfield integer operations on strings. Read-only variant of BITFIELD.
+   * <p>
    * Redis command <a href="https://redis.io/commands/bitfield_ro/">BITFIELD_RO</a>.
    * @return Future response.
    */
@@ -525,6 +543,8 @@ public interface RedisAPI {
   }
 
   /**
+   * Perform bitwise operations between strings.
+   * <p>
    * Redis command <a href="https://redis.io/commands/bitop/">BITOP</a>.
    * @return Future response.
    */
@@ -533,6 +553,8 @@ public interface RedisAPI {
   }
 
   /**
+   * Find first bit set or clear in a string.
+   * <p>
    * Redis command <a href="https://redis.io/commands/bitpos/">BITPOS</a>.
    * @return Future response.
    */
@@ -541,6 +563,8 @@ public interface RedisAPI {
   }
 
   /**
+   * Pop an element from a list, push it to another list and return it; or block until one is available.
+   * <p>
    * Redis command <a href="https://redis.io/commands/blmove/">BLMOVE</a>.
    * @return Future response.
    */
@@ -549,6 +573,8 @@ public interface RedisAPI {
   }
 
   /**
+   * Pop elements from a list, or block until one is available.
+   * <p>
    * Redis command <a href="https://redis.io/commands/blmpop/">BLMPOP</a>.
    * @return Future response.
    */
@@ -557,6 +583,8 @@ public interface RedisAPI {
   }
 
   /**
+   * Remove and get the first element in a list, or block until one is available.
+   * <p>
    * Redis command <a href="https://redis.io/commands/blpop/">BLPOP</a>.
    * @return Future response.
    */
@@ -565,6 +593,8 @@ public interface RedisAPI {
   }
 
   /**
+   * Remove and get the last element in a list, or block until one is available.
+   * <p>
    * Redis command <a href="https://redis.io/commands/brpop/">BRPOP</a>.
    * @return Future response.
    */
@@ -573,14 +603,20 @@ public interface RedisAPI {
   }
 
   /**
+   * Pop an element from a list, push it to another list and return it; or block until one is available.
+   * <p>
    * Redis command <a href="https://redis.io/commands/brpoplpush/">BRPOPLPUSH</a>.
    * @return Future response.
+   * @deprecated since: 6.2.0, replaced by: {@code BLMOVE} with the {@code RIGHT} and {@code LEFT} arguments
    */
+  @Deprecated
   default Future<@Nullable Response> brpoplpush(String arg0, String arg1, String arg2) {
     return send(Command.BRPOPLPUSH, arg0, arg1, arg2);
   }
 
   /**
+   * Remove and return members with scores in a sorted set or block until one is available.
+   * <p>
    * Redis command <a href="https://redis.io/commands/bzmpop/">BZMPOP</a>.
    * @return Future response.
    */
@@ -589,6 +625,8 @@ public interface RedisAPI {
   }
 
   /**
+   * Remove and return the member with the highest score from one or more sorted sets, or block until one is available.
+   * <p>
    * Redis command <a href="https://redis.io/commands/bzpopmax/">BZPOPMAX</a>.
    * @return Future response.
    */
@@ -597,6 +635,8 @@ public interface RedisAPI {
   }
 
   /**
+   * Remove and return the member with the lowest score from one or more sorted sets, or block until one is available.
+   * <p>
    * Redis command <a href="https://redis.io/commands/bzpopmin/">BZPOPMIN</a>.
    * @return Future response.
    */
@@ -717,6 +757,8 @@ public interface RedisAPI {
   }
 
   /**
+   * A container for client connection commands.
+   * <p>
    * Redis command <a href="https://redis.io/commands/client/">CLIENT</a>.
    * @return Future response.
    */
@@ -725,6 +767,8 @@ public interface RedisAPI {
   }
 
   /**
+   * A container for cluster commands.
+   * <p>
    * Redis command <a href="https://redis.io/commands/cluster/">CLUSTER</a>.
    * @return Future response.
    */
@@ -781,6 +825,8 @@ public interface RedisAPI {
   }
 
   /**
+   * Get array of Redis command details.
+   * <p>
    * Redis command <a href="https://redis.io/commands/command/">COMMAND</a>.
    * @return Future response.
    */
@@ -789,6 +835,8 @@ public interface RedisAPI {
   }
 
   /**
+   * A container for server configuration commands.
+   * <p>
    * Redis command <a href="https://redis.io/commands/config/">CONFIG</a>.
    * @return Future response.
    */
@@ -797,6 +845,8 @@ public interface RedisAPI {
   }
 
   /**
+   * Copy a key.
+   * <p>
    * Redis command <a href="https://redis.io/commands/copy/">COPY</a>.
    * @return Future response.
    */
@@ -805,6 +855,8 @@ public interface RedisAPI {
   }
 
   /**
+   * Return the number of keys in the selected database.
+   * <p>
    * Redis command <a href="https://redis.io/commands/dbsize/">DBSIZE</a>.
    * @return Future response.
    */
@@ -813,6 +865,8 @@ public interface RedisAPI {
   }
 
   /**
+   * A container for debugging commands.
+   * <p>
    * Redis command <a href="https://redis.io/commands/debug/">DEBUG</a>.
    * @return Future response.
    */
@@ -821,6 +875,8 @@ public interface RedisAPI {
   }
 
   /**
+   * Decrement the integer value of a key by one.
+   * <p>
    * Redis command <a href="https://redis.io/commands/decr/">DECR</a>.
    * @return Future response.
    */
@@ -829,6 +885,8 @@ public interface RedisAPI {
   }
 
   /**
+   * Decrement the integer value of a key by the given number.
+   * <p>
    * Redis command <a href="https://redis.io/commands/decrby/">DECRBY</a>.
    * @return Future response.
    */
@@ -837,6 +895,8 @@ public interface RedisAPI {
   }
 
   /**
+   * Delete a key.
+   * <p>
    * Redis command <a href="https://redis.io/commands/del/">DEL</a>.
    * @return Future response.
    */
@@ -845,6 +905,8 @@ public interface RedisAPI {
   }
 
   /**
+   * Discard all commands issued after MULTI.
+   * <p>
    * Redis command <a href="https://redis.io/commands/discard/">DISCARD</a>.
    * @return Future response.
    */
@@ -853,6 +915,8 @@ public interface RedisAPI {
   }
 
   /**
+   * Return a serialized version of the value stored at the specified key.
+   * <p>
    * Redis command <a href="https://redis.io/commands/dump/">DUMP</a>.
    * @return Future response.
    */
@@ -861,6 +925,8 @@ public interface RedisAPI {
   }
 
   /**
+   * Echo the given string.
+   * <p>
    * Redis command <a href="https://redis.io/commands/echo/">ECHO</a>.
    * @return Future response.
    */
@@ -869,6 +935,8 @@ public interface RedisAPI {
   }
 
   /**
+   * Execute a Lua script server side.
+   * <p>
    * Redis command <a href="https://redis.io/commands/eval/">EVAL</a>.
    * @return Future response.
    */
@@ -877,6 +945,8 @@ public interface RedisAPI {
   }
 
   /**
+   * Execute a read-only Lua script server side.
+   * <p>
    * Redis command <a href="https://redis.io/commands/eval_ro/">EVAL_RO</a>.
    * @return Future response.
    */
@@ -885,6 +955,8 @@ public interface RedisAPI {
   }
 
   /**
+   * Execute a Lua script server side.
+   * <p>
    * Redis command <a href="https://redis.io/commands/evalsha/">EVALSHA</a>.
    * @return Future response.
    */
@@ -893,6 +965,8 @@ public interface RedisAPI {
   }
 
   /**
+   * Execute a read-only Lua script server side.
+   * <p>
    * Redis command <a href="https://redis.io/commands/evalsha_ro/">EVALSHA_RO</a>.
    * @return Future response.
    */
@@ -901,6 +975,8 @@ public interface RedisAPI {
   }
 
   /**
+   * Execute all commands issued after MULTI.
+   * <p>
    * Redis command <a href="https://redis.io/commands/exec/">EXEC</a>.
    * @return Future response.
    */
@@ -909,6 +985,8 @@ public interface RedisAPI {
   }
 
   /**
+   * Determine if a key exists.
+   * <p>
    * Redis command <a href="https://redis.io/commands/exists/">EXISTS</a>.
    * @return Future response.
    */
@@ -917,6 +995,8 @@ public interface RedisAPI {
   }
 
   /**
+   * Set a key&#x27;s time to live in seconds.
+   * <p>
    * Redis command <a href="https://redis.io/commands/expire/">EXPIRE</a>.
    * @return Future response.
    */
@@ -925,6 +1005,8 @@ public interface RedisAPI {
   }
 
   /**
+   * Set the expiration for a key as a UNIX timestamp.
+   * <p>
    * Redis command <a href="https://redis.io/commands/expireat/">EXPIREAT</a>.
    * @return Future response.
    */
@@ -933,6 +1015,8 @@ public interface RedisAPI {
   }
 
   /**
+   * Get the expiration Unix timestamp for a key.
+   * <p>
    * Redis command <a href="https://redis.io/commands/expiretime/">EXPIRETIME</a>.
    * @return Future response.
    */
@@ -941,6 +1025,8 @@ public interface RedisAPI {
   }
 
   /**
+   * Start a coordinated failover between this server and one of its replicas.
+   * <p>
    * Redis command <a href="https://redis.io/commands/failover/">FAILOVER</a>.
    * @return Future response.
    */
@@ -949,6 +1035,8 @@ public interface RedisAPI {
   }
 
   /**
+   * Invoke a function.
+   * <p>
    * Redis command <a href="https://redis.io/commands/fcall/">FCALL</a>.
    * @return Future response.
    */
@@ -957,6 +1045,8 @@ public interface RedisAPI {
   }
 
   /**
+   * Invoke a read-only function.
+   * <p>
    * Redis command <a href="https://redis.io/commands/fcall_ro/">FCALL_RO</a>.
    * @return Future response.
    */
@@ -965,6 +1055,8 @@ public interface RedisAPI {
   }
 
   /**
+   * Remove all keys from all databases.
+   * <p>
    * Redis command <a href="https://redis.io/commands/flushall/">FLUSHALL</a>.
    * @return Future response.
    */
@@ -973,6 +1065,8 @@ public interface RedisAPI {
   }
 
   /**
+   * Remove all keys from the current database.
+   * <p>
    * Redis command <a href="https://redis.io/commands/flushdb/">FLUSHDB</a>.
    * @return Future response.
    */
@@ -981,6 +1075,8 @@ public interface RedisAPI {
   }
 
   /**
+   * A container for function commands.
+   * <p>
    * Redis command <a href="https://redis.io/commands/function/">FUNCTION</a>.
    * @return Future response.
    */
@@ -989,6 +1085,8 @@ public interface RedisAPI {
   }
 
   /**
+   * Add one or more geospatial items in the geospatial index represented using a sorted set.
+   * <p>
    * Redis command <a href="https://redis.io/commands/geoadd/">GEOADD</a>.
    * @return Future response.
    */
@@ -997,6 +1095,8 @@ public interface RedisAPI {
   }
 
   /**
+   * Returns the distance between two members of a geospatial index.
+   * <p>
    * Redis command <a href="https://redis.io/commands/geodist/">GEODIST</a>.
    * @return Future response.
    */
@@ -1005,6 +1105,8 @@ public interface RedisAPI {
   }
 
   /**
+   * Returns members of a geospatial index as standard geohash strings.
+   * <p>
    * Redis command <a href="https://redis.io/commands/geohash/">GEOHASH</a>.
    * @return Future response.
    */
@@ -1013,6 +1115,8 @@ public interface RedisAPI {
   }
 
   /**
+   * Returns longitude and latitude of members of a geospatial index.
+   * <p>
    * Redis command <a href="https://redis.io/commands/geopos/">GEOPOS</a>.
    * @return Future response.
    */
@@ -1021,38 +1125,56 @@ public interface RedisAPI {
   }
 
   /**
+   * Query a sorted set representing a geospatial index to fetch members matching a given maximum distance from a point.
+   * <p>
    * Redis command <a href="https://redis.io/commands/georadius/">GEORADIUS</a>.
    * @return Future response.
+   * @deprecated since: 6.2.0, replaced by: {@code GEOSEARCH} and {@code GEOSEARCHSTORE} with the {@code BYRADIUS} argument
    */
+  @Deprecated
   default Future<@Nullable Response> georadius(List<String> args) {
     return send(Command.GEORADIUS, args.toArray(new String[0]));
   }
 
   /**
+   * A read-only variant for GEORADIUS.
+   * <p>
    * Redis command <a href="https://redis.io/commands/georadius_ro/">GEORADIUS_RO</a>.
    * @return Future response.
+   * @deprecated since: 6.2.0, replaced by: {@code GEOSEARCH} with the {@code BYRADIUS} argument
    */
+  @Deprecated
   default Future<@Nullable Response> georadiusRo(List<String> args) {
     return send(Command.GEORADIUS_RO, args.toArray(new String[0]));
   }
 
   /**
+   * Query a sorted set representing a geospatial index to fetch members matching a given maximum distance from a member.
+   * <p>
    * Redis command <a href="https://redis.io/commands/georadiusbymember/">GEORADIUSBYMEMBER</a>.
    * @return Future response.
+   * @deprecated since: 6.2.0, replaced by: {@code GEOSEARCH} and {@code GEOSEARCHSTORE} with the {@code BYRADIUS} and {@code FROMMEMBER} arguments
    */
+  @Deprecated
   default Future<@Nullable Response> georadiusbymember(List<String> args) {
     return send(Command.GEORADIUSBYMEMBER, args.toArray(new String[0]));
   }
 
   /**
+   * A read-only variant for GEORADIUSBYMEMBER.
+   * <p>
    * Redis command <a href="https://redis.io/commands/georadiusbymember_ro/">GEORADIUSBYMEMBER_RO</a>.
    * @return Future response.
+   * @deprecated since: 6.2.0, replaced by: {@code GEOSEARCH} with the {@code BYRADIUS} and {@code FROMMEMBER} arguments
    */
+  @Deprecated
   default Future<@Nullable Response> georadiusbymemberRo(List<String> args) {
     return send(Command.GEORADIUSBYMEMBER_RO, args.toArray(new String[0]));
   }
 
   /**
+   * Query a sorted set representing a geospatial index to fetch members inside an area of a box or a circle.
+   * <p>
    * Redis command <a href="https://redis.io/commands/geosearch/">GEOSEARCH</a>.
    * @return Future response.
    */
@@ -1061,6 +1183,8 @@ public interface RedisAPI {
   }
 
   /**
+   * Query a sorted set representing a geospatial index to fetch members inside an area of a box or a circle, and store the result in another key.
+   * <p>
    * Redis command <a href="https://redis.io/commands/geosearchstore/">GEOSEARCHSTORE</a>.
    * @return Future response.
    */
@@ -1069,6 +1193,8 @@ public interface RedisAPI {
   }
 
   /**
+   * Get the value of a key.
+   * <p>
    * Redis command <a href="https://redis.io/commands/get/">GET</a>.
    * @return Future response.
    */
@@ -1077,6 +1203,8 @@ public interface RedisAPI {
   }
 
   /**
+   * Returns the bit value at offset in the string value stored at key.
+   * <p>
    * Redis command <a href="https://redis.io/commands/getbit/">GETBIT</a>.
    * @return Future response.
    */
@@ -1085,6 +1213,8 @@ public interface RedisAPI {
   }
 
   /**
+   * Get the value of a key and delete the key.
+   * <p>
    * Redis command <a href="https://redis.io/commands/getdel/">GETDEL</a>.
    * @return Future response.
    */
@@ -1093,6 +1223,8 @@ public interface RedisAPI {
   }
 
   /**
+   * Get the value of a key and optionally set its expiration.
+   * <p>
    * Redis command <a href="https://redis.io/commands/getex/">GETEX</a>.
    * @return Future response.
    */
@@ -1101,6 +1233,8 @@ public interface RedisAPI {
   }
 
   /**
+   * Get a substring of the string stored at a key.
+   * <p>
    * Redis command <a href="https://redis.io/commands/getrange/">GETRANGE</a>.
    * @return Future response.
    */
@@ -1109,9 +1243,13 @@ public interface RedisAPI {
   }
 
   /**
+   * Set the string value of a key and return its old value.
+   * <p>
    * Redis command <a href="https://redis.io/commands/getset/">GETSET</a>.
    * @return Future response.
+   * @deprecated since: 6.2.0, replaced by: {@code SET} with the {@code !GET} argument
    */
+  @Deprecated
   default Future<@Nullable Response> getset(String arg0, String arg1) {
     return send(Command.GETSET, arg0, arg1);
   }
@@ -1197,6 +1335,8 @@ public interface RedisAPI {
   }
 
   /**
+   * Delete one or more hash fields.
+   * <p>
    * Redis command <a href="https://redis.io/commands/hdel/">HDEL</a>.
    * @return Future response.
    */
@@ -1205,6 +1345,8 @@ public interface RedisAPI {
   }
 
   /**
+   * Handshake with Redis.
+   * <p>
    * Redis command <a href="https://redis.io/commands/hello/">HELLO</a>.
    * @return Future response.
    */
@@ -1213,6 +1355,8 @@ public interface RedisAPI {
   }
 
   /**
+   * Determine if a hash field exists.
+   * <p>
    * Redis command <a href="https://redis.io/commands/hexists/">HEXISTS</a>.
    * @return Future response.
    */
@@ -1221,6 +1365,8 @@ public interface RedisAPI {
   }
 
   /**
+   * Get the value of a hash field.
+   * <p>
    * Redis command <a href="https://redis.io/commands/hget/">HGET</a>.
    * @return Future response.
    */
@@ -1229,6 +1375,8 @@ public interface RedisAPI {
   }
 
   /**
+   * Get all the fields and values in a hash.
+   * <p>
    * Redis command <a href="https://redis.io/commands/hgetall/">HGETALL</a>.
    * @return Future response.
    */
@@ -1237,6 +1385,8 @@ public interface RedisAPI {
   }
 
   /**
+   * Increment the integer value of a hash field by the given number.
+   * <p>
    * Redis command <a href="https://redis.io/commands/hincrby/">HINCRBY</a>.
    * @return Future response.
    */
@@ -1245,6 +1395,8 @@ public interface RedisAPI {
   }
 
   /**
+   * Increment the float value of a hash field by the given amount.
+   * <p>
    * Redis command <a href="https://redis.io/commands/hincrbyfloat/">HINCRBYFLOAT</a>.
    * @return Future response.
    */
@@ -1253,6 +1405,8 @@ public interface RedisAPI {
   }
 
   /**
+   * Get all the fields in a hash.
+   * <p>
    * Redis command <a href="https://redis.io/commands/hkeys/">HKEYS</a>.
    * @return Future response.
    */
@@ -1261,6 +1415,8 @@ public interface RedisAPI {
   }
 
   /**
+   * Get the number of fields in a hash.
+   * <p>
    * Redis command <a href="https://redis.io/commands/hlen/">HLEN</a>.
    * @return Future response.
    */
@@ -1269,6 +1425,8 @@ public interface RedisAPI {
   }
 
   /**
+   * Get the values of all the given hash fields.
+   * <p>
    * Redis command <a href="https://redis.io/commands/hmget/">HMGET</a>.
    * @return Future response.
    */
@@ -1277,14 +1435,20 @@ public interface RedisAPI {
   }
 
   /**
+   * Set multiple hash fields to multiple values.
+   * <p>
    * Redis command <a href="https://redis.io/commands/hmset/">HMSET</a>.
    * @return Future response.
+   * @deprecated since: 4.0.0, replaced by: {@code HSET} with multiple field-value pairs
    */
+  @Deprecated
   default Future<@Nullable Response> hmset(List<String> args) {
     return send(Command.HMSET, args.toArray(new String[0]));
   }
 
   /**
+   * Get one or multiple random fields from a hash.
+   * <p>
    * Redis command <a href="https://redis.io/commands/hrandfield/">HRANDFIELD</a>.
    * @return Future response.
    */
@@ -1293,6 +1457,8 @@ public interface RedisAPI {
   }
 
   /**
+   * Incrementally iterate hash fields and associated values.
+   * <p>
    * Redis command <a href="https://redis.io/commands/hscan/">HSCAN</a>.
    * @return Future response.
    */
@@ -1301,6 +1467,8 @@ public interface RedisAPI {
   }
 
   /**
+   * Set the string value of a hash field.
+   * <p>
    * Redis command <a href="https://redis.io/commands/hset/">HSET</a>.
    * @return Future response.
    */
@@ -1309,6 +1477,8 @@ public interface RedisAPI {
   }
 
   /**
+   * Set the value of a hash field, only if the field does not exist.
+   * <p>
    * Redis command <a href="https://redis.io/commands/hsetnx/">HSETNX</a>.
    * @return Future response.
    */
@@ -1317,6 +1487,8 @@ public interface RedisAPI {
   }
 
   /**
+   * Get the length of the value of a hash field.
+   * <p>
    * Redis command <a href="https://redis.io/commands/hstrlen/">HSTRLEN</a>.
    * @return Future response.
    */
@@ -1325,6 +1497,8 @@ public interface RedisAPI {
   }
 
   /**
+   * Get all the values in a hash.
+   * <p>
    * Redis command <a href="https://redis.io/commands/hvals/">HVALS</a>.
    * @return Future response.
    */
@@ -1333,6 +1507,8 @@ public interface RedisAPI {
   }
 
   /**
+   * Increment the integer value of a key by one.
+   * <p>
    * Redis command <a href="https://redis.io/commands/incr/">INCR</a>.
    * @return Future response.
    */
@@ -1341,6 +1517,8 @@ public interface RedisAPI {
   }
 
   /**
+   * Increment the integer value of a key by the given amount.
+   * <p>
    * Redis command <a href="https://redis.io/commands/incrby/">INCRBY</a>.
    * @return Future response.
    */
@@ -1349,6 +1527,8 @@ public interface RedisAPI {
   }
 
   /**
+   * Increment the float value of a key by the given amount.
+   * <p>
    * Redis command <a href="https://redis.io/commands/incrbyfloat/">INCRBYFLOAT</a>.
    * @return Future response.
    */
@@ -1357,6 +1537,8 @@ public interface RedisAPI {
   }
 
   /**
+   * Get information and statistics about the server.
+   * <p>
    * Redis command <a href="https://redis.io/commands/info/">INFO</a>.
    * @return Future response.
    */
@@ -1549,6 +1731,8 @@ public interface RedisAPI {
   }
 
   /**
+   * Find all keys matching the given pattern.
+   * <p>
    * Redis command <a href="https://redis.io/commands/keys/">KEYS</a>.
    * @return Future response.
    */
@@ -1557,6 +1741,8 @@ public interface RedisAPI {
   }
 
   /**
+   * Get the UNIX time stamp of the last successful save to disk.
+   * <p>
    * Redis command <a href="https://redis.io/commands/lastsave/">LASTSAVE</a>.
    * @return Future response.
    */
@@ -1565,6 +1751,8 @@ public interface RedisAPI {
   }
 
   /**
+   * A container for latency diagnostics commands.
+   * <p>
    * Redis command <a href="https://redis.io/commands/latency/">LATENCY</a>.
    * @return Future response.
    */
@@ -1573,6 +1761,8 @@ public interface RedisAPI {
   }
 
   /**
+   * Find longest common substring.
+   * <p>
    * Redis command <a href="https://redis.io/commands/lcs/">LCS</a>.
    * @return Future response.
    */
@@ -1581,6 +1771,8 @@ public interface RedisAPI {
   }
 
   /**
+   * Get an element from a list by its index.
+   * <p>
    * Redis command <a href="https://redis.io/commands/lindex/">LINDEX</a>.
    * @return Future response.
    */
@@ -1589,6 +1781,8 @@ public interface RedisAPI {
   }
 
   /**
+   * Insert an element before or after another element in a list.
+   * <p>
    * Redis command <a href="https://redis.io/commands/linsert/">LINSERT</a>.
    * @return Future response.
    */
@@ -1597,6 +1791,8 @@ public interface RedisAPI {
   }
 
   /**
+   * Get the length of a list.
+   * <p>
    * Redis command <a href="https://redis.io/commands/llen/">LLEN</a>.
    * @return Future response.
    */
@@ -1605,6 +1801,8 @@ public interface RedisAPI {
   }
 
   /**
+   * Pop an element from a list, push it to another list and return it.
+   * <p>
    * Redis command <a href="https://redis.io/commands/lmove/">LMOVE</a>.
    * @return Future response.
    */
@@ -1613,6 +1811,8 @@ public interface RedisAPI {
   }
 
   /**
+   * Pop elements from a list.
+   * <p>
    * Redis command <a href="https://redis.io/commands/lmpop/">LMPOP</a>.
    * @return Future response.
    */
@@ -1621,6 +1821,8 @@ public interface RedisAPI {
   }
 
   /**
+   * Display some computer art and the Redis version.
+   * <p>
    * Redis command <a href="https://redis.io/commands/lolwut/">LOLWUT</a>.
    * @return Future response.
    */
@@ -1629,6 +1831,8 @@ public interface RedisAPI {
   }
 
   /**
+   * Remove and get the first elements in a list.
+   * <p>
    * Redis command <a href="https://redis.io/commands/lpop/">LPOP</a>.
    * @return Future response.
    */
@@ -1637,6 +1841,8 @@ public interface RedisAPI {
   }
 
   /**
+   * Return the index of matching elements on a list.
+   * <p>
    * Redis command <a href="https://redis.io/commands/lpos/">LPOS</a>.
    * @return Future response.
    */
@@ -1645,6 +1851,8 @@ public interface RedisAPI {
   }
 
   /**
+   * Prepend one or multiple elements to a list.
+   * <p>
    * Redis command <a href="https://redis.io/commands/lpush/">LPUSH</a>.
    * @return Future response.
    */
@@ -1653,6 +1861,8 @@ public interface RedisAPI {
   }
 
   /**
+   * Prepend an element to a list, only if the list exists.
+   * <p>
    * Redis command <a href="https://redis.io/commands/lpushx/">LPUSHX</a>.
    * @return Future response.
    */
@@ -1661,6 +1871,8 @@ public interface RedisAPI {
   }
 
   /**
+   * Get a range of elements from a list.
+   * <p>
    * Redis command <a href="https://redis.io/commands/lrange/">LRANGE</a>.
    * @return Future response.
    */
@@ -1669,6 +1881,8 @@ public interface RedisAPI {
   }
 
   /**
+   * Remove elements from a list.
+   * <p>
    * Redis command <a href="https://redis.io/commands/lrem/">LREM</a>.
    * @return Future response.
    */
@@ -1677,6 +1891,8 @@ public interface RedisAPI {
   }
 
   /**
+   * Set the value of an element in a list by its index.
+   * <p>
    * Redis command <a href="https://redis.io/commands/lset/">LSET</a>.
    * @return Future response.
    */
@@ -1685,6 +1901,8 @@ public interface RedisAPI {
   }
 
   /**
+   * Trim a list to the specified range.
+   * <p>
    * Redis command <a href="https://redis.io/commands/ltrim/">LTRIM</a>.
    * @return Future response.
    */
@@ -1693,6 +1911,8 @@ public interface RedisAPI {
   }
 
   /**
+   * A container for memory diagnostics commands.
+   * <p>
    * Redis command <a href="https://redis.io/commands/memory/">MEMORY</a>.
    * @return Future response.
    */
@@ -1701,6 +1921,8 @@ public interface RedisAPI {
   }
 
   /**
+   * Get the values of all the given keys.
+   * <p>
    * Redis command <a href="https://redis.io/commands/mget/">MGET</a>.
    * @return Future response.
    */
@@ -1709,6 +1931,8 @@ public interface RedisAPI {
   }
 
   /**
+   * Atomically transfer a key from a Redis instance to another one.
+   * <p>
    * Redis command <a href="https://redis.io/commands/migrate/">MIGRATE</a>.
    * @return Future response.
    */
@@ -1717,6 +1941,8 @@ public interface RedisAPI {
   }
 
   /**
+   * A container for module commands.
+   * <p>
    * Redis command <a href="https://redis.io/commands/module/">MODULE</a>.
    * @return Future response.
    */
@@ -1725,6 +1951,8 @@ public interface RedisAPI {
   }
 
   /**
+   * Listen for all requests received by the server in real time.
+   * <p>
    * Redis command <a href="https://redis.io/commands/monitor/">MONITOR</a>.
    * @return Future response.
    */
@@ -1733,6 +1961,8 @@ public interface RedisAPI {
   }
 
   /**
+   * Move a key to another database.
+   * <p>
    * Redis command <a href="https://redis.io/commands/move/">MOVE</a>.
    * @return Future response.
    */
@@ -1741,6 +1971,8 @@ public interface RedisAPI {
   }
 
   /**
+   * Set multiple keys to multiple values.
+   * <p>
    * Redis command <a href="https://redis.io/commands/mset/">MSET</a>.
    * @return Future response.
    */
@@ -1749,6 +1981,8 @@ public interface RedisAPI {
   }
 
   /**
+   * Set multiple keys to multiple values, only if none of the keys exist.
+   * <p>
    * Redis command <a href="https://redis.io/commands/msetnx/">MSETNX</a>.
    * @return Future response.
    */
@@ -1757,6 +1991,8 @@ public interface RedisAPI {
   }
 
   /**
+   * Mark the start of a transaction block.
+   * <p>
    * Redis command <a href="https://redis.io/commands/multi/">MULTI</a>.
    * @return Future response.
    */
@@ -1765,6 +2001,8 @@ public interface RedisAPI {
   }
 
   /**
+   * A container for object introspection commands.
+   * <p>
    * Redis command <a href="https://redis.io/commands/object/">OBJECT</a>.
    * @return Future response.
    */
@@ -1773,6 +2011,8 @@ public interface RedisAPI {
   }
 
   /**
+   * Remove the expiration from a key.
+   * <p>
    * Redis command <a href="https://redis.io/commands/persist/">PERSIST</a>.
    * @return Future response.
    */
@@ -1781,6 +2021,8 @@ public interface RedisAPI {
   }
 
   /**
+   * Set a key&#x27;s time to live in milliseconds.
+   * <p>
    * Redis command <a href="https://redis.io/commands/pexpire/">PEXPIRE</a>.
    * @return Future response.
    */
@@ -1789,6 +2031,8 @@ public interface RedisAPI {
   }
 
   /**
+   * Set the expiration for a key as a UNIX timestamp specified in milliseconds.
+   * <p>
    * Redis command <a href="https://redis.io/commands/pexpireat/">PEXPIREAT</a>.
    * @return Future response.
    */
@@ -1797,6 +2041,8 @@ public interface RedisAPI {
   }
 
   /**
+   * Get the expiration Unix timestamp for a key in milliseconds.
+   * <p>
    * Redis command <a href="https://redis.io/commands/pexpiretime/">PEXPIRETIME</a>.
    * @return Future response.
    */
@@ -1805,6 +2051,8 @@ public interface RedisAPI {
   }
 
   /**
+   * Adds the specified elements to the specified HyperLogLog.
+   * <p>
    * Redis command <a href="https://redis.io/commands/pfadd/">PFADD</a>.
    * @return Future response.
    */
@@ -1813,6 +2061,8 @@ public interface RedisAPI {
   }
 
   /**
+   * Return the approximated cardinality of the set(s) observed by the HyperLogLog at key(s).
+   * <p>
    * Redis command <a href="https://redis.io/commands/pfcount/">PFCOUNT</a>.
    * @return Future response.
    */
@@ -1821,6 +2071,8 @@ public interface RedisAPI {
   }
 
   /**
+   * Internal commands for debugging HyperLogLog values.
+   * <p>
    * Redis command <a href="https://redis.io/commands/pfdebug/">PFDEBUG</a>.
    * @return Future response.
    */
@@ -1829,6 +2081,8 @@ public interface RedisAPI {
   }
 
   /**
+   * Merge N different HyperLogLogs into a single one.
+   * <p>
    * Redis command <a href="https://redis.io/commands/pfmerge/">PFMERGE</a>.
    * @return Future response.
    */
@@ -1837,6 +2091,8 @@ public interface RedisAPI {
   }
 
   /**
+   * An internal command for testing HyperLogLog values.
+   * <p>
    * Redis command <a href="https://redis.io/commands/pfselftest/">PFSELFTEST</a>.
    * @return Future response.
    */
@@ -1845,6 +2101,8 @@ public interface RedisAPI {
   }
 
   /**
+   * Ping the server.
+   * <p>
    * Redis command <a href="https://redis.io/commands/ping/">PING</a>.
    * @return Future response.
    */
@@ -1853,6 +2111,8 @@ public interface RedisAPI {
   }
 
   /**
+   * Set the value and expiration in milliseconds of a key.
+   * <p>
    * Redis command <a href="https://redis.io/commands/psetex/">PSETEX</a>.
    * @return Future response.
    */
@@ -1861,6 +2121,8 @@ public interface RedisAPI {
   }
 
   /**
+   * Listen for messages published to channels matching the given patterns.
+   * <p>
    * Redis command <a href="https://redis.io/commands/psubscribe/">PSUBSCRIBE</a>.
    * @return Future response.
    */
@@ -1869,6 +2131,8 @@ public interface RedisAPI {
   }
 
   /**
+   * Internal command used for replication.
+   * <p>
    * Redis command <a href="https://redis.io/commands/psync/">PSYNC</a>.
    * @return Future response.
    */
@@ -1877,6 +2141,8 @@ public interface RedisAPI {
   }
 
   /**
+   * Get the time to live for a key in milliseconds.
+   * <p>
    * Redis command <a href="https://redis.io/commands/pttl/">PTTL</a>.
    * @return Future response.
    */
@@ -1885,6 +2151,8 @@ public interface RedisAPI {
   }
 
   /**
+   * Post a message to a channel.
+   * <p>
    * Redis command <a href="https://redis.io/commands/publish/">PUBLISH</a>.
    * @return Future response.
    */
@@ -1893,6 +2161,8 @@ public interface RedisAPI {
   }
 
   /**
+   * A container for Pub/Sub commands.
+   * <p>
    * Redis command <a href="https://redis.io/commands/pubsub/">PUBSUB</a>.
    * @return Future response.
    */
@@ -1901,6 +2171,8 @@ public interface RedisAPI {
   }
 
   /**
+   * Stop listening for messages posted to channels matching the given patterns.
+   * <p>
    * Redis command <a href="https://redis.io/commands/punsubscribe/">PUNSUBSCRIBE</a>.
    * @return Future response.
    */
@@ -1909,6 +2181,8 @@ public interface RedisAPI {
   }
 
   /**
+   * Close the connection.
+   * <p>
    * Redis command <a href="https://redis.io/commands/quit/">QUIT</a>.
    * @return Future response.
    */
@@ -1917,6 +2191,8 @@ public interface RedisAPI {
   }
 
   /**
+   * Return a random key from the keyspace.
+   * <p>
    * Redis command <a href="https://redis.io/commands/randomkey/">RANDOMKEY</a>.
    * @return Future response.
    */
@@ -1925,6 +2201,8 @@ public interface RedisAPI {
   }
 
   /**
+   * Enables read queries for a connection to a cluster replica node.
+   * <p>
    * Redis command <a href="https://redis.io/commands/readonly/">READONLY</a>.
    * @return Future response.
    */
@@ -1933,6 +2211,8 @@ public interface RedisAPI {
   }
 
   /**
+   * Disables read queries for a connection to a cluster replica node.
+   * <p>
    * Redis command <a href="https://redis.io/commands/readwrite/">READWRITE</a>.
    * @return Future response.
    */
@@ -1941,6 +2221,8 @@ public interface RedisAPI {
   }
 
   /**
+   * Rename a key.
+   * <p>
    * Redis command <a href="https://redis.io/commands/rename/">RENAME</a>.
    * @return Future response.
    */
@@ -1949,6 +2231,8 @@ public interface RedisAPI {
   }
 
   /**
+   * Rename a key, only if the new key does not exist.
+   * <p>
    * Redis command <a href="https://redis.io/commands/renamenx/">RENAMENX</a>.
    * @return Future response.
    */
@@ -1957,6 +2241,8 @@ public interface RedisAPI {
   }
 
   /**
+   * An internal command for configuring the replication stream.
+   * <p>
    * Redis command <a href="https://redis.io/commands/replconf/">REPLCONF</a>.
    * @return Future response.
    */
@@ -1965,6 +2251,8 @@ public interface RedisAPI {
   }
 
   /**
+   * Make the server a replica of another instance, or promote it as master.
+   * <p>
    * Redis command <a href="https://redis.io/commands/replicaof/">REPLICAOF</a>.
    * @return Future response.
    */
@@ -1973,6 +2261,8 @@ public interface RedisAPI {
   }
 
   /**
+   * Reset the connection.
+   * <p>
    * Redis command <a href="https://redis.io/commands/reset/">RESET</a>.
    * @return Future response.
    */
@@ -1981,6 +2271,8 @@ public interface RedisAPI {
   }
 
   /**
+   * Create a key using the provided serialized value, previously obtained using DUMP.
+   * <p>
    * Redis command <a href="https://redis.io/commands/restore/">RESTORE</a>.
    * @return Future response.
    */
@@ -1989,6 +2281,8 @@ public interface RedisAPI {
   }
 
   /**
+   * An internal command for migrating keys in a cluster.
+   * <p>
    * Redis command <a href="https://redis.io/commands/restore asking/">RESTORE-ASKING</a>.
    * @return Future response.
    */
@@ -1997,6 +2291,8 @@ public interface RedisAPI {
   }
 
   /**
+   * Return the role of the instance in the context of replication.
+   * <p>
    * Redis command <a href="https://redis.io/commands/role/">ROLE</a>.
    * @return Future response.
    */
@@ -2005,6 +2301,8 @@ public interface RedisAPI {
   }
 
   /**
+   * Remove and get the last elements in a list.
+   * <p>
    * Redis command <a href="https://redis.io/commands/rpop/">RPOP</a>.
    * @return Future response.
    */
@@ -2013,14 +2311,20 @@ public interface RedisAPI {
   }
 
   /**
+   * Remove the last element in a list, prepend it to another list and return it.
+   * <p>
    * Redis command <a href="https://redis.io/commands/rpoplpush/">RPOPLPUSH</a>.
    * @return Future response.
+   * @deprecated since: 6.2.0, replaced by: {@code LMOVE} with the {@code RIGHT} and {@code LEFT} arguments
    */
+  @Deprecated
   default Future<@Nullable Response> rpoplpush(String arg0, String arg1) {
     return send(Command.RPOPLPUSH, arg0, arg1);
   }
 
   /**
+   * Append one or multiple elements to a list.
+   * <p>
    * Redis command <a href="https://redis.io/commands/rpush/">RPUSH</a>.
    * @return Future response.
    */
@@ -2029,6 +2333,8 @@ public interface RedisAPI {
   }
 
   /**
+   * Append an element to a list, only if the list exists.
+   * <p>
    * Redis command <a href="https://redis.io/commands/rpushx/">RPUSHX</a>.
    * @return Future response.
    */
@@ -2037,6 +2343,8 @@ public interface RedisAPI {
   }
 
   /**
+   * Add one or more members to a set.
+   * <p>
    * Redis command <a href="https://redis.io/commands/sadd/">SADD</a>.
    * @return Future response.
    */
@@ -2045,6 +2353,8 @@ public interface RedisAPI {
   }
 
   /**
+   * Synchronously save the dataset to disk.
+   * <p>
    * Redis command <a href="https://redis.io/commands/save/">SAVE</a>.
    * @return Future response.
    */
@@ -2053,6 +2363,8 @@ public interface RedisAPI {
   }
 
   /**
+   * Incrementally iterate the keys space.
+   * <p>
    * Redis command <a href="https://redis.io/commands/scan/">SCAN</a>.
    * @return Future response.
    */
@@ -2061,6 +2373,8 @@ public interface RedisAPI {
   }
 
   /**
+   * Get the number of members in a set.
+   * <p>
    * Redis command <a href="https://redis.io/commands/scard/">SCARD</a>.
    * @return Future response.
    */
@@ -2069,6 +2383,8 @@ public interface RedisAPI {
   }
 
   /**
+   * A container for Lua scripts management commands.
+   * <p>
    * Redis command <a href="https://redis.io/commands/script/">SCRIPT</a>.
    * @return Future response.
    */
@@ -2077,6 +2393,8 @@ public interface RedisAPI {
   }
 
   /**
+   * Subtract multiple sets.
+   * <p>
    * Redis command <a href="https://redis.io/commands/sdiff/">SDIFF</a>.
    * @return Future response.
    */
@@ -2085,6 +2403,8 @@ public interface RedisAPI {
   }
 
   /**
+   * Subtract multiple sets and store the resulting set in a key.
+   * <p>
    * Redis command <a href="https://redis.io/commands/sdiffstore/">SDIFFSTORE</a>.
    * @return Future response.
    */
@@ -2093,6 +2413,8 @@ public interface RedisAPI {
   }
 
   /**
+   * Change the selected database for the current connection.
+   * <p>
    * Redis command <a href="https://redis.io/commands/select/">SELECT</a>.
    * @return Future response.
    */
@@ -2101,6 +2423,8 @@ public interface RedisAPI {
   }
 
   /**
+   * Set the string value of a key.
+   * <p>
    * Redis command <a href="https://redis.io/commands/set/">SET</a>.
    * @return Future response.
    */
@@ -2109,6 +2433,8 @@ public interface RedisAPI {
   }
 
   /**
+   * Sets or clears the bit at offset in the string value stored at key.
+   * <p>
    * Redis command <a href="https://redis.io/commands/setbit/">SETBIT</a>.
    * @return Future response.
    */
@@ -2117,6 +2443,8 @@ public interface RedisAPI {
   }
 
   /**
+   * Set the value and expiration of a key.
+   * <p>
    * Redis command <a href="https://redis.io/commands/setex/">SETEX</a>.
    * @return Future response.
    */
@@ -2125,6 +2453,8 @@ public interface RedisAPI {
   }
 
   /**
+   * Set the value of a key, only if the key does not exist.
+   * <p>
    * Redis command <a href="https://redis.io/commands/setnx/">SETNX</a>.
    * @return Future response.
    */
@@ -2133,6 +2463,8 @@ public interface RedisAPI {
   }
 
   /**
+   * Overwrite part of a string at key starting at the specified offset.
+   * <p>
    * Redis command <a href="https://redis.io/commands/setrange/">SETRANGE</a>.
    * @return Future response.
    */
@@ -2141,6 +2473,8 @@ public interface RedisAPI {
   }
 
   /**
+   * Synchronously save the dataset to disk and then shut down the server.
+   * <p>
    * Redis command <a href="https://redis.io/commands/shutdown/">SHUTDOWN</a>.
    * @return Future response.
    */
@@ -2149,6 +2483,8 @@ public interface RedisAPI {
   }
 
   /**
+   * Intersect multiple sets.
+   * <p>
    * Redis command <a href="https://redis.io/commands/sinter/">SINTER</a>.
    * @return Future response.
    */
@@ -2157,6 +2493,8 @@ public interface RedisAPI {
   }
 
   /**
+   * Intersect multiple sets and return the cardinality of the result.
+   * <p>
    * Redis command <a href="https://redis.io/commands/sintercard/">SINTERCARD</a>.
    * @return Future response.
    */
@@ -2165,6 +2503,8 @@ public interface RedisAPI {
   }
 
   /**
+   * Intersect multiple sets and store the resulting set in a key.
+   * <p>
    * Redis command <a href="https://redis.io/commands/sinterstore/">SINTERSTORE</a>.
    * @return Future response.
    */
@@ -2173,6 +2513,8 @@ public interface RedisAPI {
   }
 
   /**
+   * Determine if a given value is a member of a set.
+   * <p>
    * Redis command <a href="https://redis.io/commands/sismember/">SISMEMBER</a>.
    * @return Future response.
    */
@@ -2181,14 +2523,20 @@ public interface RedisAPI {
   }
 
   /**
+   * Make the server a replica of another instance, or promote it as master.
+   * <p>
    * Redis command <a href="https://redis.io/commands/slaveof/">SLAVEOF</a>.
    * @return Future response.
+   * @deprecated since: 5.0.0, replaced by: {@code REPLICAOF}
    */
+  @Deprecated
   default Future<@Nullable Response> slaveof(String arg0, String arg1) {
     return send(Command.SLAVEOF, arg0, arg1);
   }
 
   /**
+   * A container for slow log commands.
+   * <p>
    * Redis command <a href="https://redis.io/commands/slowlog/">SLOWLOG</a>.
    * @return Future response.
    */
@@ -2197,6 +2545,8 @@ public interface RedisAPI {
   }
 
   /**
+   * Get all the members in a set.
+   * <p>
    * Redis command <a href="https://redis.io/commands/smembers/">SMEMBERS</a>.
    * @return Future response.
    */
@@ -2205,6 +2555,8 @@ public interface RedisAPI {
   }
 
   /**
+   * Returns the membership associated with the given elements for a set.
+   * <p>
    * Redis command <a href="https://redis.io/commands/smismember/">SMISMEMBER</a>.
    * @return Future response.
    */
@@ -2213,6 +2565,8 @@ public interface RedisAPI {
   }
 
   /**
+   * Move a member from one set to another.
+   * <p>
    * Redis command <a href="https://redis.io/commands/smove/">SMOVE</a>.
    * @return Future response.
    */
@@ -2221,6 +2575,8 @@ public interface RedisAPI {
   }
 
   /**
+   * Sort the elements in a list, set or sorted set.
+   * <p>
    * Redis command <a href="https://redis.io/commands/sort/">SORT</a>.
    * @return Future response.
    */
@@ -2229,6 +2585,8 @@ public interface RedisAPI {
   }
 
   /**
+   * Sort the elements in a list, set or sorted set. Read-only variant of SORT.
+   * <p>
    * Redis command <a href="https://redis.io/commands/sort_ro/">SORT_RO</a>.
    * @return Future response.
    */
@@ -2237,6 +2595,8 @@ public interface RedisAPI {
   }
 
   /**
+   * Remove and return one or multiple random members from a set.
+   * <p>
    * Redis command <a href="https://redis.io/commands/spop/">SPOP</a>.
    * @return Future response.
    */
@@ -2245,6 +2605,8 @@ public interface RedisAPI {
   }
 
   /**
+   * Post a message to a shard channel.
+   * <p>
    * Redis command <a href="https://redis.io/commands/spublish/">SPUBLISH</a>.
    * @return Future response.
    */
@@ -2253,6 +2615,8 @@ public interface RedisAPI {
   }
 
   /**
+   * Get one or multiple random members from a set.
+   * <p>
    * Redis command <a href="https://redis.io/commands/srandmember/">SRANDMEMBER</a>.
    * @return Future response.
    */
@@ -2261,6 +2625,8 @@ public interface RedisAPI {
   }
 
   /**
+   * Remove one or more members from a set.
+   * <p>
    * Redis command <a href="https://redis.io/commands/srem/">SREM</a>.
    * @return Future response.
    */
@@ -2269,6 +2635,8 @@ public interface RedisAPI {
   }
 
   /**
+   * Incrementally iterate Set elements.
+   * <p>
    * Redis command <a href="https://redis.io/commands/sscan/">SSCAN</a>.
    * @return Future response.
    */
@@ -2277,6 +2645,8 @@ public interface RedisAPI {
   }
 
   /**
+   * Listen for messages published to the given shard channels.
+   * <p>
    * Redis command <a href="https://redis.io/commands/ssubscribe/">SSUBSCRIBE</a>.
    * @return Future response.
    */
@@ -2285,6 +2655,8 @@ public interface RedisAPI {
   }
 
   /**
+   * Get the length of the value stored in a key.
+   * <p>
    * Redis command <a href="https://redis.io/commands/strlen/">STRLEN</a>.
    * @return Future response.
    */
@@ -2293,6 +2665,8 @@ public interface RedisAPI {
   }
 
   /**
+   * Listen for messages published to the given channels.
+   * <p>
    * Redis command <a href="https://redis.io/commands/subscribe/">SUBSCRIBE</a>.
    * @return Future response.
    */
@@ -2301,14 +2675,20 @@ public interface RedisAPI {
   }
 
   /**
+   * Get a substring of the string stored at a key.
+   * <p>
    * Redis command <a href="https://redis.io/commands/substr/">SUBSTR</a>.
    * @return Future response.
+   * @deprecated since: 2.0.0, replaced by: {@code GETRANGE}
    */
+  @Deprecated
   default Future<@Nullable Response> substr(String arg0, String arg1, String arg2) {
     return send(Command.SUBSTR, arg0, arg1, arg2);
   }
 
   /**
+   * Add multiple sets.
+   * <p>
    * Redis command <a href="https://redis.io/commands/sunion/">SUNION</a>.
    * @return Future response.
    */
@@ -2317,6 +2697,8 @@ public interface RedisAPI {
   }
 
   /**
+   * Add multiple sets and store the resulting set in a key.
+   * <p>
    * Redis command <a href="https://redis.io/commands/sunionstore/">SUNIONSTORE</a>.
    * @return Future response.
    */
@@ -2325,6 +2707,8 @@ public interface RedisAPI {
   }
 
   /**
+   * Stop listening for messages posted to the given shard channels.
+   * <p>
    * Redis command <a href="https://redis.io/commands/sunsubscribe/">SUNSUBSCRIBE</a>.
    * @return Future response.
    */
@@ -2333,6 +2717,8 @@ public interface RedisAPI {
   }
 
   /**
+   * Swaps two Redis databases.
+   * <p>
    * Redis command <a href="https://redis.io/commands/swapdb/">SWAPDB</a>.
    * @return Future response.
    */
@@ -2341,6 +2727,8 @@ public interface RedisAPI {
   }
 
   /**
+   * Internal command used for replication.
+   * <p>
    * Redis command <a href="https://redis.io/commands/sync/">SYNC</a>.
    * @return Future response.
    */
@@ -2461,6 +2849,8 @@ public interface RedisAPI {
   }
 
   /**
+   * Return the current server time.
+   * <p>
    * Redis command <a href="https://redis.io/commands/time/">TIME</a>.
    * @return Future response.
    */
@@ -2581,6 +2971,8 @@ public interface RedisAPI {
   }
 
   /**
+   * Alters the last access time of a key(s). Returns the number of existing keys specified.
+   * <p>
    * Redis command <a href="https://redis.io/commands/touch/">TOUCH</a>.
    * @return Future response.
    */
@@ -2725,6 +3117,8 @@ public interface RedisAPI {
   }
 
   /**
+   * Get the time to live for a key in seconds.
+   * <p>
    * Redis command <a href="https://redis.io/commands/ttl/">TTL</a>.
    * @return Future response.
    */
@@ -2733,6 +3127,8 @@ public interface RedisAPI {
   }
 
   /**
+   * Determine the type stored at key.
+   * <p>
    * Redis command <a href="https://redis.io/commands/type/">TYPE</a>.
    * @return Future response.
    */
@@ -2741,6 +3137,8 @@ public interface RedisAPI {
   }
 
   /**
+   * Delete a key asynchronously in another thread. Otherwise it is just as DEL, but non blocking.
+   * <p>
    * Redis command <a href="https://redis.io/commands/unlink/">UNLINK</a>.
    * @return Future response.
    */
@@ -2749,6 +3147,8 @@ public interface RedisAPI {
   }
 
   /**
+   * Stop listening for messages posted to the given channels.
+   * <p>
    * Redis command <a href="https://redis.io/commands/unsubscribe/">UNSUBSCRIBE</a>.
    * @return Future response.
    */
@@ -2757,6 +3157,8 @@ public interface RedisAPI {
   }
 
   /**
+   * Forget about all watched keys.
+   * <p>
    * Redis command <a href="https://redis.io/commands/unwatch/">UNWATCH</a>.
    * @return Future response.
    */
@@ -2765,6 +3167,8 @@ public interface RedisAPI {
   }
 
   /**
+   * Wait for the synchronous replication of all the write commands sent in the context of the current connection.
+   * <p>
    * Redis command <a href="https://redis.io/commands/wait/">WAIT</a>.
    * @return Future response.
    */
@@ -2773,6 +3177,8 @@ public interface RedisAPI {
   }
 
   /**
+   * Watch the given keys to determine execution of the MULTI/EXEC block.
+   * <p>
    * Redis command <a href="https://redis.io/commands/watch/">WATCH</a>.
    * @return Future response.
    */
@@ -2781,6 +3187,8 @@ public interface RedisAPI {
   }
 
   /**
+   * Marks a pending message as correctly processed, effectively removing it from the pending entries list of the consumer group. Return value of the command is the number of messages successfully acknowledged, that is, the IDs we were actually able to resolve in the PEL.
+   * <p>
    * Redis command <a href="https://redis.io/commands/xack/">XACK</a>.
    * @return Future response.
    */
@@ -2789,6 +3197,8 @@ public interface RedisAPI {
   }
 
   /**
+   * Appends a new entry to a stream.
+   * <p>
    * Redis command <a href="https://redis.io/commands/xadd/">XADD</a>.
    * @return Future response.
    */
@@ -2797,6 +3207,8 @@ public interface RedisAPI {
   }
 
   /**
+   * Changes (or acquires) ownership of messages in a consumer group, as if the messages were delivered to the specified consumer.
+   * <p>
    * Redis command <a href="https://redis.io/commands/xautoclaim/">XAUTOCLAIM</a>.
    * @return Future response.
    */
@@ -2805,6 +3217,8 @@ public interface RedisAPI {
   }
 
   /**
+   * Changes (or acquires) ownership of a message in a consumer group, as if the message was delivered to the specified consumer.
+   * <p>
    * Redis command <a href="https://redis.io/commands/xclaim/">XCLAIM</a>.
    * @return Future response.
    */
@@ -2813,6 +3227,8 @@ public interface RedisAPI {
   }
 
   /**
+   * Removes the specified entries from the stream. Returns the number of items actually deleted, that may be different from the number of IDs passed in case certain IDs do not exist.
+   * <p>
    * Redis command <a href="https://redis.io/commands/xdel/">XDEL</a>.
    * @return Future response.
    */
@@ -2821,6 +3237,8 @@ public interface RedisAPI {
   }
 
   /**
+   * A container for consumer groups commands.
+   * <p>
    * Redis command <a href="https://redis.io/commands/xgroup/">XGROUP</a>.
    * @return Future response.
    */
@@ -2829,6 +3247,8 @@ public interface RedisAPI {
   }
 
   /**
+   * A container for stream introspection commands.
+   * <p>
    * Redis command <a href="https://redis.io/commands/xinfo/">XINFO</a>.
    * @return Future response.
    */
@@ -2837,6 +3257,8 @@ public interface RedisAPI {
   }
 
   /**
+   * Return the number of entries in a stream.
+   * <p>
    * Redis command <a href="https://redis.io/commands/xlen/">XLEN</a>.
    * @return Future response.
    */
@@ -2845,6 +3267,8 @@ public interface RedisAPI {
   }
 
   /**
+   * Return information and entries from a stream consumer group pending entries list, that are messages fetched but never acknowledged.
+   * <p>
    * Redis command <a href="https://redis.io/commands/xpending/">XPENDING</a>.
    * @return Future response.
    */
@@ -2853,6 +3277,8 @@ public interface RedisAPI {
   }
 
   /**
+   * Return a range of elements in a stream, with IDs matching the specified IDs interval.
+   * <p>
    * Redis command <a href="https://redis.io/commands/xrange/">XRANGE</a>.
    * @return Future response.
    */
@@ -2861,6 +3287,8 @@ public interface RedisAPI {
   }
 
   /**
+   * Return never seen elements in multiple streams, with IDs greater than the ones reported by the caller for each stream. Can block.
+   * <p>
    * Redis command <a href="https://redis.io/commands/xread/">XREAD</a>.
    * @return Future response.
    */
@@ -2869,6 +3297,8 @@ public interface RedisAPI {
   }
 
   /**
+   * Return new entries from a stream using a consumer group, or access the history of the pending entries for a given consumer. Can block.
+   * <p>
    * Redis command <a href="https://redis.io/commands/xreadgroup/">XREADGROUP</a>.
    * @return Future response.
    */
@@ -2877,6 +3307,8 @@ public interface RedisAPI {
   }
 
   /**
+   * Return a range of elements in a stream, with IDs matching the specified IDs interval, in reverse order (from greater to smaller IDs) compared to XRANGE.
+   * <p>
    * Redis command <a href="https://redis.io/commands/xrevrange/">XREVRANGE</a>.
    * @return Future response.
    */
@@ -2885,6 +3317,8 @@ public interface RedisAPI {
   }
 
   /**
+   * An internal command for replicating stream values.
+   * <p>
    * Redis command <a href="https://redis.io/commands/xsetid/">XSETID</a>.
    * @return Future response.
    */
@@ -2893,6 +3327,8 @@ public interface RedisAPI {
   }
 
   /**
+   * Trims the stream to (approximately if &#x27;~&#x27; is passed) a certain size.
+   * <p>
    * Redis command <a href="https://redis.io/commands/xtrim/">XTRIM</a>.
    * @return Future response.
    */
@@ -2901,6 +3337,8 @@ public interface RedisAPI {
   }
 
   /**
+   * Add one or more members to a sorted set, or update its score if it already exists.
+   * <p>
    * Redis command <a href="https://redis.io/commands/zadd/">ZADD</a>.
    * @return Future response.
    */
@@ -2909,6 +3347,8 @@ public interface RedisAPI {
   }
 
   /**
+   * Get the number of members in a sorted set.
+   * <p>
    * Redis command <a href="https://redis.io/commands/zcard/">ZCARD</a>.
    * @return Future response.
    */
@@ -2917,6 +3357,8 @@ public interface RedisAPI {
   }
 
   /**
+   * Count the members in a sorted set with scores within the given values.
+   * <p>
    * Redis command <a href="https://redis.io/commands/zcount/">ZCOUNT</a>.
    * @return Future response.
    */
@@ -2925,6 +3367,8 @@ public interface RedisAPI {
   }
 
   /**
+   * Subtract multiple sorted sets.
+   * <p>
    * Redis command <a href="https://redis.io/commands/zdiff/">ZDIFF</a>.
    * @return Future response.
    */
@@ -2933,6 +3377,8 @@ public interface RedisAPI {
   }
 
   /**
+   * Subtract multiple sorted sets and store the resulting sorted set in a new key.
+   * <p>
    * Redis command <a href="https://redis.io/commands/zdiffstore/">ZDIFFSTORE</a>.
    * @return Future response.
    */
@@ -2941,6 +3387,8 @@ public interface RedisAPI {
   }
 
   /**
+   * Increment the score of a member in a sorted set.
+   * <p>
    * Redis command <a href="https://redis.io/commands/zincrby/">ZINCRBY</a>.
    * @return Future response.
    */
@@ -2949,6 +3397,8 @@ public interface RedisAPI {
   }
 
   /**
+   * Intersect multiple sorted sets.
+   * <p>
    * Redis command <a href="https://redis.io/commands/zinter/">ZINTER</a>.
    * @return Future response.
    */
@@ -2957,6 +3407,8 @@ public interface RedisAPI {
   }
 
   /**
+   * Intersect multiple sorted sets and return the cardinality of the result.
+   * <p>
    * Redis command <a href="https://redis.io/commands/zintercard/">ZINTERCARD</a>.
    * @return Future response.
    */
@@ -2965,6 +3417,8 @@ public interface RedisAPI {
   }
 
   /**
+   * Intersect multiple sorted sets and store the resulting sorted set in a new key.
+   * <p>
    * Redis command <a href="https://redis.io/commands/zinterstore/">ZINTERSTORE</a>.
    * @return Future response.
    */
@@ -2973,6 +3427,8 @@ public interface RedisAPI {
   }
 
   /**
+   * Count the number of members in a sorted set between a given lexicographical range.
+   * <p>
    * Redis command <a href="https://redis.io/commands/zlexcount/">ZLEXCOUNT</a>.
    * @return Future response.
    */
@@ -2981,6 +3437,8 @@ public interface RedisAPI {
   }
 
   /**
+   * Remove and return members with scores in a sorted set.
+   * <p>
    * Redis command <a href="https://redis.io/commands/zmpop/">ZMPOP</a>.
    * @return Future response.
    */
@@ -2989,6 +3447,8 @@ public interface RedisAPI {
   }
 
   /**
+   * Get the score associated with the given members in a sorted set.
+   * <p>
    * Redis command <a href="https://redis.io/commands/zmscore/">ZMSCORE</a>.
    * @return Future response.
    */
@@ -2997,6 +3457,8 @@ public interface RedisAPI {
   }
 
   /**
+   * Remove and return members with the highest scores in a sorted set.
+   * <p>
    * Redis command <a href="https://redis.io/commands/zpopmax/">ZPOPMAX</a>.
    * @return Future response.
    */
@@ -3005,6 +3467,8 @@ public interface RedisAPI {
   }
 
   /**
+   * Remove and return members with the lowest scores in a sorted set.
+   * <p>
    * Redis command <a href="https://redis.io/commands/zpopmin/">ZPOPMIN</a>.
    * @return Future response.
    */
@@ -3013,6 +3477,8 @@ public interface RedisAPI {
   }
 
   /**
+   * Get one or multiple random elements from a sorted set.
+   * <p>
    * Redis command <a href="https://redis.io/commands/zrandmember/">ZRANDMEMBER</a>.
    * @return Future response.
    */
@@ -3021,6 +3487,8 @@ public interface RedisAPI {
   }
 
   /**
+   * Return a range of members in a sorted set.
+   * <p>
    * Redis command <a href="https://redis.io/commands/zrange/">ZRANGE</a>.
    * @return Future response.
    */
@@ -3029,22 +3497,32 @@ public interface RedisAPI {
   }
 
   /**
+   * Return a range of members in a sorted set, by lexicographical range.
+   * <p>
    * Redis command <a href="https://redis.io/commands/zrangebylex/">ZRANGEBYLEX</a>.
    * @return Future response.
+   * @deprecated since: 6.2.0, replaced by: {@code ZRANGE} with the {@code BYLEX} argument
    */
+  @Deprecated
   default Future<@Nullable Response> zrangebylex(List<String> args) {
     return send(Command.ZRANGEBYLEX, args.toArray(new String[0]));
   }
 
   /**
+   * Return a range of members in a sorted set, by score.
+   * <p>
    * Redis command <a href="https://redis.io/commands/zrangebyscore/">ZRANGEBYSCORE</a>.
    * @return Future response.
+   * @deprecated since: 6.2.0, replaced by: {@code ZRANGE} with the {@code BYSCORE} argument
    */
+  @Deprecated
   default Future<@Nullable Response> zrangebyscore(List<String> args) {
     return send(Command.ZRANGEBYSCORE, args.toArray(new String[0]));
   }
 
   /**
+   * Store a range of members from sorted set into another key.
+   * <p>
    * Redis command <a href="https://redis.io/commands/zrangestore/">ZRANGESTORE</a>.
    * @return Future response.
    */
@@ -3053,6 +3531,8 @@ public interface RedisAPI {
   }
 
   /**
+   * Determine the index of a member in a sorted set.
+   * <p>
    * Redis command <a href="https://redis.io/commands/zrank/">ZRANK</a>.
    * @return Future response.
    */
@@ -3061,6 +3541,8 @@ public interface RedisAPI {
   }
 
   /**
+   * Remove one or more members from a sorted set.
+   * <p>
    * Redis command <a href="https://redis.io/commands/zrem/">ZREM</a>.
    * @return Future response.
    */
@@ -3069,6 +3551,8 @@ public interface RedisAPI {
   }
 
   /**
+   * Remove all members in a sorted set between the given lexicographical range.
+   * <p>
    * Redis command <a href="https://redis.io/commands/zremrangebylex/">ZREMRANGEBYLEX</a>.
    * @return Future response.
    */
@@ -3077,6 +3561,8 @@ public interface RedisAPI {
   }
 
   /**
+   * Remove all members in a sorted set within the given indexes.
+   * <p>
    * Redis command <a href="https://redis.io/commands/zremrangebyrank/">ZREMRANGEBYRANK</a>.
    * @return Future response.
    */
@@ -3085,6 +3571,8 @@ public interface RedisAPI {
   }
 
   /**
+   * Remove all members in a sorted set within the given scores.
+   * <p>
    * Redis command <a href="https://redis.io/commands/zremrangebyscore/">ZREMRANGEBYSCORE</a>.
    * @return Future response.
    */
@@ -3093,30 +3581,44 @@ public interface RedisAPI {
   }
 
   /**
+   * Return a range of members in a sorted set, by index, with scores ordered from high to low.
+   * <p>
    * Redis command <a href="https://redis.io/commands/zrevrange/">ZREVRANGE</a>.
    * @return Future response.
+   * @deprecated since: 6.2.0, replaced by: {@code ZRANGE} with the {@code REV} argument
    */
+  @Deprecated
   default Future<@Nullable Response> zrevrange(List<String> args) {
     return send(Command.ZREVRANGE, args.toArray(new String[0]));
   }
 
   /**
+   * Return a range of members in a sorted set, by lexicographical range, ordered from higher to lower strings.
+   * <p>
    * Redis command <a href="https://redis.io/commands/zrevrangebylex/">ZREVRANGEBYLEX</a>.
    * @return Future response.
+   * @deprecated since: 6.2.0, replaced by: {@code ZRANGE} with the {@code REV} and {@code BYLEX} arguments
    */
+  @Deprecated
   default Future<@Nullable Response> zrevrangebylex(List<String> args) {
     return send(Command.ZREVRANGEBYLEX, args.toArray(new String[0]));
   }
 
   /**
+   * Return a range of members in a sorted set, by score, with scores ordered from high to low.
+   * <p>
    * Redis command <a href="https://redis.io/commands/zrevrangebyscore/">ZREVRANGEBYSCORE</a>.
    * @return Future response.
+   * @deprecated since: 6.2.0, replaced by: {@code ZRANGE} with the {@code REV} and {@code BYSCORE} arguments
    */
+  @Deprecated
   default Future<@Nullable Response> zrevrangebyscore(List<String> args) {
     return send(Command.ZREVRANGEBYSCORE, args.toArray(new String[0]));
   }
 
   /**
+   * Determine the index of a member in a sorted set, with scores ordered from high to low.
+   * <p>
    * Redis command <a href="https://redis.io/commands/zrevrank/">ZREVRANK</a>.
    * @return Future response.
    */
@@ -3125,6 +3627,8 @@ public interface RedisAPI {
   }
 
   /**
+   * Incrementally iterate sorted sets elements and associated scores.
+   * <p>
    * Redis command <a href="https://redis.io/commands/zscan/">ZSCAN</a>.
    * @return Future response.
    */
@@ -3133,6 +3637,8 @@ public interface RedisAPI {
   }
 
   /**
+   * Get the score associated with the given member in a sorted set.
+   * <p>
    * Redis command <a href="https://redis.io/commands/zscore/">ZSCORE</a>.
    * @return Future response.
    */
@@ -3141,6 +3647,8 @@ public interface RedisAPI {
   }
 
   /**
+   * Add multiple sorted sets.
+   * <p>
    * Redis command <a href="https://redis.io/commands/zunion/">ZUNION</a>.
    * @return Future response.
    */
@@ -3149,6 +3657,8 @@ public interface RedisAPI {
   }
 
   /**
+   * Add multiple sorted sets and store the resulting sorted set in a new key.
+   * <p>
    * Redis command <a href="https://redis.io/commands/zunionstore/">ZUNIONSTORE</a>.
    * @return Future response.
    */

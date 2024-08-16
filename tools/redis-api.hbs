@@ -43,12 +43,22 @@ public interface RedisAPI {
   }
 
   void close();
-{{#each .}}
+{{#each commands}}
 
   /**
+{{#if docsSummary }}
+   * {{docsSummary}}
+   * <p>
+{{/if}}
    * Redis command <a href="https://redis.io/commands/{{ lowercase safename }}/">{{ uppercase name }}</a>.
    * @return Future response.
+{{#if docsDeprecatedSince}}
+   * @deprecated since: {{docsDeprecatedSince}}, replaced by: {{docsReplacedBy}}
+{{/if}}
    */
+{{#if docsDeprecatedSince}}
+  @Deprecated
+{{/if}}
   default Future<@Nullable Response> {{ camelcase safename }}({{{ types }}}) {
     return send(Command.{{ enum }}{{#if argLen}}, {{{ args }}}{{#if variable}}.toArray(new String[0]){{/if}}{{/if}});
   }
