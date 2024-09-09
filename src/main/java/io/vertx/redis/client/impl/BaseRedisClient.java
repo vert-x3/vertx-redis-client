@@ -26,6 +26,10 @@ public abstract class BaseRedisClient implements Redis {
     this.connectionManager.start();
   }
 
+  public RedisConnectionManager connectionManager() {
+    return connectionManager;
+  }
+
   @Override
   public void close() {
     this.connectionManager.close();

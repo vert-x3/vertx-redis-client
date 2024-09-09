@@ -61,12 +61,17 @@
 
     <dependency>
       <groupId>io.vertx</groupId>
-      <artifactId>vertx-codegen</artifactId>
+      <artifactId>vertx-codegen-api</artifactId>
       <optional>true</optional>
     </dependency>
     <dependency>
       <groupId>io.vertx</groupId>
-      <artifactId>vertx-docgen</artifactId>
+      <artifactId>vertx-codegen-json</artifactId>
+      <optional>true</optional>
+    </dependency>
+    <dependency>
+      <groupId>io.vertx</groupId>
+      <artifactId>vertx-docgen-api</artifactId>
       <optional>true</optional>
     </dependency>
     <dependency>
@@ -115,10 +120,19 @@
               <id>default-compile</id>
               <phase>compile</phase>
               <configuration>
-                <annotationProcessors>
-                  <annotationProcessor>io.vertx.codegen.CodeGenProcessor</annotationProcessor>
-                  <annotationProcessor>io.vertx.docgen.JavaDocGenProcessor</annotationProcessor>
-                </annotationProcessors>
+                <generatedSourcesDirectory>${project.basedir}/src/main/generated</generatedSourcesDirectory>
+                <annotationProcessorPaths>
+                  <annotationProcessorPath>
+                    <groupId>io.vertx</groupId>
+                    <artifactId>vertx-codegen</artifactId>
+                    <classifier>processor</classifier>
+                  </annotationProcessorPath>
+                  <annotationProcessorPath>
+                    <groupId>io.vertx</groupId>
+                    <artifactId>vertx-docgen-processor</artifactId>
+                    <classifier>processor</classifier>
+                  </annotationProcessorPath>
+                </annotationProcessorPaths>
               </configuration>
             </execution>
           </executions>
@@ -141,6 +155,7 @@
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-surefire-plugin</artifactId>
         <configuration>
+          <useModulePath>false</useModulePath>
           <systemPropertyVariables>
             <java.util.logging.config.file>src/test/resources/logging.properties</java.util.logging.config.file>
           </systemPropertyVariables>
