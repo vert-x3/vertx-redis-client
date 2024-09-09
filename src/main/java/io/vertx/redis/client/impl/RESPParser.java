@@ -37,7 +37,7 @@ public final class RESPParser implements Handler<Buffer> {
   // nesting while parsing
   private final ArrayStack stack;
 
-  RESPParser(ParserHandler handler, int maxStack) {
+  public RESPParser(ParserHandler handler, int maxStack) {
     this.handler = handler;
     this.stack = new ArrayStack(maxStack);
   }

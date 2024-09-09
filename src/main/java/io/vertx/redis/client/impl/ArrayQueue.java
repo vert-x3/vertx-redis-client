@@ -19,7 +19,7 @@ import io.vertx.codegen.annotations.Nullable;
 
 import java.util.Objects;
 
-final class ArrayQueue {
+public final class ArrayQueue {
 
   private int
     cur,      // current number of elements
@@ -31,7 +31,7 @@ final class ArrayQueue {
   /**
    * Creates a new empty queue.
    */
-  ArrayQueue(int capacity) {
+  public ArrayQueue(int capacity) {
     queue = new Object[capacity];
     back = -1;
     front = 0;
@@ -54,7 +54,7 @@ final class ArrayQueue {
    * @throws IndexOutOfBoundsException if the queue is full.
    * @throws NullPointerException      if the value is {@code null}
    */
-  <T> void offer(T value) {
+  public <T> void offer(T value) {
     Objects.requireNonNull(value, "'value' cannot be null");
     if (isFull()) {
       throw new IndexOutOfBoundsException();
@@ -87,7 +87,7 @@ final class ArrayQueue {
    *
    * @return element at front of the queue or {@code null} if the queue is empty.
    */
-  <T> @Nullable T poll() {
+  public <T> @Nullable T poll() {
     if (isEmpty()) {
       return null;
     }
@@ -102,7 +102,7 @@ final class ArrayQueue {
     return e;
   }
 
-  int freeSlots() {
+  public int freeSlots() {
     return queue.length - cur;
   }
 

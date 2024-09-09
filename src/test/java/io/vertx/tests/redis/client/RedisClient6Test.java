@@ -1,0 +1,197 @@
+package io.vertx.tests.redis.client;
+
+import io.vertx.core.json.JsonObject;
+import io.vertx.ext.unit.Async;
+import io.vertx.ext.unit.TestContext;
+import io.vertx.ext.unit.junit.RunTestOnContext;
+import io.vertx.ext.unit.junit.VertxUnitRunner;
+import io.vertx.redis.client.Redis;
+import io.vertx.redis.client.RedisOptions;
+import io.vertx.redis.client.Response;
+import io.vertx.redis.client.impl.types.ErrorType;
+import io.vertx.tests.redis.containers.RedisStandalone;
+import org.junit.After;
+import org.junit.Before;
+import org.junit.ClassRule;
+import org.junit.Rule;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+
+import static io.vertx.redis.client.Command.ACL;
+import static io.vertx.redis.client.Command.CLIENT;
+import static io.vertx.redis.client.Command.GET;
+import static io.vertx.redis.client.Command.HGETALL;
+import static io.vertx.redis.client.Command.HSET;
+import static io.vertx.redis.client.Command.SET;
+import static io.vertx.redis.client.Command.SUBSCRIBE;
+import static io.vertx.redis.client.Request.cmd;
+import static io.vertx.tests.redis.client.TestUtils.randomKey;
+
+@RunWith(VertxUnitRunner.class)
+public class RedisClient6Test {
+
+  @ClassRule
+  public static final RedisStandalone redis = RedisStandalone.builder().setVersion("6.2").build();
+
+  @Rule
+  public final RunTestOnContext rule = new RunTestOnContext();
+
+  private Redis client;
+
+  @Before
+  public void before(TestContext should) {
+    final Async before = should.async();
+
+    client = Redis.createClient(
+      rule.vertx(),
+      new RedisOptions().setConnectionString("redis://" + redis.getHost() + ":" + redis.getPort() + "?client=tester"));
+
+    client.connect().onComplete(onConnect -> {
+      should.assertTrue(onConnect.succeeded());
+      onConnect.result().close();
+      before.complete();
+    });
+  }
+
+  @After
+  public void after() {
+    client.close();
+  }
+
+  @Test
+  public void testBasicInterop(TestContext should) {
+    final Async test = should.async();
+    final String nonexisting = randomKey();
+    final String mykey = randomKey();
+
+    client.send(cmd(GET).arg(nonexisting)).onComplete(reply0 -> {
+      should.assertTrue(reply0.succeeded());
+      should.assertNull(reply0.result());
+
+      client.send(cmd(SET).arg(mykey).arg("Hello")).onComplete(reply1 -> {
+        should.assertTrue(reply1.succeeded());
+        client.send(cmd(GET).arg(mykey)).onComplete(reply2 -> {
+          should.assertTrue(reply2.succeeded());
+          should.assertEquals("Hello", reply2.result().toString());
+          test.complete();
+        });
+      });
+    });
+  }
+
+  @Test
+  public void testAssistedCaching2Connections(TestContext should) {
+    final Async test = should.async();
+
+    // get connection #1
+    client.connect()
+      .onFailure(should::fail)
+      .onSuccess(conn1 -> {
+        conn1.send(cmd(CLIENT).arg("ID"))
+          .onFailure(should::fail)
+          .onSuccess(id -> {
+            conn1
+              .handler(push -> {
+                if ("invalidate".equals(push.get(0).toString())) {
+                  for (Response invalidated : push.get(1)) {
+                    if ("foo".equals(invalidated.toString())) {
+                      test.complete();
+                    }
+                  }
+                }
+              })
+              .send(cmd(SUBSCRIBE).arg("__redis__:invalidate"))
+              .onFailure(should::fail)
+              .onSuccess(subscribe -> {
+                // get connection #2
+                client.connect()
+                  .onFailure(should::fail)
+                  .onSuccess(conn2 -> {
+                    conn2.send(cmd(CLIENT).arg("TRACKING").arg("on").arg("REDIRECT").arg(id.toInteger()))
+                      .onFailure(should::fail)
+                      .onSuccess(redirect -> {
+                        conn2.send(cmd(GET).arg("foo"))
+                          .onFailure(should::fail)
+                          .onSuccess(get0 -> {
+                            System.out.println(get0);
+                            // some other unrelated connection
+                            client.connect()
+                              .onFailure(should::fail)
+                              .onSuccess(conn3 -> {
+                                conn3.send(cmd(SET).arg("foo").arg("bar"))
+                                  .onFailure(should::fail)
+                                  .onSuccess(System.out::println);
+                              });
+                          });
+                      });
+                  });
+              });
+          });
+      });
+  }
+
+  @Test
+  public void testBoolean(TestContext should) {
+    final Async test = should.async();
+    final String key = randomKey();
+
+    client.send(cmd(HSET).arg(key).arg("true").arg(true).arg("false").arg(false))
+      .onFailure(should::fail)
+      .onSuccess(ok -> {
+        client.send(cmd(HGETALL).arg(key))
+          .onFailure(should::fail)
+          .onSuccess(hgetall -> {
+            should.assertFalse(hgetall.get("false").toBoolean());
+            should.assertTrue(hgetall.get("true").toBoolean());
+            test.complete();
+          });
+      });
+  }
+
+  @Test
+  public void testJson(TestContext should) {
+    final Async test = should.async();
+    final String mykey = randomKey();
+
+    JsonObject json = new JsonObject()
+      .put("key", "value");
+
+    client.send(cmd(HSET).arg(mykey).arg(json))
+      .compose(ignored -> client.send(cmd(HGETALL).arg(mykey)))
+      .onComplete(should.asyncAssertSuccess(value -> {
+        should.assertEquals("value", value.get("key").toString());
+        test.complete();
+      }));
+  }
+
+  @Test
+  public void testACL(TestContext should) {
+    final Async test = should.async();
+
+    // create a alice user
+    client.send(cmd(ACL).arg("SETUSER").arg("alice").arg("on").arg(">p1pp0").arg("~cached:*").arg("+get"))
+      .onFailure(should::fail)
+      .onSuccess(ok -> {
+        // create a new client, this time using alice ACL
+        Redis alice = Redis.createClient(
+          rule.vertx(),
+          new RedisOptions().setConnectionString("redis://alice:p1pp0@" + redis.getHost() + ":" + redis.getPort() + "?client=tester"));
+
+        // connect should be fine
+        alice.connect()
+          .onFailure(should::fail)
+          .onSuccess(conn -> {
+            // there should not be allowed to GET
+            conn.send(cmd(GET).arg("foo"))
+              .onSuccess(res -> should.fail("This should fail with a NOPERM"))
+              .onFailure(err -> {
+                should.assertTrue(err instanceof ErrorType);
+                ErrorType error = (ErrorType) err;
+                should.assertTrue(error.is("NOPERM"));
+                test.complete();
+              });
+          });
+
+      });
+  }
+}

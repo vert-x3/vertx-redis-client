@@ -18,12 +18,11 @@ package io.vertx.redis.client.impl;
 import io.vertx.core.Future;
 import io.vertx.core.Handler;
 import io.vertx.core.Promise;
+import io.vertx.core.internal.resource.ManagedResource;
+import io.vertx.core.internal.resource.ResourceManager;
 import io.vertx.core.net.ConnectOptions;
 import io.vertx.core.net.NetClientOptions;
 import io.vertx.core.net.NetSocket;
-import io.vertx.core.net.impl.endpoint.EndpointManager;
-import io.vertx.core.net.impl.endpoint.EndpointProvider;
-import io.vertx.core.net.impl.endpoint.Endpoint;
 import io.vertx.core.internal.pool.*;
 import io.vertx.core.internal.net.NetClientInternal;
 import io.vertx.core.internal.ContextInternal;
@@ -38,8 +37,9 @@ import io.vertx.redis.client.*;
 import io.vertx.redis.client.impl.types.ErrorType;
 
 import java.util.Objects;
+import java.util.function.Function;
 
-class RedisConnectionManager implements EndpointProvider<RedisConnectionManager.ConnectionKey, RedisConnectionManager.RedisEndpoint> {
+public class RedisConnectionManager implements Function<RedisConnectionManager.ConnectionKey, RedisConnectionManager.RedisEndpoint> {
 
   private static final Logger LOG = LoggerFactory.getLogger(RedisConnectionManager.class);
 
@@ -53,7 +53,7 @@ class RedisConnectionManager implements EndpointProvider<RedisConnectionManager.
   private final RedisConnectOptions connectOptions;
   private final TracingPolicy tracingPolicy;
 
-  private final EndpointManager<ConnectionKey, RedisEndpoint> pooledConnectionManager;
+  private final ResourceManager<ConnectionKey, RedisEndpoint> pooledConnectionManager;
   private long timerID;
 
   RedisConnectionManager(VertxInternal vertx, NetClientOptions tcpOptions, PoolOptions poolOptions, RedisConnectOptions connectOptions, TracingPolicy tracingPolicy) {
@@ -65,11 +65,11 @@ class RedisConnectionManager implements EndpointProvider<RedisConnectionManager.
     VertxMetrics metricsSPI = this.vertx.metricsSPI();
     metrics = metricsSPI != null ? metricsSPI.createPoolMetrics("redis", poolOptions.getName(), poolOptions.getMaxSize()) : null;
     this.netClient = (NetClientInternal) vertx.createNetClient(tcpOptions);
-    this.pooledConnectionManager = new EndpointManager<>();
+    this.pooledConnectionManager = new ResourceManager<>();
   }
 
-  private RedisEndpoint connectionEndpointProvider(Runnable dispose, String connectionString, Request setup) {
-    return new RedisEndpoint(vertx, netClient, tcpOptions, poolOptions, connectOptions, tracingPolicy, dispose, connectionString, setup);
+  private RedisEndpoint connectionEndpointProvider(String connectionString, Request setup) {
+    return new RedisEndpoint(vertx, netClient, tcpOptions, poolOptions, connectOptions, tracingPolicy, connectionString, setup);
   }
 
   synchronized void start() {
@@ -93,7 +93,7 @@ class RedisConnectionManager implements EndpointProvider<RedisConnectionManager.
     timerID = vertx.setTimer(period, id -> checkExpired(period));
   }
 
-  static class ConnectionKey {
+  public static class ConnectionKey {
     private final String string;
     private final Request setup;
 
@@ -338,8 +338,8 @@ class RedisConnectionManager implements EndpointProvider<RedisConnectionManager.
   }
 
   @Override
-  public RedisEndpoint create(ConnectionKey key, Runnable dispose) {
-    return connectionEndpointProvider(dispose, key.string, key.setup);
+  public RedisEndpoint apply(ConnectionKey key) {
+    return connectionEndpointProvider(key.string, key.setup);
   }
 
   public Future<PooledRedisConnection> getConnection(String connectionString, Request setup) {
@@ -353,7 +353,7 @@ class RedisConnectionManager implements EndpointProvider<RedisConnectionManager.
 
     final boolean metricsEnabled = metrics != null;
     final Object queueMetric = metricsEnabled ? metrics.enqueue() : null;
-    Future<Lease<RedisConnectionInternal>> future = pooledConnectionManager.withEndpointAsync(new ConnectionKey(connectionString, setup), this, (endpoint, created) -> {
+    Future<Lease<RedisConnectionInternal>> future = pooledConnectionManager.withResourceAsync(new ConnectionKey(connectionString, setup), this, (endpoint, created) -> {
       return endpoint.requestConnection(eventLoopContext);
     });
     return future
@@ -379,12 +379,15 @@ class RedisConnectionManager implements EndpointProvider<RedisConnectionManager.
     }
   }
 
-  static class RedisEndpoint extends Endpoint {
+  public static class RedisEndpoint extends ManagedResource {
 
     final ConnectionPool<RedisConnectionInternal> pool;
 
-    public RedisEndpoint(VertxInternal vertx, NetClientInternal netClient, NetClientOptions netClientOptions, PoolOptions poolOptions, RedisConnectOptions connectOptions, TracingPolicy tracingPolicy, Runnable dispose, String connectionString, Request setup) {
-      super(dispose);
+    public ConnectionPool<RedisConnectionInternal> pool() {
+      return pool;
+    }
+
+    public RedisEndpoint(VertxInternal vertx, NetClientInternal netClient, NetClientOptions netClientOptions, PoolOptions poolOptions, RedisConnectOptions connectOptions, TracingPolicy tracingPolicy, String connectionString, Request setup) {
       PoolConnector<RedisConnectionInternal> connector = new RedisConnectionProvider(vertx, netClient, netClientOptions, poolOptions, connectOptions, tracingPolicy, connectionString, setup);
       pool = ConnectionPool.pool(connector, new int[]{poolOptions.getMaxSize()}, poolOptions.getMaxWaiting());
     }

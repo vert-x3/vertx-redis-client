@@ -123,7 +123,7 @@ public final class RequestImpl implements Request {
     return this;
   }
 
-  Buffer encode() {
+  public Buffer encode() {
     return encode(Buffer.buffer());
   }
 
@@ -153,7 +153,7 @@ public final class RequestImpl implements Request {
     return buffer;
   }
 
-  List<byte[]> getArgs() {
+  public List<byte[]> getArgs() {
     return args;
   }
 

@@ -113,6 +113,11 @@ public class RedisOptionsConverter {
             obj.setPoolName((String)member.getValue());
           }
           break;
+        case "metricsName":
+          if (member.getValue() instanceof String) {
+            obj.setMetricsName((String)member.getValue());
+          }
+          break;
         case "hashSlotCacheTTL":
           if (member.getValue() instanceof Number) {
             obj.setHashSlotCacheTTL(((Number)member.getValue()).longValue());
@@ -173,6 +178,9 @@ public class RedisOptionsConverter {
     }
     if (obj.getPoolName() != null) {
       json.put("poolName", obj.getPoolName());
+    }
+    if (obj.getMetricsName() != null) {
+      json.put("metricsName", obj.getMetricsName());
     }
     json.put("hashSlotCacheTTL", obj.getHashSlotCacheTTL());
     json.put("autoFailover", obj.isAutoFailover());
