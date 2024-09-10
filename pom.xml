@@ -120,7 +120,6 @@
               <id>default-compile</id>
               <phase>compile</phase>
               <configuration>
-                <generatedSourcesDirectory>${project.basedir}/src/main/generated</generatedSourcesDirectory>
                 <annotationProcessorPaths>
                   <annotationProcessorPath>
                     <groupId>io.vertx</groupId>
