@@ -117,14 +117,14 @@ public class RedisReplicationClient extends BaseRedisClient implements Redis {
     return promise.future();
   }
 
-  private void connectWithDiscoverTopology(List<String> endpoints, int index, Set<Throwable> failures, Handler<AsyncResult<RedisConnection>> onConnect) {
+  private void connectWithDiscoverTopology(List<String> endpoints, int index, Set<Throwable> failures, Completable<RedisConnection> onConnect) {
     if (index >= endpoints.size()) {
       // stop condition
       StringBuilder message = new StringBuilder("Cannot connect to any of the provided endpoints");
       for (Throwable failure : failures) {
         message.append("\n- ").append(failure);
       }
-      onConnect.handle(Future.failedFuture(new RedisConnectException(message.toString())));
+      onConnect.fail(new RedisConnectException(message.toString()));
       return;
     }
 
@@ -155,7 +155,7 @@ public class RedisReplicationClient extends BaseRedisClient implements Redis {
             if (!replica.online) {
               LOG.info("Skipping offline replica: " + replica.ip + ":" + replica.port);
               if (counter.incrementAndGet() == replicas.size()) {
-                onConnect.handle(Future.succeededFuture(new RedisReplicationConnection(vertx, connectOptions, conn, replicaConnections)));
+                onConnect.succeed(new RedisReplicationConnection(vertx, connectOptions, conn, replicaConnections));
               }
               continue;
             }
@@ -166,7 +166,7 @@ public class RedisReplicationClient extends BaseRedisClient implements Redis {
                 // failed try with the next endpoint
                 LOG.warn("Skipping failed replica: " + replica.ip + ":" + replica.port, err);
                 if (counter.incrementAndGet() == replicas.size()) {
-                  onConnect.handle(Future.succeededFuture(new RedisReplicationConnection(vertx, connectOptions, conn, replicaConnections)));
+                  onConnect.succeed(new RedisReplicationConnection(vertx, connectOptions, conn, replicaConnections));
                 }
               })
               .onSuccess(replicaConnection -> {
@@ -177,7 +177,7 @@ public class RedisReplicationClient extends BaseRedisClient implements Redis {
                   replicaConnections.add(replicaConnection);
                 }
                 if (counter.incrementAndGet() == replicas.size()) {
-                  onConnect.handle(Future.succeededFuture(new RedisReplicationConnection(vertx, connectOptions, conn, replicaConnections)));
+                  onConnect.succeed(new RedisReplicationConnection(vertx, connectOptions, conn, replicaConnections));
                 }
               });
           }

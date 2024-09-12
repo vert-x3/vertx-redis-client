@@ -83,12 +83,12 @@ public class RedisClusterImpl implements RedisCluster {
       return;
     }
 
-    conn.send(endpoints[index], RedisClusterConnection.RETRIES, request, ar -> {
-      if (ar.succeeded()) {
-        result.add(ar.result());
+    conn.send(endpoints[index], RedisClusterConnection.RETRIES, request, (res, err) -> {
+      if (err == null) {
+        result.add(res);
         onAllNodes(endpoints, index + 1, request, result, conn, promise);
       } else {
-        promise.fail(ar.cause());
+        promise.fail(err);
       }
     });
   }

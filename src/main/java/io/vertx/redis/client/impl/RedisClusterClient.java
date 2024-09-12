@@ -15,11 +15,7 @@
  */
 package io.vertx.redis.client.impl;
 
-import io.vertx.core.AsyncResult;
-import io.vertx.core.Future;
-import io.vertx.core.Handler;
-import io.vertx.core.Promise;
-import io.vertx.core.Vertx;
+import io.vertx.core.*;
 import io.vertx.core.internal.logging.Logger;
 import io.vertx.core.internal.logging.LoggerFactory;
 import io.vertx.core.net.NetClientOptions;
@@ -154,7 +150,7 @@ public class RedisClusterClient extends BaseRedisClient implements Redis {
     return promise.future();
   }
 
-  private void connect(Slots slots, Handler<AsyncResult<RedisConnection>> onConnected) {
+  private void connect(Slots slots, Completable<RedisConnection> onConnected) {
     // create a cluster connection
     final Set<Throwable> failures = ConcurrentHashMap.newKeySet();
     final AtomicInteger counter = new AtomicInteger();
@@ -180,7 +176,7 @@ public class RedisClusterClient extends BaseRedisClient implements Redis {
   }
 
   private void connectionComplete(AtomicInteger counter, Slots slots, Map<String, PooledRedisConnection> connections,
-      Set<Throwable> failures, Handler<AsyncResult<RedisConnection>> onConnected) {
+      Set<Throwable> failures, Completable<RedisConnection> onConnected) {
     if (counter.incrementAndGet() == slots.endpoints().length) {
       // end condition
       if (!failures.isEmpty()) {
@@ -200,10 +196,10 @@ public class RedisClusterClient extends BaseRedisClient implements Redis {
         for (Throwable failure : failures) {
           message.append("\n- ").append(failure);
         }
-        onConnected.handle(Future.failedFuture(new RedisConnectException(message.toString())));
+        onConnected.fail(new RedisConnectException(message.toString()));
       } else {
-        onConnected.handle(Future.succeededFuture(new RedisClusterConnection(vertx, connectionManager,
-          connectOptions, sharedSlots, connections)));
+        onConnected.succeed(new RedisClusterConnection(vertx, connectionManager,
+          connectOptions, sharedSlots, connections));
       }
     }
   }

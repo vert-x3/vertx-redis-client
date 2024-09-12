@@ -15,11 +15,7 @@
  */
 package io.vertx.redis.client.impl;
 
-import io.vertx.core.AsyncResult;
-import io.vertx.core.Future;
-import io.vertx.core.Handler;
-import io.vertx.core.Promise;
-import io.vertx.core.Vertx;
+import io.vertx.core.*;
 import io.vertx.core.internal.logging.Logger;
 import io.vertx.core.internal.logging.LoggerFactory;
 import io.vertx.core.net.NetClientOptions;
@@ -73,13 +69,11 @@ public class RedisSentinelClient extends BaseRedisClient implements Redis {
   public Future<RedisConnection> connect() {
     final Promise<RedisConnection> promise = vertx.promise();
 
-    createConnectionInternal(connectOptions, connectOptions.getRole(), createConnection -> {
-      if (createConnection.failed()) {
-        promise.fail(createConnection.cause());
+    createConnectionInternal(connectOptions, connectOptions.getRole(), (conn, err) -> {
+      if (err != null) {
+        promise.fail(err);
         return;
       }
-
-      final PooledRedisConnection conn = createConnection.result();
 
       if (connectOptions.getRole() == RedisRole.SENTINEL || connectOptions.getRole() == RedisRole.REPLICA) {
         // it is possible that a replica is later promoted to a master, but that shouldn't be too big of a deal
@@ -130,11 +124,11 @@ public class RedisSentinelClient extends BaseRedisClient implements Redis {
     return promise.future();
   }
 
-  private void createConnectionInternal(RedisSentinelConnectOptions options, RedisRole role, Handler<AsyncResult<PooledRedisConnection>> onCreate) {
+  private void createConnectionInternal(RedisSentinelConnectOptions options, RedisRole role, Completable<PooledRedisConnection> onCreate) {
 
     final Handler<AsyncResult<RedisURI>> createAndConnect = resolve -> {
       if (resolve.failed()) {
-        onCreate.handle(Future.failedFuture(resolve.cause()));
+        onCreate.fail(resolve.cause());
         return;
       }
 

@@ -1,11 +1,7 @@
 package io.vertx.redis.client.impl;
 
 import io.vertx.codegen.annotations.Nullable;
-import io.vertx.core.AsyncResult;
-import io.vertx.core.Future;
-import io.vertx.core.Handler;
-import io.vertx.core.Promise;
-import io.vertx.core.Vertx;
+import io.vertx.core.*;
 import io.vertx.core.internal.VertxInternal;
 import io.vertx.core.internal.logging.Logger;
 import io.vertx.core.internal.logging.LoggerFactory;
@@ -266,7 +262,7 @@ public class RedisClusterConnection implements RedisConnection {
     return map;
   }
 
-  void send(String endpoint, int retries, Request command, Handler<AsyncResult<Response>> handler) {
+  void send(String endpoint, int retries, Request command, Completable<Response> handler) {
     PooledRedisConnection connection = connections.get(endpoint);
     if (connection == null) {
       connectionManager.getConnection(endpoint, RedisReplicas.NEVER != connectOptions.getUseReplicas() ? Request.cmd(Command.READONLY) : null)
@@ -285,7 +281,7 @@ public class RedisClusterConnection implements RedisConnection {
           if (retries > 0) {
             send(endpoint, retries - 1, command, handler);
           } else {
-            handler.handle(Future.failedFuture("Failed obtaining connection to: " + endpoint));
+            handler.fail("Failed obtaining connection to: " + endpoint);
           }
         });
       return;
@@ -293,7 +289,7 @@ public class RedisClusterConnection implements RedisConnection {
 
     connection
       .send(command)
-      .onComplete(send -> {
+      .onComplete((send -> {
         if (send.failed() && send.cause() instanceof ErrorType && retries >= 0) {
           final ErrorType cause = (ErrorType) send.cause();
 
@@ -308,7 +304,7 @@ public class RedisClusterConnection implements RedisConnection {
             String addr = cause.slice(' ', 2);
             if (addr == null) {
               // bad message
-              handler.handle(Future.failedFuture("Cannot find endpoint:port in redirection: " + cause));
+              handler.fail("Cannot find endpoint:port in redirection: " + cause);
               return;
             }
 
@@ -319,9 +315,9 @@ public class RedisClusterConnection implements RedisConnection {
             }
             String newEndpoint = uri.protocol() + "://" + uri.userinfo() + addr;
             if (ask) {
-              send(newEndpoint, retries - 1, Request.cmd(Command.ASKING), resp -> {
-                if (resp.failed()) {
-                  handler.handle(Future.failedFuture("Failed ASKING: " + resp.cause() + ", caused by " + cause));
+              send(newEndpoint, retries - 1, Request.cmd(Command.ASKING), (resp, err) -> {
+                if (err != null) {
+                  handler.fail("Failed ASKING: " + err + ", caused by " + cause);
                 } else {
                   send(newEndpoint, retries - 1, command, handler);
                 }
@@ -343,7 +339,7 @@ public class RedisClusterConnection implements RedisConnection {
             // NOAUTH will try to authenticate
             connection
               .send(Request.cmd(Command.AUTH).arg(connectOptions.getPassword()))
-              .onFailure(err -> handler.handle(Future.failedFuture(err)))
+              .onFailure(err -> handler.fail(err))
               .onSuccess(auth -> {
                 // again
                 send(endpoint, retries - 1, command, handler);
@@ -353,11 +349,11 @@ public class RedisClusterConnection implements RedisConnection {
         }
 
         try {
-          handler.handle(send);
+          handler.succeed(send.result());
         } catch (RuntimeException e) {
           LOG.error("Handler failure", e);
         }
-      });
+      }));
   }
 
   @Override
@@ -447,7 +443,7 @@ public class RedisClusterConnection implements RedisConnection {
     return promise.future();
   }
 
-  private void batch(String endpoint, int retries, List<Request> commands, Handler<AsyncResult<List<Response>>> handler) {
+  private void batch(String endpoint, int retries, List<Request> commands, Completable<List<Response>> handler) {
     RedisConnection connection = connections.get(endpoint);
     if (connection == null) {
       connectionManager.getConnection(endpoint, RedisReplicas.NEVER != connectOptions.getUseReplicas() ? Request.cmd(Command.READONLY) : null)
@@ -466,7 +462,7 @@ public class RedisClusterConnection implements RedisConnection {
           if (retries > 0) {
             batch(endpoint, retries - 1, commands, handler);
           } else {
-            handler.handle(Future.failedFuture("Failed obtaining connection to: " + endpoint));
+            handler.fail("Failed obtaining connection to: " + endpoint);
           }
         });
       return;
@@ -489,7 +485,7 @@ public class RedisClusterConnection implements RedisConnection {
             String addr = cause.slice(' ', 2);
             if (addr == null) {
               // bad message
-              handler.handle(Future.failedFuture("Cannot find endpoint:port in redirection: " + cause));
+              handler.fail("Cannot find endpoint:port in redirection: " + cause);
               return;
             }
 
@@ -500,9 +496,9 @@ public class RedisClusterConnection implements RedisConnection {
             }
             String newEndpoint = uri.protocol() + "://" + uri.userinfo() + addr;
             if (ask) {
-              batch(newEndpoint, retries - 1, Collections.singletonList(Request.cmd(Command.ASKING)), resp -> {
-                if (resp.failed()) {
-                  handler.handle(Future.failedFuture("Failed ASKING: " + resp.cause() + ", caused by " + cause));
+              batch(newEndpoint, retries - 1, Collections.singletonList(Request.cmd(Command.ASKING)), (resp, err) -> {
+                if (err != null) {
+                  handler.fail("Failed ASKING: " + err + ", caused by " + cause);
                 } else {
                   batch(newEndpoint, retries - 1, commands, handler);
                 }
@@ -524,7 +520,7 @@ public class RedisClusterConnection implements RedisConnection {
             // try to authenticate
             connection
               .send(Request.cmd(Command.AUTH).arg(connectOptions.getPassword()))
-              .onFailure(err -> handler.handle(Future.failedFuture(err)))
+              .onFailure(err -> handler.fail(err))
               .onSuccess(auth -> {
                 // again
                 batch(endpoint, retries - 1, commands, handler);
@@ -534,7 +530,7 @@ public class RedisClusterConnection implements RedisConnection {
         }
 
         try {
-          handler.handle(send);
+          handler.succeed(send.result());
         } catch (RuntimeException e) {
           LOG.error("Handler failure", e);
         }
