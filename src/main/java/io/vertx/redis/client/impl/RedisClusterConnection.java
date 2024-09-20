@@ -1,7 +1,11 @@
 package io.vertx.redis.client.impl;
 
 import io.vertx.codegen.annotations.Nullable;
-import io.vertx.core.*;
+import io.vertx.core.Completable;
+import io.vertx.core.Future;
+import io.vertx.core.Handler;
+import io.vertx.core.Promise;
+import io.vertx.core.Vertx;
 import io.vertx.core.internal.VertxInternal;
 import io.vertx.core.internal.logging.Logger;
 import io.vertx.core.internal.logging.LoggerFactory;
@@ -165,7 +169,7 @@ public class RedisClusterConnection implements RedisConnection {
               // means if one of the operations failed, then we can fail the handler
               promise.fail(composite.cause());
             } else {
-              promise.complete(REDUCERS.get(cmd).apply(composite.result().list()));
+              promise.succeed(REDUCERS.get(cmd).apply(composite.result().list()));
             }
           });
         } else {
@@ -211,7 +215,7 @@ public class RedisClusterConnection implements RedisConnection {
               // means if one of the operations failed, then we can fail the handler
               promise.fail(composite.cause());
             } else {
-              promise.complete(REDUCERS.get(cmd).apply(composite.result().list()));
+              promise.succeed(REDUCERS.get(cmd).apply(composite.result().list()));
             }
           });
 
@@ -289,7 +293,7 @@ public class RedisClusterConnection implements RedisConnection {
 
     connection
       .send(command)
-      .onComplete((send -> {
+      .onComplete(send -> {
         if (send.failed() && send.cause() instanceof ErrorType && retries >= 0) {
           final ErrorType cause = (ErrorType) send.cause();
 
@@ -339,7 +343,7 @@ public class RedisClusterConnection implements RedisConnection {
             // NOAUTH will try to authenticate
             connection
               .send(Request.cmd(Command.AUTH).arg(connectOptions.getPassword()))
-              .onFailure(err -> handler.fail(err))
+              .onFailure(handler::fail)
               .onSuccess(auth -> {
                 // again
                 send(endpoint, retries - 1, command, handler);
@@ -353,7 +357,7 @@ public class RedisClusterConnection implements RedisConnection {
         } catch (RuntimeException e) {
           LOG.error("Handler failure", e);
         }
-      }));
+      });
   }
 
   @Override
@@ -367,7 +371,7 @@ public class RedisClusterConnection implements RedisConnection {
 
     if (requests.isEmpty()) {
       LOG.debug("Empty batch");
-      promise.complete(Collections.emptyList());
+      promise.succeed(Collections.emptyList());
     } else {
       int correctSlot = -1;
       String currentEndpoint = null;
@@ -520,7 +524,7 @@ public class RedisClusterConnection implements RedisConnection {
             // try to authenticate
             connection
               .send(Request.cmd(Command.AUTH).arg(connectOptions.getPassword()))
-              .onFailure(err -> handler.fail(err))
+              .onFailure(handler::fail)
               .onSuccess(auth -> {
                 // again
                 batch(endpoint, retries - 1, commands, handler);

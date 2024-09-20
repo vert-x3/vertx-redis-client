@@ -8,7 +8,11 @@ import io.vertx.core.internal.logging.Logger;
 import io.vertx.core.internal.logging.LoggerFactory;
 import io.vertx.core.net.NetClientOptions;
 import io.vertx.core.tracing.TracingPolicy;
-import io.vertx.redis.client.*;
+import io.vertx.redis.client.PoolOptions;
+import io.vertx.redis.client.Redis;
+import io.vertx.redis.client.RedisConnectOptions;
+import io.vertx.redis.client.Request;
+import io.vertx.redis.client.Response;
 
 import java.util.Collections;
 import java.util.List;

@@ -19,7 +19,11 @@ import io.vertx.codegen.annotations.Nullable;
 import io.vertx.redis.client.Response;
 import io.vertx.redis.client.ResponseType;
 
-import java.util.*;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.Map;
+import java.util.Set;
 
 /**
  * A Redis MULTI response can represent a List/Set/Map type.

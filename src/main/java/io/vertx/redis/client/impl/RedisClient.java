@@ -15,10 +15,15 @@
  */
 package io.vertx.redis.client.impl;
 
-import io.vertx.core.*;
+import io.vertx.core.Future;
+import io.vertx.core.Promise;
+import io.vertx.core.Vertx;
 import io.vertx.core.net.NetClientOptions;
 import io.vertx.core.tracing.TracingPolicy;
-import io.vertx.redis.client.*;
+import io.vertx.redis.client.PoolOptions;
+import io.vertx.redis.client.Redis;
+import io.vertx.redis.client.RedisConnectOptions;
+import io.vertx.redis.client.RedisConnection;
 
 public class RedisClient extends BaseRedisClient implements Redis {
 
@@ -33,7 +38,7 @@ public class RedisClient extends BaseRedisClient implements Redis {
   public Future<RedisConnection> connect() {
     // so that the caller is called back on its original context
     Promise<RedisConnection> promise = vertx.promise();
-    connectionManager.getConnection(defaultAddress, null).onComplete((Promise) promise);
+    connectionManager.getConnection(defaultAddress, null).onComplete(promise);
     return promise.future();
   }
 }

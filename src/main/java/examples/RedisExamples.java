@@ -1,10 +1,24 @@
 package examples;
 
-import io.vertx.core.*;
+import io.vertx.core.AbstractVerticle;
+import io.vertx.core.Future;
+import io.vertx.core.Promise;
+import io.vertx.core.Vertx;
 import io.vertx.core.net.NetClientOptions;
 import io.vertx.core.net.PemTrustOptions;
 import io.vertx.core.tracing.TracingPolicy;
-import io.vertx.redis.client.*;
+import io.vertx.redis.client.Command;
+import io.vertx.redis.client.ProtocolVersion;
+import io.vertx.redis.client.Redis;
+import io.vertx.redis.client.RedisAPI;
+import io.vertx.redis.client.RedisClientType;
+import io.vertx.redis.client.RedisConnection;
+import io.vertx.redis.client.RedisOptions;
+import io.vertx.redis.client.RedisRole;
+import io.vertx.redis.client.RedisTopology;
+import io.vertx.redis.client.Request;
+import io.vertx.redis.client.Response;
+import io.vertx.redis.client.ResponseType;
 
 import java.util.concurrent.atomic.AtomicBoolean;
 

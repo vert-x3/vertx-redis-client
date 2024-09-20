@@ -15,7 +15,10 @@
  */
 package io.vertx.redis.client.impl;
 
-import io.vertx.core.*;
+import io.vertx.core.Completable;
+import io.vertx.core.Future;
+import io.vertx.core.Promise;
+import io.vertx.core.Vertx;
 import io.vertx.core.internal.logging.Logger;
 import io.vertx.core.internal.logging.LoggerFactory;
 import io.vertx.core.net.NetClientOptions;

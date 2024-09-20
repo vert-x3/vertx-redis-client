@@ -18,12 +18,15 @@ package io.vertx.redis.client.impl;
 import io.vertx.core.Future;
 import io.vertx.core.Handler;
 import io.vertx.core.Promise;
+import io.vertx.core.internal.pool.ConnectResult;
+import io.vertx.core.internal.pool.ConnectionPool;
+import io.vertx.core.internal.pool.Lease;
+import io.vertx.core.internal.pool.PoolConnector;
 import io.vertx.core.internal.resource.ManagedResource;
 import io.vertx.core.internal.resource.ResourceManager;
 import io.vertx.core.net.ConnectOptions;
 import io.vertx.core.net.NetClientOptions;
 import io.vertx.core.net.NetSocket;
-import io.vertx.core.internal.pool.*;
 import io.vertx.core.internal.net.NetClientInternal;
 import io.vertx.core.internal.ContextInternal;
 import io.vertx.core.internal.VertxInternal;
@@ -33,7 +36,12 @@ import io.vertx.core.spi.metrics.ClientMetrics;
 import io.vertx.core.spi.metrics.PoolMetrics;
 import io.vertx.core.spi.metrics.VertxMetrics;
 import io.vertx.core.tracing.TracingPolicy;
-import io.vertx.redis.client.*;
+import io.vertx.redis.client.Command;
+import io.vertx.redis.client.PoolOptions;
+import io.vertx.redis.client.RedisConnectOptions;
+import io.vertx.redis.client.RedisConnection;
+import io.vertx.redis.client.Request;
+import io.vertx.redis.client.Response;
 import io.vertx.redis.client.impl.types.ErrorType;
 
 import java.util.Objects;
@@ -79,15 +87,13 @@ public class RedisConnectionManager implements Function<RedisConnectionManager.C
 
   private void checkExpired(long period) {
     pooledConnectionManager.forEach(e ->
-      ((RedisEndpoint) e).pool.evict(conn -> !conn.isValid(), ar -> {
-        if (ar.succeeded()) {
-          for (RedisConnectionInternal conn : ar.result()) {
-            // on close we reset the default handlers
-            conn.handler(null);
-            conn.endHandler(null);
-            conn.exceptionHandler(null);
-            conn.forceClose();
-          }
+      ((RedisEndpoint) e).pool.evict(conn -> !conn.isValid()).onSuccess(conns -> {
+        for (RedisConnectionInternal conn : conns) {
+          // on close we reset the default handlers
+          conn.handler(null);
+          conn.endHandler(null);
+          conn.exceptionHandler(null);
+          conn.forceClose();
         }
       }));
     timerID = vertx.setTimer(period, id -> checkExpired(period));
@@ -395,19 +401,18 @@ public class RedisConnectionManager implements Function<RedisConnectionManager.C
 
     public Future<Lease<RedisConnectionInternal>> requestConnection(ContextInternal ctx) {
       Promise<Lease<RedisConnectionInternal>> promise = ctx.promise();
-      pool.acquire(ctx, 0, ar -> {
-        if (ar.succeeded()) {
+      pool.acquire(ctx, 0)
+        .onSuccess(lease -> {
           // increment the reference counter to avoid the pool to be closed too soon
           // once there are no more connections the pool is collected, so this counter needs
           // to be as up to date as possible.
           incRefCount();
           // Integration between endpoint/pool and the standalone connection
-          ((RedisStandaloneConnection) ar.result().get())
-            .evictHandler(this::decRefCount);
-        }
-        // proceed to user
-        promise.handle(ar);
-      });
+          ((RedisStandaloneConnection) lease.get()).evictHandler(this::decRefCount);
+          // proceed to user
+          promise.succeed(lease);
+        })
+        .onFailure(promise::fail);
       return promise.future();
     }
   }

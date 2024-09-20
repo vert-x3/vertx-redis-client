@@ -1,8 +1,7 @@
 package io.vertx.redis.client.impl;
 
-import io.vertx.core.AsyncResult;
+import io.vertx.core.Completable;
 import io.vertx.core.Future;
-import io.vertx.core.Handler;
 import io.vertx.core.Promise;
 import io.vertx.core.Vertx;
 import io.vertx.core.internal.logging.Logger;
@@ -55,14 +54,14 @@ class SharedSlots {
     }
   }
 
-  private void getSlots(List<String> endpoints, int index, Set<Throwable> failures, Promise<Slots> onGotSlots) {
+  private void getSlots(List<String> endpoints, int index, Set<Throwable> failures, Completable<Slots> onGotSlots) {
     if (index >= endpoints.size()) {
       // stop condition
       StringBuilder message = new StringBuilder("Cannot connect to any of the provided endpoints");
       for (Throwable failure : failures) {
         message.append("\n- ").append(failure);
       }
-      onGotSlots.handle(Future.failedFuture(new RedisConnectException(message.toString())));
+      onGotSlots.fail(new RedisConnectException(message.toString()));
       scheduleInvalidation();
       return;
     }
@@ -85,7 +84,7 @@ class SharedSlots {
             getSlots(endpoints, index + 1, failures, onGotSlots);
           } else {
             Slots slots = result.result();
-            onGotSlots.handle(Future.succeededFuture(slots));
+            onGotSlots.succeed(slots);
             scheduleInvalidation();
           }
         });

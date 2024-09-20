@@ -6,7 +6,12 @@ import io.vertx.core.Handler;
 import io.vertx.core.Vertx;
 import io.vertx.core.internal.logging.Logger;
 import io.vertx.core.internal.logging.LoggerFactory;
-import io.vertx.redis.client.*;
+import io.vertx.redis.client.Command;
+import io.vertx.redis.client.RedisConnection;
+import io.vertx.redis.client.RedisReplicas;
+import io.vertx.redis.client.RedisReplicationConnectOptions;
+import io.vertx.redis.client.Request;
+import io.vertx.redis.client.Response;
 
 import java.util.ArrayList;
 import java.util.Collections;

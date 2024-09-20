@@ -18,7 +18,11 @@ package io.vertx.redis.client.impl;
 import io.vertx.codegen.annotations.Nullable;
 import io.vertx.redis.client.Response;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Random;
+import java.util.Set;
 
 // see https://redis.io/commands/cluster-slots/
 class Slots {
