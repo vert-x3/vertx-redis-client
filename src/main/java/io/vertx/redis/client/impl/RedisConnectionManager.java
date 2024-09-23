@@ -237,7 +237,9 @@ public class RedisConnectionManager implements Function<RedisConnectionManager.C
         return ping(ctx, connection);
       } else {
         String version = RESPParser.VERSION;
-        if (options.getPreferredProtocolVersion() != null) {
+        if (redisURI.param("protocol") != null) {
+          version = redisURI.param("protocol");
+        } else if (options.getPreferredProtocolVersion() != null) {
           version = options.getPreferredProtocolVersion().getValue();
         }
         Request hello = Request.cmd(Command.HELLO).arg(version);
