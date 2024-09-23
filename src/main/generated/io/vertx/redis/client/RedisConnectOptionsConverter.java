@@ -33,6 +33,11 @@ public class RedisConnectOptionsConverter {
             obj.setPreferredProtocolVersion(io.vertx.redis.client.ProtocolVersion.valueOf((String)member.getValue()));
           }
           break;
+        case "user":
+          if (member.getValue() instanceof String) {
+            obj.setUser((String)member.getValue());
+          }
+          break;
         case "password":
           if (member.getValue() instanceof String) {
             obj.setPassword((String)member.getValue());
@@ -66,6 +71,9 @@ public class RedisConnectOptionsConverter {
     json.put("protocolNegotiation", obj.isProtocolNegotiation());
     if (obj.getPreferredProtocolVersion() != null) {
       json.put("preferredProtocolVersion", obj.getPreferredProtocolVersion().name());
+    }
+    if (obj.getUser() != null) {
+      json.put("user", obj.getUser());
     }
     if (obj.getPassword() != null) {
       json.put("password", obj.getPassword());

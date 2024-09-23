@@ -108,6 +108,11 @@ public class RedisClusterConnectOptions extends RedisConnectOptions {
   }
 
   @Override
+  public RedisClusterConnectOptions setUser(String user) {
+    return (RedisClusterConnectOptions) super.setUser(user);
+  }
+
+  @Override
   public RedisClusterConnectOptions setPassword(String password) {
     return (RedisClusterConnectOptions) super.setPassword(password);
   }

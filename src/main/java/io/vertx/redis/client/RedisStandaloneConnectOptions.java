@@ -58,6 +58,11 @@ public class RedisStandaloneConnectOptions extends RedisConnectOptions {
   }
 
   @Override
+  public RedisStandaloneConnectOptions setUser(String user) {
+    return (RedisStandaloneConnectOptions) super.setUser(user);
+  }
+
+  @Override
   public RedisStandaloneConnectOptions setPassword(String password) {
     return (RedisStandaloneConnectOptions) super.setPassword(password);
   }

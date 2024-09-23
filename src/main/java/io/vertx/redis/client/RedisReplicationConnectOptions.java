@@ -109,6 +109,11 @@ public class RedisReplicationConnectOptions extends RedisConnectOptions {
   }
 
   @Override
+  public RedisReplicationConnectOptions setUser(String user) {
+    return (RedisReplicationConnectOptions) super.setUser(user);
+  }
+
+  @Override
   public RedisReplicationConnectOptions setPassword(String password) {
     return (RedisReplicationConnectOptions) super.setPassword(password);
   }

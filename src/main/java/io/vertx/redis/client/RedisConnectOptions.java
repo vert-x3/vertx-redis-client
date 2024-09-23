@@ -27,7 +27,8 @@ import java.util.List;
 @JsonGen(publicConverter = false)
 public abstract class RedisConnectOptions {
 
-  private volatile String password;
+  private String user;
+  private String password;
   private List<String> endpoints;
   private int maxNestedArrays;
   private boolean protocolNegotiation;
@@ -42,6 +43,7 @@ public abstract class RedisConnectOptions {
 
   public RedisConnectOptions(RedisOptions options) {
     this();
+    setUser(options.getUser());
     setPassword(options.getPassword());
     setEndpoints(new ArrayList<>(options.getEndpoints()));
     setMaxNestedArrays(options.getMaxNestedArrays());
@@ -52,6 +54,7 @@ public abstract class RedisConnectOptions {
 
   public RedisConnectOptions(RedisConnectOptions other) {
     this();
+    setUser(other.getUser());
     setPassword(other.getPassword());
     setEndpoints(new ArrayList<>(other.getEndpoints()));
     setMaxNestedArrays(other.getMaxNestedArrays());
@@ -134,8 +137,27 @@ public abstract class RedisConnectOptions {
   }
 
   /**
-   * Get the default password for cluster/sentinel connections, if not set it will try to
-   * extract it from the current default endpoint.
+   * Get the default username for Redis connections.
+   *
+   * @return username
+   */
+  public String getUser() {
+    return user;
+  }
+
+  /**
+   * Set the default username for Redis connections.
+   *
+   * @param user the default username
+   * @return fluent self
+   */
+  public RedisConnectOptions setUser(String user) {
+    this.user = user;
+    return this;
+  }
+
+  /**
+   * Get the default password for Redis connections.
    *
    * @return password
    */
@@ -144,7 +166,7 @@ public abstract class RedisConnectOptions {
   }
 
   /**
-   * Set the default password for cluster/sentinel connections.
+   * Set the default password for Redis connections.
    *
    * @param password the default password
    * @return fluent self

@@ -243,7 +243,7 @@ public class RedisConnectionManager implements Function<RedisConnectionManager.C
         Request hello = Request.cmd(Command.HELLO).arg(version);
 
         String password = redisURI.password() != null ? redisURI.password() : options.getPassword();
-        String user = redisURI.user();
+        String user = redisURI.user() != null ? redisURI.user() : options.getUser();
 
         if (password != null) {
           // will perform auth at hello level
@@ -298,7 +298,8 @@ public class RedisConnectionManager implements Function<RedisConnectionManager.C
               if (((ErrorType) err).is("NOAUTH")) {
                 // old authentication required
                 String password = redisURI.password() != null ? redisURI.password() : options.getPassword();
-                return this.authenticate(ctx, connection, redisURI.user(), password);
+                String user = redisURI.user() != null ? redisURI.user() : options.getUser();
+                return this.authenticate(ctx, connection, user, password);
               }
             }
           }
