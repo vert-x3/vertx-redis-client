@@ -21,11 +21,7 @@ import org.junit.ClassRule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.function.BiConsumer;
 
 @RunWith(VertxUnitRunner.class)
@@ -80,12 +76,12 @@ public class RedisTracingTest {
         Map<String, String> tags = tagExtractor.extract(request);
         String redisPort = String.valueOf(redis.getPort());
         test.assertEquals("client", tags.get("span.kind"));
-        test.assertEquals("redis", tags.get("db.type"));
+        test.assertEquals("redis", tags.get("db.system"));
         test.assertEquals("127.0.0.1", tags.get("network.peer.address"));
         test.assertEquals(redisPort, tags.get("network.peer.port"));
         test.assertEquals("localhost", tags.get("server.address"));
         test.assertEquals(redisPort, tags.get("server.port"));
-        test.assertEquals(clientRequest.command().toString(), tags.get("db.statement"));
+        test.assertEquals(clientRequest.command().toString(), tags.get("db.query.text"));
         actions.add("sendRequest");
         return trace;
       }
