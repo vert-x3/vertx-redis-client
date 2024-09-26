@@ -34,6 +34,8 @@ import org.junit.runner.RunWith;
 
 import java.util.concurrent.TimeUnit;
 
+import static org.junit.Assert.assertTrue;
+
 @RunWith(VertxUnitRunner.class)
 public class RedisClientPubSubTest {
 
@@ -71,7 +73,7 @@ public class RedisClientPubSubTest {
     Async test = should.async();
     consumer = vertx.eventBus().consumer("io.vertx.redis.news", msg -> test.complete());
     subConn.send(Request.cmd(Command.SUBSCRIBE).arg("news")).await(20, TimeUnit.SECONDS);
-    publishMsg(should, Request.cmd(Command.PUBLISH).arg("news").arg("foo"), 5);
+    publishMsg(Request.cmd(Command.PUBLISH).arg("news").arg("foo"), 5);
   }
 
   @Test
@@ -79,18 +81,20 @@ public class RedisClientPubSubTest {
     final Async test = should.async();
     consumer = vertx.eventBus().consumer("io.vertx.redis.new*", msg -> test.complete());
     subConn.send(Request.cmd(Command.PSUBSCRIBE).arg("new*")).await(20, TimeUnit.SECONDS);
-    publishMsg(should, Request.cmd(Command.PUBLISH).arg("news").arg("foo"), 5);
+    publishMsg(Request.cmd(Command.PUBLISH).arg("news").arg("foo"), 5);
   }
 
-  private void publishMsg(TestContext should, Request req, int retries) {
-    should.assertTrue(retries > 0);
-    pubConn.send(req)
-      .onComplete(should.asyncAssertSuccess(response2 -> {
-        Integer num = response2.toInteger();
-        if (num == 0){
-          // Racy publish, no subscriber yet
-          publishMsg(should, req, retries - 1);
-        }
-      }));
+  private void publishMsg(Request req, int retries) throws Exception {
+    while (true) {
+      assertTrue(retries > 0);
+      Integer num = pubConn
+        .send(req)
+        .await(20, TimeUnit.SECONDS)
+        .toInteger();
+      if (num > 0) {
+        // Racy publish, no subscriber yet
+        break;
+      }
+    }
   }
 }
