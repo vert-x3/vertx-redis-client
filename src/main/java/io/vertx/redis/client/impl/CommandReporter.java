@@ -26,7 +26,7 @@ class CommandReporter {
 
     DB_USER("db.user", reporter -> reporter.user),
     DB_NAMESPACE("db.namespace", reporter -> reporter.database),
-    DB_QUERY_TEXT("db.query.text", reporter -> reporter.command),
+    DB_OPERATION_NAME("db.operation.name", reporter -> reporter.command),
     DB_SYSTEM("db.system", reporter -> "redis");
 
     final String name;

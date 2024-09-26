@@ -81,7 +81,7 @@ public class RedisTracingTest {
         test.assertEquals(redisPort, tags.get("network.peer.port"));
         test.assertEquals("localhost", tags.get("server.address"));
         test.assertEquals(redisPort, tags.get("server.port"));
-        test.assertEquals(clientRequest.command().toString(), tags.get("db.query.text"));
+        test.assertEquals(clientRequest.command().toString(), tags.get("db.operation.name"));
         actions.add("sendRequest");
         return trace;
       }
