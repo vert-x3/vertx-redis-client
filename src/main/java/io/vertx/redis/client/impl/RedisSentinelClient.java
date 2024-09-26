@@ -110,12 +110,12 @@ public class RedisSentinelClient extends BaseRedisClient implements Redis {
   }
 
   @Override
-  public void close() {
+  public Future<Void> close() {
     SentinelFailover failover = this.failover.get();
     if (failover != null) {
       failover.close();
     }
-    super.close();
+    return super.close();
   }
 
   private Future<PooledRedisConnection> createConnectionInternal(RedisRole role) {

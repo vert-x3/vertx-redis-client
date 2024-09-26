@@ -365,7 +365,7 @@ public class RedisConnectionManager implements Function<RedisConnectionManager.C
       .map(lease -> new PooledRedisConnection(lease, metrics, metricsEnabled ? metrics.begin() : null));
   }
 
-  public void close() {
+  public Future<Void> close() {
     synchronized (this) {
       if (timerID >= 0) {
         vertx.cancelTimer(timerID);
@@ -373,10 +373,11 @@ public class RedisConnectionManager implements Function<RedisConnectionManager.C
       }
     }
     pooledConnectionManager.close();
-    netClient.close();
+    Future<Void> fut = netClient.close();
     if (metrics != null) {
       metrics.close();
     }
+    return fut;
   }
 
   public static class RedisEndpoint extends ManagedResource {

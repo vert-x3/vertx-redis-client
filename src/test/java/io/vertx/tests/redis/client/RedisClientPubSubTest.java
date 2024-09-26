@@ -15,9 +15,10 @@
  */
 package io.vertx.tests.redis.client;
 
+import io.vertx.core.Vertx;
+import io.vertx.core.eventbus.MessageConsumer;
 import io.vertx.ext.unit.Async;
 import io.vertx.ext.unit.TestContext;
-import io.vertx.ext.unit.junit.RunTestOnContext;
 import io.vertx.ext.unit.junit.VertxUnitRunner;
 import io.vertx.redis.client.Command;
 import io.vertx.redis.client.Redis;
@@ -28,9 +29,10 @@ import io.vertx.tests.redis.containers.RedisStandalone;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.ClassRule;
-import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+
+import java.util.concurrent.TimeUnit;
 
 @RunWith(VertxUnitRunner.class)
 public class RedisClientPubSubTest {
@@ -38,59 +40,57 @@ public class RedisClientPubSubTest {
   @ClassRule
   public static final RedisStandalone redis = new RedisStandalone();
 
-  @Rule
-  public final RunTestOnContext rule = new RunTestOnContext();
+  private Vertx vertx;
 
   private Redis redisPublish;
   private Redis redisSubscribe;
 
   private RedisConnection pubConn;
   private RedisConnection subConn;
+  private MessageConsumer<Object> consumer;
+
 
   @Before
-  public void before(TestContext should) {
-    Async test = should.async();
-    redisPublish = Redis.createClient(rule.vertx(), new RedisOptions().setConnectionString(redis.getRedisUri()));
-    redisPublish
-      .connect().onComplete(connectPub -> {
-        should.assertTrue(connectPub.succeeded());
-
-        pubConn = connectPub.result();
-
-        redisSubscribe = Redis.createClient(rule.vertx(), new RedisOptions().setConnectionString(redis.getRedisUri()));
-        redisSubscribe
-          .connect().onComplete(connectSub -> {
-            should.assertTrue(connectSub.succeeded());
-
-            subConn = connectSub.result();
-            test.complete();
-          });
-      });
+  public void before() throws Exception {
+    vertx = Vertx.vertx();
+    redisPublish = Redis.createClient(vertx, new RedisOptions().setConnectionString(redis.getRedisUri()));
+    pubConn = redisPublish.connect().await(20, TimeUnit.SECONDS);
+    redisSubscribe = Redis.createClient(vertx, new RedisOptions().setConnectionString(redis.getRedisUri()));
+    subConn = redisSubscribe.connect().await(20, TimeUnit.SECONDS);
   }
 
   @After
-  public void after() {
-    redisPublish.close();
-    redisSubscribe.close();
+  public void after() throws Exception {
+    redisPublish.close().await(20, TimeUnit.SECONDS);
+    redisSubscribe.close().await(20, TimeUnit.SECONDS);
+    vertx.close().await(20, TimeUnit.SECONDS);
   }
 
   @Test
-  public void testPublishSubscribe(TestContext should) {
-    final Async test = should.async();
-    subConn.send(Request.cmd(Command.SUBSCRIBE).arg("news")).onComplete(reply -> {
-      should.assertTrue(reply.succeeded());
-      rule.vertx().eventBus().consumer("io.vertx.redis.news", msg -> test.complete());
-      pubConn.send(Request.cmd(Command.PUBLISH).arg("news").arg("foo")).onComplete(preply -> should.assertTrue(preply.succeeded()));
-    });
+  public void testPublishSubscribe(TestContext should) throws Exception {
+    Async test = should.async();
+    consumer = vertx.eventBus().consumer("io.vertx.redis.news", msg -> test.complete());
+    subConn.send(Request.cmd(Command.SUBSCRIBE).arg("news")).await(20, TimeUnit.SECONDS);
+    publishMsg(should, Request.cmd(Command.PUBLISH).arg("news").arg("foo"), 5);
   }
 
   @Test
-  public void testPublishPSubscribe(TestContext should) {
+  public void testPublishPSubscribe(TestContext should) throws Exception {
     final Async test = should.async();
-    subConn.send(Request.cmd(Command.PSUBSCRIBE).arg("new*")).onComplete(reply -> {
-      should.assertTrue(reply.succeeded());
-      rule.vertx().eventBus().consumer("io.vertx.redis.new*", msg -> test.complete());
-      pubConn.send(Request.cmd(Command.PUBLISH).arg("news").arg("foo")).onComplete(preply -> should.assertTrue(preply.succeeded()));
-    });
+    consumer = vertx.eventBus().consumer("io.vertx.redis.new*", msg -> test.complete());
+    subConn.send(Request.cmd(Command.PSUBSCRIBE).arg("new*")).await(20, TimeUnit.SECONDS);
+    publishMsg(should, Request.cmd(Command.PUBLISH).arg("news").arg("foo"), 5);
+  }
+
+  private void publishMsg(TestContext should, Request req, int retries) {
+    should.assertTrue(retries > 0);
+    pubConn.send(req)
+      .onComplete(should.asyncAssertSuccess(response2 -> {
+        Integer num = response2.toInteger();
+        if (num == 0){
+          // Racy publish, no subscriber yet
+          publishMsg(should, req, retries - 1);
+        }
+      }));
   }
 }

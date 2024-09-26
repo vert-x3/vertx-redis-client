@@ -88,7 +88,7 @@ public interface Redis {
   /**
    * Closes the client and terminates any connection.
    */
-  void close();
+  Future<Void> close();
 
   /**
    * Send the given command to the redis server or cluster.

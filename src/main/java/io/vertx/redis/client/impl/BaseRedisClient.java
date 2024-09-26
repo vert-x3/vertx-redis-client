@@ -31,8 +31,8 @@ public abstract class BaseRedisClient implements Redis {
   }
 
   @Override
-  public void close() {
-    this.connectionManager.close();
+  public Future<Void> close() {
+    return this.connectionManager.close();
   }
 
   @Override
