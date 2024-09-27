@@ -22,23 +22,24 @@ import io.vertx.core.net.NetClientOptions;
 import io.vertx.core.tracing.TracingPolicy;
 import io.vertx.redis.client.PoolOptions;
 import io.vertx.redis.client.Redis;
-import io.vertx.redis.client.RedisConnectOptions;
 import io.vertx.redis.client.RedisConnection;
+import io.vertx.redis.client.RedisStandaloneConnectOptions;
 
-public class RedisClient extends BaseRedisClient implements Redis {
+import java.util.function.Supplier;
 
-  private final String defaultAddress;
+public class RedisClient extends BaseRedisClient<RedisStandaloneConnectOptions> implements Redis {
 
-  public RedisClient(Vertx vertx, NetClientOptions tcpOptions, PoolOptions poolOptions, RedisConnectOptions connectOptions, TracingPolicy tracingPolicy) {
+  public RedisClient(Vertx vertx, NetClientOptions tcpOptions, PoolOptions poolOptions, Supplier<Future<RedisStandaloneConnectOptions>> connectOptions, TracingPolicy tracingPolicy) {
     super(vertx, tcpOptions, poolOptions, connectOptions, tracingPolicy);
-    this.defaultAddress = connectOptions.getEndpoint();
   }
 
   @Override
   public Future<RedisConnection> connect() {
     // so that the caller is called back on its original context
     Promise<RedisConnection> promise = vertx.promise();
-    connectionManager.getConnection(defaultAddress, null).onComplete(promise);
+    connectOptions.get()
+      .compose(opts -> connectionManager.getConnection(opts.getEndpoint(), null))
+      .onComplete(promise);
     return promise.future();
   }
 }

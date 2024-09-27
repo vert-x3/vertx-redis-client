@@ -38,8 +38,9 @@ import java.util.Random;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicReference;
+import java.util.function.Supplier;
 
-public class RedisSentinelClient extends BaseRedisClient implements Redis {
+public class RedisSentinelClient extends BaseRedisClient<RedisSentinelConnectOptions> implements Redis {
 
   // we need some randomness, it doesn't need to be cryptographically secure
   private static final Random RANDOM = new Random();
@@ -56,12 +57,10 @@ public class RedisSentinelClient extends BaseRedisClient implements Redis {
 
   private static final Logger LOG = LoggerFactory.getLogger(RedisSentinelClient.class);
 
-  private final RedisSentinelConnectOptions connectOptions;
   private final AtomicReference<SentinelFailover> failover = new AtomicReference<>();
 
-  public RedisSentinelClient(Vertx vertx, NetClientOptions tcpOptions, PoolOptions poolOptions, RedisSentinelConnectOptions connectOptions, TracingPolicy tracingPolicy) {
+  public RedisSentinelClient(Vertx vertx, NetClientOptions tcpOptions, PoolOptions poolOptions, Supplier<Future<RedisSentinelConnectOptions>> connectOptions, TracingPolicy tracingPolicy) {
     super(vertx, tcpOptions, poolOptions, connectOptions, tracingPolicy);
-    this.connectOptions = connectOptions;
     // validate options
     if (poolOptions.getMaxWaiting() < poolOptions.getMaxSize()) {
       throw new IllegalStateException("Invalid options: maxWaiting < maxSize");
@@ -71,7 +70,13 @@ public class RedisSentinelClient extends BaseRedisClient implements Redis {
   @Override
   public Future<RedisConnection> connect() {
     final Promise<RedisConnection> promise = vertx.promise();
+    connectOptions.get()
+      .onSuccess(opts -> doConnect(opts, promise))
+      .onFailure(promise::fail);
+    return promise.future();
+  }
 
+  private void doConnect(RedisSentinelConnectOptions connectOptions, Completable<RedisConnection> promise) {
     createConnectionInternal(connectOptions, connectOptions.getRole(), (conn, err) -> {
       if (err != null) {
         promise.fail(err);
@@ -89,19 +94,21 @@ public class RedisSentinelClient extends BaseRedisClient implements Redis {
         return;
       }
 
-      SentinelFailover failover = setupFailover();
+      SentinelFailover failover = setupFailover(connectOptions);
       RedisSentinelConnection sentinelConn = new RedisSentinelConnection(conn, failover);
       promise.succeed(sentinelConn);
     });
-
-    return promise.future();
   }
 
-  private SentinelFailover setupFailover() {
+  private SentinelFailover setupFailover(RedisSentinelConnectOptions connectOptions) {
     SentinelFailover result = this.failover.get();
 
     if (result == null) {
-      result = new SentinelFailover(connectOptions.getMasterName(), this::createConnectionInternal);
+      result = new SentinelFailover(connectOptions.getMasterName(), role -> {
+        Promise<PooledRedisConnection> promise = Promise.promise();
+        createConnectionInternal(connectOptions, role, promise);
+        return promise.future();
+      });
       if (this.failover.compareAndSet(null, result)) {
         result.start();
       } else {
@@ -119,12 +126,6 @@ public class RedisSentinelClient extends BaseRedisClient implements Redis {
       failover.close();
     }
     return super.close();
-  }
-
-  private Future<PooledRedisConnection> createConnectionInternal(RedisRole role) {
-    Promise<PooledRedisConnection> promise = Promise.promise();
-    createConnectionInternal(connectOptions, role, promise);
-    return promise.future();
   }
 
   private void createConnectionInternal(RedisSentinelConnectOptions options, RedisRole role, Completable<PooledRedisConnection> onCreate) {

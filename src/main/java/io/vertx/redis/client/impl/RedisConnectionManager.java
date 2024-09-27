@@ -46,6 +46,7 @@ import io.vertx.redis.client.impl.types.ErrorType;
 
 import java.util.Objects;
 import java.util.function.Function;
+import java.util.function.Supplier;
 
 public class RedisConnectionManager implements Function<RedisConnectionManager.ConnectionKey, RedisConnectionManager.RedisEndpoint> {
 
@@ -58,13 +59,13 @@ public class RedisConnectionManager implements Function<RedisConnectionManager.C
   private final PoolMetrics metrics;
   private final NetClientOptions tcpOptions;
   private final PoolOptions poolOptions;
-  private final RedisConnectOptions connectOptions;
+  private final Supplier<Future<RedisConnectOptions>> connectOptions;
   private final TracingPolicy tracingPolicy;
 
   private final ResourceManager<ConnectionKey, RedisEndpoint> pooledConnectionManager;
   private long timerID;
 
-  RedisConnectionManager(VertxInternal vertx, NetClientOptions tcpOptions, PoolOptions poolOptions, RedisConnectOptions connectOptions, TracingPolicy tracingPolicy) {
+  RedisConnectionManager(VertxInternal vertx, NetClientOptions tcpOptions, PoolOptions poolOptions, Supplier<Future<RedisConnectOptions>> connectOptions, TracingPolicy tracingPolicy) {
     this.vertx = vertx;
     this.tcpOptions = tcpOptions;
     this.poolOptions = poolOptions;
@@ -130,10 +131,10 @@ public class RedisConnectionManager implements Function<RedisConnectionManager.C
     private final Request setup;
     private final NetClientOptions netClientOptions;
     private final PoolOptions poolOptions;
-    private final RedisConnectOptions options;
+    private final Supplier<Future<RedisConnectOptions>> options;
     private final TracingPolicy tracingPolicy;
 
-    public RedisConnectionProvider(VertxInternal vertx, NetClientInternal netClient, NetClientOptions netClientOptions, PoolOptions poolOptions, RedisConnectOptions options, TracingPolicy tracingPolicy, String connectionString, Request setup) {
+    public RedisConnectionProvider(VertxInternal vertx, NetClientInternal netClient, NetClientOptions netClientOptions, PoolOptions poolOptions, Supplier<Future<RedisConnectOptions>> options, TracingPolicy tracingPolicy, String connectionString, Request setup) {
       this.vertx = vertx;
       this.netClient = netClient;
       this.netClientOptions = netClientOptions;
@@ -166,15 +167,16 @@ public class RedisConnectionManager implements Function<RedisConnectionManager.C
       }
 
       // all calls the user handler will happen in the user context (ctx)
-      return connectAndSetup(ctx, listener, connectionStringInetSocket, connectionStringSsl, netClientSsl);
+      return getConnectOptions(ctx, listener, connectionStringInetSocket, connectionStringSsl, netClientSsl);
     }
 
-    private Future<ConnectResult<RedisConnectionInternal>> connectAndSetup(
-      ContextInternal ctx,
-      Listener listener,
-      boolean connectionStringInetSocket,
-      boolean connectionStringSsl,
-      boolean netClientSsl) {
+    private Future<ConnectResult<RedisConnectionInternal>> getConnectOptions(ContextInternal ctx, Listener listener,
+        boolean connectionStringInetSocket, boolean connectionStringSsl, boolean netClientSsl) {
+      return options.get()
+        .compose(opts -> connectAndSetup(ctx, opts, listener, connectionStringInetSocket, connectionStringSsl, netClientSsl));
+    }
+
+    private Future<ConnectResult<RedisConnectionInternal>> connectAndSetup(ContextInternal ctx, RedisConnectOptions options, Listener listener, boolean connectionStringInetSocket, boolean connectionStringSsl, boolean netClientSsl) {
       try {
         ConnectOptions connectOptions = new ConnectOptions()
           .setRemoteAddress(redisURI.socketAddress())
@@ -189,10 +191,10 @@ public class RedisConnectionManager implements Function<RedisConnectionManager.C
               // must upgrade protocol
               return so
                 .upgradeToSsl()
-                .compose(v -> init(ctx, so, listener));
+                .compose(v -> init(ctx, options, so, listener));
             } else {
               // no need to upgrade
-              return init(ctx, so, listener);
+              return init(ctx, options, so, listener);
             }
           });
       } catch (RuntimeException err) {
@@ -201,7 +203,7 @@ public class RedisConnectionManager implements Function<RedisConnectionManager.C
       }
     }
 
-    private Future<ConnectResult<RedisConnectionInternal>> init(ContextInternal ctx, NetSocket netSocket, PoolConnector.Listener connectionListener) {
+    private Future<ConnectResult<RedisConnectionInternal>> init(ContextInternal ctx, RedisConnectOptions options, NetSocket netSocket, PoolConnector.Listener connectionListener) {
       // the connection will inherit the user event loop context
       VertxMetrics vertxMetrics = vertx.metricsSPI();
       ClientMetrics metrics = vertxMetrics != null
@@ -218,7 +220,7 @@ public class RedisConnectionManager implements Function<RedisConnectionManager.C
         .exceptionHandler(connection::fail);
 
       // initial handshake
-      return hello(ctx, connection, redisURI)
+      return hello(ctx, connection, redisURI, options)
         .compose(hello -> {
           // perform select
           return select(ctx, connection, redisURI.select());
@@ -232,9 +234,9 @@ public class RedisConnectionManager implements Function<RedisConnectionManager.C
         });
     }
 
-    private Future<Void> hello(ContextInternal ctx, RedisConnection connection, RedisURI redisURI) {
+    private Future<Void> hello(ContextInternal ctx, RedisConnection connection, RedisURI redisURI, RedisConnectOptions options) {
       if (!options.isProtocolNegotiation()) {
-        return ping(ctx, connection);
+        return ping(ctx, connection, options);
       } else {
         String version = RESPParser.VERSION;
         if (redisURI.param("protocol") != null) {
@@ -275,7 +277,7 @@ public class RedisConnectionManager implements Function<RedisConnectionManager.C
                   String msg = redisErr.getMessage();
                   if (msg.startsWith("ERR unknown command") || msg.startsWith("ERR unknown or unsupported command")) {
                     // chatting to an old server
-                    return ping(ctx, connection);
+                    return ping(ctx, connection, options);
                   }
                 }
               }
@@ -287,7 +289,7 @@ public class RedisConnectionManager implements Function<RedisConnectionManager.C
       }
     }
 
-    private Future<Void> ping(ContextInternal ctx, RedisConnection connection) {
+    private Future<Void> ping(ContextInternal ctx, RedisConnection connection, RedisConnectOptions options) {
       Request ping = Request.cmd(Command.PING);
 
       return connection
@@ -397,7 +399,7 @@ public class RedisConnectionManager implements Function<RedisConnectionManager.C
       return pool;
     }
 
-    public RedisEndpoint(VertxInternal vertx, NetClientInternal netClient, NetClientOptions netClientOptions, PoolOptions poolOptions, RedisConnectOptions connectOptions, TracingPolicy tracingPolicy, String connectionString, Request setup) {
+    public RedisEndpoint(VertxInternal vertx, NetClientInternal netClient, NetClientOptions netClientOptions, PoolOptions poolOptions, Supplier<Future<RedisConnectOptions>> connectOptions, TracingPolicy tracingPolicy, String connectionString, Request setup) {
       PoolConnector<RedisConnectionInternal> connector = new RedisConnectionProvider(vertx, netClient, netClientOptions, poolOptions, connectOptions, tracingPolicy, connectionString, setup);
       pool = ConnectionPool.pool(connector, new int[]{poolOptions.getMaxSize()}, poolOptions.getMaxWaiting());
     }
