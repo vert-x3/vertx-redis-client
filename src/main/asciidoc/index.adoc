@@ -80,7 +80,7 @@ In the configuration contains a `password` and/or a `select` database, these 2 c
 {@link examples.RedisExamples#example2}
 ----
 
-== Connecting using TLS
+=== Connecting using TLS
 
 You can connect to a Redis server using TLS by configuring the client TCP options, make sure to set:
 
@@ -95,7 +95,7 @@ You can connect to a Redis server using TLS by configuring the client TCP option
 
 NOTE: More details on the TLS client config can be found https://vertx.io/docs/vertx-core/java/#_enabling_ssltls_on_the_client[here].
 
-== Connection String
+=== Connection String
 
 The client will recognize addresses that follow the expression:
 
@@ -110,6 +110,114 @@ unix://[:password@]/domain/docker.sock[?select=db-number]
 ----
 
 When specifying a password or a database, those commands are always executed on connection start.
+
+=== Providing `RedisConnectOptions` asynchronously
+
+The `Redis.createClient()` method takes a single `RedisOptions` object that contains all options.
+This is the most common way of connecting to Redis.
+
+However, there's also an option to provide `RedisOptions` synchronously and the `RedisConnectOptions` asynchronously.
+There are 4 methods with the same parameter list that allow this:
+
+- `Redis.createStandaloneClient()`
+- `Redis.createReplicationClient()`
+- `Redis.createSentinelClient()`
+- `Redis.createClusterClient()`
+
+These methods accept the `Vertx` object, the `RedisOptions` object, and a `Supplier<Future<RedisConnectOptions>>`.
+The `RedisOptions` object mainly provides `NetClientOptions` and `PoolOptions`, which are static.
+The `Supplier<Future<RedisConnectOptions>>` is used whenever a connection needs to be created and provides dynamic options.
+The type clearly shows that these dynamic options may be provided asynchronously.
+
+The prime example when you might want this is when using Amazon ElastiCache with IAM authentication.
+The IAM authentication accepts short-lived tokens (their lifetime is only 15 minutes), so they need to be regenerated frequently.
+
+Here's an implementation of the `Supplier<Future<RedisConnectOptions>>` that caches the `RedisConnectOptions` for 10 minutes:
+
+[source,$lang]
+----
+{@link examples.RedisConnectOptionsSupplier}
+----
+
+To create the token, here's a helper class that's heavily based on https://github.com/aws-samples/elasticache-iam-auth-demo-app/blob/main/src/main/java/com/amazon/elasticache/IAMAuthTokenRequest.java:
+
+[source,$lang]
+----
+package examples;
+
+import software.amazon.awssdk.auth.credentials.AwsCredentials;
+import software.amazon.awssdk.auth.credentials.AwsCredentialsProvider;
+import software.amazon.awssdk.http.SdkHttpMethod;
+import software.amazon.awssdk.http.SdkHttpRequest;
+import software.amazon.awssdk.http.auth.aws.signer.AwsV4FamilyHttpSigner;
+import software.amazon.awssdk.http.auth.aws.signer.AwsV4HttpSigner;
+import software.amazon.awssdk.http.auth.spi.signer.SignRequest;
+
+import java.net.URI;
+import java.time.Duration;
+
+public class IamAuthToken {
+  private static final String PROTOCOL = "http://";
+
+  private final String userId;
+  private final String replicationGroupId;
+  private final String region;
+  private final AwsCredentialsProvider credentials;
+
+  public IamAuthToken(String userId, String replicationGroupId, String region, AwsCredentialsProvider credentials) {
+    this.userId = userId;
+    this.replicationGroupId = replicationGroupId;
+    this.region = region;
+    this.credentials = credentials;
+  }
+
+  public String getUserId() {
+    return userId;
+  }
+
+  public String getToken() {
+    URI uri = URI.create(PROTOCOL + replicationGroupId + "/");
+    SdkHttpRequest request = SdkHttpRequest.builder()
+      .method(SdkHttpMethod.GET)
+      .uri(uri)
+      .appendRawQueryParameter("Action", "connect")
+      .appendRawQueryParameter("User", userId)
+      .build();
+
+    SdkHttpRequest signedRequest = sign(request, credentials.resolveCredentials());
+    return signedRequest.getUri().toString().replace(PROTOCOL, "");
+  }
+
+  private SdkHttpRequest sign(SdkHttpRequest request, AwsCredentials credentials) {
+    SignRequest<AwsCredentials> signRequest = SignRequest.builder(credentials)
+      .request(request)
+      .putProperty(AwsV4HttpSigner.REGION_NAME, region)
+      .putProperty(AwsV4HttpSigner.SERVICE_SIGNING_NAME, "elasticache")
+      .putProperty(AwsV4HttpSigner.EXPIRATION_DURATION, Duration.ofSeconds(900))
+      .putProperty(AwsV4HttpSigner.AUTH_LOCATION, AwsV4FamilyHttpSigner.AuthLocation.QUERY_STRING)
+      .build();
+    return AwsV4HttpSigner.create().sign(signRequest).request();
+  }
+}
+----
+
+This helper class might be instantiated like this:
+
+[source,$lang]
+----
+AwsCredentialsProvider credentialsProvider = DefaultCredentialsProvider.builder()
+  .asyncCredentialUpdateEnabled(true)
+  .build();
+IamAuthToken token = new IamAuthToken("my-user", "my-redis", "us-east-1", credentialsProvider);
+----
+
+Then, the `Redis` client might be instantiated like this:
+
+[source,$lang]
+----
+Redis client = Redis.createStandaloneClient(vertx, redisOptions, new RedisConnectOptionsSupplier<>(vertx,
+  redisOptions, RedisStandaloneConnectOptions::new, token::getUserId, token::getToken));
+----
 
 == Running commands
 

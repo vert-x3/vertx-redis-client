@@ -18,7 +18,12 @@ package io.vertx.redis.client.impl;
 import io.vertx.core.Future;
 import io.vertx.core.internal.logging.Logger;
 import io.vertx.core.internal.logging.LoggerFactory;
-import io.vertx.redis.client.*;
+import io.vertx.redis.client.Command;
+import io.vertx.redis.client.Redis;
+import io.vertx.redis.client.RedisAPI;
+import io.vertx.redis.client.RedisConnection;
+import io.vertx.redis.client.Request;
+import io.vertx.redis.client.Response;
 
 public class RedisAPIImpl implements RedisAPI {
 

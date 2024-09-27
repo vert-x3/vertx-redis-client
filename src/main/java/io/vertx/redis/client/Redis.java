@@ -25,7 +25,6 @@ import io.vertx.redis.client.impl.RedisReplicationClient;
 import io.vertx.redis.client.impl.RedisSentinelClient;
 
 import java.util.List;
-import java.util.function.Consumer;
 import java.util.function.Supplier;
 
 /**
@@ -35,7 +34,7 @@ import java.util.function.Supplier;
 public interface Redis {
 
   /**
-   * Create a new redis client using the default client options.
+   * Create a new Redis client using the default client options.
    *
    * @param vertx the vertx instance
    * @return the client
@@ -45,10 +44,10 @@ public interface Redis {
   }
 
   /**
-   * Create a new redis client using the default client options. Does not support rediss (redis over ssl scheme) for now.
+   * Create a new Redis client using the default client options. Does not support rediss (redis over ssl scheme) for now.
    *
    * @param connectionString a string URI following the scheme: redis://[username:password@][host][:port][/database]
-   * @param vertx            the vertx instance
+   * @param vertx the vertx instance
    * @return the client
    * @see <a href="https://www.iana.org/assignments/uri-schemes/prov/redis">Redis scheme on iana.org</a>
    */
@@ -57,29 +56,109 @@ public interface Redis {
   }
 
   /**
-   * Create a new redis client using the given client options.
+   * Create a new Redis client using the given client options.
    *
-   * @param vertx   the vertx instance
+   * @param vertx the Vert.x instance
    * @param options the user provided options
    * @return the client
    */
   static Redis createClient(Vertx vertx, RedisOptions options) {
     switch (options.getType()) {
       case STANDALONE:
-        return new RedisClient(vertx, options.getNetClientOptions(), options.getPoolOptions(), new RedisStandaloneConnectOptions(options), options.getTracingPolicy());
+        return createStandaloneClient(vertx, options, new ConstantSupplier<>(Future.succeededFuture(new RedisStandaloneConnectOptions(options))));
       case SENTINEL:
-        return new RedisSentinelClient(vertx, options.getNetClientOptions(), options.getPoolOptions(), new RedisSentinelConnectOptions(options), options.getTracingPolicy());
+        return createSentinelClient(vertx, options, new ConstantSupplier<>(Future.succeededFuture(new RedisSentinelConnectOptions(options))));
       case CLUSTER:
-        return new RedisClusterClient(vertx, options.getNetClientOptions(), options.getPoolOptions(), new RedisClusterConnectOptions(options), options.getTracingPolicy());
+        return createClusterClient(vertx, options, new ConstantSupplier<>(Future.succeededFuture(new RedisClusterConnectOptions(options))));
       case REPLICATION:
-        return new RedisReplicationClient(vertx, options.getNetClientOptions(), options.getPoolOptions(), new RedisReplicationConnectOptions(options), options.getTracingPolicy());
+        return createReplicationClient(vertx, options, new ConstantSupplier<>(Future.succeededFuture(new RedisReplicationConnectOptions(options))));
       default:
         throw new IllegalStateException("Unknown Redis Client type: " + options.getType());
     }
   }
 
   /**
-   * Connects to the redis server.
+   * Creates a new standalone Redis client. The {@code options} are used to obtain {@link RedisOptions#getType()},
+   * {@link RedisOptions#getNetClientOptions()}, {@link RedisOptions#getPoolOptions()}
+   * and {@link RedisOptions#getTracingPolicy()}. The {@code connectOptions} are queried for every
+   * connection attempt.
+   * <p>
+   * If {@code options.getType() != RedisClientType.STANDALONE}, an exception is thrown.
+   *
+   * @param vertx the Vert.x instance
+   * @param options the static options
+   * @param connectOptions supplier of the dynamic options
+   * @return the standalone client
+   */
+  static Redis createStandaloneClient(Vertx vertx, RedisOptions options, Supplier<Future<RedisStandaloneConnectOptions>> connectOptions) {
+    if (options.getType() != RedisClientType.STANDALONE) {
+      throw new IllegalArgumentException("RedisOptions.getType() != RedisClientType.STANDALONE");
+    }
+    return new RedisClient(vertx, options.getNetClientOptions(), options.getPoolOptions(), connectOptions, options.getTracingPolicy());
+  }
+
+  /**
+   * Creates a new replication Redis client. The {@code options} are used to obtain {@link RedisOptions#getType()},
+   * {@link RedisOptions#getNetClientOptions()}, {@link RedisOptions#getPoolOptions()}
+   * and {@link RedisOptions#getTracingPolicy()}. The {@code connectOptions} are queried for every
+   * connection attempt.
+   * <p>
+   * If {@code options.getType() != RedisClientType.REPLICATION}, an exception is thrown.
+   *
+   * @param vertx the Vert.x instance
+   * @param options the static options
+   * @param connectOptions supplier of the dynamic options
+   * @return the replication client
+   */
+  static Redis createReplicationClient(Vertx vertx, RedisOptions options, Supplier<Future<RedisReplicationConnectOptions>> connectOptions) {
+    if (options.getType() != RedisClientType.REPLICATION) {
+      throw new IllegalArgumentException("RedisOptions.getType() != RedisClientType.REPLICATION");
+    }
+    return new RedisReplicationClient(vertx, options.getNetClientOptions(), options.getPoolOptions(), connectOptions, options.getTracingPolicy());
+  }
+
+  /**
+   * Creates a new sentinel Redis client. The {@code options} are used to obtain {@link RedisOptions#getType()},
+   * {@link RedisOptions#getNetClientOptions()}, {@link RedisOptions#getPoolOptions()}
+   * and {@link RedisOptions#getTracingPolicy()}. The {@code connectOptions} are queried for every
+   * connection attempt.
+   * <p>
+   * If {@code options.getType() != RedisClientType.SENTINEL}, an exception is thrown.
+   *
+   * @param vertx the Vert.x instance
+   * @param options the static options
+   * @param connectOptions supplier of the dynamic options
+   * @return the sentinel client
+   */
+  static Redis createSentinelClient(Vertx vertx, RedisOptions options, Supplier<Future<RedisSentinelConnectOptions>> connectOptions) {
+    if (options.getType() != RedisClientType.SENTINEL) {
+      throw new IllegalArgumentException("RedisOptions.getType() != RedisClientType.SENTINEL");
+    }
+    return new RedisSentinelClient(vertx, options.getNetClientOptions(), options.getPoolOptions(), connectOptions, options.getTracingPolicy());
+  }
+
+  /**
+   * Creates a new cluster Redis client. The {@code options} are used to obtain {@link RedisOptions#getType()},
+   * {@link RedisOptions#getNetClientOptions()}, {@link RedisOptions#getPoolOptions()}
+   * and {@link RedisOptions#getTracingPolicy()}. The {@code connectOptions} are queried for every
+   * connection attempt.
+   * <p>
+   * If {@code options.getType() != RedisClientType.CLUSTER}, an exception is thrown.
+   *
+   * @param vertx the Vert.x instance
+   * @param options the static options
+   * @param connectOptions supplier of the dynamic options
+   * @return the cluster client
+   */
+  static Redis createClusterClient(Vertx vertx, RedisOptions options, Supplier<Future<RedisClusterConnectOptions>> connectOptions) {
+    if (options.getType() != RedisClientType.CLUSTER) {
+      throw new IllegalArgumentException("RedisOptions.getType() != RedisClientType.CLUSTER");
+    }
+    return new RedisClusterClient(vertx, options.getNetClientOptions(), options.getPoolOptions(), connectOptions, options.getTracingPolicy());
+  }
+
+  /**
+   * Connects to the Redis server.
    *
    * @return a future with the result of the operation
    */
@@ -91,7 +170,7 @@ public interface Redis {
   Future<Void> close();
 
   /**
-   * Send the given command to the redis server or cluster.
+   * Send the given command to the Redis server or cluster.
    *
    * @param command the command to send
    * @return a future with the result of the operation

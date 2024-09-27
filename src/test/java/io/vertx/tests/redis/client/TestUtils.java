@@ -1,5 +1,6 @@
 package io.vertx.tests.redis.client;
 
+import io.vertx.core.Completable;
 import io.vertx.core.Future;
 import io.vertx.core.Promise;
 import io.vertx.core.Vertx;
@@ -18,10 +19,10 @@ public class TestUtils {
     return promise.future();
   }
 
-  private static <T> void retryUntilSuccess(Vertx vertx, Supplier<Future<T>> action, int maxRetries, Promise<T> promise) {
+  private static <T> void retryUntilSuccess(Vertx vertx, Supplier<Future<T>> action, int maxRetries, Completable<T> promise) {
     action.get().onComplete(result -> {
       if (result.succeeded()) {
-        promise.complete(result.result());
+        promise.succeed(result.result());
       } else {
         if (maxRetries < 1) {
           promise.fail(result.cause());

@@ -1,8 +1,7 @@
 package io.vertx.redis.client.impl;
 
-import io.vertx.core.AsyncResult;
+import io.vertx.core.Completable;
 import io.vertx.core.Future;
-import io.vertx.core.Handler;
 import io.vertx.core.Promise;
 import io.vertx.core.Vertx;
 import io.vertx.core.internal.logging.Logger;
@@ -17,6 +16,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicReference;
+import java.util.function.Supplier;
 
 /**
  * Exactly one instance of this class exists for each instance of {@link RedisClusterClient}
@@ -26,12 +26,12 @@ class SharedSlots {
   private static final Logger LOG = LoggerFactory.getLogger(SharedSlots.class);
 
   private final Vertx vertx;
-  private final RedisClusterConnectOptions connectOptions;
+  private final Supplier<Future<RedisClusterConnectOptions>> connectOptions;
   private final RedisConnectionManager connectionManager;
 
   private final AtomicReference<Future<Slots>> slots = new AtomicReference<>();
 
-  SharedSlots(Vertx vertx, RedisClusterConnectOptions connectOptions, RedisConnectionManager connectionManager) {
+  SharedSlots(Vertx vertx, Supplier<Future<RedisClusterConnectOptions>> connectOptions, RedisConnectionManager connectionManager) {
     this.vertx = vertx;
     this.connectOptions = connectOptions;
     this.connectionManager = connectionManager;
@@ -49,21 +49,24 @@ class SharedSlots {
       if (this.slots.compareAndSet(null, future)) {
         LOG.debug("Obtaining hash slot assignment");
         // attempt to load the slots from the first good endpoint
-        getSlots(connectOptions.getEndpoints(), 0, ConcurrentHashMap.newKeySet(), promise);
+        connectOptions.get()
+          .onSuccess(opts -> getSlots(opts, 0, ConcurrentHashMap.newKeySet(), promise))
+          .onFailure(promise::fail);
         return future;
       }
     }
   }
 
-  private void getSlots(List<String> endpoints, int index, Set<Throwable> failures, Promise<Slots> onGotSlots) {
+  private void getSlots(RedisClusterConnectOptions connectOptions, int index, Set<Throwable> failures, Completable<Slots> onGotSlots) {
+    List<String> endpoints = connectOptions.getEndpoints();
     if (index >= endpoints.size()) {
       // stop condition
       StringBuilder message = new StringBuilder("Cannot connect to any of the provided endpoints");
       for (Throwable failure : failures) {
         message.append("\n- ").append(failure);
       }
-      onGotSlots.handle(Future.failedFuture(new RedisConnectException(message.toString())));
-      scheduleInvalidation();
+      onGotSlots.fail(new RedisConnectException(message.toString()));
+      scheduleInvalidation(connectOptions);
       return;
     }
 
@@ -71,7 +74,7 @@ class SharedSlots {
       .onFailure(err -> {
         // try with the next endpoint
         failures.add(err);
-        getSlots(endpoints, index + 1, failures, onGotSlots);
+        getSlots(connectOptions, index + 1, failures, onGotSlots);
       })
       .onSuccess(conn -> {
         getSlots(endpoints.get(index), conn).onComplete(result -> {
@@ -82,11 +85,11 @@ class SharedSlots {
           if (result.failed()) {
             // the slots command failed, try with next endpoint
             failures.add(result.cause());
-            getSlots(endpoints, index + 1, failures, onGotSlots);
+            getSlots(connectOptions, index + 1, failures, onGotSlots);
           } else {
             Slots slots = result.result();
-            onGotSlots.handle(Future.succeededFuture(slots));
-            scheduleInvalidation();
+            onGotSlots.succeed(slots);
+            scheduleInvalidation(connectOptions);
           }
         });
       });
@@ -115,7 +118,7 @@ class SharedSlots {
     slots.set(null);
   }
 
-  void scheduleInvalidation() {
+  private void scheduleInvalidation(RedisClusterConnectOptions connectOptions) {
     vertx.setTimer(connectOptions.getHashSlotCacheTTL(), ignored -> invalidate());
   }
 }

@@ -170,6 +170,11 @@ public class RedisSentinelConnectOptions extends RedisConnectOptions {
   }
 
   @Override
+  public RedisSentinelConnectOptions setUser(String user) {
+    return (RedisSentinelConnectOptions) super.setUser(user);
+  }
+
+  @Override
   public RedisSentinelConnectOptions setPassword(String password) {
     return (RedisSentinelConnectOptions) super.setPassword(password);
   }

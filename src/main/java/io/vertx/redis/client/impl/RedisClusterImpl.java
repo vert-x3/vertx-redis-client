@@ -1,5 +1,6 @@
 package io.vertx.redis.client.impl;
 
+import io.vertx.core.Completable;
 import io.vertx.core.Future;
 import io.vertx.core.Promise;
 import io.vertx.core.internal.logging.Logger;
@@ -77,9 +78,9 @@ public class RedisClusterImpl implements RedisCluster {
       });
   }
 
-  private void onAllNodes(String[] endpoints, int index, Request request, List<Response> result, RedisClusterConnection conn, Promise<List<Response>> promise) {
+  private void onAllNodes(String[] endpoints, int index, Request request, List<Response> result, RedisClusterConnection conn, Completable<List<Response>> promise) {
     if (index >= endpoints.length) {
-      promise.complete(result);
+      promise.succeed(result);
       return;
     }
 

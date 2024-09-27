@@ -51,6 +51,7 @@ public class RedisOptions {
   private String masterName;
   private RedisRole role;
   private RedisReplicas useReplicas;
+  private volatile String user;
   private volatile String password;
   private boolean protocolNegotiation;
   private ProtocolVersion preferredProtocolVersion;
@@ -59,7 +60,7 @@ public class RedisOptions {
   private boolean autoFailover;
 
   /**
-   * Creates a default configuration object using redis server defaults
+   * Creates a default configuration object using Redis server defaults
    */
   public RedisOptions() {
     type = RedisClientType.STANDALONE;
@@ -95,6 +96,7 @@ public class RedisOptions {
     this.masterName = other.masterName;
     this.role = other.role;
     this.useReplicas = other.useReplicas;
+    this.user = other.user;
     this.password = other.password;
     this.protocolNegotiation = other.protocolNegotiation;
     this.preferredProtocolVersion = other.preferredProtocolVersion;
@@ -144,7 +146,7 @@ public class RedisOptions {
   }
 
   /**
-   * Set the net client options to be used while connecting to the redis server. Use this to tune your connection.
+   * Set the net client options to be used while connecting to the Redis server. Use this to tune your connection.
    *
    * @param netClientOptions custom net client options.
    * @return fluent self.
@@ -155,7 +157,7 @@ public class RedisOptions {
   }
 
   /**
-   * Gets the redis endpoint to use
+   * Gets the Redis endpoint to use
    *
    * @return the Redis connection string URI
    */
@@ -169,7 +171,7 @@ public class RedisOptions {
   }
 
   /**
-   * Adds an endpoint to use while connecting to the redis server. Only the cluster mode will consider more than
+   * Adds an endpoint to use while connecting to the Redis server. Only the cluster mode will consider more than
    * 1 element. If more are provided, they are not considered by the client when in single server mode.
    *
    * @param connectionString a string URI following the scheme: redis://[username:password@][host][:port][/database]
@@ -187,7 +189,7 @@ public class RedisOptions {
   }
 
   /**
-   * Sets a single connection string to use while connecting to the redis server.
+   * Sets a single connection string to use while connecting to the Redis server.
    * Will replace the previously configured connection strings.
    *
    * @param connectionString a string following the scheme: redis://[username:password@][host][:port][/[database]
@@ -208,7 +210,7 @@ public class RedisOptions {
   }
 
   /**
-   * Adds a connection string (endpoint) to use while connecting to the redis server. Only the cluster mode will
+   * Adds a connection string (endpoint) to use while connecting to the Redis server. Only the cluster mode will
    * consider more than 1 element. If more are provided, they are not considered by the client when in single server mode.
    *
    * @param connectionString a string URI following the scheme: redis://[username:password@][host][:port][/database]
@@ -225,7 +227,7 @@ public class RedisOptions {
   }
 
   /**
-   * Sets a single connection string (endpoint) to use while connecting to the redis server.
+   * Sets a single connection string (endpoint) to use while connecting to the Redis server.
    * Will replace the previously configured connection strings.
    *
    * @param connectionString a string following the scheme: redis://[username:password@][host][:port][/[database].
@@ -279,7 +281,7 @@ public class RedisOptions {
   }
 
   /**
-   * Gets the list of redis endpoints to use (mostly used while connecting to a cluster)
+   * Gets the list of Redis endpoints to use (mostly used while connecting to a cluster)
    *
    * @return list of socket addresses.
    */
@@ -292,7 +294,7 @@ public class RedisOptions {
   }
 
   /**
-   * Set the endpoints to use while connecting to the redis server. Only the cluster mode will consider more than
+   * Set the endpoints to use while connecting to the Redis server. Only the cluster mode will consider more than
    * 1 element. If more are provided, they are not considered by the client when in single server mode.
    *
    * @param endpoints list of socket addresses.
@@ -411,7 +413,7 @@ public class RedisOptions {
 
 
   /**
-   * Tune how much nested arrays are allowed on a redis response. This affects the parser performance.
+   * Tune how much nested arrays are allowed on a Redis response. This affects the parser performance.
    *
    * @return the configured max nested arrays allowance.
    */
@@ -420,7 +422,7 @@ public class RedisOptions {
   }
 
   /**
-   * Tune how much nested arrays are allowed on a redis response. This affects the parser performance.
+   * Tune how much nested arrays are allowed on a Redis response. This affects the parser performance.
    *
    * @param maxNestedArrays the configured max nested arrays allowance.
    * @return fluent self.
@@ -572,8 +574,39 @@ public class RedisOptions {
   }
 
   /**
-   * Get the default password for cluster/sentinel connections, if not set it will try to
-   * extract it from the current default endpoint.
+   * Get the default username for Redis connections. If not set, it will try to
+   * extract it from the current default endpoint ({@link #getEndpoint()}).
+   *
+   * @return username
+   */
+  public String getUser() {
+    if (user == null) {
+      // try to fetch it from the endpoint
+      synchronized (this) {
+        if (user == null) {
+          RedisURI uri = new RedisURI(getEndpoint());
+          // use the parsed value
+          user = uri.user();
+        }
+      }
+    }
+    return user;
+  }
+
+  /**
+   * Set the default username for Redis connections.
+   *
+   * @param user the default username
+   * @return fluent self
+   */
+  public RedisOptions setUser(String user) {
+    this.user = user;
+    return this;
+  }
+
+  /**
+   * Get the default password for Redis connections. If not set, it will try to
+   * extract it from the current default endpoint ({@link #getEndpoint()}).
    *
    * @return password
    */
@@ -592,7 +625,7 @@ public class RedisOptions {
   }
 
   /**
-   * Set the default password for cluster/sentinel connections.
+   * Set the default password for Redis connections.
    *
    * @param password the default password
    * @return fluent self
@@ -604,7 +637,7 @@ public class RedisOptions {
 
   /**
    * Should the client perform {@code RESP} protocol negotiation during the connection handshake.
-   * By default this is {@code true}, but there are situations when using broken servers it may
+   * By default, this is {@code true}, but there are situations when using broken servers it may
    * be useful to skip this and always fallback to {@code RESP2} without using the {@code HELLO}
    * command.
    *
@@ -615,8 +648,8 @@ public class RedisOptions {
   }
 
   /**
-   * Should the client perform {@code REST} protocol negotiation during the connection acquire.
-   * By default this is {@code true}, but there are situations when using broken servers it may
+   * Should the client perform {@code RESP} protocol negotiation during the connection acquire.
+   * By default, this is {@code true}, but there are situations when using broken servers it may
    * be useful to skip this and always fallback to {@code RESP2} without using the {@code HELLO}
    * command.
    *

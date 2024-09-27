@@ -19,7 +19,15 @@ import io.vertx.core.Handler;
 import io.vertx.core.buffer.Buffer;
 import io.vertx.redis.client.Response;
 import io.vertx.redis.client.ResponseType;
-import io.vertx.redis.client.impl.types.*;
+import io.vertx.redis.client.impl.types.AttributeType;
+import io.vertx.redis.client.impl.types.BooleanType;
+import io.vertx.redis.client.impl.types.BulkType;
+import io.vertx.redis.client.impl.types.ErrorType;
+import io.vertx.redis.client.impl.types.Multi;
+import io.vertx.redis.client.impl.types.MultiType;
+import io.vertx.redis.client.impl.types.NumberType;
+import io.vertx.redis.client.impl.types.PushType;
+import io.vertx.redis.client.impl.types.SimpleStringType;
 
 public final class RESPParser implements Handler<Buffer> {
 

@@ -20,7 +20,11 @@ import io.vertx.redis.client.Command;
 import io.vertx.redis.client.Request;
 
 import java.nio.charset.StandardCharsets;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
+import java.util.Objects;
 
 import static io.vertx.redis.client.impl.RESPEncoder.numToBytes;
 

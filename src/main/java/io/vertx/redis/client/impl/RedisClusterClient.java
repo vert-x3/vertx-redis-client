@@ -15,7 +15,10 @@
  */
 package io.vertx.redis.client.impl;
 
-import io.vertx.core.*;
+import io.vertx.core.Completable;
+import io.vertx.core.Future;
+import io.vertx.core.Promise;
+import io.vertx.core.Vertx;
 import io.vertx.core.internal.logging.Logger;
 import io.vertx.core.internal.logging.LoggerFactory;
 import io.vertx.core.net.NetClientOptions;
@@ -39,8 +42,9 @@ import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Function;
+import java.util.function.Supplier;
 
-public class RedisClusterClient extends BaseRedisClient implements Redis {
+public class RedisClusterClient extends BaseRedisClient<RedisClusterConnectOptions> implements Redis {
 
   private static final Logger LOG = LoggerFactory.getLogger(RedisClusterClient.class);
 
@@ -128,12 +132,10 @@ public class RedisClusterClient extends BaseRedisClient implements Redis {
     addReducer(Command.SUNSUBSCRIBE, list -> SimpleStringType.OK);
   }
 
-  final RedisClusterConnectOptions connectOptions;
-  final SharedSlots sharedSlots;
+  private final SharedSlots sharedSlots;
 
-  public RedisClusterClient(Vertx vertx, NetClientOptions tcpOptions, PoolOptions poolOptions, RedisClusterConnectOptions connectOptions, TracingPolicy tracingPolicy) {
+  public RedisClusterClient(Vertx vertx, NetClientOptions tcpOptions, PoolOptions poolOptions, Supplier<Future<RedisClusterConnectOptions>> connectOptions, TracingPolicy tracingPolicy) {
     super(vertx, tcpOptions, poolOptions, connectOptions, tracingPolicy);
-    this.connectOptions = connectOptions;
     this.sharedSlots = new SharedSlots(vertx, connectOptions, connectionManager);
     // validate options
     if (poolOptions.getMaxWaiting() < poolOptions.getMaxSize()) {
@@ -150,7 +152,13 @@ public class RedisClusterClient extends BaseRedisClient implements Redis {
     return promise.future();
   }
 
-  private void connect(Slots slots, Completable<RedisConnection> onConnected) {
+  private void connect(Slots slots, Completable<RedisConnection> promise) {
+    connectOptions.get()
+      .onSuccess(opts -> connect(slots, opts, promise))
+      .onFailure(promise::fail);
+  }
+
+  private void connect(Slots slots, RedisClusterConnectOptions connectOptions, Completable<RedisConnection> onConnected) {
     // create a cluster connection
     final Set<Throwable> failures = ConcurrentHashMap.newKeySet();
     final AtomicInteger counter = new AtomicInteger();
@@ -161,7 +169,7 @@ public class RedisClusterClient extends BaseRedisClient implements Redis {
         .onFailure(err -> {
           // failed try with the next endpoint
           failures.add(err);
-          connectionComplete(counter, slots, connections, failures, onConnected);
+          connectionComplete(counter, slots, connectOptions, connections, failures, onConnected);
         })
         .onSuccess(cconn -> {
           // there can be concurrent access to the connection map
@@ -170,13 +178,13 @@ public class RedisClusterClient extends BaseRedisClient implements Redis {
           synchronized (connections) {
             connections.put(endpoint, cconn);
           }
-          connectionComplete(counter, slots, connections, failures, onConnected);
+          connectionComplete(counter, slots, connectOptions, connections, failures, onConnected);
         });
     }
   }
 
-  private void connectionComplete(AtomicInteger counter, Slots slots, Map<String, PooledRedisConnection> connections,
-      Set<Throwable> failures, Completable<RedisConnection> onConnected) {
+  private void connectionComplete(AtomicInteger counter, Slots slots, RedisClusterConnectOptions connectOptions,
+      Map<String, PooledRedisConnection> connections, Set<Throwable> failures, Completable<RedisConnection> onConnected) {
     if (counter.incrementAndGet() == slots.endpoints().length) {
       // end condition
       if (!failures.isEmpty()) {

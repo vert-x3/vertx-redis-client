@@ -16,7 +16,12 @@ import io.vertx.core.net.SocketAddress;
 import io.vertx.core.internal.pool.PoolConnector;
 import io.vertx.core.spi.metrics.ClientMetrics;
 import io.vertx.core.tracing.TracingPolicy;
-import io.vertx.redis.client.*;
+import io.vertx.redis.client.Command;
+import io.vertx.redis.client.PoolOptions;
+import io.vertx.redis.client.RedisConnection;
+import io.vertx.redis.client.Request;
+import io.vertx.redis.client.Response;
+import io.vertx.redis.client.ResponseType;
 import io.vertx.redis.client.impl.types.ErrorType;
 import io.vertx.redis.client.impl.types.Multi;
 
@@ -264,7 +269,7 @@ public class RedisStandaloneConnection implements RedisConnectionInternal, Parse
 
     if (commands.isEmpty()) {
       LOG.debug("Empty batch");
-      promise.complete(Collections.emptyList());
+      promise.succeed(Collections.emptyList());
     } else {
       // will re-encode the handler into a list of promises
       final List<Promise<Response>> callbacks = new ArrayList<>(commands.size());
