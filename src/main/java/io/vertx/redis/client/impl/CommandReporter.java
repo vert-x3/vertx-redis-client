@@ -22,12 +22,12 @@ class CommandReporter {
     SPAN_KIND("span.kind", reporter -> "client"),
 
     // DB
-    // See https://github.com/opentracing/specification/blob/master/semantic_conventions.md
+    // See https://opentelemetry.io/docs/specs/semconv/database/redis/
 
     DB_USER("db.user", reporter -> reporter.user),
-    DB_INSTANCE("db.instance", reporter -> reporter.database),
-    DB_STATEMENT("db.statement", reporter -> reporter.command),
-    DB_TYPE("db.type", reporter -> "redis");
+    DB_NAMESPACE("db.namespace", reporter -> reporter.database),
+    DB_OPERATION_NAME("db.operation.name", reporter -> reporter.command),
+    DB_SYSTEM("db.system", reporter -> "redis");
 
     final String name;
     final Function<CommandReporter, String> valueFunction;
@@ -38,17 +38,19 @@ class CommandReporter {
     }
   }
 
-  private static final TagExtractor<CommandReporter> REQUEST_TAG_EXTRACTOR = new TagExtractor<CommandReporter>() {
+  private static final TagExtractor<CommandReporter> REQUEST_TAG_EXTRACTOR = new TagExtractor<>() {
     private final Tags[] TAGS = Tags.values();
 
     @Override
     public int len(CommandReporter obj) {
       return TAGS.length;
     }
+
     @Override
     public String name(CommandReporter obj, int index) {
       return TAGS[index].name;
     }
+
     @Override
     public String value(CommandReporter obj, int index) {
       return TAGS[index].valueFunction.apply(obj);
