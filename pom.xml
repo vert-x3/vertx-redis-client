@@ -14,179 +14,101 @@
   ~
   ~  You may elect to redistribute this code under either of these licenses.
   --><project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
-      
-    <modelVersion>4.0.0</modelVersion>
-      
-    <parent>
-            
-        <groupId>io.vertx</groupId>
-            
-        <artifactId>vertx-ext-parent</artifactId>
-            
-        <version>38</version>
-          
-    </parent>
-      
-    <artifactId>vertx-redis-client</artifactId>
-      
-    <version>4.5.11-SNAPSHOT</version>
-      
-    <name>Vert.x Redis Client</name>
-      
-    <properties>
-            
-        <stack.version>4.5.11-SNAPSHOT</stack.version>
-            
-        <jar.manifest>${project.basedir}/src/main/resources/META-INF/MANIFEST.MF</jar.manifest>
-          
-    </properties>
-      
-    <dependencyManagement>
-            
-        <dependencies>
-                  
-            <dependency>
-                        
-                <groupId>io.vertx</groupId>
-                        
-                <artifactId>vertx-dependencies</artifactId>
-                        
-                <version>${stack.version}</version>
-                        
-                <type>pom</type>
-                        
-                <scope>import</scope>
-                      
-            </dependency>
-                
-        </dependencies>
-          
-    </dependencyManagement>
-      
+
+  <modelVersion>4.0.0</modelVersion>
+
+  <parent>
+    <groupId>io.vertx</groupId>
+    <artifactId>vertx-ext-parent</artifactId>
+    <version>38</version>
+  </parent>
+
+  <artifactId>vertx-redis-client</artifactId>
+  <version>4.5.11-SNAPSHOT</version>
+
+  <name>Vert.x Redis Client</name>
+
+  <properties>
+    <stack.version>4.5.11-SNAPSHOT</stack.version>
+    <jar.manifest>${project.basedir}/src/main/resources/META-INF/MANIFEST.MF</jar.manifest>
+  </properties>
+
+  <dependencyManagement>
     <dependencies>
-            
-        <dependency>
-                  
-            <groupId>io.vertx</groupId>
-                  
-            <artifactId>vertx-core</artifactId>
-                
-        </dependency>
-            
-        <dependency>
-                  
-            <groupId>io.vertx</groupId>
-                  
-            <artifactId>vertx-codegen</artifactId>
-                  
-            <optional>true</optional>
-                
-        </dependency>
-            
-        <dependency>
-                  
-            <groupId>io.vertx</groupId>
-                  
-            <artifactId>vertx-docgen</artifactId>
-                  
-            <optional>true</optional>
-                
-        </dependency>
-            
-        <dependency>
-                  
-            <groupId>io.vertx</groupId>
-                  
-            <artifactId>vertx-core</artifactId>
-                  
-            <type>test-jar</type>
-                  
-            <scope>test</scope>
-                
-        </dependency>
-            
-        <dependency>
-                  
-            <groupId>io.vertx</groupId>
-                  
-            <artifactId>vertx-unit</artifactId>
-                  
-            <scope>test</scope>
-                
-        </dependency>
-            
-        <dependency>
-                  
-            <groupId>junit</groupId>
-                  
-            <artifactId>junit</artifactId>
-                  
-            <scope>test</scope>
-                  
-            <version>4.13.1</version>
-                
-        </dependency>
-            
-        <dependency>
-                  
-            <groupId>org.testcontainers</groupId>
-                  
-            <artifactId>testcontainers</artifactId>
-                  
-            <version>1.19.8</version>
-                  
-            <scope>test</scope>
-                
-        </dependency>
-            
-        <dependency>
-                  
-            <groupId>org.slf4j</groupId>
-                  
-            <artifactId>slf4j-jdk14</artifactId>
-                  
-            <scope>test</scope>
-                
-        </dependency>
-            
-        <dependency>
-                  
-            <groupId>org.bouncycastle</groupId>
-                  
-            <artifactId>bcprov-jdk18on</artifactId>
-                  
-            <version>1.78.1</version>
-                  
-            <scope>test</scope>
-                
-        </dependency>
-          
+      <dependency>
+        <groupId>io.vertx</groupId>
+        <artifactId>vertx-dependencies</artifactId>
+        <version>${stack.version}</version>
+        <type>pom</type>
+        <scope>import</scope>
+      </dependency>
     </dependencies>
-      
-    <build>
-            
-        <plugins>
-                  
-            <plugin>
-                        
-                <groupId>org.apache.maven.plugins</groupId>
-                        
-                <artifactId>maven-surefire-plugin</artifactId>
-                        
-                <configuration>
-                              
-                    <systemPropertyVariables>
-                                    
-                        <java.util.logging.config.file>src/test/resources/logging.properties</java.util.logging.config.file>
-                                  
-                    </systemPropertyVariables>
-                            
-                </configuration>
-                      
-            </plugin>
-                
-        </plugins>
-          
-    </build>
-    
+  </dependencyManagement>
+
+  <dependencies>
+
+    <dependency>
+      <groupId>io.vertx</groupId>
+      <artifactId>vertx-core</artifactId>
+    </dependency>
+
+    <dependency>
+      <groupId>io.vertx</groupId>
+      <artifactId>vertx-codegen</artifactId>
+      <optional>true</optional>
+    </dependency>
+    <dependency>
+      <groupId>io.vertx</groupId>
+      <artifactId>vertx-docgen</artifactId>
+      <optional>true</optional>
+    </dependency>
+    <dependency>
+      <groupId>io.vertx</groupId>
+      <artifactId>vertx-core</artifactId>
+      <type>test-jar</type>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>io.vertx</groupId>
+      <artifactId>vertx-unit</artifactId>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>junit</groupId>
+      <artifactId>junit</artifactId>
+      <scope>test</scope>
+      <version>4.13.1</version>
+    </dependency>
+    <dependency>
+      <groupId>org.testcontainers</groupId>
+      <artifactId>testcontainers</artifactId>
+      <version>1.19.8</version>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.slf4j</groupId>
+      <artifactId>slf4j-jdk14</artifactId>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.bouncycastle</groupId>
+      <artifactId>bcprov-jdk18on</artifactId>
+      <version>1.78.1</version>
+      <scope>test</scope>
+    </dependency>
+  </dependencies>
+
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-surefire-plugin</artifactId>
+        <configuration>
+          <systemPropertyVariables>
+            <java.util.logging.config.file>src/test/resources/logging.properties</java.util.logging.config.file>
+          </systemPropertyVariables>
+        </configuration>
+      </plugin>
+    </plugins>
+  </build>
 </project>
