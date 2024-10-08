@@ -347,6 +347,40 @@ NOTE: It is important to remember that the commands `SUBSCRIBE`, `UNSUBSCRIBE`, 
 This means that the result in case of success is `null` not a instance of response.
 All messages are then routed through the handler on the client.
 
+=== `EventBusHandler`
+
+The Vert.x Redis client version 4.x automatically forwarded messages to the Vert.x event bus unless a `RedisConnection.handler()` was registered.
+
+In Vert.x Redis client version 5.x, that automatic forwarding is gone.
+If you still want it, you have to manually create an instance of `EventBusHandler` and register it using `RedisConnection.handler()`:
+
+[source,$lang]
+----
+{@link examples.RedisExamples#example15}
+----
+
+The `EventBusHandler` allows customizing the address prefix, so if you want to use an address of `com.example.<the channel>` (instead of `io.vertx.redis.<the channel>`), you can use `EventBusHandler.create(vertx, "com.example")`.
+
+The message sent to the Vert.x event bus is a `JsonObject` with the following format:
+
+[source,json]
+----
+{
+  "status": "OK",
+  "type": "message|subscribe|unsubscribe|pmessage|psubscribe|punsubscribe",
+  "value": {
+    "channel": "<the channel>", <1>
+    "message": "<the message>", <2>
+    "pattern": "<the pattern>", <3>
+    "current": <number of current subscriptions> <4>
+  }
+}
+----
+<1> For `[p]message`, `subscribe` and `unsubscribe`.
+<2> For `[p]message`.
+<3> For `pmessage`, `psubscribe` and `punsubscribe`.
+<4> For `[p]subscribe` and `[p]unsubscribe`.
+
 == Tracing commands
 
 The Redis client can trace command execution when Vert.x has tracing enabled.

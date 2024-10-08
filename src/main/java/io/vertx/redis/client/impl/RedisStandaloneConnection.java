@@ -32,9 +32,6 @@ import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 
 public class RedisStandaloneConnection implements RedisConnectionInternal, ParserHandler {
-
-  private static final String BASE_ADDRESS = "io.vertx.redis";
-
   private static final Logger LOG = LoggerFactory.getLogger(RedisStandaloneConnection.class);
 
   private static final ErrorType CONNECTION_CLOSED = ErrorType.create("CONNECTION_CLOSED");
@@ -45,7 +42,6 @@ public class RedisStandaloneConnection implements RedisConnectionInternal, Parse
   private final VertxInternal vertx;
   // to be used for callbacks
   private final ContextInternal context;
-  private final EventBus eventBus;
   private final NetSocket netSocket;
   // waiting: commands that have been sent but not answered
   // the queue is only accessed from the event loop
@@ -69,7 +65,6 @@ public class RedisStandaloneConnection implements RedisConnectionInternal, Parse
     this.context = context;
     this.poolOptions = options;
     this.listener = connectionListener;
-    this.eventBus = vertx.eventBus();
     this.netSocket = netSocket;
     this.waiting = new ArrayQueue(maxWaitingHandlers);
     this.expiresAt = computeExpiration();
@@ -386,40 +381,10 @@ public class RedisStandaloneConnection implements RedisConnectionInternal, Parse
     }
 
     // pub/sub mode
-    if ((reply != null && reply.type() == ResponseType.PUSH) || empty) {
+    if (reply != null && reply.type() == ResponseType.PUSH || empty) {
       if (onMessage != null) {
         context.execute(reply, onMessage);
       } else {
-        // pub/sub messages are arrays
-        if (reply instanceof Multi) {
-          // Detect valid published messages according to https://redis.io/topics/pubsub
-
-          if (reply.size() == 3 && "message".equals(reply.get(0).toString())) {
-            // channel
-            eventBus.send(
-              BASE_ADDRESS + "." + reply.get(1).toString(),
-              new JsonObject()
-                .put("status", "OK")
-                .put("value", new JsonObject()
-                  .put("channel", reply.get(1).toString())
-                  .put("message", reply.get(2).toString())));
-            return;
-          }
-
-          if (reply.size() == 4 && "pmessage".equals(reply.get(0).toString())) {
-            // pattern
-            eventBus.send(
-              BASE_ADDRESS + "." + reply.get(1).toString(),
-              new JsonObject()
-                .put("status", "OK")
-                .put("value", new JsonObject()
-                  .put("pattern", reply.get(1).toString())
-                  .put("channel", reply.get(2).toString())
-                  .put("message", reply.get(3).toString())));
-            return;
-          }
-          // fallback will just go to the log
-        }
         LOG.warn("No handler waiting for message: " + reply);
       }
       return;

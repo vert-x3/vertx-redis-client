@@ -8,6 +8,7 @@ import io.vertx.core.net.NetClientOptions;
 import io.vertx.core.net.PemTrustOptions;
 import io.vertx.core.tracing.TracingPolicy;
 import io.vertx.redis.client.Command;
+import io.vertx.redis.client.EventBusHandler;
 import io.vertx.redis.client.ProtocolVersion;
 import io.vertx.redis.client.Redis;
 import io.vertx.redis.client.RedisAPI;
@@ -294,6 +295,15 @@ public class RedisExamples {
         // and read operations may end up on the replica nodes
         // (depending on configuration and their availability)
         conn.send(Request.cmd(Command.GET).arg("key"));
+      });
+  }
+
+  public void example15(Vertx vertx) {
+    Redis redis = Redis.createClient(vertx);
+    redis.connect()
+      .onSuccess(conn -> {
+        conn.handler(EventBusHandler.create(vertx));
+        conn.send(Request.cmd(Command.SUBSCRIBE).arg("news"));
       });
   }
 
