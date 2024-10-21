@@ -381,6 +381,8 @@ The message sent to the Vert.x event bus is a `JsonObject` with the following fo
 <3> For `pmessage`, `psubscribe` and `punsubscribe`.
 <4> For `[p]subscribe` and `[p]unsubscribe`.
 
+The event bus address is `<prefix>.<the channel>` for `message`, `subscribe` and `unsubscribe` messages, and `<prefix>.<the pattern>` for `pmessage`, `psubscribe` and `punsubscribe` messages.
+
 == Tracing commands
 
 The Redis client can trace command execution when Vert.x has tracing enabled.

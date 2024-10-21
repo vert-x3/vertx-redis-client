@@ -68,9 +68,9 @@ public class RedisPubSubTest {
 
   @Test
   public void publishSubscribe_withHandler(TestContext test) {
-    Async async = test.async();
+    Async async = test.async(2);
 
-    rule.vertx().eventBus().consumer("io.vertx.redis.news", msg -> async.complete());
+    rule.vertx().eventBus().consumer("io.vertx.redis.news", msg -> async.countDown());
 
     subConn.handler(EventBusHandler.create(rule.vertx()));
     subConn.send(Request.cmd(Command.SUBSCRIBE).arg("news")).onComplete(test.asyncAssertSuccess(result -> {
@@ -80,9 +80,9 @@ public class RedisPubSubTest {
 
   @Test
   public void publishPSubscribe_withHandler(TestContext test) {
-    Async async = test.async();
+    Async async = test.async(2);
 
-    rule.vertx().eventBus().consumer("io.vertx.redis.new*", msg -> async.complete());
+    rule.vertx().eventBus().consumer("io.vertx.redis.new*", msg -> async.countDown());
 
     subConn.handler(EventBusHandler.create(rule.vertx()));
     subConn.send(Request.cmd(Command.PSUBSCRIBE).arg("new*")).onComplete(test.asyncAssertSuccess(result -> {
