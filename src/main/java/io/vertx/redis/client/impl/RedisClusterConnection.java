@@ -353,7 +353,7 @@ public class RedisClusterConnection implements RedisConnection {
         }
 
         try {
-          handler.succeed(send.result());
+          handler.complete(send.result(), send.cause());
         } catch (RuntimeException e) {
           LOG.error("Handler failure", e);
         }
@@ -534,7 +534,7 @@ public class RedisClusterConnection implements RedisConnection {
         }
 
         try {
-          handler.succeed(send.result());
+          handler.complete(send.result(), send.cause());
         } catch (RuntimeException e) {
           LOG.error("Handler failure", e);
         }
