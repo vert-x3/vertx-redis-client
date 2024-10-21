@@ -80,7 +80,7 @@ public class EventBusHandler implements Handler<Response> {
       }
 
       if (reply.size() == 4 && "pmessage".equals(type)) {
-        eventBus.send(prefix + "." + reply.get(2).toString(),
+        eventBus.send(prefix + "." + reply.get(1).toString(),
           new JsonObject()
             .put("status", "OK")
             .put("type", type)
