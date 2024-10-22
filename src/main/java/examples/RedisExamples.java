@@ -1,9 +1,6 @@
 package examples;
 
-import io.vertx.core.AbstractVerticle;
-import io.vertx.core.Future;
-import io.vertx.core.Promise;
-import io.vertx.core.Vertx;
+import io.vertx.core.*;
 import io.vertx.core.net.NetClientOptions;
 import io.vertx.core.net.PemTrustOptions;
 import io.vertx.core.tracing.TracingPolicy;
@@ -151,7 +148,7 @@ public class RedisExamples {
 
   public void example10() {
 
-    class RedisVerticle extends AbstractVerticle {
+    class RedisVerticle extends VerticleBase {
 
       private static final int MAX_RECONNECT_RETRIES = 16;
 
@@ -161,8 +158,8 @@ public class RedisExamples {
       private final AtomicBoolean CONNECTING = new AtomicBoolean();
 
       @Override
-      public void start() {
-        createRedisClient()
+      public Future<?> start() {
+        return createRedisClient()
           .onSuccess(conn -> {
             // connected to redis!
           });

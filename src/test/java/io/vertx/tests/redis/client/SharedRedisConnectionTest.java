@@ -1,9 +1,6 @@
 package io.vertx.tests.redis.client;
 
-import io.vertx.core.AbstractVerticle;
-import io.vertx.core.DeploymentOptions;
-import io.vertx.core.Future;
-import io.vertx.core.Vertx;
+import io.vertx.core.*;
 import io.vertx.ext.unit.Async;
 import io.vertx.ext.unit.TestContext;
 import io.vertx.ext.unit.junit.VertxUnitRunner;
@@ -73,7 +70,7 @@ public class SharedRedisConnectionTest {
     vertx.deployVerticle(() -> new MyVerticle(conn, test), new DeploymentOptions().setInstances(VERTICLES_COUNT));
   }
 
-  public static class MyVerticle extends AbstractVerticle {
+  public static class MyVerticle extends VerticleBase {
     private final RedisAPI conn;
     private final TestContext test;
 
@@ -83,13 +80,14 @@ public class SharedRedisConnectionTest {
     }
 
     @Override
-    public void start() {
+    public Future<?> start() throws Exception {
       Async async = test.async(ITERATIONS_COUNT);
       for (int i = 0; i < ITERATIONS_COUNT; i++) {
         test()
           .onSuccess(ignored -> async.countDown())
           .onFailure(test::fail);
       }
+      return super.start();
     }
 
     private Future<?> test() {

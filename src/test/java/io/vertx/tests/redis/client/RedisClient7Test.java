@@ -1,9 +1,6 @@
 package io.vertx.tests.redis.client;
 
-import io.vertx.core.AbstractVerticle;
-import io.vertx.core.DeploymentOptions;
-import io.vertx.core.Promise;
-import io.vertx.core.ThreadingModel;
+import io.vertx.core.*;
 import io.vertx.core.json.JsonObject;
 import io.vertx.ext.unit.Async;
 import io.vertx.ext.unit.TestContext;
@@ -213,9 +210,9 @@ public class RedisClient7Test {
     AtomicInteger count = new AtomicInteger();
 
     rule.vertx()
-      .deployVerticle(() -> new AbstractVerticle() {
+      .deployVerticle(() -> new VerticleBase() {
         @Override
-        public void start(Promise<Void> onStart) {
+        public Future<?> start() throws Exception {
           Redis redisClient = Redis.createClient(rule.vertx(), new RedisOptions()
             .setConnectionString("redis://" + redis.getHost() + ":" + redis.getPort() + "/0")
             .setMaxPoolSize(10)
@@ -234,7 +231,7 @@ public class RedisClient7Test {
                 .onFailure(should::fail);
             });
 
-          onStart.complete();
+          return super.start();
         }
       }, new DeploymentOptions().setInstances(instances).setThreadingModel(ThreadingModel.WORKER))
       .onComplete(res -> {

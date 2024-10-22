@@ -1,7 +1,7 @@
 package io.vertx.tests.redis.client;
 
-import io.vertx.core.AbstractVerticle;
-import io.vertx.core.Promise;
+import io.vertx.core.Future;
+import io.vertx.core.VerticleBase;
 import io.vertx.core.http.HttpMethod;
 import io.vertx.ext.unit.Async;
 import io.vertx.ext.unit.TestContext;
@@ -54,7 +54,7 @@ public class RedisThreadConsistencyTest {
       });
   }
 
-  static class Verticle extends AbstractVerticle {
+  static class Verticle extends VerticleBase {
 
     RedisAPI redisAPI;
 
@@ -63,8 +63,8 @@ public class RedisThreadConsistencyTest {
     }
 
     @Override
-    public void start(Promise<Void> startFuture) {
-      vertx.createHttpServer()
+    public Future<?> start() {
+      return vertx.createHttpServer()
         .requestHandler(req -> {
           String threadBeforeRedisCommandExecution = Thread.currentThread().getName();
           redisAPI.info(Collections.emptyList()).onComplete(result -> {
@@ -74,9 +74,7 @@ public class RedisThreadConsistencyTest {
               .end("Ok");
           });
         })
-        .listen(8080)
-        .onFailure(startFuture::fail)
-        .onSuccess(conn -> startFuture.complete());
+        .listen(8080);
     }
   }
 }

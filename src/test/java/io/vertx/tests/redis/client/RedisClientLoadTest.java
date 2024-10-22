@@ -1,10 +1,6 @@
 package io.vertx.tests.redis.client;
 
-import io.vertx.core.AbstractVerticle;
-import io.vertx.core.DeploymentOptions;
-import io.vertx.core.Future;
-import io.vertx.core.Promise;
-import io.vertx.core.ThreadingModel;
+import io.vertx.core.*;
 import io.vertx.core.internal.VertxInternal;
 import io.vertx.core.net.NetClientOptions;
 import io.vertx.ext.unit.Async;
@@ -95,9 +91,9 @@ public class RedisClientLoadTest {
 
     Promise<Void> donePromise = ((VertxInternal) rule.vertx()).promise();
 
-    rule.vertx().deployVerticle(() -> new AbstractVerticle() {
+    rule.vertx().deployVerticle(() -> new VerticleBase() {
         @Override
-        public void start() throws Exception {
+        public Future<?> start() throws Exception {
           Redis redis = Redis.createClient(rule.vertx(), REDIS_OPTIONS);
           this.vertx.eventBus().consumer("test.redis.load").handler(m -> {
             redis.send(Request.cmd(Command.SET).arg("foo").arg("bar")).onComplete(res -> {
@@ -113,6 +109,7 @@ public class RedisClientLoadTest {
               }
             });
           });
+          return super.start();
         }
       }, new DeploymentOptions().setInstances(instances))
       .onFailure(should::fail)
@@ -144,9 +141,9 @@ public class RedisClientLoadTest {
 
     Promise<Void> donePromise = Promise.promise();
 
-    rule.vertx().deployVerticle(() -> new AbstractVerticle() {
+    rule.vertx().deployVerticle(() -> new VerticleBase() {
         @Override
-        public void start() throws Exception {
+        public Future<?> start() throws Exception {
           Redis redis = Redis.createClient(rule.vertx(), new RedisOptions().setMaxPoolWaiting(1000).setConnectionString(redisServer.getRedisUri()));
           this.vertx.eventBus().consumer("test.redis.load").handler(m -> {
             redis.connect().compose(r -> r.send(Request.cmd(Command.SET).arg("foo").arg("bar")).onComplete(res -> r.close()))
@@ -163,6 +160,7 @@ public class RedisClientLoadTest {
                 }
               });
           });
+          return super.start();
         }
       }, new DeploymentOptions().setInstances(instances).setThreadingModel(ThreadingModel.WORKER).setWorkerPoolName("RedisLoadTest"))
       .onComplete(res -> {
@@ -189,9 +187,9 @@ public class RedisClientLoadTest {
     AtomicInteger countOfSuccess = new AtomicInteger();
     AtomicInteger connectionsInProcess = new AtomicInteger();
     Promise<Void> donePromise = Promise.promise();
-    rule.vertx().deployVerticle(() -> new AbstractVerticle() {
+    rule.vertx().deployVerticle(() -> new VerticleBase() {
         @Override
-        public void start() throws Exception {
+        public Future<?> start() throws Exception {
           Redis redis = Redis.createClient(rule.vertx(), new RedisOptions().setMaxPoolWaiting(1000).setConnectionString(redisServer.getRedisUri()));
           this.vertx.eventBus().consumer("test.redis.load").handler(m -> {
             connectionsInProcess.incrementAndGet();
@@ -219,6 +217,8 @@ public class RedisClientLoadTest {
                 }
               });
           });
+
+          return super.start();
         }
       }, new DeploymentOptions().setInstances(instances).setThreadingModel(ThreadingModel.WORKER).setWorkerPoolName("RedisLoadTest"))
       .onComplete(res -> {
