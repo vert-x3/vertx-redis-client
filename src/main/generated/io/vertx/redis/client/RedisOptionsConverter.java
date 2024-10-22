@@ -59,6 +59,11 @@ public class RedisOptionsConverter {
             obj.setUseReplicas(io.vertx.redis.client.RedisReplicas.valueOf((String)member.getValue()));
           }
           break;
+        case "clusterTransactions":
+          if (member.getValue() instanceof String) {
+            obj.setClusterTransactions(io.vertx.redis.client.RedisClusterTransactions.valueOf((String)member.getValue()));
+          }
+          break;
         case "maxNestedArrays":
           if (member.getValue() instanceof Number) {
             obj.setMaxNestedArrays(((Number)member.getValue()).intValue());
@@ -161,6 +166,9 @@ public class RedisOptionsConverter {
     }
     if (obj.getUseReplicas() != null) {
       json.put("useReplicas", obj.getUseReplicas().name());
+    }
+    if (obj.getClusterTransactions() != null) {
+      json.put("clusterTransactions", obj.getClusterTransactions().name());
     }
     json.put("maxNestedArrays", obj.getMaxNestedArrays());
     if (obj.getTracingPolicy() != null) {

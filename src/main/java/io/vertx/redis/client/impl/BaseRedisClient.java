@@ -48,6 +48,8 @@ public abstract class BaseRedisClient<OPTS extends RedisConnectOptions> implemen
     if (cmd.isPubSub()) {
       // mixing pubSub cannot be used on a one-shot operation
       return vertx.getOrCreateContext().failedFuture("PubSub command in connection-less mode not allowed");
+    } else if (cmd.isTransactional()) {
+      return vertx.getOrCreateContext().failedFuture("Transactional command in connection-less mode not allowed");
     }
 
     return connect()
@@ -71,6 +73,9 @@ public abstract class BaseRedisClient<OPTS extends RedisConnectOptions> implemen
           // mixing pubSub cannot be used on a one-shot operation
           return Future.failedFuture("PubSub command in connection-less batch not allowed");
         }
+        // someone might expect that for symmetry with `send()`, we'll also check the commands here
+        // and fail if any of them is transactional, but that would be wrong -- a batch is always
+        // executed on a single connection and can therefore contain the whole transaction
       }
 
       return connect()

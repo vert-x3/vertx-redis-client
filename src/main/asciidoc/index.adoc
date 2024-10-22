@@ -325,6 +325,42 @@ This form of DNS-based load balancing does not work well with DNS resolution cac
 As a result, some replicas are likely to be underutilized.
 Elasticache for Redis (Cluster Mode Enabled) doesn't suffer from this problem, because it uses classic round-robin DNS.
 
+== Redis transactions
+
+The Vert.x Redis client supports Redis transactions.
+You simply have to issue the corresponding commands: `MULTI`, `EXEC`, `DISCARD`, `WATCH` or `UNWATCH`.
+Note that transactions in Redis are _not_ classic ACID transactions from SQL databases; they merely allow queueing multiple commands for later execution.
+
+Transactions must be executed on a single connection.
+Trying to execute a transactional command in a connection-less mode (`Redis.send()`) will fail.
+It is possible to execute a transaction in a connection-less batch (`Redis.batch()`), but the batch must contain the entire transaction; it must not be split in multiple batches.
+
+It is recommended to always obtain a connection (`Redis.connect()`) and execute all commands of a transaction on that connection.
+
+=== Transactions in cluster
+
+By default, transactions in Redis cluster are disabled.
+Attempting to execute a transactional command leads to a failure.
+
+It is possible to enable single-node transactions in Redis cluster by:
+
+[source,$lang]
+----
+{@link examples.RedisExamples#example16}
+----
+
+In single-node transactions, the first command (if it is `WATCH`) or the second command (if the first one is `MULTI`) determines on which node the transaction should execute.
+The connection is bound to the selected node and all subsequent commands are sent to that node, regardless of the hash slot assignment.
+When the final command of a transaction (`EXEC` or `DISCARD`) is executed, the connection is reset to default mode and is no longer bound to a single node.
+
+If the transaction starts with `WATCH`, that command has keys and so determines the target node.
+If the transaction starts with `MULTI`, that command is not sent to Redis directly but is rather queued until the next command is executed.
+It is that command that determines the target node (so it should have keys, otherwise the target node is random).
+
+WARNING: Note that all this only applies to `RedisConnection.send()`.
+Command batches (`RedisConnection.batch()`) are always executed on a single node in the cluster, so there is no special support for transactions (they are not even disabled by default).
+Again, the batch must contain the entire transaction; it must not be split in multiple batches.
+
 == Pub/Sub mode
 
 Redis supports queues and pub/sub mode, when operated in this mode once a connection invokes a subscriber mode then it cannot be used for running other commands than the command to leave that mode.

@@ -13,6 +13,7 @@ import io.vertx.redis.client.ProtocolVersion;
 import io.vertx.redis.client.Redis;
 import io.vertx.redis.client.RedisAPI;
 import io.vertx.redis.client.RedisClientType;
+import io.vertx.redis.client.RedisClusterTransactions;
 import io.vertx.redis.client.RedisConnection;
 import io.vertx.redis.client.RedisOptions;
 import io.vertx.redis.client.RedisRole;
@@ -305,6 +306,10 @@ public class RedisExamples {
         conn.handler(EventBusHandler.create(vertx));
         conn.send(Request.cmd(Command.SUBSCRIBE).arg("news"));
       });
+  }
+
+  public void example16(RedisOptions options) {
+    options.setClusterTransactions(RedisClusterTransactions.SINGLE_NODE);
   }
 
   public void tracing1(RedisOptions options) {
