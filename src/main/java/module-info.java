@@ -1,5 +1,5 @@
 
-module io.vertx.client.redis {
+module io.vertx.redis.client {
   requires io.vertx.core;
   requires io.vertx.core.logging;
   requires static io.vertx.docgen;
