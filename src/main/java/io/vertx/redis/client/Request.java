@@ -15,9 +15,9 @@
  */
 package io.vertx.redis.client;
 
+import io.vertx.codegen.annotations.DataObject;
 import io.vertx.codegen.annotations.Fluent;
 import io.vertx.codegen.annotations.GenIgnore;
-import io.vertx.codegen.annotations.VertxGen;
 import io.vertx.core.buffer.Buffer;
 import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;
@@ -41,7 +41,7 @@ import java.util.Map;
  *
  * @author Paulo Lopes
  */
-@VertxGen
+@DataObject
 public interface Request {
 
   /**

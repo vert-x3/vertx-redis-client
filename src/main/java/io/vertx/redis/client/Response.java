@@ -15,9 +15,9 @@
  */
 package io.vertx.redis.client;
 
+import io.vertx.codegen.annotations.DataObject;
 import io.vertx.codegen.annotations.GenIgnore;
 import io.vertx.codegen.annotations.Nullable;
-import io.vertx.codegen.annotations.VertxGen;
 import io.vertx.core.buffer.Buffer;
 
 import java.math.BigInteger;
@@ -45,7 +45,7 @@ import java.util.stream.StreamSupport;
  *
  * @author Paulo Lopes
  */
-@VertxGen
+@DataObject
 public interface Response extends Iterable<Response> {
 
   /**
