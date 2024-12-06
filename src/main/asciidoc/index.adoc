@@ -278,6 +278,36 @@ When the cache is empty, the first attempt to acquire a connection will execute 
 The cache has a configurable TTL (time to live), which defaults to 1 second.
 The cache is also cleared whenever any command executed by the client receives the `MOVED` redirection.
 
+=== Cluster Utilities
+
+The `RedisCluster` class contains a small number of methods useful in the Redis cluster.
+To create an instance, call `create()` with either a `Redis` object, or a `RedisConnection` object.
+If you call `create()` with a non-clustered `Redis` / `RedisConnection`, an exception is thrown.
+
+The methods provided by `RedisCluster` are:
+
+* `onAllNodes(Request)`: runs the request against all nodes in the cluster.
+Returns a future that completes with a list of responses, one from each node, or failure when one of the operations fails.
+Note that in case of a failure, there are no guarantees that the request was or wasn't executed successfully on other Redis cluster nodes.
+No result order is guaranteed either.
+* `onAllMasterNodes(Request)`: runs the request against all _master_ nodes in the cluster.
+Returns a future that completes with a list of responses, one from each master node, or failure when one of the operations fails.
+Note that in case of a failure, there are no guarantees that the request was or wasn't executed successfully on other Redis cluster master nodes.
+No result order is guaranteed either.
+* `groupByNodes(List<Request>)`: groups the requests into a `RequestGrouping`, which contains:
++
+--
+** _keyed_ requests: requests that include a key and it is therefore possible to determine to which master node they should be sent; all requests in each inner list in the `keyed` collection are guaranteed to be sent to the same _master_ node;
+** _unkeyed_ requests: requests that do not include a key and it is therefore _not_ possible to determine to which master node they should be sent.
+--
++
+If any of the requests includes multiple keys that belong to different master nodes, the resulting future will fail.
++
+If the cluster client was created with `RedisReplicas.SHARE` or `RedisReplicas.ALWAYS` and the commands are executed individually (using `RedisConnection.send()`, not `RedisConnection.batch()`), it is possible that the commands will be spread across different replicas of the same master node.
++
+Note that this method is only reliable in case the Redis cluster is in a stable state.
+In case of resharding, failover or in general any change of cluster topology, there are no guarantees on the validity of the result.
+
 == Replication Mode
 
 Working with replication is transparent to the client.
