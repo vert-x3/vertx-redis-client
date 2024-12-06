@@ -9,9 +9,11 @@ import io.vertx.redis.client.Redis;
 import io.vertx.redis.client.RedisCluster;
 import io.vertx.redis.client.RedisConnection;
 import io.vertx.redis.client.Request;
+import io.vertx.redis.client.RequestGrouping;
 import io.vertx.redis.client.Response;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -95,7 +97,7 @@ public class RedisClusterImpl implements RedisCluster {
   }
 
   @Override
-  public Future<List<List<Request>>> groupByNodes(List<Request> requests) {
+  public Future<RequestGrouping> groupByNodes(List<Request> requests) {
     if (connection != null) {
       return groupByNodes(requests, (RedisClusterConnection) connection);
     } else /* client != null */ {
@@ -107,7 +109,7 @@ public class RedisClusterImpl implements RedisCluster {
     }
   }
 
-  private Future<List<List<Request>>> groupByNodes(List<Request> requests, RedisClusterConnection conn) {
+  private Future<RequestGrouping> groupByNodes(List<Request> requests, RedisClusterConnection conn) {
     return conn.sharedSlots.get()
       .compose(slots -> {
         Map<String, List<Request>> grouping = new HashMap<>();
@@ -143,11 +145,7 @@ public class RedisClusterImpl implements RedisCluster {
           }
         }
 
-        List<List<Request>> result = new ArrayList<>(grouping.values());
-        if (ambiguous != null) {
-          result.add(ambiguous);
-        }
-        return Future.succeededFuture(result);
+        return Future.succeededFuture(new RequestGrouping(grouping.values(), ambiguous != null ? ambiguous : Collections.emptyList()));
       });
   }
 }

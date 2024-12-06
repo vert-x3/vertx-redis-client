@@ -1,5 +1,6 @@
 package io.vertx.redis.client;
 
+import io.vertx.codegen.annotations.VertxGen;
 import io.vertx.core.Future;
 import io.vertx.redis.client.impl.RedisClusterImpl;
 
@@ -14,6 +15,7 @@ import java.util.List;
  * @see #onAllMasterNodes(Request)
  * @see #groupByNodes(List)
  */
+@VertxGen
 public interface RedisCluster {
   static RedisCluster create(Redis client) {
     return new RedisClusterImpl(client);
@@ -50,18 +52,21 @@ public interface RedisCluster {
   Future<List<Response>> onAllMasterNodes(Request request);
 
   /**
-   * Groups the {@code requests} such that all requests in each inner list in the result
-   * are guaranteed to be sent to the same Redis <em>master</em> node.
+   * Groups the {@code requests} into a {@link RequestGrouping}, which contains:
+   * <ul>
+   * <li><em>keyed</em> requests: requests that include a key and it is therefore possible
+   * to determine to which master node they should be sent; all requests in each inner list
+   * in the {@code keyed} collection are guaranteed to be sent to the same <em>master</em> node;</li>
+   * <li><em>unkeyed</em> requests: requests that do not include a key and it is therefore
+   * <em>not</em> possible to determine to which master node they should be sent.</li>
+   * </ul>
+   * If any of the {@code requests} includes multiple keys that belong to different master nodes,
+   * the resulting future will fail.
    * <p>
-   * If the cluster client was not created with {@link RedisReplicas#NEVER} and
-   * the commands are executed individually (not using {@link RedisConnection#batch(List) batch()}),
-   * it is possible that the commands will be spread across different replicas
-   * of the same master node.
-   * <p>
-   * If any of the {@code requests} don't have keys and hence are targeted at a random
-   * node, all such requests shall be grouped into an extra single list for which
-   * the above guarantee does not apply. If any of the {@code requests} includes multiple
-   * keys that belong to different master nodes, the resulting future will fail.
+   * If the cluster client was created with {@link RedisReplicas#SHARE} or {@link RedisReplicas#ALWAYS}
+   * and the commands are executed individually (using {@link RedisConnection#send(Request) send()},
+   * not {@link RedisConnection#batch(List) batch()}), it is possible that the commands will be spread
+   * across different replicas of the same master node.
    * <p>
    * Note that this method is only reliable in case the Redis cluster is in a stable
    * state. In case of resharding, failover or in general any change of cluster topology,
@@ -70,5 +75,5 @@ public interface RedisCluster {
    * @param requests the requests, must not be {@code null}
    * @return the requests grouped by the cluster node assignment
    */
-  Future<List<List<Request>>> groupByNodes(List<Request> requests);
+  Future<RequestGrouping> groupByNodes(List<Request> requests);
 }

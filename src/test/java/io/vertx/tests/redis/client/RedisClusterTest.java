@@ -1150,12 +1150,12 @@ public class RedisClusterTest {
         cluster.groupByNodes(commands)
           .onComplete(should.asyncAssertSuccess(groupedCommands -> {
             List<Future<List<Response>>> futures = new ArrayList<>();
-            for (List<Request> commandGroup : groupedCommands) {
+            for (List<Request> commandGroup : groupedCommands.getKeyed()) {
               futures.add(conn.batch(commandGroup));
             }
             Future.all(futures)
               .onComplete(should.asyncAssertSuccess(responses -> {
-                should.assertEquals(groupedCommands.stream().map(List::size).reduce(0, Integer::sum),
+                should.assertEquals(groupedCommands.getKeyed().stream().map(List::size).reduce(0, Integer::sum),
                   responses.result().list().stream().map(item -> ((List<Request>) item).size()).reduce(0, Integer::sum));
                 test.complete();
               }));
@@ -1181,7 +1181,7 @@ public class RedisClusterTest {
 
         cluster.groupByNodes(commands)
           .onComplete(should.asyncAssertSuccess(groupedCommands -> {
-            List<Request> commandGroup = groupedCommands.get(0);
+            List<Request> commandGroup = groupedCommands.getKeyed().iterator().next();
 
             conn.batch(commandGroup)
               .onComplete(should.asyncAssertSuccess(responses -> {
