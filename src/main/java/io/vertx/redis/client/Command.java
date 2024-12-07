@@ -15,7 +15,7 @@
  */
 package io.vertx.redis.client;
 
-import io.vertx.codegen.annotations.VertxGen;
+import io.vertx.codegen.annotations.DataObject;
 import io.vertx.redis.client.impl.CommandImpl;
 import io.vertx.redis.client.impl.KeyLocator;
 import io.vertx.redis.client.impl.keys.BeginSearchIndex;
@@ -29,7 +29,7 @@ import io.vertx.redis.client.impl.keys.FindKeysRange;
  * @author <a href="mailto:plopes@redhat.com">Paulo Lopes</a>
  * @version redis_version:7.0.12
  */
-@VertxGen
+@DataObject
 public interface Command {
 
   /**
