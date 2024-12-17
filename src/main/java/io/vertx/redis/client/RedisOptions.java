@@ -174,45 +174,6 @@ public class RedisOptions {
   }
 
   /**
-   * Adds an endpoint to use while connecting to the Redis server. Only the cluster mode will consider more than
-   * 1 element. If more are provided, they are not considered by the client when in single server mode.
-   *
-   * @param connectionString a string URI following the scheme: redis://[username:password@][host][:port][/database]
-   * @return fluent self.
-   * @deprecated see {@link #setConnectionString(String connectionString)} for a better naming
-   */
-  @Deprecated
-  @GenIgnore
-  public RedisOptions addEndpoint(String connectionString) {
-    if (endpoints == null) {
-      endpoints = new ArrayList<>();
-    }
-    this.endpoints.add(connectionString);
-    return this;
-  }
-
-  /**
-   * Sets a single connection string to use while connecting to the Redis server.
-   * Will replace the previously configured connection strings.
-   *
-   * @param connectionString a string following the scheme: redis://[username:password@][host][:port][/[database]
-   * @return fluent self.
-   * @deprecated see {@link #setConnectionString(String connectionString)} for a better naming
-   */
-  @Deprecated
-  @GenIgnore
-  public RedisOptions setEndpoint(String connectionString) {
-    if (endpoints == null) {
-      endpoints = new ArrayList<>();
-    } else {
-      endpoints.clear();
-    }
-
-    this.endpoints.add(connectionString);
-    return this;
-  }
-
-  /**
    * Adds a connection string (endpoint) to use while connecting to the Redis server. Only the cluster mode will
    * consider more than 1 element. If more are provided, they are not considered by the client when in single server mode.
    *
