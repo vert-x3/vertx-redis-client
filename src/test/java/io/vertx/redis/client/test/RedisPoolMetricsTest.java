@@ -100,6 +100,36 @@ public class RedisPoolMetricsTest {
   }
 
   @Test
+  public void taintedConnection(TestContext test) {
+    Async async = test.async();
+
+    Redis client = Redis.createClient(rule.vertx(), new RedisOptions().setConnectionString(redis.getRedisUri()));
+    client.connect()
+      .compose(conn -> {
+        test.assertEquals(0, getMetrics().numberOfWaitingTasks());
+        test.assertEquals(1, getMetrics().numberOfRunningTasks());
+
+        return conn.send(Request.cmd(Command.SELECT).arg(7)) // taints the connection
+          .compose(response -> {
+            test.assertEquals(0, getMetrics().numberOfWaitingTasks());
+            test.assertEquals(1, getMetrics().numberOfRunningTasks());
+
+            return conn.close();
+          }).onComplete(test.asyncAssertSuccess(ignored -> {
+            test.assertEquals(0, getMetrics().numberOfWaitingTasks());
+            test.assertEquals(0, getMetrics().numberOfRunningTasks());
+          }));
+      })
+      .map(ignored -> {
+        client.close();
+        return null;
+      })
+      .onComplete(test.asyncAssertSuccess(ignored -> {
+        async.complete();
+      }));
+  }
+
+  @Test
   public void testLifecycle(TestContext should) {
     final Async test = should.async();
 
