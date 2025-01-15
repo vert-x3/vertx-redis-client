@@ -10,6 +10,7 @@ import io.vertx.redis.client.Request;
 import io.vertx.redis.client.Response;
 
 import java.util.List;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
  * A pooled Redis connection
@@ -20,6 +21,7 @@ public class PooledRedisConnection implements RedisConnection {
   private final RedisConnectionInternal connection;
   private final PoolMetrics metrics;
   private final Object metric;
+  private final AtomicBoolean ended = new AtomicBoolean();
 
   public PooledRedisConnection(Lease<RedisConnectionInternal> lease, PoolMetrics<?, ?> poolMetrics, Object metric) {
     this.lease = lease;
@@ -88,6 +90,9 @@ public class PooledRedisConnection implements RedisConnection {
   public Future<Void> close() {
     if (connection.reset()) {
       lease.recycle();
+    }
+
+    if (ended.compareAndSet(false, true)) {
       if (metrics != null) {
         metrics.end(metric);
       }
