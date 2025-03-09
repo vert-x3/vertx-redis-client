@@ -18,6 +18,7 @@ package io.vertx.redis.client.impl;
 import io.vertx.core.Future;
 import io.vertx.core.Handler;
 import io.vertx.core.Promise;
+import io.vertx.core.ThreadingModel;
 import io.vertx.core.internal.pool.ConnectResult;
 import io.vertx.core.internal.pool.ConnectionPool;
 import io.vertx.core.internal.pool.Lease;
@@ -71,7 +72,7 @@ public class RedisConnectionManager implements Function<RedisConnectionManager.C
     this.poolOptions = poolOptions;
     this.connectOptions = connectOptions;
     this.tracingPolicy = tracingPolicy;
-    VertxMetrics metricsSPI = this.vertx.metricsSPI();
+    VertxMetrics metricsSPI = this.vertx.metrics();
     metrics = metricsSPI != null ? metricsSPI.createPoolMetrics("redis", poolOptions.getName(), poolOptions.getMaxSize()) : null;
     this.netClient = (NetClientInternal) vertx.createNetClient(tcpOptions);
     this.pooledConnectionManager = new ResourceManager<>();
@@ -205,7 +206,7 @@ public class RedisConnectionManager implements Function<RedisConnectionManager.C
 
     private Future<ConnectResult<RedisConnectionInternal>> init(ContextInternal ctx, RedisConnectOptions options, NetSocket netSocket, PoolConnector.Listener connectionListener) {
       // the connection will inherit the user event loop context
-      VertxMetrics vertxMetrics = vertx.metricsSPI();
+      VertxMetrics vertxMetrics = vertx.metrics();
       ClientMetrics metrics = vertxMetrics != null
         ? vertxMetrics.createClientMetrics(redisURI.socketAddress(), "redis", netClientOptions.getMetricsName())
         : null;
@@ -359,7 +360,11 @@ public class RedisConnectionManager implements Function<RedisConnectionManager.C
     if (context.isEventLoopContext()) {
       eventLoopContext = context;
     } else {
-      eventLoopContext = vertx.createEventLoopContext(context.nettyEventLoop(), context.workerPool(), context.classLoader());
+      eventLoopContext = vertx.contextBuilder()
+        .withThreadingModel(ThreadingModel.EVENT_LOOP)
+        .withEventLoop(context.nettyEventLoop())
+        .withWorkerPool(context.workerPool())
+        .build();
     }
 
     final boolean metricsEnabled = metrics != null;
