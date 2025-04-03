@@ -24,12 +24,12 @@
   </parent>
 
   <artifactId>vertx-redis-client</artifactId>
-  <version>4.5.14</version>
+  <version>4.5.15-SNAPSHOT</version>
 
   <name>Vert.x Redis Client</name>
 
   <properties>
-    <stack.version>4.5.14</stack.version>
+    <stack.version>4.5.15-SNAPSHOT</stack.version>
     <jar.manifest>${project.basedir}/src/main/resources/META-INF/MANIFEST.MF</jar.manifest>
   </properties>
 
