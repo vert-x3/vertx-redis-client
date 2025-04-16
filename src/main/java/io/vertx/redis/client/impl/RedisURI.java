@@ -27,14 +27,42 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * Utility to parse redis URLs. The URI should follow the scheme: redis://[username:password@][host][:port][/[database]
- * An example URI can be found at <a href="https://redis.io/topics/rediscli">Redis cli docs</a>
+ * Utility to parse Redis URLs. The URI should follow the general scheme:
+ * {@code redis://[username:password@][host][:port][/[database]}
+ *
+ * <p>An example URI can be found at <a href="https://redis.io/topics/rediscli">Redis cli docs</a>.</p>
+ *
+ * <p>Valid URI schemes are: {@code redis} (TCP), {@code rediss} (TCP+TLS), {@code unix} (UNIX socket).</p>
+ *
+ * <p>
+ *   Additionally the following query parameters are supported (while the dedicated URI components take precedence):
+ *   <ul>
+ *     <li>{@code db}: database</li>
+ *     <li>{@code user}: username</li>
+ *     <li>{@code password}: username</li>
+ *   </ul>
+ * </p>
+ *
+ * <p>
+ *   Valid examples:
+ *   <ul>
+ *     <li>{@code redis://example.com}</li>
+ *     <li>{@code redis://example.com/my-database}</li>
+ *     <li>{@code redis://my-user:secret@example.com/my-database}</li>
+ *     <li>{@code rediss://:secret@example.com/my-database} (username {@code default})</li>
+ *     <li>{@code unix://example.com/my-database?user=my-user&password=secret}</li>
+ *   </ul>
+ *
+ * </p>
  *
  * @author <a href="mailto:plopes@redhat.com">Paulo Lopes</a>
  */
 public final class RedisURI {
 
   private static final int DEFAULT_PORT = 6379;
+  private static final String QUERY_DB = "db";
+  private static final String QUERY_USER = "user";
+  private static final String QUERY_PASSWORD = "password";
 
   /**
    * Address, including host and port
@@ -104,8 +132,8 @@ public final class RedisURI {
           if (path.length() > 1) {
             // skip initial slash
             select = Integer.parseInt(uri.getPath().substring(1));
-          } else if (params.containsKey("db")) {
-            select = Integer.parseInt(params.get("db"));
+          } else if (params.containsKey(QUERY_DB)) {
+            select = Integer.parseInt(params.get(QUERY_DB));
           } else {
             select = null;
           }
@@ -117,8 +145,8 @@ public final class RedisURI {
           if (path.length() > 1) {
             // skip initial slash
             select = Integer.parseInt(uri.getPath().substring(1));
-          } else if (params.containsKey("db")) {
-            select = Integer.parseInt(params.get("db"));
+          } else if (params.containsKey(QUERY_DB)) {
+            select = Integer.parseInt(params.get(QUERY_DB));
           } else {
             select = null;
           }
@@ -127,8 +155,8 @@ public final class RedisURI {
           ssl = false;
           unix = true;
           socketAddress = SocketAddress.domainSocketAddress(path);
-          if (params.containsKey("db")) {
-            select = Integer.parseInt(params.get("db"));
+          if (params.containsKey(QUERY_DB)) {
+            select = Integer.parseInt(params.get(QUERY_DB));
           } else {
             select = null;
           }
@@ -144,16 +172,16 @@ public final class RedisURI {
           if (sep > 0) {
             user = urlDecode(userInfo.substring(0, sep));
           } else {
-            user = params.getOrDefault("user", null);
+            user = params.getOrDefault(QUERY_USER, null);
           }
           password = urlDecode(userInfo.substring(sep + 1));
         } else {
-          user = params.getOrDefault("user", null);
-          password = params.getOrDefault("password", null);
+          user = userInfo.isEmpty() ? params.getOrDefault(QUERY_USER, null) : urlDecode(userInfo);
+          password = params.getOrDefault(QUERY_PASSWORD, null);
         }
       } else {
-        user = params.getOrDefault("user", null);
-        password = params.getOrDefault("password", null);
+        user = params.getOrDefault(QUERY_USER, null);
+        password = params.getOrDefault(QUERY_PASSWORD, null);
       }
 
     } catch (URISyntaxException e) {

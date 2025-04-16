@@ -43,6 +43,18 @@ public class RedisURITest {
   }
 
   @Test
+  public void testOnlyLoginGiven() {
+    RedisURI redisURI = new RedisURI("redis://redisUs%65r@redis-1234.hosted.com:1234/0");
+    Assert.assertEquals("User is not correct", "redisUser", redisURI.user());
+  }
+
+  @Test
+  public void testTwoLoginsAreGiven() {
+    RedisURI redisURI = new RedisURI("redis://redisUs%65r:pass@redis-1234.hosted.com:1234/0?user=otherUs%65r");
+    Assert.assertEquals("User is not correct", "redisUser", redisURI.user());
+  }
+
+  @Test
   public void testPasswordNotGiven() {
     RedisURI redisURI = new RedisURI("redis://redis-1234.hosted.com:1234/0");
     Assert.assertNull("Password is not null", redisURI.password());
