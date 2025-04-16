@@ -39,7 +39,7 @@ import java.util.Map;
  *   <ul>
  *     <li>{@code db}: database</li>
  *     <li>{@code user}: username</li>
- *     <li>{@code password}: username</li>
+ *     <li>{@code password}: password</li>
  *   </ul>
  * </p>
  *
