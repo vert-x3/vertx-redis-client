@@ -28,7 +28,7 @@ import java.util.Map;
 
 /**
  * Utility to parse Redis URLs. The URI should follow the general scheme:
- * {@code redis://[username:password@][host][:port][/[database]}
+ * {@code redis://[[username][:password]@][host][:port][/[database]]}
  *
  * <p>An example URI can be found at <a href="https://redis.io/topics/rediscli">Redis cli docs</a>.</p>
  *
