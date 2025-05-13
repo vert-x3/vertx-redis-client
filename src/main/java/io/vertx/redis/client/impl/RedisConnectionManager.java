@@ -89,13 +89,15 @@ public class RedisConnectionManager implements Function<RedisConnectionManager.C
 
   private void checkExpired(long period) {
     pooledConnectionManager.forEach(e ->
-      ((RedisEndpoint) e).pool.evict(conn -> !conn.isValid()).onSuccess(conns -> {
-        for (RedisConnectionInternal conn : conns) {
-          // on close we reset the default handlers
-          conn.handler(null);
-          conn.endHandler(null);
-          conn.exceptionHandler(null);
-          conn.forceClose();
+      ((RedisEndpoint) e).pool.evict(conn -> !conn.isValid(), (conns, err) -> {
+        if (err == null) {
+          for (RedisConnectionInternal conn : conns) {
+            // on close we reset the default handlers
+            conn.handler(null);
+            conn.endHandler(null);
+            conn.exceptionHandler(null);
+            conn.forceClose();
+          }
         }
       }));
     timerID = vertx.setTimer(period, id -> checkExpired(period));
@@ -411,8 +413,8 @@ public class RedisConnectionManager implements Function<RedisConnectionManager.C
 
     public Future<Lease<RedisConnectionInternal>> requestConnection(ContextInternal ctx) {
       Promise<Lease<RedisConnectionInternal>> promise = ctx.promise();
-      pool.acquire(ctx, 0)
-        .onSuccess(lease -> {
+      pool.acquire(ctx, 0, (lease, err) -> {
+        if (err == null) {
           // increment the reference counter to avoid the pool to be closed too soon
           // once there are no more connections the pool is collected, so this counter needs
           // to be as up to date as possible.
@@ -420,9 +422,9 @@ public class RedisConnectionManager implements Function<RedisConnectionManager.C
           // Integration between endpoint/pool and the standalone connection
           ((RedisStandaloneConnection) lease.get()).evictHandler(this::decRefCount);
           // proceed to user
-          promise.succeed(lease);
-        })
-        .onFailure(promise::fail);
+        }
+        promise.complete(lease, err);
+      });
       return promise.future();
     }
   }
