@@ -26,23 +26,27 @@ import java.util.List;
 public class RedisClusterConnectOptions extends RedisConnectOptions {
 
   private RedisReplicas useReplicas;
+  private RedisClusterTransactions clusterTransactions;
   private long hashSlotCacheTTL;
 
   public RedisClusterConnectOptions() {
     super();
     useReplicas = RedisReplicas.NEVER;
+    clusterTransactions = RedisClusterTransactions.DISABLED;
     hashSlotCacheTTL = 1000;
   }
 
   public RedisClusterConnectOptions(RedisOptions options) {
     super(options);
     setUseReplicas(options.getUseReplicas());
+    setClusterTransactions(options.getClusterTransactions());
     setHashSlotCacheTTL(options.getHashSlotCacheTTL());
   }
 
   public RedisClusterConnectOptions(RedisClusterConnectOptions other) {
     super(other);
     setUseReplicas(other.getUseReplicas());
+    setClusterTransactions(other.getClusterTransactions());
     setHashSlotCacheTTL(other.getHashSlotCacheTTL());
   }
 
@@ -89,6 +93,26 @@ public class RedisClusterConnectOptions extends RedisConnectOptions {
    */
   public RedisClusterConnectOptions setHashSlotCacheTTL(long hashSlotCacheTTL) {
     this.hashSlotCacheTTL = hashSlotCacheTTL;
+    return this;
+  }
+
+  /**
+   * Get how Redis transactions are handled in cluster mode.
+   *
+   * @return how transactions are handled
+   */
+  public RedisClusterTransactions getClusterTransactions() {
+    return clusterTransactions;
+  }
+
+  /**
+   * Set how Redis transactions are handled in cluster mode.
+   *
+   * @param clusterTransactions transaction handling mode
+   * @return fluent self
+   */
+  public RedisClusterConnectOptions setClusterTransactions(RedisClusterTransactions clusterTransactions) {
+    this.clusterTransactions = clusterTransactions;
     return this;
   }
 

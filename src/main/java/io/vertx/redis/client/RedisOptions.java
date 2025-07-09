@@ -51,6 +51,7 @@ public class RedisOptions {
   private String masterName;
   private RedisRole role;
   private RedisReplicas useReplicas;
+  private RedisClusterTransactions clusterTransactions;
   private volatile String password;
   private boolean protocolNegotiation;
   private ProtocolVersion preferredProtocolVersion;
@@ -74,6 +75,7 @@ public class RedisOptions {
     masterName = "mymaster";
     role = RedisRole.MASTER;
     useReplicas = RedisReplicas.NEVER;
+    clusterTransactions = RedisClusterTransactions.DISABLED;
     protocolNegotiation = true;
     hashSlotCacheTTL = 1000;
   }
@@ -95,6 +97,7 @@ public class RedisOptions {
     this.masterName = other.masterName;
     this.role = other.role;
     this.useReplicas = other.useReplicas;
+    this.clusterTransactions = other.clusterTransactions;
     this.password = other.password;
     this.protocolNegotiation = other.protocolNegotiation;
     this.preferredProtocolVersion = other.preferredProtocolVersion;
@@ -405,6 +408,25 @@ public class RedisOptions {
     return this;
   }
 
+  /**
+   * Get how Redis transactions are handled in cluster mode.
+   *
+   * @return how transactions are handled
+   */
+  public RedisClusterTransactions getClusterTransactions() {
+    return clusterTransactions;
+  }
+
+  /**
+   * Set how Redis transactions are handled in cluster mode.
+   *
+   * @param clusterTransactions transaction handling mode
+   * @return fluent self
+   */
+  public RedisOptions setClusterTransactions(RedisClusterTransactions clusterTransactions) {
+    this.clusterTransactions = clusterTransactions;
+    return this;
+  }
 
   /**
    * Tune how much nested arrays are allowed on a redis response. This affects the parser performance.

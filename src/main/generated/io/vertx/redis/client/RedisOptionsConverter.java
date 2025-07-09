@@ -25,6 +25,11 @@ public class RedisOptionsConverter {
             obj.setAutoFailover((Boolean)member.getValue());
           }
           break;
+        case "clusterTransactions":
+          if (member.getValue() instanceof String) {
+            obj.setClusterTransactions(io.vertx.redis.client.RedisClusterTransactions.valueOf((String)member.getValue()));
+          }
+          break;
         case "connectionString":
           if (member.getValue() instanceof String) {
             obj.setConnectionString((String)member.getValue());
@@ -158,6 +163,9 @@ public class RedisOptionsConverter {
 
    static void toJson(RedisOptions obj, java.util.Map<String, Object> json) {
     json.put("autoFailover", obj.isAutoFailover());
+    if (obj.getClusterTransactions() != null) {
+      json.put("clusterTransactions", obj.getClusterTransactions().name());
+    }
     if (obj.getEndpoint() != null) {
       json.put("endpoint", obj.getEndpoint());
     }

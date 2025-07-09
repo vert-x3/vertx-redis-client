@@ -283,6 +283,10 @@ public class RedisExamples {
       });
   }
 
+  public void example16(RedisOptions options) {
+    options.setClusterTransactions(RedisClusterTransactions.SINGLE_NODE);
+  }
+
   public void tracing1(RedisOptions options) {
     options.setTracingPolicy(TracingPolicy.ALWAYS);
   }
