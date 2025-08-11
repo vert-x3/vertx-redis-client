@@ -1,5 +1,6 @@
 package io.vertx.tests.redis.client;
 
+import io.vertx.core.json.JsonObject;
 import io.vertx.ext.unit.Async;
 import io.vertx.ext.unit.TestContext;
 import io.vertx.ext.unit.junit.RunTestOnContext;
@@ -17,6 +18,10 @@ import org.junit.ClassRule;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+
+import java.util.concurrent.atomic.AtomicInteger;
+
+import static io.vertx.tests.redis.client.TestUtils.executeWhenConditionSatisfied;
 
 @RunWith(VertxUnitRunner.class)
 public class RedisPubSubClusterTest {
@@ -69,22 +74,29 @@ public class RedisPubSubClusterTest {
       });
     }
 
-    rule.vertx().eventBus().consumer("io.vertx.redis." + channel, msg -> {
-      rule.vertx().eventBus().publish(channel, msg.body());
+    AtomicInteger subs = new AtomicInteger();
+    rule.vertx().eventBus().<JsonObject>consumer("io.vertx.redis." + channel, msg -> {
+      if ("subscribe".equals(msg.body().getString("type"))) {
+        subs.incrementAndGet();
+      }
+      if ("message".equals(msg.body().getString("type"))) {
+        rule.vertx().eventBus().publish(channel, msg.body());
+      }
     });
 
     subConn.handler(EventBusHandler.create(rule.vertx()));
     subUnsub(channel, N, should.async(N));
 
-    rule.vertx().setTimer(1000, id -> {
-      pubConn.send(Request.cmd(Command.PUBLISH).arg(channel).arg("hello"))
-        .onComplete(should.asyncAssertSuccess());
+    executeWhenConditionSatisfied(rule.vertx(), () -> subs.get() == 10, () -> {
+      pubConn.send(Request.cmd(Command.PUBLISH).arg(channel).arg("hello")).onComplete(should.asyncAssertSuccess(publish -> {
+        should.assertEquals(1, publish.toInteger());
+      }));
     });
   }
 
   private void subUnsub(String channel, int attempts, Async testSub) {
-    subConn.send(Request.cmd(Command.UNSUBSCRIBE).arg(channel)).onComplete(unreply -> {
-      subConn.send(Request.cmd(Command.SUBSCRIBE).arg(channel)).onComplete(reply -> {
+    subConn.send(Request.cmd(Command.UNSUBSCRIBE).arg(channel)).onComplete(unsub -> {
+      subConn.send(Request.cmd(Command.SUBSCRIBE).arg(channel)).onComplete(sub -> {
         testSub.countDown();
         if (attempts > 1) {
           subUnsub(channel, attempts - 1, testSub);
