@@ -77,20 +77,34 @@ public class RedisClientPubSubTest {
   @Test
   public void testPublishSubscribe(TestContext should) {
     final Async test = should.async();
-    subConn.send(Request.cmd(Command.SUBSCRIBE).arg("news"), reply -> {
-      should.assertTrue(reply.succeeded());
+    subConn.send(Request.cmd(Command.SUBSCRIBE).arg("news"), subscribe -> {
+      should.assertTrue(subscribe.succeeded());
       rule.vertx().eventBus().consumer("io.vertx.redis.news", msg -> test.complete());
-      pubConn.send(Request.cmd(Command.PUBLISH).arg("news").arg("foo"), preply -> should.assertTrue(preply.succeeded()));
+      // cannot use `executeWhenConditionSatisfied()` here because subscription events are not forwarded
+      // to the event bus in Vert.x Redis Client 4.x
+      rule.vertx().setTimer(1000, ignored -> {
+        pubConn.send(Request.cmd(Command.PUBLISH).arg("news").arg("foo"), publish -> {
+          should.assertTrue(publish.succeeded());
+          should.assertEquals(1, publish.result().toInteger());
+        });
+      });
     });
   }
 
   @Test
   public void testPublishPSubscribe(TestContext should) {
     final Async test = should.async();
-    subConn.send(Request.cmd(Command.PSUBSCRIBE).arg("new*"), reply -> {
-      should.assertTrue(reply.succeeded());
+    subConn.send(Request.cmd(Command.PSUBSCRIBE).arg("new*"), subscribe -> {
+      should.assertTrue(subscribe.succeeded());
       rule.vertx().eventBus().consumer("io.vertx.redis.new*", msg -> test.complete());
-      pubConn.send(Request.cmd(Command.PUBLISH).arg("news").arg("foo"), preply -> should.assertTrue(preply.succeeded()));
+      // cannot use `executeWhenConditionSatisfied()` here because subscription events are not forwarded
+      // to the event bus in Vert.x Redis Client 4.x
+      rule.vertx().setTimer(1000, ignored -> {
+        pubConn.send(Request.cmd(Command.PUBLISH).arg("news").arg("foo"), publish -> {
+          should.assertTrue(publish.succeeded());
+          should.assertEquals(1, publish.result().toInteger());
+        });
+      });
     });
   }
 }

@@ -78,13 +78,17 @@ public class RedisPubSubTest {
       rule.vertx().eventBus().publish(CHAN, msg.body());
     });
     subUnsub(CHAN, N, should.async(N));
+    // cannot use `executeWhenConditionSatisfied()` here because subscription events are not forwarded
+    // to the event bus in Vert.x Redis Client 4.x
     rule.vertx().setTimer(1000, id ->
-      pubConn.send(Request.cmd(Command.PUBLISH).arg(CHAN).arg("hello"), preply -> should.assertTrue(preply.succeeded())));
+      pubConn.send(Request.cmd(Command.PUBLISH).arg(CHAN).arg("hello"), publish -> {
+        should.assertTrue(publish.succeeded());
+      }));
   }
 
   private void subUnsub(String channel, int attempts, Async testSub){
-    subConn.send(Request.cmd(Command.UNSUBSCRIBE).arg(channel), unreply -> {
-      subConn.send(Request.cmd(Command.SUBSCRIBE).arg(channel), reply -> {
+    subConn.send(Request.cmd(Command.UNSUBSCRIBE).arg(channel), unsub -> {
+      subConn.send(Request.cmd(Command.SUBSCRIBE).arg(channel), sub -> {
         testSub.countDown();
         if (attempts > 1) {
           subUnsub(channel, attempts - 1, testSub);

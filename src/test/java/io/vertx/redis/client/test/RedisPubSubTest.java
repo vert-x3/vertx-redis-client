@@ -16,13 +16,16 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
+import java.util.Arrays;
 import java.util.HashSet;
+import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import static io.vertx.redis.client.Command.PSUBSCRIBE;
 import static io.vertx.redis.client.Command.PUBLISH;
 import static io.vertx.redis.client.Command.SUBSCRIBE;
 import static io.vertx.redis.client.Request.cmd;
+import static io.vertx.redis.client.test.TestUtils.executeWhenConditionSatisfied;
 
 @RunWith(VertxUnitRunner.class)
 public class RedisPubSubTest {
@@ -67,8 +70,8 @@ public class RedisPubSubTest {
   public void simpleTest(TestContext should) {
     final Async test = should.async();
 
-    final AtomicInteger psubscribeCnt = new AtomicInteger(0);
-    final AtomicInteger pmessageCnt = new AtomicInteger(0);
+    final AtomicInteger subscribeCnt = new AtomicInteger(0);
+    final AtomicInteger messageCnt = new AtomicInteger(0);
 
     sub.handler(message -> {
       System.out.println(message);
@@ -77,13 +80,13 @@ public class RedisPubSubTest {
         case MULTI:
           if (message.get(0).toString().equals("message")) {
             should.assertEquals(3, message.size());
-            pmessageCnt.incrementAndGet();
+            messageCnt.incrementAndGet();
           }
           if (message.get(0).toString().equals("subscribe")) {
             should.assertEquals(3, message.size());
-            psubscribeCnt.incrementAndGet();
+            subscribeCnt.incrementAndGet();
           }
-          if (psubscribeCnt.get() + pmessageCnt.get() == 2) {
+          if (subscribeCnt.get() + messageCnt.get() == 2) {
             test.complete();
           }
           break;
@@ -95,10 +98,12 @@ public class RedisPubSubTest {
     sub.send(cmd(SUBSCRIBE).arg("mychannel"), subscribe -> {
       should.assertTrue(subscribe.succeeded());
 
-      rule.vertx().setTimer(100L, t -> pub.send(cmd(PUBLISH).arg("mychannel").arg(123456), publish -> {
-        should.assertTrue(publish.succeeded());
-        should.assertNotNull(publish.result());
-      }));
+      executeWhenConditionSatisfied(rule.vertx(), () -> subscribeCnt.get() == 1, () -> {
+        pub.send(cmd(PUBLISH).arg("mychannel").arg(123456), publish -> {
+          should.assertTrue(publish.succeeded());
+          should.assertEquals(1, publish.result().toInteger());
+        });
+      });
     });
   }
 
@@ -131,28 +136,23 @@ public class RedisPubSubTest {
       }
     });
 
-    String REDIS_KEYSPACE_EVENT_CHANNEL_SET = "__keyspace@0__:";
+    List<String> patterns = Arrays.asList("A*", "B*", "C*", "D*", "E*", "F*");
+    List<String> matchingChannels = Arrays.asList("A", "B1", "Co", "DDD", "E234", "F");
 
-    HashSet<String> patterns = new HashSet<String>() {{
-      add(REDIS_KEYSPACE_EVENT_CHANNEL_SET + "A*");
-      add(REDIS_KEYSPACE_EVENT_CHANNEL_SET + "B*");
-      add(REDIS_KEYSPACE_EVENT_CHANNEL_SET + "C*");
-      add(REDIS_KEYSPACE_EVENT_CHANNEL_SET + "D*");
-      add(REDIS_KEYSPACE_EVENT_CHANNEL_SET + "E*");
-      add(REDIS_KEYSPACE_EVENT_CHANNEL_SET + "F*");
-    }};
+    Request psub = cmd(PSUBSCRIBE);
+    patterns.forEach(psub::arg);
 
-    Request psub_request = cmd(PSUBSCRIBE);
-    // Add all patterns to subscribe to
-    patterns.forEach(psub_request::arg);
-
-    sub.send(psub_request, subscribe -> {
+    sub.send(psub, subscribe -> {
       should.assertTrue(subscribe.succeeded());
 
-      rule.vertx().setTimer(100L, t -> patterns.forEach(p -> pub.send(cmd(PUBLISH).arg(p).arg(System.nanoTime()), publish -> {
-          should.assertTrue(publish.succeeded());
-          should.assertNotNull(publish.result());
-        })));
+      executeWhenConditionSatisfied(rule.vertx(), () -> psubscribeCnt.get() == 6, () -> {
+        for (String ch : matchingChannels) {
+          pub.send(cmd(PUBLISH).arg(ch).arg(System.nanoTime()), publish -> {
+            should.assertTrue(publish.succeeded());
+            should.assertEquals(1, publish.result().toInteger());
+          });
+        }
+      });
     });
   }
 }
