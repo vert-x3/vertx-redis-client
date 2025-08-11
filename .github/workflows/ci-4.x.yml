@@ -19,7 +19,7 @@ jobs:
         jdk: [8, 17]
     runs-on: ${{ matrix.os }}
     steps:
-      - uses: actions/cache@v2
+      - uses: actions/cache@v4
         with:
           path: ~/.m2/repository
           key: maven-java-${{ matrix.jdk }}
@@ -41,7 +41,7 @@ jobs:
       VERTX_NEXUS_USERNAME: ${{ secrets.VERTX_NEXUS_USERNAME }}
       VERTX_NEXUS_PASSWORD: ${{ secrets.VERTX_NEXUS_PASSWORD }}
     steps:
-      - uses: actions/cache@v2
+      - uses: actions/cache@v4
         with:
           path: ~/.m2/repository
           key: maven-java-${{ matrix.jdk }}
