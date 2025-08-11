@@ -36,6 +36,7 @@ public class CommandImpl implements Command {
   private final boolean needGetKeys;
   private final Boolean readOnly;
   private final boolean pubsub;
+  private final boolean transactional;
 
   public CommandImpl(String command, int arity, Boolean readOnly, boolean pubsub, boolean needGetKeys, KeyLocator... keyLocators) {
     this.command = command;
@@ -45,6 +46,11 @@ public class CommandImpl implements Command {
     this.keyLocators = keyLocators;
     this.readOnly = readOnly;
     this.pubsub = pubsub;
+    this.transactional = "multi".equals(command)
+      || "exec".equals(command)
+      || "discard".equals(command)
+      || "watch".equals(command)
+      || "unwatch".equals(command);
   }
 
   public byte[] getBytes() {
@@ -87,6 +93,10 @@ public class CommandImpl implements Command {
 
   public boolean isPubSub() {
     return pubsub;
+  }
+
+  public boolean isTransactional() {
+    return transactional;
   }
 
   public boolean needsGetKeys() {

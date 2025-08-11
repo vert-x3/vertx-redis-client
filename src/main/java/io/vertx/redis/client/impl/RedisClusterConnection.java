@@ -11,11 +11,13 @@ import io.vertx.core.impl.logging.Logger;
 import io.vertx.core.impl.logging.LoggerFactory;
 import io.vertx.redis.client.Command;
 import io.vertx.redis.client.RedisClusterConnectOptions;
+import io.vertx.redis.client.RedisClusterTransactions;
 import io.vertx.redis.client.RedisConnection;
 import io.vertx.redis.client.RedisReplicas;
 import io.vertx.redis.client.Request;
 import io.vertx.redis.client.Response;
 import io.vertx.redis.client.impl.types.ErrorType;
+import io.vertx.redis.client.impl.types.SimpleStringType;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -56,6 +58,11 @@ public class RedisClusterConnection implements RedisConnection {
   private final RedisClusterConnectOptions connectOptions;
   final SharedSlots sharedSlots;
   private final Map<String, PooledRedisConnection> connections;
+
+  // these fields are only used in `send()` and are ignored in `batch()`, because request batches
+  // are always sent to a single node and so no extra support is necessary
+  private boolean deferredMulti = false;
+  private String boundToEndpoint = null;
 
   RedisClusterConnection(Vertx vertx, RedisConnectionManager connectionManager, RedisClusterConnectOptions connectOptions,
       SharedSlots sharedSlots, Map<String, PooledRedisConnection> connections) {
@@ -128,8 +135,20 @@ public class RedisClusterConnection implements RedisConnection {
 
   @Override
   public Future<Response> send(Request request) {
-    return sharedSlots.get()
+    Future<Response> future = sharedSlots.get()
       .compose(slots -> send(request, slots));
+
+    if (connectOptions.getClusterTransactions() == RedisClusterTransactions.SINGLE_NODE) {
+      return future.andThen(ignored -> {
+        String cmdName = request.command().toString();
+        if ("exec".equals(cmdName) || "discard".equals(cmdName)) {
+          deferredMulti = false;
+          boundToEndpoint = null;
+        }
+      });
+    } else {
+      return future;
+    }
   }
 
   private Future<Response> send(Request request, Slots slots) {
@@ -139,6 +158,25 @@ public class RedisClusterConnection implements RedisConnection {
     final RequestImpl req = (RequestImpl) request;
     final CommandImpl cmd = (CommandImpl) req.command();
     final List<byte[]> args = req.getArgs();
+    final List<byte[]> keys = req.keys();
+
+    if (cmd.isTransactional()) {
+      RedisClusterTransactions txMode = connectOptions.getClusterTransactions();
+      if (txMode == RedisClusterTransactions.DISABLED) {
+        promise.fail("Transactions in Redis cluster disabled");
+        return promise.future();
+      } else if (txMode == RedisClusterTransactions.SINGLE_NODE && boundToEndpoint == null) {
+        String cmdName = cmd.toString();
+        if ("multi".equals(cmdName)) {
+          deferredMulti = true;
+          return Future.succeededFuture(SimpleStringType.OK);
+        } else if ("watch".equals(cmdName)) {
+          int hashSlot = ZModem.generateMultiRaw(keys);
+          String[] endpoints = slots.endpointsForKey(hashSlot);
+          boundToEndpoint = endpoints[0]; // always master, since transactions are writing
+        }
+      }
+    }
 
     if (cmd.needsGetKeys()) {
       // it is required to resolve the keys at the server side as we cannot deduct where they are algorithmically
@@ -147,8 +185,8 @@ public class RedisClusterConnection implements RedisConnection {
       return promise.future();
     }
 
-    final boolean forceMasterEndpoint = MASTER_ONLY_COMMANDS.contains(cmd);
-    final List<byte[]> keys = req.keys();
+    final boolean forceMasterEndpoint = MASTER_ONLY_COMMANDS.contains(cmd)
+      || deferredMulti; // always master, since transactions are writing
 
     switch (keys.size()) {
       case 0:
@@ -266,7 +304,22 @@ public class RedisClusterConnection implements RedisConnection {
     return map;
   }
 
-  void send(String endpoint, int retries, Request command, Handler<AsyncResult<Response>> handler) {
+  void send(String selectedEndpoint, int retries, Request command, Handler<AsyncResult<Response>> handler) {
+    String endpoint = boundToEndpoint != null ? boundToEndpoint : selectedEndpoint;
+
+    if (deferredMulti) {
+      deferredMulti = false;
+      boundToEndpoint = endpoint;
+
+      send(endpoint, retries, Request.cmd(Command.MULTI), resp -> {
+        if (resp.succeeded()) {
+          send(endpoint, retries, command, handler);
+        } else {
+          handler.handle(Future.failedFuture(resp.cause()));
+        }
+      });
+      return;
+    }
     PooledRedisConnection connection = connections.get(endpoint);
     if (connection == null) {
       connectionManager.getConnection(endpoint, RedisReplicas.NEVER != connectOptions.getUseReplicas() ? Request.cmd(Command.READONLY) : null)
@@ -316,6 +369,10 @@ public class RedisClusterConnection implements RedisConnection {
               addr = uri.socketAddress().host() + addr;
             }
             String newEndpoint = uri.protocol() + "://" + uri.userinfo() + addr;
+            if (boundToEndpoint != null && !boundToEndpoint.equalsIgnoreCase(newEndpoint)) {
+              handler.handle(Future.failedFuture("Redirect inside a transaction: " + cause));
+              return;
+            }
             if (ask) {
               send(newEndpoint, retries - 1, Request.cmd(Command.ASKING), resp -> {
                 if (resp.failed()) {
@@ -384,6 +441,9 @@ public class RedisClusterConnection implements RedisConnection {
         final CommandImpl cmd = (CommandImpl) req.command();
         final List<byte[]> args = req.getArgs();
 
+        // someone might expect that for symmetry with `send()`, we'll also check the commands here
+        // and fail if any of them is transactional, but that would be wrong -- a batch is always
+        // executed on a single node and can therefore contain the whole transaction
 
         readOnly |= cmd.isReadOnly(args);
 
@@ -395,7 +455,8 @@ public class RedisClusterConnection implements RedisConnection {
         }
 
         final List<byte[]> keys = req.keys();
-        forceMasterEndpoint |= MASTER_ONLY_COMMANDS.contains(cmd);
+        forceMasterEndpoint |= MASTER_ONLY_COMMANDS.contains(cmd)
+          || cmd.isTransactional(); // always master, since transactions are writing
         int slot;
         String endpoint;
 
@@ -541,6 +602,9 @@ public class RedisClusterConnection implements RedisConnection {
 
   @Override
   public Future<Void> close() {
+    deferredMulti = false;
+    boundToEndpoint = null;
+
     List<Future<Void>> futures = new ArrayList<>();
     for (RedisConnection conn : connections.values()) {
       if (conn != null) {

@@ -38,7 +38,8 @@ public enum RedisClientType {
   /**
    * The client should work in cluster mode. When this mode is active,
    * use the {@link RedisReplicas} to define when replica nodes can be
-   * used for read only queries.
+   * used for read only queries, and use {@link RedisClusterTransactions}
+   * to define how transactions should be handled.
    */
   CLUSTER,
 
