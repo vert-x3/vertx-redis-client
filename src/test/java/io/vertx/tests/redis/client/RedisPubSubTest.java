@@ -18,13 +18,14 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
-import java.util.Set;
+import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import static io.vertx.redis.client.Command.PSUBSCRIBE;
 import static io.vertx.redis.client.Command.PUBLISH;
 import static io.vertx.redis.client.Command.SUBSCRIBE;
 import static io.vertx.redis.client.Request.cmd;
+import static io.vertx.tests.redis.client.TestUtils.executeWhenConditionSatisfied;
 
 @RunWith(VertxUnitRunner.class)
 public class RedisPubSubTest {
@@ -73,8 +74,12 @@ public class RedisPubSubTest {
     rule.vertx().eventBus().consumer("io.vertx.redis.news", msg -> async.countDown());
 
     subConn.handler(EventBusHandler.create(rule.vertx()));
-    subConn.send(Request.cmd(Command.SUBSCRIBE).arg("news")).onComplete(test.asyncAssertSuccess(result -> {
-      pubConn.send(Request.cmd(Command.PUBLISH).arg("news").arg("foo"));
+    subConn.send(Request.cmd(Command.SUBSCRIBE).arg("news")).onComplete(test.asyncAssertSuccess(subscribe -> {
+      executeWhenConditionSatisfied(rule.vertx(), () -> async.count() == 1, () -> {
+        pubConn.send(Request.cmd(Command.PUBLISH).arg("news").arg("foo")).onComplete(test.asyncAssertSuccess(publish -> {
+          test.assertEquals(1, publish.toInteger());
+        }));
+      });
     }));
   }
 
@@ -85,8 +90,12 @@ public class RedisPubSubTest {
     rule.vertx().eventBus().consumer("io.vertx.redis.new*", msg -> async.countDown());
 
     subConn.handler(EventBusHandler.create(rule.vertx()));
-    subConn.send(Request.cmd(Command.PSUBSCRIBE).arg("new*")).onComplete(test.asyncAssertSuccess(result -> {
-      pubConn.send(Request.cmd(Command.PUBLISH).arg("news").arg("foo"));
+    subConn.send(Request.cmd(Command.PSUBSCRIBE).arg("new*")).onComplete(test.asyncAssertSuccess(subscribe -> {
+      executeWhenConditionSatisfied(rule.vertx(), () -> async.count() == 1, () -> {
+        pubConn.send(Request.cmd(Command.PUBLISH).arg("news").arg("foo")).onComplete(test.asyncAssertSuccess(publish -> {
+          test.assertEquals(1, publish.toInteger());
+        }));
+      });
     }));
   }
 
@@ -119,8 +128,11 @@ public class RedisPubSubTest {
     });
 
     subConn.send(cmd(SUBSCRIBE).arg("mychannel")).onComplete(test.asyncAssertSuccess(subscribe -> {
-      pubConn.send(cmd(PUBLISH).arg("mychannel").arg(123456))
-        .onComplete(test.asyncAssertSuccess(test::assertNotNull));
+      executeWhenConditionSatisfied(rule.vertx(), () -> subscribeCnt.get() == 1, () -> {
+        pubConn.send(cmd(PUBLISH).arg("mychannel").arg(123456)).onComplete(test.asyncAssertSuccess(publish -> {
+          test.assertEquals(1, publish.toInteger());
+        }));
+      });
     }));
   }
 
@@ -152,15 +164,19 @@ public class RedisPubSubTest {
       }
     });
 
-    Set<String> patterns = Set.of("A*", "B*", "C*", "D*", "E*", "F*");
+    List<String> patterns = List.of("A*", "B*", "C*", "D*", "E*", "F*");
+    List<String> matchingChannels = List.of("A", "B1", "Co", "DDD", "E234", "F");
 
     Request psub = cmd(PSUBSCRIBE);
     patterns.forEach(psub::arg);
 
     subConn.send(psub).onComplete(test.asyncAssertSuccess(subscribe -> {
-      patterns.forEach(p -> {
-        pubConn.send(cmd(PUBLISH).arg(p).arg(System.nanoTime()))
-          .onComplete(test.asyncAssertSuccess(test::assertNotNull));
+      executeWhenConditionSatisfied(rule.vertx(), () -> psubscribeCnt.get() == 6, () -> {
+        for (String ch : matchingChannels) {
+          pubConn.send(cmd(PUBLISH).arg(ch).arg(System.nanoTime())).onComplete(test.asyncAssertSuccess(publish -> {
+            test.assertEquals(1, publish.toInteger());
+          }));
+        }
       });
     }));
   }
