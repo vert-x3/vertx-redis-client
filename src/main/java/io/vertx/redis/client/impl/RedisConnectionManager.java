@@ -279,7 +279,8 @@ class RedisConnectionManager {
           if (err != null) {
             if (err instanceof ErrorType) {
               final ErrorType redisErr = (ErrorType) err;
-              if (redisErr.is("NOAUTH")) {
+              if (redisErr.is("NOAUTH") || redisErr.is("WRONGPASS")) {
+                // Pika/PikiwiDB doesn't support authentication through `HELLO`, need to use `AUTH`
                 authenticate(ctx, connection, user, password, handler);
                 return;
               }
