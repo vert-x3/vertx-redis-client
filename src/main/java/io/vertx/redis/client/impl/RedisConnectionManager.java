@@ -273,7 +273,8 @@ public class RedisConnectionManager implements Function<RedisConnectionManager.C
               Throwable err = ar.cause();
               if (err instanceof ErrorType) {
                 final ErrorType redisErr = (ErrorType) err;
-                if (redisErr.is("NOAUTH")) {
+                if (redisErr.is("NOAUTH") || redisErr.is("WRONGPASS")) {
+                  // Pika/PikiwiDB doesn't support authentication through `HELLO`, need to use `AUTH`
                   return authenticate(ctx, connection, user, password);
                 }
                 if (redisErr.is("ERR")) {
