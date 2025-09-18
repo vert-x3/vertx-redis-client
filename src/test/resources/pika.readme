@@ -1,0 +1,11 @@
+`pika.conf` is https://raw.githubusercontent.com/OpenAtomFoundation/pikiwidb/refs/tags/v3.5.6/conf/pika.conf
+with the following changes:
+
+- `requirepass : foobar`
+- `userpass : userpass`
+
+`pika4.conf` is https://raw.githubusercontent.com/OpenAtomFoundation/pikiwidb/refs/tags/v4.0.2/conf/pika.conf
+with the following changes:
+
+- `requirepass : foobar`
+- `userpass : userpass`

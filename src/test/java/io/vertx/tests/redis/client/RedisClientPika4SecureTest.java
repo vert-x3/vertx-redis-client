@@ -13,6 +13,7 @@ import org.junit.ClassRule;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.testcontainers.containers.BindMode;
 import org.testcontainers.containers.GenericContainer;
 
 import static io.vertx.redis.client.Command.GET;
@@ -22,14 +23,18 @@ import static io.vertx.redis.client.Command.SET;
 import static io.vertx.redis.client.Request.cmd;
 import static io.vertx.tests.redis.client.TestUtils.randomKey;
 
+// this is exactly the same as `RedisClientPikaSecureTest`, except of:
+// - the image name uses the tag of `v4.0.2`
+// - the config file is `pika4.conf`
 @RunWith(VertxUnitRunner.class)
-public class RedisClientPikaTest {
+public class RedisClientPika4SecureTest {
 
   @Rule
   public final RunTestOnContext rule = new RunTestOnContext();
 
   @ClassRule
-  public static final GenericContainer<?> redis = new GenericContainer<>("pikadb/pika:v3.5.6")
+  public static final GenericContainer<?> redis = new GenericContainer<>("pikadb/pika:v4.0.2")
+    .withClasspathResourceMapping("pika4.conf", "/pika/conf/pika.conf", BindMode.READ_ONLY)
     .withExposedPorts(9221);
 
   private Redis client;
@@ -40,7 +45,7 @@ public class RedisClientPikaTest {
 
     client = Redis.createClient(
       rule.vertx(),
-      new RedisOptions().setConnectionString("redis://" + redis.getHost() + ":" + redis.getFirstMappedPort()));
+      new RedisOptions().setConnectionString("redis://:userpass@" + redis.getHost() + ":" + redis.getFirstMappedPort()));
 
     client.connect().onComplete(onConnect -> {
       should.assertTrue(onConnect.succeeded());

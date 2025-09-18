@@ -66,7 +66,7 @@ public class RedisStandalone implements TestRule {
   }
 
   private RedisStandalone(Builder builder) {
-    String image = "docker.io/bitnami/redis:" + (builder.version != null ? builder.version : "7.2");
+    String image = "docker.io/bitnamilegacy/redis:" + (builder.version != null ? builder.version : "7.2");
 
     Map<String, String> env = new HashMap<>();
     if (builder.password != null) {
