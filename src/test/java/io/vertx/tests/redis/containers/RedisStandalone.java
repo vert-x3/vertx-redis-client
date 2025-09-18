@@ -25,6 +25,21 @@ public class RedisStandalone implements TestRule {
     private Builder() {
     }
 
+    /**
+     * See the tags in <a href="https://quay.io/repository/ladicek/redis-standalone">the Quay repository</a>
+     * for a list of available version numbers. As of this writing, it is:
+     * <ul>
+     * <li>{@code 5.0}</li>
+     * <li>{@code 6.0}</li>
+     * <li>{@code 6.2}</li>
+     * <li>{@code 7.0}</li>
+     * <li>{@code 7.2} (same as {@code latest})</li>
+     * <li>{@code 8.0}</li>
+     * <li>{@code 8.2}</li>
+     * </ul>
+     *
+     * The source code lives in <a href="https://github.com/Ladicek/redis-containers">https://github.com/Ladicek/redis-containers</a>.
+     */
     public Builder setVersion(String version) {
       this.version = Objects.requireNonNull(version);
       return this;
@@ -66,7 +81,7 @@ public class RedisStandalone implements TestRule {
   }
 
   private RedisStandalone(Builder builder) {
-    String image = "docker.io/bitnamilegacy/redis:" + (builder.version != null ? builder.version : "7.2");
+    String image = "quay.io/ladicek/redis-standalone:" + (builder.version != null ? builder.version : "7.2");
 
     Map<String, String> env = new HashMap<>();
     if (builder.password != null) {
