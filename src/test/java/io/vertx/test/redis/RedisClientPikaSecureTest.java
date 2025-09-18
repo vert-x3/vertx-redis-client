@@ -29,7 +29,7 @@ public class RedisClientPikaSecureTest {
   public final RunTestOnContext rule = new RunTestOnContext();
 
   @ClassRule
-  public static final GenericContainer<?> redis = new GenericContainer<>("pikadb/pika:latest")
+  public static final GenericContainer<?> redis = new GenericContainer<>("pikadb/pika:v3.5.6")
     .withClasspathResourceMapping("pika.conf", "/pika/conf/pika.conf", BindMode.READ_ONLY)
     .withExposedPorts(9221);
 

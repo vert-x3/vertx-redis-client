@@ -46,7 +46,7 @@ public final class ErrorType extends Throwable implements Response {
       if (kind.equals("ERR")) {
         return message.startsWith(kind);
       } else {
-        // this is to address databases like PIKA which drift from the official
+        // this is to address databases like Pika/PikiwiDB which drift from the official
         // protocol by always prefixing errors with ERR
         return message.startsWith(kind) || message.startsWith("ERR " + kind);
       }
