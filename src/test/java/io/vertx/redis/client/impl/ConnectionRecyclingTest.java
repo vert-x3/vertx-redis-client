@@ -83,7 +83,7 @@ public class ConnectionRecyclingTest {
     vertx.setTimer(2500, ignored -> {
       assertConnectionPool(test, 1);
 
-      vertx.setTimer(1000, ignored2 -> {
+      vertx.setTimer(1500, ignored2 -> {
         assertConnectionPool(test, 0);
         async.complete();
       });
