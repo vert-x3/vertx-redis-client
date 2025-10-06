@@ -234,7 +234,7 @@ public final class MultiType implements Multi {
 
         sb.append(kv.getKey());
         sb.append(": ");
-        sb.append(kv.getValue().toString());
+        sb.append(kv.getValue());
         more = true;
       }
       sb.append('}');
