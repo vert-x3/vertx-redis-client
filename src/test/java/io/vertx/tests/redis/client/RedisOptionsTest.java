@@ -22,6 +22,8 @@ public class RedisOptionsTest {
     assertEquals(6, options.getMaxPoolSize()); // default value
     assertEquals("redis://localhost:6379", options.getEndpoint()); // default value
     assertEquals(Collections.singletonList("redis://localhost:6379"), options.getEndpoints()); // default value
+    assertEquals(1000L, options.getTopologyCacheTTL()); // default value
+    assertEquals(1000L, options.getHashSlotCacheTTL()); // default value
   }
 
   @Test
@@ -37,7 +39,9 @@ public class RedisOptionsTest {
       .setMasterName("someOtherMaster")
       .setRole(RedisRole.SENTINEL)
       .setPassword("myPassword")
-      .setTracingPolicy(TracingPolicy.ALWAYS);
+      .setTracingPolicy(TracingPolicy.ALWAYS)
+      .setHashSlotCacheTTL(1234L) // overwritten by the next call
+      .setTopologyCacheTTL(2500L);
 
     RedisOptions copy = new RedisOptions(original);
 
@@ -48,6 +52,8 @@ public class RedisOptionsTest {
     assertEquals(RedisRole.SENTINEL, copy.getRole());
     assertEquals("myPassword", copy.getPassword());
     assertEquals(TracingPolicy.ALWAYS, copy.getTracingPolicy());
+    assertEquals(2500L, copy.getTopologyCacheTTL());
+    assertEquals(2500L, copy.getHashSlotCacheTTL());
   }
 
   @Test
@@ -62,7 +68,9 @@ public class RedisOptionsTest {
       .setMasterName("someOtherMaster")
       .setRole(RedisRole.SENTINEL)
       .setPassword("myPassword")
-      .setTracingPolicy(TracingPolicy.ALWAYS);
+      .setTracingPolicy(TracingPolicy.ALWAYS)
+      .setHashSlotCacheTTL(2468L) // overwritten by the next call
+      .setTopologyCacheTTL(3333L);
 
     RedisOptions copy = new RedisOptions(original.toJson());
 
@@ -73,6 +81,8 @@ public class RedisOptionsTest {
     assertEquals(RedisRole.SENTINEL, copy.getRole());
     assertEquals("myPassword", copy.getPassword());
     assertEquals(TracingPolicy.ALWAYS, copy.getTracingPolicy());
+    assertEquals(3333L, copy.getTopologyCacheTTL());
+    assertEquals(3333L, copy.getHashSlotCacheTTL());
   }
 
 }

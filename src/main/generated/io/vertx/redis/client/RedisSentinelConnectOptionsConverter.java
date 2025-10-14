@@ -27,6 +27,11 @@ public class RedisSentinelConnectOptionsConverter {
             obj.setAutoFailover((Boolean)member.getValue());
           }
           break;
+        case "topologyCacheTTL":
+          if (member.getValue() instanceof Number) {
+            obj.setTopologyCacheTTL(((Number)member.getValue()).longValue());
+          }
+          break;
       }
     }
   }
@@ -43,5 +48,6 @@ public class RedisSentinelConnectOptionsConverter {
       json.put("masterName", obj.getMasterName());
     }
     json.put("autoFailover", obj.isAutoFailover());
+    json.put("topologyCacheTTL", obj.getTopologyCacheTTL());
   }
 }

@@ -122,9 +122,9 @@ public class RedisOptionsConverter {
             obj.setMetricsName((String)member.getValue());
           }
           break;
-        case "hashSlotCacheTTL":
+        case "topologyCacheTTL":
           if (member.getValue() instanceof Number) {
-            obj.setHashSlotCacheTTL(((Number)member.getValue()).longValue());
+            obj.setTopologyCacheTTL(((Number)member.getValue()).longValue());
           }
           break;
         case "autoFailover":
@@ -192,7 +192,7 @@ public class RedisOptionsConverter {
     if (obj.getMetricsName() != null) {
       json.put("metricsName", obj.getMetricsName());
     }
-    json.put("hashSlotCacheTTL", obj.getHashSlotCacheTTL());
+    json.put("topologyCacheTTL", obj.getTopologyCacheTTL());
     json.put("autoFailover", obj.isAutoFailover());
   }
 }

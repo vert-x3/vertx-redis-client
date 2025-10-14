@@ -119,6 +119,6 @@ class SharedSlots {
   }
 
   private void scheduleInvalidation(RedisClusterConnectOptions connectOptions) {
-    vertx.setTimer(connectOptions.getHashSlotCacheTTL(), ignored -> invalidate());
+    vertx.setTimer(connectOptions.getTopologyCacheTTL(), ignored -> invalidate());
   }
 }

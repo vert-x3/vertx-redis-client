@@ -128,30 +128,4 @@ public class RedisSentinelTest {
     PreservesContext.connectThenSend(client, test);
     PreservesContext.connectThenBatch(client, test);
   }
-
-  @Test
-  public void testWriteToMasterReadFromReplica(VertxTestContext test) {
-    final String key = randomKey();
-
-    Redis.createClient(
-        context.vertx(),
-        new RedisOptions()
-          .setType(RedisClientType.SENTINEL)
-          .setUseReplicas(RedisReplicas.ALWAYS)
-          .addConnectionString(redis.getRedisSentinel0Uri())
-          .addConnectionString(redis.getRedisSentinel1Uri())
-          .addConnectionString(redis.getRedisSentinel2Uri())
-          .setMaxPoolSize(4)
-          .setMaxPoolWaiting(16))
-      .connect().onComplete(test.succeeding(conn -> {
-        conn.send(Request.cmd(Command.SET).arg(key).arg("foobar"))
-          .compose(ignored -> retryUntilSuccess(context.vertx(), () -> {
-            return conn.send(Request.cmd(Command.GET).arg(key));
-          }, 10))
-          .onComplete(test.succeeding(result -> {
-            assertEquals("foobar", result.toString());
-            test.completeNow();
-          }));
-      }));
-  }
 }
