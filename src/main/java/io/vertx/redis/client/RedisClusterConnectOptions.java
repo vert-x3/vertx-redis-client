@@ -16,6 +16,7 @@
 package io.vertx.redis.client;
 
 import io.vertx.codegen.annotations.DataObject;
+import io.vertx.codegen.annotations.GenIgnore;
 import io.vertx.codegen.json.annotations.JsonGen;
 import io.vertx.core.json.JsonObject;
 
@@ -27,27 +28,30 @@ public class RedisClusterConnectOptions extends RedisConnectOptions {
 
   private RedisReplicas useReplicas;
   private RedisClusterTransactions clusterTransactions;
-  private long hashSlotCacheTTL;
+  private long topologyCacheTTL;
 
   public RedisClusterConnectOptions() {
     super();
     useReplicas = RedisReplicas.NEVER;
     clusterTransactions = RedisClusterTransactions.DISABLED;
-    hashSlotCacheTTL = 1000;
+    topologyCacheTTL = 1000;
   }
 
   public RedisClusterConnectOptions(RedisOptions options) {
     super(options);
     setUseReplicas(options.getUseReplicas());
     setClusterTransactions(options.getClusterTransactions());
-    setHashSlotCacheTTL(options.getHashSlotCacheTTL());
+    // note that we HAVE TO call `options.getHashSlotCacheTTL()` here,
+    // because `RedisOptions` does NOT unify `hashSlotCacheTTL`
+    // and `topologyCacheTTL` yet (only since Vert.x 5.1)
+    setTopologyCacheTTL(options.getHashSlotCacheTTL());
   }
 
   public RedisClusterConnectOptions(RedisClusterConnectOptions other) {
     super(other);
     setUseReplicas(other.getUseReplicas());
     setClusterTransactions(other.getClusterTransactions());
-    setHashSlotCacheTTL(other.getHashSlotCacheTTL());
+    setTopologyCacheTTL(other.getTopologyCacheTTL());
   }
 
   public RedisClusterConnectOptions(JsonObject json) {
@@ -76,23 +80,41 @@ public class RedisClusterConnectOptions extends RedisConnectOptions {
   }
 
   /**
-   * Returns the TTL of the hash slot cache. The TTL is expressed in milliseconds.
+   * @deprecated use {@link #getTopologyCacheTTL()}
+   */
+  @Deprecated
+  public long getHashSlotCacheTTL() {
+    return getTopologyCacheTTL();
+  }
+
+  /**
+   * @deprecated use {@link #setTopologyCacheTTL(long)}
+   */
+  @Deprecated
+  public RedisClusterConnectOptions setHashSlotCacheTTL(long hashSlotCacheTTL) {
+    return setTopologyCacheTTL(hashSlotCacheTTL);
+  }
+
+  /**
+   * Returns the TTL of the topology cache. The TTL is expressed in milliseconds.
    * Defaults to 1000 millis (1 second).
    *
-   * @return the TTL of the hash slot cache
+   * @return the TTL of the topology cache
    */
-  public long getHashSlotCacheTTL() {
-    return hashSlotCacheTTL;
+  @GenIgnore
+  public long getTopologyCacheTTL() {
+    return topologyCacheTTL;
   }
 
   /**
    * Sets the TTL of the hash slot cache. The TTL is expressed in milliseconds.
    * Defaults to 1000 millis (1 second).
    *
-   * @param hashSlotCacheTTL the TTL of the hash slot cache, in millis
+   * @param topologyCacheTTL the TTL of the hash slot cache, in millis
    */
-  public RedisClusterConnectOptions setHashSlotCacheTTL(long hashSlotCacheTTL) {
-    this.hashSlotCacheTTL = hashSlotCacheTTL;
+  @GenIgnore
+  public RedisClusterConnectOptions setTopologyCacheTTL(long topologyCacheTTL) {
+    this.topologyCacheTTL = topologyCacheTTL;
     return this;
   }
 

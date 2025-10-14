@@ -30,11 +30,13 @@ public class RedisSentinelConnectOptions extends RedisConnectOptions {
   private RedisRole role;
   private String masterName;
   private boolean autoFailover;
+  private long topologyCacheTTL;
 
   public RedisSentinelConnectOptions() {
     super();
     role = RedisRole.MASTER;
     masterName = "mymaster";
+    topologyCacheTTL = 1000;
   }
 
   public RedisSentinelConnectOptions(RedisOptions options) {
@@ -42,6 +44,7 @@ public class RedisSentinelConnectOptions extends RedisConnectOptions {
     setRole(options.getRole());
     setMasterName(options.getMasterName());
     setAutoFailover(options.isAutoFailover());
+    setTopologyCacheTTL(options.getTopologyCacheTTL());
   }
 
   public RedisSentinelConnectOptions(RedisSentinelConnectOptions other) {
@@ -49,6 +52,7 @@ public class RedisSentinelConnectOptions extends RedisConnectOptions {
     setRole(other.getRole());
     setMasterName(other.getMasterName());
     setAutoFailover(other.isAutoFailover());
+    setTopologyCacheTTL(other.getTopologyCacheTTL());
   }
 
   public RedisSentinelConnectOptions(JsonObject json) {
@@ -125,7 +129,7 @@ public class RedisSentinelConnectOptions extends RedisConnectOptions {
   }
 
   /**
-   * Returns whether automatic failover is enabled. This only makes sense for sentinel clients
+   * Sets whether automatic failover is enabled. This only makes sense for sentinel clients
    * with role of {@link RedisRole#MASTER} and is ignored otherwise.
    * <p>
    * If enabled, the sentinel client will additionally create a connection to one sentinel node
@@ -151,6 +155,27 @@ public class RedisSentinelConnectOptions extends RedisConnectOptions {
    */
   public RedisSentinelConnectOptions setAutoFailover(boolean autoFailover) {
     this.autoFailover = autoFailover;
+    return this;
+  }
+
+  /**
+   * Returns the TTL of the topology cache. The TTL is expressed in milliseconds.
+   * Defaults to 1000 millis (1 second).
+   *
+   * @return the TTL of the topology cache
+   */
+  public long getTopologyCacheTTL() {
+    return topologyCacheTTL;
+  }
+
+  /**
+   * Sets the TTL of the topology cache. The TTL is expressed in milliseconds.
+   * Defaults to 1000 millis (1 second).
+   *
+   * @param topologyCacheTTL the TTL of the hash topology cache, in millis
+   */
+  public RedisSentinelConnectOptions setTopologyCacheTTL(long topologyCacheTTL) {
+    this.topologyCacheTTL = topologyCacheTTL;
     return this;
   }
 

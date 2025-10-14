@@ -116,6 +116,6 @@ class SharedSlots {
   }
 
   void scheduleInvalidation() {
-    vertx.setTimer(connectOptions.getHashSlotCacheTTL(), ignored -> invalidate());
+    vertx.setTimer(connectOptions.getTopologyCacheTTL(), ignored -> invalidate());
   }
 }

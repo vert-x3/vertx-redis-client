@@ -143,7 +143,10 @@ To work with the sentinel mode (also known as high availability), the connection
 {@link examples.RedisExamples#example5}
 ----
 
-The connection strings here point to the _sentinel_ nodes, which are used to discover the actual master and replica nodes.
+The connection strings here point to the _sentinel_ nodes, which are used to discover the actual topology (full set of sentinel nodes, master node, replica nodes).
+The sentinel Redis client holds a cache of the discovered topology.
+When the cache is empty, the first attempt to acquire a connection will execute 3 commands against one of the configured sentinel nodes (`SENTINEL SENTINELS <master name>`, `SENTINEL GET-MASTER-ADDR-BY-NAME <master name>`, `SENTINEL REPLICAS <master name>`).
+The cache has a configurable TTL (time to live), which defaults to 1 second.
 
 What is important to notice is that in this mode, when the selected role is `MASTER` (which is the default) and when automatic failover is enabled (`RedisOptions.setAutoFailover(true)`), there is an extra connection to one of the sentinels that listens for failover events. When the sentinel notifies that a new master was elected, all clients will close their connection to the old master and transparently reconnect to the new master.
 
@@ -167,7 +170,7 @@ It is recommended to read the Redis manual in order to understand how clustering
 The client operating in this mode will do a best effort to identify which slot is used by the executed command in order to execute it on the right node.
 There could be cases where this isn't possible to identify and in that case, as a best effort, the command will be run on a random node.
 
-To know which Redis node holds which slots, the clustered Redis client holds a cache of the hash slot assignment.
+To know which Redis node holds which slots, the clustered Redis client holds a cache of cluster topology (hash slot assignment).
 When the cache is empty, the first attempt to acquire a connection will execute `CLUSTER SLOTS`.
 The cache has a configurable TTL (time to live), which defaults to 1 second.
 The cache is also cleared whenever any command executed by the client receives the `MOVED` redirection.
@@ -239,7 +242,7 @@ It is possible to enable single-node transactions in Redis cluster by:
 ----
 
 In single-node transactions, the first command (if it is `WATCH`) or the second command (if the first one is `MULTI`) determines on which node the transaction should execute.
-The connection is bound to the selected node and all subsequent commands are sent to that node, regardless of the hash slot assignment.
+The connection is bound to the selected node and all subsequent commands are sent to that node, regardless of the cluster topology (hash slot assignment).
 When the final command of a transaction (`EXEC` or `DISCARD`) is executed, the connection is reset to default mode and is no longer bound to a single node.
 
 If the transaction starts with `WATCH`, that command has keys and so determines the target node.
