@@ -1,16 +1,16 @@
 package io.vertx.tests.redis.internal;
 
 import io.vertx.redis.client.impl.ArrayQueue;
-import org.junit.Ignore;
-import org.junit.Test;
+import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.Test;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 public class ArrayQueueTest {
 
   @Test
-  @Ignore("This test is very CPU intensive and causes trouble on CI")
+  @Disabled("This test is very CPU intensive and causes trouble on CI")
   public void testOverflow() {
     ArrayQueue arrayQueue = new ArrayQueue(10);
 

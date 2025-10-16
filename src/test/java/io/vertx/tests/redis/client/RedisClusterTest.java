@@ -4,10 +4,10 @@ import io.vertx.codegen.annotations.Nullable;
 import io.vertx.core.Context;
 import io.vertx.core.Future;
 import io.vertx.core.buffer.Buffer;
-import io.vertx.ext.unit.Async;
-import io.vertx.ext.unit.TestContext;
-import io.vertx.ext.unit.junit.RunTestOnContext;
-import io.vertx.ext.unit.junit.VertxUnitRunner;
+import io.vertx.junit5.Checkpoint;
+import io.vertx.junit5.RunTestOnContext;
+import io.vertx.junit5.VertxExtension;
+import io.vertx.junit5.VertxTestContext;
 import io.vertx.redis.client.Redis;
 import io.vertx.redis.client.RedisClientType;
 import io.vertx.redis.client.RedisConnection;
@@ -17,13 +17,14 @@ import io.vertx.redis.client.Request;
 import io.vertx.redis.client.Response;
 import io.vertx.redis.client.ResponseType;
 import io.vertx.tests.redis.containers.RedisCluster;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.ClassRule;
-import org.junit.Ignore;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.api.extension.RegisterExtension;
+import org.testcontainers.junit.jupiter.Container;
+import org.testcontainers.junit.jupiter.Testcontainers;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -66,16 +67,20 @@ import static io.vertx.redis.client.Command.WAIT;
 import static io.vertx.redis.client.Request.cmd;
 import static io.vertx.tests.redis.client.TestUtils.randomKey;
 import static io.vertx.tests.redis.client.TestUtils.retryUntilSuccess;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
-
-@RunWith(VertxUnitRunner.class)
+@ExtendWith(VertxExtension.class)
+@Testcontainers
 public class RedisClusterTest {
 
-  @ClassRule
+  @Container
   public static final RedisCluster redis = new RedisCluster();
 
-  @Rule
-  public final RunTestOnContext rule = new RunTestOnContext();
+  @RegisterExtension
+  public final RunTestOnContext context = new RunTestOnContext();
 
   private final RedisOptions options = new RedisOptions()
     .setType(RedisClientType.CLUSTER)
@@ -94,40 +99,31 @@ public class RedisClusterTest {
 
   private Redis client;
 
-  @Before
+  @BeforeEach
   public void createClient() {
-    client = Redis.createClient(rule.vertx(), options);
+    client = Redis.createClient(context.vertx(), options);
   }
 
-  @After
-  public void cleanRedis(TestContext should) {
-    final Async test = should.async();
-
-    client.connect().onComplete(onCreate -> {
-      should.assertTrue(onCreate.succeeded());
-      final RedisConnection cluster = onCreate.result();
-      cluster.send(cmd(FLUSHDB)).onComplete(flushDB -> {
-        should.assertTrue(flushDB.succeeded());
-        client.close();
-        test.complete();
-      });
-    });
+  @AfterEach
+  public void cleanRedis(VertxTestContext test) {
+    client.connect().onComplete(test.succeeding(conn -> {
+      conn.send(cmd(FLUSHDB)).onComplete(test.succeeding(flushDB -> {
+        client.close().onComplete(test.succeedingThenComplete());
+      }));
+    }));
   }
 
   @Test
-  public void testContextReturn(TestContext should) {
-    final Async test = should.async();
-    Context context = rule.vertx().getOrCreateContext();
-    client.connect().onComplete(onCreate -> {
-      should.assertEquals(context, rule.vertx().getOrCreateContext());
-      test.complete();
-    });
+  public void testContextReturn(VertxTestContext test) {
+    Context context = this.context.vertx().getOrCreateContext();
+    client.connect().onComplete(test.succeeding(conn -> {
+      assertEquals(context, this.context.vertx().getOrCreateContext());
+      conn.close().onComplete(test.succeedingThenComplete());
+    }));
   }
 
-  @Test(timeout = 30_000)
-  public void testConnectTime(TestContext should) {
-    final Async test = should.async();
-
+  @Test
+  public void testConnectTime(VertxTestContext test) {
     RedisOptions options = new RedisOptions()
       .setType(RedisClientType.CLUSTER)
       .setUseReplicas(RedisReplicas.SHARE)
@@ -139,65 +135,47 @@ public class RedisClusterTest {
       .setMaxPoolWaiting(16);
 
     long t0 = System.currentTimeMillis();
-    client = Redis.createClient(rule.vertx(), options);
+    client = Redis.createClient(context.vertx(), options);
     long t1 = System.currentTimeMillis();
 
     client
-      .connect().onComplete(onCreate -> {
+      .connect().onComplete(test.succeeding(conn -> {
         long t2 = System.currentTimeMillis();
-
-        should.assertTrue(onCreate.succeeded());
 
         System.out.println(t1 - t0);
         System.out.println(t2 - t1);
-        test.complete();
-      });
+        test.completeNow();
+      }));
   }
 
 
-  @Test(timeout = 30_000)
-  public void runTheSlotScope(TestContext should) {
-    final Async test = should.async();
-
+  @Test
+  public void runTheSlotScope(VertxTestContext test) {
     client
-      .connect().onComplete(onCreate -> {
-        should.assertTrue(onCreate.succeeded());
-
-        final RedisConnection cluster = onCreate.result();
-        cluster.exceptionHandler(should::fail);
+      .connect().onComplete(test.succeeding(conn -> {
+        conn.exceptionHandler(test::failNow);
 
         final int len = (int) Math.pow(2, 17);
         final AtomicInteger counter = new AtomicInteger();
 
         for (int i = 0; i < len; i++) {
           final String id = Integer.toString(i);
-          cluster.send(cmd(SET).arg(id).arg(id)).onComplete(set -> {
-            should.assertTrue(set.succeeded());
-            cluster.send(cmd(GET).arg(id)).onComplete(get -> {
-              if (get.failed()) {
-                get.cause().printStackTrace();
-              }
-              should.assertTrue(get.succeeded());
-              should.assertEquals(id, get.result().toString());
+          conn.send(cmd(SET).arg(id).arg(id)).onComplete(test.succeeding(set -> {
+            conn.send(cmd(GET).arg(id)).onComplete(test.succeeding(get -> {
+              assertEquals(id, get.toString());
 
               final int cnt = counter.incrementAndGet();
-              if (cnt % 1024 == 0) {
-                System.out.print('.');
-              }
-
               if (cnt == len) {
-                test.complete();
+                test.completeNow();
               }
-            });
-          });
+            }));
+          }));
         }
-      });
+      }));
   }
 
-  @Test(timeout = 30_000)
-  public void autoFindNodes(TestContext should) {
-    final Async test = should.async();
-
+  @Test
+  public void autoFindNodes(VertxTestContext test) {
     final RedisOptions options = new RedisOptions()
       .setType(RedisClientType.CLUSTER)
       // we will flood the redis server
@@ -208,45 +186,34 @@ public class RedisClusterTest {
 
     // we only provide 1 node
 
-    final Redis client2 = Redis.createClient(rule.vertx(), options);
+    final Redis client2 = Redis.createClient(context.vertx(), options);
 
     client2
-      .connect().onComplete(onCreate -> {
-        should.assertTrue(onCreate.succeeded());
-
-        final RedisConnection cluster = onCreate.result();
-        cluster.exceptionHandler(should::fail);
+      .connect().onComplete(test.succeeding(conn -> {
+        conn.exceptionHandler(test::failNow);
 
         final int len = (int) Math.pow(2, 17);
         final AtomicInteger counter = new AtomicInteger();
 
         for (int i = 0; i < len; i++) {
           final String id = Integer.toString(i);
-          cluster.send(cmd(SET).arg(id).arg(id)).onComplete(set -> {
-            should.assertTrue(set.succeeded());
-            cluster.send(cmd(GET).arg(id)).onComplete(get -> {
-              should.assertTrue(get.succeeded());
-              should.assertEquals(id, get.result().toString());
+          conn.send(cmd(SET).arg(id).arg(id)).onComplete(test.succeeding(set -> {
+            conn.send(cmd(GET).arg(id)).onComplete(test.succeeding(get -> {
+              assertEquals(id, get.toString());
 
               final int cnt = counter.incrementAndGet();
-              if (cnt % 1024 == 0) {
-                System.out.print('.');
-              }
-
               if (cnt == len) {
                 client2.close();
-                test.complete();
+                test.completeNow();
               }
-            });
-          });
+            }));
+          }));
         }
-      });
+      }));
   }
 
-  @Test(timeout = 30_000)
-  public void autoFindNodesAcross24Instances(TestContext should) {
-    final Async test = should.async();
-
+  @Test
+  public void autoFindNodesAcross24Instances(VertxTestContext test) {
     final RedisOptions options = new RedisOptions()
       .setType(RedisClientType.CLUSTER)
       // we will flood the redis server
@@ -258,19 +225,18 @@ public class RedisClusterTest {
     List<Future<RedisConnection>> futures = new ArrayList<>(24);
 
     for (int i = 0; i < 24; i++) {
-      futures.add(Redis.createClient(rule.vertx(), options).connect());
+      futures.add(Redis.createClient(context.vertx(), options).connect());
     }
 
-
     Future.all(futures).onComplete(all -> {
-      should.assertFalse(all.failed());
+      test.verify(() -> {
+        assertFalse(all.failed());
+      });
 
       final Random rnd = new Random();
       final List<RedisConnection> clients = all.result().list();
       // ensure we fail on client error
-      clients.forEach(client -> client.exceptionHandler(should::fail));
-
-      System.out.println("We have " + clients.size() + " clients");
+      clients.forEach(client -> client.exceptionHandler(test::failNow));
 
       final int len = (int) Math.pow(2, 17);
       final AtomicInteger counter = new AtomicInteger();
@@ -278,630 +244,461 @@ public class RedisClusterTest {
       for (int i = 0; i < len; i++) {
         final String id = Integer.toString(i);
         clients.get(rnd.nextInt(clients.size()))
-          .send(cmd(SET).arg(id).arg(id)).onComplete(set -> {
-            should.assertTrue(set.succeeded());
+          .send(cmd(SET).arg(id).arg(id)).onComplete(test.succeeding(set -> {
             clients.get(rnd.nextInt(clients.size()))
-              .send(cmd(GET).arg(id)).onComplete(get -> {
-                should.assertTrue(get.succeeded());
-                should.assertEquals(id, get.result().toString());
+              .send(cmd(GET).arg(id)).onComplete(test.succeeding(get -> {
+                assertEquals(id, get.toString());
 
                 final int cnt = counter.incrementAndGet();
-                if (cnt % 1024 == 0) {
-                  System.out.print('.');
-                }
-
                 if (cnt == len) {
-                  test.complete();
+                  test.completeNow();
                 }
-              });
-          });
+              }));
+          }));
       }
-
     });
   }
 
-  @Test(timeout = 30_000)
-  public void testHgetall(TestContext should) {
-    final Async test = should.async();
+  @Test
+  public void testHgetall(VertxTestContext test) {
+    client.connect().onComplete(test.succeeding(conn -> {
+      conn.exceptionHandler(test::failNow);
 
-    client
-      .connect().onComplete(onCreate -> {
-        should.assertTrue(onCreate.succeeded());
-
-        final RedisConnection cluster = onCreate.result();
-        cluster.exceptionHandler(should::fail);
-
-        cluster.send(cmd(HSET).arg("testKey").arg("field1").arg("Hello")).onComplete(hset1 -> {
-          should.assertTrue(hset1.succeeded());
-          cluster.send(cmd(HSET).arg("testKey").arg("field2").arg("World")).onComplete(hset2 -> {
-            should.assertTrue(hset2.succeeded());
-            cluster.send(cmd(HGETALL).arg("testKey")).onComplete(hGetAll -> {
-              should.assertTrue(hGetAll.succeeded());
-              try {
-                Response obj = hGetAll.result();
-                should.assertEquals("Hello", obj.get("field1").toString());
-                should.assertEquals("World", obj.get("field2").toString());
-                test.complete();
-              } catch (Exception ex) {
-                should.fail(ex);
-              }
-            });
-          });
-        });
-      });
+      conn.send(cmd(HSET).arg("testKey").arg("field1").arg("Hello"))
+        .compose(hset1 -> {
+          return conn.send(cmd(HSET).arg("testKey").arg("field2").arg("World"));
+        })
+        .compose(hset2 -> {
+          return conn.send(cmd(HGETALL).arg("testKey"));
+        }).onComplete(test.succeeding(hGetAll -> {
+          try {
+            assertEquals("Hello", hGetAll.get("field1").toString());
+            assertEquals("World", hGetAll.get("field2").toString());
+            test.completeNow();
+          } catch (Exception ex) {
+            test.failNow(ex);
+          }
+        }));
+    }));
   }
 
   @Test
-  public void testAppend(TestContext should) {
-    final Async test = should.async();
+  public void testAppend(VertxTestContext test) {
     final String key = randomKey();
 
-    client
-      .connect().onComplete(onCreate -> {
-        should.assertTrue(onCreate.succeeded());
+    client.connect().onComplete(test.succeeding(conn -> {
+      conn.exceptionHandler(test::failNow);
 
-        final RedisConnection cluster = onCreate.result();
-        cluster.exceptionHandler(should::fail);
-
-        cluster.send(cmd(DEL).arg(key)).onComplete(del -> {
-          should.assertTrue(del.succeeded());
-
-          cluster.send(cmd(APPEND).arg(key).arg("Hello")).onComplete(append1 -> {
-            should.assertTrue(append1.succeeded());
-            should.assertEquals(5L, append1.result().toLong());
-
-            cluster.send(cmd(APPEND).arg(key).arg(" World")).onComplete(append2 -> {
-              should.assertTrue(append2.succeeded());
-              should.assertEquals(11L, append2.result().toLong());
-
-              cluster.send(cmd(GET).arg(key)).onComplete(get -> {
-                should.assertTrue(get.succeeded());
-                should.assertEquals("Hello World", get.result().toString());
-                test.complete();
-              });
-            });
-          });
-        });
-      });
+      conn.send(cmd(DEL).arg(key))
+        .compose(del -> {
+          return conn.send(cmd(APPEND).arg(key).arg("Hello"));
+        })
+        .compose(append1 -> {
+          assertEquals(5L, append1.toLong());
+          return conn.send(cmd(APPEND).arg(key).arg(" World"));
+        })
+        .compose(append2 -> {
+          assertEquals(11L, append2.toLong());
+          return conn.send(cmd(GET).arg(key));
+        })
+        .onComplete(test.succeeding(get -> {
+          assertEquals("Hello World", get.toString());
+          test.completeNow();
+        }));
+    }));
   }
 
   @Test
-  public void testBitCount(TestContext should) {
-    final Async test = should.async();
+  public void testBitCount(VertxTestContext test) {
     final String key = randomKey();
 
-    client
-      .connect().onComplete(onCreate -> {
-        should.assertTrue(onCreate.succeeded());
+    client.connect().onComplete(test.succeeding(conn -> {
+      conn.exceptionHandler(test::failNow);
 
-        final RedisConnection cluster = onCreate.result();
-        cluster.exceptionHandler(should::fail);
-
-        cluster.send(cmd(SET).arg(key).arg("foobar")).onComplete(set -> {
-          should.assertTrue(set.succeeded());
-
-          cluster.send(cmd(BITCOUNT).arg(key)).onComplete(bitCount1 -> {
-            should.assertTrue(bitCount1.succeeded());
-            should.assertEquals(26L, bitCount1.result().toLong());
-
-            cluster.send(cmd(BITCOUNT).arg(key).arg(0).arg(0)).onComplete(bitCount2 -> {
-              should.assertTrue(bitCount2.succeeded());
-              should.assertEquals(4L, bitCount2.result().toLong());
-
-              cluster.send(cmd(BITCOUNT).arg(key).arg(1).arg(1)).onComplete(bitCount3 -> {
-                should.assertTrue(bitCount3.succeeded());
-                should.assertEquals(6L, bitCount3.result().toLong());
-                test.complete();
-              });
-            });
-          });
-        });
-      });
+      conn.send(cmd(SET).arg(key).arg("foobar"))
+        .compose(set -> {
+          return conn.send(cmd(BITCOUNT).arg(key));
+        })
+        .compose(bitCount1 -> {
+          assertEquals(26L, bitCount1.toLong());
+          return conn.send(cmd(BITCOUNT).arg(key).arg(0).arg(0));
+        })
+        .compose(bitCount2 -> {
+          assertEquals(4L, bitCount2.toLong());
+          return conn.send(cmd(BITCOUNT).arg(key).arg(1).arg(1));
+        })
+        .onComplete(test.succeeding(bitCount3 -> {
+          assertEquals(6L, bitCount3.toLong());
+          test.completeNow();
+        }));
+    }));
   }
 
   @Test
-  @Ignore
-  public void testBitTop(TestContext should) {
-    final Async test = should.async();
+  @Disabled
+  public void testBitTop(VertxTestContext test) {
     final String key1 = randomKey();
     final String key2 = randomKey();
     final String destkey = randomKey();
 
-    client
-      .connect().onComplete(onCreate -> {
-        should.assertTrue(onCreate.succeeded());
+    client.connect().onComplete(test.succeeding(conn -> {
+      conn.exceptionHandler(test::failNow);
 
-        final RedisConnection cluster = onCreate.result();
-        cluster.exceptionHandler(should::fail);
-
-        cluster.send(cmd(SET).arg(key1).arg("foobar")).onComplete(set1 -> {
-          should.assertTrue(set1.succeeded());
-
-          cluster.send(cmd(SET).arg(key1).arg("abcdef")).onComplete(set2 -> {
-            should.assertTrue(set2.succeeded());
-
-            cluster.send(cmd(BITOP).arg("AND").arg(destkey).arg(key1).arg(key2)).onComplete(bitTop -> {
-              should.assertTrue(bitTop.succeeded());
-              cluster.send(cmd(GET).arg(destkey)).onComplete(get -> {
-                should.assertTrue(get.succeeded());
-                test.complete();
-              });
-            });
-          });
-        });
-      });
+      conn.send(cmd(SET).arg(key1).arg("foobar"))
+        .compose(set1 -> {
+          return conn.send(cmd(SET).arg(key2).arg("abcdef"));
+        })
+        .compose(set2 -> {
+          return conn.send(cmd(BITOP).arg("AND").arg(destkey).arg(key1).arg(key2));
+        })
+        .compose(bitOp -> {
+          return conn.send(cmd(GET).arg(destkey));
+        })
+        .onComplete(test.succeedingThenComplete());
+    }));
   }
 
-  @Test(timeout = 30_000)
-  public void testBlPop(TestContext should) {
-    final Async test = should.async();
+  @Test
+  public void testBlPop(VertxTestContext test) {
     final String list1 = randomKey();
     final String list2 = randomKey();
 
-    client
-      .connect().onComplete(onCreate -> {
-        should.assertTrue(onCreate.succeeded());
+    client.connect().onComplete(test.succeeding(conn -> {
+      conn.exceptionHandler(test::failNow);
 
-        final RedisConnection cluster = onCreate.result();
-        cluster.exceptionHandler(should::fail);
-
-        cluster.send(cmd(DEL).arg(list1)).onComplete(del1 -> {
-          should.assertTrue(del1.succeeded());
-
-          cluster.send(cmd(DEL).arg(list2)).onComplete(del2 -> {
-            should.assertTrue(del2.succeeded());
-
-            cluster.send(cmd(RPUSH).arg(list1).arg("a").arg("b").arg("c")).onComplete(rPush -> {
-              should.assertTrue(rPush.succeeded());
-
-              cluster.send(cmd(BLPOP).arg(list1).arg(0)).onComplete(blPop -> {
-                should.assertTrue(blPop.succeeded());
-                should.assertEquals(list1, blPop.result().get(0).toString());
-                should.assertEquals("a", blPop.result().get(1).toString());
-                should.assertEquals("[" + String.join(", ", list1, "a") + "]", blPop.result().toString());
-                test.complete();
-              });
-            });
-          });
-        });
-      });
+      conn.send(cmd(DEL).arg(list1))
+        .compose(del1 -> {
+          return conn.send(cmd(DEL).arg(list2));
+        })
+        .compose(del2 -> {
+          return conn.send(cmd(RPUSH).arg(list1).arg("a").arg("b").arg("c"));
+        })
+        .compose(rpush -> {
+          return conn.send(cmd(BLPOP).arg(list1).arg(0));
+        })
+        .onComplete(test.succeeding(blPop -> {
+          assertEquals(list1, blPop.get(0).toString());
+          assertEquals("a", blPop.get(1).toString());
+          assertEquals("[" + String.join(", ", list1, "a") + "]", blPop.toString());
+          test.completeNow();
+        }));
+    }));
   }
 
 
   @Test
-  public void testBitPos(TestContext should) {
-    final Async test = should.async();
+  public void testBitPos(VertxTestContext test) {
     final String key = randomKey();
     final byte[] value1 = new byte[]{(byte) 0xff, (byte) 0xf0, (byte) 0x00};
     final byte[] value2 = new byte[]{0, 0, 0};
 
-    client
-      .connect().onComplete(onCreate -> {
-        should.assertTrue(onCreate.succeeded());
+    client.connect().onComplete(test.succeeding(conn -> {
+      conn.exceptionHandler(test::failNow);
 
-        final RedisConnection cluster = onCreate.result();
-        cluster.exceptionHandler(should::fail);
-
-        cluster.send(cmd(SET).arg(key).arg(Buffer.buffer(value1))).onComplete(set1 -> {
-          should.assertTrue(set1.succeeded());
-
-          cluster.send(cmd(BITPOS).arg(key).arg(0)).onComplete(bitPos1 -> {
-            should.assertTrue(bitPos1.succeeded());
-            should.assertEquals(12L, bitPos1.result().toLong());
-
-            cluster.send(cmd(SET).arg(key).arg(Buffer.buffer(value2))).onComplete(set2 -> {
-              should.assertTrue(set2.succeeded());
-
-              cluster.send(cmd(BITPOS).arg(key).arg(1)).onComplete(bitPos2 -> {
-                should.assertTrue(bitPos2.succeeded());
-                should.assertEquals(-1L, bitPos2.result().toLong());
-                test.complete();
-              });
-            });
-          });
-        });
-      });
+      conn.send(cmd(SET).arg(key).arg(Buffer.buffer(value1)))
+        .compose(set1 -> {
+          return conn.send(cmd(BITPOS).arg(key).arg(0));
+        })
+        .compose(bitPos1 -> {
+          assertEquals(12L, bitPos1.toLong());
+          return conn.send(cmd(SET).arg(key).arg(Buffer.buffer(value2)));
+        })
+        .compose(set2 -> {
+          return conn.send(cmd(BITPOS).arg(key).arg(1));
+        })
+        .onComplete(test.succeeding(bitPos2 -> {
+          assertEquals(-1L, bitPos2.toLong());
+          test.completeNow();
+        }));
+    }));
   }
 
-  @Test(timeout = 5_000)
-  @Ignore
-  public void testBrPop(TestContext should) {
-    final Async test = should.async();
+  @Test
+  @Disabled
+  public void testBrPop(VertxTestContext test) {
     final String list1 = randomKey();
     final String list2 = randomKey();
 
-    client
-      .connect().onComplete(onCreate -> {
-        should.assertTrue(onCreate.succeeded());
+    client.connect().onComplete(test.succeeding(conn -> {
+      conn.exceptionHandler(test::failNow);
 
-        final RedisConnection cluster = onCreate.result();
-        cluster.exceptionHandler(should::fail);
-
-        cluster.send(cmd(DEL).arg(list1)).onComplete(del1 -> {
-          should.assertTrue(del1.succeeded());
-
-          cluster.send(cmd(DEL).arg(list2)).onComplete(del2 -> {
-            should.assertTrue(del2.succeeded());
-
-            cluster.send(cmd(RPUSH).arg(list1).arg("a").arg("b").arg("c")).onComplete(rPush -> {
-              should.assertTrue(rPush.succeeded());
-
-              cluster.send(cmd(BRPOP).arg(list1).arg(list2).arg(0)).onComplete(brPop -> {
-                should.assertTrue(brPop.succeeded());
-                should.assertEquals(String.join(",", list1, "a"), brPop.result().toString());
-                test.complete();
-              });
-            });
-          });
-        });
-      });
+      conn.send(cmd(DEL).arg(list1))
+        .compose(del1 -> {
+          return conn.send(cmd(DEL).arg(list2));
+        })
+        .compose(del2 -> {
+          return conn.send(cmd(RPUSH).arg(list1).arg("a").arg("b").arg("c"));
+        })
+        .compose(rpush -> {
+          return conn.send(cmd(BRPOP).arg(list1).arg(list2).arg(0));
+        })
+        .onComplete(test.succeeding(brPop -> {
+          assertEquals(String.join(",", list1, "a"), brPop.toString());
+          test.completeNow();
+        }));
+    }));
   }
 
   @Test
-  public void testDecr(TestContext should) {
-    final Async test = should.async();
+  public void testDecr(VertxTestContext test) {
     final String key = randomKey();
 
-    client
-      .connect().onComplete(onCreate -> {
-        should.assertTrue(onCreate.succeeded());
+    client.connect().onComplete(test.succeeding(conn -> {
+      conn.exceptionHandler(test::failNow);
 
-        final RedisConnection cluster = onCreate.result();
-        cluster.exceptionHandler(should::fail);
-
-        cluster.send(cmd(SET).arg(key).arg(10)).onComplete(set -> {
-          should.assertTrue(set.succeeded());
-
-          cluster.send(cmd(DECR).arg(key)).onComplete(decr -> {
-            should.assertTrue(decr.succeeded());
-            should.assertEquals(9L, decr.result().toLong());
-            test.complete();
-          });
-        });
-      });
+      conn.send(cmd(SET).arg(key).arg(10))
+        .compose(set -> {
+          return conn.send(cmd(DECR).arg(key));
+        })
+        .onComplete(test.succeeding(decr -> {
+          assertEquals(9L, decr.toLong());
+          test.completeNow();
+        }));
+    }));
   }
 
   @Test
-  public void testDecrBy(TestContext should) {
-    final Async test = should.async();
+  public void testDecrBy(VertxTestContext test) {
     final String key = randomKey();
 
-    client
-      .connect().onComplete(onCreate -> {
-        should.assertTrue(onCreate.succeeded());
+    client.connect().onComplete(test.succeeding(conn -> {
+      conn.exceptionHandler(test::failNow);
 
-        final RedisConnection cluster = onCreate.result();
-        cluster.exceptionHandler(should::fail);
-
-        cluster.send(cmd(SET).arg(key).arg(10)).onComplete(set -> {
-          should.assertTrue(set.succeeded());
-
-          cluster.send(cmd(DECRBY).arg(key).arg(5)).onComplete(decrBy -> {
-            should.assertTrue(decrBy.succeeded());
-            should.assertEquals(5L, decrBy.result().toLong());
-            test.complete();
-          });
-        });
-      });
+      conn.send(cmd(SET).arg(key).arg(10))
+        .compose(set -> {
+          return conn.send(cmd(DECRBY).arg(key).arg(5));
+        }).onComplete(test.succeeding(decrBy -> {
+          assertEquals(5L, decrBy.toLong());
+          test.completeNow();
+        }));
+    }));
   }
 
   @Test
-  public void testDel(TestContext should) {
-    final Async test = should.async();
+  public void testDel(VertxTestContext test) {
     final String key1 = randomKey();
     final String key2 = randomKey();
 
-    client.connect().onComplete(onCreate -> {
-      should.assertTrue(onCreate.succeeded());
+    client.connect().onComplete(test.succeeding(conn -> {
+      conn.exceptionHandler(test::failNow);
 
-      final RedisConnection cluster = onCreate.result();
-      cluster.exceptionHandler(should::fail);
-
-      cluster.send(cmd(SET).arg(key1).arg("Hello")).onComplete(set1 -> {
-        should.assertTrue(set1.succeeded());
-
-        cluster.send(cmd(SET).arg(key2).arg("Hello")).onComplete(set2 -> {
-          should.assertTrue(set2.succeeded());
-
-          cluster.send(cmd(DEL).arg(key1).arg(key2)).onComplete(del -> {
-            should.assertTrue(del.succeeded());
-            should.assertEquals(2, del.result().toInteger());
-            test.complete();
-          });
-        });
-      });
-    });
+      conn.send(cmd(SET).arg(key1).arg("Hello"))
+        .compose(set1 -> {
+          return conn.send(cmd(SET).arg(key2).arg("Hello"));
+        }).compose(set2 -> {
+          return conn.send(cmd(DEL).arg(key1).arg(key2));
+        }).onComplete(test.succeeding(del -> {
+          assertEquals(2, del.toInteger());
+          test.completeNow();
+        }));
+    }));
   }
 
   @Test
-  public void testEcho(TestContext should) {
-    final Async test = should.async();
+  public void testEcho(VertxTestContext test) {
+    client.connect().onComplete(test.succeeding(conn -> {
+      conn.exceptionHandler(test::failNow);
 
-    client
-      .connect().onComplete(onCreate -> {
-        should.assertTrue(onCreate.succeeded());
-
-        final RedisConnection cluster = onCreate.result();
-        cluster.exceptionHandler(should::fail);
-
-        cluster.send(cmd(ECHO).arg("Hello Wordl")).onComplete(echo -> {
-          should.assertTrue(echo.succeeded());
-          should.assertEquals("Hello Wordl", echo.result().toString());
-          test.complete();
-        });
-      });
+      conn.send(cmd(ECHO).arg("Hello Wordl")).onComplete(test.succeeding(echo -> {
+        assertEquals("Hello Wordl", echo.toString());
+        test.completeNow();
+      }));
+    }));
   }
 
   @Test
-  public void testExists(TestContext should) {
-    final Async test = should.async();
+  public void testExists(VertxTestContext test) {
     final String key1 = randomKey();
     final String key2 = randomKey();
 
-    final AtomicInteger counter = new AtomicInteger();
+    Checkpoint checkpoint = test.checkpoint(2);
 
-    client
-      .connect().onComplete(onCreate -> {
-        should.assertTrue(onCreate.succeeded());
+    client.connect().onComplete(test.succeeding(conn -> {
+      conn.exceptionHandler(test::failNow);
 
-        final RedisConnection cluster = onCreate.result();
-        cluster.exceptionHandler(should::fail);
+      conn.send(cmd(SET).arg(key1).arg("Hello"))
+        .compose(set -> {
+          return conn.send(cmd(EXISTS).arg(key1));
+        })
+        .onComplete(test.succeeding(exists -> {
+          assertEquals(1L, exists.toLong());
+          checkpoint.flag();
+        }));
 
-        cluster.send(cmd(SET).arg(key1).arg("Hello")).onComplete(set -> {
-          should.assertTrue(set.succeeded());
-
-          cluster.send(cmd(EXISTS).arg(key1)).onComplete(exists -> {
-            should.assertTrue(exists.succeeded());
-            should.assertEquals(1L, exists.result().toLong());
-            if (counter.incrementAndGet() == 2) {
-              test.complete();
-            }
-          });
-        });
-
-        cluster.send(cmd(EXISTS).arg(key2)).onComplete(exists -> {
-          should.assertTrue(exists.succeeded());
-          should.assertEquals(0L, exists.result().toLong());
-          if (counter.incrementAndGet() == 2) {
-            test.complete();
-          }
-        });
-      });
+      conn.send(cmd(EXISTS).arg(key2)).onComplete(test.succeeding(exists -> {
+        assertEquals(0L, exists.toLong());
+        checkpoint.flag();
+      }));
+    }));
   }
 
   @Test
-  public void testExpire(TestContext should) {
-    final Async test = should.async();
+  public void testExpire(VertxTestContext test) {
     final String key = randomKey();
 
-    client
-      .connect().onComplete(onCreate -> {
-        should.assertTrue(onCreate.succeeded());
+    client.connect().onComplete(test.succeeding(conn -> {
+      conn.exceptionHandler(test::failNow);
 
-        final RedisConnection cluster = onCreate.result();
-        cluster.exceptionHandler(should::fail);
-
-        cluster.send(cmd(SET).arg(key).arg("Hello")).onComplete(set1 -> {
-          should.assertTrue(set1.succeeded());
-
-          cluster.send(cmd(EXPIRE).arg(key).arg(10)).onComplete(expire -> {
-            should.assertTrue(expire.succeeded());
-            should.assertEquals(1L, expire.result().toLong());
-
-            cluster.send(cmd(TTL).arg(key)).onComplete(ttl1 -> {
-              should.assertTrue(ttl1.succeeded());
-              should.assertEquals(10L, ttl1.result().toLong());
-
-
-              cluster.send(cmd(SET).arg(key).arg("Hello World")).onComplete(set2 -> {
-                should.assertTrue(set2.succeeded());
-
-                cluster.send(cmd(TTL).arg(key)).onComplete(ttl2 -> {
-                  should.assertTrue(ttl2.succeeded());
-                  should.assertEquals(-1L, ttl2.result().toLong());
-                  test.complete();
-                });
-              });
-            });
-          });
-        });
-      });
+      conn.send(cmd(SET).arg(key).arg("Hello"))
+        .compose(set1 -> {
+          return conn.send(cmd(EXPIRE).arg(key).arg(10));
+        }).compose(expire -> {
+          assertEquals(1L, expire.toLong());
+          return conn.send(cmd(TTL).arg(key));
+        }).compose(ttl1 -> {
+          assertEquals(10L, ttl1.toLong());
+          return conn.send(cmd(SET).arg(key).arg("Hello World"));
+        }).compose(set2 -> {
+          return conn.send(cmd(TTL).arg(key));
+        }).onComplete(test.succeeding(ttl2 -> {
+          assertEquals(-1L, ttl2.toLong());
+          test.completeNow();
+        }));
+    }));
   }
 
   @Test
-  public void testExpireAt(TestContext should) {
-    final Async test = should.async();
+  public void testExpireAt(VertxTestContext test) {
     final String key = randomKey();
 
-    client
-      .connect().onComplete(onCreate -> {
-        should.assertTrue(onCreate.succeeded());
+    client.connect().onComplete(test.succeeding(conn -> {
+      conn.exceptionHandler(test::failNow);
 
-        final RedisConnection cluster = onCreate.result();
-        cluster.exceptionHandler(should::fail);
-
-        cluster.send(cmd(SET).arg(key).arg("Hello")).onComplete(set1 -> {
-          should.assertTrue(set1.succeeded());
-
-          cluster.send(cmd(EXISTS).arg(key)).onComplete(exists1 -> {
-            should.assertTrue(exists1.succeeded());
-            should.assertEquals(1L, exists1.result().toLong());
-
-            cluster.send(cmd(EXPIREAT).arg(key).arg(1293840000)).onComplete(expireAt -> {
-              should.assertTrue(expireAt.succeeded());
-              should.assertEquals(1L, expireAt.result().toLong());
-
-
-              cluster.send(cmd(EXISTS).arg(key)).onComplete(exists2 -> {
-                should.assertTrue(exists2.succeeded());
-                should.assertEquals(0L, exists2.result().toLong());
-                test.complete();
-              });
-            });
-          });
-        });
-      });
+      conn.send(cmd(SET).arg(key).arg("Hello"))
+        .compose(set1 -> {
+          return conn.send(cmd(EXISTS).arg(key));
+        }).compose(exists1 -> {
+          assertEquals(1L, exists1.toLong());
+          return conn.send(cmd(EXPIREAT).arg(key).arg(1293840000));
+        }).compose(expireAt -> {
+          assertEquals(1L, expireAt.toLong());
+          return conn.send(cmd(EXISTS).arg(key));
+        }).onComplete(test.succeeding(exists2 -> {
+          assertEquals(0L, exists2.toLong());
+          test.completeNow();
+        }));
+    }));
   }
 
-  @Test(timeout = 10_000)
-  public void testGet(TestContext should) {
-    final Async test = should.async();
+  @Test
+  public void testGet(VertxTestContext test) {
     final String key = randomKey();
     final String nonExistentKey = "---";
 
 
-    client
-      .connect().onComplete(onCreate -> {
-        should.assertTrue(onCreate.succeeded());
+    client.connect().onComplete(test.succeeding(conn -> {
+      conn.exceptionHandler(test::failNow);
 
-        final RedisConnection cluster = onCreate.result();
-
-        cluster.exceptionHandler(should::fail);
-
-        cluster.send(cmd(GET).arg(nonExistentKey)).onComplete(get1 -> {
-          should.assertTrue(get1.succeeded());
-          should.assertNull(get1.result());
-
-          cluster.send(cmd(SET).arg(key).arg("Hello")).onComplete(set -> {
-            should.assertTrue(set.succeeded());
-
-            cluster.send(cmd(GET).arg(key)).onComplete(get2 -> {
-              should.assertTrue(get2.succeeded());
-              should.assertEquals("Hello", get2.result().toString());
-              test.complete();
-            });
-          });
-        });
-      });
+      conn.send(cmd(GET).arg(nonExistentKey))
+        .compose(get1 -> {
+          assertNull(get1);
+          return conn.send(cmd(SET).arg(key).arg("Hello"));
+        }).compose(set -> {
+          return conn.send(cmd(GET).arg(key));
+        }).onComplete(test.succeeding(get2 -> {
+          assertEquals("Hello", get2.toString());
+          test.completeNow();
+        }));
+    }));
   }
 
-  @Test(timeout = 60_000)
-  public void dbSize(TestContext should) {
-    final Async test = should.async();
+  @Test
+  public void dbSize(VertxTestContext test) {
+    client.connect().onComplete(test.succeeding(conn -> {
+      conn.exceptionHandler(test::failNow);
 
-    client
-      .connect().onComplete(onCreate -> {
-        should.assertTrue(onCreate.succeeded());
+      final int len = (int) Math.pow(2, 17);
+      final AtomicInteger counter = new AtomicInteger(len);
+      for (int i = 0; i < len; i++) {
+        final String id = Integer.toString(i);
+        conn.send(cmd(SET).arg(id).arg(id)).onComplete(test.succeeding(set -> {
+          if (counter.decrementAndGet() == 0) {
+            // CI is slow, give it a few seconds to sync the cluster
+            context.vertx().setTimer(2_000L, v -> {
+              conn.send(cmd(DBSIZE)).onComplete(test.succeeding(dbSize -> {
+                assertEquals(len, dbSize.toInteger());
+                test.completeNow();
+              }));
+            });
+          }
+        }));
+      }
+    }));
+  }
 
-        final RedisConnection cluster = onCreate.result();
-        cluster.exceptionHandler(should::fail);
+  @Test
+  public void flushDB(VertxTestContext test) {
+    client.connect().onComplete(test.succeeding(conn -> {
+      conn.exceptionHandler(test::failNow);
 
-        final int len = (int) Math.pow(2, 17);
-        final AtomicInteger counter = new AtomicInteger(len);
-        for (int i = 0; i < len; i++) {
-          final String id = Integer.toString(i);
-          cluster.send(cmd(SET).arg(id).arg(id)).onComplete(set -> {
-            should.assertTrue(set.succeeded());
-            if (counter.decrementAndGet() == 0) {
-              // CI is slow, give it a few seconds to sync the cluster
-              System.out.println("Waiting 2sec so CI cluster can sync up");
-              rule.vertx()
-                .setTimer(2_000L, v -> {
-                  cluster.send(cmd(DBSIZE)).onComplete(dbSize -> {
-                    should.assertTrue(dbSize.succeeded());
-                    should.assertEquals(len, dbSize.result().toInteger());
-                    test.complete();
-                  });
-                });
+      final int len = (int) Math.pow(2, 17);
+      final AtomicInteger counter = new AtomicInteger(len);
+      for (int i = 0; i < len; i++) {
+        final String id = Integer.toString(i);
+        conn.send(cmd(SET).arg(id).arg(id)).onComplete(test.succeeding(set -> {
+          if (counter.decrementAndGet() == 0) {
+            // CI is slow, give it a few seconds to sync the cluster
+            context.vertx().setTimer(2_000L, v -> {
+              conn.send(cmd(FLUSHDB))
+                .compose(flushDb -> {
+                  return conn.send(cmd(DBSIZE));
+                })
+                .onComplete(test.succeeding(dbSize -> {
+                  assertEquals(0L, dbSize.toLong());
+                  test.completeNow();
+                }));
+            });
+          }
+        }));
+      }
+    }));
+  }
+
+  @Test
+  public void keys(VertxTestContext test) {
+    client.connect().onComplete(test.succeeding(conn -> {
+      conn.exceptionHandler(test::failNow);
+
+      conn.send(cmd(MSET).arg("1").arg("1").arg("2").arg("2").arg("3").arg("3").arg("key").arg("value"))
+        .compose(mset -> {
+          return conn.send(cmd(KEYS).arg("[0-9]"));
+        }).onComplete(test.succeeding(keys -> {
+          assertEquals(3, keys.size());
+          test.completeNow();
+        }));
+    }));
+  }
+
+  @Test
+  public void mget(VertxTestContext test) {
+    client.connect().onComplete(test.succeeding(conn -> {
+      conn.exceptionHandler(test::failNow);
+
+      conn.send(cmd(SET).arg("key1").arg("Hello"))
+        .compose(set1 -> {
+          return conn.send(cmd(SET).arg("key2").arg("World"));
+        }).compose(set2 -> {
+          return conn.send(cmd(MGET).arg("key1").arg("key2").arg("nonexisting"));
+        }).onComplete(test.succeeding(mget -> {
+          assertEquals(3, mget.size());
+          List<String> values = new ArrayList<>();
+          mget.forEach(value -> {
+            if (value != null) {
+              values.add(value.toString());
+            } else {
+              values.add(null);
             }
           });
-        }
-      });
+          assertTrue(values.contains("Hello"));
+          assertTrue(values.contains("World"));
+          assertTrue(values.contains(null));
+          test.completeNow();
+        }));
+    }));
   }
 
-  @Test(timeout = 30_000)
-  public void flushDB(TestContext should) {
-    final Async test = should.async();
-
-    client
-      .connect().onComplete(onCreate -> {
-        should.assertTrue(onCreate.succeeded());
-
-        final RedisConnection cluster = onCreate.result();
-        cluster.exceptionHandler(should::fail);
-
-        final int len = (int) Math.pow(2, 17);
-        final AtomicInteger counter = new AtomicInteger();
-        for (int i = 0; i < len; i++) {
-          final String id = Integer.toString(i);
-          cluster.send(cmd(SET).arg(id).arg(id)).onComplete(set -> should.assertTrue(set.succeeded()));
-        }
-
-        cluster.send(cmd(FLUSHDB)).onComplete(flushDb -> {
-          should.assertTrue(flushDb.succeeded());
-
-          cluster.send(cmd(DBSIZE)).onComplete(dbSize -> {
-            should.assertTrue(dbSize.succeeded());
-            should.assertEquals(0L, dbSize.result().toLong());
-            test.complete();
-          });
-        });
-
-      });
-  }
-
-  @Test(timeout = 30_000)
-  public void keys(TestContext should) {
-    final Async test = should.async();
-
-    client
-      .connect().onComplete(onCreate -> {
-        should.assertTrue(onCreate.succeeded());
-
-        final RedisConnection cluster = onCreate.result();
-        cluster.exceptionHandler(should::fail);
-
-        cluster.send(cmd(MSET).arg("1").arg("1").arg("2").arg("2").arg("3").arg("3").arg("key").arg("value")).onComplete(mset -> {
-          should.assertTrue(mset.succeeded());
-          cluster.send(cmd(KEYS).arg("[0-9]")).onComplete(keys -> {
-            should.assertTrue(keys.succeeded());
-            should.assertEquals(3, keys.result().size());
-            test.complete();
-          });
-        });
-      });
-  }
-
-  @Test(timeout = 30_000)
-  public void mget(TestContext should) {
-    final Async test = should.async();
-
-    client
-      .connect().onComplete(onCreate -> {
-        should.assertTrue(onCreate.succeeded());
-
-        final RedisConnection cluster = onCreate.result();
-        cluster.exceptionHandler(should::fail);
-
-        cluster.send(cmd(SET).arg("key1").arg("Hello")).onComplete(set1 -> {
-          should.assertTrue(set1.succeeded());
-          cluster.send(cmd(SET).arg("key2").arg("World")).onComplete(set2 -> {
-            should.assertTrue(set2.succeeded());
-            cluster.send(cmd(MGET).arg("key1").arg("key2").arg("nonexisting")).onComplete(mget -> {
-              should.assertTrue(mget.succeeded());
-              should.assertEquals(3, mget.result().size());
-              List<String> values = new ArrayList<>();
-              mget.result().forEach(value -> {
-                if (value != null) {
-                  values.add(value.toString());
-                } else {
-                  values.add(null);
-                }
-              });
-              should.assertTrue(values.contains("Hello"));
-              should.assertTrue(values.contains("World"));
-              should.assertTrue(values.contains(null));
-              test.complete();
-            });
-          });
-        });
-      });
-  }
-
-  @Test(timeout = 30_000)
-  public void mgetMultiKeyInDifferentSlotsWithFirstTwoInSameSlots(TestContext should) {
-    final Async test = should.async();
-
+  @Test
+  public void mgetMultiKeyInDifferentSlotsWithFirstTwoInSameSlots(VertxTestContext test) {
     final String key1 = "{hash_tag}.some-key1";
     final String argv1 = "some-value1";
     final String key2 = "{hash_tag}.some-key2";
@@ -912,38 +709,30 @@ public class RedisClusterTest {
     final String key4 = "{other_hash_tag}.other-key2";
     final String argv4 = "other-value2";
 
-    client.connect().compose(cluster -> {
-      cluster.exceptionHandler(should::fail);
-      Future<@Nullable Response> setFuture1 = cluster.send(cmd(SET).arg(key1).arg(argv1));
-      Future<@Nullable Response> setFuture2 = cluster.send(cmd(SET).arg(key2).arg(argv2));
-      Future<@Nullable Response> setFuture3 = cluster.send(cmd(SET).arg(key3).arg(argv3));
-      Future<@Nullable Response> setFuture4 = cluster.send(cmd(SET).arg(key4).arg(argv4));
-      return Future.all(setFuture1, setFuture2, setFuture3, setFuture4)
+    client.connect().onComplete(test.succeeding(conn -> {
+      conn.exceptionHandler(test::failNow);
+
+      Future<@Nullable Response> setFuture1 = conn.send(cmd(SET).arg(key1).arg(argv1));
+      Future<@Nullable Response> setFuture2 = conn.send(cmd(SET).arg(key2).arg(argv2));
+      Future<@Nullable Response> setFuture3 = conn.send(cmd(SET).arg(key3).arg(argv3));
+      Future<@Nullable Response> setFuture4 = conn.send(cmd(SET).arg(key4).arg(argv4));
+      Future.all(setFuture1, setFuture2, setFuture3, setFuture4)
         .compose(compositeRet -> {
-          System.out.println("set operations successfully");
-          return cluster.send(cmd(MGET).arg(key1).arg(key2).arg(key3).arg(key4));
+          return conn.send(cmd(MGET).arg(key1).arg(key2).arg(key3).arg(key4));
         })
-        .compose(mgetResponse -> {
-          System.out.println("mget operation successfully");
-          Set<String> mgetRet = mgetResponse.stream().map(Response::toString)
-            .collect(Collectors.toSet());
-          should.assertTrue(mgetRet.contains(argv1));
-          should.assertTrue(mgetRet.contains(argv2));
-          should.assertTrue(mgetRet.contains(argv3));
-          should.assertTrue(mgetRet.contains(argv4));
-          test.complete();
-          return Future.succeededFuture();
-        });
-    }).onFailure(throwable -> {
-      throwable.printStackTrace();
-      should.fail(throwable);
-    });
+        .onComplete(test.succeeding(mgetResponse -> {
+          Set<String> mgetRet = mgetResponse.stream().map(Response::toString).collect(Collectors.toSet());
+          assertTrue(mgetRet.contains(argv1));
+          assertTrue(mgetRet.contains(argv2));
+          assertTrue(mgetRet.contains(argv3));
+          assertTrue(mgetRet.contains(argv4));
+          test.completeNow();
+        }));
+    }));
   }
 
-  @Test(timeout = 30_000)
-  public void mgetMultiKeyInDifferentSlotsWithFirstTwoInDifferentSlots(TestContext should) {
-    final Async test = should.async();
-
+  @Test
+  public void mgetMultiKeyInDifferentSlotsWithFirstTwoInDifferentSlots(VertxTestContext test) {
     final String key1 = "{hash_tag}.some-key1";
     final String argv1 = "some-value1";
     final String key2 = "{hash_tag}.some-key2";
@@ -954,54 +743,47 @@ public class RedisClusterTest {
     final String key4 = "{other_hash_tag}.other-key2";
     final String argv4 = "other-value2";
 
-    client.connect().compose(cluster -> {
-      cluster.exceptionHandler(should::fail);
-      Future<@Nullable Response> setFuture1 = cluster.send(cmd(SET).arg(key1).arg(argv1));
-      Future<@Nullable Response> setFuture2 = cluster.send(cmd(SET).arg(key2).arg(argv2));
-      Future<@Nullable Response> setFuture3 = cluster.send(cmd(SET).arg(key3).arg(argv3));
-      Future<@Nullable Response> setFuture4 = cluster.send(cmd(SET).arg(key4).arg(argv4));
-      return Future.all(setFuture1, setFuture2, setFuture3, setFuture4)
+    client.connect().onComplete(test.succeeding(conn -> {
+      conn.exceptionHandler(test::failNow);
+
+      Future<@Nullable Response> setFuture1 = conn.send(cmd(SET).arg(key1).arg(argv1));
+      Future<@Nullable Response> setFuture2 = conn.send(cmd(SET).arg(key2).arg(argv2));
+      Future<@Nullable Response> setFuture3 = conn.send(cmd(SET).arg(key3).arg(argv3));
+      Future<@Nullable Response> setFuture4 = conn.send(cmd(SET).arg(key4).arg(argv4));
+      Future.all(setFuture1, setFuture2, setFuture3, setFuture4)
         .compose(compositeRet -> {
-          System.out.println("set operations successfully");
-          return cluster.send(cmd(MGET).arg(key1).arg(key3).arg(key2).arg(key4));
+          return conn.send(cmd(MGET).arg(key1).arg(key3).arg(key2).arg(key4));
         })
-        .compose(mgetResponse -> {
-          System.out.println("mget operation successfully");
+        .onComplete(test.succeeding(mgetResponse -> {
           Set<String> mgetRet = mgetResponse.stream().map(Response::toString)
             .collect(Collectors.toSet());
-          should.assertTrue(mgetRet.contains(argv1));
-          should.assertTrue(mgetRet.contains(argv2));
-          should.assertTrue(mgetRet.contains(argv3));
-          should.assertTrue(mgetRet.contains(argv4));
-          test.complete();
-          return Future.succeededFuture();
-        });
-    }).onFailure(throwable -> {
-      throwable.printStackTrace();
-      should.fail(throwable);
-    });
+          assertTrue(mgetRet.contains(argv1));
+          assertTrue(mgetRet.contains(argv2));
+          assertTrue(mgetRet.contains(argv3));
+          assertTrue(mgetRet.contains(argv4));
+          test.completeNow();
+        }));
+    }));
   }
 
-  @Test(timeout = 30_000)
-  public void evalSingleKey(TestContext should) {
-    final Async test = should.async();
-
+  @Test
+  public void evalSingleKey(VertxTestContext test) {
     final String key = "{hash_tag}.some-key";
     final String argv = "some-value";
 
-    Redis.createClient(rule.vertx(), options).connect()
-      .onComplete(should.asyncAssertSuccess(cluster -> cluster.send(cmd(EVAL).arg("return redis.call('SET', KEYS[1], ARGV[1])").arg(1).arg(key).arg(argv))
-        .onComplete(should.asyncAssertSuccess(response -> {
-          should.assertEquals("OK", response.toString());
-          test.complete();
-        }))
+    Redis.createClient(context.vertx(), options).connect()
+      .onComplete(test.succeeding(conn -> {
+          conn.send(cmd(EVAL).arg("return redis.call('SET', KEYS[1], ARGV[1])").arg(1).arg(key).arg(argv))
+            .onComplete(test.succeeding(response -> {
+              assertEquals("OK", response.toString());
+              test.completeNow();
+            }));
+        }
       ));
   }
 
-  @Test(timeout = 30_000)
-  public void evalSingleKeyBatch(TestContext should) {
-    final Async test = should.async();
-
+  @Test
+  public void evalSingleKeyBatch(VertxTestContext test) {
     final String key = "{hash_tag}.some-key";
     final String argv = "some-value";
 
@@ -1009,83 +791,88 @@ public class RedisClusterTest {
     final List<Request> cmdList = new ArrayList<>();
     cmdList.add(req);
     cmdList.add(req);
-    Redis.createClient(rule.vertx(), options).connect().onComplete(should.asyncAssertSuccess(cluster -> cluster.batch(cmdList).onComplete(should.asyncAssertSuccess(response -> {
-        should.assertEquals(2, response.size());
-        response.forEach(r -> should.assertEquals("OK", r.toString()));
-        test.complete();
-      }))
+    Redis.createClient(context.vertx(), options).connect().onComplete(test.succeeding(conn -> {
+        conn.batch(cmdList).onComplete(test.succeeding(response -> {
+          assertEquals(2, response.size());
+          response.forEach(r -> assertEquals("OK", r.toString()));
+          test.completeNow();
+        }));
+      }
     ));
   }
 
-  @Test(timeout = 30_000)
-  public void evalMultiKey(TestContext should) {
-    final Async test = should.async();
-
+  @Test
+  public void evalMultiKey(VertxTestContext test) {
     final String key1 = "{hash_tag}.some-key";
     final String argv1 = "some-value";
     final String key2 = "{hash_tag}.other-key";
     final String argv2 = "other-value";
 
-    Redis.createClient(rule.vertx(), options).connect().onComplete(should.asyncAssertSuccess(cluster -> cluster.send(cmd(EVAL).arg("local r1 = redis.call('SET', KEYS[1], ARGV[1]) \n" +
-        "local r2 = redis.call('SET', KEYS[2], ARGV[2]) \n" +
-        "return {r1, r2}").arg(2).arg(key1).arg(key2).arg(argv1).arg(argv2)).onComplete(should.asyncAssertSuccess(response -> {
-        should.assertEquals(2, response.size());
-        response.forEach(r -> should.assertEquals("OK", r.toString()));
-        test.complete();
-      }))
+    Redis.createClient(context.vertx(), options).connect().onComplete(test.succeeding(conn -> {
+        conn.send(cmd(EVAL).arg("local r1 = redis.call('SET', KEYS[1], ARGV[1]) \n" +
+                                "local r2 = redis.call('SET', KEYS[2], ARGV[2]) \n" +
+                                "return {r1, r2}").arg(2).arg(key1).arg(key2).arg(argv1).arg(argv2))
+          .onComplete(test.succeeding(response -> {
+            assertEquals(2, response.size());
+            response.forEach(r -> assertEquals("OK", r.toString()));
+            test.completeNow();
+          }));
+      }
     ));
   }
 
-  @Test(timeout = 30_000)
-  public void evalMultiKeyDifferentSlots(TestContext should) {
-    final Async test = should.async();
-
+  @Test
+  public void evalMultiKeyDifferentSlots(VertxTestContext test) {
     final String key1 = "{hash_tag}.some-key";
     final String argv1 = "some-value";
     final String key2 = "{other_hash_tag}.other-key";
     final String argv2 = "other-value";
 
-    Redis.createClient(rule.vertx(), options).connect().onComplete(should.asyncAssertSuccess(cluster -> cluster.send(cmd(EVAL).arg("local r1 = redis.call('SET', KEYS[1], ARGV[1]) \n" +
-        "local r2 = redis.call('SET', KEYS[2], ARGV[2]) \n" +
-        "return {r1, r2}").arg(2).arg(key1).arg(key2).arg(argv1).arg(argv2)).onComplete(should.asyncAssertFailure(throwable -> {
-        should.assertTrue(throwable.getMessage().startsWith("Keys of command or batch"));
-        test.complete();
-      }))
+    Redis.createClient(context.vertx(), options).connect().onComplete(test.succeeding(conn -> {
+        conn.send(cmd(EVAL).arg("local r1 = redis.call('SET', KEYS[1], ARGV[1]) \n" +
+                                "local r2 = redis.call('SET', KEYS[2], ARGV[2]) \n" +
+                                "return {r1, r2}").arg(2).arg(key1).arg(key2).arg(argv1).arg(argv2))
+          .onComplete(test.failing(err -> {
+            assertTrue(err.getMessage().startsWith("Keys of command or batch"));
+            test.completeNow();
+          }));
+      }
     ));
   }
 
-  @Test(timeout = 30_000)
-  public void evalSingleKeyDifferentSlotsBatch(TestContext should) {
-    final Async test = should.async();
-
+  @Test
+  public void evalSingleKeyDifferentSlotsBatch(VertxTestContext test) {
     final String argv = "some-value";
 
     final List<Request> cmdList = new ArrayList<>();
     cmdList.add(cmd(EVAL).arg("return redis.call('SET', KEYS[1], ARGV[1])").arg(1).arg("{hash_tag}.some-key").arg(argv));
     cmdList.add(cmd(EVAL).arg("return redis.call('SET', KEYS[1], ARGV[1])").arg(1).arg("{other_hash_tag}.some-key").arg(argv));
-    Redis.createClient(rule.vertx(), options).connect().onComplete(should.asyncAssertSuccess(cluster -> cluster.batch(cmdList).onComplete(should.asyncAssertFailure(throwable -> {
-        should.assertTrue(throwable.getMessage().startsWith("Keys of command or batch"));
-        test.complete();
-      }))
+    Redis.createClient(context.vertx(), options).connect().onComplete(test.succeeding(conn -> {
+        conn.batch(cmdList).onComplete(test.failing(err -> {
+          assertTrue(err.getMessage().startsWith("Keys of command or batch"));
+          test.completeNow();
+        }));
+      }
     ));
   }
 
   /**
    * Wait must run every time against a master node.
    */
-  @Test(timeout = 30_000)
-  public void setAndWait(TestContext should) {
+  @Test
+  public void setAndWait(VertxTestContext test) {
     final int runs = 10;
-    final Async test = should.async(runs);
 
-    Redis.createClient(rule.vertx(), options).connect().onComplete(should.asyncAssertSuccess(cluster -> {
+    Checkpoint checkpoint = test.checkpoint(runs);
+
+    Redis.createClient(context.vertx(), options).connect().onComplete(test.succeeding(conn -> {
         for (int i = 0; i < runs; i++) {
-          cluster.send(cmd(SET).arg("key").arg("value")).onComplete(should.asyncAssertSuccess(setResponse -> {
-            should.assertEquals("OK", setResponse.toString().toUpperCase());
+          conn.send(cmd(SET).arg("key").arg("value")).onComplete(test.succeeding(setResponse -> {
+            assertEquals("OK", setResponse.toString().toUpperCase());
 
-            cluster.send(cmd(WAIT).arg(1).arg(2000)).onComplete(should.asyncAssertSuccess(waitResponse -> {
-              should.assertEquals(1, waitResponse.toInteger());
-              test.countDown();
+            conn.send(cmd(WAIT).arg(1).arg(2000)).onComplete(test.succeeding(waitResponse -> {
+              assertEquals(1, waitResponse.toInteger());
+              checkpoint.flag();
             }));
           }));
         }
@@ -1093,51 +880,47 @@ public class RedisClusterTest {
     ));
   }
 
-  @Test(timeout = 30_000)
-  public void setAndWaitBatch(TestContext should) {
+  @Test
+  public void setAndWaitBatch(VertxTestContext test) {
     final int runs = 10;
-    final Async test = should.async(runs);
+
+    Checkpoint checkpoint = test.checkpoint(runs);
 
     final List<Request> cmdList = new ArrayList<>();
     cmdList.add(cmd(SET).arg("key").arg("value"));
     cmdList.add(cmd(WAIT).arg(1).arg(2000));
-    Redis.createClient(rule.vertx(), options).connect().onComplete(should.asyncAssertSuccess(cluster -> {
+    Redis.createClient(context.vertx(), options).connect().onComplete(test.succeeding(conn -> {
         for (int i = 0; i < runs; i++) {
-          cluster.batch(cmdList).onComplete(should.asyncAssertSuccess(responses -> {
-            should.assertEquals(2, responses.size());
+          conn.batch(cmdList).onComplete(test.succeeding(responses -> {
+            assertEquals(2, responses.size());
             Response setResponse = responses.get(0);
-            should.assertEquals("OK", setResponse.toString().toUpperCase());
+            assertEquals("OK", setResponse.toString().toUpperCase());
             Response waitResponse = responses.get(1);
-            should.assertEquals(1, waitResponse.toInteger());
+            assertEquals(1, waitResponse.toInteger());
 
-            test.countDown();
+            checkpoint.flag();
           }));
         }
       }
     ));
   }
 
-  @Test(timeout = 30_000)
-  public void setAndWaitEmptyBatch(TestContext should) {
-    final Async test = should.async();
-
-    Redis.createClient(rule.vertx(), options).connect().onComplete(should.asyncAssertSuccess(cluster -> {
-        cluster.batch(Collections.emptyList()).onComplete(should.asyncAssertSuccess(responses -> {
-          should.assertEquals(0, responses.size());
-          test.countDown();
+  @Test
+  public void setAndWaitEmptyBatch(VertxTestContext test) {
+    Redis.createClient(context.vertx(), options).connect().onComplete(test.succeeding(conn -> {
+        conn.batch(List.of()).onComplete(test.succeeding(responses -> {
+          assertEquals(0, responses.size());
+          test.completeNow();
         }));
       }
     ));
   }
 
-  @Test(timeout = 30_000)
-  @SuppressWarnings("unchecked")
-  public void batchSameSlotGroupByMultipleSlotsCommands(TestContext should) {
-    final Async test = should.async();
-
-    Redis.createClient(rule.vertx(), options)
+  @Test
+  public void batchSameSlotGroupByMultipleSlotsCommands(VertxTestContext test) {
+    Redis.createClient(context.vertx(), options)
       .connect()
-      .onComplete(should.asyncAssertSuccess(conn -> {
+      .onComplete(test.succeeding(conn -> {
         io.vertx.redis.client.RedisCluster cluster = io.vertx.redis.client.RedisCluster.create(conn);
 
         List<Request> commands = new ArrayList<>();
@@ -1148,28 +931,34 @@ public class RedisClusterTest {
         }
 
         cluster.groupByNodes(commands)
-          .onComplete(should.asyncAssertSuccess(groupedCommands -> {
+          .onComplete(test.succeeding(groupedCommands -> {
             List<Future<List<Response>>> futures = new ArrayList<>();
             for (List<Request> commandGroup : groupedCommands.getKeyed()) {
               futures.add(conn.batch(commandGroup));
             }
             Future.all(futures)
-              .onComplete(should.asyncAssertSuccess(responses -> {
-                should.assertEquals(groupedCommands.getKeyed().stream().map(List::size).reduce(0, Integer::sum),
-                  responses.result().list().stream().map(item -> ((List<Request>) item).size()).reduce(0, Integer::sum));
-                test.complete();
+              .onComplete(test.succeeding(responses -> {
+                assertEquals(
+                  groupedCommands.getKeyed()
+                    .stream()
+                    .map(List::size)
+                    .reduce(0, Integer::sum),
+                  responses.result()
+                    .list()
+                    .stream()
+                    .map(item -> ((List<Request>) item).size())
+                    .reduce(0, Integer::sum));
+                test.completeNow();
               }));
           }));
       }));
   }
 
-  @Test(timeout = 30_000)
-  public void batchSameSlotsCommands(TestContext should) {
-    final Async test = should.async();
-
-    Redis.createClient(rule.vertx(), options)
+  @Test
+  public void batchSameSlotsCommands(VertxTestContext test) {
+    Redis.createClient(context.vertx(), options)
       .connect()
-      .onComplete(should.asyncAssertSuccess(conn -> {
+      .onComplete(test.succeeding(conn -> {
         io.vertx.redis.client.RedisCluster cluster = io.vertx.redis.client.RedisCluster.create(conn);
 
         List<Request> commands = new ArrayList<>();
@@ -1180,105 +969,83 @@ public class RedisClusterTest {
         }
 
         cluster.groupByNodes(commands)
-          .onComplete(should.asyncAssertSuccess(groupedCommands -> {
+          .onComplete(test.succeeding(groupedCommands -> {
             List<Request> commandGroup = groupedCommands.getKeyed().iterator().next();
 
             conn.batch(commandGroup)
-              .onComplete(should.asyncAssertSuccess(responses -> {
-                should.assertEquals(commandGroup.size(), responses.size());
-                test.complete();
+              .onComplete(test.succeeding(responses -> {
+                assertEquals(commandGroup.size(), responses.size());
+                test.completeNow();
               }));
           }));
       }));
   }
 
-  @Test(timeout = 30_000)
-  public void groupByNodesCrossSlotFailure(TestContext test) {
-    Async async = test.async();
-
-    Redis.createClient(rule.vertx(), options)
+  @Test
+  public void groupByNodesCrossSlotFailure(VertxTestContext test) {
+    Redis.createClient(context.vertx(), options)
       .connect()
-      .onComplete(test.asyncAssertSuccess(conn -> {
+      .onComplete(test.succeeding(conn -> {
         io.vertx.redis.client.RedisCluster cluster = io.vertx.redis.client.RedisCluster.create(conn);
 
         List<Request> commands = Collections.singletonList(cmd(DEL).arg("key1").arg("key2").arg("key3"));
 
         cluster.groupByNodes(commands)
-          .onComplete(test.asyncAssertFailure(err -> {
-            test.assertTrue(err.getMessage().contains("CROSSSLOT"));
-            async.complete();
+          .onComplete(test.failing(err -> {
+            err.getMessage().contains("CROSSSLOT");
+            test.completeNow();
           }));
       }));
   }
 
-  @Test(timeout = 30_000)
-  public void clusterInfoReturnsVerbatimString(TestContext should) {
-    final Async test = should.async();
-
-    Redis.createClient(rule.vertx(), options).connect().onComplete(should.asyncAssertSuccess(cluster -> {
-        cluster.send(cmd(CLUSTER).arg("INFO")).onComplete(should.asyncAssertSuccess(response -> {
-          should.assertEquals("txt", response.format());
-          should.assertTrue(response.toString().startsWith("cluster_state:ok"));
-          test.complete();
+  @Test
+  public void clusterInfoReturnsVerbatimString(VertxTestContext test) {
+    Redis.createClient(context.vertx(), options).connect().onComplete(test.succeeding(conn -> {
+        conn.send(cmd(CLUSTER).arg("INFO")).onComplete(test.succeeding(response -> {
+          assertEquals("txt", response.format());
+          assertTrue(response.toString().startsWith("cluster_state:ok"));
+          test.completeNow();
         }));
       }
     ));
   }
 
-  @Test(timeout = 30_000)
-  public void testUnsupportedCommand(TestContext should) {
-    final Async test = should.async();
+  @Test
+  public void testUnsupportedCommand(VertxTestContext test) {
+    client.connect().onComplete(test.succeeding(conn -> {
+      conn.exceptionHandler(test::failNow);
 
-    client
-      .connect().onComplete(onCreate -> {
-        should.assertTrue(onCreate.succeeded());
-
-        final RedisConnection cluster = onCreate.result();
-        cluster.exceptionHandler(should::fail);
-
-        cluster.send(cmd(WAIT).arg(1).arg(0)).onComplete(hset1 -> {
-          should.assertTrue(hset1.succeeded());
-          System.out.println(hset1.result());
-          test.complete();
-        });
-      });
+      conn.send(cmd(WAIT).arg(1).arg(0)).onComplete(test.succeedingThenComplete());
+    }));
   }
 
   @Test
-  public void testCommandWithoutReadOrWrite(TestContext should) {
-    final Async test = should.async();
+  public void testCommandWithoutReadOrWrite(VertxTestContext test) {
+    client.connect().onComplete(test.succeeding(conn -> {
+      conn.exceptionHandler(test::failNow);
 
-    client
-      .connect().onComplete(onCreate -> {
-        should.assertTrue(onCreate.succeeded());
-
-        final RedisConnection cluster = onCreate.result();
-        cluster.exceptionHandler(should::fail);
-
-        cluster.send(cmd(ACL, "users")).onComplete(aclUsers -> {
-          should.assertTrue(aclUsers.succeeded());
-          should.assertEquals(1, aclUsers.result().size());
-          test.complete();
-        });
-      });
+      conn.send(cmd(ACL, "users")).onComplete(test.succeeding(aclUsers -> {
+        assertEquals(1, aclUsers.size());
+        test.completeNow();
+      }));
+    }));
   }
 
   @Test
-  public void preservesContext(TestContext should) {
-    PreservesContext.sendWithoutConnect(client, should);
-    PreservesContext.batchWithoutConnect(client, should);
-    PreservesContext.connect(client, should);
-    PreservesContext.connectThenSend(client, should);
-    PreservesContext.connectThenBatch(client, should);
+  public void preservesContext(VertxTestContext test) {
+    PreservesContext.sendWithoutConnect(client, test);
+    PreservesContext.batchWithoutConnect(client, test);
+    PreservesContext.connect(client, test);
+    PreservesContext.connectThenSend(client, test);
+    PreservesContext.connectThenBatch(client, test);
   }
 
   @Test
-  public void testWriteToMasterReadFromReplica(TestContext should) {
-    final Async test = should.async();
+  public void testWriteToMasterReadFromReplica(VertxTestContext test) {
     final String key = randomKey();
 
     Redis.createClient(
-        rule.vertx(),
+        context.vertx(),
         new RedisOptions()
           .setType(RedisClientType.CLUSTER)
           .setUseReplicas(RedisReplicas.ALWAYS)
@@ -1290,51 +1057,45 @@ public class RedisClusterTest {
           .addConnectionString(redis.getRedisNode5Uri())
           .setMaxPoolSize(8)
           .setMaxPoolWaiting(16))
-      .connect().onComplete(should.asyncAssertSuccess(conn -> {
+      .connect().onComplete(test.succeeding(conn -> {
         conn.send(Request.cmd(SET).arg(key).arg("foobar"))
-          .compose(ignored -> retryUntilSuccess(rule.vertx(), () -> {
+          .compose(ignored -> retryUntilSuccess(context.vertx(), () -> {
             return conn.send(Request.cmd(GET).arg(key));
           }, 10))
-          .onComplete(should.asyncAssertSuccess(result -> {
-            should.assertEquals("foobar", result.toString());
-            test.complete();
+          .onComplete(test.succeeding(result -> {
+            assertEquals("foobar", result.toString());
+            test.completeNow();
           }));
       }));
   }
 
   @Test
-  public void testRedisClusterOnAllNodes(TestContext test) {
-    Async async = test.async();
+  public void testRedisClusterOnAllNodes(VertxTestContext test) {
+    client.connect().onComplete(test.succeeding(conn -> {
+      io.vertx.redis.client.RedisCluster cluster = io.vertx.redis.client.RedisCluster.create(conn);
+      cluster.onAllMasterNodes(cmd(FLUSHDB))
+        .compose(result -> {
+          for (Response response : result) {
+            assertEquals(ResponseType.SIMPLE, response.type());
+          }
 
-    client.connect()
-      .compose(conn -> {
-        io.vertx.redis.client.RedisCluster cluster = io.vertx.redis.client.RedisCluster.create(conn);
-        return cluster.onAllMasterNodes(cmd(FLUSHDB))
-          .compose(result -> {
-            for (Response response : result) {
-              test.assertEquals(ResponseType.SIMPLE, response.type());
+          return conn.send(cmd(SET).arg("key1").arg("value1"));
+        }).compose(ignored -> {
+          return conn.send(cmd(SET).arg("key2").arg("value2"));
+        }).compose(ignored -> {
+          return conn.send(cmd(SET).arg("key3").arg("value3"));
+        }).compose(ignored -> {
+          return cluster.onAllMasterNodes(cmd(KEYS).arg("*"));
+        }).onComplete(test.succeeding(responses -> {
+          Set<String> keys = new HashSet<>();
+          for (Response response : responses) {
+            for (Response item : response) {
+              keys.add(item.toString());
             }
-
-            return conn.send(cmd(SET).arg("key1").arg("value1"));
-          }).compose(ignored -> {
-            return conn.send(cmd(SET).arg("key2").arg("value2"));
-          }).compose(ignored -> {
-            return conn.send(cmd(SET).arg("key3").arg("value3"));
-          }).compose(ignored -> {
-            return cluster.onAllMasterNodes(cmd(KEYS).arg("*"));
-          }).compose(responses -> {
-            Set<String> keys = new HashSet<>();
-            for (Response response : responses) {
-              for (Response item : response) {
-                keys.add(item.toString());
-              }
-            }
-            test.assertEquals(new HashSet<>(Arrays.asList("key1", "key2", "key3")), keys);
-            return Future.succeededFuture();
-          });
-      })
-      .onComplete(test.asyncAssertSuccess(ignored -> {
-        async.complete();
-      }));
+          }
+          assertEquals(new HashSet<>(Arrays.asList("key1", "key2", "key3")), keys);
+          test.completeNow();
+        }));
+    }));
   }
 }

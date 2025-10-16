@@ -1,31 +1,35 @@
 package io.vertx.tests.redis.client;
 
+import io.vertx.core.Future;
 import io.vertx.core.Vertx;
 import io.vertx.core.VertxOptions;
 import io.vertx.core.spi.VertxMetricsFactory;
 import io.vertx.core.spi.metrics.PoolMetrics;
 import io.vertx.core.spi.metrics.VertxMetrics;
-import io.vertx.ext.unit.Async;
-import io.vertx.ext.unit.TestContext;
-import io.vertx.ext.unit.junit.RunTestOnContext;
-import io.vertx.ext.unit.junit.VertxUnitRunner;
+import io.vertx.junit5.RunTestOnContext;
+import io.vertx.junit5.VertxExtension;
+import io.vertx.junit5.VertxTestContext;
 import io.vertx.redis.client.Command;
 import io.vertx.redis.client.Redis;
-import io.vertx.redis.client.RedisConnection;
 import io.vertx.redis.client.RedisOptions;
 import io.vertx.redis.client.Request;
-import io.vertx.tests.redis.containers.RedisStandalone;
 import io.vertx.test.fakemetrics.FakePoolMetrics;
-import org.junit.ClassRule;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import io.vertx.tests.redis.containers.RedisStandalone;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.api.extension.RegisterExtension;
+import org.testcontainers.junit.jupiter.Container;
+import org.testcontainers.junit.jupiter.Testcontainers;
 
 import java.util.Collections;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicReference;
 
-@RunWith(VertxUnitRunner.class)
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+
+@ExtendWith(VertxExtension.class)
+@Testcontainers
 public class RedisPoolMetricsTest {
 
   private static final AtomicReference<String> POOL_NAME = new AtomicReference<>();
@@ -51,98 +55,80 @@ public class RedisPoolMetricsTest {
       .build();
   }
 
-  @ClassRule
+  @Container
   public static final RedisStandalone redis = new RedisStandalone();
 
-  @Rule
-  public final RunTestOnContext rule = new RunTestOnContext(RedisPoolMetricsTest::getVertx);
+  @RegisterExtension
+  public final RunTestOnContext context = new RunTestOnContext(() -> Future.succeededFuture(getVertx()));
 
   private FakePoolMetrics getMetrics() {
     return FakePoolMetrics.getMetrics(POOL_NAME.get());
   }
 
   @Test
-  public void simpleTest(TestContext should) {
-    final Async test = should.async();
-
-    Redis client = Redis.createClient(rule.vertx(), new RedisOptions().setConnectionString(redis.getRedisUri()));
+  public void simpleTest(VertxTestContext test) {
+    Redis client = Redis.createClient(context.vertx(), new RedisOptions().setConnectionString(redis.getRedisUri()));
 
     client
-      .connect().onComplete(create -> {
-        should.assertTrue(create.succeeded());
+      .connect().onComplete(test.succeeding(conn -> {
+        assertEquals(0, getMetrics().pending());
+        assertEquals(1, getMetrics().inUse());
 
-        should.assertEquals(0, getMetrics().pending());
-        should.assertEquals(1, getMetrics().inUse());
-
-        final RedisConnection redis = create.result();
-
-        redis.exceptionHandler(ex -> {
-
+        conn.exceptionHandler(ex -> {
         });
 
-        redis.send(Request.cmd(Command.PING)).onComplete(send -> {
-          should.assertTrue(send.succeeded());
-          should.assertNotNull(send.result());
+        conn.send(Request.cmd(Command.PING)).onComplete(test.succeeding(send -> {
+          assertNotNull(send);
+          assertEquals("PONG", send.toString());
 
-          should.assertEquals("PONG", send.result().toString());
+          conn.close();
 
-          redis.close();
+          assertEquals(0, getMetrics().pending());
+          assertEquals(0, getMetrics().inUse());
 
-          should.assertEquals(0, getMetrics().pending());
-          should.assertEquals(0, getMetrics().inUse());
-
-          client.close();
-          test.complete();
-        });
-      });
-  }
-
-  @Test
-  public void taintedConnection(TestContext test) {
-    Async async = test.async();
-
-    Redis client = Redis.createClient(rule.vertx(), new RedisOptions().setConnectionString(redis.getRedisUri()));
-    client.connect()
-      .compose(conn -> {
-        test.assertEquals(0, getMetrics().pending());
-        test.assertEquals(1, getMetrics().inUse());
-
-        return conn.send(Request.cmd(Command.SELECT).arg(7)) // taints the connection
-          .compose(response -> {
-            test.assertEquals(0, getMetrics().pending());
-            test.assertEquals(1, getMetrics().inUse());
-
-            return conn.close();
-          }).onComplete(test.asyncAssertSuccess(ignored -> {
-            test.assertEquals(0, getMetrics().pending());
-            test.assertEquals(0, getMetrics().inUse());
-          }));
-      })
-      .compose(ignored -> client.close())
-      .onComplete(test.asyncAssertSuccess(ignored -> {
-        async.complete();
+          client.close().onComplete(test.succeedingThenComplete());
+        }));
       }));
   }
 
   @Test
-  public void testLifecycle(TestContext should) {
-    final Async test = should.async();
-
-    Map<String, FakePoolMetrics> metricsMap = FakePoolMetrics.getMetrics();
-    should.assertEquals(Collections.emptySet(), metricsMap.keySet());
-    Redis client = Redis.createClient(rule.vertx(), new RedisOptions().setConnectionString(redis.getRedisUri()));
-    should.assertEquals(1, metricsMap.size());
+  public void taintedConnection(VertxTestContext test) {
+    Redis client = Redis.createClient(context.vertx(), new RedisOptions().setConnectionString(redis.getRedisUri()));
     client.connect()
-      .onFailure(should::fail)
-      .onSuccess(conn -> {
-        should.assertEquals(1, metricsMap.size());
-        should.assertEquals(6, getMetrics().maxSize());
-        conn.close();
-        should.assertEquals(1, metricsMap.size());
-        client.close();
-        should.assertEquals(0, metricsMap.size());
-        test.complete();
-      });
+      .compose(conn -> {
+        assertEquals(0, getMetrics().pending());
+        assertEquals(1, getMetrics().inUse());
+
+        return conn.send(Request.cmd(Command.SELECT).arg(7)) // taints the connection
+          .compose(response -> {
+            assertEquals(0, getMetrics().pending());
+            assertEquals(1, getMetrics().inUse());
+
+            return conn.close();
+          }).onComplete(test.succeeding(ignored -> {
+            assertEquals(0, getMetrics().pending());
+            assertEquals(0, getMetrics().inUse());
+          }));
+      })
+      .compose(ignored -> client.close())
+      .onComplete(test.succeedingThenComplete());
   }
 
+  @Test
+  public void testLifecycle(VertxTestContext test) {
+    Map<String, FakePoolMetrics> metricsMap = FakePoolMetrics.getMetrics();
+    assertEquals(Collections.emptySet(), metricsMap.keySet());
+    Redis client = Redis.createClient(context.vertx(), new RedisOptions().setConnectionString(redis.getRedisUri()));
+    assertEquals(1, metricsMap.size());
+    client.connect()
+      .onComplete(test.succeeding(conn -> {
+        assertEquals(1, metricsMap.size());
+        assertEquals(6, getMetrics().maxSize());
+        conn.close();
+        assertEquals(1, metricsMap.size());
+        client.close();
+        assertEquals(0, metricsMap.size());
+        test.completeNow();
+      }));
+  }
 }

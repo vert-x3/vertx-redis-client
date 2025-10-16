@@ -1,9 +1,9 @@
 package io.vertx.tests.redis.client;
 
-import io.vertx.ext.unit.Async;
-import io.vertx.ext.unit.TestContext;
-import io.vertx.ext.unit.junit.RunTestOnContext;
-import io.vertx.ext.unit.junit.VertxUnitRunner;
+import io.vertx.junit5.Checkpoint;
+import io.vertx.junit5.RunTestOnContext;
+import io.vertx.junit5.VertxExtension;
+import io.vertx.junit5.VertxTestContext;
 import io.vertx.redis.client.Command;
 import io.vertx.redis.client.EventBusHandler;
 import io.vertx.redis.client.Redis;
@@ -11,12 +11,13 @@ import io.vertx.redis.client.RedisConnection;
 import io.vertx.redis.client.RedisOptions;
 import io.vertx.redis.client.Request;
 import io.vertx.tests.redis.containers.RedisStandalone;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.ClassRule;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.api.extension.RegisterExtension;
+import org.testcontainers.junit.jupiter.Container;
+import org.testcontainers.junit.jupiter.Testcontainers;
 
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -26,15 +27,17 @@ import static io.vertx.redis.client.Command.PUBLISH;
 import static io.vertx.redis.client.Command.SUBSCRIBE;
 import static io.vertx.redis.client.Request.cmd;
 import static io.vertx.tests.redis.client.TestUtils.executeWhenConditionSatisfied;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
-@RunWith(VertxUnitRunner.class)
+@ExtendWith(VertxExtension.class)
+@Testcontainers
 public class RedisPubSubTest {
 
-  @ClassRule
+  @Container
   public static final RedisStandalone redis = new RedisStandalone();
 
-  @Rule
-  public final RunTestOnContext rule = new RunTestOnContext();
+  @RegisterExtension
+  public final RunTestOnContext context = new RunTestOnContext();
 
   private Redis redisPublish;
   private Redis redisSubscribe;
@@ -43,66 +46,71 @@ public class RedisPubSubTest {
   private RedisConnection subConn;
 
 
-  @Before
-  public void before(TestContext test) throws Exception {
-    Async async = test.async();
+  @BeforeEach
+  public void before(VertxTestContext test) throws Exception {
     RedisOptions options = new RedisOptions().setConnectionString(redis.getRedisUri());
 
-    redisPublish = Redis.createClient(rule.vertx(), options);
-    redisPublish.connect().onComplete(test.asyncAssertSuccess(connectPub -> {
+    redisPublish = Redis.createClient(context.vertx(), options);
+    redisPublish.connect().onComplete(test.succeeding(connectPub -> {
       pubConn = connectPub;
 
-      redisSubscribe = Redis.createClient(rule.vertx(), options);
-      redisSubscribe.connect().onComplete(test.asyncAssertSuccess(connectSub -> {
+      redisSubscribe = Redis.createClient(context.vertx(), options);
+      redisSubscribe.connect().onComplete(test.succeeding(connectSub -> {
         subConn = connectSub;
 
-        async.complete();
+        test.completeNow();
       }));
     }));
   }
 
-  @After
+  @AfterEach
   public void after() throws Exception {
     redisPublish.close();
     redisSubscribe.close();
   }
 
   @Test
-  public void publishSubscribe_withHandler(TestContext test) {
-    Async async = test.async(2);
+  public void publishSubscribe_withHandler(VertxTestContext test) {
+    Checkpoint checkpoint = test.checkpoint(2);
+    AtomicInteger counter = new AtomicInteger(0);
 
-    rule.vertx().eventBus().consumer("io.vertx.redis.news", msg -> async.countDown());
+    context.vertx().eventBus().consumer("io.vertx.redis.news", msg -> {
+      checkpoint.flag();
+      counter.incrementAndGet();
+    });
 
-    subConn.handler(EventBusHandler.create(rule.vertx()));
-    subConn.send(Request.cmd(Command.SUBSCRIBE).arg("news")).onComplete(test.asyncAssertSuccess(subscribe -> {
-      executeWhenConditionSatisfied(rule.vertx(), () -> async.count() == 1, () -> {
-        pubConn.send(Request.cmd(Command.PUBLISH).arg("news").arg("foo")).onComplete(test.asyncAssertSuccess(publish -> {
-          test.assertEquals(1, publish.toInteger());
+    subConn.handler(EventBusHandler.create(context.vertx()));
+    subConn.send(Request.cmd(Command.SUBSCRIBE).arg("news")).onComplete(test.succeeding(subscribe -> {
+      executeWhenConditionSatisfied(context.vertx(), () -> counter.get() == 1, () -> {
+        pubConn.send(Request.cmd(Command.PUBLISH).arg("news").arg("foo")).onComplete(test.succeeding(publish -> {
+          assertEquals(1, publish.toInteger());
         }));
       });
     }));
   }
 
   @Test
-  public void publishPSubscribe_withHandler(TestContext test) {
-    Async async = test.async(2);
+  public void publishPSubscribe_withHandler(VertxTestContext test) {
+    Checkpoint checkpoint = test.checkpoint(2);
+    AtomicInteger counter = new AtomicInteger(0);
 
-    rule.vertx().eventBus().consumer("io.vertx.redis.new*", msg -> async.countDown());
+    context.vertx().eventBus().consumer("io.vertx.redis.new*", msg -> {
+      checkpoint.flag();
+      counter.incrementAndGet();
+    });
 
-    subConn.handler(EventBusHandler.create(rule.vertx()));
-    subConn.send(Request.cmd(Command.PSUBSCRIBE).arg("new*")).onComplete(test.asyncAssertSuccess(subscribe -> {
-      executeWhenConditionSatisfied(rule.vertx(), () -> async.count() == 1, () -> {
-        pubConn.send(Request.cmd(Command.PUBLISH).arg("news").arg("foo")).onComplete(test.asyncAssertSuccess(publish -> {
-          test.assertEquals(1, publish.toInteger());
+    subConn.handler(EventBusHandler.create(context.vertx()));
+    subConn.send(Request.cmd(Command.PSUBSCRIBE).arg("new*")).onComplete(test.succeeding(subscribe -> {
+      executeWhenConditionSatisfied(context.vertx(), () -> counter.get() == 1, () -> {
+        pubConn.send(Request.cmd(Command.PUBLISH).arg("news").arg("foo")).onComplete(test.succeeding(publish -> {
+          assertEquals(1, publish.toInteger());
         }));
       });
     }));
   }
 
   @Test
-  public void publishSubscribe_naive(TestContext test) {
-    Async async = test.async();
-
+  public void publishSubscribe_naive(VertxTestContext test) {
     AtomicInteger subscribeCnt = new AtomicInteger(0);
     AtomicInteger messageCnt = new AtomicInteger(0);
 
@@ -111,35 +119,33 @@ public class RedisPubSubTest {
         case PUSH:
         case MULTI:
           if (message.get(0).toString().equals("message")) {
-            test.assertEquals(3, message.size());
+            assertEquals(3, message.size());
             messageCnt.incrementAndGet();
           }
           if (message.get(0).toString().equals("subscribe")) {
-            test.assertEquals(3, message.size());
+            assertEquals(3, message.size());
             subscribeCnt.incrementAndGet();
           }
           if (subscribeCnt.get() + messageCnt.get() == 2) {
-            async.complete();
+            test.completeNow();
           }
           break;
         default:
-          test.fail();
+          test.failNow("Unknown message type: " + message.type());
       }
     });
 
-    subConn.send(cmd(SUBSCRIBE).arg("mychannel")).onComplete(test.asyncAssertSuccess(subscribe -> {
-      executeWhenConditionSatisfied(rule.vertx(), () -> subscribeCnt.get() == 1, () -> {
-        pubConn.send(cmd(PUBLISH).arg("mychannel").arg(123456)).onComplete(test.asyncAssertSuccess(publish -> {
-          test.assertEquals(1, publish.toInteger());
+    subConn.send(cmd(SUBSCRIBE).arg("mychannel")).onComplete(test.succeeding(subscribe -> {
+      executeWhenConditionSatisfied(context.vertx(), () -> subscribeCnt.get() == 1, () -> {
+        pubConn.send(cmd(PUBLISH).arg("mychannel").arg(123456)).onComplete(test.succeeding(publish -> {
+          assertEquals(1, publish.toInteger());
         }));
       });
     }));
   }
 
   @Test
-  public void publishPSubscribe_naive(TestContext test) {
-    Async async = test.async();
-
+  public void publishPSubscribe_naive(VertxTestContext test) {
     AtomicInteger psubscribeCnt = new AtomicInteger(0);
     AtomicInteger pmessageCnt = new AtomicInteger(0);
 
@@ -148,19 +154,19 @@ public class RedisPubSubTest {
         case PUSH:
         case MULTI:
           if (message.get(0).toString().equals("pmessage")) {
-            test.assertEquals(4, message.size());
+            assertEquals(4, message.size());
             pmessageCnt.incrementAndGet();
           }
           if (message.get(0).toString().equals("psubscribe")) {
-            test.assertEquals(3, message.size());
+            assertEquals(3, message.size());
             psubscribeCnt.incrementAndGet();
           }
           if (psubscribeCnt.get() + pmessageCnt.get() == 12) {
-            async.complete();
+            test.completeNow();
           }
           break;
         default:
-          test.fail();
+          test.failNow("Unknown message type: " + message.type());
       }
     });
 
@@ -170,11 +176,11 @@ public class RedisPubSubTest {
     Request psub = cmd(PSUBSCRIBE);
     patterns.forEach(psub::arg);
 
-    subConn.send(psub).onComplete(test.asyncAssertSuccess(subscribe -> {
-      executeWhenConditionSatisfied(rule.vertx(), () -> psubscribeCnt.get() == 6, () -> {
+    subConn.send(psub).onComplete(test.succeeding(subscribe -> {
+      executeWhenConditionSatisfied(context.vertx(), () -> psubscribeCnt.get() == 6, () -> {
         for (String ch : matchingChannels) {
-          pubConn.send(cmd(PUBLISH).arg(ch).arg(System.nanoTime())).onComplete(test.asyncAssertSuccess(publish -> {
-            test.assertEquals(1, publish.toInteger());
+          pubConn.send(cmd(PUBLISH).arg(ch).arg(System.nanoTime())).onComplete(test.succeeding(publish -> {
+            assertEquals(1, publish.toInteger());
           }));
         }
       });

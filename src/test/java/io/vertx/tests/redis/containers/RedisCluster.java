@@ -1,16 +1,14 @@
 package io.vertx.tests.redis.containers;
 
-import org.junit.rules.TestRule;
-import org.junit.runner.Description;
-import org.junit.runners.model.Statement;
 import org.testcontainers.containers.FixedHostPortGenericContainer;
 import org.testcontainers.containers.GenericContainer;
 import org.testcontainers.containers.wait.strategy.Wait;
 import org.testcontainers.containers.wait.strategy.WaitAllStrategy;
+import org.testcontainers.lifecycle.Startable;
 
 import java.io.IOException;
 
-public class RedisCluster implements TestRule {
+public class RedisCluster implements Startable {
   private final GenericContainer<?> container = new FixedHostPortGenericContainer<>("quay.io/ladicek/redis-cluster")
     .withFixedExposedPort(7000, 7000)
     .withFixedExposedPort(7001, 7001)
@@ -25,8 +23,13 @@ public class RedisCluster implements TestRule {
       .withStrategy(Wait.forSuccessfulCommand("/cluster-slots-expected-lines.sh 7000 7005 30")));
 
   @Override
-  public Statement apply(Statement base, Description description) {
-    return container.apply(base, description);
+  public void start() {
+    container.start();
+  }
+
+  @Override
+  public void stop() {
+    container.stop();
   }
 
   public String getRedisNode0Uri() {

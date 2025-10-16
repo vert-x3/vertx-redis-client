@@ -1,17 +1,15 @@
 package io.vertx.tests.redis.containers;
 
-import org.junit.rules.TestRule;
-import org.junit.runner.Description;
-import org.junit.runners.model.Statement;
 import org.testcontainers.containers.GenericContainer;
 import org.testcontainers.containers.wait.strategy.LogMessageWaitStrategy;
 import org.testcontainers.images.builder.Transferable;
+import org.testcontainers.lifecycle.Startable;
 
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
 
-public class RedisStandalone implements TestRule {
+public class RedisStandalone implements Startable {
   public static class Builder {
     private String version;
     private String password;
@@ -117,8 +115,13 @@ public class RedisStandalone implements TestRule {
   }
 
   @Override
-  public Statement apply(Statement base, Description description) {
-    return container.apply(base, description);
+  public void start() {
+    container.start();
+  }
+
+  @Override
+  public void stop() {
+    container.stop();
   }
 
   public String getHost() {

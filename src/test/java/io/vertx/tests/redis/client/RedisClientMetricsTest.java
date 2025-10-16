@@ -4,29 +4,34 @@ import io.vertx.core.Vertx;
 import io.vertx.core.net.SocketAddress;
 import io.vertx.core.spi.metrics.ClientMetrics;
 import io.vertx.core.spi.metrics.VertxMetrics;
-import io.vertx.ext.unit.Async;
-import io.vertx.ext.unit.TestContext;
-import io.vertx.ext.unit.junit.VertxUnitRunner;
+import io.vertx.junit5.VertxExtension;
+import io.vertx.junit5.VertxTestContext;
 import io.vertx.redis.client.Command;
 import io.vertx.redis.client.Redis;
 import io.vertx.redis.client.RedisOptions;
 import io.vertx.redis.client.Request;
 import io.vertx.redis.client.impl.CommandImpl;
 import io.vertx.tests.redis.containers.RedisStandalone;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.ClassRule;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.testcontainers.junit.jupiter.Container;
+import org.testcontainers.junit.jupiter.Testcontainers;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
-@RunWith(VertxUnitRunner.class)
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertSame;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
+@ExtendWith(VertxExtension.class)
+@Testcontainers
 public class RedisClientMetricsTest {
-  @ClassRule
+  @Container
   public static final RedisStandalone redis = new RedisStandalone();
 
   Vertx vertx;
@@ -34,7 +39,7 @@ public class RedisClientMetricsTest {
   Redis client;
   String reportedNamespace;
 
-  @Before
+  @BeforeEach
   public void setup() {
     vertx = Vertx.builder()
       .withMetrics(ignored -> new VertxMetrics() {
@@ -48,24 +53,22 @@ public class RedisClientMetricsTest {
     client = Redis.createClient(vertx, new RedisOptions().setConnectionString(redis.getRedisUri()).setMetricsName("the-namespace"));
   }
 
-  @After
-  public void teardown(TestContext test) {
-    vertx.close().onComplete(test.asyncAssertSuccess());
+  @AfterEach
+  public void teardown(VertxTestContext test) {
+    vertx.close().onComplete(test.succeedingThenComplete());
   }
 
   @Test
-  public void success(TestContext test) {
+  public void success(VertxTestContext test) {
     testClientMetrics(test, Request.cmd(Command.PING), true);
   }
 
   @Test
-  public void failure(TestContext test) {
+  public void failure(VertxTestContext test) {
     testClientMetrics(test, Request.cmd(new CommandImpl("NONEXISTING COMMAND", 0, true, false, false)), false);
   }
 
-  private void testClientMetrics(TestContext test, Request request, boolean success) {
-    Async async = test.async();
-
+  private void testClientMetrics(VertxTestContext test, Request request, boolean success) {
     Object metric = new Object();
     List<String> actions = Collections.synchronizedList(new ArrayList<>());
 
@@ -78,40 +81,50 @@ public class RedisClientMetricsTest {
 
       @Override
       public void requestEnd(Object requestMetric, long bytesWritten) {
-        test.assertTrue(requestMetric == metric);
+        test.verify(() -> {
+          assertSame(metric, requestMetric);
+        });
         actions.add("requestEnd");
       }
 
       @Override
       public void responseBegin(Object requestMetric, Object response) {
-        test.assertTrue(requestMetric == metric);
+        test.verify(() -> {
+          assertSame(metric, requestMetric);
+        });
         actions.add("responseBegin");
       }
 
       @Override
       public void responseEnd(Object requestMetric, long bytesRead) {
-        test.assertTrue(requestMetric == metric);
+        test.verify(() -> {
+          assertSame(metric, requestMetric);
+        });
         actions.add("responseEnd");
       }
 
       @Override
       public void requestReset(Object requestMetric) {
-        test.assertTrue(requestMetric == metric);
+        test.verify(() -> {
+          assertSame(metric, requestMetric);
+        });
         actions.add("fail");
       }
     };
 
     vertx.runOnContext(ignored -> {
       client.send(request).onComplete(result -> {
-        if (success) {
-          test.assertTrue(result.succeeded());
-          test.assertEquals(Arrays.asList("requestBegin", "requestEnd", "responseBegin", "responseEnd"), actions);
-        } else {
-          test.assertTrue(result.failed());
-          test.assertEquals(Arrays.asList("requestBegin", "requestEnd", "fail"), actions);
-        }
-        test.assertEquals("the-namespace", reportedNamespace);
-        async.complete();
+        test.verify(() -> {
+          if (success) {
+            assertTrue(result.succeeded());
+            assertEquals(Arrays.asList("requestBegin", "requestEnd", "responseBegin", "responseEnd"), actions);
+          } else {
+            assertTrue(result.failed());
+            assertEquals(Arrays.asList("requestBegin", "requestEnd", "fail"), actions);
+          }
+          assertEquals("the-namespace", reportedNamespace);
+        });
+        test.completeNow();
       });
     });
   }

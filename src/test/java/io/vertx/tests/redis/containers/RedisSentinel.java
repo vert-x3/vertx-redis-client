@@ -1,13 +1,11 @@
 package io.vertx.tests.redis.containers;
 
-import org.junit.rules.TestRule;
-import org.junit.runner.Description;
-import org.junit.runners.model.Statement;
 import org.testcontainers.containers.FixedHostPortGenericContainer;
 import org.testcontainers.containers.GenericContainer;
 import org.testcontainers.containers.wait.strategy.Wait;
+import org.testcontainers.lifecycle.Startable;
 
-public class RedisSentinel implements TestRule {
+public class RedisSentinel implements Startable {
   private final GenericContainer<?> container = new FixedHostPortGenericContainer<>("quay.io/ladicek/redis-replication")
     .withEnv("SENTINEL", "true")
     .withFixedExposedPort(7000, 7000)
@@ -19,8 +17,13 @@ public class RedisSentinel implements TestRule {
     .waitingFor(Wait.forLogMessage(".*\\+slave.*", 6));
 
   @Override
-  public Statement apply(Statement base, Description description) {
-    return container.apply(base, description);
+  public void start() {
+    container.start();
+  }
+
+  @Override
+  public void stop() {
+    container.stop();
   }
 
   public String getRedisMasterUri() {

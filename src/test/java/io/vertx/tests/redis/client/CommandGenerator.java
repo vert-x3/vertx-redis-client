@@ -165,8 +165,8 @@ public class CommandGenerator extends VerticleBase {
               if ("pubsub".equals(flag.toString())) {
                 // we exclude PUBSUB / PUBLISH / SPUBLISH from the flag
                 if ("pubsub".equalsIgnoreCase(commandName)
-                  || "publish".equalsIgnoreCase(commandName)
-                  || "spublish".equalsIgnoreCase(commandName)) {
+                    || "publish".equalsIgnoreCase(commandName)
+                    || "spublish".equalsIgnoreCase(commandName)) {
                   continue;
                 }
                 pubSub = true;

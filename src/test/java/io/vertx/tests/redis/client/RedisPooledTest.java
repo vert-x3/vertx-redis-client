@@ -1,10 +1,10 @@
 package io.vertx.tests.redis.client;
 
 import io.vertx.core.Vertx;
-import io.vertx.ext.unit.Async;
-import io.vertx.ext.unit.TestContext;
-import io.vertx.ext.unit.junit.RunTestOnContext;
-import io.vertx.ext.unit.junit.VertxUnitRunner;
+import io.vertx.junit5.Checkpoint;
+import io.vertx.junit5.RunTestOnContext;
+import io.vertx.junit5.VertxExtension;
+import io.vertx.junit5.VertxTestContext;
 import io.vertx.redis.client.Command;
 import io.vertx.redis.client.Redis;
 import io.vertx.redis.client.RedisAPI;
@@ -12,10 +12,11 @@ import io.vertx.redis.client.RedisOptions;
 import io.vertx.redis.client.Request;
 import io.vertx.redis.client.impl.PooledRedisConnection;
 import io.vertx.tests.redis.containers.RedisStandalone;
-import org.junit.ClassRule;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.api.extension.RegisterExtension;
+import org.testcontainers.junit.jupiter.Container;
+import org.testcontainers.junit.jupiter.Testcontainers;
 
 import java.util.Arrays;
 import java.util.Collections;
@@ -32,133 +33,108 @@ import static io.vertx.redis.client.Command.SET;
 import static io.vertx.redis.client.Command.SUBSCRIBE;
 import static io.vertx.redis.client.Request.cmd;
 import static io.vertx.tests.redis.client.TestUtils.randomKey;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
-@RunWith(VertxUnitRunner.class)
+@ExtendWith(VertxExtension.class)
+@Testcontainers
 public class RedisPooledTest {
 
-  @ClassRule
+  @Container
   public static final RedisStandalone redis = new RedisStandalone();
 
-  @Rule
-  public final RunTestOnContext rule = new RunTestOnContext();
+  @RegisterExtension
+  public final RunTestOnContext context = new RunTestOnContext();
 
   @Test
-  public void simpleTest(TestContext should) {
-    final Async test = should.async();
+  public void simpleTest(VertxTestContext test) {
+    Redis.createClient(context.vertx(), redis.getRedisUri())
+      .send(Request.cmd(Command.PING)).onComplete(test.succeeding(send -> {
+        assertNotNull(send);
 
-    Redis.createClient(rule.vertx(), redis.getRedisUri())
-      .send(Request.cmd(Command.PING)).onComplete(send -> {
-        should.assertTrue(send.succeeded());
-        should.assertNotNull(send.result());
-
-        should.assertEquals("PONG", send.result().toString());
-        test.complete();
-      });
+        assertEquals("PONG", send.toString());
+        test.completeNow();
+      }));
   }
 
   @Test
-  public void emptyStringTest(TestContext should) {
-    final Async test = should.async();
-
-    Redis.createClient(rule.vertx(), redis.getRedisUri())
-      .send(Request.cmd(Command.SET).arg(randomKey()).arg("")).onComplete(send -> {
-        should.assertTrue(send.succeeded());
-        should.assertNotNull(send.result());
-
-        should.assertEquals("OK", send.result().toString());
-        test.complete();
-      });
+  public void emptyStringTest(VertxTestContext test) {
+    Redis.createClient(context.vertx(), redis.getRedisUri())
+      .send(Request.cmd(Command.SET).arg(randomKey()).arg("")).onComplete(test.succeeding(send -> {
+        assertNotNull(send);
+        assertEquals("OK", send.toString());
+        test.completeNow();
+      }));
   }
 
   @Test
-  public void simpleSelectTest(TestContext should) {
-    final Async test = should.async();
-
-    Redis.createClient(rule.vertx(), redis.getRedisUri() + "/0")
-      .send(Request.cmd(Command.PING)).onComplete(send -> {
-        should.assertTrue(send.succeeded());
-        should.assertNotNull(send.result());
-
-        should.assertEquals("PONG", send.result().toString());
-        test.complete();
-      });
+  public void simpleSelectTest(VertxTestContext test) {
+    Redis.createClient(context.vertx(), redis.getRedisUri() + "/0")
+      .send(Request.cmd(Command.PING)).onComplete(test.succeeding(send -> {
+        assertNotNull(send);
+        assertEquals("PONG", send.toString());
+        test.completeNow();
+      }));
   }
 
   @Test
-  public void batchTest(TestContext should) {
-    final Async test = should.async();
-
-    Redis.createClient(rule.vertx(), redis.getRedisUri())
+  public void batchTest(VertxTestContext test) {
+    Redis.createClient(context.vertx(), redis.getRedisUri())
       .batch(Arrays.asList(
         cmd(MULTI),
         cmd(SET).arg("a").arg(3),
         cmd(LPOP).arg("a"),
         cmd(EXEC)
-      )).onComplete(batch -> {
-        should.assertTrue(batch.succeeded());
-        test.complete();
-      });
+      )).onComplete(test.succeedingThenComplete());
   }
 
   @Test
-  public void batchEmptyTest(TestContext should) {
-    final Async test = should.async();
-
-    Redis.createClient(rule.vertx(), redis.getRedisUri())
-      .batch(Collections.emptyList()).onComplete(batch -> {
-        should.assertTrue(batch.succeeded());
-        test.complete();
-      });
+  public void batchEmptyTest(VertxTestContext test) {
+    Redis.createClient(context.vertx(), redis.getRedisUri())
+      .batch(Collections.emptyList()).onComplete(test.succeedingThenComplete());
   }
 
   @Test
-  public void simpleTestAPI(TestContext should) {
-    final Async test = should.async();
+  public void simpleTestAPI(VertxTestContext test) {
+    RedisAPI api = RedisAPI.api(Redis.createClient(context.vertx(), redis.getRedisUri()));
 
-    RedisAPI api = RedisAPI.api(Redis.createClient(rule.vertx(), redis.getRedisUri()));
-
-    api.set(Arrays.asList("key1", "value1")).onComplete(should.asyncAssertSuccess(set -> {
-      should.assertNotNull(set);
-      should.assertEquals("OK", set.toString());
-      test.complete();
+    api.set(Arrays.asList("key1", "value1")).onComplete(test.succeeding(set -> {
+      assertEquals("OK", set.toString());
+      test.completeNow();
     }));
   }
 
   @Test
-  public void simpleStream(TestContext should) {
+  public void simpleStream(VertxTestContext test) {
 
-    final AtomicInteger cnt = new AtomicInteger(5);
-    final Async test = should.async();
-    final Vertx vertx = rule.vertx();
+    final Vertx vertx = context.vertx();
 
     RedisAPI api = RedisAPI.api(Redis.createClient(
-      rule.vertx(),
+      context.vertx(),
       new RedisOptions()
         .setMaxPoolWaiting(10)
         .addConnectionString(redis.getRedisUri())));
+
+    Checkpoint checkpoint = test.checkpoint(5);
 
     IntStream.range(0, 5).forEach(i -> vertx.setTimer(1, timerid -> {
 
       api.set(Arrays.asList("foo", "bar"));
 
       // EXPECTED NULL
-      api.get("redis_test").onComplete(res -> {
-        if (res.failed()) {
-          should.fail(res.cause());
-        } else {
-          should.assertNull(res.result());
-        }
-        if (cnt.decrementAndGet() == 0) {
-          test.complete();
-        }
-      });
+      api.get("redis_test").onComplete(test.succeeding(res -> {
+        assertNull(res);
+        checkpoint.flag();
+      }));
     }));
   }
 
-  @Test(timeout = 30_000L)
-  public void acquireConnectionsTest(TestContext should) {
-    final Vertx vertx = rule.vertx();
-    final Async test = should.async();
+  @Test
+  public void acquireConnectionsTest(VertxTestContext test) {
+    final Vertx vertx = context.vertx();
 
     Redis client = Redis.createClient(
       vertx,
@@ -171,24 +147,24 @@ public class RedisPooledTest {
     final AtomicBoolean closing = new AtomicBoolean(false);
     final AtomicInteger pending = new AtomicInteger();
 
-    // this test asserts that the pools behaves as expected it shall return 10 new connections
+    // this test asserts that the pool behaves as expected: it shall return 10 new connections
     // and will fail on the 21st call as the 10 waiting slots are taken
 
     vertx.setPeriodic(250, event -> {
       counter.incrementAndGet();
       client.connect().onComplete(event1 -> {
         if (event1.succeeded()) {
-          should.assertTrue(counter.get() <= 10);
+          assertTrue(counter.get() <= 10);
         } else {
-          should.assertTrue(counter.get() == 21);
+          assertEquals(21, counter.get());
           if (closing.compareAndSet(false, true)) {
             vertx.cancelTimer(event);
             client.close();
           } else {
             int _pending = pending.incrementAndGet();
-            should.assertTrue(_pending <= 10);
+            assertTrue(_pending <= 10);
             if (_pending == 10) {
-              test.complete();
+              test.completeNow();
             }
           }
         }
@@ -197,10 +173,8 @@ public class RedisPooledTest {
   }
 
   @Test
-  public void testLeakOfSubscriptions(TestContext should) {
-    final Async test = should.async();
-
-    final Vertx vertx = rule.vertx();
+  public void testLeakOfSubscriptions(VertxTestContext test) {
+    final Vertx vertx = context.vertx();
 
     Redis client = Redis.createClient(
       vertx,
@@ -211,38 +185,29 @@ public class RedisPooledTest {
 
     client
       .connect()
-      .onFailure(should::fail)
-      .onSuccess(conn -> {
+      .onComplete(test.succeeding(conn -> {
         conn
           .send(Request.cmd(SUBSCRIBE).arg("news"))
-          .onFailure(should::fail)
-          .onSuccess(msg -> {
+          .onComplete(test.succeeding(msg -> {
             conn.close();
             // escape the current ctx to avoid inlining
             vertx.setTimer(5L, v -> {
               client
                 .connect()
-                .onFailure(should::fail)
-                .onSuccess(conn2 -> {
-                  should.assertNotEquals(((PooledRedisConnection) conn).actual(), ((PooledRedisConnection) conn2).actual());
+                .onComplete(test.succeeding(conn2 -> {
+                  assertNotEquals(((PooledRedisConnection) conn).actual(), ((PooledRedisConnection) conn2).actual());
                   conn2
                     .send(Request.cmd(GET).arg("foo"))
-                    .onFailure(should::fail)
-                    .onSuccess(msg2 -> {
-                      System.out.println(msg2);
-                      test.complete();
-                    });
-                });
+                    .onComplete(test.succeedingThenComplete());
+                }));
             });
-          });
-      });
+          }));
+      }));
   }
 
   @Test
-  public void testReuse(TestContext should) {
-    final Async test = should.async();
-
-    final Vertx vertx = rule.vertx();
+  public void testReuse(VertxTestContext test) {
+    final Vertx vertx = context.vertx();
 
     Redis client = Redis.createClient(
       vertx,
@@ -253,36 +218,30 @@ public class RedisPooledTest {
 
     client
       .connect()
-      .onFailure(should::fail)
-      .onSuccess(conn -> {
+      .onComplete(test.succeeding(conn -> {
         conn
           .send(Request.cmd(INFO))
-          .onFailure(should::fail)
-          .onSuccess(msg -> {
+          .onComplete(test.succeeding(msg -> {
             conn.close();
             // escape the current ctx to avoid inlining
             vertx.setTimer(5L, v -> {
               client
                 .connect()
-                .onFailure(should::fail)
-                .onSuccess(conn2 -> {
-                  should.assertEquals(((PooledRedisConnection) conn).actual(), ((PooledRedisConnection) conn2).actual());
+                .onComplete(test.succeeding(conn2 -> {
+                  assertEquals(((PooledRedisConnection) conn).actual(), ((PooledRedisConnection) conn2).actual());
                   conn2
                     .send(Request.cmd(GET).arg("foo"))
-                    .onFailure(should::fail)
-                    .onSuccess(msg2 -> test.complete());
-                });
+                    .onComplete(test.succeedingThenComplete());
+                }));
             });
-          });
-      });
+          }));
+      }));
   }
 
   @Test
-  public void simpleTestRecycle(TestContext should) {
-    final Async test = should.async();
-
+  public void simpleTestRecycle(VertxTestContext test) {
     final Redis client = Redis.createClient(
-      rule.vertx(),
+      context.vertx(),
       new RedisOptions()
         .setConnectionString(redis.getRedisUri())
         .setMaxPoolSize(1)
@@ -291,29 +250,27 @@ public class RedisPooledTest {
         .setPoolRecycleTimeout(1000));
 
     client.connect()
-      .onSuccess(conn -> {
+      .onComplete(test.succeeding(conn -> {
         long conn1Id = ((PooledRedisConnection) conn).actual().hashCode();
         conn.close();
 
-        rule.vertx()
+        context.vertx()
           .setTimer(2000L, t -> {
             client.connect()
-              .onSuccess(conn2 -> {
+              .onComplete(test.succeeding(conn2 -> {
                 long conn2Id = ((PooledRedisConnection) conn2).actual().hashCode();
-                should.assertNotEquals(conn1Id, conn2Id);
+                assertNotEquals(conn1Id, conn2Id);
                 conn2.close();
-                test.complete();
-              });
+                test.completeNow();
+              }));
           });
-      });
+      }));
   }
 
   @Test
-  public void simpleTestReuse(TestContext should) {
-    final Async test = should.async();
-
+  public void simpleTestReuse(VertxTestContext test) {
     final Redis client = Redis.createClient(
-      rule.vertx(),
+      context.vertx(),
       new RedisOptions()
         .setConnectionString(redis.getRedisUri())
         .setMaxPoolSize(1)
@@ -322,20 +279,20 @@ public class RedisPooledTest {
         .setPoolRecycleTimeout(1000));
 
     client.connect()
-      .onSuccess(conn -> {
+      .onComplete(test.succeeding(conn -> {
         long conn1Id = ((PooledRedisConnection) conn).actual().hashCode();
         conn.close();
 
-        rule.vertx()
+        context.vertx()
           .setTimer(100L, t -> {
             client.connect()
-              .onSuccess(conn2 -> {
+              .onComplete(test.succeeding(conn2 -> {
                 long conn2Id = ((PooledRedisConnection) conn2).actual().hashCode();
-                should.assertEquals(conn1Id, conn2Id);
+                assertEquals(conn1Id, conn2Id);
                 conn2.close();
-                test.complete();
-              });
+                test.completeNow();
+              }));
           });
-      });
+      }));
   }
 }
