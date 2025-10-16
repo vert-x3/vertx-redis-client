@@ -3,22 +3,23 @@ package io.vertx.tests.redis.client;
 import io.vertx.core.buffer.Buffer;
 import io.vertx.core.net.JksOptions;
 import io.vertx.core.net.NetClientOptions;
-import io.vertx.ext.unit.Async;
-import io.vertx.ext.unit.TestContext;
-import io.vertx.ext.unit.junit.RunTestOnContext;
-import io.vertx.ext.unit.junit.VertxUnitRunner;
+import io.vertx.junit5.RunTestOnContext;
+import io.vertx.junit5.VertxExtension;
+import io.vertx.junit5.VertxTestContext;
 import io.vertx.redis.client.Command;
 import io.vertx.redis.client.Redis;
 import io.vertx.redis.client.RedisOptions;
 import io.vertx.redis.client.Request;
 import io.vertx.tests.redis.containers.KeyPairAndCertificate;
 import io.vertx.tests.redis.containers.RedisStandalone;
-import org.junit.ClassRule;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.api.extension.RegisterExtension;
+import org.testcontainers.junit.jupiter.Container;
+import org.testcontainers.junit.jupiter.Testcontainers;
 
-@RunWith(VertxUnitRunner.class)
+@ExtendWith(VertxExtension.class)
+@Testcontainers
 public class RedisClientTLSTest {
 
   private static final KeyPairAndCertificate serverKey = KeyPairAndCertificate.generateSelfSigned("redis");
@@ -35,50 +36,42 @@ public class RedisClientTLSTest {
       .setHostnameVerificationAlgorithm("");
   }
 
-  @ClassRule
+  @Container
   public static final RedisStandalone redis = RedisStandalone.builder()
     .enableTls(serverKey)
     .enableMutualTls(clientKey)
     .build();
 
-  @Rule
-  public final RunTestOnContext rule = new RunTestOnContext();
+  @RegisterExtension
+  public final RunTestOnContext context = new RunTestOnContext();
 
   @Test
-  public void testConnection(TestContext should) {
-    final Async test = should.async();
-
+  public void testConnection(VertxTestContext test) {
     Redis client = Redis.createClient(
-      rule.vertx(),
+      context.vertx(),
       new RedisOptions()
         .setNetClientOptions(createNetClientOptions())
         .setConnectionString("rediss://" + redis.getHost() + ":" + redis.getPort()));
 
     client.connect()
-      .onComplete(should.asyncAssertSuccess(conn -> {
+      .onComplete(test.succeeding(conn -> {
         conn.send(Request.cmd(Command.PING))
-          .onComplete(should.asyncAssertSuccess(ignored -> {
-            conn.close();
-            test.complete();
+          .onComplete(test.succeeding(ignored -> {
+            conn.close().onComplete(test.succeedingThenComplete());
           }));
       }));
   }
 
   @Test
-  public void testInvalidConnection(TestContext should) {
-    final Async test = should.async();
-
+  public void testInvalidConnection(VertxTestContext test) {
     Redis client = Redis.createClient(
-      rule.vertx(),
+      context.vertx(),
       new RedisOptions()
         .setNetClientOptions(createNetClientOptions())
         // in this test, Redis requires SSL and doesn't accept plain text connections;
         // the connection string has wrong scheme
         .setConnectionString("redis://" + redis.getHost() + ":" + redis.getPort()));
 
-    client.connect()
-      .onComplete(should.asyncAssertFailure(ignored -> {
-        test.complete();
-      }));
+    client.connect().onComplete(test.failingThenComplete());
   }
 }

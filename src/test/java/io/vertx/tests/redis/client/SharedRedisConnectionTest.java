@@ -1,26 +1,31 @@
 package io.vertx.tests.redis.client;
 
-import io.vertx.core.*;
-import io.vertx.ext.unit.Async;
-import io.vertx.ext.unit.TestContext;
-import io.vertx.ext.unit.junit.VertxUnitRunner;
+import io.vertx.core.DeploymentOptions;
+import io.vertx.core.Future;
+import io.vertx.core.VerticleBase;
+import io.vertx.core.Vertx;
+import io.vertx.junit5.Checkpoint;
+import io.vertx.junit5.VertxExtension;
+import io.vertx.junit5.VertxTestContext;
 import io.vertx.redis.client.Redis;
 import io.vertx.redis.client.RedisAPI;
 import io.vertx.redis.client.RedisOptions;
 import io.vertx.redis.client.Response;
 import io.vertx.tests.redis.containers.RedisStandalone;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.ClassRule;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.testcontainers.junit.jupiter.Container;
+import org.testcontainers.junit.jupiter.Testcontainers;
 
 import java.util.Arrays;
 
-@RunWith(VertxUnitRunner.class)
+@ExtendWith(VertxExtension.class)
+@Testcontainers
 public class SharedRedisConnectionTest {
 
-  @ClassRule
+  @Container
   public static final RedisStandalone redis = new RedisStandalone();
 
   private static final int VERTICLES_COUNT = 10;
@@ -32,9 +37,8 @@ public class SharedRedisConnectionTest {
   Vertx vertx;
   RedisAPI conn;
 
-  @Before
-  public void setup(TestContext test) {
-    Async async = test.async();
+  @BeforeEach
+  public void setup(VertxTestContext test) {
     vertx = Vertx.vertx();
     RedisOptions options = new RedisOptions()
       .setConnectionString(redis.getRedisUri())
@@ -53,39 +57,39 @@ public class SharedRedisConnectionTest {
         if (result.succeeded()) {
           conn = result.result();
         } else {
-          test.fail(result.cause());
+          test.failNow(result.cause());
         }
-        async.complete();
+        test.completeNow();
       });
   }
 
-  @After
-  public void teardown(TestContext test) {
+  @AfterEach
+  public void teardownVer(VertxTestContext test) {
     conn.close();
-    vertx.close().onComplete(test.asyncAssertSuccess());
+    vertx.close().onComplete(test.succeedingThenComplete());
   }
 
   @Test
-  public void test(TestContext test) {
+  public void test(VertxTestContext test) {
     vertx.deployVerticle(() -> new MyVerticle(conn, test), new DeploymentOptions().setInstances(VERTICLES_COUNT));
   }
 
   public static class MyVerticle extends VerticleBase {
     private final RedisAPI conn;
-    private final TestContext test;
+    private final VertxTestContext test;
 
-    public MyVerticle(RedisAPI conn, TestContext test) {
+    public MyVerticle(RedisAPI conn, VertxTestContext test) {
       this.conn = conn;
       this.test = test;
     }
 
     @Override
     public Future<?> start() throws Exception {
-      Async async = test.async(ITERATIONS_COUNT);
+      Checkpoint checkpoint = test.checkpoint(ITERATIONS_COUNT);
       for (int i = 0; i < ITERATIONS_COUNT; i++) {
         test()
-          .onSuccess(ignored -> async.countDown())
-          .onFailure(test::fail);
+          .onSuccess(ignored -> checkpoint.flag())
+          .onFailure(test::failNow);
       }
       return super.start();
     }
@@ -96,7 +100,7 @@ public class SharedRedisConnectionTest {
           try {
             response.toInteger();
           } catch (Exception e) {
-            test.fail(e);
+            test.failNow(e);
           }
         });
 
@@ -107,7 +111,7 @@ public class SharedRedisConnectionTest {
               part.toInteger();
             }
           } catch (Exception e) {
-            test.fail(e);
+            test.failNow(e);
           }
         });
 

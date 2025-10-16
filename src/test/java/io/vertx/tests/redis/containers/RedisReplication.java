@@ -1,13 +1,11 @@
 package io.vertx.tests.redis.containers;
 
-import org.junit.rules.TestRule;
-import org.junit.runner.Description;
-import org.junit.runners.model.Statement;
 import org.testcontainers.containers.FixedHostPortGenericContainer;
 import org.testcontainers.containers.GenericContainer;
 import org.testcontainers.containers.wait.strategy.Wait;
+import org.testcontainers.lifecycle.Startable;
 
-public class RedisReplication implements TestRule {
+public class RedisReplication implements Startable {
   private final GenericContainer<?> container = new FixedHostPortGenericContainer<>("quay.io/ladicek/redis-replication")
     .withFixedExposedPort(7000, 7000)
     .withFixedExposedPort(7001, 7001)
@@ -15,8 +13,13 @@ public class RedisReplication implements TestRule {
     .waitingFor(Wait.forLogMessage(".*MASTER <-> REPLICA sync: Finished with success.*", 2));
 
   @Override
-  public Statement apply(Statement base, Description description) {
-    return container.apply(base, description);
+  public void start() {
+    container.start();
+  }
+
+  @Override
+  public void stop() {
+    container.stop();
   }
 
   public String getRedisMasterUri() {

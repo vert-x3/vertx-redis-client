@@ -1,9 +1,8 @@
 package io.vertx.tests.redis.client;
 
-import io.vertx.ext.unit.Async;
-import io.vertx.ext.unit.TestContext;
-import io.vertx.ext.unit.junit.RunTestOnContext;
-import io.vertx.ext.unit.junit.VertxUnitRunner;
+import io.vertx.junit5.RunTestOnContext;
+import io.vertx.junit5.VertxExtension;
+import io.vertx.junit5.VertxTestContext;
 import io.vertx.redis.client.Command;
 import io.vertx.redis.client.Redis;
 import io.vertx.redis.client.RedisClientType;
@@ -12,29 +11,31 @@ import io.vertx.redis.client.RedisReplicas;
 import io.vertx.redis.client.RedisRole;
 import io.vertx.redis.client.Request;
 import io.vertx.tests.redis.containers.RedisSentinel;
-import org.junit.ClassRule;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.api.extension.RegisterExtension;
+import org.testcontainers.junit.jupiter.Container;
+import org.testcontainers.junit.jupiter.Testcontainers;
 
 import static io.vertx.tests.redis.client.TestUtils.randomKey;
 import static io.vertx.tests.redis.client.TestUtils.retryUntilSuccess;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
-@RunWith(VertxUnitRunner.class)
+@ExtendWith(VertxExtension.class)
+@Testcontainers
 public class RedisSentinelTest {
 
-  @ClassRule
+  @Container
   public static final RedisSentinel redis = new RedisSentinel();
 
-  @Rule
-  public final RunTestOnContext rule = new RunTestOnContext();
+  @RegisterExtension
+  public final RunTestOnContext context = new RunTestOnContext();
 
   @Test
-  public void testGetClientToMaster(TestContext should) {
-    final Async test = should.async();
-
+  public void testGetClientToMaster(VertxTestContext test) {
     Redis.createClient(
-        rule.vertx(),
+        context.vertx(),
         new RedisOptions()
           .setType(RedisClientType.SENTINEL)
           .addConnectionString(redis.getRedisSentinel0Uri())
@@ -45,18 +46,16 @@ public class RedisSentinelTest {
           .setMaxPoolWaiting(16))
       .connect()
       .compose(conn -> conn.send(Request.cmd(Command.INFO)))
-      .onComplete(should.asyncAssertSuccess(info -> {
-        should.assertTrue(info.toString().contains("role:master"));
-        test.complete();
+      .onComplete(test.succeeding(info -> {
+        assertTrue(info.toString().contains("role:master"));
+        test.completeNow();
       }));
   }
 
   @Test
-  public void testGetClientToMasterWithDB(TestContext should) {
-    final Async test = should.async();
-
+  public void testGetClientToMasterWithDB(VertxTestContext test) {
     Redis.createClient(
-        rule.vertx(),
+        context.vertx(),
         new RedisOptions()
           .setType(RedisClientType.SENTINEL)
           .addConnectionString(redis.getRedisSentinel0Uri() + "/5")
@@ -67,18 +66,16 @@ public class RedisSentinelTest {
           .setMaxPoolWaiting(16))
       .connect()
       .compose(conn -> conn.send(Request.cmd(Command.CLIENT).arg("INFO")))
-      .onComplete(should.asyncAssertSuccess(info -> {
-        should.assertTrue(info.toString().contains("db=5"));
-        test.complete();
+      .onComplete(test.succeeding(info -> {
+        assertTrue(info.toString().contains("db=5"));
+        test.completeNow();
       }));
   }
 
   @Test
-  public void testGetClientToReplica(TestContext should) {
-    final Async test = should.async();
-
+  public void testGetClientToReplica(VertxTestContext test) {
     Redis.createClient(
-        rule.vertx(),
+        context.vertx(),
         new RedisOptions()
           .setType(RedisClientType.SENTINEL)
           .addConnectionString(redis.getRedisSentinel0Uri())
@@ -89,18 +86,16 @@ public class RedisSentinelTest {
           .setMaxPoolWaiting(16))
       .connect()
       .compose(conn -> conn.send(Request.cmd(Command.INFO)))
-      .onComplete(should.asyncAssertSuccess(info -> {
-        should.assertTrue(info.toString().contains("role:slave"));
-        test.complete();
+      .onComplete(test.succeeding(info -> {
+        assertTrue(info.toString().contains("role:slave"));
+        test.completeNow();
       }));
   }
 
   @Test
-  public void testGetClientToSentinel(TestContext should) {
-    final Async test = should.async();
-
+  public void testGetClientToSentinel(VertxTestContext test) {
     Redis.createClient(
-        rule.vertx(),
+        context.vertx(),
         new RedisOptions()
           .setType(RedisClientType.SENTINEL)
           .addConnectionString(redis.getRedisSentinel0Uri())
@@ -111,36 +106,35 @@ public class RedisSentinelTest {
           .setMaxPoolWaiting(16))
       .connect()
       .compose(conn -> conn.send(Request.cmd(Command.INFO)))
-      .onComplete(should.asyncAssertSuccess(info -> {
-        should.assertTrue(info.toString().contains("redis_mode:sentinel"));
-        should.assertTrue(info.toString().contains("sentinel_masters:1"));
-        test.complete();
+      .onComplete(test.succeeding(info -> {
+        assertTrue(info.toString().contains("redis_mode:sentinel"));
+        assertTrue(info.toString().contains("sentinel_masters:1"));
+        test.completeNow();
       }));
   }
 
   @Test
-  public void preservesContext(TestContext should) {
-    Redis client = Redis.createClient(rule.vertx(), new RedisOptions()
+  public void preservesContext(VertxTestContext test) {
+    Redis client = Redis.createClient(context.vertx(), new RedisOptions()
       .setType(RedisClientType.SENTINEL)
       .addConnectionString(redis.getRedisSentinel0Uri())
       .addConnectionString(redis.getRedisSentinel1Uri())
       .addConnectionString(redis.getRedisSentinel2Uri())
       .setRole(RedisRole.MASTER));
 
-    PreservesContext.sendWithoutConnect(client, should);
-    PreservesContext.batchWithoutConnect(client, should);
-    PreservesContext.connect(client, should);
-    PreservesContext.connectThenSend(client, should);
-    PreservesContext.connectThenBatch(client, should);
+    PreservesContext.sendWithoutConnect(client, test);
+    PreservesContext.batchWithoutConnect(client, test);
+    PreservesContext.connect(client, test);
+    PreservesContext.connectThenSend(client, test);
+    PreservesContext.connectThenBatch(client, test);
   }
 
   @Test
-  public void testWriteToMasterReadFromReplica(TestContext should) {
-    final Async test = should.async();
+  public void testWriteToMasterReadFromReplica(VertxTestContext test) {
     final String key = randomKey();
 
     Redis.createClient(
-        rule.vertx(),
+        context.vertx(),
         new RedisOptions()
           .setType(RedisClientType.SENTINEL)
           .setUseReplicas(RedisReplicas.ALWAYS)
@@ -149,14 +143,14 @@ public class RedisSentinelTest {
           .addConnectionString(redis.getRedisSentinel2Uri())
           .setMaxPoolSize(4)
           .setMaxPoolWaiting(16))
-      .connect().onComplete(should.asyncAssertSuccess(conn -> {
+      .connect().onComplete(test.succeeding(conn -> {
         conn.send(Request.cmd(Command.SET).arg(key).arg("foobar"))
-          .compose(ignored -> retryUntilSuccess(rule.vertx(), () -> {
+          .compose(ignored -> retryUntilSuccess(context.vertx(), () -> {
             return conn.send(Request.cmd(Command.GET).arg(key));
           }, 10))
-          .onComplete(should.asyncAssertSuccess(result -> {
-            should.assertEquals("foobar", result.toString());
-            test.complete();
+          .onComplete(test.succeeding(result -> {
+            assertEquals("foobar", result.toString());
+            test.completeNow();
           }));
       }));
   }

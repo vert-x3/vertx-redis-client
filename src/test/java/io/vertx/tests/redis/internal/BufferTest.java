@@ -6,7 +6,7 @@ import io.vertx.core.internal.buffer.BufferInternal;
 import io.vertx.redis.client.Command;
 import io.vertx.redis.client.Request;
 import io.vertx.redis.client.impl.RequestImpl;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;

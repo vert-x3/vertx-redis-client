@@ -3,9 +3,8 @@ package io.vertx.tests.redis.internal;
 import io.vertx.core.Vertx;
 import io.vertx.core.internal.pool.ConnectionPool;
 import io.vertx.core.internal.resource.ResourceManager;
-import io.vertx.ext.unit.Async;
-import io.vertx.ext.unit.TestContext;
-import io.vertx.ext.unit.junit.VertxUnitRunner;
+import io.vertx.junit5.VertxExtension;
+import io.vertx.junit5.VertxTestContext;
 import io.vertx.redis.client.Command;
 import io.vertx.redis.client.Redis;
 import io.vertx.redis.client.RedisConnection;
@@ -17,24 +16,28 @@ import io.vertx.redis.client.impl.RedisConnectionManager;
 import io.vertx.redis.client.impl.RedisConnectionManager.ConnectionKey;
 import io.vertx.redis.client.impl.RedisConnectionManager.RedisEndpoint;
 import io.vertx.tests.redis.containers.RedisStandalone;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.ClassRule;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.testcontainers.junit.jupiter.Container;
+import org.testcontainers.junit.jupiter.Testcontainers;
 
 import java.lang.reflect.Field;
 
-@RunWith(VertxUnitRunner.class)
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
+@ExtendWith(VertxExtension.class)
+@Testcontainers
 public class ConnectionRecyclingTest {
 
-  @ClassRule
+  @Container
   public static final RedisStandalone redis = new RedisStandalone();
 
   Vertx vertx;
   Redis client;
 
-  @Before
+  @BeforeEach
   public void setup() {
     vertx = Vertx.vertx();
     RedisOptions options = new RedisOptions()
@@ -45,39 +48,35 @@ public class ConnectionRecyclingTest {
     client = Redis.createClient(vertx, options);
   }
 
-  @After
-  public void teardown(TestContext test) {
+  @AfterEach
+  public void teardown(VertxTestContext test) {
     client.close();
-    vertx.close().onComplete(test.asyncAssertSuccess());
+    vertx.close().onComplete(test.succeedingThenComplete());
   }
 
   @Test
-  public void testUsageShorterThanRecycleTimeout(TestContext test) {
-    Async async = test.async();
-
+  public void testUsageShorterThanRecycleTimeout(VertxTestContext test) {
     assertConnectionPool(test, 0);
 
     client.connect()
       .flatMap(conn -> {
         assertConnectionPool(test, 1);
         return conn.close();
-      }).onComplete(test.asyncAssertSuccess(ignored -> {
+      }).onComplete(test.succeeding(ignored -> {
         assertConnectionPool(test, 1);
 
         vertx.setTimer(2000, ignored2 -> {
           assertConnectionPool(test, 0);
-          async.complete();
+          test.completeNow();
         });
       }));
   }
 
   @Test
-  public void testUsageLongerThanRecycleTimeout(TestContext test) {
-    Async async = test.async();
-
+  public void testUsageLongerThanRecycleTimeout(VertxTestContext test) {
     assertConnectionPool(test, 0);
 
-    client.connect().onComplete(test.asyncAssertSuccess(conn -> {
+    client.connect().onComplete(test.succeeding(conn -> {
       assertConnectionPool(test, 1);
       useConnectionForLongTime(conn, System.currentTimeMillis() + 2000);
     }));
@@ -87,7 +86,7 @@ public class ConnectionRecyclingTest {
 
       vertx.setTimer(1500, ignored2 -> {
         assertConnectionPool(test, 0);
-        async.complete();
+        test.completeNow();
       });
     });
   }
@@ -106,7 +105,7 @@ public class ConnectionRecyclingTest {
       });
   }
 
-  private void assertConnectionPool(TestContext test, int expectedSize) {
+  private void assertConnectionPool(VertxTestContext test, int expectedSize) {
     IntBox size = new IntBox(0);
 
     try {
@@ -123,7 +122,9 @@ public class ConnectionRecyclingTest {
       throw new RuntimeException(e);
     }
 
-    test.assertEquals(expectedSize, size.value);
+    test.verify(() -> {
+      assertEquals(expectedSize, size.value);
+    });
   }
 
   static class IntBox {

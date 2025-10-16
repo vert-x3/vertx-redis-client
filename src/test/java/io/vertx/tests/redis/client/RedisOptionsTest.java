@@ -4,13 +4,13 @@ import io.vertx.core.tracing.TracingPolicy;
 import io.vertx.redis.client.RedisClientType;
 import io.vertx.redis.client.RedisOptions;
 import io.vertx.redis.client.RedisRole;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class RedisOptionsTest {
 

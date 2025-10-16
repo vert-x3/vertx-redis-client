@@ -16,39 +16,39 @@
 package io.vertx.tests.redis.client;
 
 import io.vertx.core.Future;
-import io.vertx.ext.unit.Async;
-import io.vertx.ext.unit.TestContext;
-import io.vertx.ext.unit.junit.RunTestOnContext;
-import io.vertx.ext.unit.junit.VertxUnitRunner;
+import io.vertx.junit5.RunTestOnContext;
+import io.vertx.junit5.VertxExtension;
+import io.vertx.junit5.VertxTestContext;
 import io.vertx.redis.client.Command;
 import io.vertx.redis.client.Redis;
-import org.junit.ClassRule;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.api.extension.RegisterExtension;
 import org.testcontainers.containers.GenericContainer;
+import org.testcontainers.junit.jupiter.Container;
+import org.testcontainers.junit.jupiter.Testcontainers;
 
 import static io.vertx.redis.client.Request.cmd;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /**
  * This test relies on a REJSON capable Redis server.
  */
-@RunWith(VertxUnitRunner.class)
+@ExtendWith(VertxExtension.class)
+@Testcontainers
 public class RedisClientREJSONTest {
 
-  @Rule
-  public final RunTestOnContext rule = new RunTestOnContext();
-
-  @ClassRule
+  @Container
   public static final GenericContainer<?> container = new GenericContainer<>("redislabs/rejson:2.4.7")
     .withExposedPorts(6379);
 
-  @Test(timeout = 30_000L)
-  public void testJsonSetAndGet(TestContext should) {
-    final Async test = should.async();
+  @RegisterExtension
+  public final RunTestOnContext context = new RunTestOnContext();
 
+  @Test
+  public void testJsonSetAndGet(VertxTestContext test) {
     final Redis client = Redis.createClient(
-      rule.vertx(),
+      context.vertx(),
       "redis://" + container.getHost() + ":" + container.getFirstMappedPort());
 
     client
@@ -58,16 +58,13 @@ public class RedisClientREJSONTest {
         return client.send(cmd(Command.create("JSON.GET")).arg("foo"));
       })
       .compose(response -> {
-        should.assertEquals("\"bar\"", response.toString());
+        assertEquals("\"bar\"", response.toString());
         return client.send(cmd(Command.create("JSON.TYPE")).arg("foo").arg("."));
       })
       .compose(response -> {
-        should.assertEquals("string", response.toString());
+        assertEquals("string", response.toString());
         return Future.succeededFuture();
       })
-      .onFailure(should::fail)
-      .onSuccess(v -> {
-        test.complete();
-      });
+      .onComplete(test.succeedingThenComplete());
   }
 }

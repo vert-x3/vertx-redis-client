@@ -3,55 +3,53 @@ package io.vertx.tests.redis.client;
 import io.vertx.core.Future;
 import io.vertx.core.VerticleBase;
 import io.vertx.core.http.HttpMethod;
-import io.vertx.ext.unit.Async;
-import io.vertx.ext.unit.TestContext;
-import io.vertx.ext.unit.junit.RunTestOnContext;
-import io.vertx.ext.unit.junit.VertxUnitRunner;
+import io.vertx.junit5.RunTestOnContext;
+import io.vertx.junit5.VertxExtension;
+import io.vertx.junit5.VertxTestContext;
 import io.vertx.redis.client.Redis;
 import io.vertx.redis.client.RedisAPI;
 import io.vertx.redis.client.RedisOptions;
 import io.vertx.tests.redis.containers.RedisStandalone;
-import org.junit.ClassRule;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.api.extension.RegisterExtension;
+import org.testcontainers.junit.jupiter.Container;
+import org.testcontainers.junit.jupiter.Testcontainers;
 
 import java.util.Collections;
 
-@RunWith(VertxUnitRunner.class)
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
+@ExtendWith(VertxExtension.class)
+@Testcontainers
 public class RedisThreadConsistencyTest {
 
-  @ClassRule
+  @Container
   public static final RedisStandalone redis = new RedisStandalone();
 
-  @Rule
-  public final RunTestOnContext rule = new RunTestOnContext();
+  @RegisterExtension
+  public final RunTestOnContext context = new RunTestOnContext();
 
   @Test
-  public void redisThreadConsistencyTest(TestContext should) {
-    final Async test = should.async();
-
-    rule.vertx()
+  public void redisThreadConsistencyTest(VertxTestContext test) {
+    context.vertx()
       .deployVerticle(new Verticle(
         RedisAPI.api(
           Redis.createClient(
-            rule.vertx(),
+            context.vertx(),
             new RedisOptions().setConnectionString(redis.getRedisUri())))))
-      .onFailure(should::fail)
-      .onSuccess(id -> {
-        rule.vertx()
+      .onComplete(test.succeeding(id -> {
+        context.vertx()
           .createHttpClient()
           .request(HttpMethod.GET, 8080, "localhost", "/")
-          .onFailure(should::fail)
-          .onSuccess(req -> {
+          .onComplete(test.succeeding(req -> {
             req.send()
-              .onFailure(should::fail)
-              .onSuccess(res -> {
-                should.assertEquals(res.getHeader("initialThread"), res.getHeader("threadAfterRedisExecution"));
-                test.complete();
-              });
-          });
-      });
+              .onComplete(test.succeeding(res -> {
+                assertEquals(res.getHeader("initialThread"), res.getHeader("threadAfterRedisExecution"));
+                test.completeNow();
+              }));
+          }));
+      }));
   }
 
   static class Verticle extends VerticleBase {

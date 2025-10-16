@@ -1,10 +1,9 @@
 package io.vertx.tests.redis.client;
 
 import io.vertx.core.Future;
-import io.vertx.ext.unit.Async;
-import io.vertx.ext.unit.TestContext;
-import io.vertx.ext.unit.junit.RunTestOnContext;
-import io.vertx.ext.unit.junit.VertxUnitRunner;
+import io.vertx.junit5.RunTestOnContext;
+import io.vertx.junit5.VertxExtension;
+import io.vertx.junit5.VertxTestContext;
 import io.vertx.redis.client.Command;
 import io.vertx.redis.client.Redis;
 import io.vertx.redis.client.RedisClientType;
@@ -13,20 +12,25 @@ import io.vertx.redis.client.RedisOptions;
 import io.vertx.redis.client.RedisReplicas;
 import io.vertx.redis.client.Request;
 import io.vertx.tests.redis.containers.RedisCluster;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.ClassRule;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.api.extension.RegisterExtension;
+import org.testcontainers.junit.jupiter.Container;
+import org.testcontainers.junit.jupiter.Testcontainers;
 
-@RunWith(VertxUnitRunner.class)
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
+
+@ExtendWith(VertxExtension.class)
+@Testcontainers
 public class RedisClusterAskTest {
-  @ClassRule
+  @Container
   public static final RedisCluster redis = new RedisCluster();
 
-  @Rule
-  public final RunTestOnContext rule = new RunTestOnContext();
+  @RegisterExtension
+  public final RunTestOnContext context = new RunTestOnContext();
 
   private final RedisOptions options = new RedisOptions()
     .setType(RedisClientType.CLUSTER)
@@ -41,21 +45,19 @@ public class RedisClusterAskTest {
   private Redis client;
   private ClusterUtils cluster;
 
-  @Before
+  @BeforeEach
   public void createClient() {
-    client = Redis.createClient(rule.vertx(), options);
-    cluster = new ClusterUtils(rule.vertx(), client);
+    client = Redis.createClient(context.vertx(), options);
+    cluster = new ClusterUtils(context.vertx(), client);
   }
 
-  @After
+  @AfterEach
   public void cleanRedis() {
     client.close();
   }
 
   @Test
-  public void test(TestContext test) {
-    Async async = test.async();
-
+  public void test(VertxTestContext test) {
     // slot number: 16287
     // keys hashing to the slot: x, exs
     int slot = 16287;
@@ -82,26 +84,24 @@ public class RedisClusterAskTest {
               return clusterConn.send(Request.cmd(Command.GET).arg(key1));
             })
             .compose(result -> {
-              test.assertEquals("fubar", result.toString());
+              assertEquals("fubar", result.toString());
               return clusterConn.send(Request.cmd(Command.GET).arg(key2)); // ASK
             })
             .compose(result -> {
-              test.assertEquals(null, result);
+              assertNull(result);
               return clusterConn.send(Request.cmd(Command.SET).arg(key2).arg("quux")); // ASK
             })
             .compose(ignored -> {
               return clusterConn.send(Request.cmd(Command.GET).arg(key2)); // ASK
             })
             .compose(result -> {
-              test.assertEquals("quux", result.toString());
+              assertEquals("quux", result.toString());
               master.close();
               otherMaster.close();
               return Future.succeededFuture();
             });
         });
       });
-    }).onComplete(test.asyncAssertSuccess(ignored -> {
-      async.complete();
-    }));
+    }).onComplete(test.succeedingThenComplete());
   }
 }

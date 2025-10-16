@@ -1,55 +1,55 @@
 package io.vertx.tests.redis.client;
 
-import io.vertx.ext.unit.Async;
-import io.vertx.ext.unit.TestContext;
-import io.vertx.ext.unit.junit.RunTestOnContext;
-import io.vertx.ext.unit.junit.VertxUnitRunner;
+import io.vertx.junit5.RunTestOnContext;
+import io.vertx.junit5.VertxExtension;
+import io.vertx.junit5.VertxTestContext;
 import io.vertx.redis.client.Redis;
 import io.vertx.redis.client.RedisOptions;
 import io.vertx.tests.redis.containers.RedisStandalone;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.ClassRule;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.api.extension.RegisterExtension;
+import org.testcontainers.junit.jupiter.Container;
+import org.testcontainers.junit.jupiter.Testcontainers;
 
 import static io.vertx.redis.client.Command.GET;
 import static io.vertx.redis.client.Request.cmd;
 import static io.vertx.tests.redis.client.TestUtils.randomKey;
+import static org.junit.jupiter.api.Assertions.assertNull;
 
-@RunWith(VertxUnitRunner.class)
+@ExtendWith(VertxExtension.class)
+@Testcontainers
 public class RedisClient6SecureTest {
 
-  @ClassRule
+  @Container
   public static final RedisStandalone redis = RedisStandalone.builder().setVersion("6.2").setPassword("foobar").build();
 
-  @Rule
-  public final RunTestOnContext rule = new RunTestOnContext();
+  @RegisterExtension
+  public final RunTestOnContext context = new RunTestOnContext();
 
   private Redis client;
 
-  @Before
+  @BeforeEach
   public void before() {
     client = Redis.createClient(
-      rule.vertx(),
+      context.vertx(),
       new RedisOptions().setConnectionString("redis://:foobar@" + redis.getHost() + ":" + redis.getPort()));
   }
 
-  @After
+  @AfterEach
   public void after() {
     client.close();
   }
 
   @Test
-  public void testBasicInterop(TestContext should) {
-    final Async test = should.async();
+  public void testBasicInterop(VertxTestContext test) {
     final String nonexisting = randomKey();
 
-    client.send(cmd(GET).arg(nonexisting)).onComplete(reply -> {
-      should.assertTrue(reply.succeeded());
-      should.assertNull(reply.result());
-      test.complete();
-    });
+    client.send(cmd(GET).arg(nonexisting)).onComplete(test.succeeding(reply -> {
+      assertNull(reply);
+      test.completeNow();
+    }));
   }
 }
