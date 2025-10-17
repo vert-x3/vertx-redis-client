@@ -56,6 +56,7 @@ public class RedisOptions {
   private boolean protocolNegotiation;
   private ProtocolVersion preferredProtocolVersion;
   private long hashSlotCacheTTL;
+  private long topologyCacheTTL;
   private TracingPolicy tracingPolicy;
   private boolean autoFailover;
 
@@ -78,6 +79,7 @@ public class RedisOptions {
     clusterTransactions = RedisClusterTransactions.DISABLED;
     protocolNegotiation = true;
     hashSlotCacheTTL = 1000;
+    topologyCacheTTL = 1000;
   }
 
   /**
@@ -102,6 +104,7 @@ public class RedisOptions {
     this.protocolNegotiation = other.protocolNegotiation;
     this.preferredProtocolVersion = other.preferredProtocolVersion;
     this.hashSlotCacheTTL = other.hashSlotCacheTTL;
+    this.topologyCacheTTL = other.topologyCacheTTL;
     this.tracingPolicy = other.tracingPolicy;
     this.autoFailover = other.autoFailover;
   }
@@ -712,9 +715,13 @@ public class RedisOptions {
    * Returns the TTL of the hash slot cache. The TTL is expressed in milliseconds.
    * Defaults to 1000 millis (1 second).
    * <p>
-   * This is only meaningful in case of a {@linkplain RedisClientType#CLUSTER cluster} Redis client
-   * and is ignored otherwise.
+   * This is only meaningful in case of a {@linkplain RedisClientType#CLUSTER cluster}
+   * Redis client and is ignored otherwise.
    * </p>
+   * <strong>Note:</strong> this method will be deprecated since Vert.x 5.1, where
+   * the configuration of (cluster) hash slot cache TTL and (sentinel) topology cache TTL
+   * will be unified. Currently, {@code hashSlotCacheTTL} applies only to cluster clients
+   * and {@code topologyCacheTTL} applies only to sentinel clients.
    *
    * @return the TTL of the hash slot cache
    */
@@ -726,15 +733,53 @@ public class RedisOptions {
    * Sets the TTL of the hash slot cache. The TTL is expressed in milliseconds.
    * Defaults to 1000 millis (1 second).
    * <p>
-   * This is only meaningful in case of a {@linkplain RedisClientType#CLUSTER cluster} Redis client
-   * and is ignored otherwise.
+   * This is only meaningful in case of a {@linkplain RedisClientType#CLUSTER cluster}
+   * Redis client and is ignored otherwise.
    * </p>
+   * <strong>Note:</strong> this method will be deprecated since Vert.x 5.1, where
+   * the configuration of (cluster) hash slot cache TTL and (sentinel) topology cache TTL
+   * will be unified. Currently, {@code hashSlotCacheTTL} applies only to cluster clients
+   * and {@code topologyCacheTTL} applies only to sentinel clients.
    *
    * @param hashSlotCacheTTL the TTL of the hash slot cache, in millis
    * @return fluent self
    */
   public RedisOptions setHashSlotCacheTTL(long hashSlotCacheTTL) {
     this.hashSlotCacheTTL = hashSlotCacheTTL;
+    return this;
+  }
+
+  /**
+   * Returns the TTL of the topology cache. The TTL is expressed in milliseconds.
+   * Defaults to 1000 millis (1 second).
+   * <p>
+   * This is only meaningful in case of a {@linkplain RedisClientType#SENTINEL sentinel}
+   * Redis client and is ignored otherwise.
+   * </p>
+   * <strong>Note:</strong> starting with Vert.x 5.1, this method will apply to both
+   * the cluster client and sentinel client and will replace {@link #getHashSlotCacheTTL()}.
+   *
+   * @return the TTL of the topology cache
+   */
+  public long getTopologyCacheTTL() {
+    return topologyCacheTTL;
+  }
+
+  /**
+   * Sets the TTL of the topology cache. The TTL is expressed in milliseconds.
+   * Defaults to 1000 millis (1 second).
+   * <p>
+   * This is only meaningful in case of a {@linkplain RedisClientType#SENTINEL sentinel}
+   * Redis client and is ignored otherwise.
+   * </p>
+   * <strong>Note:</strong> starting with Vert.x 5.1, this method will apply to both
+   * the cluster client and sentinel client and will replace {@link #setHashSlotCacheTTL(long)}.
+   *
+   * @param topologyCacheTTL the TTL of the topology cache, in millis
+   * @return fluent self
+   */
+  public RedisOptions setTopologyCacheTTL(long topologyCacheTTL) {
+    this.topologyCacheTTL = topologyCacheTTL;
     return this;
   }
 

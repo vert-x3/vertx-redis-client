@@ -138,6 +138,11 @@ public class RedisOptionsConverter {
             obj.setTopology(io.vertx.redis.client.RedisTopology.valueOf((String)member.getValue()));
           }
           break;
+        case "topologyCacheTTL":
+          if (member.getValue() instanceof Number) {
+            obj.setTopologyCacheTTL(((Number)member.getValue()).longValue());
+          }
+          break;
         case "tracingPolicy":
           if (member.getValue() instanceof String) {
             obj.setTracingPolicy(io.vertx.core.tracing.TracingPolicy.valueOf((String)member.getValue()));
@@ -206,6 +211,7 @@ public class RedisOptionsConverter {
     if (obj.getTopology() != null) {
       json.put("topology", obj.getTopology().name());
     }
+    json.put("topologyCacheTTL", obj.getTopologyCacheTTL());
     if (obj.getTracingPolicy() != null) {
       json.put("tracingPolicy", obj.getTracingPolicy().name());
     }

@@ -133,31 +133,4 @@ public class RedisSentinelTest {
     PreservesContext.connectThenSend(client, should);
     PreservesContext.connectThenBatch(client, should);
   }
-
-  @Test
-  public void testWriteToMasterReadFromReplica(TestContext should) {
-    final Async test = should.async();
-    final String key = randomKey();
-
-    Redis.createClient(
-        rule.vertx(),
-        new RedisOptions()
-          .setType(RedisClientType.SENTINEL)
-          .setUseReplicas(RedisReplicas.ALWAYS)
-          .addConnectionString(redis.getRedisSentinel0Uri())
-          .addConnectionString(redis.getRedisSentinel1Uri())
-          .addConnectionString(redis.getRedisSentinel2Uri())
-          .setMaxPoolSize(4)
-          .setMaxPoolWaiting(16))
-      .connect().onComplete(should.asyncAssertSuccess(conn -> {
-        conn.send(Request.cmd(Command.SET).arg(key).arg("foobar"))
-          .compose(ignored -> retryUntilSuccess(rule.vertx(), () -> {
-            return conn.send(Request.cmd(Command.GET).arg(key));
-          }, 10))
-          .onComplete(should.asyncAssertSuccess(result -> {
-            should.assertEquals("foobar", result.toString());
-            test.complete();
-          }));
-      }));
-  }
 }

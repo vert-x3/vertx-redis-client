@@ -35,6 +35,11 @@ public class RedisSentinelConnectOptionsConverter {
             obj.setRole(io.vertx.redis.client.RedisRole.valueOf((String)member.getValue()));
           }
           break;
+        case "topologyCacheTTL":
+          if (member.getValue() instanceof Number) {
+            obj.setTopologyCacheTTL(((Number)member.getValue()).longValue());
+          }
+          break;
       }
     }
   }
@@ -51,5 +56,6 @@ public class RedisSentinelConnectOptionsConverter {
     if (obj.getRole() != null) {
       json.put("role", obj.getRole().name());
     }
+    json.put("topologyCacheTTL", obj.getTopologyCacheTTL());
   }
 }

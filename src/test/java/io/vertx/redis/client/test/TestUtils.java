@@ -22,9 +22,9 @@ public class TestUtils {
   }
 
   /**
-   * Waits until the given {@code condition} is {@code true} and then invokes the given {@code action} once,
-   * returning its result. Waiting is not active, it uses the Vert.x {@linkplain Vertx#setTimer(long, Handler) timer}
-   * facility.
+   * Waits until the given {@code condition} is {@code true} and then invokes the given {@code action} once.
+   * Waiting is not active, it uses the Vert.x {@linkplain Vertx#setTimer(long, Handler) timer} facility.
+   * The delay between retries is 5 millis.
    */
   public static void executeWhenConditionSatisfied(Vertx vertx, BooleanSupplier condition, Runnable action) {
     if (condition.getAsBoolean()) {
@@ -38,6 +38,7 @@ public class TestUtils {
 
   /**
    * Retries the given {@code action} until it succeeds or until the number of retries reaches the given maximum.
+   * The delay between retries is 500 millis.
    */
   public static <T> Future<T> retryUntilSuccess(Vertx vertx, Supplier<Future<T>> action, int maxRetries) {
     Promise<T> promise = Promise.promise();
