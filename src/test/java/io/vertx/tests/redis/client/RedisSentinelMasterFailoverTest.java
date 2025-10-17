@@ -42,13 +42,28 @@ public class RedisSentinelMasterFailoverTest {
       .connect()
       .onComplete(test.asyncAssertSuccess(conn -> {
         conn.send(Request.cmd(Command.SET).arg("key").arg("value"))
-          .compose(ignored -> conn.send(Request.cmd(Command.SHUTDOWN)))
-          .onComplete(test.asyncAssertFailure(ignored -> { // connection closed
-            retryUntilSuccess(rule.vertx(), () -> conn.send(Request.cmd(Command.GET).arg("key")), 50)
-              .onComplete(test.asyncAssertSuccess(response -> {
-                test.assertEquals("value", response.toString());
-                async.complete();
-              }));
+          .compose(ignored -> {
+            // shutdown current master, promote one replica out of two (the other replica remains)
+            return conn.send(Request.cmd(Command.SHUTDOWN));
+          })
+          .transform((value, error) -> {
+            test.assertNull(value);
+            test.assertNotNull(error); // connection closed
+            return retryUntilSuccess(rule.vertx(), () -> conn.send(Request.cmd(Command.GET).arg("key")), 50);
+          })
+          .compose(response -> {
+            test.assertEquals("value", response.toString());
+            // shutdown current master, promote the remaining replica (no other replica exists)
+            return conn.send(Request.cmd(Command.SHUTDOWN));
+          })
+          .transform((value, error) -> {
+            test.assertNull(value);
+            test.assertNotNull(error); // connection closed
+            return retryUntilSuccess(rule.vertx(), () -> conn.send(Request.cmd(Command.GET).arg("key")), 50);
+          })
+          .onComplete(test.asyncAssertSuccess(response -> {
+            test.assertEquals("value", response.toString());
+            async.complete();
           }));
       }));
   }

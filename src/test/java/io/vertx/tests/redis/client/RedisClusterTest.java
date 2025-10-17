@@ -90,7 +90,7 @@ public class RedisClusterTest {
     .addConnectionString(redis.getRedisNode5Uri())
     .setMaxPoolSize(8)
     .setMaxPoolWaiting(16)
-    .setHashSlotCacheTTL(10_000);
+    .setTopologyCacheTTL(10_000);
 
   private Redis client;
 
