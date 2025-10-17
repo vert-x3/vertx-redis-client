@@ -10,6 +10,11 @@ import io.vertx.redis.client.Response;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicReference;
 
+// in the Sentinel mode, a plain connection is used:
+// - when connecting to a sentinel
+// - when connecting to a replica
+// - when connecting to a master node and automatic failover is disabled
+// this class is only used when connecting to a master node and automatic failover is enabled
 public class RedisSentinelConnection implements RedisConnection {
 
   private final AtomicReference<PooledRedisConnection> connection;

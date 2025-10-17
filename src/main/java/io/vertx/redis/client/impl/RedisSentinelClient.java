@@ -19,48 +19,27 @@ import io.vertx.core.Completable;
 import io.vertx.core.Future;
 import io.vertx.core.Promise;
 import io.vertx.core.Vertx;
-import io.vertx.core.internal.logging.Logger;
-import io.vertx.core.internal.logging.LoggerFactory;
 import io.vertx.core.net.NetClientOptions;
 import io.vertx.core.tracing.TracingPolicy;
 import io.vertx.redis.client.Command;
 import io.vertx.redis.client.PoolOptions;
 import io.vertx.redis.client.Redis;
-import io.vertx.redis.client.RedisConnectOptions;
 import io.vertx.redis.client.RedisConnection;
 import io.vertx.redis.client.RedisRole;
 import io.vertx.redis.client.RedisSentinelConnectOptions;
 import io.vertx.redis.client.Request;
-import io.vertx.redis.client.Response;
 
-import java.util.List;
-import java.util.Random;
-import java.util.Set;
-import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Supplier;
 
 public class RedisSentinelClient extends BaseRedisClient<RedisSentinelConnectOptions> implements Redis {
 
-  // we need some randomness, it doesn't need to be cryptographically secure
-  private static final Random RANDOM = new Random();
-
-  private static class Pair<L, R> {
-    final L left;
-    final R right;
-
-    Pair(L left, R right) {
-      this.left = left;
-      this.right = right;
-    }
-  }
-
-  private static final Logger LOG = LoggerFactory.getLogger(RedisSentinelClient.class);
-
+  private final SharedSentinelTopology sharedTopology;
   private final AtomicReference<SentinelFailover> failover = new AtomicReference<>();
 
   public RedisSentinelClient(Vertx vertx, NetClientOptions tcpOptions, PoolOptions poolOptions, Supplier<Future<RedisSentinelConnectOptions>> connectOptions, TracingPolicy tracingPolicy) {
     super(vertx, tcpOptions, poolOptions, connectOptions, tracingPolicy);
+    this.sharedTopology = new SharedSentinelTopology(vertx, connectOptions, connectionManager);
     // validate options
     if (poolOptions.getMaxWaiting() < poolOptions.getMaxSize()) {
       throw new IllegalStateException("Invalid options: maxWaiting < maxSize");
@@ -70,14 +49,20 @@ public class RedisSentinelClient extends BaseRedisClient<RedisSentinelConnectOpt
   @Override
   public Future<RedisConnection> connect() {
     final Promise<RedisConnection> promise = vertx.promise();
-    connectOptions.get()
-      .onSuccess(opts -> doConnect(opts, promise))
+    sharedTopology.get()
+      .onSuccess(topology -> connect(topology, promise))
       .onFailure(promise::fail);
     return promise.future();
   }
 
-  private void doConnect(RedisSentinelConnectOptions connectOptions, Completable<RedisConnection> promise) {
-    createConnectionInternal(connectOptions, connectOptions.getRole(), (conn, err) -> {
+  private void connect(SentinelTopology topology, Completable<RedisConnection> promise) {
+    connectOptions.get()
+      .onSuccess(opts -> connect(topology, opts, promise))
+      .onFailure(promise::fail);
+  }
+
+  private void connect(SentinelTopology topology, RedisSentinelConnectOptions connectOptions, Completable<RedisConnection> promise) {
+    createConnectionInternal(topology, connectOptions.getRole(), (conn, err) -> {
       if (err != null) {
         promise.fail(err);
         return;
@@ -94,19 +79,21 @@ public class RedisSentinelClient extends BaseRedisClient<RedisSentinelConnectOpt
         return;
       }
 
-      SentinelFailover failover = setupFailover(connectOptions);
+      SentinelFailover failover = setupFailover(connectOptions.getMasterName());
       RedisSentinelConnection sentinelConn = new RedisSentinelConnection(conn, failover);
       promise.succeed(sentinelConn);
     });
   }
 
-  private SentinelFailover setupFailover(RedisSentinelConnectOptions connectOptions) {
+  private SentinelFailover setupFailover(String masterName) {
     SentinelFailover result = this.failover.get();
 
     if (result == null) {
-      result = new SentinelFailover(connectOptions.getMasterName(), role -> {
+      result = new SentinelFailover(vertx, masterName, role -> {
         Promise<PooledRedisConnection> promise = Promise.promise();
-        createConnectionInternal(connectOptions, role, promise);
+        sharedTopology.get()
+          .onSuccess(topology -> createConnectionInternal(topology, role, promise))
+          .onFailure(promise::fail);
         return promise.future();
       });
       if (this.failover.compareAndSet(null, result)) {
@@ -128,177 +115,32 @@ public class RedisSentinelClient extends BaseRedisClient<RedisSentinelConnectOpt
     return super.close();
   }
 
-  private void createConnectionInternal(RedisSentinelConnectOptions options, RedisRole role, Completable<PooledRedisConnection> onCreate) {
-
-    final Completable<RedisURI> createAndConnect = (uri, err) -> {
-      if (err != null) {
-        onCreate.fail(err);
-        return;
-      }
-
-      final Request setup;
-
-      // `SELECT` is only allowed on non-sentinel nodes
-      // we don't send `READONLY` setup to replica nodes, because that's a cluster-only command
-      if (role != RedisRole.SENTINEL && uri.select() != null) {
-        setup = Request.cmd(Command.SELECT).arg(uri.select());
-      } else {
-        setup = null;
-      }
-
-      // wrap a new client
-      connectionManager.getConnection(uri.baseUri(), setup).onComplete(onCreate);
-    };
-
+  private void createConnectionInternal(SentinelTopology topology, RedisRole role, Completable<PooledRedisConnection> onCreate) {
+    RedisURI uri;
     switch (role) {
       case SENTINEL:
-        resolveClient(this::isSentinelOk, options, createAndConnect);
+        uri = topology.getRandomSentinel();
         break;
       case MASTER:
-        resolveClient(this::getMasterFromEndpoint, options, createAndConnect);
+        uri = topology.getMaster();
         break;
       case REPLICA:
-        resolveClient(this::getReplicaFromEndpoint, options, createAndConnect);
+        uri = topology.getRandomReplica();
         break;
-    }
-  }
-
-  /**
-   * We use the algorithm from http://redis.io/topics/sentinel-clients
-   * to get a sentinel client and then do 'stuff' with it
-   */
-  private static void resolveClient(final Resolver checkEndpointFn, final RedisSentinelConnectOptions options, final Completable<RedisURI> callback) {
-    // Because finding the master is going to be an async list we will terminate
-    // when we find one then use promises...
-    iterate(0, ConcurrentHashMap.newKeySet(), checkEndpointFn, options, (found, err) -> {
-      if (err != null) {
-        callback.fail(err);
-      } else {
-        // This is the endpoint that has responded so stick it on the top of
-        // the list
-        final List<String> endpoints = options.getEndpoints();
-        String endpoint = endpoints.get(found.left);
-        endpoints.set(found.left, endpoints.get(0));
-        endpoints.set(0, endpoint);
-        // now return the right address
-        callback.succeed(found.right);
-      }
-    });
-  }
-
-  private static void iterate(final int idx, final Set<Throwable> failures, final Resolver checkEndpointFn, final RedisSentinelConnectOptions argument, final Completable<Pair<Integer, RedisURI>> resultHandler) {
-    // stop condition
-    final List<String> endpoints = argument.getEndpoints();
-
-    if (idx >= endpoints.size()) {
-      StringBuilder message = new StringBuilder("Cannot connect to any of the provided endpoints");
-      for (Throwable failure : failures) {
-        message.append("\n- ").append(failure);
-      }
-      resultHandler.fail(new RedisConnectException(message.toString()));
-      return;
+      default:
+        onCreate.fail("Unknown role: " + role);
+        return;
     }
 
-    // attempt to perform operation
-    checkEndpointFn.resolve(endpoints.get(idx), argument, (res, err) -> {
-      if (err == null) {
-        resultHandler.succeed(new Pair<>(idx, res));
-      } else {
-        // try again with next endpoint
-        failures.add(err);
-        iterate(idx + 1, failures, checkEndpointFn, argument, resultHandler);
-      }
-    });
+    Request setup = null;
+
+    // `SELECT` is only allowed on non-sentinel nodes
+    // we don't send `READONLY` setup to replica nodes, because that's a cluster-only command
+    if (role != RedisRole.SENTINEL && uri.select() != null) {
+      setup = Request.cmd(Command.SELECT).arg(uri.select());
+    }
+
+    // wrap a new client
+    connectionManager.getConnection(uri.baseUri(), setup).onComplete(onCreate);
   }
-
-  // begin endpoint check methods
-
-  private void isSentinelOk(String endpoint, RedisConnectOptions argument, Completable<RedisURI> handler) {
-    // we can't use the endpoint as is, it should not contain a database selection,
-    // but can contain authentication
-    final RedisURI uri = new RedisURI(endpoint);
-
-    connectionManager.getConnection(uri.baseUri(), null)
-      .onFailure(handler::fail)
-      .onSuccess(conn -> {
-        // Send a command just to check we have a working node
-        conn
-          .send(Request.cmd(Command.PING))
-          .onFailure(handler::fail)
-          .onSuccess(ok -> handler.succeed(uri))
-          .eventually(() -> conn.close().onFailure(LOG::warn));
-      });
-  }
-
-  private void getMasterFromEndpoint(String endpoint, RedisSentinelConnectOptions options, Completable<RedisURI> handler) {
-    // we can't use the endpoint as is, it should not contain a database selection,
-    // but can contain authentication
-    final RedisURI uri = new RedisURI(endpoint);
-    connectionManager.getConnection(uri.baseUri(), null)
-      .onFailure(handler::fail)
-      .onSuccess(conn -> {
-        final String masterName = options.getMasterName();
-        // Send a command just to check we have a working node
-        conn
-          .send(Request.cmd(Command.SENTINEL).arg("GET-MASTER-ADDR-BY-NAME").arg(masterName))
-          .onFailure(handler::fail)
-          .onSuccess(response -> {
-            if (response == null) {
-              handler.fail("Failed to GET-MASTER-ADDR-BY-NAME " + masterName);
-            } else {
-              final String rHost = response.get(0).toString();
-              final Integer rPort = response.get(1).toInteger();
-              handler.succeed(new RedisURI(uri, rHost.contains(":") ? "[" + rHost + "]" : rHost, rPort));
-            }
-          })
-          .eventually(() -> conn.close().onFailure(LOG::warn));
-      });
-  }
-
-  private void getReplicaFromEndpoint(String endpoint, RedisSentinelConnectOptions options, Completable<RedisURI> handler) {
-    // we can't use the endpoint as is, it should not contain a database selection,
-    // but can contain authentication
-    final RedisURI uri = new RedisURI(endpoint);
-    connectionManager.getConnection(uri.baseUri(), null)
-      .onFailure(handler::fail)
-      .onSuccess(conn -> {
-        final String masterName = options.getMasterName();
-        // Send a command just to check we have a working node
-        conn
-          .send(Request.cmd(Command.SENTINEL).arg("SLAVES").arg(masterName))
-          .onFailure(handler::fail)
-          .onSuccess(response -> {
-            // Test the response
-            if (response == null || response.size() == 0) {
-              handler.fail("No replicas linked to the master: " + masterName);
-            } else {
-              Response replicaInfoArr = response.get(RANDOM.nextInt(response.size()));
-              if ((replicaInfoArr.size() % 2) > 0) {
-                handler.fail("Corrupted response from the sentinel");
-              } else {
-                int port = 6379;
-                String ip = null;
-
-                if (replicaInfoArr.containsKey("port")) {
-                  port = replicaInfoArr.get("port").toInteger();
-                }
-
-                if (replicaInfoArr.containsKey("ip")) {
-                  ip = replicaInfoArr.get("ip").toString();
-                }
-
-                if (ip == null) {
-                  handler.fail("No IP found for a REPLICA node!");
-                } else {
-                  final String host = ip.contains(":") ? "[" + ip + "]" : ip;
-
-                  handler.succeed(new RedisURI(uri, host, port));
-                }
-              }
-            }
-          })
-          .eventually(() -> conn.close().onFailure(LOG::warn));
-      });
-  }
-
 }

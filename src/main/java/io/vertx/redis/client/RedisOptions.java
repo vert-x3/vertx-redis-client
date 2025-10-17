@@ -56,7 +56,7 @@ public class RedisOptions {
   private volatile String password;
   private boolean protocolNegotiation;
   private ProtocolVersion preferredProtocolVersion;
-  private long hashSlotCacheTTL;
+  private long topologyCacheTTL;
   private TracingPolicy tracingPolicy;
   private boolean autoFailover;
 
@@ -78,7 +78,7 @@ public class RedisOptions {
     useReplicas = RedisReplicas.NEVER;
     clusterTransactions = RedisClusterTransactions.DISABLED;
     protocolNegotiation = true;
-    hashSlotCacheTTL = 1000;
+    topologyCacheTTL = 1000;
   }
 
   /**
@@ -103,7 +103,7 @@ public class RedisOptions {
     this.password = other.password;
     this.protocolNegotiation = other.protocolNegotiation;
     this.preferredProtocolVersion = other.preferredProtocolVersion;
-    this.hashSlotCacheTTL = other.hashSlotCacheTTL;
+    this.topologyCacheTTL = other.topologyCacheTTL;
     this.tracingPolicy = other.tracingPolicy;
     this.autoFailover = other.autoFailover;
   }
@@ -706,33 +706,45 @@ public class RedisOptions {
     return this;
   }
 
-  /**
-   * Returns the TTL of the hash slot cache. The TTL is expressed in milliseconds.
-   * Defaults to 1000 millis (1 second).
-   * <p>
-   * This is only meaningful in case of a {@linkplain RedisClientType#CLUSTER cluster} Redis client
-   * and is ignored otherwise.
-   * </p>
-   *
-   * @return the TTL of the hash slot cache
-   */
+  @Deprecated
+  @GenIgnore
   public long getHashSlotCacheTTL() {
-    return hashSlotCacheTTL;
+    return getTopologyCacheTTL();
   }
 
   /**
-   * Sets the TTL of the hash slot cache. The TTL is expressed in milliseconds.
+   * Returns the TTL of the topology cache. The TTL is expressed in milliseconds.
    * Defaults to 1000 millis (1 second).
    * <p>
-   * This is only meaningful in case of a {@linkplain RedisClientType#CLUSTER cluster} Redis client
-   * and is ignored otherwise.
+   * This is only meaningful in case of a {@linkplain RedisClientType#CLUSTER cluster}
+   * or {@linkplain RedisClientType#SENTINEL sentinel} Redis client and is ignored otherwise.
    * </p>
    *
-   * @param hashSlotCacheTTL the TTL of the hash slot cache, in millis
+   * @return the TTL of the topology cache
+   */
+  public long getTopologyCacheTTL() {
+    return topologyCacheTTL;
+  }
+
+  @Deprecated
+  @GenIgnore
+  public RedisOptions setHashSlotCacheTTL(long hashSlotCacheTTL) {
+    return setTopologyCacheTTL(hashSlotCacheTTL);
+  }
+
+  /**
+   * Sets the TTL of the topology cache. The TTL is expressed in milliseconds.
+   * Defaults to 1000 millis (1 second).
+   * <p>
+   * This is only meaningful in case of a {@linkplain RedisClientType#CLUSTER cluster}
+   * or {@linkplain RedisClientType#SENTINEL sentinel} Redis client and is ignored otherwise.
+   * </p>
+   *
+   * @param topologyCacheTTL the TTL of the topology cache, in millis
    * @return fluent self
    */
-  public RedisOptions setHashSlotCacheTTL(long hashSlotCacheTTL) {
-    this.hashSlotCacheTTL = hashSlotCacheTTL;
+  public RedisOptions setTopologyCacheTTL(long topologyCacheTTL) {
+    this.topologyCacheTTL = topologyCacheTTL;
     return this;
   }
 
