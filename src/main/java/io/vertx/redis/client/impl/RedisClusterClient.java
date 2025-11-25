@@ -38,7 +38,6 @@ import io.vertx.redis.client.impl.types.SimpleStringType;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Function;
@@ -160,7 +159,7 @@ public class RedisClusterClient extends BaseRedisClient<RedisClusterConnectOptio
 
   private void connect(Slots slots, RedisClusterConnectOptions connectOptions, Completable<RedisConnection> onConnected) {
     // create a cluster connection
-    final Set<Throwable> failures = ConcurrentHashMap.newKeySet();
+    final Map<String, Throwable> failures = new ConcurrentHashMap<>();
     final AtomicInteger counter = new AtomicInteger();
     final Map<String, PooledRedisConnection> connections = new HashMap<>();
 
@@ -168,7 +167,7 @@ public class RedisClusterClient extends BaseRedisClient<RedisClusterConnectOptio
       connectionManager.getConnection(endpoint, RedisReplicas.NEVER != connectOptions.getUseReplicas() ? Request.cmd(Command.READONLY) : null)
         .onFailure(err -> {
           // failed try with the next endpoint
-          failures.add(err);
+          failures.put(endpoint, err);
           connectionComplete(counter, slots, connectOptions, connections, failures, onConnected);
         })
         .onSuccess(cconn -> {
@@ -184,7 +183,7 @@ public class RedisClusterClient extends BaseRedisClient<RedisClusterConnectOptio
   }
 
   private void connectionComplete(AtomicInteger counter, Slots slots, RedisClusterConnectOptions connectOptions,
-      Map<String, PooledRedisConnection> connections, Set<Throwable> failures, Completable<RedisConnection> onConnected) {
+      Map<String, PooledRedisConnection> connections, Map<String, Throwable> failures, Completable<RedisConnection> onConnected) {
     if (counter.incrementAndGet() == slots.endpoints().length) {
       // end condition
       if (!failures.isEmpty()) {
@@ -201,8 +200,8 @@ public class RedisClusterClient extends BaseRedisClient<RedisClusterConnectOptio
         }
         // return
         StringBuilder message = new StringBuilder("Failed to connect to all nodes of the cluster");
-        for (Throwable failure : failures) {
-          message.append("\n- ").append(failure);
+        for (Map.Entry<String, Throwable> failure : failures.entrySet()) {
+          message.append(String.format("\n- %s: %s", failure.getKey(), failure.getValue().getMessage()));
         }
         onConnected.fail(new RedisConnectException(message.toString()));
       } else {
