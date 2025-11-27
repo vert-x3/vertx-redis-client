@@ -29,7 +29,7 @@
   <name>Vert.x Redis Client</name>
 
   <properties>
-    <version.bouncycastle>1.82</version.bouncycastle>
+    <version.bouncycastle>1.83</version.bouncycastle>
     <version.junit-jupiter>5.14.0</version.junit-jupiter>
     <version.testcontainers>2.0.2</version.testcontainers>
   </properties>
