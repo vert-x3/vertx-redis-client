@@ -16,19 +16,25 @@
 package io.vertx.redis.client.impl.types;
 
 import io.vertx.codegen.annotations.Nullable;
+import io.vertx.core.buffer.Buffer;
 import io.vertx.redis.client.Response;
 import io.vertx.redis.client.ResponseType;
 
-import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Iterator;
+import java.util.LinkedHashMap;
+import java.util.LinkedHashSet;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
+import java.util.function.Function;
 
 /**
  * A Redis MULTI response can represent a List/Set/Map type.
  */
 public final class MultiType implements Multi {
+  // shorthand aliases for better readability
+  private static final Function<Response, String> AS_STRING = Response::toString;
+  private static final Function<Response, Buffer> AS_BIN = Response::toBuffer;
 
   public static final MultiType EMPTY_MULTI = new MultiType(0, false);
   public static final MultiType EMPTY_MAP = new MultiType(0, true);
@@ -42,29 +48,32 @@ public final class MultiType implements Multi {
   }
 
   // only one of these will be not null
-  private final Map<String, Response> map;
+  private final Map<StrKey, Response> strMap;
   private final Response[] multi;
+  private Map<BinKey, Response> binMap; // evaluated when binary keys are used
   // the expected size
   private final int size;
   // mutable temporary state
   private int count;
-  private String key;
+  private StrKey key;
 
   private MultiType(int size, boolean asMap) {
     if (asMap) {
       this.multi = null;
-      this.map = new HashMap<>(size, 1.0f);
+      // redis tracks the order of entries in hashes, for some use-cases it may
+      // be important to preserve it, so we use LinkedHashMap
+      this.strMap = new LinkedHashMap<>(size, 1.0f);
     } else {
       this.multi = new Response[size];
-      this.map = null;
+      this.strMap = null;
     }
     this.size = size;
     this.count = 0;
   }
 
-  private MultiType(String key, Response value) {
-    this.map = null;
-    this.multi = new Response[]{SimpleStringType.create(key), value};
+  private MultiType(WrappedResp wrappedKey, Response value) {
+    this.strMap = null;
+    this.multi = new Response[]{wrappedKey.rawResp(), value};
     this.size = 2;
   }
 
@@ -76,7 +85,7 @@ public final class MultiType implements Multi {
   @Override
   public void add(Response reply) {
     // if this Multi was created as a Map
-    if (map != null) {
+    if (strMap != null) {
       if (count % 2 == 0) {
         if (reply == null || reply.type() == null) {
           throw new IllegalArgumentException("Map key is NULL or untyped");
@@ -85,14 +94,14 @@ public final class MultiType implements Multi {
         switch (reply.type()) {
           case BULK:
           case SIMPLE:
-            key = reply.toString();
+            key = new StrKey(reply);
             break;
           default:
             throw new IllegalArgumentException("Map key is not BULK or SIMPLE");
         }
       } else {
         if (key != null) {
-          map.put(key, reply);
+          strMap.put(key, reply);
         }
         // clear the key
         key = null;
@@ -120,72 +129,90 @@ public final class MultiType implements Multi {
 
   @Override
   public @Nullable Response get(String key) {
-    if (map != null) {
-      return map.get(key);
+    if (strMap != null) {
+      return strMap.get(new StrKey(key));
     }
-
-    if (multi != null) {
+    if (canInterpretMultiArrayAsMap()) {
       // fallback (emulate old behavior)
-      if (multi.length % 2 == 0) {
-        // if the size is even we assume we can handle it as Map
-        for (int i = 0; i < multi.length; i += 2) {
-          if (key.equals(multi[i].toString())) {
-            return multi[i + 1];
-          }
-        }
-        // not found
-        return null;
-      }
+      return findInMultiArray(key, AS_STRING);
     }
-
     throw new RuntimeException("Number of key is not even can't handle as Map");
   }
 
   @Override
   public boolean containsKey(String key) {
-    if (map != null) {
-      return map.containsKey(key);
+    if (strMap != null) {
+      return strMap.containsKey(new StrKey(key));
+    }
+    if (canInterpretMultiArrayAsMap()) {
+      // fallback (emulate old behavior)
+      return findInMultiArray(key, AS_STRING) != null;
+    }
+    throw new RuntimeException("Number of key is not even can't handle as Map");
+  }
+
+  @Override
+  public Set<String> getKeys() {
+    if (strMap != null) {
+      Set<String> strKeys = new LinkedHashSet<>();
+      for (StrKey k : strMap.keySet()) {
+        strKeys.add(k.asStr());
+      }
+      return strKeys;
     }
 
-    if (multi != null) {
+    if (canInterpretMultiArrayAsMap()) {
       // fallback (emulate old behavior)
-      if (multi.length % 2 == 0) {
-        // if the size is even we assume we can handle it as Map
-        for (int i = 0; i < multi.length; i += 2) {
-          if (key.equals(multi[i].toString())) {
-            return true;
-          }
-        }
-        // not found
-        return false;
-      }
+      return getKeysOfMultiArray(AS_STRING);
     }
 
     throw new RuntimeException("Number of key is not even can't handle as Map");
   }
 
   @Override
-  public Set<String> getKeys() {
-    if (map != null) {
-      return map.keySet();
+  public Response get(Buffer binKey) {
+    if (strMap != null) {
+      buildBinMapIfNeeded();
+      return binMap.get(new BinKey(binKey));
     }
 
-    if (multi != null) {
+    if (canInterpretMultiArrayAsMap()) {
       // fallback (emulate old behavior)
-      if (multi.length % 2 == 0) {
-        final Set<String> keys = new HashSet<>();
-        // if the size is even we assume we can handle it as Map
-        for (int i = 0; i < multi.length; i += 2) {
-          switch (multi[i].type()) {
-            case BULK:
-            case SIMPLE:
-              keys.add(multi[i].toString());
-              break;
-          }
-        }
+      return findInMultiArray(binKey, AS_BIN);
+    }
 
-        return keys;
+    throw new RuntimeException("Number of key is not even can't handle as Map");
+  }
+
+  @Override
+  public boolean containsKey(Buffer binKey) {
+    if (strMap != null) {
+      buildBinMapIfNeeded();
+      return binMap.containsKey(new BinKey(binKey));
+    }
+
+    if (canInterpretMultiArrayAsMap()) {
+      // fallback (emulate old behavior)
+      return findInMultiArray(binKey, AS_BIN) != null;
+    }
+
+    throw new RuntimeException("Number of key is not even can't handle as Map");
+  }
+
+  @Override
+  public Set<Buffer> getBinaryKeys() {
+    if (strMap != null) {
+      buildBinMapIfNeeded();
+      Set<Buffer> binKeys = new LinkedHashSet<>();
+      for (BinKey k : binMap.keySet()) {
+        binKeys.add(k.asBin());
       }
+      return binKeys;
+    }
+
+    if (canInterpretMultiArrayAsMap()) {
+      // fallback (emulate old behavior)
+      return getKeysOfMultiArray(AS_BIN);
     }
 
     throw new RuntimeException("Number of key is not even can't handle as Map");
@@ -203,7 +230,7 @@ public final class MultiType implements Multi {
 
   @Override
   public boolean isMap() {
-    return map != null;
+    return strMap != null;
   }
 
   @Override
@@ -228,10 +255,13 @@ public final class MultiType implements Multi {
       sb.append(']');
     }
 
-    if (map != null) {
+    if (strMap != null) {
       sb.append('{');
       boolean more = false;
-      for (Map.Entry<String, Response> kv : map.entrySet()) {
+      // if binMap is built, then the caller interprets keys as binary
+      Map<? extends WrappedResp, Response> mapToUse =
+        Objects.requireNonNullElse(binMap, strMap);
+      for (Map.Entry<? extends WrappedResp, Response> kv : mapToUse.entrySet()) {
         if (more) {
           sb.append(", ");
         }
@@ -265,9 +295,9 @@ public final class MultiType implements Multi {
       };
     }
 
-    if (map != null) {
+    if (strMap != null) {
       return new Iterator<Response>() {
-        private final Iterator<Map.Entry<String, Response>> it = map.entrySet().iterator();
+        private final Iterator<Map.Entry<StrKey, Response>> it = strMap.entrySet().iterator();
 
         @Override
         public boolean hasNext() {
@@ -277,12 +307,166 @@ public final class MultiType implements Multi {
         @Override
         public Response next() {
           // wrap the kv into a single multi response
-          final Map.Entry<String, Response> kv = it.next();
+          final Map.Entry<StrKey, Response> kv = it.next();
           return new MultiType(kv.getKey(), kv.getValue());
         }
       };
     }
 
     throw new UnsupportedOperationException("Cannot iterator over NULL");
+  }
+
+  private boolean canInterpretMultiArrayAsMap() {
+    // if the size is even we assume we can handle it as Map
+    return multi != null && multi.length % 2 == 0;
+  }
+
+  private <K> Set<K> getKeysOfMultiArray(Function<Response, K> converter) {
+    Set<K> convertedKeys = new LinkedHashSet<K>();
+    // if the size is even we assume we can handle it as Map
+    for (int i = 0; i < multi.length; i += 2) {
+      switch (multi[i].type()) {
+        case BULK:
+        case SIMPLE:
+          convertedKeys.add(converter.apply(multi[i]));
+          break;
+      }
+    }
+    return convertedKeys;
+  }
+
+  private <K> Response findInMultiArray(K key, Function<Response, K> converter) {
+    for (int i = 0; i < multi.length; i += 2) {
+      K respInKeyFormat = converter.apply(multi[i]);
+      if (key.equals(respInKeyFormat)) {
+        return multi[i + 1];
+      }
+    }
+    // not found
+    return null;
+  }
+
+  private void buildBinMapIfNeeded() {
+    if (binMap != null) {
+      return;
+    }
+    binMap = new LinkedHashMap<>(strMap.size(), 1.0f);
+    for (Map.Entry<StrKey, Response> e : strMap.entrySet()) {
+      binMap.put(new BinKey(e.getKey().rawResp()), e.getValue());
+    }
+  }
+
+  private abstract static class WrappedResp {
+    private final Response rawResp;
+
+    WrappedResp(Response rawResp) {
+      this.rawResp = rawResp;
+    }
+
+    Response rawResp() {
+      return rawResp;
+    }
+  }
+
+  /**
+   * Wrapper over {@link Response} that allows using it as a Map key,
+   * and allows comparison (equals/hashCode) with both other {@link StrKey}
+   * instances and with {@link String} directly. Needed to support lookups
+   * by String keys provided by callers.
+   */
+  private static class StrKey extends WrappedResp {
+    private final String asStr;
+
+    StrKey(Response rawResp) {
+      super(rawResp);
+      this.asStr = rawResp.toString();
+    }
+
+    StrKey(String strKey) {
+      super(null);
+      this.asStr = strKey;
+    }
+
+    String asStr() {
+      return asStr;
+    }
+
+    @Override
+    public int hashCode() {
+      return asStr.hashCode();
+    }
+
+    @Override
+    public boolean equals(Object o) {
+      if (o == this) {
+        return true;
+      }
+      if (o == null) {
+        return false;
+      }
+      if (o.getClass() == String.class) {
+        return asStr.equals(o);
+      } else if (o.getClass() == StrKey.class) {
+        return asStr.equals(((StrKey) o).asStr);
+      } else {
+        return false;
+      }
+    }
+
+    @Override
+    public String toString() {
+      return asStr;
+    }
+  }
+
+  /**
+   * Wrapper over {@link Response} that allows using it as a Map key,
+   * and allows comparison (equals/hashCode) with both other {@link BinKey}
+   * instances and with {@link Buffer} directly. Needed to support lookups
+   * by binary keys ({@link Buffer}) provided by callers.
+   */
+  private static class BinKey extends WrappedResp {
+    private final Buffer asBin;
+
+    BinKey(Response rawResp) {
+      super(rawResp);
+      this.asBin = rawResp.toBuffer();
+    }
+
+    BinKey(Buffer binKey) {
+      super(null);
+      this.asBin = binKey;
+    }
+
+    Buffer asBin() {
+      return asBin;
+    }
+
+    @Override
+    public int hashCode() {
+      return asBin.hashCode();
+    }
+
+    @Override
+    public boolean equals(Object o) {
+      if (o == this) {
+        return true;
+      }
+      if (o == null) {
+        return false;
+      }
+      if (o instanceof Buffer) {
+        return asBin.equals(o);
+      } else if (o.getClass() == BinKey.class) {
+        return asBin.equals(((BinKey) o).asBin);
+      } else {
+        return false;
+      }
+    }
+
+    @Override
+    public String toString() {
+      return asBin.toJson(); // to base64 in JSON standard
+    }
   }
 }
