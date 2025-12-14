@@ -24,12 +24,12 @@ public class RedisCluster implements Startable {
 
   @Override
   public void start() {
-    container.start();
+    ContainerUtil.start(container);
   }
 
   @Override
   public void stop() {
-    container.stop();
+    ContainerUtil.stop(container);
   }
 
   public String getRedisNode0Uri() {
