@@ -278,7 +278,53 @@ public interface Response extends Iterable<Response> {
   }
 
   /**
-   * Get this size of this multi response.
+   * Get this Multi response value at a binary key.
+   * <p>
+   * This is a variant of {@link #get(String)} that accepts binary keys. Use
+   * this method when the map contains binary keys that may not be interpreted
+   * as valid UTF-8 chars. For example, redis HASH with binary field names
+   * like UUIDs, IPs in binary form, hashes of some data, etc.
+   *
+   * @param key the required key.
+   * @return Response value.
+   */
+  default Response get(Buffer key) {
+    throw new UnsupportedOperationException("This type doesn't hold a Map type");
+  }
+
+  /**
+   * Check if this Multi response contains a binary key.
+   * <p>
+   * This is a variant of {@link #containsKey(String)} that accepts binary keys.
+   * Use this method when the map contains binary keys that may not be
+   * interpreted as valid UTF-8 chars. For example, redis HASH with binary
+   * field names like UUIDs, IPs in binary form, hashes of some data, etc.
+   *
+   * @param key the required key.
+   * @return whether the response contains the key.
+   */
+  default boolean containsKey(Buffer key) {
+    throw new UnsupportedOperationException("This type doesn't hold a Map type");
+  }
+
+  /**
+   * Get binary keys of this multi response.
+   * <p>
+   * This is a variant of {@link #getKeys()} that returns binary keys. Use this
+   * method when the map contains binary keys that may not be interpreted as
+   * valid UTF-8 chars. For example, redis HASH with binary field names like
+   * UUIDs, IPs in binary form, hashes of some data, etc.
+   *
+   * @return the set of binary keys.
+   */
+  default Set<Buffer> getBinaryKeys() {
+    throw new UnsupportedOperationException("This type doesn't hold a Map type");
+  }
+
+  /**
+   * Get the size of this multi response, which is the number of elements in the array.
+   * In case of a map, it is the number of keys <em>plus</em> the number of values, or
+   * in other words <em>twice</em> the number of key/value mappings.
    *
    * @return the size of the multi.
    */

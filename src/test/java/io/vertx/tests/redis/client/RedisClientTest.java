@@ -16,6 +16,7 @@
 package io.vertx.tests.redis.client;
 
 import io.vertx.core.Context;
+import io.vertx.core.buffer.Buffer;
 import io.vertx.core.internal.pool.PoolConnector;
 import io.vertx.junit5.RunTestOnContext;
 import io.vertx.junit5.VertxExtension;
@@ -23,6 +24,7 @@ import io.vertx.junit5.VertxTestContext;
 import io.vertx.redis.client.Command;
 import io.vertx.redis.client.Redis;
 import io.vertx.redis.client.RedisAPI;
+import io.vertx.redis.client.RedisConnection;
 import io.vertx.redis.client.RedisOptions;
 import io.vertx.redis.client.Request;
 import io.vertx.redis.client.impl.PooledRedisConnection;
@@ -42,6 +44,7 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import static io.vertx.tests.redis.client.TestUtils.randomKey;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -737,6 +740,42 @@ public class RedisClientTest {
         assertEquals("World", reply2.get("field2").toString());
         test.completeNow();
       }));
+  }
+
+  @Test
+  public void testHgetallBinKeys(VertxTestContext test) {
+    final String myhash = randomKey();
+    final byte[] binField1 = new byte[]{0x10, 0x20, 0x30, 0x40, 0x50, 0x60};
+    final byte[] binField2 = new byte[]{-0x10, -0x20, -0x30, -0x40, -0x50, -0x60};
+    final String strField = "test-field-3";
+    final String value = "test-value";
+
+    // need to use low level API to work with binary data
+    client.connect().onComplete(test.succeeding(redisConn -> {
+      redisConn.send(Request.cmd(Command.HSET)
+          .arg(myhash)
+          .arg(binField1).arg(value)
+          .arg(binField2).arg(value)
+          .arg(strField).arg(value))
+        .compose(resp -> {
+          assertEquals(3, resp.toInteger()); // num of fields set
+          return redisConn.send(Request.cmd(Command.HGETALL).arg(myhash));
+        })
+        .compose(resp -> {
+          // can get fields by binary keys
+          assertEquals(value, resp.get(Buffer.buffer(binField1)).toString());
+          assertEquals(value, resp.get(Buffer.buffer(binField2)).toString());
+          assertEquals(value, resp.get(strField).toString());
+          // and can get set of all binary keys
+          assertEquals(Set.of(
+            Buffer.buffer(binField1),
+            Buffer.buffer(binField2),
+            Buffer.buffer(strField)
+          ), resp.getBinaryKeys());
+          return redisConn.close();
+        })
+        .onComplete(test.succeedingThenComplete());
+    }));
   }
 
   @Test
