@@ -31,10 +31,13 @@ import io.vertx.redis.client.RedisConnection;
 import io.vertx.redis.client.RedisReplicas;
 import io.vertx.redis.client.Request;
 import io.vertx.redis.client.Response;
+import io.vertx.redis.client.impl.Primitives.IntList;
+import io.vertx.redis.client.impl.RedisClusterConnection.ResponseWithPositions;
 import io.vertx.redis.client.impl.types.MultiType;
 import io.vertx.redis.client.impl.types.NumberType;
 import io.vertx.redis.client.impl.types.SimpleStringType;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -47,10 +50,16 @@ public class RedisClusterClient extends BaseRedisClient<RedisClusterConnectOptio
 
   private static final Logger LOG = LoggerFactory.getLogger(RedisClusterClient.class);
 
+  @Deprecated(forRemoval = true)
   public static void addReducer(Command command, Function<List<Response>, Response> fn) {
     RedisClusterConnection.addReducer(command, fn);
   }
 
+  static void addNewReducer(Command command, Function<List<ResponseWithPositions>, Response> fn) {
+    RedisClusterConnection.addNewReducer(command, fn);
+  }
+
+  @Deprecated(forRemoval = true)
   public static void addMasterOnlyCommand(Command command) {
     RedisClusterConnection.addMasterOnlyCommand(command);
   }
@@ -58,34 +67,40 @@ public class RedisClusterClient extends BaseRedisClient<RedisClusterConnectOptio
   static {
     // provided reducers
 
-    addReducer(Command.MSET, list ->
+    addNewReducer(Command.MSET, list ->
       // Simple string reply: always OK since MSET can't fail.
       SimpleStringType.OK);
 
-    addReducer(Command.DEL, list ->
+    addNewReducer(Command.DEL, list ->
       NumberType.create(list.stream()
         .mapToLong(el -> {
-          Long l = el.toLong();
-          if (l == null) {
-            return 0L;
-          } else {
-            return l;
-          }
-        }).sum()));
+          Long l = el.response().toLong();
+          return l == null ? 0L : l;
+        })
+        .sum()));
 
-    addReducer(Command.MGET, list -> {
+    addNewReducer(Command.MGET, list -> {
       int total = 0;
-      for (Response resp : list) {
-        total += resp.size();
+      for (ResponseWithPositions resp : list) {
+        total += resp.response().size();
       }
 
-      MultiType multi = MultiType.create(total, false);
-      for (Response resp : list) {
+      List<Response> result = new ArrayList<>(total);
+      for (int i = 0; i < total; i++) {
+        result.add(null);
+      }
+      for (ResponseWithPositions rwp : list) {
+        Response resp = rwp.response();
+        IntList positions = rwp.positions();
+        int j = 0;
         for (Response child : resp) {
-          multi.add(child);
+          result.set(positions.get(j), child);
+          j++;
         }
       }
 
+      MultiType multi = MultiType.create(total, false);
+      result.forEach(multi::add);
       return multi;
     });
 
@@ -105,30 +120,27 @@ public class RedisClusterClient extends BaseRedisClient<RedisClusterConnectOptio
       return multi;
     });
 
-    addReducer(Command.FLUSHDB, list ->
+    addNewReducer(Command.FLUSHDB, list ->
       // Simple string reply: always OK since FLUSHDB can't fail.
       SimpleStringType.OK);
 
-    addReducer(Command.DBSIZE, list ->
+    addNewReducer(Command.DBSIZE, list ->
       // Sum of key numbers on all Key Slots
       NumberType.create(list.stream()
         .mapToLong(el -> {
-          Long l = el.toLong();
-          if (l == null) {
-            return 0L;
-          } else {
-            return l;
-          }
-        }).sum()));
+          Long l = el.response().toLong();
+          return l == null ? 0L : l;
+        })
+        .sum()));
 
     addMasterOnlyCommand(Command.WAIT);
 
     addMasterOnlyCommand(Command.SUBSCRIBE);
     addMasterOnlyCommand(Command.PSUBSCRIBE);
     addMasterOnlyCommand(Command.SSUBSCRIBE);
-    addReducer(Command.UNSUBSCRIBE, list -> SimpleStringType.OK);
-    addReducer(Command.PUNSUBSCRIBE, list -> SimpleStringType.OK);
-    addReducer(Command.SUNSUBSCRIBE, list -> SimpleStringType.OK);
+    addNewReducer(Command.UNSUBSCRIBE, list -> SimpleStringType.OK);
+    addNewReducer(Command.PUNSUBSCRIBE, list -> SimpleStringType.OK);
+    addNewReducer(Command.SUNSUBSCRIBE, list -> SimpleStringType.OK);
   }
 
   private final SharedSlots sharedSlots;

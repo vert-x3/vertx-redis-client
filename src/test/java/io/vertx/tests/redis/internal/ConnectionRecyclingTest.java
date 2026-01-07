@@ -10,6 +10,7 @@ import io.vertx.redis.client.Redis;
 import io.vertx.redis.client.RedisConnection;
 import io.vertx.redis.client.RedisOptions;
 import io.vertx.redis.client.Request;
+import io.vertx.redis.client.impl.Primitives.Int;
 import io.vertx.redis.client.impl.RedisClient;
 import io.vertx.redis.client.impl.RedisConnectionInternal;
 import io.vertx.redis.client.impl.RedisConnectionManager;
@@ -106,7 +107,7 @@ public class ConnectionRecyclingTest {
   }
 
   private void assertConnectionPool(VertxTestContext test, int expectedSize) {
-    IntBox size = new IntBox(0);
+    Int size = new Int(0);
 
     try {
       RedisConnectionManager connManager = ((RedisClient) client).connectionManager();
@@ -125,13 +126,5 @@ public class ConnectionRecyclingTest {
     test.verify(() -> {
       assertEquals(expectedSize, size.value);
     });
-  }
-
-  static class IntBox {
-    int value;
-
-    IntBox(int value) {
-      this.value = value;
-    }
   }
 }

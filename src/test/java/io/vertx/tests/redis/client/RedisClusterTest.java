@@ -663,7 +663,11 @@ public class RedisClusterTest {
         .compose(mset -> {
           return conn.send(cmd(KEYS).arg("[0-9]"));
         }).onComplete(test.succeeding(keys -> {
-          assertEquals(3, keys.size());
+          Set<String> set = keys.stream().map(Response::toString).collect(Collectors.toSet());
+          assertEquals(3, set.size());
+          assertTrue(set.contains("1"));
+          assertTrue(set.contains("2"));
+          assertTrue(set.contains("3"));
           test.completeNow();
         }));
     }));
@@ -681,17 +685,9 @@ public class RedisClusterTest {
           return conn.send(cmd(MGET).arg("key1").arg("key2").arg("nonexisting"));
         }).onComplete(test.succeeding(mget -> {
           assertEquals(3, mget.size());
-          List<String> values = new ArrayList<>();
-          mget.forEach(value -> {
-            if (value != null) {
-              values.add(value.toString());
-            } else {
-              values.add(null);
-            }
-          });
-          assertTrue(values.contains("Hello"));
-          assertTrue(values.contains("World"));
-          assertTrue(values.contains(null));
+          assertEquals("Hello", mget.get(0).toString());
+          assertEquals("World", mget.get(1).toString());
+          assertNull(mget.get(2));
           test.completeNow();
         }));
     }));
@@ -720,12 +716,12 @@ public class RedisClusterTest {
         .compose(compositeRet -> {
           return conn.send(cmd(MGET).arg(key1).arg(key2).arg(key3).arg(key4));
         })
-        .onComplete(test.succeeding(mgetResponse -> {
-          Set<String> mgetRet = mgetResponse.stream().map(Response::toString).collect(Collectors.toSet());
-          assertTrue(mgetRet.contains(argv1));
-          assertTrue(mgetRet.contains(argv2));
-          assertTrue(mgetRet.contains(argv3));
-          assertTrue(mgetRet.contains(argv4));
+        .onComplete(test.succeeding(mget -> {
+          assertEquals(4, mget.size());
+          assertEquals(argv1, mget.get(0).toString());
+          assertEquals(argv2, mget.get(1).toString());
+          assertEquals(argv3, mget.get(2).toString());
+          assertEquals(argv4, mget.get(3).toString());
           test.completeNow();
         }));
     }));
@@ -754,13 +750,11 @@ public class RedisClusterTest {
         .compose(compositeRet -> {
           return conn.send(cmd(MGET).arg(key1).arg(key3).arg(key2).arg(key4));
         })
-        .onComplete(test.succeeding(mgetResponse -> {
-          Set<String> mgetRet = mgetResponse.stream().map(Response::toString)
-            .collect(Collectors.toSet());
-          assertTrue(mgetRet.contains(argv1));
-          assertTrue(mgetRet.contains(argv2));
-          assertTrue(mgetRet.contains(argv3));
-          assertTrue(mgetRet.contains(argv4));
+        .onComplete(test.succeeding(mget -> {
+          assertEquals(argv1, mget.get(0).toString());
+          assertEquals(argv3, mget.get(1).toString());
+          assertEquals(argv2, mget.get(2).toString());
+          assertEquals(argv4, mget.get(3).toString());
           test.completeNow();
         }));
     }));

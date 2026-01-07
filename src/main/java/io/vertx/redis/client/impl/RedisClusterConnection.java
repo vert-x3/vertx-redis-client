@@ -16,6 +16,8 @@ import io.vertx.redis.client.RedisConnection;
 import io.vertx.redis.client.RedisReplicas;
 import io.vertx.redis.client.Request;
 import io.vertx.redis.client.Response;
+import io.vertx.redis.client.impl.Primitives.Int;
+import io.vertx.redis.client.impl.Primitives.IntList;
 import io.vertx.redis.client.impl.types.ErrorType;
 import io.vertx.redis.client.impl.types.SimpleStringType;
 
@@ -23,7 +25,6 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.IdentityHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
@@ -41,16 +42,46 @@ public class RedisClusterConnection implements RedisConnection {
   static final int RETRIES = 16;
 
   // reduce from list of responses to a single response
-  private static final Map<Command, Function<List<Response>, Response>> REDUCERS = new HashMap<>();
+  private static final Map<Command, Function<List<ResponseWithPositions>, Response>> REDUCERS = new HashMap<>();
   // List of commands that should always run only against master nodes
   private static final List<Command> MASTER_ONLY_COMMANDS = new ArrayList<>();
 
+  @Deprecated(forRemoval = true)
   public static void addReducer(Command command, Function<List<Response>, Response> fn) {
+    REDUCERS.put(command, list -> {
+      List<Response> responses = new ArrayList<>(list.size());
+      for (ResponseWithPositions r : list) {
+        responses.add(r.response());
+      }
+      return fn.apply(responses);
+    });
+  }
+
+  static void addNewReducer(Command command, Function<List<ResponseWithPositions>, Response> fn) {
     REDUCERS.put(command, fn);
   }
 
+  @Deprecated(forRemoval = true)
   public static void addMasterOnlyCommand(Command command) {
     MASTER_ONLY_COMMANDS.add(command);
+  }
+
+  static class ResponseWithPositions {
+    private final Response response;
+    private final IntList positions;
+
+    private ResponseWithPositions(Response response, IntList positions) {
+      this.response = response;
+      this.positions = positions;
+    }
+
+    public Response response() {
+      return response;
+    }
+
+    public IntList positions() {
+      return positions;
+    }
   }
 
   final VertxInternal vertx;
@@ -207,7 +238,12 @@ public class RedisClusterConnection implements RedisConnection {
               // means if one of the operations failed, then we can fail the handler
               promise.fail(composite.cause());
             } else {
-              promise.succeed(REDUCERS.get(cmd).apply(composite.result().list()));
+              List<Response> list = composite.result().list();
+              List<ResponseWithPositions> listWithPositions = new ArrayList<>(list.size());
+              for (Response resp : list) {
+                listWithPositions.add(new ResponseWithPositions(resp, new IntList()));
+              }
+              promise.succeed(REDUCERS.get(cmd).apply(listWithPositions));
             }
           });
         } else {
@@ -232,20 +268,25 @@ public class RedisClusterConnection implements RedisConnection {
             return promise.future();
           }
 
-          final Map<Integer, Request> requests = splitRequest(cmd, args);
+          final Collection<RequestWithSlotNumber> groupedRequests = splitRequest(cmd, args);
 
-          if (requests.isEmpty()) {
+          if (groupedRequests.isEmpty()) {
             // we can't continue as we don't know how to split this command
             promise.fail(buildCrossslotFailureMsg(req));
             return promise.future();
           }
 
-          final List<Future<Response>> responses = new ArrayList<>(requests.size());
+          final List<Future<Response>> responses = new ArrayList<>(groupedRequests.size());
+          final Map<Integer, IntList> responsePositions = new HashMap<>();
 
-          for (Map.Entry<Integer, Request> kv : requests.entrySet()) {
+          int i = 0;
+          for (RequestWithSlotNumber rwsn : groupedRequests) {
             final Promise<Response> p = vertx.promise();
-            send(selectEndpoint(slots, kv.getKey(), cmd.isReadOnly(args), forceMasterEndpoint), RETRIES, kv.getValue(), p);
+            send(selectEndpoint(slots, rwsn.slot, cmd.isReadOnly(args), forceMasterEndpoint), RETRIES, rwsn.request, p);
             responses.add(p.future());
+
+            responsePositions.put(i, rwsn.includedArguments);
+            i++;
           }
 
           Future.all(responses).onComplete(composite -> {
@@ -253,7 +294,12 @@ public class RedisClusterConnection implements RedisConnection {
               // means if one of the operations failed, then we can fail the handler
               promise.fail(composite.cause());
             } else {
-              promise.succeed(REDUCERS.get(cmd).apply(composite.result().list()));
+              List<Response> list = composite.result().list();
+              List<ResponseWithPositions> listWithPositions = new ArrayList<>(list.size());
+              for (int j = 0; j < list.size(); j++) {
+                listWithPositions.add(new ResponseWithPositions(list.get(j), responsePositions.get(j)));
+              }
+              promise.succeed(REDUCERS.get(cmd).apply(listWithPositions));
             }
           });
 
@@ -267,41 +313,58 @@ public class RedisClusterConnection implements RedisConnection {
     }
   }
 
-  private Map<Integer, Request> splitRequest(CommandImpl cmd, List<byte[]> args) {
+  private static class RequestWithSlotNumber {
+    final int slot;
+    final Request request;
+    final IntList includedArguments;
+
+    RequestWithSlotNumber(int slot, Request request) {
+      this.slot = slot;
+      this.request = request;
+      this.includedArguments = new IntList();
+    }
+  }
+
+  private Collection<RequestWithSlotNumber> splitRequest(CommandImpl cmd, List<byte[]> args) {
     // we will split the request across the slots
-    final Map<Integer, Request> map = new IdentityHashMap<>();
+    final Map<Integer, RequestWithSlotNumber> map = new HashMap<>();
+    final Int argCounter = new Int(0);
 
     int lastKey = cmd.iterateKeys(args, (begin, keyIdx, keyStep) -> {
       int slot = ZModem.generate(args.get(keyIdx));
       // get the client for the slot
-      Request request = map.get(slot);
-      if (request == null) {
+      Request request;
+      RequestWithSlotNumber rwsn = map.get(slot);
+      if (rwsn == null) {
         // we need to create a new one
         request = Request.cmd(cmd);
+        rwsn = new RequestWithSlotNumber(slot, request);
         // all params before the key get added
         for (int j = 0; j < begin; j++) {
           request.arg(args.get(j));
         }
         // add to the map
-        map.put(slot, request);
+        map.put(slot, rwsn);
+      } else {
+        request = rwsn.request;
       }
-      // request isn't null anymore
-      request.arg(args.get(keyIdx));
       // all params before the next key get added
-      for (int j = keyIdx + 1; j < keyIdx + keyStep; j++) {
+      for (int j = keyIdx; j < keyIdx + keyStep; j++) {
         request.arg(args.get(j));
       }
+      rwsn.includedArguments.add(argCounter.value++);
     });
 
     // if there are args after the end they must be added to all requests
-    final Collection<Request> col = map.values();
-    col.forEach(req -> {
+    final Collection<RequestWithSlotNumber> requests = map.values();
+    for (RequestWithSlotNumber rwsn : requests) {
+      Request req = rwsn.request;
       for (int j = lastKey; j < args.size(); j++) {
         req.arg(args.get(j));
       }
-    });
+    }
 
-    return map;
+    return requests;
   }
 
   void send(String selectedEndpoint, int retries, Request command, Completable<Response> handler) {
