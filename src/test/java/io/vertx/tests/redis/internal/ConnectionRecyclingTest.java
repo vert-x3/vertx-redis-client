@@ -1,5 +1,6 @@
 package io.vertx.tests.redis.internal;
 
+import io.vertx.core.Promise;
 import io.vertx.core.Vertx;
 import io.vertx.core.internal.pool.ConnectionPool;
 import io.vertx.core.internal.resource.ResourceManager;
@@ -60,16 +61,15 @@ public class ConnectionRecyclingTest {
     assertConnectionPool(test, 0);
 
     client.connect()
-      .flatMap(conn -> {
+      .compose(conn -> {
         assertConnectionPool(test, 1);
         return conn.close();
-      }).onComplete(test.succeeding(ignored -> {
+      }).compose(ignored -> {
         assertConnectionPool(test, 1);
-
-        vertx.setTimer(2000, ignored2 -> {
-          assertConnectionPool(test, 0);
-          test.completeNow();
-        });
+        return vertx.timer(2000);
+      }).onComplete(test.succeeding(ignored -> {
+        assertConnectionPool(test, 0);
+        test.completeNow();
       }));
   }
 
@@ -82,14 +82,53 @@ public class ConnectionRecyclingTest {
       useConnectionForLongTime(conn, System.currentTimeMillis() + 2000);
     }));
 
-    vertx.setTimer(2500, ignored -> {
-      assertConnectionPool(test, 1);
-
-      vertx.setTimer(1500, ignored2 -> {
+    vertx.timer(2500)
+      .compose(ignored -> {
+        assertConnectionPool(test, 1);
+        return vertx.timer(1500);
+      }).onComplete(test.succeeding(ignord -> {
         assertConnectionPool(test, 0);
         test.completeNow();
-      });
-    });
+      }));
+  }
+
+  @Test
+  public void testConnectionIsRemovedFromPoolAfterCloseByRedis(VertxTestContext test) {
+    assertConnectionPool(test, 0);
+
+    client.connect().onComplete(test.succeeding(conn1 -> {
+      assertConnectionPool(test, 1);
+
+      Promise<Void> conn1Close = Promise.promise();
+      conn1.endHandler(conn1Close::complete);
+
+      client.connect().onComplete(test.succeeding(conn2 -> {
+        assertConnectionPool(test, 2);
+
+        conn1.send(Request.cmd(Command.CLIENT).arg("INFO"))
+          .compose(resp -> {
+            String str = resp.toString();
+            int start = str.indexOf("id=") + 3;
+            int end = str.indexOf(" ", start);
+            String connId =  str.substring(start, end);
+            return conn2.send(Request.cmd(Command.CLIENT).arg("KILL").arg("ID").arg(connId));
+          }).compose(resp -> {
+            test.verify(() -> {
+              assertEquals(1, resp.toInteger());
+            });
+            return conn1Close.future();
+          }).compose(ignored -> {
+            assertConnectionPool(test, 1);
+            return conn2.close();
+          }).compose(ignored -> {
+            assertConnectionPool(test, 1);
+            return vertx.timer(2000);
+          }).onComplete(test.succeeding(ignored -> {
+            assertConnectionPool(test, 0);
+            test.completeNow();
+          }));
+      }));
+    }));
   }
 
   private void useConnectionForLongTime(RedisConnection conn, long endTime) {
