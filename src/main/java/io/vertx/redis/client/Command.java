@@ -1188,4 +1188,8 @@ public interface Command {
     Command known = CommandMap.getKnownCommand(command);
     return known != null ? known : new CommandImpl(command, -1, null, false, true);
   }
+  
+  static Command create(String command, int arity, Boolean readOnly, boolean pubsub, boolean needGetKeys) {
+    return new CommandImpl(command, arity, readOnly, pubsub, needGetKeys);
+  }
 }
