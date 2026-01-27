@@ -443,11 +443,12 @@ public class RedisOptions {
 
   /**
    * Get how often the connection pool will be cleaned. Cleaning the connection pool
-   * means scanning for unused and invalid connections and if any are found, they are forcibly
-   * closed and evicted from the pool.
+   * means scanning for unused, too old and invalid connections and if any are found,
+   * they are forcibly closed and evicted from the pool.
    * <p>
    * A connection is marked invalid if it enters a exception or fatal state. It is marked unused
    * if it is unused for longer than the {@linkplain #getPoolRecycleTimeout() recycle timeout}.
+   * It is marked too old if it exists longer than the {@linkplain #getPoolMaxLifetime() maximum lifetime}.
    * <p>
    * The return value is in milliseconds. By default, the cleaning interval is 30 seconds.
    * The value of -1 means connection pool cleaning is disabled.
@@ -460,11 +461,12 @@ public class RedisOptions {
 
   /**
    * Set how often the connection pool will be cleaned. Cleaning the connection pool
-   * means scanning for unused and invalid connections and if any are found, they are forcibly
-   * closed and evicted from the pool.
+   * means scanning for unused, too old and invalid connections and if any are found,
+   * they are forcibly closed and evicted from the pool.
    * <p>
    * A connection is marked invalid if it enters a exception or fatal state. It is marked unused
    * if it is unused for longer than the {@linkplain #setPoolRecycleTimeout(int) recycle timeout}.
+   * It is marked too old if it exists longer than the {@linkplain #setPoolMaxLifetime(long) maximum lifetime}.
    * <p>
    * The value is in milliseconds. By default, the cleaning interval is 30 seconds.
    * The value of -1 means connection pool cleaning is disabled.
@@ -553,6 +555,42 @@ public class RedisOptions {
    */
   public RedisOptions setPoolRecycleTimeout(int poolRecycleTimeout) {
     poolOptions.setRecycleTimeout(poolRecycleTimeout);
+    return this;
+  }
+
+  /**
+   * Get how long a connection can exist before it is recycled during connection pool
+   * {@linkplain #getPoolCleanerInterval() cleaning}.
+   * <p>
+   * The value is in milliseconds. By default, the maximum lifetime is -1.
+   * The value of -1 means connections are never too old.
+   * <p>
+   * As opposed to {@linkplain #getPoolRecycleTimeout() recycle timeout}, this property
+   * does not take into account when the connection was last used. If the connection
+   * is too old, it is evicted even if it was used very recently.
+   *
+   * @return the maximum lifetime
+   */
+  public long getPoolMaxLifetime() {
+    return poolOptions.getMaxLifetime();
+  }
+
+  /**
+   * Set how long a connection can exist before it is recycled during connection pool
+   * {@linkplain #setPoolCleanerInterval(int) cleaning}.
+   * <p>
+   * The value is in milliseconds. By default, the maximum lifetime is -1.
+   * The value of -1 means connections are never too old.
+   * <p>
+   * As opposed to {@linkplain #setPoolRecycleTimeout(int) recycle timeout}, this property
+   * does not take into account when the connection was last used. If the connection
+   * is too old, it is evicted even if it was used very recently.
+   *
+   * @param maxLifetime the maximum lifetime
+   * @return fluent self
+   */
+  public RedisOptions setPoolMaxLifetime(long maxLifetime) {
+    poolOptions.setMaxLifetime(maxLifetime);
     return this;
   }
 

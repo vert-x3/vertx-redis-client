@@ -58,52 +58,52 @@ public class ConnectionRecyclingTest {
 
   @Test
   public void testUsageShorterThanRecycleTimeout(VertxTestContext test) {
-    assertConnectionPool(test, 0);
+    assertConnectionPool(test, client, 0);
 
     client.connect()
       .compose(conn -> {
-        assertConnectionPool(test, 1);
+        assertConnectionPool(test, client, 1);
         return conn.close();
       }).compose(ignored -> {
-        assertConnectionPool(test, 1);
+        assertConnectionPool(test, client, 1);
         return vertx.timer(2000);
       }).onComplete(test.succeeding(ignored -> {
-        assertConnectionPool(test, 0);
+        assertConnectionPool(test, client, 0);
         test.completeNow();
       }));
   }
 
   @Test
   public void testUsageLongerThanRecycleTimeout(VertxTestContext test) {
-    assertConnectionPool(test, 0);
+    assertConnectionPool(test, client, 0);
 
     client.connect().onComplete(test.succeeding(conn -> {
-      assertConnectionPool(test, 1);
+      assertConnectionPool(test, client, 1);
       useConnectionForLongTime(conn, System.currentTimeMillis() + 2000);
     }));
 
     vertx.timer(2500)
       .compose(ignored -> {
-        assertConnectionPool(test, 1);
+        assertConnectionPool(test, client, 1);
         return vertx.timer(1500);
       }).onComplete(test.succeeding(ignord -> {
-        assertConnectionPool(test, 0);
+        assertConnectionPool(test, client, 0);
         test.completeNow();
       }));
   }
 
   @Test
   public void testConnectionIsRemovedFromPoolAfterCloseByRedis(VertxTestContext test) {
-    assertConnectionPool(test, 0);
+    assertConnectionPool(test, client, 0);
 
     client.connect().onComplete(test.succeeding(conn1 -> {
-      assertConnectionPool(test, 1);
+      assertConnectionPool(test, client, 1);
 
       Promise<Void> conn1Close = Promise.promise();
       conn1.endHandler(conn1Close::complete);
 
       client.connect().onComplete(test.succeeding(conn2 -> {
-        assertConnectionPool(test, 2);
+        assertConnectionPool(test, client, 2);
 
         conn1.send(Request.cmd(Command.CLIENT).arg("INFO"))
           .compose(resp -> {
@@ -118,17 +118,42 @@ public class ConnectionRecyclingTest {
             });
             return conn1Close.future();
           }).compose(ignored -> {
-            assertConnectionPool(test, 1);
+            assertConnectionPool(test, client, 1);
             return conn2.close();
           }).compose(ignored -> {
-            assertConnectionPool(test, 1);
+            assertConnectionPool(test, client, 1);
             return vertx.timer(2000);
           }).onComplete(test.succeeding(ignored -> {
-            assertConnectionPool(test, 0);
+            assertConnectionPool(test, client, 0);
             test.completeNow();
           }));
       }));
     }));
+  }
+
+  @Test
+  public void testMaximumLifetime(VertxTestContext test) {
+    // default recycle timeout, longer than max lifetime
+    RedisOptions options = new RedisOptions()
+      .setConnectionString(redis.getRedisUri())
+      .setMaxPoolSize(2)
+      .setPoolCleanerInterval(100)
+      .setPoolMaxLifetime(1000);
+    Redis client = Redis.createClient(vertx, options);
+
+    assertConnectionPool(test, client, 0);
+
+    client.connect()
+      .compose(conn -> {
+        assertConnectionPool(test, client, 1);
+        return conn.close();
+      }).compose(ignored -> {
+        assertConnectionPool(test, client, 1);
+        return vertx.timer(2000);
+      }).onComplete(test.succeeding(ignored -> {
+        assertConnectionPool(test, client, 0);
+        test.completeNow();
+      }));
   }
 
   private void useConnectionForLongTime(RedisConnection conn, long endTime) {
@@ -145,7 +170,7 @@ public class ConnectionRecyclingTest {
       });
   }
 
-  private void assertConnectionPool(VertxTestContext test, int expectedSize) {
+  private void assertConnectionPool(VertxTestContext test, Redis client, int expectedSize) {
     Int size = new Int(0);
 
     try {

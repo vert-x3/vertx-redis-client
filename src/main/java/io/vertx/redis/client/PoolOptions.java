@@ -30,6 +30,7 @@ public class PoolOptions {
   private int maxSize;
   private int maxWaiting;
   private int recycleTimeout;
+  private long maxLifetime;
 
   public PoolOptions() {
     name = UUID.randomUUID().toString();
@@ -38,6 +39,7 @@ public class PoolOptions {
     maxSize = 6;
     maxWaiting = 24;
     recycleTimeout = 180_000;
+    maxLifetime = -1;
   }
 
   public PoolOptions(PoolOptions other) {
@@ -75,11 +77,12 @@ public class PoolOptions {
 
   /**
    * Get how often the connection pool will be cleaned. Cleaning the connection pool
-   * means scanning for unused and invalid connections and if any are found, they are forcibly
-   * closed and evicted from the pool.
+   * means scanning for unused, too old and invalid connections and if any are found,
+   * they are forcibly closed and evicted from the pool.
    * <p>
    * A connection is marked invalid if it enters a exception or fatal state. It is marked unused
    * if it is unused for longer than the {@linkplain #getRecycleTimeout() recycle timeout}.
+   * It is marked too old if it exists longer than the {@linkplain #getMaxLifetime() maximum lifetime}.
    * <p>
    * The return value is in milliseconds. By default, the cleaning interval is 30 seconds.
    * The value of -1 means connection pool cleaning is disabled.
@@ -92,11 +95,12 @@ public class PoolOptions {
 
   /**
    * Set how often the connection pool will be cleaned. Cleaning the connection pool
-   * means scanning for unused and invalid connections and if any are found, they are forcibly
-   * closed and evicted from the pool.
+   * means scanning for unused, too old and invalid connections and if any are found,
+   * they are forcibly closed and evicted from the pool.
    * <p>
    * A connection is marked invalid if it enters a exception or fatal state. It is marked unused
    * if it is unused for longer than the {@linkplain #setRecycleTimeout(int) recycle timeout}.
+   * It is marked too old if it exists longer than the {@linkplain #setMaxLifetime(long) maximum lifetime}.
    * <p>
    * The value is in milliseconds. By default, the cleaning interval is 30 seconds.
    * The value of -1 means connection pool cleaning is disabled.
@@ -185,6 +189,42 @@ public class PoolOptions {
    */
   public PoolOptions setRecycleTimeout(int recycleTimeout) {
     this.recycleTimeout = recycleTimeout;
+    return this;
+  }
+
+  /**
+   * Get how long a connection can exist before it is recycled during connection pool
+   * {@linkplain #getCleanerInterval() cleaning}.
+   * <p>
+   * The value is in milliseconds. By default, the maximum lifetime is -1.
+   * The value of -1 means connections are never too old.
+   * <p>
+   * As opposed to {@linkplain #getRecycleTimeout() recycle timeout}, this property
+   * does not take into account when the connection was last used. If the connection
+   * is too old, it is evicted even if it was used very recently.
+   *
+   * @return the maximum lifetime
+   */
+  public long getMaxLifetime() {
+    return maxLifetime;
+  }
+
+  /**
+   * Set how long a connection can exist before it is recycled during connection pool
+   * {@linkplain #setCleanerInterval(int) cleaning}.
+   * <p>
+   * The value is in milliseconds. By default, the maximum lifetime is -1.
+   * The value of -1 means connections are never too old.
+   * <p>
+   * As opposed to {@linkplain #setRecycleTimeout(int) recycle timeout}, this property
+   * does not take into account when the connection was last used. If the connection
+   * is too old, it is evicted even if it was used very recently.
+   *
+   * @param maxLifetime the maximum lifetime
+   * @return fluent self
+   */
+  public PoolOptions setMaxLifetime(long maxLifetime) {
+    this.maxLifetime = maxLifetime;
     return this;
   }
 

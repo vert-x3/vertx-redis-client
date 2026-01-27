@@ -4,13 +4,11 @@ import io.vertx.core.Future;
 import io.vertx.core.Handler;
 import io.vertx.core.Promise;
 import io.vertx.core.buffer.Buffer;
-import io.vertx.core.eventbus.EventBus;
 import io.vertx.core.internal.ContextInternal;
 import io.vertx.core.internal.VertxInternal;
 import io.vertx.core.internal.PromiseInternal;
 import io.vertx.core.internal.logging.Logger;
 import io.vertx.core.internal.logging.LoggerFactory;
-import io.vertx.core.json.JsonObject;
 import io.vertx.core.net.NetSocket;
 import io.vertx.core.net.SocketAddress;
 import io.vertx.core.internal.pool.PoolConnector;
@@ -23,7 +21,6 @@ import io.vertx.redis.client.Request;
 import io.vertx.redis.client.Response;
 import io.vertx.redis.client.ResponseType;
 import io.vertx.redis.client.impl.types.ErrorType;
-import io.vertx.redis.client.impl.types.Multi;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -49,6 +46,7 @@ public class RedisStandaloneConnection implements RedisConnectionInternal, Parse
   private final RedisURI uri;
   private final ClientMetrics metrics;
   private final TracingPolicy tracingPolicy;
+  private final long maxLifetimeExpiration;
 
   // state
   private Handler<Throwable> onException;
@@ -61,20 +59,22 @@ public class RedisStandaloneConnection implements RedisConnectionInternal, Parse
 
   public RedisStandaloneConnection(VertxInternal vertx, ContextInternal context, PoolConnector.Listener connectionListener, NetSocket netSocket, PoolOptions options, int maxWaitingHandlers, RedisURI uri, ClientMetrics metrics, TracingPolicy tracingPolicy) {
     //System.out.println("<ctor>#" + this.hashCode());
-    this.vertx = vertx;
-    this.context = context;
     this.poolOptions = options;
     this.listener = connectionListener;
+    this.vertx = vertx;
+    this.context = context;
     this.netSocket = netSocket;
     this.waiting = new ArrayQueue(maxWaitingHandlers);
-    this.expiresAt = computeExpiration();
     this.uri = uri;
     this.metrics = metrics;
     this.tracingPolicy = tracingPolicy;
+    this.maxLifetimeExpiration = options.getMaxLifetime() == -1 ? Long.MAX_VALUE : System.currentTimeMillis() + options.getMaxLifetime();
+
+    this.expiresAt = computeExpiration();
   }
 
   private long computeExpiration() {
-    return poolOptions.getRecycleTimeout() == -1 ? -1 : System.currentTimeMillis() + poolOptions.getRecycleTimeout();
+    return poolOptions.getRecycleTimeout() == -1 ? Long.MAX_VALUE : System.currentTimeMillis() + poolOptions.getRecycleTimeout();
   }
 
   synchronized void setValid() {
@@ -95,7 +95,8 @@ public class RedisStandaloneConnection implements RedisConnectionInternal, Parse
   @Override
   public synchronized boolean isValid() {
     //System.out.println("isValid()#" + this.hashCode());
-    return !closed && (expiresAt <= 0 || System.currentTimeMillis() < expiresAt);
+    long now = System.currentTimeMillis();
+    return !closed && now < expiresAt && now < maxLifetimeExpiration;
   }
 
   @Override
