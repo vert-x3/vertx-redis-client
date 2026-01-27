@@ -61,11 +61,12 @@ public class RedisReconnectTest {
         // the connection was closed, will reconnect
         reconnect(0);
       })
-      .send(Request.cmd(Command.CLIENT).arg("LIST"))
-      .onComplete(test.succeeding(list -> {
-        String res = list.toString();
-        // this is a hack
-        String id = res.substring(3, res.indexOf(' '));
+      .send(Request.cmd(Command.CLIENT).arg("INFO"))
+      .onComplete(test.succeeding(info -> {
+        String str = info.toString();
+        int start = str.indexOf("id=") + 3;
+        int end = str.indexOf(" ", start);
+        String id = str.substring(start, end);
 
         // kill the connection
         final RedisConnection orig = connection;

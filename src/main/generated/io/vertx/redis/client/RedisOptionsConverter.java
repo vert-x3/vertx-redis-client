@@ -92,6 +92,11 @@ public class RedisOptionsConverter {
             obj.setPoolRecycleTimeout(((Number)member.getValue()).intValue());
           }
           break;
+        case "poolMaxLifetime":
+          if (member.getValue() instanceof Number) {
+            obj.setPoolMaxLifetime(((Number)member.getValue()).longValue());
+          }
+          break;
         case "user":
           if (member.getValue() instanceof String) {
             obj.setUser((String)member.getValue());
@@ -176,6 +181,7 @@ public class RedisOptionsConverter {
     json.put("maxPoolSize", obj.getMaxPoolSize());
     json.put("maxPoolWaiting", obj.getMaxPoolWaiting());
     json.put("poolRecycleTimeout", obj.getPoolRecycleTimeout());
+    json.put("poolMaxLifetime", obj.getPoolMaxLifetime());
     if (obj.getUser() != null) {
       json.put("user", obj.getUser());
     }

@@ -37,6 +37,11 @@ public class PoolOptionsConverter {
             obj.setRecycleTimeout(((Number)member.getValue()).intValue());
           }
           break;
+        case "maxLifetime":
+          if (member.getValue() instanceof Number) {
+            obj.setMaxLifetime(((Number)member.getValue()).longValue());
+          }
+          break;
       }
     }
   }
@@ -53,5 +58,6 @@ public class PoolOptionsConverter {
     json.put("maxSize", obj.getMaxSize());
     json.put("maxWaiting", obj.getMaxWaiting());
     json.put("recycleTimeout", obj.getRecycleTimeout());
+    json.put("maxLifetime", obj.getMaxLifetime());
   }
 }

@@ -32,15 +32,16 @@ public class RedisSentinelMasterFailoverTest {
 
   @Test
   public void test(VertxTestContext test) {
-    Redis.createClient(
-        context.vertx(),
-        new RedisOptions()
-          .setType(RedisClientType.SENTINEL)
-          .addConnectionString(redis.getRedisSentinel0Uri())
-          .addConnectionString(redis.getRedisSentinel1Uri())
-          .addConnectionString(redis.getRedisSentinel2Uri())
-          .setRole(RedisRole.MASTER)
-          .setAutoFailover(true))
+    Redis client = Redis.createClient(
+      context.vertx(),
+      new RedisOptions()
+        .setType(RedisClientType.SENTINEL)
+        .addConnectionString(redis.getRedisSentinel0Uri())
+        .addConnectionString(redis.getRedisSentinel1Uri())
+        .addConnectionString(redis.getRedisSentinel2Uri())
+        .setRole(RedisRole.MASTER)
+        .setAutoFailover(true));
+    client
       .connect()
       .onComplete(test.succeeding(conn -> {
         conn.send(Request.cmd(Command.SET).arg("key").arg("value"))
@@ -63,10 +64,14 @@ public class RedisSentinelMasterFailoverTest {
             assertNotNull(error); // connection closed
             return retryUntilSuccess(context.vertx(), () -> conn.send(Request.cmd(Command.GET).arg("key")), 50);
           })
-          .onComplete(test.succeeding(response -> {
+          .compose(response -> {
             assertEquals("value", response.toString());
-            test.completeNow();
-          }));
+            return conn.close();
+          })
+          .compose(ignored -> {
+            return client.close();
+          })
+          .onComplete(test.succeedingThenComplete());
       }));
   }
 }
