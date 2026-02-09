@@ -96,7 +96,8 @@ class CommandReporter {
       trace = tracer.sendRequest(context, SpanKind.RPC, tracingPolicy, this, "Command", (k, v) -> {}, REQUEST_TAG_EXTRACTOR);
     }
     if (metrics != null) {
-      metric = metrics.requestBegin(command, command);
+      metric = metrics.init();
+      metrics.requestBegin(metric, command, command);
       metrics.requestEnd(metric);
     }
   }

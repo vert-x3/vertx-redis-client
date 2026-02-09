@@ -24,9 +24,7 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertSame;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 
 @ExtendWith(VertxExtension.class)
 @Testcontainers
@@ -74,9 +72,13 @@ public class RedisClientMetricsTest {
 
     metrics = new ClientMetrics() {
       @Override
-      public Object requestBegin(String uri, Object request) {
-        actions.add("requestBegin");
+      public Object init() {
         return metric;
+      }
+
+      @Override
+      public void requestBegin(Object requestMetric, String uri, Object request) {
+        actions.add("requestBegin");
       }
 
       @Override
