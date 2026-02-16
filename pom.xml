@@ -30,7 +30,7 @@
 
   <properties>
     <version.bouncycastle>1.83</version.bouncycastle>
-    <version.junit-jupiter>5.14.0</version.junit-jupiter>
+    <version.junit-jupiter>6.0.3</version.junit-jupiter>
     <version.testcontainers>2.0.3</version.testcontainers>
   </properties>
 
