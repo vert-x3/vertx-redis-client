@@ -1,0 +1,17 @@
+package io.vertx.redis.client;
+
+import java.util.HashMap;
+import java.util.Map;
+
+// this class is auto-generated
+class CommandMap {
+  private static final Map<String, Command> KNOWN_COMMANDS = new HashMap<>();
+
+  static Command getKnownCommand(String command) {
+    return command == null ? null : KNOWN_COMMANDS.get(command.toLowerCase());
+  }
+
+  static {
+{{{ commandMapEntries }}}
+  }
+}

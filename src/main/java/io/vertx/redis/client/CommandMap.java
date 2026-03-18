@@ -3,6 +3,7 @@ package io.vertx.redis.client;
 import java.util.HashMap;
 import java.util.Map;
 
+// this class is auto-generated
 class CommandMap {
   private static final Map<String, Command> KNOWN_COMMANDS = new HashMap<>();
 
@@ -10,7 +11,6 @@ class CommandMap {
     return command == null ? null : KNOWN_COMMANDS.get(command.toLowerCase());
   }
 
-  // this block is auto-generated
   static {
     KNOWN_COMMANDS.put("acl", Command.ACL);
     KNOWN_COMMANDS.put("append", Command.APPEND);

@@ -2,14 +2,14 @@
   "name": "commands-generator",
   "private": true,
   "type": "module",
-  "main": "commands.js",
+  "main": "generate.js",
   "dependencies": {
-    "handlebars": "^4.7.8",
-    "handlebars-helpers": "^0.10.0",
-    "redis": "^4.7.0"
+    "handlebars": "4.7.8",
+    "handlebars-helpers": "0.10.0",
+    "redis": "5.11.0"
   },
   "scripts": {
     "--prestart": "docker run --rm --net=host redis/redis-stack-server:7.0.6-RC9",
-    "start": "node commands.js"
+    "start": "node generate.js"
   }
 }

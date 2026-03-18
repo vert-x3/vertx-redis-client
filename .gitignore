@@ -22,3 +22,4 @@ ScratchPad.java
 *.swp
 cscope.*
 node_modules
+package-lock.json

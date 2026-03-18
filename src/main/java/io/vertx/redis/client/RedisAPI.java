@@ -2283,7 +2283,7 @@ public interface RedisAPI {
   /**
    * An internal command for migrating keys in a cluster.
    * <p>
-   * Redis command <a href="https://redis.io/commands/restore asking/">RESTORE-ASKING</a>.
+   * Redis command <a href="https://redis.io/commands/restore-asking/">RESTORE-ASKING</a>.
    * @return Future response.
    */
   default Future<@Nullable Response> restoreAsking(List<String> args) {
