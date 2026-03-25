@@ -207,7 +207,7 @@ public class RedisClusterClient extends BaseRedisClient<RedisClusterConnectOptio
         onConnected.fail(new RedisConnectException(message.toString()));
       } else {
         onConnected.succeed(new RedisClusterConnection(vertx, connectionManager,
-          connectOptions, sharedSlots, connections));
+          connectOptions, sharedSlots, slots, connections));
       }
     }
   }
