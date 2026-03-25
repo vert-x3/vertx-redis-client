@@ -1349,4 +1349,56 @@ public class RedisClusterTest {
         async.complete();
       }));
   }
+
+  @Test
+  public void testPoolNotExhaustedDuringSlotRefresh(TestContext test) {
+    // Reproduces a deadlock where slot refresh competes with user requests
+    // for pool connections. Steps:
+    // 1. connect() twice to exhaust the pool (maxPoolSize=2, each connect
+    //    acquires 1 connection per endpoint)
+    // 2. wait for the short topology cache TTL to expire (slots become null)
+    // 3. send() on the held connections -- RedisClusterConnection.send()
+    //    calls sharedSlots.get() which needs a pool connection for refresh,
+    //    but the pool is fully held -- deadlock
+    //
+    // For the deadlock to occur, the user-configured endpoint must match
+    // the cluster-discovered endpoints (same pool). We first query CLUSTER
+    // SLOTS to find the host the cluster announces, then use that host
+    // in the connection string.
+    Async async = test.async(2);
+
+    Redis standaloneClient = Redis.createClient(rule.vertx(), new RedisOptions()
+      .addConnectionString(redis.getRedisNode0Uri()));
+
+    standaloneClient.send(cmd(CLUSTER).arg("SLOTS"))
+      .onComplete(test.asyncAssertSuccess(reply -> {
+        // extract the host that the cluster announces
+        String clusterHost = reply.get(0).get(2).get(0).toString();
+        standaloneClient.close();
+
+        final RedisOptions opts = new RedisOptions()
+          .setType(RedisClientType.CLUSTER)
+          .setUseReplicas(RedisReplicas.SHARE)
+          .addConnectionString("redis://" + clusterHost + ":7000")
+          .setMaxPoolSize(2)
+          .setMaxPoolWaiting(1024)
+          .setTopologyCacheTTL(1);
+
+        Redis clusterClient = Redis.createClient(rule.vertx(), opts);
+
+        CompositeFuture.all(clusterClient.connect(), clusterClient.connect())
+          .onComplete(test.asyncAssertSuccess(composite -> {
+            RedisConnection conn1 = composite.resultAt(0);
+            RedisConnection conn2 = composite.resultAt(1);
+
+            // wait for the topology cache TTL to expire
+            rule.vertx().setTimer(100, t -> {
+              conn1.send(cmd(SET).arg(randomKey()).arg("value"))
+                .onComplete(test.asyncAssertSuccess(resp -> async.countDown()));
+              conn2.send(cmd(SET).arg(randomKey()).arg("value"))
+                .onComplete(test.asyncAssertSuccess(resp -> async.countDown()));
+            });
+          }));
+      }));
+  }
 }
