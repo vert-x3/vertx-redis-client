@@ -88,6 +88,7 @@ public class RedisClusterConnection implements RedisConnection {
   private final RedisConnectionManager connectionManager;
   private final RedisClusterConnectOptions connectOptions;
   final SharedSlots sharedSlots;
+  private Slots lastSlots;
   private final Map<String, PooledRedisConnection> connections;
 
   // these fields are only used in `send()` and are ignored in `batch()`, because request batches
@@ -96,11 +97,12 @@ public class RedisClusterConnection implements RedisConnection {
   private String boundToEndpoint = null;
 
   RedisClusterConnection(Vertx vertx, RedisConnectionManager connectionManager, RedisClusterConnectOptions connectOptions,
-      SharedSlots sharedSlots, Map<String, PooledRedisConnection> connections) {
+      SharedSlots sharedSlots, Slots lastSlots, Map<String, PooledRedisConnection> connections) {
     this.vertx = (VertxInternal) vertx;
     this.connectionManager = connectionManager;
     this.connectOptions = connectOptions;
     this.sharedSlots = sharedSlots;
+    this.lastSlots = lastSlots;
     this.connections = connections;
   }
 
@@ -164,10 +166,22 @@ public class RedisClusterConnection implements RedisConnection {
     return this;
   }
 
+  /**
+   * Returns the best available slots: fresh slots from the shared cache if available,
+   * otherwise the last known slots. Triggers a refresh of the cache if it has been
+   * invalidated, but doesn't wait for the refresh to finish.
+   */
+  Slots currentSlots() {
+    Future<Slots> future = sharedSlots.get();
+    if (future.succeeded()) {
+      lastSlots = future.result();
+    }
+    return lastSlots;
+  }
+
   @Override
   public Future<Response> send(Request request) {
-    Future<Response> future = sharedSlots.get()
-      .compose(slots -> send(request, slots));
+    Future<Response> future = send(request, currentSlots());
 
     if (connectOptions.getClusterTransactions() == RedisClusterTransactions.SINGLE_NODE) {
       return future.andThen(ignored -> {
@@ -483,8 +497,7 @@ public class RedisClusterConnection implements RedisConnection {
 
   @Override
   public Future<List<Response>> batch(List<Request> requests) {
-    return sharedSlots.get()
-      .compose(slots -> batch(requests, slots));
+    return batch(requests, currentSlots());
   }
 
   private Future<List<Response>> batch(List<Request> requests, Slots slots) {

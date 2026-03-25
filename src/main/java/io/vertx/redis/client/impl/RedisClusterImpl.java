@@ -67,17 +67,15 @@ public class RedisClusterImpl implements RedisCluster {
   }
 
   private Future<List<Response>> onAllNodes(Request request, boolean mastersOnly, RedisClusterConnection conn) {
-    return conn.sharedSlots.get()
-      .compose(slots -> {
-        String[] endpoints = mastersOnly ? slots.masterEndpoints() : slots.endpoints();
-        HashSet<String> endpointsSet = new HashSet<>(endpoints.length);
-        Collections.addAll(endpointsSet, endpoints);
-        String[] uniqueEndpoints = endpointsSet.toArray(new String[0]);
+    Slots slots = conn.currentSlots();
+    String[] endpoints = mastersOnly ? slots.masterEndpoints() : slots.endpoints();
+    HashSet<String> endpointsSet = new HashSet<>(endpoints.length);
+    Collections.addAll(endpointsSet, endpoints);
+    String[] uniqueEndpoints = endpointsSet.toArray(new String[0]);
 
-        Promise<List<Response>> promise = conn.vertx.promise();
-        onAllNodes(uniqueEndpoints, 0, request, new ArrayList<>(uniqueEndpoints.length), conn, promise);
-        return promise.future();
-      });
+    Promise<List<Response>> promise = conn.vertx.promise();
+    onAllNodes(uniqueEndpoints, 0, request, new ArrayList<>(uniqueEndpoints.length), conn, promise);
+    return promise.future();
   }
 
   private void onAllNodes(String[] endpoints, int index, Request request, List<Response> result, RedisClusterConnection conn, Completable<List<Response>> promise) {
@@ -110,42 +108,40 @@ public class RedisClusterImpl implements RedisCluster {
   }
 
   private Future<RequestGrouping> groupByNodes(List<Request> requests, RedisClusterConnection conn) {
-    return conn.sharedSlots.get()
-      .compose(slots -> {
-        Map<String, List<Request>> grouping = new HashMap<>();
-        List<Request> ambiguous = null;
+    Slots slots = conn.currentSlots();
+    Map<String, List<Request>> grouping = new HashMap<>();
+    List<Request> ambiguous = null;
 
-        for (Request request : requests) {
-          RequestImpl req = (RequestImpl) request;
-          CommandImpl cmd = (CommandImpl) req.command();
-          List<byte[]> keys = req.keys();
+    for (Request request : requests) {
+      RequestImpl req = (RequestImpl) request;
+      CommandImpl cmd = (CommandImpl) req.command();
+      List<byte[]> keys = req.keys();
 
-          if (cmd.needsGetKeys() || keys.isEmpty()) {
-            if (ambiguous == null) {
-              ambiguous = new ArrayList<>();
-            }
-            ambiguous.add(request);
-          } else if (keys.size() == 1) {
-            int slot = ZModem.generate(keys.get(0));
-            String endpoint = slots.endpointsForKey(slot)[0];
-            grouping.computeIfAbsent(endpoint, ignored -> new ArrayList<>()).add(request);
-          } else {
-            String endpoint = null;
-            for (byte[] key : keys) {
-              int slot = ZModem.generate(key);
-              String endpointForSlot = slots.endpointsForKey(slot)[0];
-              if (endpoint == null) {
-                endpoint = endpointForSlot;
-              } else if (!endpointForSlot.equals(endpoint)) {
-                return Future.failedFuture(conn.buildCrossslotFailureMsg(req));
-              }
-            }
-
-            grouping.computeIfAbsent(endpoint, ignored -> new ArrayList<>()).add(request);
+      if (cmd.needsGetKeys() || keys.isEmpty()) {
+        if (ambiguous == null) {
+          ambiguous = new ArrayList<>();
+        }
+        ambiguous.add(request);
+      } else if (keys.size() == 1) {
+        int slot = ZModem.generate(keys.get(0));
+        String endpoint = slots.endpointsForKey(slot)[0];
+        grouping.computeIfAbsent(endpoint, ignored -> new ArrayList<>()).add(request);
+      } else {
+        String endpoint = null;
+        for (byte[] key : keys) {
+          int slot = ZModem.generate(key);
+          String endpointForSlot = slots.endpointsForKey(slot)[0];
+          if (endpoint == null) {
+            endpoint = endpointForSlot;
+          } else if (!endpointForSlot.equals(endpoint)) {
+            return Future.failedFuture(conn.buildCrossslotFailureMsg(req));
           }
         }
 
-        return Future.succeededFuture(new RequestGrouping(grouping.values(), ambiguous != null ? ambiguous : Collections.emptyList()));
-      });
+        grouping.computeIfAbsent(endpoint, ignored -> new ArrayList<>()).add(request);
+      }
+    }
+
+    return Future.succeededFuture(new RequestGrouping(grouping.values(), ambiguous != null ? ambiguous : Collections.emptyList()));
   }
 }
