@@ -67,6 +67,7 @@ public class CommandMap {
     KNOWN_COMMANDS.put("cms.merge", Command.CMS_MERGE);
     KNOWN_COMMANDS.put("cms.query", Command.CMS_QUERY);
     KNOWN_COMMANDS.put("command", Command.COMMAND);
+    KNOWN_COMMANDS.put("commandlog", Command.COMMANDLOG);
     KNOWN_COMMANDS.put("config", Command.CONFIG);
     KNOWN_COMMANDS.put("copy", Command.COPY);
     KNOWN_COMMANDS.put("dbsize", Command.DBSIZE);
@@ -75,6 +76,7 @@ public class CommandMap {
     KNOWN_COMMANDS.put("decrby", Command.DECRBY);
     KNOWN_COMMANDS.put("del", Command.DEL);
     KNOWN_COMMANDS.put("delex", Command.DELEX);
+    KNOWN_COMMANDS.put("delifeq", Command.DELIFEQ);
     KNOWN_COMMANDS.put("digest", Command.DIGEST);
     KNOWN_COMMANDS.put("discard", Command.DISCARD);
     KNOWN_COMMANDS.put("dump", Command.DUMP);

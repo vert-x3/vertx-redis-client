@@ -8,3 +8,8 @@ The Vert.x Redis client provides an asynchronous API to interact with a [Redis](
 ## Documentation:
 
 The documentation can be read from the official vert.x [Documentation](http://vertx.io/docs/vertx-redis-client/java/).
+
+## Valkey
+
+This client also supports [Valkey](https://valkey.io/).
+Use the `valkey://` or `valkeys://` connection string scheme and the `ValkeyAPI` interface, which only includes commands supported by Valkey.

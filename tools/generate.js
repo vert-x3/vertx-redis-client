@@ -28,6 +28,14 @@ const redisImages = [
   'redis:8.6.2',
 ]
 
+// oldest first, newest last
+const valkeyImages = [
+  'valkey/valkey:7.2.12',
+  'valkey/valkey:8.0.7',
+  'valkey/valkey:8.1.6',
+  'valkey/valkey:9.0.3',
+]
+
 const docker = new Docker()
 
 async function startContainer(image) {
@@ -53,15 +61,19 @@ async function fetchCommands(port) {
   let url = 'redis://localhost:' + port
   let client = await redis.createClient({ url, RESP: 3 }).connect()
 
-  // get Redis version
-  let version = null
+  // get server version (Valkey reports its own version as valkey_version,
+  // while redis_version is kept for backwards compatibility)
+  let redisVersion = null
+  let valkeyVersion = null
   let infoResponse = await client.sendCommand(['INFO'])
   for (let line of infoResponse.split("\r\n")) {
     if (line.startsWith('redis_version:')) {
-      version = line
-      break
+      redisVersion = line
+    } else if (line.startsWith('valkey_version:')) {
+      valkeyVersion = line
     }
   }
+  let version = valkeyVersion || redisVersion
 
   // get command docs
   let docs = {}
@@ -194,7 +206,7 @@ async function fetchCommands(port) {
   return { version, commands }
 }
 
-async function fetchAndMerge(images) {
+async function fetchAndMerge(images, label) {
   let results = []
   for (let image of images) {
     console.log('Using ' + image)
@@ -223,7 +235,43 @@ async function fetchAndMerge(images) {
   return { version, merged, oldest: results[0].commands }
 }
 
-let redisResult = await fetchAndMerge(redisImages)
+let redisResult = await fetchAndMerge(redisImages, 'Redis')
+let valkeyResult = await fetchAndMerge(valkeyImages, 'Valkey')
+
+// verify that commands shared between Redis and Valkey have
+// identical CommandImpl parameters (arity, ro, pubSub, getKeys, keyLocator)
+for (let [name, rCmd] of Object.entries(redisResult.merged)) {
+  let vCmd = valkeyResult.merged[name]
+  if (!vCmd) continue
+  let diffs = []
+  if (rCmd.arity !== vCmd.arity) diffs.push('  arity: ' + rCmd.arity + ' vs ' + vCmd.arity)
+  if (rCmd.ro !== vCmd.ro) diffs.push('  ro: ' + rCmd.ro + ' vs ' + vCmd.ro)
+  if (rCmd.pubSub !== vCmd.pubSub) diffs.push('  pubSub: ' + rCmd.pubSub + ' vs ' + vCmd.pubSub)
+  if (rCmd.getKeys !== vCmd.getKeys) diffs.push('  getKeys: ' + rCmd.getKeys + ' vs ' + vCmd.getKeys)
+  if ((rCmd.keyLocator || '') !== (vCmd.keyLocator || '')) diffs.push('  keyLocator: ' + rCmd.keyLocator + ' vs ' + vCmd.keyLocator)
+  if (diffs.length > 0) {
+    console.warn('WARNING: ' + name + ' differs between Redis and Valkey:')
+    for (let diff of diffs) {
+      console.warn(diff)
+    }
+  }
+}
+
+// union of all commands for Command.java and CommandMap.java;
+// mark commands that only exist in one server
+let allCommands = {}
+for (let [name, cmd] of Object.entries(redisResult.merged)) {
+  if (!(name in valkeyResult.merged)) {
+    cmd.redisOnly = true
+  }
+  allCommands[name] = cmd
+}
+for (let [name, cmd] of Object.entries(valkeyResult.merged)) {
+  if (!(name in allCommands)) {
+    cmd.valkeyOnly = true
+    allCommands[name] = cmd
+  }
+}
 
 let version = redisResult.version
 
@@ -232,23 +280,31 @@ let version = redisResult.version
 function buildCommandList(merged, oldest) {
   let commands = []
   for (let cmd of Object.values(merged)) {
-    let { name, arity, ro, pubSub, getKeys, keyLocator, doc } = cmd
+    let { name, arity, ro, pubSub, getKeys, keyLocator, doc, redisOnly, valkeyOnly } = cmd
     let identifier = name.replaceAll('.', '_').replaceAll('-', '_').toUpperCase()
+    let server = valkeyOnly ? 'Valkey' : 'Redis'
 
     // build Command.java declaration
     let declaration = ''
-    if (doc.summary || doc.since || doc.removed || doc.deprecatedSince) {
+    if (doc.summary || doc.since || doc.removed || doc.deprecatedSince || redisOnly || valkeyOnly) {
       declaration += '  /**\n'
       if (doc.summary) {
         declaration += '   * ' + doc.summary + '\n'
       }
+      if (redisOnly) {
+        declaration += '   * <p>\n'
+        declaration += '   * This command only exists in Redis.\n'
+      } else if (valkeyOnly) {
+        declaration += '   * <p>\n'
+        declaration += '   * This command only exists in Valkey.\n'
+      }
       if (doc.since) {
-        declaration += '   * @since Redis ' + (doc.module ? doc.module + ' ' : '') + doc.since + '\n'
+        declaration += '   * @since ' + server + ' ' + (doc.module ? doc.module + ' ' : '') + doc.since + '\n'
       }
       if (doc.removed) {
-        declaration += '   * @deprecated this command no longer exists in the latest Redis release\n'
+        declaration += '   * @deprecated this command no longer exists in the latest ' + server + ' release\n'
       } else if (doc.deprecatedSince) {
-        declaration += '   * @deprecated since Redis ' + doc.deprecatedSince + ', replaced by: ' + doc.replacedBy + '\n'
+        declaration += '   * @deprecated since ' + server + ' ' + doc.deprecatedSince + ', replaced by: ' + doc.replacedBy + '\n'
       }
       declaration += '   */\n'
     }
@@ -334,7 +390,7 @@ function buildCommandList(merged, oldest) {
       oldTypes,
       docsSummary: doc.summary,
       docsSince: doc.since,
-      docsSinceServer: 'Redis',
+      docsSinceServer: cmd.sinceServer || 'Redis',
       docsModule: doc.module,
       docsRemoved: doc.removed,
       docsDeprecatedSince: doc.deprecatedSince,
@@ -344,9 +400,19 @@ function buildCommandList(merged, oldest) {
   return commands
 }
 
-let redisCommandList = buildCommandList(redisResult.merged, redisResult.oldest)
+// for ValkeyAPI, commands inherited from Redis should say "@since Redis",
+// only commands added in Valkey should say "@since Valkey";
+// the oldest Valkey image represents the fork point (Redis 7.2.4),
+// so any command not in that baseline was added by Valkey
+for (let [name, cmd] of Object.entries(valkeyResult.merged)) {
+  cmd.sinceServer = name in valkeyResult.oldest ? 'Redis' : 'Valkey'
+}
 
-let byIdentifier = [...redisCommandList].sort((a, b) => a.identifier < b.identifier ? -1 : a.identifier > b.identifier ? 1 : 0)
+let allCommandList = buildCommandList(allCommands)
+let redisCommandList = buildCommandList(redisResult.merged, redisResult.oldest)
+let valkeyCommandList = buildCommandList(valkeyResult.merged, valkeyResult.oldest)
+
+let byIdentifier = [...allCommandList].sort((a, b) => a.identifier < b.identifier ? -1 : a.identifier > b.identifier ? 1 : 0)
 
 let commandDeclarations = byIdentifier.map(c => c.declaration).join('\n')
 let commandTemplate = Handlebars.compile(fs.readFileSync('command.hbs', 'utf8'))
@@ -364,3 +430,8 @@ let redisByName = [...redisCommandList].sort((a, b) => a.name < b.name ? -1 : a.
 let redisApiTemplate = Handlebars.compile(fs.readFileSync('redis-api.hbs', 'utf8'))
 fs.writeFileSync('../src/main/java/io/vertx/redis/client/RedisAPI.java',
   redisApiTemplate({ version: redisResult.version, commands: redisByName }))
+
+let valkeyByName = [...valkeyCommandList].sort((a, b) => a.name < b.name ? -1 : a.name > b.name ? 1 : 0)
+let valkeyApiTemplate = Handlebars.compile(fs.readFileSync('valkey-api.hbs', 'utf8'))
+fs.writeFileSync('../src/main/java/io/vertx/redis/client/ValkeyAPI.java',
+  valkeyApiTemplate({ version: valkeyResult.version, commands: valkeyByName }))

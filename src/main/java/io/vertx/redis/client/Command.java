@@ -55,52 +55,76 @@ public interface Command {
   Command AUTH = new CommandImpl("auth", -2, null, false, false);
   /**
    * Adds an item to a Bloom Filter.
+   * <p>
+   * This command only exists in Redis.
    * @since Redis Bloom 1.0.0
    */
   Command BF_ADD = new CommandImpl("bf.add", 3, false, false, false, new KeyLocator(false, new BeginSearchIndex(1), new FindKeysRange(0, 1, 0)));
   /**
    * Returns the cardinality of a Bloom filter.
+   * <p>
+   * This command only exists in Redis.
    * @since Redis Bloom 2.4.4
    */
   Command BF_CARD = new CommandImpl("bf.card", 2, true, false, false, new KeyLocator(true, new BeginSearchIndex(1), new FindKeysRange(0, 1, 0)));
+  /**
+   * <p>
+   * This command only exists in Redis.
+   */
   Command BF_DEBUG = new CommandImpl("bf.debug", -1, true, false, false, new KeyLocator(false, new BeginSearchIndex(1), new FindKeysRange(0, 1, 0)));
   /**
    * Checks whether an item exists in a Bloom Filter.
+   * <p>
+   * This command only exists in Redis.
    * @since Redis Bloom 1.0.0
    */
   Command BF_EXISTS = new CommandImpl("bf.exists", 3, true, false, false, new KeyLocator(true, new BeginSearchIndex(1), new FindKeysRange(0, 1, 0)));
   /**
    * Returns information about a Bloom Filter.
+   * <p>
+   * This command only exists in Redis.
    * @since Redis Bloom 1.0.0
    */
   Command BF_INFO = new CommandImpl("bf.info", -2, true, false, false, new KeyLocator(true, new BeginSearchIndex(1), new FindKeysRange(0, 1, 0)));
   /**
    * Adds one or more items to a Bloom Filter. A filter will be created if it does not exist.
+   * <p>
+   * This command only exists in Redis.
    * @since Redis Bloom 1.0.0
    */
   Command BF_INSERT = new CommandImpl("bf.insert", -4, false, false, false, new KeyLocator(false, new BeginSearchIndex(1), new FindKeysRange(0, 1, 0)));
   /**
    * Restores a filter previously saved using SCANDUMP.
+   * <p>
+   * This command only exists in Redis.
    * @since Redis Bloom 1.0.0
    */
   Command BF_LOADCHUNK = new CommandImpl("bf.loadchunk", 4, false, false, false, new KeyLocator(false, new BeginSearchIndex(1), new FindKeysRange(0, 1, 0)));
   /**
    * Adds one or more items to a Bloom Filter. A filter will be created if it does not exist.
+   * <p>
+   * This command only exists in Redis.
    * @since Redis Bloom 1.0.0
    */
   Command BF_MADD = new CommandImpl("bf.madd", -3, false, false, false, new KeyLocator(false, new BeginSearchIndex(1), new FindKeysRange(0, 1, 0)));
   /**
    * Checks whether one or more items exist in a Bloom Filter.
+   * <p>
+   * This command only exists in Redis.
    * @since Redis Bloom 1.0.0
    */
   Command BF_MEXISTS = new CommandImpl("bf.mexists", -3, true, false, false, new KeyLocator(true, new BeginSearchIndex(1), new FindKeysRange(0, 1, 0)));
   /**
    * Creates a new Bloom Filter.
+   * <p>
+   * This command only exists in Redis.
    * @since Redis Bloom 1.0.0
    */
   Command BF_RESERVE = new CommandImpl("bf.reserve", -4, false, false, false, new KeyLocator(false, new BeginSearchIndex(1), new FindKeysRange(0, 1, 0)));
   /**
    * Begins an incremental save of the bloom filter.
+   * <p>
+   * This command only exists in Redis.
    * @since Redis Bloom 1.0.0
    */
   Command BF_SCANDUMP = new CommandImpl("bf.scandump", 3, true, false, false, new KeyLocator(false, new BeginSearchIndex(1), new FindKeysRange(0, 1, 0)));
@@ -182,63 +206,95 @@ public interface Command {
   Command BZPOPMIN = new CommandImpl("bzpopmin", -3, false, false, false, new KeyLocator(false, new BeginSearchIndex(1), new FindKeysRange(-2, 1, 0)));
   /**
    * Adds an item to a Cuckoo Filter.
+   * <p>
+   * This command only exists in Redis.
    * @since Redis Bloom 1.0.0
    */
   Command CF_ADD = new CommandImpl("cf.add", 3, false, false, false, new KeyLocator(false, new BeginSearchIndex(1), new FindKeysRange(0, 1, 0)));
   /**
    * Adds an item to a Cuckoo Filter if the item did not exist previously.
+   * <p>
+   * This command only exists in Redis.
    * @since Redis Bloom 1.0.0
    */
   Command CF_ADDNX = new CommandImpl("cf.addnx", 3, false, false, false, new KeyLocator(false, new BeginSearchIndex(1), new FindKeysRange(0, 1, 0)));
+  /**
+   * <p>
+   * This command only exists in Redis.
+   */
   Command CF_COMPACT = new CommandImpl("cf.compact", -1, true, false, false, new KeyLocator(false, new BeginSearchIndex(1), new FindKeysRange(0, 1, 0)));
   /**
    * Return the number of times an item might be in a Cuckoo Filter.
+   * <p>
+   * This command only exists in Redis.
    * @since Redis Bloom 1.0.0
    */
   Command CF_COUNT = new CommandImpl("cf.count", 3, true, false, false, new KeyLocator(true, new BeginSearchIndex(1), new FindKeysRange(0, 1, 0)));
+  /**
+   * <p>
+   * This command only exists in Redis.
+   */
   Command CF_DEBUG = new CommandImpl("cf.debug", -1, true, false, false, new KeyLocator(false, new BeginSearchIndex(1), new FindKeysRange(0, 1, 0)));
   /**
    * Deletes an item from a Cuckoo Filter.
+   * <p>
+   * This command only exists in Redis.
    * @since Redis Bloom 1.0.0
    */
   Command CF_DEL = new CommandImpl("cf.del", 3, false, false, false, new KeyLocator(false, new BeginSearchIndex(1), new FindKeysRange(0, 1, 0)));
   /**
    * Checks whether one or more items exist in a Cuckoo Filter.
+   * <p>
+   * This command only exists in Redis.
    * @since Redis Bloom 1.0.0
    */
   Command CF_EXISTS = new CommandImpl("cf.exists", 3, true, false, false, new KeyLocator(true, new BeginSearchIndex(1), new FindKeysRange(0, 1, 0)));
   /**
    * Returns information about a Cuckoo Filter.
+   * <p>
+   * This command only exists in Redis.
    * @since Redis Bloom 1.0.0
    */
   Command CF_INFO = new CommandImpl("cf.info", 2, true, false, false, new KeyLocator(true, new BeginSearchIndex(1), new FindKeysRange(0, 1, 0)));
   /**
    * Adds one or more items to a Cuckoo Filter. A filter will be created if it does not exist.
+   * <p>
+   * This command only exists in Redis.
    * @since Redis Bloom 1.0.0
    */
   Command CF_INSERT = new CommandImpl("cf.insert", -4, false, false, false, new KeyLocator(false, new BeginSearchIndex(1), new FindKeysRange(0, 1, 0)));
   /**
    * Adds one or more items to a Cuckoo Filter if the items did not exist previously. A filter will be created if it does not exist.
+   * <p>
+   * This command only exists in Redis.
    * @since Redis Bloom 1.0.0
    */
   Command CF_INSERTNX = new CommandImpl("cf.insertnx", -4, false, false, false, new KeyLocator(false, new BeginSearchIndex(1), new FindKeysRange(0, 1, 0)));
   /**
    * Restores a filter previously saved using SCANDUMP.
+   * <p>
+   * This command only exists in Redis.
    * @since Redis Bloom 1.0.0
    */
   Command CF_LOADCHUNK = new CommandImpl("cf.loadchunk", 4, false, false, false, new KeyLocator(false, new BeginSearchIndex(1), new FindKeysRange(0, 1, 0)));
   /**
    * Checks whether one or more items exist in a Cuckoo Filter.
+   * <p>
+   * This command only exists in Redis.
    * @since Redis Bloom 1.0.0
    */
   Command CF_MEXISTS = new CommandImpl("cf.mexists", -3, true, false, false, new KeyLocator(true, new BeginSearchIndex(1), new FindKeysRange(0, 1, 0)));
   /**
    * Creates a new Cuckoo Filter.
+   * <p>
+   * This command only exists in Redis.
    * @since Redis Bloom 1.0.0
    */
   Command CF_RESERVE = new CommandImpl("cf.reserve", -3, false, false, false, new KeyLocator(false, new BeginSearchIndex(1), new FindKeysRange(0, 1, 0)));
   /**
    * Begins an incremental save of the bloom filter.
+   * <p>
+   * This command only exists in Redis.
    * @since Redis Bloom 1.0.0
    */
   Command CF_SCANDUMP = new CommandImpl("cf.scandump", 3, true, false, false, new KeyLocator(false, new BeginSearchIndex(1), new FindKeysRange(0, 1, 0)));
@@ -254,31 +310,43 @@ public interface Command {
   Command CLUSTER = new CommandImpl("cluster", -2, null, false, false);
   /**
    * Increases the count of one or more items by increment.
+   * <p>
+   * This command only exists in Redis.
    * @since Redis Bloom 2.0.0
    */
   Command CMS_INCRBY = new CommandImpl("cms.incrby", -4, false, false, false, new KeyLocator(false, new BeginSearchIndex(1), new FindKeysRange(0, 1, 0)));
   /**
    * Returns information about a sketch.
+   * <p>
+   * This command only exists in Redis.
    * @since Redis Bloom 2.0.0
    */
   Command CMS_INFO = new CommandImpl("cms.info", 2, true, false, false, new KeyLocator(true, new BeginSearchIndex(1), new FindKeysRange(0, 1, 0)));
   /**
    * Initializes a Count-Min Sketch to dimensions specified by user.
+   * <p>
+   * This command only exists in Redis.
    * @since Redis Bloom 2.0.0
    */
   Command CMS_INITBYDIM = new CommandImpl("cms.initbydim", 4, false, false, false, new KeyLocator(false, new BeginSearchIndex(1), new FindKeysRange(0, 1, 0)));
   /**
    * Initializes a Count-Min Sketch to accommodate requested tolerances.
+   * <p>
+   * This command only exists in Redis.
    * @since Redis Bloom 2.0.0
    */
   Command CMS_INITBYPROB = new CommandImpl("cms.initbyprob", 4, false, false, false, new KeyLocator(false, new BeginSearchIndex(1), new FindKeysRange(0, 1, 0)));
   /**
    * Merges several sketches into one sketch.
+   * <p>
+   * This command only exists in Redis.
    * @since Redis Bloom 2.0.0
    */
   Command CMS_MERGE = new CommandImpl("cms.merge", -4, false, false, false, new KeyLocator(false, new BeginSearchIndex(1), new FindKeysRange(0, 1, 0)));
   /**
    * Returns the count for one or more items in a sketch.
+   * <p>
+   * This command only exists in Redis.
    * @since Redis Bloom 2.0.0
    */
   Command CMS_QUERY = new CommandImpl("cms.query", -3, true, false, false, new KeyLocator(true, new BeginSearchIndex(1), new FindKeysRange(0, 1, 0)));
@@ -287,6 +355,13 @@ public interface Command {
    * @since Redis 2.8.13
    */
   Command COMMAND = new CommandImpl("command", -1, null, false, false);
+  /**
+   * A container for command log commands.
+   * <p>
+   * This command only exists in Valkey.
+   * @since Valkey 8.1.0
+   */
+  Command COMMANDLOG = new CommandImpl("commandlog", -2, null, false, false);
   /**
    * A container for server configuration commands.
    * @since Redis 2.0.0
@@ -324,11 +399,22 @@ public interface Command {
   Command DEL = new CommandImpl("del", -2, false, false, false, new KeyLocator(false, new BeginSearchIndex(1), new FindKeysRange(-1, 1, 0)));
   /**
    * Conditionally removes the specified key based on value or digest comparison.
+   * <p>
+   * This command only exists in Redis.
    * @since Redis 8.4.0
    */
   Command DELEX = new CommandImpl("delex", -2, false, false, false, new KeyLocator(false, new BeginSearchIndex(1), new FindKeysRange(0, 1, 0)));
   /**
+   * Delete key if value matches string.
+   * <p>
+   * This command only exists in Valkey.
+   * @since Valkey 9.0.0
+   */
+  Command DELIFEQ = new CommandImpl("delifeq", 3, false, false, false, new KeyLocator(false, new BeginSearchIndex(1), new FindKeysRange(0, 1, 0)));
+  /**
    * Returns the XXH3 hash of a string value.
+   * <p>
+   * This command only exists in Redis.
    * @since Redis 8.4.0
    */
   Command DIGEST = new CommandImpl("digest", 2, true, false, false, new KeyLocator(true, new BeginSearchIndex(1), new FindKeysRange(0, 1, 0)));
@@ -417,167 +503,269 @@ public interface Command {
    * @since Redis 1.0.0
    */
   Command FLUSHDB = new CommandImpl("flushdb", -1, false, false, false);
+  /**
+   * <p>
+   * This command only exists in Redis.
+   */
   Command FT_ADD = new CommandImpl("FT.ADD", -1, false, false, false, new KeyLocator(false, new BeginSearchIndex(2), new FindKeysRange(0, 1, 0)));
   /**
    * Run a search query on an index and perform aggregate transformations on the results.
+   * <p>
+   * This command only exists in Redis.
    * @since Redis Search 1.1.0
    */
   Command FT_AGGREGATE = new CommandImpl("FT.AGGREGATE", -3, true, false, false);
   /**
    * Adds an alias to the index.
+   * <p>
+   * This command only exists in Redis.
    * @since Redis Search 1.0.0
    */
   Command FT_ALIASADD = new CommandImpl("FT.ALIASADD", -3, false, false, false);
   /**
    * Deletes an alias from the index.
+   * <p>
+   * This command only exists in Redis.
    * @since Redis Search 1.0.0
    */
   Command FT_ALIASDEL = new CommandImpl("FT.ALIASDEL", -2, false, false, false);
   /**
    * Adds or updates an alias to the index.
+   * <p>
+   * This command only exists in Redis.
    * @since Redis Search 1.0.0
    */
   Command FT_ALIASUPDATE = new CommandImpl("FT.ALIASUPDATE", -3, false, false, false);
   /**
    * Adds a new field to the index.
+   * <p>
+   * This command only exists in Redis.
    * @since Redis Search 1.0.0
    */
   Command FT_ALTER = new CommandImpl("FT.ALTER", -6, false, false, false);
+  /**
+   * <p>
+   * This command only exists in Redis.
+   */
   Command FT_CONFIG = new CommandImpl("FT.CONFIG", -2, true, false, false);
   /**
    * Creates an index with the given spec.
+   * <p>
+   * This command only exists in Redis.
    * @since Redis Search 1.0.0
    */
   Command FT_CREATE = new CommandImpl("FT.CREATE", -4, false, false, false);
+  /**
+   * <p>
+   * This command only exists in Redis.
+   */
   Command FT_CURSOR = new CommandImpl("FT.CURSOR", -2, true, false, false);
   /**
+   * <p>
+   * This command only exists in Redis.
    * @deprecated this command no longer exists in the latest Redis release
    */
   Command FT_DEBUG = new CommandImpl("FT.DEBUG", -1, true, false, false);
+  /**
+   * <p>
+   * This command only exists in Redis.
+   */
   Command FT_DEL = new CommandImpl("FT.DEL", -1, false, false, false, new KeyLocator(false, new BeginSearchIndex(2), new FindKeysRange(0, 1, 0)));
   /**
    * Adds terms to a dictionary.
+   * <p>
+   * This command only exists in Redis.
    * @since Redis Search 1.4.0
    */
   Command FT_DICTADD = new CommandImpl("FT.DICTADD", -3, false, false, false);
   /**
    * Deletes terms from a dictionary.
+   * <p>
+   * This command only exists in Redis.
    * @since Redis Search 1.4.0
    */
   Command FT_DICTDEL = new CommandImpl("FT.DICTDEL", -3, false, false, false);
   /**
    * Dumps all terms in the given dictionary.
+   * <p>
+   * This command only exists in Redis.
    * @since Redis Search 1.4.0
    */
   Command FT_DICTDUMP = new CommandImpl("FT.DICTDUMP", -2, true, false, false);
+  /**
+   * <p>
+   * This command only exists in Redis.
+   */
   Command FT_DROP = new CommandImpl("FT.DROP", -1, false, false, false);
   /**
    * Deletes the index.
+   * <p>
+   * This command only exists in Redis.
    * @since Redis Search 2.0.0
    */
   Command FT_DROPINDEX = new CommandImpl("FT.DROPINDEX", -2, false, false, false);
   /**
    * Returns the execution plan for a complex query.
+   * <p>
+   * This command only exists in Redis.
    * @since Redis Search 1.0.0
    */
   Command FT_EXPLAIN = new CommandImpl("FT.EXPLAIN", -3, true, false, false);
   /**
    * Returns the execution plan for a complex query.
+   * <p>
+   * This command only exists in Redis.
    * @since Redis Search 1.0.0
    */
   Command FT_EXPLAINCLI = new CommandImpl("FT.EXPLAINCLI", -3, true, false, false);
+  /**
+   * <p>
+   * This command only exists in Redis.
+   */
   Command FT_GET = new CommandImpl("FT.GET", -1, true, false, false, new KeyLocator(false, new BeginSearchIndex(2), new FindKeysRange(0, 1, 0)));
   /**
    * Performs hybrid search combining text search and vector similarity search.
+   * <p>
+   * This command only exists in Redis.
    * @since Redis Search 8.4.4
    */
   Command FT_HYBRID = new CommandImpl("FT.HYBRID", -4, true, false, false);
   /**
    * Returns information and statistics on the index.
+   * <p>
+   * This command only exists in Redis.
    * @since Redis Search 1.0.0
    */
   Command FT_INFO = new CommandImpl("FT.INFO", -2, true, false, false);
+  /**
+   * <p>
+   * This command only exists in Redis.
+   */
   Command FT_MGET = new CommandImpl("FT.MGET", -1, true, false, false);
   /**
    * Performs a `FT.SEARCH` or `FT.AGGREGATE` command and collects performance information.
+   * <p>
+   * This command only exists in Redis.
    * @since Redis Search 2.2.0
    */
   Command FT_PROFILE = new CommandImpl("FT.PROFILE", -5, true, false, false);
+  /**
+   * <p>
+   * This command only exists in Redis.
+   */
   Command FT_SAFEADD = new CommandImpl("FT.SAFEADD", -1, false, false, false, new KeyLocator(false, new BeginSearchIndex(2), new FindKeysRange(0, 1, 0)));
   /**
    * Searches the index with a textual query, returning either documents or just ids.
+   * <p>
+   * This command only exists in Redis.
    * @since Redis Search 1.0.0
    */
   Command FT_SEARCH = new CommandImpl("FT.SEARCH", -3, true, false, false);
   /**
    * Performs spelling correction on a query, returning suggestions for misspelled terms.
+   * <p>
+   * This command only exists in Redis.
    * @since Redis Search 1.4.0
    */
   Command FT_SPELLCHECK = new CommandImpl("FT.SPELLCHECK", -3, true, false, false);
   /**
    * Adds a suggestion string to an auto-complete suggestion dictionary.
+   * <p>
+   * This command only exists in Redis.
    * @since Redis Search 1.0.0
    */
   Command FT_SUGADD = new CommandImpl("FT.SUGADD", -4, false, false, false, new KeyLocator(false, new BeginSearchIndex(1), new FindKeysRange(0, 1, 0)));
   /**
    * Deletes a string from a suggestion index.
+   * <p>
+   * This command only exists in Redis.
    * @since Redis Search 1.0.0
    */
   Command FT_SUGDEL = new CommandImpl("FT.SUGDEL", -3, false, false, false, new KeyLocator(false, new BeginSearchIndex(1), new FindKeysRange(0, 1, 0)));
   /**
    * Gets completion suggestions for a prefix.
+   * <p>
+   * This command only exists in Redis.
    * @since Redis Search 1.0.0
    */
   Command FT_SUGGET = new CommandImpl("FT.SUGGET", -3, true, false, false, new KeyLocator(false, new BeginSearchIndex(1), new FindKeysRange(0, 1, 0)));
   /**
    * Gets the size of an auto-complete suggestion dictionary.
+   * <p>
+   * This command only exists in Redis.
    * @since Redis Search 1.0.0
    */
   Command FT_SUGLEN = new CommandImpl("FT.SUGLEN", -2, true, false, false, new KeyLocator(false, new BeginSearchIndex(1), new FindKeysRange(0, 1, 0)));
+  /**
+   * <p>
+   * This command only exists in Redis.
+   */
   Command FT_SYNADD = new CommandImpl("FT.SYNADD", -1, false, false, false);
   /**
    * Dumps the contents of a synonym group.
+   * <p>
+   * This command only exists in Redis.
    * @since Redis Search 1.2.0
    */
   Command FT_SYNDUMP = new CommandImpl("FT.SYNDUMP", -2, true, false, false);
   /**
    * Creates or updates a synonym group with additional terms.
+   * <p>
+   * This command only exists in Redis.
    * @since Redis Search 1.2.0
    */
   Command FT_SYNUPDATE = new CommandImpl("FT.SYNUPDATE", -4, false, false, false);
   /**
    * Returns the distinct tags indexed in a Tag field.
+   * <p>
+   * This command only exists in Redis.
    * @since Redis Search 1.0.0
    */
   Command FT_TAGVALS = new CommandImpl("FT.TAGVALS", -3, true, false, false);
   /**
    * Adds an alias to the index.
+   * <p>
+   * This command only exists in Redis.
    * @since Redis Search 1.0.0
    */
   Command FT__ALIASADDIFNX = new CommandImpl("FT._ALIASADDIFNX", -3, false, false, false);
   /**
    * Deletes an alias from the index.
+   * <p>
+   * This command only exists in Redis.
    * @since Redis Search 1.0.0
    */
   Command FT__ALIASDELIFX = new CommandImpl("FT._ALIASDELIFX", -2, false, false, false);
   /**
    * Adds a new field to the index.
+   * <p>
+   * This command only exists in Redis.
    * @since Redis Search 1.0.0
    */
   Command FT__ALTERIFNX = new CommandImpl("FT._ALTERIFNX", -6, false, false, false);
   /**
    * Creates an index with the given spec.
+   * <p>
+   * This command only exists in Redis.
    * @since Redis Search 1.0.0
    */
   Command FT__CREATEIFNX = new CommandImpl("FT._CREATEIFNX", -4, false, false, false);
+  /**
+   * <p>
+   * This command only exists in Redis.
+   */
   Command FT__DROPIFX = new CommandImpl("FT._DROPIFX", -1, false, false, false);
   /**
    * Deletes the index.
+   * <p>
+   * This command only exists in Redis.
    * @since Redis Search 2.0.0
    */
   Command FT__DROPINDEXIFX = new CommandImpl("FT._DROPINDEXIFX", -2, false, false, false);
   /**
    * Returns a list of all existing indexes.
+   * <p>
+   * This command only exists in Redis.
    * @since Redis Search 2.0.0
    */
   Command FT__LIST = new CommandImpl("FT._LIST", -1, true, false, false);
@@ -672,42 +860,62 @@ public interface Command {
    */
   Command GETSET = new CommandImpl("getset", 3, false, false, false, new KeyLocator(false, new BeginSearchIndex(1), new FindKeysRange(0, 1, 0)));
   /**
+   * <p>
+   * This command only exists in Redis.
    * @deprecated this command no longer exists in the latest Redis release
    */
   Command GRAPH_BULK = new CommandImpl("graph.BULK", -1, false, false, false, new KeyLocator(false, new BeginSearchIndex(1), new FindKeysRange(0, 1, 0)));
   /**
+   * <p>
+   * This command only exists in Redis.
    * @deprecated this command no longer exists in the latest Redis release
    */
   Command GRAPH_CONFIG = new CommandImpl("graph.CONFIG", -1, true, false, false);
   /**
+   * <p>
+   * This command only exists in Redis.
    * @deprecated this command no longer exists in the latest Redis release
    */
   Command GRAPH_DEBUG = new CommandImpl("graph.DEBUG", -1, true, false, false);
   /**
+   * <p>
+   * This command only exists in Redis.
    * @deprecated this command no longer exists in the latest Redis release
    */
   Command GRAPH_DELETE = new CommandImpl("graph.DELETE", -1, false, false, false, new KeyLocator(false, new BeginSearchIndex(1), new FindKeysRange(0, 1, 0)));
   /**
+   * <p>
+   * This command only exists in Redis.
    * @deprecated this command no longer exists in the latest Redis release
    */
   Command GRAPH_EXPLAIN = new CommandImpl("graph.EXPLAIN", -1, false, false, false, new KeyLocator(false, new BeginSearchIndex(1), new FindKeysRange(0, 1, 0)));
   /**
+   * <p>
+   * This command only exists in Redis.
    * @deprecated this command no longer exists in the latest Redis release
    */
   Command GRAPH_LIST = new CommandImpl("graph.LIST", -1, true, false, false);
   /**
+   * <p>
+   * This command only exists in Redis.
    * @deprecated this command no longer exists in the latest Redis release
    */
   Command GRAPH_PROFILE = new CommandImpl("graph.PROFILE", -1, false, false, false, new KeyLocator(false, new BeginSearchIndex(1), new FindKeysRange(0, 1, 0)));
   /**
+   * <p>
+   * This command only exists in Redis.
    * @deprecated this command no longer exists in the latest Redis release
    */
   Command GRAPH_QUERY = new CommandImpl("graph.QUERY", -1, false, false, false, new KeyLocator(false, new BeginSearchIndex(1), new FindKeysRange(0, 1, 0)));
   /**
+   * <p>
+   * This command only exists in Redis.
    * @deprecated this command no longer exists in the latest Redis release
    */
   Command GRAPH_RO_QUERY = new CommandImpl("graph.RO_QUERY", -1, true, false, false, new KeyLocator(false, new BeginSearchIndex(1), new FindKeysRange(0, 1, 0)));
   /**
+   * <p>
+   * This command only exists in Redis.
    * @deprecated this command no longer exists in the latest Redis release
    */
   Command GRAPH_SLOWLOG = new CommandImpl("graph.SLOWLOG", -1, true, false, false, new KeyLocator(false, new BeginSearchIndex(1), new FindKeysRange(0, 1, 0)));
@@ -753,6 +961,8 @@ public interface Command {
   Command HGETALL = new CommandImpl("hgetall", 2, true, false, false, new KeyLocator(true, new BeginSearchIndex(1), new FindKeysRange(0, 1, 0)));
   /**
    * Returns the value of a field and deletes it from the hash.
+   * <p>
+   * This command only exists in Redis.
    * @since Redis 8.0.0
    */
   Command HGETDEL = new CommandImpl("hgetdel", -5, false, false, false, new KeyLocator(false, new BeginSearchIndex(1), new FindKeysRange(0, 1, 0)));
@@ -794,6 +1004,8 @@ public interface Command {
   Command HMSET = new CommandImpl("hmset", -4, false, false, false, new KeyLocator(false, new BeginSearchIndex(1), new FindKeysRange(0, 1, 0)));
   /**
    * A container for hotkeys tracking commands.
+   * <p>
+   * This command only exists in Redis.
    * @since Redis 8.6.0
    */
   Command HOTKEYS = new CommandImpl("hotkeys", -2, null, false, false);
@@ -884,126 +1096,176 @@ public interface Command {
   Command INFO = new CommandImpl("info", -1, null, false, false);
   /**
    * Append the JSON values into the array at path after the last element in it.
+   * <p>
+   * This command only exists in Redis.
    * @since Redis ReJSON 1.0.0
    */
   Command JSON_ARRAPPEND = new CommandImpl("json.arrappend", -3, false, false, false, new KeyLocator(false, new BeginSearchIndex(1), new FindKeysRange(0, 1, 0)));
   /**
    * Search for the first occurrence of a JSON value in an array.
+   * <p>
+   * This command only exists in Redis.
    * @since Redis ReJSON 1.0.0
    */
   Command JSON_ARRINDEX = new CommandImpl("json.arrindex", -4, true, false, false, new KeyLocator(true, new BeginSearchIndex(1), new FindKeysRange(0, 1, 0)));
   /**
    * Insert the json values into the array at path before the index (shifts to the right).
+   * <p>
+   * This command only exists in Redis.
    * @since Redis ReJSON 1.0.0
    */
   Command JSON_ARRINSERT = new CommandImpl("json.arrinsert", -5, false, false, false, new KeyLocator(false, new BeginSearchIndex(1), new FindKeysRange(0, 1, 0)));
   /**
    * Report the length of the JSON array at path in key.
+   * <p>
+   * This command only exists in Redis.
    * @since Redis ReJSON 1.0.0
    */
   Command JSON_ARRLEN = new CommandImpl("json.arrlen", -2, true, false, false, new KeyLocator(true, new BeginSearchIndex(1), new FindKeysRange(0, 1, 0)));
   /**
    * Remove and return the element at the specified index in the array at path.
+   * <p>
+   * This command only exists in Redis.
    * @since Redis ReJSON 1.0.0
    */
   Command JSON_ARRPOP = new CommandImpl("json.arrpop", -2, false, false, false, new KeyLocator(false, new BeginSearchIndex(1), new FindKeysRange(0, 1, 0)));
   /**
    * Trim an array so that it contains only the specified inclusive range of elements.
+   * <p>
+   * This command only exists in Redis.
    * @since Redis ReJSON 1.0.0
    */
   Command JSON_ARRTRIM = new CommandImpl("json.arrtrim", 5, false, false, false, new KeyLocator(false, new BeginSearchIndex(1), new FindKeysRange(0, 1, 0)));
   /**
    * Clear container values (arrays/objects) and set numeric values to 0.
+   * <p>
+   * This command only exists in Redis.
    * @since Redis ReJSON 2.0.0
    */
   Command JSON_CLEAR = new CommandImpl("json.clear", -2, false, false, false, new KeyLocator(false, new BeginSearchIndex(1), new FindKeysRange(0, 1, 0)));
   /**
    * This is a container command for debugging related tasks.
+   * <p>
+   * This command only exists in Redis.
    * @since Redis ReJSON 1.0.0
    */
   Command JSON_DEBUG = new CommandImpl("json.debug", -2, true, false, false);
   /**
    * Delete a value.
+   * <p>
+   * This command only exists in Redis.
    * @since Redis ReJSON 1.0.0
    */
   Command JSON_DEL = new CommandImpl("json.del", -2, false, false, false, new KeyLocator(false, new BeginSearchIndex(1), new FindKeysRange(0, 1, 0)));
   /**
    * Delete a value.
+   * <p>
+   * This command only exists in Redis.
    * @since Redis ReJSON 1.0.0
    */
   Command JSON_FORGET = new CommandImpl("json.forget", -2, false, false, false, new KeyLocator(false, new BeginSearchIndex(1), new FindKeysRange(0, 1, 0)));
   /**
    * Get JSON value at path.
+   * <p>
+   * This command only exists in Redis.
    * @since Redis ReJSON 1.0.0
    */
   Command JSON_GET = new CommandImpl("json.get", -2, true, false, false, new KeyLocator(true, new BeginSearchIndex(1), new FindKeysRange(0, 1, 0)));
   /**
    * Merge a given JSON value into matching paths. Consequently, JSON values at matching paths are updated, deleted, or expanded with new children.
+   * <p>
+   * This command only exists in Redis.
    * @since Redis ReJSON 2.6.0
    */
   Command JSON_MERGE = new CommandImpl("json.merge", -4, false, false, false, new KeyLocator(false, new BeginSearchIndex(1), new FindKeysRange(0, 1, 0)));
   /**
    * Return the values at path from multiple key arguments.
+   * <p>
+   * This command only exists in Redis.
    * @since Redis ReJSON 1.0.0
    */
   Command JSON_MGET = new CommandImpl("json.mget", -3, true, false, false, new KeyLocator(true, new BeginSearchIndex(1), new FindKeysRange(0, 1, 0)));
   /**
    * Set or update one or more JSON values according to the specified key-path-value triplets.
+   * <p>
+   * This command only exists in Redis.
    * @since Redis ReJSON 2.6.0
    */
   Command JSON_MSET = new CommandImpl("json.mset", -4, false, false, false, new KeyLocator(false, new BeginSearchIndex(1), new FindKeysRange(-1, 3, 0)));
   /**
    * Increment the number value stored at path by number.
+   * <p>
+   * This command only exists in Redis.
    * @since Redis ReJSON 1.0.0
    */
   Command JSON_NUMINCRBY = new CommandImpl("json.numincrby", 4, false, false, false, new KeyLocator(false, new BeginSearchIndex(1), new FindKeysRange(0, 1, 0)));
   /**
    * Multiply the number value stored at path by number.
+   * <p>
+   * This command only exists in Redis.
    * @since Redis ReJSON 1.0.0
    */
   Command JSON_NUMMULTBY = new CommandImpl("json.nummultby", 4, false, false, false, new KeyLocator(false, new BeginSearchIndex(1), new FindKeysRange(0, 1, 0)));
   /**
    * Raise the number value stored at path to the power of number.
+   * <p>
+   * This command only exists in Redis.
    * @since Redis ReJSON 1.0.0
    */
   Command JSON_NUMPOWBY = new CommandImpl("json.numpowby", 4, false, false, false, new KeyLocator(false, new BeginSearchIndex(1), new FindKeysRange(0, 1, 0)));
   /**
    * Return the keys in the object that's referenced by path.
+   * <p>
+   * This command only exists in Redis.
    * @since Redis ReJSON 1.0.0
    */
   Command JSON_OBJKEYS = new CommandImpl("json.objkeys", -2, true, false, false, new KeyLocator(true, new BeginSearchIndex(1), new FindKeysRange(0, 1, 0)));
   /**
    * Report the number of keys in the JSON object at path in key.
+   * <p>
+   * This command only exists in Redis.
    * @since Redis ReJSON 1.0.0
    */
   Command JSON_OBJLEN = new CommandImpl("json.objlen", -2, true, false, false, new KeyLocator(true, new BeginSearchIndex(1), new FindKeysRange(0, 1, 0)));
   /**
    * Return the JSON in key in Redis serialization protocol specification form.
+   * <p>
+   * This command only exists in Redis.
    * @since Redis ReJSON 1.0.0
    */
   Command JSON_RESP = new CommandImpl("json.resp", -2, true, false, false, new KeyLocator(true, new BeginSearchIndex(1), new FindKeysRange(0, 1, 0)));
   /**
    * Set the JSON value at path in key.
+   * <p>
+   * This command only exists in Redis.
    * @since Redis ReJSON 1.0.0
    */
   Command JSON_SET = new CommandImpl("json.set", -4, false, false, false, new KeyLocator(false, new BeginSearchIndex(1), new FindKeysRange(0, 1, 0)));
   /**
    * Append the json-string values to the string at path.
+   * <p>
+   * This command only exists in Redis.
    * @since Redis ReJSON 1.0.0
    */
   Command JSON_STRAPPEND = new CommandImpl("json.strappend", -3, false, false, false, new KeyLocator(false, new BeginSearchIndex(1), new FindKeysRange(0, 1, 0)));
   /**
    * Report the length of the JSON String at path in key.
+   * <p>
+   * This command only exists in Redis.
    * @since Redis ReJSON 1.0.0
    */
   Command JSON_STRLEN = new CommandImpl("json.strlen", -2, true, false, false, new KeyLocator(true, new BeginSearchIndex(1), new FindKeysRange(0, 1, 0)));
   /**
    * Toggle the boolean value stored at path.
+   * <p>
+   * This command only exists in Redis.
    * @since Redis ReJSON 2.0.0
    */
   Command JSON_TOGGLE = new CommandImpl("json.toggle", 3, false, false, false, new KeyLocator(false, new BeginSearchIndex(1), new FindKeysRange(0, 1, 0)));
   /**
    * Report the type of JSON value at path.
+   * <p>
+   * This command only exists in Redis.
    * @since Redis ReJSON 1.0.0
    */
   Command JSON_TYPE = new CommandImpl("json.type", -2, true, false, false, new KeyLocator(true, new BeginSearchIndex(1), new FindKeysRange(0, 1, 0)));
@@ -1134,6 +1396,8 @@ public interface Command {
   Command MSET = new CommandImpl("mset", -3, false, false, false, new KeyLocator(false, new BeginSearchIndex(1), new FindKeysRange(-1, 2, 0)));
   /**
    * Atomically sets multiple string keys with a shared expiration in a single operation. Supports flexible argument parsing where condition and expiration flags can appear in any order.
+   * <p>
+   * This command only exists in Redis.
    * @since Redis 8.4.0
    */
   Command MSETEX = new CommandImpl("msetex", -4, false, false, false, new KeyLocator(false, new BeginSearchIndex(1), new FindKeysKeynum(0, 1, 2)));
@@ -1355,8 +1619,20 @@ public interface Command {
    * @since Redis 1.0.0
    */
   Command SDIFFSTORE = new CommandImpl("sdiffstore", -3, false, false, false, new KeyLocator(false, new BeginSearchIndex(1), new FindKeysRange(0, 1, 0)), new KeyLocator(true, new BeginSearchIndex(2), new FindKeysRange(-1, 1, 0)));
+  /**
+   * <p>
+   * This command only exists in Redis.
+   */
   Command SEARCH_CLUSTERINFO = new CommandImpl("search.CLUSTERINFO", -1, true, false, false);
+  /**
+   * <p>
+   * This command only exists in Redis.
+   */
   Command SEARCH_CLUSTERREFRESH = new CommandImpl("search.CLUSTERREFRESH", -1, true, false, false);
+  /**
+   * <p>
+   * This command only exists in Redis.
+   */
   Command SEARCH_CLUSTERSET = new CommandImpl("search.CLUSTERSET", -1, true, false, false);
   /**
    * Changes the selected database.
@@ -1524,71 +1800,99 @@ public interface Command {
   Command SYNC = new CommandImpl("sync", 1, null, false, false);
   /**
    * Adds one or more observations to a t-digest sketch.
+   * <p>
+   * This command only exists in Redis.
    * @since Redis Bloom 2.4.0
    */
   Command TDIGEST_ADD = new CommandImpl("tdigest.add", -3, false, false, false, new KeyLocator(false, new BeginSearchIndex(1), new FindKeysRange(0, 1, 0)));
   /**
    * Returns, for each input rank, an estimation of the value (floating-point) with that rank.
+   * <p>
+   * This command only exists in Redis.
    * @since Redis Bloom 2.4.0
    */
   Command TDIGEST_BYRANK = new CommandImpl("tdigest.byrank", -3, true, false, false, new KeyLocator(true, new BeginSearchIndex(1), new FindKeysRange(0, 1, 0)));
   /**
    * Returns, for each input reverse rank, an estimation of the value (floating-point) with that reverse rank.
+   * <p>
+   * This command only exists in Redis.
    * @since Redis Bloom 2.4.0
    */
   Command TDIGEST_BYREVRANK = new CommandImpl("tdigest.byrevrank", -3, true, false, false, new KeyLocator(true, new BeginSearchIndex(1), new FindKeysRange(0, 1, 0)));
   /**
    * Returns, for each input value, an estimation of the floating-point fraction of (observations smaller than the given value + half the observations equal to the given value). Multiple fractions can be retrieved in a single call.
+   * <p>
+   * This command only exists in Redis.
    * @since Redis Bloom 2.4.0
    */
   Command TDIGEST_CDF = new CommandImpl("tdigest.cdf", -3, true, false, false, new KeyLocator(true, new BeginSearchIndex(1), new FindKeysRange(0, 1, 0)));
   /**
    * Allocates memory and initializes a new t-digest sketch.
+   * <p>
+   * This command only exists in Redis.
    * @since Redis Bloom 2.4.0
    */
   Command TDIGEST_CREATE = new CommandImpl("tdigest.create", -2, false, false, false, new KeyLocator(false, new BeginSearchIndex(1), new FindKeysRange(0, 1, 0)));
   /**
    * Returns information and statistics about a t-digest sketch.
+   * <p>
+   * This command only exists in Redis.
    * @since Redis Bloom 2.4.0
    */
   Command TDIGEST_INFO = new CommandImpl("tdigest.info", 2, true, false, false, new KeyLocator(true, new BeginSearchIndex(1), new FindKeysRange(0, 1, 0)));
   /**
    * Returns the maximum observation value from a t-digest sketch.
+   * <p>
+   * This command only exists in Redis.
    * @since Redis Bloom 2.4.0
    */
   Command TDIGEST_MAX = new CommandImpl("tdigest.max", 2, true, false, false, new KeyLocator(true, new BeginSearchIndex(1), new FindKeysRange(0, 1, 0)));
   /**
    * Merges multiple t-digest sketches into a single sketch.
+   * <p>
+   * This command only exists in Redis.
    * @since Redis Bloom 2.4.0
    */
   Command TDIGEST_MERGE = new CommandImpl("tdigest.merge", -4, false, false, false, new KeyLocator(false, new BeginSearchIndex(1), new FindKeysRange(0, 1, 0)), new KeyLocator(true, new BeginSearchIndex(2), new FindKeysKeynum(0, 1, 1)));
   /**
    * Returns the minimum observation value from a t-digest sketch.
+   * <p>
+   * This command only exists in Redis.
    * @since Redis Bloom 2.4.0
    */
   Command TDIGEST_MIN = new CommandImpl("tdigest.min", 2, true, false, false, new KeyLocator(true, new BeginSearchIndex(1), new FindKeysRange(0, 1, 0)));
   /**
    * Returns, for each input fraction, an estimation of the value (floating point) that is smaller than the given fraction of observations.
+   * <p>
+   * This command only exists in Redis.
    * @since Redis Bloom 2.4.0
    */
   Command TDIGEST_QUANTILE = new CommandImpl("tdigest.quantile", -3, true, false, false, new KeyLocator(true, new BeginSearchIndex(1), new FindKeysRange(0, 1, 0)));
   /**
    * Returns, for each input value (floating-point), the estimated rank of the value (the number of observations in the sketch that are smaller than the value + half the number of observations that are equal to the value).
+   * <p>
+   * This command only exists in Redis.
    * @since Redis Bloom 2.4.0
    */
   Command TDIGEST_RANK = new CommandImpl("tdigest.rank", -3, true, false, false, new KeyLocator(true, new BeginSearchIndex(1), new FindKeysRange(0, 1, 0)));
   /**
    * Resets a t-digest sketch: empty the sketch and re-initializes it.
+   * <p>
+   * This command only exists in Redis.
    * @since Redis Bloom 2.4.0
    */
   Command TDIGEST_RESET = new CommandImpl("tdigest.reset", 2, false, false, false, new KeyLocator(false, new BeginSearchIndex(1), new FindKeysRange(0, 1, 0)));
   /**
    * Returns, for each input value (floating-point), the estimated reverse rank of the value (the number of observations in the sketch that are larger than the value + half the number of observations that are equal to the value).
+   * <p>
+   * This command only exists in Redis.
    * @since Redis Bloom 2.4.0
    */
   Command TDIGEST_REVRANK = new CommandImpl("tdigest.revrank", -3, true, false, false, new KeyLocator(true, new BeginSearchIndex(1), new FindKeysRange(0, 1, 0)));
   /**
    * Returns an estimation of the mean value from the sketch, excluding observation values outside the low and high cutoff quantiles.
+   * <p>
+   * This command only exists in Redis.
    * @since Redis Bloom 2.4.0
    */
   Command TDIGEST_TRIMMED_MEAN = new CommandImpl("tdigest.trimmed_mean", 4, true, false, false, new KeyLocator(true, new BeginSearchIndex(1), new FindKeysRange(0, 1, 0)));
@@ -1597,60 +1901,92 @@ public interface Command {
    * @since Redis 2.6.0
    */
   Command TIME = new CommandImpl("time", 1, null, false, false);
+  /**
+   * <p>
+   * This command only exists in Redis.
+   */
   Command TIMESERIES_CLUSTERSET = new CommandImpl("timeseries.CLUSTERSET", -1, true, false, false);
   /**
+   * <p>
+   * This command only exists in Redis.
    * @deprecated this command no longer exists in the latest Redis release
    */
   Command TIMESERIES_CLUSTERSETFROMSHARD = new CommandImpl("timeseries.CLUSTERSETFROMSHARD", -1, true, false, false);
   /**
+   * <p>
+   * This command only exists in Redis.
    * @deprecated this command no longer exists in the latest Redis release
    */
   Command TIMESERIES_HELLO = new CommandImpl("timeseries.HELLO", -1, true, false, false);
   /**
+   * <p>
+   * This command only exists in Redis.
    * @deprecated this command no longer exists in the latest Redis release
    */
   Command TIMESERIES_INFOCLUSTER = new CommandImpl("timeseries.INFOCLUSTER", -1, true, false, false);
   /**
+   * <p>
+   * This command only exists in Redis.
    * @deprecated this command no longer exists in the latest Redis release
    */
   Command TIMESERIES_INNERCOMMUNICATION = new CommandImpl("timeseries.INNERCOMMUNICATION", -1, true, false, false);
   /**
+   * <p>
+   * This command only exists in Redis.
    * @deprecated this command no longer exists in the latest Redis release
    */
   Command TIMESERIES_NETWORKTEST = new CommandImpl("timeseries.NETWORKTEST", -1, true, false, false);
+  /**
+   * <p>
+   * This command only exists in Redis.
+   */
   Command TIMESERIES_REFRESHCLUSTER = new CommandImpl("timeseries.REFRESHCLUSTER", -1, true, false, false);
   /**
    * Adds an item to a Top-k sketch. Multiple items can be added at the same time.
+   * <p>
+   * This command only exists in Redis.
    * @since Redis Bloom 2.0.0
    */
   Command TOPK_ADD = new CommandImpl("topk.add", -3, false, false, false, new KeyLocator(false, new BeginSearchIndex(1), new FindKeysRange(0, 1, 0)));
   /**
    * Return the count for one or more items are in a sketch.
+   * <p>
+   * This command only exists in Redis.
    * @since Redis Bloom 2.0.0
    */
   Command TOPK_COUNT = new CommandImpl("topk.count", -3, true, false, false, new KeyLocator(true, new BeginSearchIndex(1), new FindKeysRange(0, 1, 0)));
   /**
    * Increases the count of one or more items by increment.
+   * <p>
+   * This command only exists in Redis.
    * @since Redis Bloom 2.0.0
    */
   Command TOPK_INCRBY = new CommandImpl("topk.incrby", -4, false, false, false, new KeyLocator(false, new BeginSearchIndex(1), new FindKeysRange(0, 1, 0)));
   /**
    * Returns information about a sketch.
+   * <p>
+   * This command only exists in Redis.
    * @since Redis Bloom 2.0.0
    */
   Command TOPK_INFO = new CommandImpl("topk.info", 2, true, false, false, new KeyLocator(true, new BeginSearchIndex(1), new FindKeysRange(0, 1, 0)));
   /**
    * Return the full list of items in Top-K sketch.
+   * <p>
+   * This command only exists in Redis.
    * @since Redis Bloom 2.0.0
    */
   Command TOPK_LIST = new CommandImpl("topk.list", -2, true, false, false, new KeyLocator(true, new BeginSearchIndex(1), new FindKeysRange(0, 1, 0)));
   /**
    * Checks whether one or more items are in a sketch.
+   * <p>
+   * This command only exists in Redis.
    * @since Redis Bloom 2.0.0
    */
   Command TOPK_QUERY = new CommandImpl("topk.query", -3, true, false, false, new KeyLocator(true, new BeginSearchIndex(1), new FindKeysRange(0, 1, 0)));
   /**
    * Initializes a Top-K sketch with specified parameters.
+   * <p>
+   * This command only exists in Redis.
    * @since Redis Bloom 2.0.0
    */
   Command TOPK_RESERVE = new CommandImpl("topk.reserve", -3, false, false, false, new KeyLocator(false, new BeginSearchIndex(1), new FindKeysRange(0, 1, 0)));
@@ -1661,91 +1997,127 @@ public interface Command {
   Command TOUCH = new CommandImpl("touch", -2, true, false, false, new KeyLocator(true, new BeginSearchIndex(1), new FindKeysRange(-1, 1, 0)));
   /**
    * Trim the keys that belong to specified slots.
+   * <p>
+   * This command only exists in Redis.
    * @since Redis 8.4.0
    */
   Command TRIMSLOTS = new CommandImpl("trimslots", -5, false, false, false);
   /**
    * Append a sample to a time series.
+   * <p>
+   * This command only exists in Redis.
    * @since Redis TimeSeries 1.0.0
    */
   Command TS_ADD = new CommandImpl("ts.add", -4, false, false, false, new KeyLocator(false, new BeginSearchIndex(1), new FindKeysRange(0, 1, 0)));
   /**
    * Update the retention, chunk size, duplicate policy, and labels of an existing time series.
+   * <p>
+   * This command only exists in Redis.
    * @since Redis TimeSeries 1.0.0
    */
   Command TS_ALTER = new CommandImpl("ts.alter", -2, false, false, false, new KeyLocator(false, new BeginSearchIndex(1), new FindKeysRange(0, 1, 0)));
   /**
    * Create a new time series.
+   * <p>
+   * This command only exists in Redis.
    * @since Redis TimeSeries 1.0.0
    */
   Command TS_CREATE = new CommandImpl("ts.create", -2, false, false, false, new KeyLocator(false, new BeginSearchIndex(1), new FindKeysRange(0, 1, 0)));
   /**
    * Create a compaction rule.
+   * <p>
+   * This command only exists in Redis.
    * @since Redis TimeSeries 1.0.0
    */
   Command TS_CREATERULE = new CommandImpl("ts.createrule", -5, false, false, false, new KeyLocator(true, new BeginSearchIndex(1), new FindKeysRange(0, 1, 0)), new KeyLocator(false, new BeginSearchIndex(2), new FindKeysRange(0, 1, 0)));
   /**
    * Decrease the value of the latest sample.
+   * <p>
+   * This command only exists in Redis.
    * @since Redis TimeSeries 1.0.0
    */
   Command TS_DECRBY = new CommandImpl("ts.decrby", -3, false, false, false, new KeyLocator(false, new BeginSearchIndex(1), new FindKeysRange(0, 1, 0)));
   /**
    * Delete all samples between two timestamps for a given time series.
+   * <p>
+   * This command only exists in Redis.
    * @since Redis TimeSeries 1.6.0
    */
   Command TS_DEL = new CommandImpl("ts.del", 4, false, false, false, new KeyLocator(false, new BeginSearchIndex(1), new FindKeysRange(0, 1, 0)));
   /**
    * Delete a compaction rule.
+   * <p>
+   * This command only exists in Redis.
    * @since Redis TimeSeries 1.0.0
    */
   Command TS_DELETERULE = new CommandImpl("ts.deleterule", 3, false, false, false, new KeyLocator(true, new BeginSearchIndex(1), new FindKeysRange(0, 1, 0)), new KeyLocator(false, new BeginSearchIndex(2), new FindKeysRange(0, 1, 0)));
   /**
    * Get the sample with the highest timestamp from a given time series.
+   * <p>
+   * This command only exists in Redis.
    * @since Redis TimeSeries 1.0.0
    */
   Command TS_GET = new CommandImpl("ts.get", -2, true, false, false, new KeyLocator(true, new BeginSearchIndex(1), new FindKeysRange(0, 1, 0)));
   /**
    * Increase the value of the latest sample.
+   * <p>
+   * This command only exists in Redis.
    * @since Redis TimeSeries 1.0.0
    */
   Command TS_INCRBY = new CommandImpl("ts.incrby", -3, false, false, false, new KeyLocator(false, new BeginSearchIndex(1), new FindKeysRange(0, 1, 0)));
   /**
    * Returns information and statistics for a time series.
+   * <p>
+   * This command only exists in Redis.
    * @since Redis TimeSeries 1.0.0
    */
   Command TS_INFO = new CommandImpl("ts.info", -2, true, false, false, new KeyLocator(true, new BeginSearchIndex(1), new FindKeysRange(0, 1, 0)));
   /**
    * Append new samples to one or more time series.
+   * <p>
+   * This command only exists in Redis.
    * @since Redis TimeSeries 1.0.0
    */
   Command TS_MADD = new CommandImpl("ts.madd", -4, false, false, false, new KeyLocator(false, new BeginSearchIndex(1), new FindKeysRange(-1, 3, 0)));
   /**
    * Get the sample with the highest timestamp from each time series matching a specific filter.
+   * <p>
+   * This command only exists in Redis.
    * @since Redis TimeSeries 1.0.0
    */
   Command TS_MGET = new CommandImpl("ts.mget", -3, true, false, false);
   /**
    * Query a range across multiple time series by filters in forward direction.
+   * <p>
+   * This command only exists in Redis.
    * @since Redis TimeSeries 1.0.0
    */
   Command TS_MRANGE = new CommandImpl("ts.mrange", -4, true, false, false);
   /**
    * Query a range across multiple time series by filters in reverse direction.
+   * <p>
+   * This command only exists in Redis.
    * @since Redis TimeSeries 1.4.0
    */
   Command TS_MREVRANGE = new CommandImpl("ts.mrevrange", -4, true, false, false);
   /**
    * Get all time series keys matching a filter list.
+   * <p>
+   * This command only exists in Redis.
    * @since Redis TimeSeries 1.0.0
    */
   Command TS_QUERYINDEX = new CommandImpl("ts.queryindex", -2, true, false, false);
   /**
    * Query a range in forward direction.
+   * <p>
+   * This command only exists in Redis.
    * @since Redis TimeSeries 1.0.0
    */
   Command TS_RANGE = new CommandImpl("ts.range", -4, true, false, false, new KeyLocator(true, new BeginSearchIndex(1), new FindKeysRange(0, 1, 0)));
   /**
    * Query a range in reverse direction.
+   * <p>
+   * This command only exists in Redis.
    * @since Redis TimeSeries 1.4.0
    */
   Command TS_REVRANGE = new CommandImpl("ts.revrange", -4, true, false, false, new KeyLocator(true, new BeginSearchIndex(1), new FindKeysRange(0, 1, 0)));
@@ -1776,66 +2148,92 @@ public interface Command {
   Command UNWATCH = new CommandImpl("unwatch", 1, null, false, false);
   /**
    * Add one or more elements to a vector set, or update its vector if it already exists.
+   * <p>
+   * This command only exists in Redis.
    * @since Redis VectorSet 8.0.0
    */
   Command VADD = new CommandImpl("VADD", -5, false, false, false, new KeyLocator(false, new BeginSearchIndex(1), new FindKeysRange(0, 1, 0)));
   /**
    * Return the number of elements in a vector set.
+   * <p>
+   * This command only exists in Redis.
    * @since Redis VectorSet 8.0.0
    */
   Command VCARD = new CommandImpl("VCARD", 2, true, false, false, new KeyLocator(false, new BeginSearchIndex(1), new FindKeysRange(0, 1, 0)));
   /**
    * Return the dimension of vectors in the vector set.
+   * <p>
+   * This command only exists in Redis.
    * @since Redis VectorSet 8.0.0
    */
   Command VDIM = new CommandImpl("VDIM", 2, true, false, false, new KeyLocator(false, new BeginSearchIndex(1), new FindKeysRange(0, 1, 0)));
   /**
    * Return the vector associated with an element.
+   * <p>
+   * This command only exists in Redis.
    * @since Redis VectorSet 8.0.0
    */
   Command VEMB = new CommandImpl("VEMB", -3, true, false, false, new KeyLocator(false, new BeginSearchIndex(1), new FindKeysRange(0, 1, 0)));
   /**
    * Retrieve the JSON attributes of elements.
+   * <p>
+   * This command only exists in Redis.
    * @since Redis VectorSet 8.0.0
    */
   Command VGETATTR = new CommandImpl("VGETATTR", 3, true, false, false, new KeyLocator(false, new BeginSearchIndex(1), new FindKeysRange(0, 1, 0)));
   /**
    * Return information about a vector set.
+   * <p>
+   * This command only exists in Redis.
    * @since Redis VectorSet 8.0.0
    */
   Command VINFO = new CommandImpl("VINFO", 2, true, false, false, new KeyLocator(false, new BeginSearchIndex(1), new FindKeysRange(0, 1, 0)));
   /**
    * Check if an element exists in a vector set.
+   * <p>
+   * This command only exists in Redis.
    * @since Redis VectorSet 8.2.0
    */
   Command VISMEMBER = new CommandImpl("VISMEMBER", 3, true, false, false, new KeyLocator(false, new BeginSearchIndex(1), new FindKeysRange(0, 1, 0)));
   /**
    * Return the neighbors of an element at each layer in the HNSW graph.
+   * <p>
+   * This command only exists in Redis.
    * @since Redis VectorSet 8.0.0
    */
   Command VLINKS = new CommandImpl("VLINKS", -3, true, false, false, new KeyLocator(false, new BeginSearchIndex(1), new FindKeysRange(0, 1, 0)));
   /**
    * Return one or multiple random members from a vector set.
+   * <p>
+   * This command only exists in Redis.
    * @since Redis VectorSet 8.0.0
    */
   Command VRANDMEMBER = new CommandImpl("VRANDMEMBER", -2, true, false, false, new KeyLocator(false, new BeginSearchIndex(1), new FindKeysRange(0, 1, 0)));
   /**
    * Return vector set elements in a lex range.
+   * <p>
+   * This command only exists in Redis.
    * @since Redis VectorSet 8.4.0
    */
   Command VRANGE = new CommandImpl("VRANGE", -4, true, false, false, new KeyLocator(false, new BeginSearchIndex(1), new FindKeysRange(0, 1, 0)));
   /**
    * Remove an element from a vector set.
+   * <p>
+   * This command only exists in Redis.
    * @since Redis VectorSet 8.0.0
    */
   Command VREM = new CommandImpl("VREM", 3, false, false, false, new KeyLocator(false, new BeginSearchIndex(1), new FindKeysRange(0, 1, 0)));
   /**
    * Associate or remove the JSON attributes of elements.
+   * <p>
+   * This command only exists in Redis.
    * @since Redis VectorSet 8.0.0
    */
   Command VSETATTR = new CommandImpl("VSETATTR", 4, false, false, false, new KeyLocator(false, new BeginSearchIndex(1), new FindKeysRange(0, 1, 0)));
   /**
    * Return elements by vector similarity.
+   * <p>
+   * This command only exists in Redis.
    * @since Redis VectorSet 8.0.0
    */
   Command VSIM = new CommandImpl("VSIM", -4, true, false, false, new KeyLocator(false, new BeginSearchIndex(1), new FindKeysRange(0, 1, 0)));
@@ -1861,6 +2259,8 @@ public interface Command {
   Command XACK = new CommandImpl("xack", -4, false, false, false, new KeyLocator(false, new BeginSearchIndex(1), new FindKeysRange(0, 1, 0)));
   /**
    * Acknowledges and deletes one or multiple messages for a stream consumer group.
+   * <p>
+   * This command only exists in Redis.
    * @since Redis 8.2.0
    */
   Command XACKDEL = new CommandImpl("xackdel", -6, false, false, false, new KeyLocator(false, new BeginSearchIndex(1), new FindKeysRange(0, 1, 0)));
@@ -1876,6 +2276,8 @@ public interface Command {
   Command XAUTOCLAIM = new CommandImpl("xautoclaim", -6, false, false, false, new KeyLocator(false, new BeginSearchIndex(1), new FindKeysRange(0, 1, 0)));
   /**
    * Sets the IDMP configuration parameters for a stream.
+   * <p>
+   * This command only exists in Redis.
    * @since Redis 8.6.0
    */
   Command XCFGSET = new CommandImpl("xcfgset", -2, false, false, false, new KeyLocator(false, new BeginSearchIndex(1), new FindKeysRange(0, 1, 0)));
@@ -1891,6 +2293,8 @@ public interface Command {
   Command XDEL = new CommandImpl("xdel", -3, false, false, false, new KeyLocator(false, new BeginSearchIndex(1), new FindKeysRange(0, 1, 0)));
   /**
    * Deletes one or multiple entries from the stream.
+   * <p>
+   * This command only exists in Redis.
    * @since Redis 8.2.0
    */
   Command XDELEX = new CommandImpl("xdelex", -5, false, false, false, new KeyLocator(false, new BeginSearchIndex(1), new FindKeysRange(0, 1, 0)));
@@ -1901,6 +2305,8 @@ public interface Command {
   Command XGROUP = new CommandImpl("xgroup", -2, null, false, false);
   /**
    * An internal command for setting IDMP metadata on an existing stream message.
+   * <p>
+   * This command only exists in Redis.
    * @since Redis 8.6.2
    */
   Command XIDMPRECORD = new CommandImpl("xidmprecord", 5, false, false, false, new KeyLocator(false, new BeginSearchIndex(1), new FindKeysRange(0, 1, 0)));

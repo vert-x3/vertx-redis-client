@@ -564,3 +564,9 @@ By default, this value is 16 KB.
 This means that each connection to the server will use at least this amount of memory.
 As the client works in pipeline mode, keeping the number of connections low provides best results, which means `16 KB * nconn` memory will be used.
 If the application will require a large number of connections, then reducing the watermark value to a smaller value or even disable it entirely is advisable.
+
+== Valkey
+
+This client also supports https://valkey.io/[Valkey].
+To connect to a Valkey server, use the `valkey://` or `valkeys://` connection string scheme.
+For a type-safe API that only includes commands supported by Valkey, use the {@link io.vertx.redis.client.ValkeyAPI} interface instead of {@link io.vertx.redis.client.RedisAPI}.

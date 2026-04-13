@@ -1,0 +1,97 @@
+/*
+ * Copyright 2018 Red Hat, Inc.
+ *
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * and Apache License v2.0 which accompanies this distribution.
+ *
+ * The Eclipse Public License is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ *
+ * The Apache License v2.0 is available at
+ * http://www.opensource.org/licenses/apache2.0.php
+ *
+ * You may elect to redistribute this code under either of these licenses.
+ */
+package io.vertx.redis.client;
+
+import io.vertx.codegen.annotations.GenIgnore;
+import io.vertx.codegen.annotations.Nullable;
+import io.vertx.codegen.annotations.VertxGen;
+import io.vertx.core.Future;
+import io.vertx.redis.client.impl.ValkeyAPIImpl;
+
+import java.util.List;
+
+import static io.vertx.codegen.annotations.GenIgnore.PERMITTED_TYPE;
+
+/**
+ * <b>Auto generated</b> Valkey API client wrapper.
+ * @version {{ version }}
+ */
+@VertxGen
+public interface ValkeyAPI {
+
+  @GenIgnore(PERMITTED_TYPE)
+  static ValkeyAPI api(Redis client) {
+    return new ValkeyAPIImpl(client);
+  }
+
+  @GenIgnore(PERMITTED_TYPE)
+  static ValkeyAPI api(RedisConnection connection) {
+    return new ValkeyAPIImpl(connection);
+  }
+
+  void close();
+{{#each commands}}
+
+  /**
+{{#if docsSummary }}
+   * {{docsSummary}}
+{{/if}}
+   * @see <a href="https://valkey.io/commands/{{ lowercase name }}/">{{ uppercase name }}</a>
+{{#if docsSince}}
+   * @since {{docsSinceServer}} {{#if docsModule}}{{docsModule}} {{/if}}{{docsSince}}
+{{/if}}
+{{#if docsRemoved}}
+   * @deprecated this command no longer exists in the latest Valkey release
+{{else if docsDeprecatedSince}}
+   * @deprecated since Redis {{docsDeprecatedSince}}, replaced by: {{docsReplacedBy}}
+{{/if}}
+   */
+  default Future<@Nullable Response> {{ camelcase name }}({{{ types }}}) {
+    return send(Command.{{ identifier }}{{#if argLen}}, {{{ args }}}{{#if variable}}.toArray(new String[0]){{/if}}{{/if}});
+  }
+{{#if oldTypes}}
+
+  /**
+{{#if docsSummary }}
+   * {{docsSummary}}
+{{/if}}
+   * @see <a href="https://valkey.io/commands/{{ lowercase name }}/">{{ uppercase name }}</a>
+{{#if docsSince}}
+   * @since {{docsSinceServer}} {{#if docsModule}}{{docsModule}} {{/if}}{{docsSince}}
+{{/if}}
+{{#if docsRemoved}}
+   * @deprecated this command no longer exists in the latest Valkey release
+{{else if docsDeprecatedSince}}
+   * @deprecated since Redis {{docsDeprecatedSince}}, replaced by: {{docsReplacedBy}}
+{{/if}}
+   */
+  // backwards compatibility overload
+  default Future<@Nullable Response> {{ camelcase name }}({{{ oldTypes }}}) {
+    return send(Command.{{ identifier }}{{#if oldArgLen}}, {{{ oldArgs }}}{{#if oldVariable}}.toArray(new String[0]){{/if}}{{/if}});
+  }
+{{/if}}
+{{/each}}
+
+  /**
+   * Send untyped command to Valkey.
+   *
+   * @param cmd the command
+   * @param args var args
+   * @return Future response.
+   */
+  @GenIgnore
+  Future<@Nullable Response> send(Command cmd, String... args);
+}

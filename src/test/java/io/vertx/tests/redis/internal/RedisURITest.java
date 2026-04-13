@@ -124,4 +124,32 @@ public class RedisURITest {
     assertEquals("localhost", redisURI.socketAddress().host());
     assertEquals(6379, redisURI.socketAddress().port());
   }
+
+  @Test
+  public void testValkeyScheme() {
+    RedisURI redisURI = new RedisURI("valkey://localhost:6379/0");
+    assertEquals("localhost", redisURI.socketAddress().host());
+    assertEquals(6379, redisURI.socketAddress().port());
+    assertEquals(0, redisURI.select());
+    assertEquals(false, redisURI.ssl());
+    assertEquals("valkey", redisURI.protocol());
+  }
+
+  @Test
+  public void testValkeysScheme() {
+    RedisURI redisURI = new RedisURI("valkeys://localhost:6379/0");
+    assertEquals("localhost", redisURI.socketAddress().host());
+    assertEquals(6379, redisURI.socketAddress().port());
+    assertEquals(0, redisURI.select());
+    assertEquals(true, redisURI.ssl());
+    assertEquals("valkeys", redisURI.protocol());
+  }
+
+  @Test
+  public void testValkeySchemeWithCredentials() {
+    RedisURI redisURI = new RedisURI("valkey://user:p%40ss@localhost:6379/2");
+    assertEquals("user", redisURI.user());
+    assertEquals("p@ss", redisURI.password());
+    assertEquals(2, redisURI.select());
+  }
 }
