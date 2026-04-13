@@ -48,24 +48,45 @@ public interface RedisAPI {
   /**
 {{#if docsSummary }}
    * {{docsSummary}}
-   * <p>
 {{/if}}
-   * Redis command <a href="https://redis.io/commands/{{ lowercase name }}/">{{ uppercase name }}</a>.
-   * @return Future response.
-{{#if docsDeprecatedSince}}
-   * @deprecated since: {{docsDeprecatedSince}}, replaced by: {{docsReplacedBy}}
+   * @see <a href="https://redis.io/commands/{{ lowercase name }}/">{{ uppercase name }}</a>
+{{#if docsSince}}
+   * @since {{docsSinceServer}} {{#if docsModule}}{{docsModule}} {{/if}}{{docsSince}}
+{{/if}}
+{{#if docsRemoved}}
+   * @deprecated this command no longer exists in the latest Redis release
+{{else if docsDeprecatedSince}}
+   * @deprecated since Redis {{docsDeprecatedSince}}, replaced by: {{docsReplacedBy}}
 {{/if}}
    */
-{{#if docsDeprecatedSince}}
-  @Deprecated
-{{/if}}
   default Future<@Nullable Response> {{ camelcase name }}({{{ types }}}) {
     return send(Command.{{ identifier }}{{#if argLen}}, {{{ args }}}{{#if variable}}.toArray(new String[0]){{/if}}{{/if}});
   }
+{{#if oldTypes}}
+
+  /**
+{{#if docsSummary }}
+   * {{docsSummary}}
+{{/if}}
+   * @see <a href="https://redis.io/commands/{{ lowercase name }}/">{{ uppercase name }}</a>
+{{#if docsSince}}
+   * @since {{docsSinceServer}} {{#if docsModule}}{{docsModule}} {{/if}}{{docsSince}}
+{{/if}}
+{{#if docsRemoved}}
+   * @deprecated this command no longer exists in the latest Redis release
+{{else if docsDeprecatedSince}}
+   * @deprecated since Redis {{docsDeprecatedSince}}, replaced by: {{docsReplacedBy}}
+{{/if}}
+   */
+  // backwards compatibility overload
+  default Future<@Nullable Response> {{ camelcase name }}({{{ oldTypes }}}) {
+    return send(Command.{{ identifier }}{{#if oldArgLen}}, {{{ oldArgs }}}{{#if oldVariable}}.toArray(new String[0]){{/if}}{{/if}});
+  }
+{{/if}}
 {{/each}}
 
   /**
-   * Send untyped command to redis.
+   * Send untyped command to Redis.
    *
    * @param cmd the command
    * @param args var args
