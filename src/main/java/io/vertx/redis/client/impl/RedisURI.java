@@ -32,7 +32,8 @@ import java.util.Map;
  *
  * <p>An example URI can be found at <a href="https://redis.io/topics/rediscli">Redis cli docs</a>.</p>
  *
- * <p>Valid URI schemes are: {@code redis} (TCP), {@code rediss} (TCP+TLS), {@code unix} (UNIX socket).</p>
+ * <p>Valid URI schemes are: {@code redis} or {@code valkey} (TCP), {@code rediss} or {@code valkeys} (TCP+TLS),
+ * {@code unix} (UNIX socket).</p>
  *
  * <p>
  *   Additionally the following query parameters are supported (while the dedicated URI components take precedence):
@@ -65,6 +66,10 @@ public final class RedisURI {
   private static final String QUERY_PASSWORD = "password";
 
   /**
+   * Original URI scheme
+   */
+  private final String protocol;
+  /**
    * Address, including host and port
    */
   private final SocketAddress socketAddress;
@@ -77,30 +82,22 @@ public final class RedisURI {
    */
   private final String password;
   /**
-   * Database number. With a default Redis config it might be a number from 0 to 15. Not supported in clustered mode.
+   * Database number. With a default Redis config it might be a number from 0 to 15.
+   * Not supported in Redis clustered mode, but supported in Valkey 9+ clustered mode.
    */
   private final Integer select;
-  /**
-   * SSL
-   */
-  private final boolean ssl;
-  /**
-   * UNIX
-   */
-  private final boolean unix;
   /**
    * Params
    */
   private final Map<String, String> params;
 
   public RedisURI(RedisURI base, String host, int port) {
+    protocol = base.protocol;
     socketAddress = SocketAddress.inetSocketAddress(port, host);
-    unix = false;
     // use the base data
     user = base.user;
     password = base.password;
     select = base.select;
-    ssl = base.ssl;
     params = base.params;
   }
 
@@ -124,23 +121,12 @@ public final class RedisURI {
       // in case if db number or password are given in 2 different ways (e.g. in path and query).
       // Implementation uses the query values as a fallback if another one is missing.
       params = parseQuery(uri);
-      switch (uri.getScheme()) {
-        case "rediss":
-          ssl = true;
-          unix = false;
-          socketAddress = SocketAddress.inetSocketAddress(port, host);
-          if (path.length() > 1) {
-            // skip initial slash
-            select = Integer.parseInt(uri.getPath().substring(1));
-          } else if (params.containsKey(QUERY_DB)) {
-            select = Integer.parseInt(params.get(QUERY_DB));
-          } else {
-            select = null;
-          }
-          break;
+      protocol = uri.getScheme();
+      switch (protocol) {
         case "redis":
-          ssl = false;
-          unix = false;
+        case "rediss":
+        case "valkey":
+        case "valkeys":
           socketAddress = SocketAddress.inetSocketAddress(port, host);
           if (path.length() > 1) {
             // skip initial slash
@@ -152,8 +138,6 @@ public final class RedisURI {
           }
           break;
         case "unix":
-          ssl = false;
-          unix = true;
           socketAddress = SocketAddress.domainSocketAddress(path);
           if (params.containsKey(QUERY_DB)) {
             select = Integer.parseInt(params.get(QUERY_DB));
@@ -231,11 +215,11 @@ public final class RedisURI {
   }
 
   public boolean ssl() {
-    return ssl;
+    return "rediss".equals(protocol) || "valkeys".equals(protocol);
   }
 
   public boolean unix() {
-    return unix;
+    return "unix".equals(protocol);
   }
 
   public String param(String key) {
@@ -255,15 +239,7 @@ public final class RedisURI {
   }
 
   public String protocol() {
-    if (unix) {
-      return "unix";
-    } else {
-      if (ssl) {
-        return "rediss";
-      } else {
-        return "redis";
-      }
-    }
+    return protocol;
   }
 
   /**
@@ -273,13 +249,11 @@ public final class RedisURI {
   public String baseUri() {
     StringBuilder result = new StringBuilder();
     if (unix()) {
-      result.append("unix://");
+      result.append(protocol);
+      result.append("://");
       result.append(socketAddress().path());
     } else {
-      result.append("redis");
-      if (ssl()) {
-        result.append('s');
-      }
+      result.append(protocol);
       result.append("://");
       result.append(userinfo());
       result.append(socketAddress().host());
@@ -291,6 +265,6 @@ public final class RedisURI {
 
   @Override
   public String toString() {
-    return protocol() + "://" + socketAddress() + "/" + (select == null ? "" : select);
+    return protocol + "://" + socketAddress + "/" + (select == null ? "" : select);
   }
 }

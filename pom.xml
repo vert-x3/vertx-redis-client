@@ -32,6 +32,9 @@
     <version.bouncycastle>1.84</version.bouncycastle>
     <version.junit-jupiter>5.14.0</version.junit-jupiter>
     <version.testcontainers>2.0.5</version.testcontainers>
+
+    <version.revapi>0.15.1</version.revapi>
+    <version.revapi-java>0.28.4</version.revapi-java>
   </properties>
 
   <scm>
@@ -158,6 +161,29 @@
           <systemPropertyVariables>
             <java.util.logging.config.file>src/test/resources/logging.properties</java.util.logging.config.file>
           </systemPropertyVariables>
+        </configuration>
+      </plugin>
+
+      <!-- run using: mvn clean install revapi:check -DskipTests -->
+      <plugin>
+        <groupId>org.revapi</groupId>
+        <artifactId>revapi-maven-plugin</artifactId>
+        <version>${version.revapi}</version>
+        <dependencies>
+          <dependency>
+            <groupId>org.revapi</groupId>
+            <artifactId>revapi-java</artifactId>
+            <version>${version.revapi-java}</version>
+          </dependency>
+        </dependencies>
+        <configuration>
+          <oldVersion>RELEASE</oldVersion>
+          <analysisConfigurationFiles>
+            <configurationFile>
+              <path>${project.basedir}/revapi.json</path>
+            </configurationFile>
+          </analysisConfigurationFiles>
+          <checkDependencies>false</checkDependencies>
         </configuration>
       </plugin>
     </plugins>

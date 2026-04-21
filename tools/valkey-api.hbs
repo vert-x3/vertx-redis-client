@@ -19,27 +19,27 @@ import io.vertx.codegen.annotations.GenIgnore;
 import io.vertx.codegen.annotations.Nullable;
 import io.vertx.codegen.annotations.VertxGen;
 import io.vertx.core.Future;
-import io.vertx.redis.client.impl.RedisAPIImpl;
+import io.vertx.redis.client.impl.ValkeyAPIImpl;
 
 import java.util.List;
 
 import static io.vertx.codegen.annotations.GenIgnore.PERMITTED_TYPE;
 
 /**
- * <b>Auto generated</b> Redis API client wrapper.
+ * <b>Auto generated</b> Valkey API client wrapper.
  * @version {{ version }}
  */
 @VertxGen
-public interface RedisAPI {
+public interface ValkeyAPI {
 
   @GenIgnore(PERMITTED_TYPE)
-  static RedisAPI api(Redis client) {
-    return new RedisAPIImpl(client);
+  static ValkeyAPI api(Redis client) {
+    return new ValkeyAPIImpl(client);
   }
 
   @GenIgnore(PERMITTED_TYPE)
-  static RedisAPI api(RedisConnection connection) {
-    return new RedisAPIImpl(connection);
+  static ValkeyAPI api(RedisConnection connection) {
+    return new ValkeyAPIImpl(connection);
   }
 
   void close();
@@ -49,12 +49,12 @@ public interface RedisAPI {
 {{#if docsSummary }}
    * {{docsSummary}}
 {{/if}}
-   * @see <a href="https://redis.io/commands/{{ lowercase name }}/">{{ uppercase name }}</a>
+   * @see <a href="https://valkey.io/commands/{{ lowercase name }}/">{{ uppercase name }}</a>
 {{#if docsSince}}
    * @since {{docsSinceServer}} {{#if docsModule}}{{docsModule}} {{/if}}{{docsSince}}
 {{/if}}
 {{#if docsRemoved}}
-   * @deprecated this command no longer exists in the latest Redis release
+   * @deprecated this command no longer exists in the latest Valkey release
 {{else if docsDeprecatedSince}}
    * @deprecated since Redis {{docsDeprecatedSince}}, replaced by: {{docsReplacedBy}}
 {{/if}}
@@ -68,12 +68,12 @@ public interface RedisAPI {
 {{#if docsSummary }}
    * {{docsSummary}}
 {{/if}}
-   * @see <a href="https://redis.io/commands/{{ lowercase name }}/">{{ uppercase name }}</a>
+   * @see <a href="https://valkey.io/commands/{{ lowercase name }}/">{{ uppercase name }}</a>
 {{#if docsSince}}
    * @since {{docsSinceServer}} {{#if docsModule}}{{docsModule}} {{/if}}{{docsSince}}
 {{/if}}
 {{#if docsRemoved}}
-   * @deprecated this command no longer exists in the latest Redis release
+   * @deprecated this command no longer exists in the latest Valkey release
 {{else if docsDeprecatedSince}}
    * @deprecated since Redis {{docsDeprecatedSince}}, replaced by: {{docsReplacedBy}}
 {{/if}}
@@ -86,7 +86,7 @@ public interface RedisAPI {
 {{/each}}
 
   /**
-   * Send untyped command to Redis.
+   * Send untyped command to Valkey.
    *
    * @param cmd the command
    * @param args var args

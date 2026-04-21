@@ -1,13 +1,15 @@
-package io.vertx.redis.client;
+package io.vertx.redis.client.impl;
+
+import io.vertx.redis.client.Command;
 
 import java.util.HashMap;
 import java.util.Map;
 
 // this class is auto-generated
-class CommandMap {
+public class CommandMap {
   private static final Map<String, Command> KNOWN_COMMANDS = new HashMap<>();
 
-  static Command getKnownCommand(String command) {
+  public static Command getKnownCommand(String command) {
     return command == null ? null : KNOWN_COMMANDS.get(command.toLowerCase());
   }
 
@@ -65,6 +67,7 @@ class CommandMap {
     KNOWN_COMMANDS.put("cms.merge", Command.CMS_MERGE);
     KNOWN_COMMANDS.put("cms.query", Command.CMS_QUERY);
     KNOWN_COMMANDS.put("command", Command.COMMAND);
+    KNOWN_COMMANDS.put("commandlog", Command.COMMANDLOG);
     KNOWN_COMMANDS.put("config", Command.CONFIG);
     KNOWN_COMMANDS.put("copy", Command.COPY);
     KNOWN_COMMANDS.put("dbsize", Command.DBSIZE);
@@ -72,6 +75,9 @@ class CommandMap {
     KNOWN_COMMANDS.put("decr", Command.DECR);
     KNOWN_COMMANDS.put("decrby", Command.DECRBY);
     KNOWN_COMMANDS.put("del", Command.DEL);
+    KNOWN_COMMANDS.put("delex", Command.DELEX);
+    KNOWN_COMMANDS.put("delifeq", Command.DELIFEQ);
+    KNOWN_COMMANDS.put("digest", Command.DIGEST);
     KNOWN_COMMANDS.put("discard", Command.DISCARD);
     KNOWN_COMMANDS.put("dump", Command.DUMP);
     KNOWN_COMMANDS.put("echo", Command.ECHO);
@@ -108,6 +114,7 @@ class CommandMap {
     KNOWN_COMMANDS.put("ft.explain", Command.FT_EXPLAIN);
     KNOWN_COMMANDS.put("ft.explaincli", Command.FT_EXPLAINCLI);
     KNOWN_COMMANDS.put("ft.get", Command.FT_GET);
+    KNOWN_COMMANDS.put("ft.hybrid", Command.FT_HYBRID);
     KNOWN_COMMANDS.put("ft.info", Command.FT_INFO);
     KNOWN_COMMANDS.put("ft.mget", Command.FT_MGET);
     KNOWN_COMMANDS.put("ft.profile", Command.FT_PROFILE);
@@ -159,19 +166,32 @@ class CommandMap {
     KNOWN_COMMANDS.put("hdel", Command.HDEL);
     KNOWN_COMMANDS.put("hello", Command.HELLO);
     KNOWN_COMMANDS.put("hexists", Command.HEXISTS);
+    KNOWN_COMMANDS.put("hexpire", Command.HEXPIRE);
+    KNOWN_COMMANDS.put("hexpireat", Command.HEXPIREAT);
+    KNOWN_COMMANDS.put("hexpiretime", Command.HEXPIRETIME);
     KNOWN_COMMANDS.put("hget", Command.HGET);
     KNOWN_COMMANDS.put("hgetall", Command.HGETALL);
+    KNOWN_COMMANDS.put("hgetdel", Command.HGETDEL);
+    KNOWN_COMMANDS.put("hgetex", Command.HGETEX);
     KNOWN_COMMANDS.put("hincrby", Command.HINCRBY);
     KNOWN_COMMANDS.put("hincrbyfloat", Command.HINCRBYFLOAT);
     KNOWN_COMMANDS.put("hkeys", Command.HKEYS);
     KNOWN_COMMANDS.put("hlen", Command.HLEN);
     KNOWN_COMMANDS.put("hmget", Command.HMGET);
     KNOWN_COMMANDS.put("hmset", Command.HMSET);
+    KNOWN_COMMANDS.put("hotkeys", Command.HOTKEYS);
+    KNOWN_COMMANDS.put("hpersist", Command.HPERSIST);
+    KNOWN_COMMANDS.put("hpexpire", Command.HPEXPIRE);
+    KNOWN_COMMANDS.put("hpexpireat", Command.HPEXPIREAT);
+    KNOWN_COMMANDS.put("hpexpiretime", Command.HPEXPIRETIME);
+    KNOWN_COMMANDS.put("hpttl", Command.HPTTL);
     KNOWN_COMMANDS.put("hrandfield", Command.HRANDFIELD);
     KNOWN_COMMANDS.put("hscan", Command.HSCAN);
     KNOWN_COMMANDS.put("hset", Command.HSET);
+    KNOWN_COMMANDS.put("hsetex", Command.HSETEX);
     KNOWN_COMMANDS.put("hsetnx", Command.HSETNX);
     KNOWN_COMMANDS.put("hstrlen", Command.HSTRLEN);
+    KNOWN_COMMANDS.put("httl", Command.HTTL);
     KNOWN_COMMANDS.put("hvals", Command.HVALS);
     KNOWN_COMMANDS.put("incr", Command.INCR);
     KNOWN_COMMANDS.put("incrby", Command.INCRBY);
@@ -188,7 +208,9 @@ class CommandMap {
     KNOWN_COMMANDS.put("json.del", Command.JSON_DEL);
     KNOWN_COMMANDS.put("json.forget", Command.JSON_FORGET);
     KNOWN_COMMANDS.put("json.get", Command.JSON_GET);
+    KNOWN_COMMANDS.put("json.merge", Command.JSON_MERGE);
     KNOWN_COMMANDS.put("json.mget", Command.JSON_MGET);
+    KNOWN_COMMANDS.put("json.mset", Command.JSON_MSET);
     KNOWN_COMMANDS.put("json.numincrby", Command.JSON_NUMINCRBY);
     KNOWN_COMMANDS.put("json.nummultby", Command.JSON_NUMMULTBY);
     KNOWN_COMMANDS.put("json.numpowby", Command.JSON_NUMPOWBY);
@@ -225,6 +247,7 @@ class CommandMap {
     KNOWN_COMMANDS.put("monitor", Command.MONITOR);
     KNOWN_COMMANDS.put("move", Command.MOVE);
     KNOWN_COMMANDS.put("mset", Command.MSET);
+    KNOWN_COMMANDS.put("msetex", Command.MSETEX);
     KNOWN_COMMANDS.put("msetnx", Command.MSETNX);
     KNOWN_COMMANDS.put("multi", Command.MULTI);
     KNOWN_COMMANDS.put("object", Command.OBJECT);
@@ -268,6 +291,9 @@ class CommandMap {
     KNOWN_COMMANDS.put("script", Command.SCRIPT);
     KNOWN_COMMANDS.put("sdiff", Command.SDIFF);
     KNOWN_COMMANDS.put("sdiffstore", Command.SDIFFSTORE);
+    KNOWN_COMMANDS.put("search.clusterinfo", Command.SEARCH_CLUSTERINFO);
+    KNOWN_COMMANDS.put("search.clusterrefresh", Command.SEARCH_CLUSTERREFRESH);
+    KNOWN_COMMANDS.put("search.clusterset", Command.SEARCH_CLUSTERSET);
     KNOWN_COMMANDS.put("select", Command.SELECT);
     KNOWN_COMMANDS.put("set", Command.SET);
     KNOWN_COMMANDS.put("setbit", Command.SETBIT);
@@ -330,6 +356,7 @@ class CommandMap {
     KNOWN_COMMANDS.put("topk.query", Command.TOPK_QUERY);
     KNOWN_COMMANDS.put("topk.reserve", Command.TOPK_RESERVE);
     KNOWN_COMMANDS.put("touch", Command.TOUCH);
+    KNOWN_COMMANDS.put("trimslots", Command.TRIMSLOTS);
     KNOWN_COMMANDS.put("ts.add", Command.TS_ADD);
     KNOWN_COMMANDS.put("ts.alter", Command.TS_ALTER);
     KNOWN_COMMANDS.put("ts.create", Command.TS_CREATE);
@@ -352,14 +379,32 @@ class CommandMap {
     KNOWN_COMMANDS.put("unlink", Command.UNLINK);
     KNOWN_COMMANDS.put("unsubscribe", Command.UNSUBSCRIBE);
     KNOWN_COMMANDS.put("unwatch", Command.UNWATCH);
+    KNOWN_COMMANDS.put("vadd", Command.VADD);
+    KNOWN_COMMANDS.put("vcard", Command.VCARD);
+    KNOWN_COMMANDS.put("vdim", Command.VDIM);
+    KNOWN_COMMANDS.put("vemb", Command.VEMB);
+    KNOWN_COMMANDS.put("vgetattr", Command.VGETATTR);
+    KNOWN_COMMANDS.put("vinfo", Command.VINFO);
+    KNOWN_COMMANDS.put("vismember", Command.VISMEMBER);
+    KNOWN_COMMANDS.put("vlinks", Command.VLINKS);
+    KNOWN_COMMANDS.put("vrandmember", Command.VRANDMEMBER);
+    KNOWN_COMMANDS.put("vrange", Command.VRANGE);
+    KNOWN_COMMANDS.put("vrem", Command.VREM);
+    KNOWN_COMMANDS.put("vsetattr", Command.VSETATTR);
+    KNOWN_COMMANDS.put("vsim", Command.VSIM);
     KNOWN_COMMANDS.put("wait", Command.WAIT);
+    KNOWN_COMMANDS.put("waitaof", Command.WAITAOF);
     KNOWN_COMMANDS.put("watch", Command.WATCH);
     KNOWN_COMMANDS.put("xack", Command.XACK);
+    KNOWN_COMMANDS.put("xackdel", Command.XACKDEL);
     KNOWN_COMMANDS.put("xadd", Command.XADD);
     KNOWN_COMMANDS.put("xautoclaim", Command.XAUTOCLAIM);
+    KNOWN_COMMANDS.put("xcfgset", Command.XCFGSET);
     KNOWN_COMMANDS.put("xclaim", Command.XCLAIM);
     KNOWN_COMMANDS.put("xdel", Command.XDEL);
+    KNOWN_COMMANDS.put("xdelex", Command.XDELEX);
     KNOWN_COMMANDS.put("xgroup", Command.XGROUP);
+    KNOWN_COMMANDS.put("xidmprecord", Command.XIDMPRECORD);
     KNOWN_COMMANDS.put("xinfo", Command.XINFO);
     KNOWN_COMMANDS.put("xlen", Command.XLEN);
     KNOWN_COMMANDS.put("xpending", Command.XPENDING);

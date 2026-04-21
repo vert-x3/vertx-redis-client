@@ -1,0 +1,70 @@
+[
+  {
+    "extension": "revapi.filter",
+    "configuration": {
+      "elements": {
+        "include": [
+          {
+            "matcher": "java-package",
+            "match": "io.verx.redis.client"
+          }
+        ],
+        "exclude": [
+          {
+            "matcher": "java-package",
+            "match": "io.vertx.redis.client.impl"
+          }
+        ]
+      }
+    }
+  },
+  {
+    "extension": "revapi.differences",
+    "configuration": {
+      "ignore": true,
+      "differences": [
+        {
+          "code": "java.annotation.added",
+          "old": "method long io.vertx.redis.client.RedisClusterConnectOptions::getHashSlotCacheTTL()",
+          "annotation": "@io.vertx.codegen.annotations.GenIgnore",
+          "justification": "intentional"
+        },
+        {
+          "code": "java.annotation.added",
+          "old": "method io.vertx.redis.client.RedisClusterConnectOptions io.vertx.redis.client.RedisClusterConnectOptions::setHashSlotCacheTTL(long)",
+          "annotation": "@io.vertx.codegen.annotations.GenIgnore",
+          "justification": "intentional"
+        },
+        {
+          "code": "java.annotation.removed",
+          "old": "method long io.vertx.redis.client.RedisClusterConnectOptions::getTopologyCacheTTL()",
+          "annotation": "@io.vertx.codegen.annotations.GenIgnore",
+          "justification": "intentional"
+        },
+        {
+          "code": "java.annotation.removed",
+          "old": "method io.vertx.redis.client.RedisClusterConnectOptions io.vertx.redis.client.RedisClusterConnectOptions::setTopologyCacheTTL(long)",
+          "annotation": "@io.vertx.codegen.annotations.GenIgnore",
+          "justification": "intentional"
+        },
+        {
+          "code": "java.annotation.added",
+          "old": "method long io.vertx.redis.client.RedisOptions::getHashSlotCacheTTL()",
+          "annotation": "@io.vertx.codegen.annotations.GenIgnore",
+          "justification": "intentional"
+        },
+        {
+          "code": "java.annotation.added",
+          "old": "method io.vertx.redis.client.RedisOptions io.vertx.redis.client.RedisOptions::setHashSlotCacheTTL(long)",
+          "annotation": "@io.vertx.codegen.annotations.GenIgnore",
+          "justification": "intentional"
+        },
+        {
+          "code": "java.class.nonPublicPartOfAPI",
+          "old": "class io.vertx.redis.client.impl.SentinelFailover",
+          "justification": "this warning is nonsense, `impl` is not public API and the exclusion in `revapi.filter` is ignored"
+        }
+      ]
+    }
+  }
+]

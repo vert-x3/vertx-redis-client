@@ -48,6 +48,9 @@ public class RedisStandaloneConnection implements RedisConnectionInternal, Parse
   private final TracingPolicy tracingPolicy;
   private final long maxLifetimeExpiration;
 
+  // discovered late (during `HELLO`), so cannot be `final`
+  private String serverType = "redis";
+
   // state
   private Handler<Throwable> onException;
   private Handler<Void> onEnd;
@@ -200,12 +203,15 @@ public class RedisStandaloneConnection implements RedisConnectionInternal, Parse
       return;
     }
 
+    final CommandImpl cmd = (CommandImpl) request.command();
+
     if (!((RequestImpl) request).valid()) {
-      promise.fail("Redis command is not valid, check https://redis.io/commands: " + request);
+      String url = CommandMap.getKnownCommand(cmd.toString()) != null
+        ? "https://redis.io/commands/" + cmd + "/"
+        : "https://redis.io/commands/";
+      promise.fail("Command is not valid, check " + url + ": " + request);
       return;
     }
-
-    final CommandImpl cmd = (CommandImpl) request.command();
 
     // tag this connection as tainted if needed
     context.execute(cmd, this::taintCheck);
@@ -282,7 +288,10 @@ public class RedisStandaloneConnection implements RedisConnectionInternal, Parse
         final CommandImpl cmd = (CommandImpl) req.command();
 
         if (!req.valid()) {
-          promise.fail("Redis command is not valid, check https://redis.io/commands: " + req);
+          String url = CommandMap.getKnownCommand(cmd.toString()) != null
+            ? "https://redis.io/commands/" + cmd + "/"
+            : "https://redis.io/commands/";
+          promise.fail("Command is not valid, check " + url + ": " + req);
           return;
         }
 
@@ -523,5 +532,14 @@ public class RedisStandaloneConnection implements RedisConnectionInternal, Parse
   @Override
   public SocketAddress remoteAddress() {
     return netSocket.remoteAddress();
+  }
+
+  @Override
+  public String serverType() {
+    return serverType;
+  }
+
+  void setServerType(String serverType) {
+    this.serverType = serverType;
   }
 }
