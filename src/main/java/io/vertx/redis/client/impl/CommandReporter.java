@@ -27,7 +27,7 @@ class CommandReporter {
     DB_USER("db.user", reporter -> reporter.user),
     DB_NAMESPACE("db.namespace", reporter -> reporter.database),
     DB_OPERATION_NAME("db.operation.name", reporter -> reporter.command),
-    DB_SYSTEM("db.system", reporter -> "redis");
+    DB_SYSTEM("db.system", reporter -> reporter.serverType);
 
     final String name;
     final Function<CommandReporter, String> valueFunction;
@@ -69,6 +69,7 @@ class CommandReporter {
   private final String networkPeerPort;
   private final String serverAddress;
   private final String serverPort;
+  private final String serverType;
 
   private Object trace;
   private Object metric;
@@ -86,6 +87,7 @@ class CommandReporter {
     this.networkPeerPort = String.valueOf(conn.remoteAddress().port());
     this.serverAddress = uri.socketAddress().host();
     this.serverPort = String.valueOf(uri.socketAddress().port());
+    this.serverType = conn.serverType();
     this.user = uri.user();
     // the connection doesn't track the current database, so we have to report "unknown" when tainted
     this.database = conn.isTainted() ? null : (uri.select() == null ? "0" : String.valueOf(uri.select()));

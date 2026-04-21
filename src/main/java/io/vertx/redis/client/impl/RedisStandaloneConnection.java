@@ -48,6 +48,9 @@ public class RedisStandaloneConnection implements RedisConnectionInternal, Parse
   private final TracingPolicy tracingPolicy;
   private final long maxLifetimeExpiration;
 
+  // discovered late (during `HELLO`), so cannot be `final`
+  private String serverType = "redis";
+
   // state
   private Handler<Throwable> onException;
   private Handler<Void> onEnd;
@@ -529,5 +532,14 @@ public class RedisStandaloneConnection implements RedisConnectionInternal, Parse
   @Override
   public SocketAddress remoteAddress() {
     return netSocket.remoteAddress();
+  }
+
+  @Override
+  public String serverType() {
+    return serverType;
+  }
+
+  void setServerType(String serverType) {
+    this.serverType = serverType;
   }
 }

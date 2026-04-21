@@ -237,7 +237,7 @@ public class RedisConnectionManager implements Function<RedisConnectionManager.C
         });
     }
 
-    private Future<Void> hello(ContextInternal ctx, RedisConnection connection, RedisURI redisURI, RedisConnectOptions options) {
+    private Future<Void> hello(ContextInternal ctx, RedisStandaloneConnection connection, RedisURI redisURI, RedisConnectOptions options) {
       if (!options.isProtocolNegotiation()) {
         return ping(ctx, connection, options);
       } else {
@@ -267,28 +267,30 @@ public class RedisConnectionManager implements Function<RedisConnectionManager.C
 
         return connection
           .send(hello)
-          .<Void>mapEmpty()
-          .transform(ar -> {
-            if (ar.failed()) {
-              Throwable err = ar.cause();
-              if (err instanceof ErrorType) {
-                final ErrorType redisErr = (ErrorType) err;
-                if (redisErr.is("NOAUTH") || redisErr.is("WRONGPASS")) {
-                  // Pika/PikiwiDB doesn't support authentication through `HELLO`, need to use `AUTH`
-                  return authenticate(ctx, connection, user, password);
-                }
-                if (redisErr.is("ERR")) {
-                  String msg = redisErr.getMessage();
-                  if (msg.startsWith("ERR unknown command") || msg.startsWith("ERR unknown or unsupported command")) {
-                    // chatting to an old server
-                    return ping(ctx, connection, options);
-                  }
+          .<Void>map(response -> {
+            LOG.debug(response);
+            Response server = response.get("server");
+            if (server != null) {
+              connection.setServerType(server.toString());
+            }
+            return null;
+          })
+          .recover(err -> {
+            if (err instanceof ErrorType) {
+              final ErrorType redisErr = (ErrorType) err;
+              if (redisErr.is("NOAUTH") || redisErr.is("WRONGPASS")) {
+                // Pika/PikiwiDB doesn't support authentication through `HELLO`, need to use `AUTH`
+                return authenticate(ctx, connection, user, password);
+              }
+              if (redisErr.is("ERR")) {
+                String msg = redisErr.getMessage();
+                if (msg.startsWith("ERR unknown command") || msg.startsWith("ERR unknown or unsupported command")) {
+                  // chatting to an old server
+                  return ping(ctx, connection, options);
                 }
               }
-            } else {
-              LOG.debug(ar.result());
             }
-            return (Future<Void>) ar;
+            return Future.failedFuture(err);
           });
       }
     }
