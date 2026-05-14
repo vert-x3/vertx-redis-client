@@ -570,3 +570,6 @@ If the application will require a large number of connections, then reducing the
 This client also supports https://valkey.io/[Valkey].
 To connect to a Valkey server, use the `valkey://` or `valkeys://` connection string scheme.
 For a type-safe API that only includes commands supported by Valkey, use the {@link io.vertx.redis.client.ValkeyAPI} interface instead of {@link io.vertx.redis.client.RedisAPI}.
+
+CAUTION: Valkey support is only provided because Valkey implements the Redis protocol (RESP).
+If Valkey starts diverging on the protocol level, this support will be dropped without replacement.
