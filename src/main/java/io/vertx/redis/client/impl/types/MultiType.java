@@ -15,12 +15,10 @@
  */
 package io.vertx.redis.client.impl.types;
 
-import io.vertx.codegen.annotations.Nullable;
 import io.vertx.core.buffer.Buffer;
 import io.vertx.redis.client.Response;
 import io.vertx.redis.client.ResponseType;
 
-import java.util.Arrays;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;

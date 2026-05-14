@@ -2,7 +2,6 @@ package io.vertx.redis.client.impl;
 
 import io.vertx.core.Future;
 import io.vertx.core.Vertx;
-import io.vertx.core.internal.VertxInternal;
 import io.vertx.core.internal.logging.Logger;
 import io.vertx.core.internal.logging.LoggerFactory;
 import io.vertx.redis.client.Command;

@@ -19,7 +19,6 @@ import io.vertx.codegen.annotations.DataObject;
 import io.vertx.codegen.json.annotations.JsonGen;
 import io.vertx.core.Handler;
 import io.vertx.core.json.JsonObject;
-import io.vertx.redis.client.impl.RedisSentinelConnection;
 
 import java.util.List;
 
