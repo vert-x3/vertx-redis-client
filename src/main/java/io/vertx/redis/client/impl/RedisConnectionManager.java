@@ -194,7 +194,8 @@ public class RedisConnectionManager implements Function<RedisConnectionManager.C
               // must upgrade protocol
               return so
                 .upgradeToSsl()
-                .compose(v -> init(ctx, options, so, listener));
+                .compose(v -> init(ctx, options, so, listener))
+                .onFailure(ex-> so.close());
             } else {
               // no need to upgrade
               return init(ctx, options, so, listener);
@@ -227,14 +228,17 @@ public class RedisConnectionManager implements Function<RedisConnectionManager.C
         .compose(hello -> {
           // perform select
           return select(ctx, connection, redisURI.select());
-        }).compose(select -> {
+        })
+        .compose(select -> {
           // perform setup
           return setup(ctx, connection, setup);
-        }).map(setup -> {
+        })
+        .map(setup -> {
           // connection is valid
           connection.setValid();
-          return new ConnectResult<>(connection, 1, 0);
-        });
+          return new ConnectResult<>((RedisConnectionInternal) connection, 1, 0);
+        })
+        .onFailure(err -> connection.forceClose());
     }
 
     private Future<Void> hello(ContextInternal ctx, RedisStandaloneConnection connection, RedisURI redisURI, RedisConnectOptions options) {
