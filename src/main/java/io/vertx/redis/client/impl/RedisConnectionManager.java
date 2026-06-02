@@ -179,6 +179,7 @@ class RedisConnectionManager {
               // must upgrade protocol
               netSocket.upgradeToSsl(upgradeToSsl -> {
                 if (upgradeToSsl.failed()) {
+                  netSocket.close();
                   ctx.execute(ctx.failedFuture(upgradeToSsl.cause()), onConnect);
                 } else {
                   // complete the connection
@@ -215,6 +216,7 @@ class RedisConnectionManager {
       // initial handshake
       hello(ctx, connection, redisURI, hello -> {
         if (hello.failed()) {
+          connection.forceClose();
           ctx.execute(ctx.failedFuture(hello.cause()), onConnect);
           return;
         }
@@ -222,6 +224,7 @@ class RedisConnectionManager {
         // perform select
         select(ctx, connection, redisURI.select(), select -> {
           if (select.failed()) {
+            connection.forceClose();
             ctx.execute(ctx.failedFuture(select.cause()), onConnect);
             return;
           }
@@ -229,6 +232,7 @@ class RedisConnectionManager {
           // perform setup
           setup(ctx, connection, setup, setupResult -> {
             if (setupResult.failed()) {
+              connection.forceClose();
               ctx.execute(ctx.failedFuture(setupResult.cause()), onConnect);
               return;
             }
