@@ -5,6 +5,9 @@ import org.testcontainers.containers.wait.strategy.LogMessageWaitStrategy;
 import org.testcontainers.images.builder.Transferable;
 import org.testcontainers.lifecycle.Startable;
 
+import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
@@ -19,6 +22,8 @@ public class RedisStandalone implements Startable {
 
     private boolean mutualTlsEnabled;
     private KeyPairAndCertificate clientKey;
+
+    private boolean unixDomainSocketEnabled;
 
     private Builder() {
     }
@@ -61,6 +66,11 @@ public class RedisStandalone implements Startable {
       return this;
     }
 
+    public Builder enableUnixDomainSocket() {
+      unixDomainSocketEnabled = true;
+      return this;
+    }
+
     public RedisStandalone build() {
       return new RedisStandalone(this);
     }
@@ -73,6 +83,7 @@ public class RedisStandalone implements Startable {
   // ---
 
   private final GenericContainer<?> container;
+  private final File redisDir;
 
   public RedisStandalone() {
     this(builder());
@@ -100,6 +111,10 @@ public class RedisStandalone implements Startable {
       }
     }
 
+    if (builder.unixDomainSocketEnabled) {
+      env.put("REDIS_UNIX_DOMAIN_SOCKET", "yes");
+    }
+
     this.container = new GenericContainer<>(image)
       .withEnv(env)
       .withExposedPorts(6379)
@@ -111,6 +126,20 @@ public class RedisStandalone implements Startable {
     }
     if (builder.mutualTlsEnabled) {
       container.withCopyToContainer(Transferable.of(builder.clientKey.certificateAsPEM()), "/certs/client.crt");
+    }
+    if (builder.unixDomainSocketEnabled) {
+      try {
+        redisDir = Files.createTempDirectory("redis").toFile();
+      } catch (IOException e) {
+        throw new RuntimeException(e);
+      }
+      redisDir.deleteOnExit();
+      redisDir.setReadable(true, false);
+      redisDir.setWritable(true, false);
+      redisDir.setExecutable(true, false);
+      container.withFileSystemBind(redisDir.getAbsolutePath(), "/var/run/redis");
+    } else {
+      redisDir = null;
     }
   }
 
@@ -134,5 +163,12 @@ public class RedisStandalone implements Startable {
 
   public String getRedisUri() {
     return "redis://" + getHost() + ":" + getPort();
+  }
+
+  public String getRedisUnixDomainSocketUri() {
+    if (redisDir == null) {
+      throw new IllegalStateException("Unix Domain Socket disabled");
+    }
+    return "unix://" + redisDir.getAbsolutePath() + "/redis.sock";
   }
 }
