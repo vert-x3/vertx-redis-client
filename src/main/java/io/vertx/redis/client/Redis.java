@@ -94,7 +94,8 @@ public interface Redis {
     if (options.getType() != RedisClientType.STANDALONE) {
       throw new IllegalArgumentException("RedisOptions.getType() != RedisClientType.STANDALONE");
     }
-    return new RedisClient(vertx, options.getNetClientOptions(), options.getPoolOptions(), connectOptions, options.getTracingPolicy());
+    return RedisClientFactory.create(vertx, options.getNetClientOptions(), options.getPoolOptions(), connectOptions, options.getTracingPolicy(),
+      RedisClient::new);
   }
 
   /**
@@ -114,7 +115,8 @@ public interface Redis {
     if (options.getType() != RedisClientType.REPLICATION) {
       throw new IllegalArgumentException("RedisOptions.getType() != RedisClientType.REPLICATION");
     }
-    return new RedisReplicationClient(vertx, options.getNetClientOptions(), options.getPoolOptions(), connectOptions, options.getTracingPolicy());
+    return RedisClientFactory.create(vertx, options.getNetClientOptions(), options.getPoolOptions(), connectOptions, options.getTracingPolicy(),
+      RedisReplicationClient::new);
   }
 
   /**
@@ -134,7 +136,8 @@ public interface Redis {
     if (options.getType() != RedisClientType.SENTINEL) {
       throw new IllegalArgumentException("RedisOptions.getType() != RedisClientType.SENTINEL");
     }
-    return new RedisSentinelClient(vertx, options.getNetClientOptions(), options.getPoolOptions(), connectOptions, options.getTracingPolicy());
+    return RedisClientFactory.create(vertx, options.getNetClientOptions(), options.getPoolOptions(), connectOptions, options.getTracingPolicy(),
+      RedisSentinelClient::new);
   }
 
   /**
@@ -154,7 +157,8 @@ public interface Redis {
     if (options.getType() != RedisClientType.CLUSTER) {
       throw new IllegalArgumentException("RedisOptions.getType() != RedisClientType.CLUSTER");
     }
-    return new RedisClusterClient(vertx, options.getNetClientOptions(), options.getPoolOptions(), connectOptions, options.getTracingPolicy());
+    return RedisClientFactory.create(vertx, options.getNetClientOptions(), options.getPoolOptions(), connectOptions, options.getTracingPolicy(),
+      RedisClusterClient::new);
   }
 
   /**

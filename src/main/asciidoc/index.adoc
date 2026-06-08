@@ -519,6 +519,35 @@ A common configuration is to set the maximum size of the pool to the number of a
 
 NOTE: Pooling is not compatible with `SUBSCRIBE`, `UNSUBSCRIBE`, `PSUBSCRIBE` or `PUNSUBSCRIBE`, because these commands will modify the way the connection operates and the connection cannot be reused.
 
+== Client sharing
+
+You can share a Redis client between multiple verticles or instances of the same verticle.
+Such a client should be created outside a verticle otherwise it will be closed when the verticle that created it is undeployed.
+
+[source,$lang]
+----
+{@link examples.RedisExamples#example17}
+----
+
+You can also create a shared client in each verticle:
+
+[source,$lang]
+----
+{@link examples.RedisExamples#example18}
+----
+
+The first time a shared client is created it will create the resources for the client (connection manager, pools, topology caches).
+Subsequent calls will reuse this client and create a lease to it.
+The resources are disposed after all leases have been closed.
+
+When no specific pool name is set, the default shared name `{PoolOptions#DEFAULT_SHARED_NAME}` is used.
+Multiple shared clients are distinguished by the pool name.
+
+WARNING: The first caller wins on configuration. Mismatched options with the same shared name are not validated.
+
+NOTE: Sharing is at the client level (includes `NetClient`, connection pools, and topology caches), not just a single connection.
+Pub/sub and transactional commands still require a dedicated `connect()` (unchanged).
+
 == Implementing Reconnect on Error
 
 While the connection pool is quite useful, for performance, a connection should not be auto managed but controlled by you.
