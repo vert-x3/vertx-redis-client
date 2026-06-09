@@ -21,7 +21,7 @@ jobs:
           path: ~/.m2/repository
           key: maven-java-${{ inputs.jdk }}
       - name: Checkout
-        uses: actions/checkout@v3
+        uses: actions/checkout@v6
         with:
           ref: ${{ inputs.branch }}
       - name: Install JDK
