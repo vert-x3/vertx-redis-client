@@ -6,19 +6,16 @@ import io.vertx.junit5.VertxExtension;
 import io.vertx.junit5.VertxTestContext;
 import io.vertx.redis.client.Redis;
 import io.vertx.redis.client.RedisOptions;
+import io.vertx.tests.redis.containers.PikaContainer;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.api.extension.RegisterExtension;
-import org.testcontainers.containers.GenericContainer;
 import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
 
-import static io.vertx.redis.client.Command.GET;
-import static io.vertx.redis.client.Command.HGETALL;
-import static io.vertx.redis.client.Command.HSET;
-import static io.vertx.redis.client.Command.SET;
+import static io.vertx.redis.client.Command.*;
 import static io.vertx.redis.client.Request.cmd;
 import static io.vertx.tests.redis.client.TestUtils.randomKey;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -29,8 +26,7 @@ import static org.junit.jupiter.api.Assertions.assertNull;
 public class RedisClientPikaTest {
 
   @Container
-  public static final GenericContainer<?> redis = new GenericContainer<>("pikadb/pika:v3.5.6")
-    .withExposedPorts(9221);
+  public static final PikaContainer pikaServer = new PikaContainer();
 
   @RegisterExtension
   public final RunTestOnContext context = new RunTestOnContext();
@@ -41,7 +37,7 @@ public class RedisClientPikaTest {
   public void before(VertxTestContext test) {
     client = Redis.createClient(
       context.vertx(),
-      new RedisOptions().setConnectionString("redis://" + redis.getHost() + ":" + redis.getFirstMappedPort()));
+      new RedisOptions().setConnectionString(pikaServer.getPikaUri()));
 
     client.connect().onComplete(test.succeeding(conn -> {
       conn.close().onComplete(test.succeedingThenComplete());
