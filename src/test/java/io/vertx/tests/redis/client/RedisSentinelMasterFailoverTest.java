@@ -1,6 +1,7 @@
 package io.vertx.tests.redis.client;
 
 import io.vertx.junit5.RunTestOnContext;
+import io.vertx.junit5.Timeout;
 import io.vertx.junit5.VertxExtension;
 import io.vertx.junit5.VertxTestContext;
 import io.vertx.redis.client.Command;
@@ -15,6 +16,8 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.api.extension.RegisterExtension;
 import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
+
+import java.util.concurrent.TimeUnit;
 
 import static io.vertx.tests.redis.client.TestUtils.retryUntilSuccess;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -31,6 +34,7 @@ public class RedisSentinelMasterFailoverTest {
   public final RunTestOnContext context = new RunTestOnContext();
 
   @Test
+  @Timeout(value = 60, timeUnit = TimeUnit.SECONDS)
   public void test(VertxTestContext test) {
     Redis client = Redis.createClient(
       context.vertx(),
