@@ -148,7 +148,7 @@ public final class RedisURI {
           }
           password = urlDecode(userInfo.substring(sep + 1));
         } else {
-          user = params.getOrDefault("user", null);
+          user = userInfo.isEmpty() ? params.getOrDefault("user", null) : urlDecode(userInfo);
           password = params.getOrDefault("password", null);
         }
       } else {
@@ -227,11 +227,9 @@ public final class RedisURI {
       return "";
     }
 
-    return
-      (user == null ? "" : user) +
-        ":" +
-        (password == null ? "" : urlEncode(password)) +
-        "@";
+    return (user == null ? "" : user)
+           + (password == null ? "" : (":" + urlEncode(password)))
+           + "@";
   }
 
   public String protocol() {
