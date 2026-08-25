@@ -22,43 +22,57 @@ public class RedisURITest {
   @Test
   public void testOnlyPasswordGiven() {
     RedisURI redisURI = new RedisURI("redis://:p%40ssw0rd@redis-1234.hosted.com:1234/0");
+    assertNull(redisURI.user(), "User is not correct");
     assertEquals("p@ssw0rd", redisURI.password(), "Password is not correct");
+    assertEquals(":p%40ssw0rd@", redisURI.userinfo(), "Userinfo is not correct");
   }
 
   @Test
   public void testOnlyPasswordInQueryGiven() {
     RedisURI redisURI = new RedisURI("redis://redis-1234.hosted.com:1234/0?password=p%40ssw0rd");
+    assertNull(redisURI.user(), "User is not correct");
     assertEquals("p@ssw0rd", redisURI.password(), "Password is not correct");
+    assertEquals(":p%40ssw0rd@", redisURI.userinfo(), "Userinfo is not correct");
   }
 
   @Test
   public void testTwoPasswordsAreGiven() {
     RedisURI redisURI = new RedisURI("redis://:pass@redis-1234.hosted.com:1234/0?password=p%40ssw0rd");
+    assertNull(redisURI.user(), "User is not correct");
     assertEquals("pass", redisURI.password(), "Password is not correct");
+    assertEquals(":pass@", redisURI.userinfo(), "Userinfo is not correct");
   }
 
   @Test
   public void testLoginAndPasswordGiven() {
     RedisURI redisURI = new RedisURI("redis://redundantName:p%40ssw0rd@redis-1234.hosted.com:1234/0");
+    assertEquals("redundantName", redisURI.user(), "User is not correct");
     assertEquals("p@ssw0rd", redisURI.password(), "Password is not correct");
+    assertEquals("redundantName:p%40ssw0rd@", redisURI.userinfo(), "Userinfo is not correct");
   }
 
   @Test
   public void testOnlyLoginGiven() {
     RedisURI redisURI = new RedisURI("redis://redisUs%65r@redis-1234.hosted.com:1234/0");
     assertEquals("redisUser", redisURI.user(), "User is not correct");
+    assertNull(redisURI.password(), "Password is not correct");
+    assertEquals("redisUser@", redisURI.userinfo(), "Userinfo is not correct");
   }
 
   @Test
   public void testTwoLoginsAreGiven() {
     RedisURI redisURI = new RedisURI("redis://redisUs%65r:pass@redis-1234.hosted.com:1234/0?user=otherUs%65r");
     assertEquals("redisUser", redisURI.user(), "User is not correct");
+    assertEquals("pass", redisURI.password(), "Password is not correct");
+    assertEquals("redisUser:pass@", redisURI.userinfo(), "Userinfo is not correct");
   }
 
   @Test
   public void testPasswordNotGiven() {
     RedisURI redisURI = new RedisURI("redis://redis-1234.hosted.com:1234/0");
+    assertNull(redisURI.user(), "User is not null");
     assertNull(redisURI.password(), "Password is not null");
+    assertEquals("", redisURI.userinfo(), "Userinfo is not empty");
   }
 
   @Test
@@ -96,7 +110,9 @@ public class RedisURITest {
   @Test
   public void testColon() {
     RedisURI redisURI = new RedisURI("redis://:admin%3Aqwer@localhost:6379/1");
+    assertNull(redisURI.user());
     assertEquals("admin:qwer", redisURI.password());
+    assertEquals(":admin%3Aqwer@", redisURI.userinfo());
   }
 
   @Test
@@ -120,7 +136,9 @@ public class RedisURITest {
   @Test
   public void testDefaultPortWithPassword() {
     RedisURI redisURI = new RedisURI("redis://:password@localhost");
+    assertNull(redisURI.user());
     assertEquals("password", redisURI.password());
+    assertEquals(":password@", redisURI.userinfo());
     assertEquals("localhost", redisURI.socketAddress().host());
     assertEquals(6379, redisURI.socketAddress().port());
   }
@@ -150,6 +168,7 @@ public class RedisURITest {
     RedisURI redisURI = new RedisURI("valkey://user:p%40ss@localhost:6379/2");
     assertEquals("user", redisURI.user());
     assertEquals("p@ss", redisURI.password());
+    assertEquals("user:p%40ss@", redisURI.userinfo());
     assertEquals(2, redisURI.select());
   }
 }
