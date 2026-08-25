@@ -231,11 +231,9 @@ public final class RedisURI {
       return "";
     }
 
-    return
-      (user == null ? "" : user) +
-        ":" +
-        (password == null ? "" : urlEncode(password)) +
-        "@";
+    return (user == null ? "" : user)
+           + (password == null ? "" : (":" + urlEncode(password)))
+           + "@";
   }
 
   public String protocol() {
