@@ -18,6 +18,7 @@ package io.vertx.redis.client.impl;
 import io.vertx.core.Future;
 import io.vertx.core.Promise;
 import io.vertx.core.Vertx;
+import io.vertx.core.internal.CloseFuture;
 import io.vertx.core.net.NetClientOptions;
 import io.vertx.core.tracing.TracingPolicy;
 import io.vertx.redis.client.PoolOptions;
@@ -29,8 +30,8 @@ import java.util.function.Supplier;
 
 public class RedisClient extends BaseRedisClient<RedisStandaloneConnectOptions> implements Redis {
 
-  public RedisClient(Vertx vertx, NetClientOptions tcpOptions, PoolOptions poolOptions, Supplier<Future<RedisStandaloneConnectOptions>> connectOptions, TracingPolicy tracingPolicy) {
-    super(vertx, tcpOptions, poolOptions, connectOptions, tracingPolicy);
+  public RedisClient(Vertx vertx, NetClientOptions tcpOptions, PoolOptions poolOptions, Supplier<Future<RedisStandaloneConnectOptions>> connectOptions, TracingPolicy tracingPolicy, CloseFuture closeFuture) {
+    super(vertx, tcpOptions, poolOptions, connectOptions, tracingPolicy, closeFuture);
   }
 
   @Override

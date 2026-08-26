@@ -19,6 +19,7 @@ import io.vertx.core.Completable;
 import io.vertx.core.Future;
 import io.vertx.core.Promise;
 import io.vertx.core.Vertx;
+import io.vertx.core.internal.CloseFuture;
 import io.vertx.core.net.NetClientOptions;
 import io.vertx.core.tracing.TracingPolicy;
 import io.vertx.redis.client.Command;
@@ -37,8 +38,8 @@ public class RedisSentinelClient extends BaseRedisClient<RedisSentinelConnectOpt
   private final SharedSentinelTopology sharedTopology;
   private final AtomicReference<SentinelFailover> failover = new AtomicReference<>();
 
-  public RedisSentinelClient(Vertx vertx, NetClientOptions tcpOptions, PoolOptions poolOptions, Supplier<Future<RedisSentinelConnectOptions>> connectOptions, TracingPolicy tracingPolicy) {
-    super(vertx, tcpOptions, poolOptions, connectOptions, tracingPolicy);
+  public RedisSentinelClient(Vertx vertx, NetClientOptions tcpOptions, PoolOptions poolOptions, Supplier<Future<RedisSentinelConnectOptions>> connectOptions, TracingPolicy tracingPolicy, CloseFuture closeFuture) {
+    super(vertx, tcpOptions, poolOptions, connectOptions, tracingPolicy, closeFuture);
     this.sharedTopology = new SharedSentinelTopology(vertx, connectOptions, connectionManager);
     // validate options
     if (poolOptions.getMaxWaiting() < poolOptions.getMaxSize()) {

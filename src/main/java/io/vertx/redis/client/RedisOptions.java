@@ -733,6 +733,27 @@ public class RedisOptions {
   }
 
   /**
+   * @return whether the client is shared
+   */
+  public boolean isShared() {
+    return poolOptions.isShared();
+  }
+
+  /**
+   * Set to {@code true} to share the client between verticles.
+   *
+   * <p>There can be multiple shared clients distinguished by {@link #getPoolName()}. When no specific
+   * name is set, the {@link PoolOptions#DEFAULT_NAME} is used.
+   *
+   * @param shared whether the client is shared
+   * @return fluent self
+   */
+  public RedisOptions setShared(boolean shared) {
+    poolOptions.setShared(shared);
+    return this;
+  }
+
+  /**
    * @return the metrics name identifying the reported metrics.
    */
   public String getMetricsName() {

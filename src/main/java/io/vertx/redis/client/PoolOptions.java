@@ -19,13 +19,22 @@ import io.vertx.codegen.annotations.DataObject;
 import io.vertx.codegen.json.annotations.JsonGen;
 import io.vertx.core.json.JsonObject;
 
-import java.util.UUID;
-
 @DataObject
 @JsonGen(publicConverter = false)
 public class PoolOptions {
 
+  /**
+   * Default shared pool config = {@code false}
+   */
+  public static final boolean DEFAULT_SHARED_POOL = false;
+
+  /**
+   * Actual name of anonymous shared pool = {@code __vertx.DEFAULT}
+   */
+  public static final String DEFAULT_NAME = "__vertx.DEFAULT";
+
   private String name;
+  private boolean shared;
   private int cleanerInterval;
   private int maxSize;
   private int maxWaiting;
@@ -33,7 +42,8 @@ public class PoolOptions {
   private long maxLifetime;
 
   public PoolOptions() {
-    name = UUID.randomUUID().toString();
+    name = DEFAULT_NAME;
+    shared = DEFAULT_SHARED_POOL;
     // thumb guess based on web browser defaults
     cleanerInterval = 30_000;
     maxSize = 6;
@@ -44,10 +54,12 @@ public class PoolOptions {
 
   public PoolOptions(PoolOptions other) {
     this.name = other.name;
+    this.shared = other.shared;
     this.cleanerInterval = other.cleanerInterval;
     this.maxSize = other.maxSize;
     this.maxWaiting = other.maxWaiting;
     this.recycleTimeout = other.recycleTimeout;
+    this.maxLifetime = other.maxLifetime;
   }
 
   public PoolOptions(JsonObject json) {
@@ -56,7 +68,7 @@ public class PoolOptions {
   }
 
   /**
-   * Get the connection pool name to be used for metrics reporting. The default name is a random UUID.
+   * Get the connection pool name to be used for metrics reporting.
    *
    * @return the pool name
    */
@@ -65,13 +77,32 @@ public class PoolOptions {
   }
 
   /**
-   * Set the connection pool name to be used for metrics reporting. The default name is a random UUID.
+   * Set the connection pool name to be used for metrics reporting.
    *
    * @param name the pool name
    * @return fluent self
    */
   public PoolOptions setName(String name) {
     this.name = name;
+    return this;
+  }
+
+  /**
+   * @return whether the pool is shared
+   */
+  public boolean isShared() {
+    return shared;
+  }
+
+  /**
+   * Set to {@code true} to share the client between verticles.
+   *
+   *
+   * @param shared whether the client is shared
+   * @return fluent self
+   */
+  public PoolOptions setShared(boolean shared) {
+    this.shared = shared;
     return this;
   }
 

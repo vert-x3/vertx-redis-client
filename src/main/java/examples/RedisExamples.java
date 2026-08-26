@@ -309,6 +309,38 @@ public class RedisExamples {
     options.setClusterTransactions(RedisClusterTransactions.SINGLE_NODE);
   }
 
+  public void example17(Vertx vertx) {
+    Redis redis = Redis.createClient(
+      vertx,
+      new RedisOptions()
+        .setConnectionString("redis://localhost:6379")
+        .setShared(true)
+        .setPoolName("my-redis"));
+    vertx.deployVerticle(() -> new VerticleBase() {
+      @Override
+      public Future<?> start() {
+        return redis.send(Request.cmd(Command.PING)).mapEmpty();
+      }
+    }, new DeploymentOptions().setInstances(4));
+  }
+
+  public void example18(Vertx vertx) {
+    vertx.deployVerticle(() -> new VerticleBase() {
+      Redis redis;
+
+      @Override
+      public Future<?> start() {
+        redis = Redis.createClient(
+          vertx,
+          new RedisOptions()
+            .setConnectionString("redis://localhost:6379")
+            .setShared(true)
+            .setPoolName("my-redis"));
+        return Future.succeededFuture();
+      }
+    }, new DeploymentOptions().setInstances(4));
+  }
+
   public void tracing1(RedisOptions options) {
     options.setTracingPolicy(TracingPolicy.ALWAYS);
   }

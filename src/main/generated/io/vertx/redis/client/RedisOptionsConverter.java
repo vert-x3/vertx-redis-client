@@ -122,6 +122,11 @@ public class RedisOptionsConverter {
             obj.setPoolName((String)member.getValue());
           }
           break;
+        case "shared":
+          if (member.getValue() instanceof Boolean) {
+            obj.setShared((Boolean)member.getValue());
+          }
+          break;
         case "metricsName":
           if (member.getValue() instanceof String) {
             obj.setMetricsName((String)member.getValue());
@@ -210,6 +215,7 @@ public class RedisOptionsConverter {
     if (obj.getPoolName() != null) {
       json.put("poolName", obj.getPoolName());
     }
+    json.put("shared", obj.isShared());
     if (obj.getMetricsName() != null) {
       json.put("metricsName", obj.getMetricsName());
     }
