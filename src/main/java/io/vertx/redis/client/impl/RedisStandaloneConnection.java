@@ -427,7 +427,9 @@ public class RedisStandaloneConnection implements RedisConnectionInternal, Parse
 
   public synchronized void end(Void v) {
     //System.out.println("end()#" + this.hashCode());
-    assert !closed;
+    if (closed) {
+      return;
+    }
     closed = true;
     // evict this connection from the pool
     evict();
@@ -442,7 +444,9 @@ public class RedisStandaloneConnection implements RedisConnectionInternal, Parse
   @Override
   public synchronized void fail(Throwable t) {
     //System.out.println("fail()#" + this.hashCode());
-    assert !closed;
+    if (closed) {
+      return;
+    }
     closed = true;
     // evict this connection from the pool
     evict();
@@ -454,6 +458,8 @@ public class RedisStandaloneConnection implements RedisConnectionInternal, Parse
     if (onException != null) {
       context.execute(t, onException);
     }
+    // close the underlying TCP socket to prevent further data from being read
+    netSocket.close();
   }
 
   @Override

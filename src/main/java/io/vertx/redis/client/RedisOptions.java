@@ -50,6 +50,7 @@ public class RedisOptions {
   private PoolOptions poolOptions;
   private int maxWaitingHandlers;
   private int maxNestedArrays;
+  private int maxMultiLength;
   private String masterName;
   private RedisRole role;
   private RedisReplicas useReplicas;
@@ -77,6 +78,7 @@ public class RedisOptions {
     poolOptions = new PoolOptions();
     maxWaitingHandlers = 2048;
     maxNestedArrays = 32;
+    maxMultiLength = 65535;
     masterName = "mymaster";
     role = RedisRole.MASTER;
     useReplicas = RedisReplicas.NEVER;
@@ -100,6 +102,7 @@ public class RedisOptions {
     this.poolOptions = new PoolOptions(other.poolOptions);
     this.maxWaitingHandlers = other.maxWaitingHandlers;
     this.maxNestedArrays = other.maxNestedArrays;
+    this.maxMultiLength = other.maxMultiLength;
     this.masterName = other.masterName;
     this.role = other.role;
     this.useReplicas = other.useReplicas;
@@ -419,6 +422,34 @@ public class RedisOptions {
    */
   public RedisOptions setMaxNestedArrays(int maxNestedArrays) {
     this.maxNestedArrays = maxNestedArrays;
+    return this;
+  }
+
+  /**
+   * Get the maximum number of elements allowed in any single RESP multi-bulk response
+   * (array, map, set, push, attribute). Responses exceeding this limit cause the connection
+   * to be closed with an error.
+   * <p>
+   * Users with legitimate large responses (e.g. large {@code LRANGE}) can increase this value.
+   *
+   * @return the configured maximum multi-bulk length.
+   */
+  public int getMaxMultiLength() {
+    return maxMultiLength;
+  }
+
+  /**
+   * Set the maximum number of elements allowed in any single RESP multi-bulk response
+   * (array, map, set, push, attribute). Responses exceeding this limit cause the connection
+   * to be closed with an error. The default value is 65535.
+   * <p>
+   * Users with legitimate large responses (e.g. large {@code LRANGE}) can increase this value.
+   *
+   * @param maxMultiLength the maximum multi-bulk length.
+   * @return fluent self.
+   */
+  public RedisOptions setMaxMultiLength(int maxMultiLength) {
+    this.maxMultiLength = maxMultiLength;
     return this;
   }
 

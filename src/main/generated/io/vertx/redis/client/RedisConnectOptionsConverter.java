@@ -17,6 +17,11 @@ public class RedisConnectOptionsConverter {
             obj.setMaxNestedArrays(((Number)member.getValue()).intValue());
           }
           break;
+        case "maxMultiLength":
+          if (member.getValue() instanceof Number) {
+            obj.setMaxMultiLength(((Number)member.getValue()).intValue());
+          }
+          break;
         case "protocolNegotiation":
           if (member.getValue() instanceof Boolean) {
             obj.setProtocolNegotiation((Boolean)member.getValue());
@@ -77,6 +82,7 @@ public class RedisConnectOptionsConverter {
 
    static void toJson(RedisConnectOptions obj, java.util.Map<String, Object> json) {
     json.put("maxNestedArrays", obj.getMaxNestedArrays());
+    json.put("maxMultiLength", obj.getMaxMultiLength());
     json.put("protocolNegotiation", obj.isProtocolNegotiation());
     if (obj.getPreferredProtocolVersion() != null) {
       json.put("preferredProtocolVersion", obj.getPreferredProtocolVersion().name());
