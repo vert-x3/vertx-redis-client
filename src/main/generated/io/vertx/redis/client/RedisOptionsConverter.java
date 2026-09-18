@@ -67,6 +67,11 @@ public class RedisOptionsConverter {
             obj.setMaxNestedArrays(((Number)member.getValue()).intValue());
           }
           break;
+        case "maxMultiLength":
+          if (member.getValue() instanceof Number) {
+            obj.setMaxMultiLength(((Number)member.getValue()).intValue());
+          }
+          break;
         case "tracingPolicy":
           if (member.getValue() instanceof String) {
             obj.setTracingPolicy(io.vertx.core.tracing.TracingPolicy.valueOf((String)member.getValue()));
@@ -174,6 +179,7 @@ public class RedisOptionsConverter {
       json.put("clusterTransactions", obj.getClusterTransactions().name());
     }
     json.put("maxNestedArrays", obj.getMaxNestedArrays());
+    json.put("maxMultiLength", obj.getMaxMultiLength());
     if (obj.getTracingPolicy() != null) {
       json.put("tracingPolicy", obj.getTracingPolicy().name());
     }
