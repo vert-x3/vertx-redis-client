@@ -31,12 +31,14 @@ public abstract class RedisConnectOptions {
   private String password;
   private List<String> endpoints;
   private int maxNestedArrays;
+  private int maxMultiLength;
   private boolean protocolNegotiation;
   private ProtocolVersion preferredProtocolVersion;
   private int maxWaitingHandlers;
 
   public RedisConnectOptions() {
     maxNestedArrays = 32;
+    maxMultiLength = 65535;
     protocolNegotiation = true;
     maxWaitingHandlers = 2048;
   }
@@ -47,6 +49,7 @@ public abstract class RedisConnectOptions {
     setPassword(options.getPassword());
     setEndpoints(new ArrayList<>(options.getEndpoints()));
     setMaxNestedArrays(options.getMaxNestedArrays());
+    setMaxMultiLength(options.getMaxMultiLength());
     setProtocolNegotiation(options.isProtocolNegotiation());
     setPreferredProtocolVersion(options.getPreferredProtocolVersion());
     setMaxWaitingHandlers(options.getMaxWaitingHandlers());
@@ -58,6 +61,7 @@ public abstract class RedisConnectOptions {
     setPassword(other.getPassword());
     setEndpoints(new ArrayList<>(other.getEndpoints()));
     setMaxNestedArrays(other.getMaxNestedArrays());
+    setMaxMultiLength(other.getMaxMultiLength());
     setProtocolNegotiation(other.isProtocolNegotiation());
     setPreferredProtocolVersion(other.getPreferredProtocolVersion());
     setMaxWaitingHandlers(other.getMaxWaitingHandlers());
@@ -85,6 +89,34 @@ public abstract class RedisConnectOptions {
    */
   public RedisConnectOptions setMaxNestedArrays(int maxNestedArrays) {
     this.maxNestedArrays = maxNestedArrays;
+    return this;
+  }
+
+  /**
+   * Get the maximum number of elements allowed in any single RESP multi-bulk response
+   * (array, map, set, push, attribute). Responses exceeding this limit cause the connection
+   * to be closed with an error.
+   * <p>
+   * Users with legitimate large responses (e.g. large {@code LRANGE}) can increase this value.
+   *
+   * @return the configured maximum multi-bulk length.
+   */
+  public int getMaxMultiLength() {
+    return maxMultiLength;
+  }
+
+  /**
+   * Set the maximum number of elements allowed in any single RESP multi-bulk response
+   * (array, map, set, push, attribute). Responses exceeding this limit cause the connection
+   * to be closed with an error. The default value is 65535.
+   * <p>
+   * Users with legitimate large responses (e.g. large {@code LRANGE}) can increase this value.
+   *
+   * @param maxMultiLength the maximum multi-bulk length.
+   * @return fluent self.
+   */
+  public RedisConnectOptions setMaxMultiLength(int maxMultiLength) {
+    this.maxMultiLength = maxMultiLength;
     return this;
   }
 

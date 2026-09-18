@@ -219,7 +219,7 @@ public class RedisConnectionManager implements Function<RedisConnectionManager.C
 
       // parser utility
       netSocket
-        .handler(new RESPParser(connection, options.getMaxNestedArrays()))
+        .handler(new RESPParser(connection, options.getMaxNestedArrays(), options.getMaxMultiLength()))
         .closeHandler(connection::end)
         .exceptionHandler(connection::fail);
 
