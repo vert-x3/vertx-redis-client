@@ -40,7 +40,7 @@ public class ReplyParserTest {
       public void fail(Throwable t) {
         test.failNow(t);
       }
-    }, 16);
+    });
 
     parser.handle(Buffer.buffer("+PONG\r\n+PONG\r\n+PONG\r\n+PONG\r\n"));
   }
@@ -57,7 +57,7 @@ public class ReplyParserTest {
       public void fail(Throwable t) {
         test.failNow(t);
       }
-    }, 16);
+    });
 
     parser.handle(Buffer.buffer("+"));
     parser.handle(Buffer.buffer("P"));
@@ -83,7 +83,7 @@ public class ReplyParserTest {
       public void fail(Throwable t) {
         test.failNow(t);
       }
-    }, 16);
+    });
 
     parser.handle(Buffer.buffer(":1000\r\n"));
   }
@@ -103,7 +103,7 @@ public class ReplyParserTest {
       public void fail(Throwable t) {
         test.failNow(t);
       }
-    }, 16);
+    });
 
     parser.handle(Buffer.buffer(":-1\r\n"));
   }
@@ -123,7 +123,7 @@ public class ReplyParserTest {
       public void fail(Throwable t) {
         test.failNow(t);
       }
-    }, 16);
+    });
 
     parser.handle(Buffer.buffer("$6\r\nfoobar\r\n"));
   }
@@ -144,7 +144,7 @@ public class ReplyParserTest {
       public void fail(Throwable t) {
         test.failNow(t);
       }
-    }, 16);
+    });
 
     parser.handle(Buffer.buffer("$0\r\n\r\n"));
   }
@@ -164,7 +164,7 @@ public class ReplyParserTest {
       public void fail(Throwable t) {
         test.failNow(t);
       }
-    }, 16);
+    });
 
     parser.handle(Buffer.buffer("$-1\r\n"));
   }
@@ -185,7 +185,7 @@ public class ReplyParserTest {
       public void fail(Throwable t) {
         test.failNow(t);
       }
-    }, 16);
+    });
 
     parser.handle(Buffer.buffer("*0\r\n"));
   }
@@ -205,7 +205,7 @@ public class ReplyParserTest {
       public void fail(Throwable t) {
         test.failNow(t);
       }
-    }, 16);
+    });
 
     parser.handle(Buffer.buffer("*-1\r\n"));
   }
@@ -227,7 +227,7 @@ public class ReplyParserTest {
       public void fail(Throwable t) {
         test.failNow(t);
       }
-    }, 16);
+    });
 
     parser.handle(Buffer.buffer("*2\r\n$3\r\nfoo\r\n$3\r\nbar\r\n"));
   }
@@ -250,7 +250,7 @@ public class ReplyParserTest {
       public void fail(Throwable t) {
         test.failNow(t);
       }
-    }, 16);
+    });
 
     parser.handle(Buffer.buffer("*3\r\n:1\r\n:2\r\n:3\r\n"));
   }
@@ -275,7 +275,7 @@ public class ReplyParserTest {
       public void fail(Throwable t) {
         test.failNow(t);
       }
-    }, 16);
+    });
 
     parser.handle(Buffer.buffer("*5\r\n:1\r\n:2\r\n:3\r\n:4\r\n$6\r\nfoobar\r\n"));
   }
@@ -300,7 +300,7 @@ public class ReplyParserTest {
       public void fail(Throwable t) {
         test.failNow(t);
       }
-    }, 16);
+    });
 
     parser.handle(Buffer.buffer("*2\r\n*3\r\n:1\r\n:2\r\n:3\r\n*2\r\n+Foo\r\n-Bar\r\n"));
   }
@@ -323,7 +323,7 @@ public class ReplyParserTest {
       public void fail(Throwable t) {
         test.failNow(t);
       }
-    }, 16);
+    });
 
     parser.handle(Buffer.buffer("*3\r\n$3\r\nfoo\r\n$-1\r\n$3\r\nbar\r\n"));
   }
@@ -342,7 +342,7 @@ public class ReplyParserTest {
       public void fail(Throwable t) {
         test.failNow(t);
       }
-    }, 16);
+    });
 
     parser.handle(Buffer.buffer(
       "+OK\r\n" +
@@ -386,7 +386,7 @@ public class ReplyParserTest {
       public void fail(Throwable t) {
         test.failNow(t);
       }
-    }, 16);
+    });
 
     byte[] hello = Base64.getDecoder().decode("JTcNCiQ2DQpzZXJ2ZXINCiQ1DQpyZWRpcw0KJDcNCnZlcnNpb24NCiQ1DQo2LjAuMw0KJDUNCnByb3RvDQo6Mw0KJDINCmlkDQo6MzIxMDUNCiQ0DQptb2RlDQokMTANCnN0YW5kYWxvbmUNCiQ0DQpyb2xlDQokNg0KbWFzdGVyDQo=");
 

@@ -44,10 +44,17 @@ public final class RESPParser implements Handler<Buffer> {
   // arrays can have nested objects so we need to keep track of the
   // nesting while parsing
   private final ArrayStack stack;
+  // maximum number of elements allowed in a single multi-bulk response
+  private final int maxMultiLength;
 
-  public RESPParser(ParserHandler handler, int maxStack) {
+  public RESPParser(ParserHandler handler) {
+    this(handler, 32, 65535);
+  }
+
+  public RESPParser(ParserHandler handler, int maxStack, int maxMultiLength) {
     this.handler = handler;
     this.stack = new ArrayStack(maxStack);
+    this.maxMultiLength = maxMultiLength;
   }
 
   // parser state machine state
@@ -173,6 +180,11 @@ public final class RESPParser implements Handler<Buffer> {
     // redis multi cannot have more than 2GB elements
     if (integer > Integer.MAX_VALUE) {
       handler.fail(ErrorType.create("ILLEGAL_STATE Redis Multi cannot be larger 2GB elements"));
+      return -1;
+    }
+
+    if (integer > maxMultiLength) {
+      handler.fail(ErrorType.create("ILLEGAL_STATE Redis Multi length " + integer + " exceeds the configured maxMultiLength " + maxMultiLength));
       return -1;
     }
 
