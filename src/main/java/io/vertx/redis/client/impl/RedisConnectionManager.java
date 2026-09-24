@@ -209,7 +209,7 @@ class RedisConnectionManager {
 
       // parser utility
       netSocket
-        .handler(new RESPParser(connection, options.getMaxNestedArrays()))
+        .handler(new RESPParser(connection, options.getMaxNestedArrays(), options.getMaxMultiLength()))
         .closeHandler(connection::end)
         .exceptionHandler(connection::fail);
 

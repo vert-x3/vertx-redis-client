@@ -45,6 +45,11 @@ public class RedisConnectOptionsConverter {
             obj.setEndpoints(list);
           }
           break;
+        case "maxMultiLength":
+          if (member.getValue() instanceof Number) {
+            obj.setMaxMultiLength(((Number)member.getValue()).intValue());
+          }
+          break;
         case "maxNestedArrays":
           if (member.getValue() instanceof Number) {
             obj.setMaxNestedArrays(((Number)member.getValue()).intValue());
@@ -87,6 +92,7 @@ public class RedisConnectOptionsConverter {
       obj.getEndpoints().forEach(item -> array.add(item));
       json.put("endpoints", array);
     }
+    json.put("maxMultiLength", obj.getMaxMultiLength());
     json.put("maxNestedArrays", obj.getMaxNestedArrays());
     json.put("maxWaitingHandlers", obj.getMaxWaitingHandlers());
     if (obj.getPassword() != null) {
