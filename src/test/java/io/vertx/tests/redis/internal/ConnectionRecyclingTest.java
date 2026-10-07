@@ -12,7 +12,6 @@ import io.vertx.redis.client.RedisConnection;
 import io.vertx.redis.client.RedisOptions;
 import io.vertx.redis.client.Request;
 import io.vertx.redis.client.impl.Primitives.Int;
-import io.vertx.redis.client.impl.RedisClient;
 import io.vertx.redis.client.impl.RedisConnectionInternal;
 import io.vertx.redis.client.impl.RedisConnectionManager;
 import io.vertx.redis.client.impl.RedisConnectionManager.ConnectionKey;
@@ -27,6 +26,7 @@ import org.testcontainers.junit.jupiter.Testcontainers;
 
 import java.lang.reflect.Field;
 
+import static io.vertx.tests.redis.client.TestUtils.getRedisConnectionManager;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 @ExtendWith(VertxExtension.class)
@@ -174,7 +174,7 @@ public class ConnectionRecyclingTest {
     Int size = new Int(0);
 
     try {
-      RedisConnectionManager connManager = ((RedisClient) client).connectionManager();
+      RedisConnectionManager connManager = getRedisConnectionManager(client);
       Field field = RedisConnectionManager.class.getDeclaredField("pooledConnectionManager");
       field.setAccessible(true);
       ResourceManager<ConnectionKey, RedisEndpoint> endpointManager =

@@ -1,6 +1,7 @@
 package io.vertx.tests.redis.client;
 
 import io.vertx.core.tracing.TracingPolicy;
+import io.vertx.redis.client.PoolOptions;
 import io.vertx.redis.client.RedisClientType;
 import io.vertx.redis.client.RedisOptions;
 import io.vertx.redis.client.RedisRole;
@@ -11,6 +12,8 @@ import java.util.Collections;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class RedisOptionsTest {
 
@@ -83,6 +86,25 @@ public class RedisOptionsTest {
     assertEquals(TracingPolicy.ALWAYS, copy.getTracingPolicy());
     assertEquals(3333L, copy.getTopologyCacheTTL());
     assertEquals(3333L, copy.getHashSlotCacheTTL());
+  }
+
+  @Test
+  public void testSharedOptions() {
+    assertFalse(new RedisOptions().isShared());
+
+    RedisOptions options = new RedisOptions()
+      .setShared(true)
+      .setPoolName("my-redis");
+    assertTrue(options.isShared());
+    assertEquals("my-redis", options.getPoolName());
+
+    RedisOptions copy = new RedisOptions(options);
+    assertTrue(copy.isShared());
+    assertEquals("my-redis", copy.getPoolName());
+
+    PoolOptions poolOptions = new PoolOptions().setShared(true);
+    assertTrue(poolOptions.isShared());
+    assertFalse(poolOptions.getName().isEmpty());
   }
 
 }

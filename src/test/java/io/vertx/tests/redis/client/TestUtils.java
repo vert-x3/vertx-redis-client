@@ -5,6 +5,10 @@ import io.vertx.core.Future;
 import io.vertx.core.Handler;
 import io.vertx.core.Promise;
 import io.vertx.core.Vertx;
+import io.vertx.redis.client.Redis;
+import io.vertx.redis.client.impl.BaseRedisClient;
+import io.vertx.redis.client.impl.CloseableRedis;
+import io.vertx.redis.client.impl.RedisConnectionManager;
 
 import java.util.UUID;
 import java.util.function.BooleanSupplier;
@@ -61,5 +65,12 @@ public class TestUtils {
         }
       }
     });
+  }
+
+  public static RedisConnectionManager getRedisConnectionManager(Redis redis) {
+    if (redis instanceof CloseableRedis) {
+      redis = ((CloseableRedis) redis).delegate();
+    }
+    return ((BaseRedisClient<?>) redis).connectionManager();
   }
 }

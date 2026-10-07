@@ -19,6 +19,7 @@ import io.vertx.core.Completable;
 import io.vertx.core.Future;
 import io.vertx.core.Promise;
 import io.vertx.core.Vertx;
+import io.vertx.core.internal.CloseFuture;
 import io.vertx.core.internal.logging.Logger;
 import io.vertx.core.internal.logging.LoggerFactory;
 import io.vertx.core.net.NetClientOptions;
@@ -106,8 +107,8 @@ public class RedisReplicationClient extends BaseRedisClient<RedisReplicationConn
     addMasterOnlyCommand(WAIT);
   }
 
-  public RedisReplicationClient(Vertx vertx, NetClientOptions tcpOptions, PoolOptions poolOptions, Supplier<Future<RedisReplicationConnectOptions>> connectOptions, TracingPolicy tracingPolicy) {
-    super(vertx, tcpOptions, poolOptions, connectOptions, tracingPolicy);
+  public RedisReplicationClient(Vertx vertx, NetClientOptions tcpOptions, PoolOptions poolOptions, Supplier<Future<RedisReplicationConnectOptions>> connectOptions, TracingPolicy tracingPolicy, CloseFuture closeFuture) {
+    super(vertx, tcpOptions, poolOptions, connectOptions, tracingPolicy, closeFuture);
     // validate options
     if (poolOptions.getMaxWaiting() < poolOptions.getMaxSize()) {
       throw new IllegalStateException("Invalid options: maxWaiting < maxSize");

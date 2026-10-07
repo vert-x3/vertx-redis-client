@@ -17,6 +17,11 @@ public class PoolOptionsConverter {
             obj.setName((String)member.getValue());
           }
           break;
+        case "shared":
+          if (member.getValue() instanceof Boolean) {
+            obj.setShared((Boolean)member.getValue());
+          }
+          break;
         case "cleanerInterval":
           if (member.getValue() instanceof Number) {
             obj.setCleanerInterval(((Number)member.getValue()).intValue());
@@ -54,6 +59,7 @@ public class PoolOptionsConverter {
     if (obj.getName() != null) {
       json.put("name", obj.getName());
     }
+    json.put("shared", obj.isShared());
     json.put("cleanerInterval", obj.getCleanerInterval());
     json.put("maxSize", obj.getMaxSize());
     json.put("maxWaiting", obj.getMaxWaiting());

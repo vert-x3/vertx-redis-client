@@ -3,6 +3,7 @@ package io.vertx.redis.client.impl;
 import io.vertx.codegen.annotations.Nullable;
 import io.vertx.core.Future;
 import io.vertx.core.Vertx;
+import io.vertx.core.internal.CloseFuture;
 import io.vertx.core.internal.VertxInternal;
 import io.vertx.core.internal.logging.Logger;
 import io.vertx.core.internal.logging.LoggerFactory;
@@ -26,11 +27,12 @@ public abstract class BaseRedisClient<OPTS extends RedisConnectOptions> implemen
   protected final Supplier<Future<OPTS>> connectOptions;
   protected final RedisConnectionManager connectionManager;
 
-  public BaseRedisClient(Vertx vertx, NetClientOptions tcpOptions, PoolOptions poolOptions, Supplier<Future<OPTS>> connectOptions, TracingPolicy tracingPolicy) {
+  public BaseRedisClient(Vertx vertx, NetClientOptions tcpOptions, PoolOptions poolOptions, Supplier<Future<OPTS>> connectOptions, TracingPolicy tracingPolicy, CloseFuture closeFuture) {
     this.vertx = (VertxInternal) vertx;
     this.connectOptions = connectOptions;
     this.connectionManager = new RedisConnectionManager(this.vertx, tcpOptions, poolOptions, (Supplier) connectOptions, tracingPolicy);
     this.connectionManager.start();
+    closeFuture.add(completion -> close().onComplete(completion));
   }
 
   public RedisConnectionManager connectionManager() {
