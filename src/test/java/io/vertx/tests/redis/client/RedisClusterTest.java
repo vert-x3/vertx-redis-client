@@ -3,6 +3,7 @@ package io.vertx.tests.redis.client;
 import io.vertx.codegen.annotations.Nullable;
 import io.vertx.core.Context;
 import io.vertx.core.Future;
+import io.vertx.core.Promise;
 import io.vertx.core.buffer.Buffer;
 import io.vertx.junit5.Checkpoint;
 import io.vertx.junit5.RunTestOnContext;
@@ -16,6 +17,10 @@ import io.vertx.redis.client.RedisReplicas;
 import io.vertx.redis.client.Request;
 import io.vertx.redis.client.Response;
 import io.vertx.redis.client.ResponseType;
+import io.vertx.redis.client.impl.PooledRedisConnection;
+import io.vertx.redis.client.impl.RedisClusterClient;
+import io.vertx.redis.client.impl.RedisConnectionManager;
+import io.vertx.redis.client.impl.ZModem;
 import io.vertx.tests.redis.containers.RedisCluster;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -33,6 +38,11 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Random;
 import java.util.Set;
+import java.util.TreeSet;
+import java.util.concurrent.CyclicBarrier;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 
@@ -1143,5 +1153,150 @@ public class RedisClusterTest {
             });
           }));
       }));
+  }
+
+  @Test
+  public void testPoolNotDeadlockedByConcurrentConnectionLessCommands(VertxTestContext test) {
+    // Reproduces a deadlock between connection-less commands sent from blocking threads,
+    // whose requests for pooled connections interleave. With single-connection pools,
+    // a command that holds a pooled connection to one node while waiting for another
+    // node may wait for a command that waits for it; no command completes after that
+    // and `await()` times out, usually within the first few rounds.
+    int callers = 32;
+    int rounds = 50;
+
+    Redis clusterClient = Redis.createClient(context.vertx(), new RedisOptions(options)
+      .setMaxPoolSize(1)
+      .setMaxPoolWaiting(1024));
+
+    CyclicBarrier barrier = new CyclicBarrier(callers);
+    ExecutorService executor = Executors.newFixedThreadPool(callers);
+    List<Future<Void>> results = new ArrayList<>(callers);
+    for (int i = 0; i < callers; i++) {
+      Promise<Void> result = Promise.promise();
+      results.add(result.future());
+      executor.execute(() -> {
+        try {
+          for (int j = 0; j < rounds; j++) {
+            barrier.await(10, TimeUnit.SECONDS);
+            clusterClient.send(cmd(SET).arg(randomKey()).arg("value")).await(10, TimeUnit.SECONDS);
+          }
+          result.complete();
+        } catch (Throwable e) {
+          result.fail(e);
+        }
+      });
+    }
+    executor.shutdown();
+
+    Future.all(results)
+      .eventually(clusterClient::close)
+      .onComplete(test.succeedingThenComplete());
+  }
+
+  @Test
+  public void testConnectionsToMultipleNodesAcquiredInOrder(VertxTestContext test) {
+    // Reproduces a deadlock between callers that hold pooled connections to some nodes
+    // while waiting for pooled connections to other nodes. Steps:
+    // 1. read CLUSTER SLOTS to find the endpoints of all nodes, as used by the client
+    //    (they must be equal to share the pools), and pick two of them, A < B
+    // 2. acquire the only pooled connection to A (maxPoolSize=1)
+    // 3. connect() and send a command split across nodes -- both need pooled connections
+    //    to all nodes, including A
+    // 4. acquire the only pooled connection to B, like a caller that holds A and acquires
+    //    pooled connections in order would
+    // If a caller from step 3 held B while waiting for A, this would deadlock
+    Redis clusterClient = Redis.createClient(context.vertx(), new RedisOptions()
+      .setType(RedisClientType.CLUSTER)
+      .setUseReplicas(RedisReplicas.NEVER)
+      .addConnectionString(redis.getRedisNode0Uri())
+      .setMaxPoolSize(1)
+      .setMaxPoolWaiting(16));
+    RedisConnectionManager connectionManager = ((RedisClusterClient) clusterClient).connectionManager();
+
+    clusterClient.send(cmd(CLUSTER).arg("SLOTS"))
+      .compose(slots -> {
+        List<String> endpoints = endpoints(slots);
+        String endpointA = endpoints.get(endpoints.size() / 2);
+        String endpointB = endpoints.get(endpoints.size() - 1);
+        return connectionManager.getConnection(endpointA, null).compose(connA -> {
+          Future<Void> connect = clusterClient.connect().compose(RedisConnection::close);
+          Future<Response> mget = clusterClient.send(cmd(MGET).arg("{a}" + randomKey()).arg("{b}" + randomKey()));
+          return connectionManager.getConnection(endpointB, null).compose(connB -> {
+            connA.close();
+            connB.close();
+            return Future.all(connect, mget).map(ignored -> mget.result());
+          });
+        });
+      })
+      .onComplete(test.succeeding(mget -> {
+        test.verify(() -> assertEquals(2, mget.size()));
+        clusterClient.close().onComplete(test.succeedingThenComplete());
+      }));
+  }
+
+  @Test
+  public void testConnectionLessRequestAcquiresConnectionToTargetNodeOnly(VertxTestContext test) {
+    // A connection-less request that is sent to a single node only needs a pooled connection
+    // to that node, so it never holds a pooled connection while waiting for another one. Steps:
+    // 1. read CLUSTER SLOTS to find the endpoints of all nodes, as used by the client
+    //    (they must be equal to share the pools), and the master that serves the key
+    // 2. acquire the only pooled connection to every other node (maxPoolSize=1)
+    // 3. send() and batch() requests for the key -- they must not wait for other nodes
+    final String key = randomKey();
+
+    Redis clusterClient = Redis.createClient(context.vertx(), new RedisOptions()
+      .setType(RedisClientType.CLUSTER)
+      .setUseReplicas(RedisReplicas.NEVER)
+      .addConnectionString(redis.getRedisNode0Uri())
+      .setMaxPoolSize(1)
+      .setMaxPoolWaiting(16));
+    RedisConnectionManager connectionManager = ((RedisClusterClient) clusterClient).connectionManager();
+
+    clusterClient.send(cmd(CLUSTER).arg("SLOTS"))
+      .compose(slots -> {
+        String target = masterEndpoint(slots, ZModem.generate(key));
+        List<Future<PooledRedisConnection>> others = new ArrayList<>();
+        for (String endpoint : endpoints(slots)) {
+          if (!endpoint.equals(target)) {
+            others.add(connectionManager.getConnection(endpoint, null));
+          }
+        }
+        return Future.all(others).compose(ignored ->
+          clusterClient.send(cmd(SET).arg(key).arg("value"))
+            .compose(ignored2 -> clusterClient.batch(Arrays.asList(cmd(GET).arg(key), cmd(DEL).arg(key))))
+            .andThen(ignored2 -> others.forEach(conn -> conn.result().close())));
+      })
+      .onComplete(test.succeeding(batch -> {
+        test.verify(() -> {
+          assertEquals("value", batch.get(0).toString());
+          assertEquals(1, batch.get(1).toInteger());
+        });
+        clusterClient.close().onComplete(test.succeedingThenComplete());
+      }));
+  }
+
+  // all distinct endpoints in `CLUSTER SLOTS`, sorted, in the same format the client uses
+  private static List<String> endpoints(Response slots) {
+    Set<String> result = new TreeSet<>();
+    for (Response range : slots) {
+      for (int i = 2; i < range.size(); i++) {
+        result.add(endpoint(range.get(i)));
+      }
+    }
+    return new ArrayList<>(result);
+  }
+
+  private static String masterEndpoint(Response slots, int slot) {
+    for (Response range : slots) {
+      if (slot >= range.get(0).toInteger() && slot <= range.get(1).toInteger()) {
+        return endpoint(range.get(2));
+      }
+    }
+    throw new IllegalStateException("Slot " + slot + " not served by any node");
+  }
+
+  private static String endpoint(Response node) {
+    return "redis://" + node.get(0) + ":" + node.get(1);
   }
 }

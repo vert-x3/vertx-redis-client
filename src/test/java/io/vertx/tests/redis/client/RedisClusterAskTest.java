@@ -92,6 +92,10 @@ public class RedisClusterAskTest {
               return clusterConn.send(Request.cmd(Command.SET).arg(key2).arg("quux")); // ASK
             })
             .compose(ignored -> {
+              return client.send(Request.cmd(Command.GET).arg(key2)); // ASK, connection-less
+            })
+            .compose(result -> {
+              assertEquals("quux", result.toString());
               return clusterConn.send(Request.cmd(Command.GET).arg(key2)); // ASK
             })
             .compose(result -> {
