@@ -134,23 +134,28 @@ public final class RESPParser implements Handler<Buffer> {
             return;
         }
       } else {
-        // empty string
+        // fixed length parsing: read the payload, but only emit once the trailing CRLF is found
+        // this mirrors the line-based types, which locate EOL via findLineEnd()
+        final Response response;
         if (bytesNeeded == 0) {
           // special case as we don't need to allocate objects for this
-          handleResponse(BulkType.EMPTY, false);
+          response = BulkType.EMPTY;
         } else {
-          // fixed length parsing && read the required bytes
-          handleResponse(BulkType.create(buffer.readBytes(bytesNeeded), verbatim), false);
-          // clear the verbatim
-          verbatim = false;
+          // read the required bytes
+          response = BulkType.create(buffer.readBytes(bytesNeeded), verbatim);
         }
         // clean up the buffer, skip to the last \r\n
         if (buffer.skipEOL()) {
           // switch back to eol parsing
           eol = true;
+          // clear the verbatim flag only once the message is complete
+          verbatim = false;
+          handleResponse(response, false);
         } else {
-          // operation failed
+          // trailer not present yet, rewind and wait for more data
+          // note that retrying now would re-read and re-emit the payload in a loop!
           buffer.reset();
+          break;
         }
       }
     }
@@ -174,7 +179,7 @@ public final class RESPParser implements Handler<Buffer> {
   }
 
   private long handleLength(int eol) {
-    final long integer = buffer.readLong(eol);
+    final long integer = buffer.readLength(eol);
 
     // special cases
     // redis multi cannot have more than 2GB elements
