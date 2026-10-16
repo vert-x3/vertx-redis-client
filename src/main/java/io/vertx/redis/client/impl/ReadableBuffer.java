@@ -66,22 +66,26 @@ final class ReadableBuffer {
 
   int findLineEnd() {
     int index = -1;
-    for (int i = offset; i < buffer.length(); i++) {
-      if (buffer.getByte(i) == '\n') {
+    for (int i = offset + 1; i < buffer.length(); i++) {
+      if (buffer.getByte(i) == '\n' && buffer.getByte(i - 1) == '\r') {
         index = i;
         break;
       }
     }
 
-    return (index > 0 && buffer.getByte(index - 1) == '\r') ? index : -1;
+    return index > 0 ? index : -1;
   }
 
-  long readLong(int end) {
+  long readLength(int end) {
     long value = 0;
 
     boolean negative = buffer.getByte(this.offset) == '-';
 
     int offset = negative ? this.offset + 1 : this.offset;
+
+    if (offset >= end - 1) {
+      throw new IllegalStateException("Length expected, got end of line");
+    }
 
     while (offset < end - 1) {
       if (value > MAX_INTEGER_DIV_10) {
