@@ -99,6 +99,21 @@ public class RedisReplicationConnectOptions extends RedisConnectOptions {
   }
 
   @Override
+  public RedisReplicationConnectOptions setMaxMultiLength(int maxMultiLength) {
+    return (RedisReplicationConnectOptions) super.setMaxMultiLength(maxMultiLength);
+  }
+
+  @Override
+  public RedisReplicationConnectOptions setMaxLineLength(int maxLineLength) {
+    return (RedisReplicationConnectOptions) super.setMaxLineLength(maxLineLength);
+  }
+
+  @Override
+  public RedisReplicationConnectOptions setMaxStringLength(long maxStringLength) {
+    return (RedisReplicationConnectOptions) super.setMaxStringLength(maxStringLength);
+  }
+
+  @Override
   public RedisReplicationConnectOptions setProtocolNegotiation(boolean protocolNegotiation) {
     return (RedisReplicationConnectOptions) super.setProtocolNegotiation(protocolNegotiation);
   }

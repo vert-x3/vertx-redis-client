@@ -25,22 +25,22 @@ public final class RESPParser implements Handler<Buffer> {
 
   public static final String VERSION = "3";
 
-  // 512Mb
-  private static final long MAX_STRING_LENGTH = 536870912;
-
   // the callback when a full response message has been decoded
   private final ParserHandler handler;
-  // a composite buffer to allow buffer concatenation as if it was
-  // a long stream
+  // a composite buffer to allow buffer concatenation as if it was a long stream
   private final ReadableBuffer buffer = new ReadableBuffer();
-  // arrays can have nested objects so we need to keep track of the
-  // nesting while parsing
+  // arrays can have nested objects so we need to keep track of the nesting while parsing
   private final ArrayStack stack;
-  // maximum number of elements allowed in a single multi-bulk response
-  private final int maxMultiLength;
 
-  RESPParser(ParserHandler handler) {
-    this(handler, 32);
+  // maximum number of elements allowed in a single multi-bulk response
+  private final int maxMultiCount;
+  // maximum length of an unterminated line before the stream is rejected
+  private final int maxLineLength;
+  // maximum length allowed for a bulk payload
+  private final long maxStringLength;
+
+  public RESPParser(ParserHandler handler) {
+    this(handler, new RESPParserOptions());
   }
 
   RESPParser(ParserHandler handler, int maxStack) {
@@ -48,9 +48,17 @@ public final class RESPParser implements Handler<Buffer> {
   }
 
   RESPParser(ParserHandler handler, int maxStack, int maxMultiLength) {
+    this(handler, new RESPParserOptions()
+      .setMaxNestingDepth(maxStack)
+      .setMaxMultiCount(maxMultiLength));
+  }
+
+  public RESPParser(ParserHandler handler, RESPParserOptions options) {
     this.handler = handler;
-    this.stack = new ArrayStack(maxStack);
-    this.maxMultiLength = maxMultiLength;
+    this.stack = new ArrayStack(options.getMaxNestingDepth());
+    this.maxMultiCount = options.getMaxMultiCount();
+    this.maxLineLength = options.getMaxLineLength();
+    this.maxStringLength = options.getMaxStringLength();
   }
 
   // parser state machine state
@@ -78,6 +86,13 @@ public final class RESPParser implements Handler<Buffer> {
 
         // not found at all
         if (eol == -1) {
+          // The line is only complete once findLineEnd() locates the CRLF. If it is still absent
+          // and the buffered line already exceeds the maximum, a peer that never terminates the
+          // line would grow the buffer without limit, so reject the stream.
+          if (buffer.readableBytes() > maxLineLength) {
+            handler.fail(ErrorType.create("ILLEGAL_STATE RESP line exceeds maximum length " + maxLineLength));
+            return;
+          }
           buffer.reset();
           break;
         }
@@ -178,14 +193,15 @@ public final class RESPParser implements Handler<Buffer> {
     final long integer = buffer.readLength(eol);
 
     // special cases
-    // redis multi cannot have more than 2GB elements
+    // redis multi cannot have more than 2G elements
     if (integer > Integer.MAX_VALUE) {
-      handler.fail(ErrorType.create("ILLEGAL_STATE Redis Multi cannot be larger 2GB elements"));
+      handler.fail(ErrorType.create("ILLEGAL_STATE Redis Multi cannot have more than 2G elements"));
       return -1;
     }
 
-    if (integer > maxMultiLength) {
-      handler.fail(ErrorType.create("ILLEGAL_STATE Redis Multi length " + integer + " exceeds the configured maxMultiLength " + maxMultiLength));
+    if (integer > maxMultiCount) {
+      handler.fail(ErrorType.create("ILLEGAL_STATE Redis Multi element count " + integer
+        + " exceeds the configured maximum of " + maxMultiCount));
       return -1;
     }
 
@@ -260,9 +276,8 @@ public final class RESPParser implements Handler<Buffer> {
   private void handleBulk(int eol, boolean verbatim) {
     long len = handleLength(eol);
     if (len >= 0L) {
-      // redis strings cannot be longer than 512Mb
-      if (len > MAX_STRING_LENGTH) {
-        handler.fail(ErrorType.create("ILLEGAL_STATE Redis Bulk cannot be larger than 512MB"));
+      if (len > maxStringLength) {
+        handler.fail(ErrorType.create("ILLEGAL_STATE Redis Bulk cannot be larger than " + maxStringLength + " bytes"));
         return;
       }
       // safe cast

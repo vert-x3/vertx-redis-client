@@ -45,6 +45,11 @@ public class RedisConnectOptionsConverter {
             obj.setEndpoints(list);
           }
           break;
+        case "maxLineLength":
+          if (member.getValue() instanceof Number) {
+            obj.setMaxLineLength(((Number)member.getValue()).intValue());
+          }
+          break;
         case "maxMultiLength":
           if (member.getValue() instanceof Number) {
             obj.setMaxMultiLength(((Number)member.getValue()).intValue());
@@ -53,6 +58,11 @@ public class RedisConnectOptionsConverter {
         case "maxNestedArrays":
           if (member.getValue() instanceof Number) {
             obj.setMaxNestedArrays(((Number)member.getValue()).intValue());
+          }
+          break;
+        case "maxStringLength":
+          if (member.getValue() instanceof Number) {
+            obj.setMaxStringLength(((Number)member.getValue()).longValue());
           }
           break;
         case "maxWaitingHandlers":
@@ -92,8 +102,10 @@ public class RedisConnectOptionsConverter {
       obj.getEndpoints().forEach(item -> array.add(item));
       json.put("endpoints", array);
     }
+    json.put("maxLineLength", obj.getMaxLineLength());
     json.put("maxMultiLength", obj.getMaxMultiLength());
     json.put("maxNestedArrays", obj.getMaxNestedArrays());
+    json.put("maxStringLength", obj.getMaxStringLength());
     json.put("maxWaitingHandlers", obj.getMaxWaitingHandlers());
     if (obj.getPassword() != null) {
       json.put("password", obj.getPassword());

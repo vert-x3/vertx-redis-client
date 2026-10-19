@@ -68,6 +68,11 @@ public class RedisOptionsConverter {
             obj.setMasterName((String)member.getValue());
           }
           break;
+        case "maxLineLength":
+          if (member.getValue() instanceof Number) {
+            obj.setMaxLineLength(((Number)member.getValue()).intValue());
+          }
+          break;
         case "maxMultiLength":
           if (member.getValue() instanceof Number) {
             obj.setMaxMultiLength(((Number)member.getValue()).intValue());
@@ -86,6 +91,11 @@ public class RedisOptionsConverter {
         case "maxPoolWaiting":
           if (member.getValue() instanceof Number) {
             obj.setMaxPoolWaiting(((Number)member.getValue()).intValue());
+          }
+          break;
+        case "maxStringLength":
+          if (member.getValue() instanceof Number) {
+            obj.setMaxStringLength(((Number)member.getValue()).longValue());
           }
           break;
         case "maxWaitingHandlers":
@@ -188,10 +198,12 @@ public class RedisOptionsConverter {
     if (obj.getMasterName() != null) {
       json.put("masterName", obj.getMasterName());
     }
+    json.put("maxLineLength", obj.getMaxLineLength());
     json.put("maxMultiLength", obj.getMaxMultiLength());
     json.put("maxNestedArrays", obj.getMaxNestedArrays());
     json.put("maxPoolSize", obj.getMaxPoolSize());
     json.put("maxPoolWaiting", obj.getMaxPoolWaiting());
+    json.put("maxStringLength", obj.getMaxStringLength());
     json.put("maxWaitingHandlers", obj.getMaxWaitingHandlers());
     if (obj.getMetricsName() != null) {
       json.put("metricsName", obj.getMetricsName());
