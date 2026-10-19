@@ -189,38 +189,49 @@ public final class RESPParser implements Handler<Buffer> {
     }
   }
 
+  // Reads the numeric header of a length/count type and handles only what all callers share:
+  // the -1 sentinel for "NULL" and malformed negatives. The other caps are applied by callers.
   private long handleLength(int eol) {
     final long integer = buffer.readLength(eol);
 
-    // special cases
-    // redis multi cannot have more than 2G elements
-    if (integer > Integer.MAX_VALUE) {
-      handler.fail(ErrorType.create("ILLEGAL_STATE Redis Multi cannot have more than 2G elements"));
-      return -1;
-    }
-
-    if (integer > maxMultiCount) {
-      handler.fail(ErrorType.create("ILLEGAL_STATE Redis Multi element count " + integer
-        + " exceeds the configured maximum of " + maxMultiCount));
-      return -1;
-    }
-
     if (integer < 0) {
       if (integer == -1L) {
-        // this is a NULL array
+        // this is a NULL bulk/array
         handleResponse(null, false);
-        return -1;
+      } else {
+        handler.fail(ErrorType.create("ILLEGAL_STATE Redis Multi cannot have negative length"));
       }
-      // other negative values are not valid
-      handler.fail(ErrorType.create("ILLEGAL_STATE Redis Multi cannot have negative length"));
       return -1;
     }
 
     return integer;
   }
 
+  // Reads the number of elements of aggregate/push/attribute. Note the number is not a byte length!
+  private long handleCount(int eol) {
+    final long count = handleLength(eol);
+    if (count < 0) {
+      // null emitted or already failed
+      return count;
+    }
+
+    // redis multi cannot have more than 2G elements
+    if (count > Integer.MAX_VALUE) {
+      handler.fail(ErrorType.create("ILLEGAL_STATE Redis Multi cannot have more than 2G elements"));
+      return -1;
+    }
+
+    if (count > maxMultiCount) {
+      handler.fail(ErrorType.create("ILLEGAL_STATE Redis Multi element count " + count
+        + " exceeds the configured maximum of " + maxMultiCount));
+      return -1;
+    }
+
+    return count;
+  }
+
   private void handlePush(int eol) {
-    long len = handleLength(eol);
+    long len = handleCount(eol);
     if (len >= 0) {
       if (len == 0L) {
         // push always have 1 entry
@@ -232,7 +243,7 @@ public final class RESPParser implements Handler<Buffer> {
   }
 
   private void handleAttribute(int eol) {
-    long len = handleLength(eol);
+    long len = handleCount(eol);
     if (len >= 0L) {
       if (len == 0L) {
         // push always have 1 entry
@@ -290,7 +301,7 @@ public final class RESPParser implements Handler<Buffer> {
 
   private void handleMulti(byte type, int eol) {
 
-    long len = handleLength(eol);
+    long len = handleCount(eol);
 
     if (len >= 0L) {
       // empty arrays can be cached and require no further processing
