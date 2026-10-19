@@ -75,6 +75,8 @@ import static io.vertx.redis.client.Command.SET;
 import static io.vertx.redis.client.Command.TTL;
 import static io.vertx.redis.client.Command.WAIT;
 import static io.vertx.redis.client.Request.cmd;
+import static io.vertx.tests.redis.client.TestUtils.executeWhenConditionSatisfied;
+import static io.vertx.tests.redis.client.TestUtils.poolWaiters;
 import static io.vertx.tests.redis.client.TestUtils.randomKey;
 import static io.vertx.tests.redis.client.TestUtils.retryUntilSuccess;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -1203,7 +1205,8 @@ public class RedisClusterTest {
     // 2. acquire the only pooled connection to A (maxPoolSize=1)
     // 3. connect() and send a command split across nodes -- both need pooled connections
     //    to all nodes, including A
-    // 4. acquire the only pooled connection to B, like a caller that holds A and acquires
+    // 4. wait until a caller from step 3 is queued for the pooled connection to A
+    // 5. acquire the only pooled connection to B, like a caller that holds A and acquires
     //    pooled connections in order would
     // If a caller from step 3 held B while waiting for A, this would deadlock
     Redis clusterClient = Redis.createClient(context.vertx(), new RedisOptions()
@@ -1222,7 +1225,11 @@ public class RedisClusterTest {
         return connectionManager.getConnection(endpointA, null).compose(connA -> {
           Future<Void> connect = clusterClient.connect().compose(RedisConnection::close);
           Future<Response> mget = clusterClient.send(cmd(MGET).arg("{a}" + randomKey()).arg("{b}" + randomKey()));
-          return connectionManager.getConnection(endpointB, null).compose(connB -> {
+          Promise<PooledRedisConnection> pooledB = Promise.promise();
+          executeWhenConditionSatisfied(context.vertx(), () -> poolWaiters(connectionManager, endpointA) > 0, () -> {
+            connectionManager.getConnection(endpointB, null).onComplete(pooledB);
+          });
+          return pooledB.future().compose(connB -> {
             connA.close();
             connB.close();
             return Future.all(connect, mget).map(ignored -> mget.result());

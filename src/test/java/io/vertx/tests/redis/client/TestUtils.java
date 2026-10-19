@@ -5,9 +5,17 @@ import io.vertx.core.Future;
 import io.vertx.core.Handler;
 import io.vertx.core.Promise;
 import io.vertx.core.Vertx;
+import io.vertx.core.internal.resource.ResourceManager;
+import io.vertx.redis.client.Request;
+import io.vertx.redis.client.impl.RedisConnectionManager;
+import io.vertx.redis.client.impl.RedisConnectionManager.ConnectionKey;
+import io.vertx.redis.client.impl.RedisConnectionManager.RedisEndpoint;
 
+import java.lang.reflect.Constructor;
+import java.lang.reflect.Field;
 import java.util.UUID;
 import java.util.function.BooleanSupplier;
+import java.util.function.Function;
 import java.util.function.Supplier;
 
 public class TestUtils {
@@ -34,6 +42,25 @@ public class TestUtils {
       vertx.setTimer(5, ignored -> {
         executeWhenConditionSatisfied(vertx, condition, action);
       });
+    }
+  }
+
+  /**
+   * Returns the number of requests that wait in the queue of the connection pool to the given {@code endpoint}
+   * (for connections without a setup command), because all of its connections are in use.
+   */
+  @SuppressWarnings("unchecked")
+  public static int poolWaiters(RedisConnectionManager connectionManager, String endpoint) {
+    try {
+      Field field = RedisConnectionManager.class.getDeclaredField("pooledConnectionManager");
+      field.setAccessible(true);
+      ResourceManager<ConnectionKey, RedisEndpoint> endpoints = (ResourceManager<ConnectionKey, RedisEndpoint>) field.get(connectionManager);
+      Constructor<ConnectionKey> key = ConnectionKey.class.getDeclaredConstructor(String.class, Request.class);
+      key.setAccessible(true);
+      return endpoints.withResource(key.newInstance(endpoint, null), connectionManager, Function.identity(),
+        (resource, created) -> resource.pool().waiters());
+    } catch (ReflectiveOperationException e) {
+      throw new RuntimeException(e);
     }
   }
 

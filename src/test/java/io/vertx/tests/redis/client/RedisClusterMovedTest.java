@@ -1,6 +1,7 @@
 package io.vertx.tests.redis.client;
 
 import io.vertx.core.Future;
+import io.vertx.core.Promise;
 import io.vertx.core.net.SocketAddress;
 import io.vertx.junit5.RunTestOnContext;
 import io.vertx.junit5.VertxExtension;
@@ -26,6 +27,8 @@ import org.junit.jupiter.api.extension.RegisterExtension;
 import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
 
+import static io.vertx.tests.redis.client.TestUtils.executeWhenConditionSatisfied;
+import static io.vertx.tests.redis.client.TestUtils.poolWaiters;
 import static io.vertx.tests.redis.client.TestUtils.randomKey;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
@@ -155,13 +158,22 @@ public class RedisClusterMovedTest {
               return otherMasterConn.send(Request.cmd(Command.CLUSTER).arg("SETSLOT").arg(slot).arg("NODE").arg(otherMasterId));
             })
             .compose(ignored2 -> {
-              // while the only pooled connection to the new node is held (maxPoolSize=1), the MOVED
-              // request must release its pooled connection to the old node, otherwise this deadlocks
-              return connectionManager.getConnection(endpoint(otherMasterConn), null).compose(otherMasterPooled -> {
-                Future<Response> get = connectionLessClient.send(Request.cmd(Command.GET).arg(key)); // MOVED
-                return connectionManager.getConnection(endpoint(masterConn), null).compose(masterPooled -> {
-                  otherMasterPooled.close();
-                  masterPooled.close();
+              // 1. acquire the only pooled connection to the new master (maxPoolSize=1)
+              // 2. send a GET, which goes to the old master and is MOVED to the new master
+              // 3. wait until the GET is queued for the pooled connection to the new master
+              // 4. acquire the only pooled connection to the old master
+              // If the GET still held the old master's connection in step 4, this would deadlock
+              String oldMaster = endpoint(masterConn);
+              String newMaster = endpoint(otherMasterConn);
+              return connectionManager.getConnection(newMaster, null).compose(newMasterPooled -> {
+                Future<Response> get = connectionLessClient.send(Request.cmd(Command.GET).arg(key));
+                Promise<PooledRedisConnection> oldMasterPooled = Promise.promise();
+                executeWhenConditionSatisfied(context.vertx(), () -> poolWaiters(connectionManager, newMaster) == 1, () -> {
+                  connectionManager.getConnection(oldMaster, null).onComplete(oldMasterPooled);
+                });
+                return oldMasterPooled.future().compose(oldMasterPooledConn -> {
+                  newMasterPooled.close();
+                  oldMasterPooledConn.close();
                   return get;
                 });
               });
