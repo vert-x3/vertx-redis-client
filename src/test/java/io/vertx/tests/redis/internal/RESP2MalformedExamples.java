@@ -197,14 +197,14 @@ public final class RESP2MalformedExamples {
   // ------------------------------------------------------------------------------------------
   // Configured limits (NOT protocol-invalid)
   //   These vectors are legal RESP2/RESP3 but are rejected by the parser's configured safety
-  //   limits (maxStack / maxMultiLength). They are the one exception to the
+  //   limits (maxNestingDepth / maxMultiCount). They are the one exception to the
   //   "invalid under RESP2 and RESP3" guarantee stated in the class javadoc.
   // ------------------------------------------------------------------------------------------
 
-  /** Defect: element count exceeds the configured maxMultiLength (default 65535). */
+  /** Defect: element count exceeds the configured maxMultiCount (default 65535). */
   public static final String ARRAY_COUNT_OVER_MAX_MULTI = "*70000\r\n";
 
-  /** Defect: array nesting exceeds the configured maxStack depth (default 32). */
+  /** Defect: array nesting exceeds the configured maxNestingDepth (default 32). */
   public static final String ARRAY_NESTING_TOO_DEEP = nestedArrays(33);
 
   // ------------------------------------------------------------------------------------------

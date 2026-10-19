@@ -135,6 +135,21 @@ public class RedisClusterConnectOptions extends RedisConnectOptions {
   }
 
   @Override
+  public RedisClusterConnectOptions setMaxMultiLength(int maxMultiLength) {
+    return (RedisClusterConnectOptions) super.setMaxMultiLength(maxMultiLength);
+  }
+
+  @Override
+  public RedisClusterConnectOptions setMaxLineLength(int maxLineLength) {
+    return (RedisClusterConnectOptions) super.setMaxLineLength(maxLineLength);
+  }
+
+  @Override
+  public RedisClusterConnectOptions setMaxStringLength(long maxStringLength) {
+    return (RedisClusterConnectOptions) super.setMaxStringLength(maxStringLength);
+  }
+
+  @Override
   public RedisClusterConnectOptions setProtocolNegotiation(boolean protocolNegotiation) {
     return (RedisClusterConnectOptions) super.setProtocolNegotiation(protocolNegotiation);
   }

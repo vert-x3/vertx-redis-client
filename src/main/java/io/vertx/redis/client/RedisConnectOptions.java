@@ -33,6 +33,8 @@ public abstract class RedisConnectOptions {
   private List<String> endpoints;
   private int maxNestedArrays;
   private int maxMultiLength;
+  private int maxLineLength;
+  private long maxStringLength;
   private boolean protocolNegotiation;
   private ProtocolVersion preferredProtocolVersion;
   private int maxWaitingHandlers;
@@ -42,6 +44,8 @@ public abstract class RedisConnectOptions {
   public RedisConnectOptions() {
     maxNestedArrays = 32;
     maxMultiLength = 65535;
+    maxLineLength = 128 * 1024;
+    maxStringLength = 512 * 1024 * 1024;
     protocolNegotiation = true;
     maxWaitingHandlers = 2048;
     clientId = true;
@@ -54,6 +58,8 @@ public abstract class RedisConnectOptions {
     setEndpoints(new ArrayList<>(options.getEndpoints()));
     setMaxNestedArrays(options.getMaxNestedArrays());
     setMaxMultiLength(options.getMaxMultiLength());
+    setMaxLineLength(options.getMaxLineLength());
+    setMaxStringLength(options.getMaxStringLength());
     setProtocolNegotiation(options.isProtocolNegotiation());
     setPreferredProtocolVersion(options.getPreferredProtocolVersion());
     setMaxWaitingHandlers(options.getMaxWaitingHandlers());
@@ -68,6 +74,8 @@ public abstract class RedisConnectOptions {
     setEndpoints(new ArrayList<>(other.getEndpoints()));
     setMaxNestedArrays(other.getMaxNestedArrays());
     setMaxMultiLength(other.getMaxMultiLength());
+    setMaxLineLength(other.getMaxLineLength());
+    setMaxStringLength(other.getMaxStringLength());
     setProtocolNegotiation(other.isProtocolNegotiation());
     setPreferredProtocolVersion(other.getPreferredProtocolVersion());
     setMaxWaitingHandlers(other.getMaxWaitingHandlers());
@@ -125,6 +133,52 @@ public abstract class RedisConnectOptions {
    */
   public RedisConnectOptions setMaxMultiLength(int maxMultiLength) {
     this.maxMultiLength = maxMultiLength;
+    return this;
+  }
+
+  /**
+   * Get the maximum length (in bytes) of a single RESP line (a simple string, an error, or a
+   * type header) that may be buffered before its {@code \r\n} terminator is found. This bounds
+   * memory against a peer that never terminates a line. The default value is 128 KB.
+   *
+   * @return the configured maximum line length.
+   */
+  public int getMaxLineLength() {
+    return maxLineLength;
+  }
+
+  /**
+   * Set the maximum length (in bytes) of a single RESP line (a simple string, an error, or a
+   * type header) that may be buffered before its {@code \r\n} terminator is found. Lines exceeding
+   * this limit cause the connection to be closed with an error. The default value is 128 KB.
+   *
+   * @param maxLineLength the maximum line length, in bytes.
+   * @return fluent self.
+   */
+  public RedisConnectOptions setMaxLineLength(int maxLineLength) {
+    this.maxLineLength = maxLineLength;
+    return this;
+  }
+
+  /**
+   * Get the maximum length (in bytes) of a single RESP bulk (bulk string or verbatim string) payload.
+   * Responses exceeding this limit cause the connection to be closed with an error. The default value is 512 MB.
+   *
+   * @return the configured maximum string length.
+   */
+  public long getMaxStringLength() {
+    return maxStringLength;
+  }
+
+  /**
+   * Set the maximum length (in bytes) of a single RESP bulk (bulk string or verbatim string) payload.
+   * Responses exceeding this limit cause the connection to be closed with an error. The default value is 512 MB.
+   *
+   * @param maxStringLength the maximum string length, in bytes.
+   * @return fluent self.
+   */
+  public RedisConnectOptions setMaxStringLength(long maxStringLength) {
+    this.maxStringLength = maxStringLength;
     return this;
   }
 

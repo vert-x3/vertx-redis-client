@@ -48,6 +48,21 @@ public class RedisStandaloneConnectOptions extends RedisConnectOptions {
   }
 
   @Override
+  public RedisStandaloneConnectOptions setMaxMultiLength(int maxMultiLength) {
+    return (RedisStandaloneConnectOptions) super.setMaxMultiLength(maxMultiLength);
+  }
+
+  @Override
+  public RedisStandaloneConnectOptions setMaxLineLength(int maxLineLength) {
+    return (RedisStandaloneConnectOptions) super.setMaxLineLength(maxLineLength);
+  }
+
+  @Override
+  public RedisStandaloneConnectOptions setMaxStringLength(long maxStringLength) {
+    return (RedisStandaloneConnectOptions) super.setMaxStringLength(maxStringLength);
+  }
+
+  @Override
   public RedisStandaloneConnectOptions setProtocolNegotiation(boolean protocolNegotiation) {
     return (RedisStandaloneConnectOptions) super.setProtocolNegotiation(protocolNegotiation);
   }

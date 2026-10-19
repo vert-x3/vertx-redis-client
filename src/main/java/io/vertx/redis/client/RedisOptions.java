@@ -51,6 +51,8 @@ public class RedisOptions {
   private int maxWaitingHandlers;
   private int maxNestedArrays;
   private int maxMultiLength;
+  private int maxLineLength;
+  private long maxStringLength;
   private String masterName;
   private RedisRole role;
   private RedisReplicas useReplicas;
@@ -79,6 +81,8 @@ public class RedisOptions {
     maxWaitingHandlers = 2048;
     maxNestedArrays = 32;
     maxMultiLength = 65535;
+    maxLineLength = 128 * 1024;
+    maxStringLength = 512 * 1024 * 1024;
     masterName = "mymaster";
     role = RedisRole.MASTER;
     useReplicas = RedisReplicas.NEVER;
@@ -103,6 +107,8 @@ public class RedisOptions {
     this.maxWaitingHandlers = other.maxWaitingHandlers;
     this.maxNestedArrays = other.maxNestedArrays;
     this.maxMultiLength = other.maxMultiLength;
+    this.maxLineLength = other.maxLineLength;
+    this.maxStringLength = other.maxStringLength;
     this.masterName = other.masterName;
     this.role = other.role;
     this.useReplicas = other.useReplicas;
@@ -450,6 +456,52 @@ public class RedisOptions {
    */
   public RedisOptions setMaxMultiLength(int maxMultiLength) {
     this.maxMultiLength = maxMultiLength;
+    return this;
+  }
+
+  /**
+   * Get the maximum length (in bytes) of a single RESP line (a simple string, an error, or a
+   * type header) that may be buffered before its {@code \r\n} terminator is found. This bounds
+   * memory against a peer that never terminates a line. The default value is 128 KB.
+   *
+   * @return the configured maximum line length.
+   */
+  public int getMaxLineLength() {
+    return maxLineLength;
+  }
+
+  /**
+   * Set the maximum length (in bytes) of a single RESP line (a simple string, an error, or a
+   * type header) that may be buffered before its {@code \r\n} terminator is found. Lines exceeding
+   * this limit cause the connection to be closed with an error. The default value is 128 KB.
+   *
+   * @param maxLineLength the maximum line length, in bytes.
+   * @return fluent self.
+   */
+  public RedisOptions setMaxLineLength(int maxLineLength) {
+    this.maxLineLength = maxLineLength;
+    return this;
+  }
+
+  /**
+   * Get the maximum length (in bytes) of a single RESP bulk (bulk string or verbatim string) payload.
+   * Responses exceeding this limit cause the connection to be closed with an error. The default value is 512 MB.
+   *
+   * @return the configured maximum string length.
+   */
+  public long getMaxStringLength() {
+    return maxStringLength;
+  }
+
+  /**
+   * Set the maximum length (in bytes) of a single RESP bulk (bulk string or verbatim string) payload.
+   * Responses exceeding this limit cause the connection to be closed with an error. The default value is 512 MB.
+   *
+   * @param maxStringLength the maximum string length, in bytes.
+   * @return fluent self.
+   */
+  public RedisOptions setMaxStringLength(long maxStringLength) {
+    this.maxStringLength = maxStringLength;
     return this;
   }
 

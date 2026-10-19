@@ -184,6 +184,21 @@ public class RedisSentinelConnectOptions extends RedisConnectOptions {
   }
 
   @Override
+  public RedisSentinelConnectOptions setMaxMultiLength(int maxMultiLength) {
+    return (RedisSentinelConnectOptions) super.setMaxMultiLength(maxMultiLength);
+  }
+
+  @Override
+  public RedisSentinelConnectOptions setMaxLineLength(int maxLineLength) {
+    return (RedisSentinelConnectOptions) super.setMaxLineLength(maxLineLength);
+  }
+
+  @Override
+  public RedisSentinelConnectOptions setMaxStringLength(long maxStringLength) {
+    return (RedisSentinelConnectOptions) super.setMaxStringLength(maxStringLength);
+  }
+
+  @Override
   public RedisSentinelConnectOptions setProtocolNegotiation(boolean protocolNegotiation) {
     return (RedisSentinelConnectOptions) super.setProtocolNegotiation(protocolNegotiation);
   }

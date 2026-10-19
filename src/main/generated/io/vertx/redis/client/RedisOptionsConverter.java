@@ -72,6 +72,16 @@ public class RedisOptionsConverter {
             obj.setMaxMultiLength(((Number)member.getValue()).intValue());
           }
           break;
+        case "maxLineLength":
+          if (member.getValue() instanceof Number) {
+            obj.setMaxLineLength(((Number)member.getValue()).intValue());
+          }
+          break;
+        case "maxStringLength":
+          if (member.getValue() instanceof Number) {
+            obj.setMaxStringLength(((Number)member.getValue()).longValue());
+          }
+          break;
         case "tracingPolicy":
           if (member.getValue() instanceof String) {
             obj.setTracingPolicy(io.vertx.core.tracing.TracingPolicy.valueOf((String)member.getValue()));
@@ -195,6 +205,8 @@ public class RedisOptionsConverter {
     }
     json.put("maxNestedArrays", obj.getMaxNestedArrays());
     json.put("maxMultiLength", obj.getMaxMultiLength());
+    json.put("maxLineLength", obj.getMaxLineLength());
+    json.put("maxStringLength", obj.getMaxStringLength());
     if (obj.getTracingPolicy() != null) {
       json.put("tracingPolicy", obj.getTracingPolicy().name());
     }
