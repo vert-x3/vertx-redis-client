@@ -19,8 +19,6 @@ import io.vertx.core.Completable;
 import io.vertx.core.Future;
 import io.vertx.core.Promise;
 import io.vertx.core.Vertx;
-import io.vertx.core.internal.logging.Logger;
-import io.vertx.core.internal.logging.LoggerFactory;
 import io.vertx.core.net.NetClientOptions;
 import io.vertx.core.tracing.TracingPolicy;
 import io.vertx.redis.client.Command;
@@ -28,8 +26,6 @@ import io.vertx.redis.client.PoolOptions;
 import io.vertx.redis.client.Redis;
 import io.vertx.redis.client.RedisClusterConnectOptions;
 import io.vertx.redis.client.RedisConnection;
-import io.vertx.redis.client.RedisReplicas;
-import io.vertx.redis.client.Request;
 import io.vertx.redis.client.Response;
 import io.vertx.redis.client.impl.Primitives.IntList;
 import io.vertx.redis.client.impl.RedisClusterConnection.ResponseWithPositions;
@@ -38,17 +34,11 @@ import io.vertx.redis.client.impl.types.NumberType;
 import io.vertx.redis.client.impl.types.SimpleStringType;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Function;
 import java.util.function.Supplier;
 
 public class RedisClusterClient extends BaseRedisClient<RedisClusterConnectOptions> implements Redis {
-
-  private static final Logger LOG = LoggerFactory.getLogger(RedisClusterClient.class);
 
   @Deprecated(forRemoval = true)
   public static void addReducer(Command command, Function<List<Response>, Response> fn) {
@@ -170,57 +160,22 @@ public class RedisClusterClient extends BaseRedisClient<RedisClusterConnectOptio
   }
 
   private void connect(Slots slots, RedisClusterConnectOptions connectOptions, Completable<RedisConnection> onConnected) {
-    // create a cluster connection
-    final Map<String, Throwable> failures = new ConcurrentHashMap<>();
-    final AtomicInteger counter = new AtomicInteger();
-    final Map<String, PooledRedisConnection> connections = new HashMap<>();
-
-    for (String endpoint : slots.endpoints()) {
-      connectionManager.getConnection(endpoint, RedisReplicas.NEVER != connectOptions.getUseReplicas() ? Request.cmd(Command.READONLY) : null)
-        .onFailure(err -> {
-          // failed try with the next endpoint
-          failures.put(endpoint, err);
-          connectionComplete(counter, slots, connectOptions, connections, failures, onConnected);
-        })
-        .onSuccess(cconn -> {
-          // there can be concurrent access to the connection map
-          // since this is a one time operation we can pay the penalty of
-          // synchronizing on each write (hopefully is only a few writes)
-          synchronized (connections) {
-            connections.put(endpoint, cconn);
-          }
-          connectionComplete(counter, slots, connectOptions, connections, failures, onConnected);
-        });
-    }
+    RedisClusterConnection conn = new RedisClusterConnection(vertx, connectionManager, connectOptions, sharedSlots, slots);
+    conn.connectToAllNodes(slots)
+      .onSuccess(ignored -> onConnected.succeed(conn))
+      .onFailure(onConnected::fail);
   }
 
-  private void connectionComplete(AtomicInteger counter, Slots slots, RedisClusterConnectOptions connectOptions,
-      Map<String, PooledRedisConnection> connections, Map<String, Throwable> failures, Completable<RedisConnection> onConnected) {
-    if (counter.incrementAndGet() == slots.endpoints().length) {
-      // end condition
-      if (!failures.isEmpty()) {
-        // cleanup
-
-        // during an error we lock the map because we will change it
-        // probably this isn't an issue as no more write should happen anyway
-        synchronized (connections) {
-          for (RedisConnection value : connections.values()) {
-            if (value != null) {
-              value.close().onFailure(LOG::warn);
-            }
-          }
-        }
-        // return
-        StringBuilder message = new StringBuilder("Failed to connect to all nodes of the cluster");
-        for (Map.Entry<String, Throwable> failure : failures.entrySet()) {
-          message.append(String.format("\n- %s: %s", failure.getKey(), failure.getValue().getMessage()));
-        }
-        onConnected.fail(new RedisConnectException(message.toString()));
-      } else {
-        onConnected.succeed(new RedisClusterConnection(vertx, connectionManager,
-          connectOptions, sharedSlots, slots, connections));
-      }
-    }
+  @Override
+  Future<RedisConnection> connectOneShot() {
+    // no pooled connection is acquired here, the request acquires the ones it needs once it is routed
+    final Promise<RedisConnection> promise = vertx.promise();
+    sharedSlots.get()
+      .onSuccess(slots -> connectOptions.get()
+        .onSuccess(opts -> promise.succeed(new RedisClusterConnection(vertx, connectionManager, opts, sharedSlots, slots)))
+        .onFailure(promise::fail))
+      .onFailure(promise::fail);
+    return promise.future();
   }
 
 }

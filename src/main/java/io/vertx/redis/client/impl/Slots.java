@@ -19,10 +19,10 @@ import io.vertx.codegen.annotations.Nullable;
 import io.vertx.redis.client.Response;
 
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Random;
 import java.util.Set;
+import java.util.TreeSet;
 
 // see https://redis.io/commands/cluster-slots/
 class Slots {
@@ -54,7 +54,7 @@ class Slots {
 
     final RedisURI uri = new RedisURI(connectionString);
 
-    Set<String> uniqueEndpoints = new HashSet<>();
+    Set<String> uniqueEndpoints = new TreeSet<>();
     final List<String> masterEndpoints = new ArrayList<>();
 
     for (int i = 0; i < reply.size(); i++) {
@@ -132,6 +132,11 @@ class Slots {
     return endpoints[RANDOM.nextInt(endpoints.length)];
   }
 
+  /**
+   * Returns the endpoints of all nodes, masters and replicas, sorted. Pooled connections to all nodes
+   * are acquired in this order. Any two endpoints compare the same way in every topology snapshot,
+   * so callers that see different topologies still agree on the order.
+   */
   String[] endpoints() {
     return endpoints;
   }
