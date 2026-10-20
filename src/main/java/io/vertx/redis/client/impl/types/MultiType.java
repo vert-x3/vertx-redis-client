@@ -49,7 +49,9 @@ public final class MultiType implements Multi {
   private MultiType(int size, boolean asMap) {
     if (asMap) {
       this.multi = null;
-      this.map = new HashMap<>(size, 1.0f);
+      // redis tracks the order of entries in hashes, for some use-cases it may
+      // be important to preserve it, so we use LinkedHashMap
+      this.map = new LinkedHashMap<>(size, 1.0f);
     } else {
       this.multi = new Response[size];
       this.map = null;

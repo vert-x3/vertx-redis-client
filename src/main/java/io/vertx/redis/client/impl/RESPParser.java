@@ -65,6 +65,7 @@ public final class RESPParser implements Handler<Buffer> {
   private boolean eol = true;
   private int bytesNeeded = 0;
   private boolean verbatim = false;
+  private boolean bulkError = false;
 
   @Override
   public void handle(Buffer chunk) {
@@ -108,7 +109,6 @@ public final class RESPParser implements Handler<Buffer> {
             handleSimpleString(start, eol);
             break;
           case '-':
-          case '!':
             handleError(eol);
             break;
           case ':':
@@ -121,6 +121,9 @@ public final class RESPParser implements Handler<Buffer> {
             break;
           case '$':
             handleBulk(eol, false);
+            break;
+          case '!':
+            handleBulkError(eol);
             break;
           case '*':
           case '%':
@@ -148,7 +151,11 @@ public final class RESPParser implements Handler<Buffer> {
         // fixed length parsing: read the payload, but only emit once the trailing CRLF is found
         // this mirrors the line-based types, which locate EOL via findLineEnd()
         final Response response;
-        if (bytesNeeded == 0) {
+        if (bulkError) {
+          // bulk-string framing, error semantics
+          // payload is the (possibly multi-line) error message, decoded as UTF-8 like a bulk string
+          response = ErrorType.create(buffer.readBytes(bytesNeeded).toString());
+        } else if (bytesNeeded == 0) {
           // special case as we don't need to allocate objects for this
           response = BulkType.EMPTY;
         } else {
@@ -159,8 +166,9 @@ public final class RESPParser implements Handler<Buffer> {
         if (buffer.skipEOL()) {
           // switch back to eol parsing
           eol = true;
-          // clear the verbatim flag only once the message is complete
+          // clear the verbatim/bulkError flags only once the message is complete
           verbatim = false;
+          bulkError = false;
           handleResponse(response, false);
         } else {
           // trailer not present yet, rewind and wait for more data
@@ -293,9 +301,26 @@ public final class RESPParser implements Handler<Buffer> {
       }
       // safe cast
       bytesNeeded = (int) len;
-      // in this case we switch from eol parsing to fixed len parsing
+      // switch from eol parsing to fixed len parsing
       this.eol = false;
       this.verbatim = verbatim;
+      this.bulkError = false;
+    }
+  }
+
+  private void handleBulkError(int eol) {
+    long len = handleLength(eol);
+    if (len >= 0L) {
+      if (len > maxStringLength) {
+        handler.fail(ErrorType.create("ILLEGAL_STATE Redis Bulk Error cannot be larger than " + maxStringLength + " bytes"));
+        return;
+      }
+      // safe cast
+      bytesNeeded = (int) len;
+      // switch from eol parsing to fixed len parsing
+      this.eol = false;
+      this.verbatim = false;
+      this.bulkError = true;
     }
   }
 
