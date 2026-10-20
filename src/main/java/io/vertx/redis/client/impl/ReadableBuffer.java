@@ -128,7 +128,7 @@ final class ReadableBuffer {
           }
           break;
         case BIGINTEGER:
-          number = new BigInteger(bytes);
+          number = new BigInteger(new String(bytes, StandardCharsets.US_ASCII));
           break;
       }
       offset = end + 1;
