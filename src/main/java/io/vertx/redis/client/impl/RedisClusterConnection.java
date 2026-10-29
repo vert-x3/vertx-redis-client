@@ -98,9 +98,9 @@ public class RedisClusterConnection implements RedisConnection {
   private String boundToEndpoint = null;
 
   /**
-   * Creates a cluster connection that doesn't hold any pooled connection yet. Unless {@link #connectToAllNodes(Slots)}
-   * is called, it acquires a pooled connection to a node only when a request is sent there, and releases it before
-   * acquiring another one, so it must only be used for a single connection-less request.
+   * Creates a cluster connection that doesn't hold any connection yet. Unless {@link #connectToAllNodes(Slots)}
+   * is called, it acquires a connection to a node only when a request is sent there, and releases it before
+   * acquiring another one. Therefore, such connection may only be used for a one-shot request.
    */
   RedisClusterConnection(Vertx vertx, RedisConnectionManager connectionManager, RedisClusterConnectOptions connectOptions,
       SharedSlots sharedSlots, Slots lastSlots) {
@@ -112,9 +112,13 @@ public class RedisClusterConnection implements RedisConnection {
   }
 
   /**
-   * Acquires a pooled connection to every node, one at a time, in the order of {@link Slots#endpoints()}.
-   * Cluster connections that acquire their pooled connections this way can't wait for each other's
-   * pooled connections in a cycle. On failure, releases the pooled connections acquired so far.
+   * Acquires a connection to each node, one at a time, in the order of {@link Slots#endpoints()}.
+   * If all pieces of code acquire connections in the same order, they cannot deadlock.
+   * On failure, the connections acquired so far are released.
+   * <p>
+   * <strong>This method may only be called when no connection is held yet!</strong> That is, either
+   * immediately after constructing an instance, or on a one-shot connection early in request processing
+   * when no connection has been acquired yet.
    */
   Future<Void> connectToAllNodes(Slots slots) {
     Promise<Void> promise = vertx.promise();
@@ -123,11 +127,12 @@ public class RedisClusterConnection implements RedisConnection {
   }
 
   private void connectToAllNodes(String[] endpoints, int index, Completable<Void> onConnected) {
-    // a pooled connection is often available immediately, so this loops instead of recursing,
-    // which keeps the stack depth independent of the number of nodes
+    // connections may be available immediately, in which case we acquire them in a loop
+    // instead of recursing, keeping the stack depth independent of the number of nodes
     for (int i = index; i < endpoints.length; i++) {
       String endpoint = endpoints[i];
-      Future<PooledRedisConnection> future = connectionManager.getConnection(endpoint, RedisReplicas.NEVER != connectOptions.getUseReplicas() ? Request.cmd(Command.READONLY) : null);
+      Future<PooledRedisConnection> future = connectionManager.getConnection(endpoint,
+        RedisReplicas.NEVER != connectOptions.getUseReplicas() ? Request.cmd(Command.READONLY) : null);
       if (!future.isComplete()) {
         int next = i + 1;
         future.onComplete(ignored -> {
@@ -161,9 +166,8 @@ public class RedisClusterConnection implements RedisConnection {
   }
 
   /**
-   * Acquires a pooled connection to given {@code endpoint} for a connection-less request, after releasing
-   * the one it holds, if any. The request therefore never waits for a pooled connection while holding
-   * another one.
+   * Releases the currently held connection, if any, and acquires a connection to given {@code endpoint}
+   * for a one-shot request. The request never waits for a connection while holding another one.
    */
   private void connectTo(String endpoint, Completable<Void> onConnected) {
     releaseAll();
@@ -318,8 +322,8 @@ public class RedisClusterConnection implements RedisConnection {
         // can run anywhere
         if (REDUCERS.containsKey(cmd)) {
           if (!connectedToAllNodes) {
-            // the parts of a connection-less request run on multiple nodes at the same time, so it first
-            // acquires pooled connections to all nodes, in order, like `RedisClusterClient.connect()` does
+            // the parts of a one-shot request run on multiple nodes
+            // first acquire connections to all nodes, in order
             return connectToAllNodes(slots).compose(ignored -> send(request, slots));
           }
 

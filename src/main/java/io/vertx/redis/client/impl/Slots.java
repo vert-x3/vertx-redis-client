@@ -133,9 +133,9 @@ class Slots {
   }
 
   /**
-   * Returns the endpoints of all nodes, masters and replicas, sorted. Pooled connections to all nodes
-   * are acquired in this order. Any two endpoints compare the same way in every topology snapshot,
-   * so callers that see different topologies still agree on the order.
+   * Returns the endpoints of all nodes, masters and replicas, sorted deterministically.
+   * Any two endpoints compare the same way in every topology snapshot, so callers that
+   * see different topologies still agree on the order.
    */
   String[] endpoints() {
     return endpoints;

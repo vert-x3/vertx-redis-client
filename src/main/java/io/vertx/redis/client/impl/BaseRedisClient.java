@@ -44,8 +44,12 @@ public abstract class BaseRedisClient<OPTS extends RedisConnectOptions> implemen
   }
 
   /**
-   * Returns a connection for a single connection-less {@link #send(Request)} or {@link #batch(List)},
-   * which closes it afterwards. By default, this is {@link #connect()}.
+   * Returns a connection for a single {@link #send(Request)} or {@link #batch(List)},
+   * which is closed afterwards. By default, this is {@link #connect()}.
+   * <p>
+   * The clustered client overrides this to prevent obtaining connections to all cluster
+   * members when we know exactly one is needed. (Technically, it may in fact be more
+   * than one in case the cluster topology changes midflight.)
    */
   Future<RedisConnection> connectOneShot() {
     return connect();

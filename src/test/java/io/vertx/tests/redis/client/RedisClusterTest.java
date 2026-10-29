@@ -75,10 +75,10 @@ import static io.vertx.redis.client.Command.SET;
 import static io.vertx.redis.client.Command.TTL;
 import static io.vertx.redis.client.Command.WAIT;
 import static io.vertx.redis.client.Request.cmd;
-import static io.vertx.tests.redis.client.TestUtils.executeWhenConditionSatisfied;
 import static io.vertx.tests.redis.client.TestUtils.poolWaiters;
 import static io.vertx.tests.redis.client.TestUtils.randomKey;
 import static io.vertx.tests.redis.client.TestUtils.retryUntilSuccess;
+import static io.vertx.tests.redis.client.TestUtils.whenConditionSatisfied;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNull;
@@ -1158,12 +1158,12 @@ public class RedisClusterTest {
   }
 
   @Test
-  public void testPoolNotDeadlockedByConcurrentConnectionLessCommands(VertxTestContext test) {
-    // Reproduces a deadlock between connection-less commands sent from blocking threads,
-    // whose requests for pooled connections interleave. With single-connection pools,
-    // a command that holds a pooled connection to one node while waiting for another
-    // node may wait for a command that waits for it; no command completes after that
-    // and `await()` times out, usually within the first few rounds.
+  public void testPoolNotDeadlockedByConcurrentOneShotCommands(VertxTestContext test) {
+    // Reproduces a deadlock between one-shot commands sent from blocking threads whose requests
+    // for connections interleave. With pools of max 1 connection, it may easily happen that
+    // command X holds a connection to A and waits for a connection to B, while command Y holds
+    // a connection to B and waits for a connection to A. In this case, no command completes
+    // and the barrier await times out.
     int callers = 32;
     int rounds = 50;
 
@@ -1198,17 +1198,18 @@ public class RedisClusterTest {
 
   @Test
   public void testConnectionsToMultipleNodesAcquiredInOrder(VertxTestContext test) {
-    // Reproduces a deadlock between callers that hold pooled connections to some nodes
-    // while waiting for pooled connections to other nodes. Steps:
-    // 1. read CLUSTER SLOTS to find the endpoints of all nodes, as used by the client
-    //    (they must be equal to share the pools), and pick two of them, A < B
+    // Reproduces a deadlock between callers that hold connections to some nodes
+    // while waiting for connections to other nodes. Steps:
+    // 1. read CLUSTER SLOTS to find the endpoints of all nodes, and pick two of them,
+    //    such that A < B
     // 2. acquire the only pooled connection to A (maxPoolSize=1)
-    // 3. connect() and send a command split across nodes -- both need pooled connections
-    //    to all nodes, including A
-    // 4. wait until a caller from step 3 is queued for the pooled connection to A
-    // 5. acquire the only pooled connection to B, like a caller that holds A and acquires
-    //    pooled connections in order would
-    // If a caller from step 3 held B while waiting for A, this would deadlock
+    // 3. send the MGET command, which has to connect to all nodes, including A;
+    //    it cannot proceed, because no connection to A is available, so it has to wait
+    // 4. wait until the number of waiters for connection to A in the pool is > 0
+    // 5. acquire the only pooled connection to B; this has to succeed, because
+    //    no one acquired a connection to B yet
+    // If the caller from step 3 did hold a connection to B while waiting for a connection
+    // to A, step 5 would deadlock.
     Redis clusterClient = Redis.createClient(context.vertx(), new RedisOptions()
       .setType(RedisClientType.CLUSTER)
       .setUseReplicas(RedisReplicas.NEVER)
@@ -1220,20 +1221,19 @@ public class RedisClusterTest {
     clusterClient.send(cmd(CLUSTER).arg("SLOTS"))
       .compose(slots -> {
         List<String> endpoints = endpoints(slots);
-        String endpointA = endpoints.get(endpoints.size() / 2);
+        String endpointA = endpoints.get(0);
         String endpointB = endpoints.get(endpoints.size() - 1);
         return connectionManager.getConnection(endpointA, null).compose(connA -> {
-          Future<Void> connect = clusterClient.connect().compose(RedisConnection::close);
           Future<Response> mget = clusterClient.send(cmd(MGET).arg("{a}" + randomKey()).arg("{b}" + randomKey()));
-          Promise<PooledRedisConnection> pooledB = Promise.promise();
-          executeWhenConditionSatisfied(context.vertx(), () -> poolWaiters(connectionManager, endpointA) > 0, () -> {
-            connectionManager.getConnection(endpointB, null).onComplete(pooledB);
-          });
-          return pooledB.future().compose(connB -> {
-            connA.close();
-            connB.close();
-            return Future.all(connect, mget).map(ignored -> mget.result());
-          });
+          return whenConditionSatisfied(context.vertx(), () -> poolWaiters(connectionManager, endpointA) > 0)
+            .compose(ignored -> {
+              return connectionManager.getConnection(endpointB, null);
+            })
+            .compose(connB -> {
+              return connA.close()
+                .compose(ignored -> connB.close())
+                .compose(ignored -> mget);
+            });
         });
       })
       .onComplete(test.succeeding(mget -> {
@@ -1243,13 +1243,13 @@ public class RedisClusterTest {
   }
 
   @Test
-  public void testConnectionLessRequestAcquiresConnectionToTargetNodeOnly(VertxTestContext test) {
-    // A connection-less request that is sent to a single node only needs a pooled connection
-    // to that node, so it never holds a pooled connection while waiting for another one. Steps:
-    // 1. read CLUSTER SLOTS to find the endpoints of all nodes, as used by the client
-    //    (they must be equal to share the pools), and the master that serves the key
-    // 2. acquire the only pooled connection to every other node (maxPoolSize=1)
-    // 3. send() and batch() requests for the key -- they must not wait for other nodes
+  public void testOneShotCommandAcquiresConnectionToTargetNodeOnly(VertxTestContext test) {
+    // A one-shot command that is sent to a single node only needs a connection to that node,
+    // so it may not ask for connections to other nodes. Steps:
+    // 1. read `CLUSTER SLOTS` to find the endpoints of all nodes and the master node for the key
+    // 2. acquire the only connection to every node that isn't a master for the key (maxPoolSize=1)
+    // 3. send some commands for the key, using both `send()` and `batch()`
+    // If the caller from step 3 did ask for connections held by step 2, step 3 would deadlock.
     final String key = randomKey();
 
     Redis clusterClient = Redis.createClient(context.vertx(), new RedisOptions()
@@ -1269,10 +1269,11 @@ public class RedisClusterTest {
             others.add(connectionManager.getConnection(endpoint, null));
           }
         }
-        return Future.all(others).compose(ignored ->
-          clusterClient.send(cmd(SET).arg(key).arg("value"))
+        return Future.all(others).compose(ignored -> {
+          return clusterClient.send(cmd(SET).arg(key).arg("value"))
             .compose(ignored2 -> clusterClient.batch(Arrays.asList(cmd(GET).arg(key), cmd(DEL).arg(key))))
-            .andThen(ignored2 -> others.forEach(conn -> conn.result().close())));
+            .andThen(ignored2 -> others.forEach(conn -> conn.result().close()));
+        });
       })
       .onComplete(test.succeeding(batch -> {
         test.verify(() -> {
@@ -1283,7 +1284,7 @@ public class RedisClusterTest {
       }));
   }
 
-  // all distinct endpoints in `CLUSTER SLOTS`, sorted, in the same format the client uses
+  // all distinct endpoints in `CLUSTER SLOTS` response, sorted
   private static List<String> endpoints(Response slots) {
     Set<String> result = new TreeSet<>();
     for (Response range : slots) {
@@ -1294,6 +1295,7 @@ public class RedisClusterTest {
     return new ArrayList<>(result);
   }
 
+  // master endpoint of given `slot`, as indicated by `CLUSTER SLOTS` response
   private static String masterEndpoint(Response slots, int slot) {
     for (Response range : slots) {
       if (slot >= range.get(0).toInteger() && slot <= range.get(1).toInteger()) {

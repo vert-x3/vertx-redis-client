@@ -168,11 +168,12 @@ public class RedisClusterClient extends BaseRedisClient<RedisClusterConnectOptio
 
   @Override
   Future<RedisConnection> connectOneShot() {
-    // no pooled connection is acquired here, the request acquires the ones it needs once it is routed
+    // no connection is acquired here, it is acquired lazily based on the request's slot
     final Promise<RedisConnection> promise = vertx.promise();
     sharedSlots.get()
       .onSuccess(slots -> connectOptions.get()
-        .onSuccess(opts -> promise.succeed(new RedisClusterConnection(vertx, connectionManager, opts, sharedSlots, slots)))
+        .onSuccess(opts -> promise.succeed(
+          new RedisClusterConnection(vertx, connectionManager, opts, sharedSlots, slots)))
         .onFailure(promise::fail))
       .onFailure(promise::fail);
     return promise.future();

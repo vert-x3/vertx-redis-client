@@ -1,7 +1,6 @@
 package io.vertx.tests.redis.client;
 
 import io.vertx.core.Future;
-import io.vertx.core.Promise;
 import io.vertx.core.net.SocketAddress;
 import io.vertx.junit5.RunTestOnContext;
 import io.vertx.junit5.VertxExtension;
@@ -27,9 +26,9 @@ import org.junit.jupiter.api.extension.RegisterExtension;
 import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
 
-import static io.vertx.tests.redis.client.TestUtils.executeWhenConditionSatisfied;
 import static io.vertx.tests.redis.client.TestUtils.poolWaiters;
 import static io.vertx.tests.redis.client.TestUtils.randomKey;
+import static io.vertx.tests.redis.client.TestUtils.whenConditionSatisfied;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 @ExtendWith(VertxExtension.class)
@@ -122,18 +121,18 @@ public class RedisClusterMovedTest {
   }
 
   @Test
-  public void testConnectionLess(VertxTestContext test) {
+  public void testSingleConnection(VertxTestContext test) {
     // all keys with the `{a}` hash tag hash to this slot
     int slot = ZModem.generate("a");
     String key = "{a}" + randomKey();
 
     // the topology cache must not be refreshed before the request is MOVED
-    Redis connectionLessClient = Redis.createClient(context.vertx(), new RedisOptions(options)
+    Redis singleConnectionClient = Redis.createClient(context.vertx(), new RedisOptions(options)
       .setMaxPoolSize(1)
       .setTopologyCacheTTL(60_000));
-    RedisConnectionManager connectionManager = ((RedisClusterClient) connectionLessClient).connectionManager();
+    RedisConnectionManager singleConnectionManager = ((RedisClusterClient) singleConnectionClient).connectionManager();
 
-    connectionLessClient.send(Request.cmd(Command.SET).arg(key).arg("fubar")).compose(ignored -> {
+    singleConnectionClient.send(Request.cmd(Command.SET).arg(key).arg("fubar")).compose(ignored -> {
       return cluster.connectToMasterThatServesSlot(slot).compose(masterResult -> {
         Redis master = masterResult.redis;
         RedisConnection masterConn = masterResult.conn;
@@ -162,27 +161,27 @@ public class RedisClusterMovedTest {
               // 2. send a GET, which goes to the old master and is MOVED to the new master
               // 3. wait until the GET is queued for the pooled connection to the new master
               // 4. acquire the only pooled connection to the old master
-              // If the GET still held the old master's connection in step 4, this would deadlock
+              // If the GET still holds the connection to the old master in step 4, this would deadlock.
               String oldMaster = endpoint(masterConn);
               String newMaster = endpoint(otherMasterConn);
-              return connectionManager.getConnection(newMaster, null).compose(newMasterPooled -> {
-                Future<Response> get = connectionLessClient.send(Request.cmd(Command.GET).arg(key));
-                Promise<PooledRedisConnection> oldMasterPooled = Promise.promise();
-                executeWhenConditionSatisfied(context.vertx(), () -> poolWaiters(connectionManager, newMaster) == 1, () -> {
-                  connectionManager.getConnection(oldMaster, null).onComplete(oldMasterPooled);
-                });
-                return oldMasterPooled.future().compose(oldMasterPooledConn -> {
-                  newMasterPooled.close();
-                  oldMasterPooledConn.close();
-                  return get;
-                });
+              return singleConnectionManager.getConnection(newMaster, null).compose(singleNewMasterConn -> {
+                Future<Response> get = singleConnectionClient.send(Request.cmd(Command.GET).arg(key));
+                return whenConditionSatisfied(context.vertx(), () -> poolWaiters(singleConnectionManager, newMaster) > 0)
+                  .compose(ignored3 -> {
+                    return singleConnectionManager.getConnection(oldMaster, null);
+                  })
+                  .compose(singleOldMasterConn -> {
+                    return singleNewMasterConn.close()
+                      .compose(ignored3 -> singleOldMasterConn.close())
+                      .compose(ignored3 -> get);
+                  });
               });
             })
             .compose(result -> {
               assertEquals("fubar", result.toString());
               master.close();
               otherMaster.close();
-              return connectionLessClient.close();
+              return singleConnectionClient.close();
             });
         });
       });
