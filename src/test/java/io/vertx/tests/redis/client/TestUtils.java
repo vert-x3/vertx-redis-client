@@ -5,9 +5,15 @@ import io.vertx.core.Future;
 import io.vertx.core.Handler;
 import io.vertx.core.Promise;
 import io.vertx.core.Vertx;
+import io.vertx.core.internal.resource.ResourceManager;
+import io.vertx.redis.client.Request;
+import io.vertx.redis.client.impl.RedisConnectionManager;
 
+import java.lang.reflect.Constructor;
+import java.lang.reflect.Field;
 import java.util.UUID;
 import java.util.function.BooleanSupplier;
+import java.util.function.Function;
 import java.util.function.Supplier;
 
 public class TestUtils {
@@ -38,6 +44,17 @@ public class TestUtils {
   }
 
   /**
+   * Returns a future that completes successfully when the given {@code condition} becomes {@code true}.
+   * This is essentially another API for
+   * {@link #executeWhenConditionSatisfied(Vertx, BooleanSupplier, Runnable) executeWhenConditionSatisfied()}.
+   */
+  public static Future<Void> whenConditionSatisfied(Vertx vertx, BooleanSupplier condition) {
+    Promise<Void> promise = Promise.promise();
+    executeWhenConditionSatisfied(vertx, condition, promise::succeed);
+    return promise.future();
+  }
+
+  /**
    * Retries the given {@code action} until it succeeds or until the number of retries reaches the given maximum.
    * The delay between retries is 500 millis.
    */
@@ -61,5 +78,24 @@ public class TestUtils {
         }
       }
     });
+  }
+
+  /**
+   * Returns the number of requests that wait in the queue of the connection pool to the given {@code endpoint},
+   * without a setup command.
+   */
+  @SuppressWarnings("unchecked")
+  public static int poolWaiters(RedisConnectionManager connectionManager, String endpoint) {
+    try {
+      Field field = RedisConnectionManager.class.getDeclaredField("pooledConnectionManager");
+      field.setAccessible(true);
+      ResourceManager<RedisConnectionManager.ConnectionKey, RedisConnectionManager.RedisEndpoint> endpoints = (ResourceManager<RedisConnectionManager.ConnectionKey, RedisConnectionManager.RedisEndpoint>) field.get(connectionManager);
+      Constructor<RedisConnectionManager.ConnectionKey> key = RedisConnectionManager.ConnectionKey.class.getDeclaredConstructor(String.class, Request.class);
+      key.setAccessible(true);
+      return endpoints.withResource(key.newInstance(endpoint, null), connectionManager, Function.identity(),
+        (resource, created) -> resource.pool().waiters());
+    } catch (ReflectiveOperationException e) {
+      throw new RuntimeException(e);
+    }
   }
 }
