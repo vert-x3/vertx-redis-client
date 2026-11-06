@@ -13,7 +13,6 @@ import io.vertx.redis.client.Command;
 import io.vertx.redis.client.Redis;
 import io.vertx.redis.client.RedisOptions;
 import io.vertx.redis.client.Request;
-import io.vertx.test.fakemetrics.FakePoolMetrics;
 import io.vertx.tests.redis.containers.RedisStandalone;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -23,6 +22,8 @@ import org.testcontainers.junit.jupiter.Testcontainers;
 
 import java.util.Collections;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicReference;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -31,6 +32,72 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 @ExtendWith(VertxExtension.class)
 @Testcontainers
 public class RedisPoolMetricsTest {
+
+  static class FakePoolMetrics implements PoolMetrics<Object, Object> {
+    private final static Map<String, FakePoolMetrics> METRICS = new ConcurrentHashMap<>();
+
+    public static Map<String, FakePoolMetrics> getMetricsMap() {
+      return METRICS;
+    }
+
+    public static FakePoolMetrics getMetrics(String name) {
+      return METRICS.get(name);
+    }
+
+    private static final Object TASK_SUBMITTED = new Object();
+    private static final Object TASK_BEGIN = new Object();
+
+    private final String name;
+    private final int maxSize;
+    private final AtomicInteger pending = new AtomicInteger();
+    private final AtomicInteger inUse = new AtomicInteger();
+
+    public FakePoolMetrics(String name, int maxSize) {
+      this.name = name;
+      this.maxSize = maxSize;
+      METRICS.put(name, this);
+    }
+
+    @Override
+    public synchronized Object enqueue() {
+      pending.incrementAndGet();
+      return TASK_SUBMITTED;
+    }
+
+    @Override
+    public void dequeue(Object queueMetric) {
+      assert queueMetric == TASK_SUBMITTED;
+      pending.decrementAndGet();
+    }
+
+    @Override
+    public Object begin() {
+      inUse.incrementAndGet();
+      return TASK_BEGIN;
+    }
+
+    public void end(Object t) {
+      assert t == TASK_BEGIN;
+      inUse.decrementAndGet();
+    }
+
+    public int maxSize() {
+      return maxSize;
+    }
+
+    public int pending() {
+      return pending.get();
+    }
+
+    public int inUse() {
+      return inUse.get();
+    }
+
+    @Override
+    public void close() {
+      METRICS.remove(name);
+    }
+  }
 
   private static final AtomicReference<String> POOL_NAME = new AtomicReference<>();
 
@@ -116,7 +183,7 @@ public class RedisPoolMetricsTest {
 
   @Test
   public void testLifecycle(VertxTestContext test) {
-    Map<String, FakePoolMetrics> metricsMap = FakePoolMetrics.getMetrics();
+    Map<String, FakePoolMetrics> metricsMap = FakePoolMetrics.getMetricsMap();
     assertEquals(Collections.emptySet(), metricsMap.keySet());
     Redis client = Redis.createClient(context.vertx(), new RedisOptions().setConnectionString(redis.getRedisUri()));
     assertEquals(1, metricsMap.size());
