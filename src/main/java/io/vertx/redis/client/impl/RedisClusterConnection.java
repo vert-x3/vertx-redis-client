@@ -89,21 +89,105 @@ public class RedisClusterConnection implements RedisConnection {
   private final RedisClusterConnectOptions connectOptions;
   final SharedSlots sharedSlots;
   private Slots lastSlots;
-  private final Map<String, PooledRedisConnection> connections;
+  private final Map<String, PooledRedisConnection> connections = new HashMap<>();
+  private boolean connectedToAllNodes = false;
 
   // these fields are only used in `send()` and are ignored in `batch()`, because request batches
   // are always sent to a single node and so no extra support is necessary
   private boolean deferredMulti = false;
   private String boundToEndpoint = null;
 
+  /**
+   * Creates a cluster connection that doesn't hold any connection yet. Unless {@link #connectToAllNodes(Slots)}
+   * is called, it acquires a connection to a node only when a request is sent there, and releases it before
+   * acquiring another one. Therefore, such connection may only be used for a one-shot request.
+   */
   RedisClusterConnection(Vertx vertx, RedisConnectionManager connectionManager, RedisClusterConnectOptions connectOptions,
-      SharedSlots sharedSlots, Slots lastSlots, Map<String, PooledRedisConnection> connections) {
+      SharedSlots sharedSlots, Slots lastSlots) {
     this.vertx = (VertxInternal) vertx;
     this.connectionManager = connectionManager;
     this.connectOptions = connectOptions;
     this.sharedSlots = sharedSlots;
     this.lastSlots = lastSlots;
-    this.connections = connections;
+  }
+
+  /**
+   * Acquires a connection to each node, one at a time, in the order of {@link Slots#endpoints()}.
+   * If all pieces of code acquire connections in the same order, they cannot deadlock.
+   * On failure, the connections acquired so far are released.
+   * <p>
+   * <strong>This method may only be called when no connection is held yet!</strong> That is, either
+   * immediately after constructing an instance, or on a one-shot connection early in request processing
+   * when no connection has been acquired yet.
+   */
+  Future<Void> connectToAllNodes(Slots slots) {
+    Promise<Void> promise = vertx.promise();
+    connectToAllNodes(slots.endpoints(), 0, promise);
+    return promise.future();
+  }
+
+  private void connectToAllNodes(String[] endpoints, int index, Completable<Void> onConnected) {
+    // connections may be available immediately, in which case we acquire them in a loop
+    // instead of recursing, keeping the stack depth independent of the number of nodes
+    for (int i = index; i < endpoints.length; i++) {
+      String endpoint = endpoints[i];
+      Future<PooledRedisConnection> future = connectionManager.getConnection(endpoint,
+        RedisReplicas.NEVER != connectOptions.getUseReplicas() ? Request.cmd(Command.READONLY) : null);
+      if (!future.isComplete()) {
+        int next = i + 1;
+        future.onComplete(ignored -> {
+          if (addConnection(endpoint, future, onConnected)) {
+            connectToAllNodes(endpoints, next, onConnected);
+          }
+        });
+        return;
+      }
+      if (!addConnection(endpoint, future, onConnected)) {
+        return;
+      }
+    }
+
+    connectedToAllNodes = true;
+    onConnected.succeed();
+  }
+
+  // on failure, releases the pooled connections acquired so far and fails `onConnected`
+  private boolean addConnection(String endpoint, Future<PooledRedisConnection> future, Completable<Void> onConnected) {
+    if (future.failed()) {
+      releaseAll();
+      onConnected.fail(new RedisConnectException("Failed to connect to all nodes of the cluster\n- " + endpoint + ": " + future.cause().getMessage()));
+      return false;
+    }
+
+    synchronized (connections) {
+      connections.put(endpoint, future.result());
+    }
+    return true;
+  }
+
+  /**
+   * Releases the currently held connection, if any, and acquires a connection to given {@code endpoint}
+   * for a one-shot request. The request never waits for a connection while holding another one.
+   */
+  private void connectTo(String endpoint, Completable<Void> onConnected) {
+    releaseAll();
+    connectionManager.getConnection(endpoint, RedisReplicas.NEVER != connectOptions.getUseReplicas() ? Request.cmd(Command.READONLY) : null)
+      .onFailure(onConnected::fail)
+      .onSuccess(conn -> {
+        synchronized (connections) {
+          connections.put(endpoint, conn);
+        }
+        onConnected.succeed();
+      });
+  }
+
+  private void releaseAll() {
+    synchronized (connections) {
+      for (RedisConnection conn : connections.values()) {
+        conn.close().onFailure(LOG::warn);
+      }
+      connections.clear();
+    }
   }
 
   @Override
@@ -237,6 +321,12 @@ public class RedisClusterConnection implements RedisConnection {
       case 0:
         // can run anywhere
         if (REDUCERS.containsKey(cmd)) {
+          if (!connectedToAllNodes) {
+            // the parts of a one-shot request run on multiple nodes
+            // first acquire connections to all nodes, in order
+            return connectToAllNodes(slots).compose(ignored -> send(request, slots));
+          }
+
           final List<Future<Response>> responses = new ArrayList<>(slots.size());
 
           for (int i = 0; i < slots.size(); i++) {
@@ -288,6 +378,10 @@ public class RedisClusterConnection implements RedisConnection {
             // we can't continue as we don't know how to split this command
             promise.fail(buildCrossslotFailureMsg(req));
             return promise.future();
+          }
+
+          if (!connectedToAllNodes) {
+            return connectToAllNodes(slots).compose(ignored -> send(request, slots));
           }
 
           final List<Future<Response>> responses = new ArrayList<>(groupedRequests.size());
@@ -400,6 +494,17 @@ public class RedisClusterConnection implements RedisConnection {
 
     PooledRedisConnection connection = connections.get(endpoint);
     if (connection == null) {
+      if (!connectedToAllNodes) {
+        connectTo(endpoint, (ignored, err) -> {
+          if (err == null) {
+            send(endpoint, retries, command, handler);
+          } else {
+            handler.fail(err);
+          }
+        });
+        return;
+      }
+
       connectionManager.getConnection(endpoint, RedisReplicas.NEVER != connectOptions.getUseReplicas() ? Request.cmd(Command.READONLY) : null)
         .onSuccess(conn -> {
           synchronized (connections) {
@@ -588,6 +693,17 @@ public class RedisClusterConnection implements RedisConnection {
   private void batch(String endpoint, int retries, List<Request> commands, Completable<List<Response>> handler) {
     RedisConnection connection = connections.get(endpoint);
     if (connection == null) {
+      if (!connectedToAllNodes) {
+        connectTo(endpoint, (ignored, err) -> {
+          if (err == null) {
+            batch(endpoint, retries, commands, handler);
+          } else {
+            handler.fail(err);
+          }
+        });
+        return;
+      }
+
       connectionManager.getConnection(endpoint, RedisReplicas.NEVER != connectOptions.getUseReplicas() ? Request.cmd(Command.READONLY) : null)
         .onSuccess(conn -> {
           synchronized (connections) {

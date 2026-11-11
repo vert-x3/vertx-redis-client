@@ -11,6 +11,7 @@ import io.vertx.core.tracing.TracingPolicy;
 import io.vertx.redis.client.PoolOptions;
 import io.vertx.redis.client.Redis;
 import io.vertx.redis.client.RedisConnectOptions;
+import io.vertx.redis.client.RedisConnection;
 import io.vertx.redis.client.Request;
 import io.vertx.redis.client.Response;
 
@@ -42,6 +43,18 @@ public abstract class BaseRedisClient<OPTS extends RedisConnectOptions> implemen
     return this.connectionManager.close();
   }
 
+  /**
+   * Returns a connection for a single {@link #send(Request)} or {@link #batch(List)},
+   * which is closed afterwards. By default, this is {@link #connect()}.
+   * <p>
+   * The clustered client overrides this to prevent obtaining connections to all cluster
+   * members when we know exactly one is needed. (Technically, it may in fact be more
+   * than one in case the cluster topology changes midflight.)
+   */
+  Future<RedisConnection> connectOneShot() {
+    return connect();
+  }
+
   @Override
   public Future<@Nullable Response> send(Request request) {
     final CommandImpl cmd = (CommandImpl) request.command();
@@ -52,7 +65,7 @@ public abstract class BaseRedisClient<OPTS extends RedisConnectOptions> implemen
       return vertx.getOrCreateContext().failedFuture("Transactional command in connection-less mode not allowed");
     }
 
-    return connect()
+    return connectOneShot()
       .compose(conn ->
         conn.send(request)
           // regardless of the result, return the connection to the pool
@@ -78,7 +91,7 @@ public abstract class BaseRedisClient<OPTS extends RedisConnectOptions> implemen
         // executed on a single connection and can therefore contain the whole transaction
       }
 
-      return connect()
+      return connectOneShot()
         .compose(conn ->
           conn.batch(requests)
             // regardless of the result, return the connection to the pool
